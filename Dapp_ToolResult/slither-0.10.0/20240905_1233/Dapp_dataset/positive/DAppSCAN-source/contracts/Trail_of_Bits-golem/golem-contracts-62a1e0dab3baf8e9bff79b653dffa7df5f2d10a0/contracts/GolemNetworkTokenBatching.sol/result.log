@@ -1,0 +1,111 @@
+'solc --version' running
+'solc /sb/GolemNetworkTokenBatching.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/GolemNetworkTokenBatching.sol:
+/sb/GolemNetworkTokenBatching.sol:234:5: Warning: Defining constructors as functions with the same name as the contract is deprecated. Use "constructor(...) { ... }" instead.
+    function Gate(ERC20Basic _token, address _proxy) public {
+    ^ (Relevant source part starts here and spans across multiple lines).
+/sb/GolemNetworkTokenBatching.sol:281:5: Warning: Defining constructors as functions with the same name as the contract is deprecated. Use "constructor(...) { ... }" instead.
+    function TokenProxy(ERC20Basic _token) public {
+    ^ (Relevant source part starts here and spans across multiple lines).
+/sb/GolemNetworkTokenBatching.sol:362:5: Warning: Defining constructors as functions with the same name as the contract is deprecated. Use "constructor(...) { ... }" instead.
+    function GolemNetworkTokenBatching(ERC20Basic _gntToken) TokenProxy(_gntToken) public {
+    ^ (Relevant source part starts here and spans across multiple lines).
+/sb/GolemNetworkTokenBatching.sol:99:5: Warning: Invoking events without "emit" prefix is deprecated.
+    Transfer(msg.sender, _to, _value);
+    ^-------------------------------^
+/sb/GolemNetworkTokenBatching.sol:152:5: Warning: Invoking events without "emit" prefix is deprecated.
+    Transfer(_from, _to, _value);
+    ^--------------------------^
+/sb/GolemNetworkTokenBatching.sol:168:5: Warning: Invoking events without "emit" prefix is deprecated.
+    Approval(msg.sender, _spender, _value);
+    ^------------------------------------^
+/sb/GolemNetworkTokenBatching.sol:194:5: Warning: Invoking events without "emit" prefix is deprecated.
+    Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
+    ^-----------------------------------------------------------^
+/sb/GolemNetworkTokenBatching.sol:215:5: Warning: Invoking events without "emit" prefix is deprecated.
+    Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
+    ^-----------------------------------------------------------^
+/sb/GolemNetworkTokenBatching.sol:302:9: Warning: Invoking events without "emit" prefix is deprecated.
+        GateOpened(gate, user);
+        ^--------------------^
+/sb/GolemNetworkTokenBatching.sol:322:9: Warning: Invoking events without "emit" prefix is deprecated.
+        Minted(user, value);
+        ^-----------------^
+/sb/GolemNetworkTokenBatching.sol:339:9: Warning: Invoking events without "emit" prefix is deprecated.
+        Burned(user, _value);
+        ^------------------^
+/sb/GolemNetworkTokenBatching.sol:380:13: Warning: Invoking events without "emit" prefix is deprecated.
+            BatchTransfer(msg.sender, addr, v, closureTime);
+            ^---------------------------------------------^
+
+
+TokenProxy.withdrawTo(uint256,address) (../../sb/GolemNetworkTokenBatching.sol#329-340) ignores return value by TOKEN.transfer(_destination,_value) (../../sb/GolemNetworkTokenBatching.sol#337)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+Gate.Gate(ERC20Basic,address)._proxy (../../sb/GolemNetworkTokenBatching.sol#234) lacks a zero-check on :
+		- PROXY = _proxy (../../sb/GolemNetworkTokenBatching.sol#236)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in TokenProxy.transferFromGate() (../../sb/GolemNetworkTokenBatching.sol#305-323):
+	External calls:
+	- value = TOKEN.balanceOf(gate) (../../sb/GolemNetworkTokenBatching.sol#313)
+	- Gate(gate).transferToProxy(value) (../../sb/GolemNetworkTokenBatching.sol#315)
+	State variables written after the call(s):
+	- balances[user] += value (../../sb/GolemNetworkTokenBatching.sol#320)
+	- totalSupply_ += value (../../sb/GolemNetworkTokenBatching.sol#319)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in TokenProxy.transferFromGate() (../../sb/GolemNetworkTokenBatching.sol#305-323):
+	External calls:
+	- value = TOKEN.balanceOf(gate) (../../sb/GolemNetworkTokenBatching.sol#313)
+	- Gate(gate).transferToProxy(value) (../../sb/GolemNetworkTokenBatching.sol#315)
+	Event emitted after the call(s):
+	- Minted(user,value) (../../sb/GolemNetworkTokenBatching.sol#322)
+Reentrancy in TokenProxy.withdrawTo(uint256,address) (../../sb/GolemNetworkTokenBatching.sol#329-340):
+	External calls:
+	- TOKEN.transfer(_destination,_value) (../../sb/GolemNetworkTokenBatching.sol#337)
+	Event emitted after the call(s):
+	- Burned(user,_value) (../../sb/GolemNetworkTokenBatching.sol#339)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+GolemNetworkTokenBatching.batchTransfer(bytes32[],uint64) (../../sb/GolemNetworkTokenBatching.sol#365-384) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool)(block.timestamp >= closureTime) (../../sb/GolemNetworkTokenBatching.sol#366)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+SafeMath.div(uint256,uint256) (../../sb/GolemNetworkTokenBatching.sol#44-49) is never used and should be removed
+SafeMath.mul(uint256,uint256) (../../sb/GolemNetworkTokenBatching.sol#32-39) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.4.19 (../../sb/GolemNetworkTokenBatching.sol#1) allows old versions
+solc-0.4.26 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Parameter BasicToken.transfer(address,uint256)._to (../../sb/GolemNetworkTokenBatching.sol#92) is not in mixedCase
+Parameter BasicToken.transfer(address,uint256)._value (../../sb/GolemNetworkTokenBatching.sol#92) is not in mixedCase
+Parameter BasicToken.balanceOf(address)._owner (../../sb/GolemNetworkTokenBatching.sol#108) is not in mixedCase
+Parameter StandardToken.transferFrom(address,address,uint256)._from (../../sb/GolemNetworkTokenBatching.sol#144) is not in mixedCase
+Parameter StandardToken.transferFrom(address,address,uint256)._to (../../sb/GolemNetworkTokenBatching.sol#144) is not in mixedCase
+Parameter StandardToken.transferFrom(address,address,uint256)._value (../../sb/GolemNetworkTokenBatching.sol#144) is not in mixedCase
+Parameter StandardToken.approve(address,uint256)._spender (../../sb/GolemNetworkTokenBatching.sol#166) is not in mixedCase
+Parameter StandardToken.approve(address,uint256)._value (../../sb/GolemNetworkTokenBatching.sol#166) is not in mixedCase
+Parameter StandardToken.allowance(address,address)._owner (../../sb/GolemNetworkTokenBatching.sol#178) is not in mixedCase
+Parameter StandardToken.allowance(address,address)._spender (../../sb/GolemNetworkTokenBatching.sol#178) is not in mixedCase
+Parameter StandardToken.increaseApproval(address,uint256)._spender (../../sb/GolemNetworkTokenBatching.sol#192) is not in mixedCase
+Parameter StandardToken.increaseApproval(address,uint256)._addedValue (../../sb/GolemNetworkTokenBatching.sol#192) is not in mixedCase
+Parameter StandardToken.decreaseApproval(address,uint256)._spender (../../sb/GolemNetworkTokenBatching.sol#208) is not in mixedCase
+Parameter StandardToken.decreaseApproval(address,uint256)._subtractedValue (../../sb/GolemNetworkTokenBatching.sol#208) is not in mixedCase
+Parameter Gate.transferToProxy(uint256)._value (../../sb/GolemNetworkTokenBatching.sol#242) is not in mixedCase
+Variable Gate.TOKEN (../../sb/GolemNetworkTokenBatching.sol#230) is not in mixedCase
+Variable Gate.PROXY (../../sb/GolemNetworkTokenBatching.sol#231) is not in mixedCase
+Parameter TokenProxy.getGateAddress(address)._user (../../sb/GolemNetworkTokenBatching.sol#285) is not in mixedCase
+Parameter TokenProxy.withdraw(uint256)._value (../../sb/GolemNetworkTokenBatching.sol#325) is not in mixedCase
+Parameter TokenProxy.withdrawTo(uint256,address)._value (../../sb/GolemNetworkTokenBatching.sol#329) is not in mixedCase
+Parameter TokenProxy.withdrawTo(uint256,address)._destination (../../sb/GolemNetworkTokenBatching.sol#329) is not in mixedCase
+Variable TokenProxy.TOKEN (../../sb/GolemNetworkTokenBatching.sol#270) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+onTokenReceived(address,uint256,bytes) should be declared external:
+	- ReceivingContract.onTokenReceived(address,uint256,bytes) (../../sb/GolemNetworkTokenBatching.sol#8)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#public-function-that-could-be-declared-external
+/sb/GolemNetworkTokenBatching.sol analyzed (9 contracts with 93 detectors), 33 result(s) found

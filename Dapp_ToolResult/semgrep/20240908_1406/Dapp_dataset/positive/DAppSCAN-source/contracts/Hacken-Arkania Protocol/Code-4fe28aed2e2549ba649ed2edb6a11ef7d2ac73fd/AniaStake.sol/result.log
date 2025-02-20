@@ -1,0 +1,194 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 43 Code Findings │
+└──────────────────┘
+                      
+    /sb/AniaStake.sol 
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+          382┆ _totalSupply += amount;
+            ⋮┆----------------------------------------
+          604┆ totalStaked += newStake;
+            ⋮┆----------------------------------------
+          678┆ totalStaked += reward;
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+          504┆ uint256 public totalStaked = 0;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          179┆ constructor(string memory name_, string memory symbol_) {
+          180┆     _name = name_;
+          181┆     _symbol = symbol_;
+          182┆ }
+            ⋮┆----------------------------------------
+          486┆ constructor() ERC20("Arkania Protocol", "ANIA") {
+          487┆     _mint(msg.sender, 100000000 * 10 ** decimals());
+          488┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          671┆ uint256 index = stakes[users[i]];
+            ⋮┆----------------------------------------
+          672┆ uint256 reward =                                                 
+  calculateStakeReward(stakers[index].address_stake);                           
+            ⋮┆----------------------------------------
+          675┆ stakers[index].address_stake = Stake(stakers[index].user,        
+  stakers[index].address_stake.amount + reward, block.timestamp);               
+            ⋮┆----------------------------------------
+          675┆ stakers[index].address_stake = Stake(stakers[index].user,        
+  stakers[index].address_stake.amount + reward, block.timestamp);               
+            ⋮┆----------------------------------------
+          675┆ stakers[index].address_stake = Stake(stakers[index].user,        
+  stakers[index].address_stake.amount + reward, block.timestamp);               
+            ⋮┆----------------------------------------
+          678┆ totalStaked += reward;
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          670┆ for (uint256 i = 0; i < users.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          283┆ require(currentAllowance >= amount, "ERC20: transfer amount      
+  exceeds allowance");                                                          
+            ⋮┆----------------------------------------
+          324┆ require(currentAllowance >= subtractedValue, "ERC20: decreased   
+  allowance below zero");                                                       
+            ⋮┆----------------------------------------
+          351┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          352┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          357┆ require(senderBalance >= amount, "ERC20: transfer amount exceeds 
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          378┆ require(account != address(0), "ERC20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+          401┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          406┆ require(accountBalance >= amount, "ERC20: burn amount exceeds    
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          435┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          436┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          581┆ require(_amount > 0, "amount cannot be 0");
+            ⋮┆----------------------------------------
+          619┆ require(userStakes > 0, "amount has to be more than 0");
+            ⋮┆----------------------------------------
+          626┆ require(_amount <= stakedWithRewards, "amount has to be less or  
+  equal than current stakes with rewards");                                     
+            ⋮┆----------------------------------------
+          668┆ require(msg.sender == owner, "Only contract creator can          
+  redistribute");                                                               
+            ⋮┆----------------------------------------
+          685┆ require(msg.sender == owner, "Only contract creator can change   
+  APY");                                                                        
+            ⋮┆----------------------------------------
+          686┆ require(
+          687┆     _value > 0,
+          688┆     "APY value has to be more than 0, try 100 for (0.100% daily) 
+  instead"                                                                      
+          689┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          670┆ for (uint256 i = 0; i < users.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          283┆ require(currentAllowance >= amount, "ERC20: transfer amount      
+  exceeds allowance");                                                          
+            ⋮┆----------------------------------------
+          324┆ require(currentAllowance >= subtractedValue, "ERC20: decreased   
+  allowance below zero");                                                       
+            ⋮┆----------------------------------------
+          351┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          352┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          357┆ require(senderBalance >= amount, "ERC20: transfer amount exceeds 
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          401┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          406┆ require(accountBalance >= amount, "ERC20: burn amount exceeds    
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          435┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          436┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          626┆ require(_amount <= stakedWithRewards, "amount has to be less or  
+  equal than current stakes with rewards");                                     
+            ⋮┆----------------------------------------
+          668┆ require(msg.sender == owner, "Only contract creator can          
+  redistribute");                                                               
+            ⋮┆----------------------------------------
+          685┆ require(msg.sender == owner, "Only contract creator can change   
+  APY");                                                                        
+            ⋮┆----------------------------------------
+          686┆ require(
+          687┆     _value > 0,
+          688┆     "APY value has to be more than 0, try 100 for (0.100% daily) 
+  instead"                                                                      
+          689┆ );
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 43 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

@@ -1,0 +1,153 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 39 Code Findings │
+└──────────────────┘
+                  
+    /sb/ROSCA.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          213┆ for (uint16 i = 0; i < members_.length; i++) {
+            ⋮┆----------------------------------------
+          305┆ for (uint16 j = 0; j < membersAddresses.length; j++) {
+            ⋮┆----------------------------------------
+          312┆ debit += removeFees(membersAddresses.length * contributionSize);
+            ⋮┆----------------------------------------
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+          291┆ totalDiscounts += currentRoundTotalDiscounts /                   
+  membersAddresses.length;                                                      
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+           84┆ bool internal endOfROSCA = false;
+            ⋮┆----------------------------------------
+           85┆ bool internal forepersonSurplusCollected = false;
+            ⋮┆----------------------------------------
+           88┆ uint256 internal totalDiscounts = 0;
+            ⋮┆----------------------------------------
+           91┆ uint256 internal totalFees = 0;
+            ⋮┆----------------------------------------
+           94┆ uint256 internal lowestBid = 0;
+            ⋮┆----------------------------------------
+           95┆ address internal winnerAddress = 0;  // bidder who bid the lowest
+  so far                                                                        
+            ⋮┆----------------------------------------
+          108┆ bool internal escapeHatchEnabled = false;
+            ⋮┆----------------------------------------
+          109┆ bool internal escapeHatchActive = false;
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          264┆ address candidate = membersAddresses[index];
+            ⋮┆----------------------------------------
+          265┆ if (!members[candidate].paid) {
+            ⋮┆----------------------------------------
+          267┆ if (members[candidate].credit + totalDiscounts >= (currentRound *
+  contributionSize)) {                                                          
+            ⋮┆----------------------------------------
+          267┆ if (members[candidate].credit + totalDiscounts >= (currentRound *
+  contributionSize)) {                                                          
+            ⋮┆----------------------------------------
+          267┆ if (members[candidate].credit + totalDiscounts >= (currentRound *
+  contributionSize)) {                                                          
+            ⋮┆----------------------------------------
+          267┆ if (members[candidate].credit + totalDiscounts >= (currentRound *
+  contributionSize)) {                                                          
+            ⋮┆----------------------------------------
+          269┆ winnerAddress = candidate;
+            ⋮┆----------------------------------------
+          305┆ for (uint16 j = 0; j < membersAddresses.length; j++) {
+            ⋮┆----------------------------------------
+          306┆ User member = members[membersAddresses[j]];
+            ⋮┆----------------------------------------
+          306┆ User member = members[membersAddresses[j]];
+            ⋮┆----------------------------------------
+          312┆ debit += removeFees(membersAddresses.length * contributionSize);
+            ⋮┆----------------------------------------
+          312┆ debit += removeFees(membersAddresses.length * contributionSize);
+            ⋮┆----------------------------------------
+          314┆ if (credit + totalDiscounts < debit) {
+            ⋮┆----------------------------------------
+          315┆ grossTotalFees -= debit - credit - totalDiscounts;
+            ⋮┆----------------------------------------
+          330┆ if (membersAddresses[i] == winnerAddress) {
+            ⋮┆----------------------------------------
+          330┆ if (membersAddresses[i] == winnerAddress) {
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          213┆ for (uint16 i = 0; i < members_.length; i++) {
+            ⋮┆----------------------------------------
+          262┆ for (uint16 i = 0; i < numUnpaidParticipants; i++) {
+            ⋮┆----------------------------------------
+          305┆ for (uint16 j = 0; j < membersAddresses.length; j++) {
+            ⋮┆----------------------------------------
+          329┆ for (uint16 i = 0; i <= indexToSwap; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          412┆ if (members[msg.sender].debt && !endOfROSCA) {  // delinquent    
+  winners need to first pay their debt                                          
+          413┆   throw;
+          414┆ }
+            ⋮┆----------------------------------------
+          452┆ if (members[user].debt && !endOfROSCA) {
+          453┆     totalCredit -= int256(removeFees(membersAddresses.length *   
+  contributionSize));                                                           
+          454┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          213┆ for (uint16 i = 0; i < members_.length; i++) {
+            ⋮┆----------------------------------------
+          243┆ currentRound++;
+            ⋮┆----------------------------------------
+          262┆ for (uint16 i = 0; i < numUnpaidParticipants; i++) {
+            ⋮┆----------------------------------------
+          305┆ for (uint16 j = 0; j < membersAddresses.length; j++) {
+            ⋮┆----------------------------------------
+          329┆ for (uint16 i = 0; i <= indexToSwap; i++) {
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 39 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

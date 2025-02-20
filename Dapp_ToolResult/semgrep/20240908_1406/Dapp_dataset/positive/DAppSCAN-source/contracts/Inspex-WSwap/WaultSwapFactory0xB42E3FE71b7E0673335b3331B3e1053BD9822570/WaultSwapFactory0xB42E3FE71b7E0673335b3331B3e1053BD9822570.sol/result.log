@@ -1,0 +1,192 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 39 Code Findings │
+└──────────────────┘
+                                                                       
+    /sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          555┆ (bool success, bytes memory data) =                              
+  token.call(abi.encodeWithSelector(SELECTOR, to, value));                      
+            ⋮┆----------------------------------------
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+          623┆ price0CumulativeLast +=                                          
+  uint(UQ112x112.encode(_reserve1).uqdiv(_reserve0)) * timeElapsed;             
+            ⋮┆----------------------------------------
+          625┆ price1CumulativeLast +=                                          
+  uint(UQ112x112.encode(_reserve0).uqdiv(_reserve1)) * timeElapsed;             
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          241┆ constructor() public {
+          242┆ 
+          243┆     uint chainId;
+          244┆ 
+          245┆     assembly {
+          246┆ 
+          247┆         chainId := chainid
+          248┆ 
+          249┆     }
+          250┆ 
+             [hid 19 additional lines, adjust with --max-lines-per-finding] 
+          587┆ constructor() public {
+          588┆ 
+          589┆     factory = msg.sender;
+          590┆ 
+          591┆ }
+            ⋮┆----------------------------------------
+          891┆ constructor(address _feeToSetter) public {
+          892┆ 
+          893┆     feeToSetter = _feeToSetter;
+          894┆ 
+          895┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          183┆ require((z = x + y) >= x, 'ds-math-add-overflow');
+            ⋮┆----------------------------------------
+          191┆ require((z = x - y) <= x, 'ds-math-sub-underflow');
+            ⋮┆----------------------------------------
+          199┆ require(y == 0 || (z = x * y) / y == x, 'ds-math-mul-overflow');
+            ⋮┆----------------------------------------
+          357┆ require(deadline >= block.timestamp, 'WaultSwap: EXPIRED');
+            ⋮┆----------------------------------------
+          375┆ require(recoveredAddress != address(0) && recoveredAddress ==    
+  owner, 'WaultSwap: INVALID_SIGNATURE');                                       
+            ⋮┆----------------------------------------
+          529┆ require(unlocked == 1, 'WaultSwap: LOCKED');
+            ⋮┆----------------------------------------
+          557┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'WaultSwap: TRANSFER_FAILED');                                      
+            ⋮┆----------------------------------------
+          599┆ require(msg.sender == factory, 'WaultSwap: FORBIDDEN'); //       
+  sufficient check                                                              
+            ⋮┆----------------------------------------
+          613┆ require(balance0 <= uint112(-1) && balance1 <= uint112(-1),      
+  'WaultSwap: OVERFLOW');                                                       
+            ⋮┆----------------------------------------
+          715┆ require(liquidity > 0, 'WaultSwap:                               
+  INSUFFICIENT_LIQUIDITY_MINTED');                                              
+            ⋮┆----------------------------------------
+          757┆ require(amount0 > 0 && amount1 > 0, 'WaultSwap:                  
+  INSUFFICIENT_LIQUIDITY_BURNED');                                              
+            ⋮┆----------------------------------------
+          785┆ require(amount0Out > 0 || amount1Out > 0, 'WaultSwap:            
+  INSUFFICIENT_OUTPUT_AMOUNT');                                                 
+            ⋮┆----------------------------------------
+          789┆ require(amount0Out < _reserve0 && amount1Out < _reserve1,        
+  'WaultSwap: INSUFFICIENT_LIQUIDITY');                                         
+            ⋮┆----------------------------------------
+          803┆ require(to != _token0 && to != _token1, 'WaultSwap: INVALID_TO');
+            ⋮┆----------------------------------------
+          821┆ require(amount0In > 0 || amount1In > 0, 'WaultSwap:              
+  INSUFFICIENT_INPUT_AMOUNT');                                                  
+            ⋮┆----------------------------------------
+          829┆ require(balance0Adjusted.mul(balance1Adjusted) >=                
+  uint(_reserve0).mul(_reserve1).mul(1000**2), 'WaultSwap: K');                 
+            ⋮┆----------------------------------------
+          909┆ require(tokenA != tokenB, 'WaultSwap: IDENTICAL_ADDRESSES');
+            ⋮┆----------------------------------------
+          913┆ require(token0 != address(0), 'WaultSwap: ZERO_ADDRESS');
+            ⋮┆----------------------------------------
+          915┆ require(getPair[token0][token1] == address(0), 'WaultSwap:       
+  PAIR_EXISTS'); // single check is sufficient                                  
+            ⋮┆----------------------------------------
+          943┆ require(msg.sender == feeToSetter, 'WaultSwap: FORBIDDEN');
+            ⋮┆----------------------------------------
+          953┆ require(msg.sender == feeToSetter, 'WaultSwap: FORBIDDEN');
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          375┆ require(recoveredAddress != address(0) && recoveredAddress ==    
+  owner, 'WaultSwap: INVALID_SIGNATURE');                                       
+            ⋮┆----------------------------------------
+          557┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'WaultSwap: TRANSFER_FAILED');                                      
+            ⋮┆----------------------------------------
+          613┆ require(balance0 <= uint112(-1) && balance1 <= uint112(-1),      
+  'WaultSwap: OVERFLOW');                                                       
+            ⋮┆----------------------------------------
+          757┆ require(amount0 > 0 && amount1 > 0, 'WaultSwap:                  
+  INSUFFICIENT_LIQUIDITY_BURNED');                                              
+            ⋮┆----------------------------------------
+          789┆ require(amount0Out < _reserve0 && amount1Out < _reserve1,        
+  'WaultSwap: INSUFFICIENT_LIQUIDITY');                                         
+            ⋮┆----------------------------------------
+          803┆ require(to != _token0 && to != _token1, 'WaultSwap: INVALID_TO');
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          619┆ if (timeElapsed > 0 && _reserve0 != 0 && _reserve1 != 0) {
+          620┆ 
+          621┆     // * never overflows, and + overflow is desired
+          622┆ 
+          623┆     price0CumulativeLast +=                                      
+  uint(UQ112x112.encode(_reserve1).uqdiv(_reserve0)) * timeElapsed;             
+          624┆ 
+          625┆     price1CumulativeLast +=                                      
+  uint(UQ112x112.encode(_reserve0).uqdiv(_reserve1)) * timeElapsed;             
+          626┆ 
+          627┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          715┆ require(liquidity > 0, 'WaultSwap:                               
+  INSUFFICIENT_LIQUIDITY_MINTED');                                              
+            ⋮┆----------------------------------------
+          757┆ require(amount0 > 0 && amount1 > 0, 'WaultSwap:                  
+  INSUFFICIENT_LIQUIDITY_BURNED');                                              
+            ⋮┆----------------------------------------
+          785┆ require(amount0Out > 0 || amount1Out > 0, 'WaultSwap:            
+  INSUFFICIENT_OUTPUT_AMOUNT');                                                 
+            ⋮┆----------------------------------------
+          789┆ require(amount0Out < _reserve0 && amount1Out < _reserve1,        
+  'WaultSwap: INSUFFICIENT_LIQUIDITY');                                         
+            ⋮┆----------------------------------------
+          821┆ require(amount0In > 0 || amount1In > 0, 'WaultSwap:              
+  INSUFFICIENT_INPUT_AMOUNT');                                                  
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 39 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

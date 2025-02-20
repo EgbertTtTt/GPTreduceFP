@@ -1,0 +1,38 @@
+'solc --version' running
+'solc /sb/DepositSecurityModule.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+Reentrancy in DepositSecurityModule.depositBufferedEther(bytes32,uint256,uint256,bytes32,DepositSecurityModule.Signature[]) (../../sb/DepositSecurityModule.sol#442-471):
+	External calls:
+	- ILido(LIDO).depositBufferedEther(maxDepositsPerBlock) (../../sb/DepositSecurityModule.sol#469)
+	State variables written after the call(s):
+	- lastDepositBlock = block.number (../../sb/DepositSecurityModule.sol#470)
+	DepositSecurityModule.lastDepositBlock (../../sb/DepositSecurityModule.sol#109) can be used in cross function reentrancies:
+	- DepositSecurityModule.canDeposit() (../../sb/DepositSecurityModule.sol#421-423)
+	- DepositSecurityModule.constructor(address,address,address,uint256,uint256,uint256,uint256) (../../sb/DepositSecurityModule.sol#112-145)
+	- DepositSecurityModule.depositBufferedEther(bytes32,uint256,uint256,bytes32,DepositSecurityModule.Signature[]) (../../sb/DepositSecurityModule.sol#442-471)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+DepositSecurityModule.constructor(address,address,address,uint256,uint256,uint256,uint256)._lido (../../sb/DepositSecurityModule.sol#113) lacks a zero-check on :
+		- LIDO = _lido (../../sb/DepositSecurityModule.sol#121)
+DepositSecurityModule.constructor(address,address,address,uint256,uint256,uint256,uint256)._depositContract (../../sb/DepositSecurityModule.sol#114) lacks a zero-check on :
+		- DEPOSIT_CONTRACT = _depositContract (../../sb/DepositSecurityModule.sol#122)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+ECDSA.recover(bytes32,bytes32,bytes32) (../../sb/DepositSecurityModule.sol#43-51) uses assembly
+	- INLINE ASM (../../sb/DepositSecurityModule.sol#46-49)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Pragma version0.8.9 (../../sb/DepositSecurityModule.sol#1) allows old versions
+solc-0.8.9 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Function IDepositContract.get_deposit_root() (../../sb/DepositSecurityModule.sol#58) is not in mixedCase
+Variable DepositSecurityModule.ATTEST_MESSAGE_PREFIX (../../sb/DepositSecurityModule.sol#90) is not in mixedCase
+Variable DepositSecurityModule.PAUSE_MESSAGE_PREFIX (../../sb/DepositSecurityModule.sol#91) is not in mixedCase
+Variable DepositSecurityModule.LIDO (../../sb/DepositSecurityModule.sol#93) is not in mixedCase
+Variable DepositSecurityModule.DEPOSIT_CONTRACT (../../sb/DepositSecurityModule.sol#94) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Variable DepositSecurityModule.DEPOSIT_CONTRACT (../../sb/DepositSecurityModule.sol#94) is too similar to DepositSecurityModule.constructor(address,address,address,uint256,uint256,uint256,uint256)._depositContract (../../sb/DepositSecurityModule.sol#114)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+/sb/DepositSecurityModule.sol analyzed (5 contracts with 93 detectors), 12 result(s) found

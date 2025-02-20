@@ -1,0 +1,165 @@
+'solc --version' running
+'solc /sb/RocketDepositPool.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+RocketDepositPool.assignDeposits() (../../sb/RocketDepositPool.sol#664-687) has external calls inside a loop: i < rocketDAOProtocolSettingsDeposit.getMaximumDepositAssignments() (../../sb/RocketDepositPool.sol#673)
+RocketDepositPool.assignDeposits() (../../sb/RocketDepositPool.sol#664-687) has external calls inside a loop: minipoolCapacity = rocketMinipoolQueue.getNextCapacity() (../../sb/RocketDepositPool.sol#675)
+RocketBase.getAddress(bytes32) (../../sb/RocketDepositPool.sol#361) has external calls inside a loop: rocketStorage.getAddress(_key) (../../sb/RocketDepositPool.sol#361)
+RocketDepositPool.getBalance() (../../sb/RocketDepositPool.sol#594-597) has external calls inside a loop: rocketVault.balanceOf(rocketDepositPool) (../../sb/RocketDepositPool.sol#596)
+RocketDepositPool.assignDeposits() (../../sb/RocketDepositPool.sol#664-687) has external calls inside a loop: minipoolAddress = rocketMinipoolQueue.dequeueMinipool() (../../sb/RocketDepositPool.sol#678)
+RocketDepositPool.assignDeposits() (../../sb/RocketDepositPool.sol#664-687) has external calls inside a loop: rocketVault.withdrawEther(minipoolCapacity) (../../sb/RocketDepositPool.sol#681)
+RocketDepositPool.assignDeposits() (../../sb/RocketDepositPool.sol#664-687) has external calls inside a loop: minipool.userDeposit{value: minipoolCapacity}() (../../sb/RocketDepositPool.sol#683)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in RocketDepositPool.assignDeposits() (../../sb/RocketDepositPool.sol#664-687):
+	External calls:
+	- minipoolAddress = rocketMinipoolQueue.dequeueMinipool() (../../sb/RocketDepositPool.sol#678)
+	- rocketVault.withdrawEther(minipoolCapacity) (../../sb/RocketDepositPool.sol#681)
+	- minipool.userDeposit{value: minipoolCapacity}() (../../sb/RocketDepositPool.sol#683)
+	External calls sending eth:
+	- minipool.userDeposit{value: minipoolCapacity}() (../../sb/RocketDepositPool.sol#683)
+	Event emitted after the call(s):
+	- DepositAssigned(minipoolAddress,minipoolCapacity,block.timestamp) (../../sb/RocketDepositPool.sol#685)
+Reentrancy in RocketDepositPool.deposit() (../../sb/RocketDepositPool.sol#615-629):
+	External calls:
+	- rocketTokenRETH.mint(msg.value,msg.sender) (../../sb/RocketDepositPool.sol#624)
+	Event emitted after the call(s):
+	- DepositReceived(msg.sender,msg.value,block.timestamp) (../../sb/RocketDepositPool.sol#626)
+Reentrancy in RocketDepositPool.deposit() (../../sb/RocketDepositPool.sol#615-629):
+	External calls:
+	- rocketTokenRETH.mint(msg.value,msg.sender) (../../sb/RocketDepositPool.sol#624)
+	- processDeposit() (../../sb/RocketDepositPool.sol#628)
+		- rocketVault.depositEther{value: msg.value}() (../../sb/RocketDepositPool.sol#658)
+		- minipoolAddress = rocketMinipoolQueue.dequeueMinipool() (../../sb/RocketDepositPool.sol#678)
+		- rocketVault.withdrawEther(minipoolCapacity) (../../sb/RocketDepositPool.sol#681)
+		- minipool.userDeposit{value: minipoolCapacity}() (../../sb/RocketDepositPool.sol#683)
+	External calls sending eth:
+	- processDeposit() (../../sb/RocketDepositPool.sol#628)
+		- rocketVault.depositEther{value: msg.value}() (../../sb/RocketDepositPool.sol#658)
+		- minipool.userDeposit{value: minipoolCapacity}() (../../sb/RocketDepositPool.sol#683)
+	Event emitted after the call(s):
+	- DepositAssigned(minipoolAddress,minipoolCapacity,block.timestamp) (../../sb/RocketDepositPool.sol#685)
+		- processDeposit() (../../sb/RocketDepositPool.sol#628)
+Reentrancy in RocketDepositPool.processDeposit() (../../sb/RocketDepositPool.sol#653-661):
+	External calls:
+	- rocketVault.depositEther{value: msg.value}() (../../sb/RocketDepositPool.sol#658)
+	- assignDeposits() (../../sb/RocketDepositPool.sol#660)
+		- minipoolAddress = rocketMinipoolQueue.dequeueMinipool() (../../sb/RocketDepositPool.sol#678)
+		- rocketVault.withdrawEther(minipoolCapacity) (../../sb/RocketDepositPool.sol#681)
+		- minipool.userDeposit{value: minipoolCapacity}() (../../sb/RocketDepositPool.sol#683)
+	External calls sending eth:
+	- rocketVault.depositEther{value: msg.value}() (../../sb/RocketDepositPool.sol#658)
+	- assignDeposits() (../../sb/RocketDepositPool.sol#660)
+		- minipool.userDeposit{value: minipoolCapacity}() (../../sb/RocketDepositPool.sol#683)
+	Event emitted after the call(s):
+	- DepositAssigned(minipoolAddress,minipoolCapacity,block.timestamp) (../../sb/RocketDepositPool.sol#685)
+		- assignDeposits() (../../sb/RocketDepositPool.sol#660)
+Reentrancy in RocketDepositPool.withdrawExcessBalance(uint256) (../../sb/RocketDepositPool.sol#690-702):
+	External calls:
+	- rocketVault.withdrawEther(_amount) (../../sb/RocketDepositPool.sol#697)
+	- rocketTokenRETH.depositExcess{value: _amount}() (../../sb/RocketDepositPool.sol#699)
+	External calls sending eth:
+	- rocketTokenRETH.depositExcess{value: _amount}() (../../sb/RocketDepositPool.sol#699)
+	Event emitted after the call(s):
+	- ExcessWithdrawn(msg.sender,_amount,block.timestamp) (../../sb/RocketDepositPool.sol#701)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+RocketBase.getRevertMsg(bytes) (../../sb/RocketDepositPool.sol#344-352) uses assembly
+	- INLINE ASM (../../sb/RocketDepositPool.sol#347-350)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+RocketBase.deleteAddress(bytes32) (../../sb/RocketDepositPool.sol#388) is never used and should be removed
+RocketBase.deleteBool(bytes32) (../../sb/RocketDepositPool.sol#392) is never used and should be removed
+RocketBase.deleteBytes(bytes32) (../../sb/RocketDepositPool.sol#391) is never used and should be removed
+RocketBase.deleteBytes32(bytes32) (../../sb/RocketDepositPool.sol#394) is never used and should be removed
+RocketBase.deleteInt(bytes32) (../../sb/RocketDepositPool.sol#393) is never used and should be removed
+RocketBase.deleteString(bytes32) (../../sb/RocketDepositPool.sol#390) is never used and should be removed
+RocketBase.deleteUint(bytes32) (../../sb/RocketDepositPool.sol#389) is never used and should be removed
+RocketBase.getAddressS(string) (../../sb/RocketDepositPool.sol#368) is never used and should be removed
+RocketBase.getBoolS(string) (../../sb/RocketDepositPool.sol#371) is never used and should be removed
+RocketBase.getBytes(bytes32) (../../sb/RocketDepositPool.sol#364) is never used and should be removed
+RocketBase.getBytes32(bytes32) (../../sb/RocketDepositPool.sol#367) is never used and should be removed
+RocketBase.getBytesS(string) (../../sb/RocketDepositPool.sol#370) is never used and should be removed
+RocketBase.getContractName(address) (../../sb/RocketDepositPool.sol#334-341) is never used and should be removed
+RocketBase.getInt(bytes32) (../../sb/RocketDepositPool.sol#366) is never used and should be removed
+RocketBase.getRevertMsg(bytes) (../../sb/RocketDepositPool.sol#344-352) is never used and should be removed
+RocketBase.getString(bytes32) (../../sb/RocketDepositPool.sol#363) is never used and should be removed
+RocketBase.getUint(bytes32) (../../sb/RocketDepositPool.sol#362) is never used and should be removed
+RocketBase.getUintS(string) (../../sb/RocketDepositPool.sol#369) is never used and should be removed
+RocketBase.setAddress(bytes32,address) (../../sb/RocketDepositPool.sol#375) is never used and should be removed
+RocketBase.setAddressS(string,address) (../../sb/RocketDepositPool.sol#382) is never used and should be removed
+RocketBase.setBool(bytes32,bool) (../../sb/RocketDepositPool.sol#379) is never used and should be removed
+RocketBase.setBoolS(string,bool) (../../sb/RocketDepositPool.sol#385) is never used and should be removed
+RocketBase.setBytes(bytes32,bytes) (../../sb/RocketDepositPool.sol#378) is never used and should be removed
+RocketBase.setBytes32(bytes32,bytes32) (../../sb/RocketDepositPool.sol#381) is never used and should be removed
+RocketBase.setBytesS(string,bytes) (../../sb/RocketDepositPool.sol#384) is never used and should be removed
+RocketBase.setInt(bytes32,int256) (../../sb/RocketDepositPool.sol#380) is never used and should be removed
+RocketBase.setString(bytes32,string) (../../sb/RocketDepositPool.sol#377) is never used and should be removed
+RocketBase.setUint(bytes32,uint256) (../../sb/RocketDepositPool.sol#376) is never used and should be removed
+RocketBase.setUintS(string,uint256) (../../sb/RocketDepositPool.sol#383) is never used and should be removed
+SafeMath.div(uint256,uint256) (../../sb/RocketDepositPool.sol#135-138) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/RocketDepositPool.sol#190-193) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/RocketDepositPool.sol#152-155) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/RocketDepositPool.sol#210-213) is never used and should be removed
+SafeMath.mul(uint256,uint256) (../../sb/RocketDepositPool.sol#116-121) is never used and should be removed
+SafeMath.sub(uint256,uint256,string) (../../sb/RocketDepositPool.sol#170-173) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/RocketDepositPool.sol#24-28) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/RocketDepositPool.sol#60-63) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/RocketDepositPool.sol#70-73) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/RocketDepositPool.sol#45-53) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/RocketDepositPool.sol#35-38) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.7.6 (../../sb/RocketDepositPool.sol#1) allows old versions
+solc-0.7.6 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Parameter RocketBase.getContractAddress(string)._contractName (../../sb/RocketDepositPool.sol#323) is not in mixedCase
+Parameter RocketBase.getContractName(address)._contractAddress (../../sb/RocketDepositPool.sol#334) is not in mixedCase
+Parameter RocketBase.getRevertMsg(bytes)._returnData (../../sb/RocketDepositPool.sol#344) is not in mixedCase
+Parameter RocketBase.getAddress(bytes32)._key (../../sb/RocketDepositPool.sol#361) is not in mixedCase
+Parameter RocketBase.getUint(bytes32)._key (../../sb/RocketDepositPool.sol#362) is not in mixedCase
+Parameter RocketBase.getString(bytes32)._key (../../sb/RocketDepositPool.sol#363) is not in mixedCase
+Parameter RocketBase.getBytes(bytes32)._key (../../sb/RocketDepositPool.sol#364) is not in mixedCase
+Parameter RocketBase.getBool(bytes32)._key (../../sb/RocketDepositPool.sol#365) is not in mixedCase
+Parameter RocketBase.getInt(bytes32)._key (../../sb/RocketDepositPool.sol#366) is not in mixedCase
+Parameter RocketBase.getBytes32(bytes32)._key (../../sb/RocketDepositPool.sol#367) is not in mixedCase
+Parameter RocketBase.getAddressS(string)._key (../../sb/RocketDepositPool.sol#368) is not in mixedCase
+Parameter RocketBase.getUintS(string)._key (../../sb/RocketDepositPool.sol#369) is not in mixedCase
+Parameter RocketBase.getBytesS(string)._key (../../sb/RocketDepositPool.sol#370) is not in mixedCase
+Parameter RocketBase.getBoolS(string)._key (../../sb/RocketDepositPool.sol#371) is not in mixedCase
+Parameter RocketBase.setAddress(bytes32,address)._key (../../sb/RocketDepositPool.sol#375) is not in mixedCase
+Parameter RocketBase.setAddress(bytes32,address)._value (../../sb/RocketDepositPool.sol#375) is not in mixedCase
+Parameter RocketBase.setUint(bytes32,uint256)._key (../../sb/RocketDepositPool.sol#376) is not in mixedCase
+Parameter RocketBase.setUint(bytes32,uint256)._value (../../sb/RocketDepositPool.sol#376) is not in mixedCase
+Parameter RocketBase.setString(bytes32,string)._key (../../sb/RocketDepositPool.sol#377) is not in mixedCase
+Parameter RocketBase.setString(bytes32,string)._value (../../sb/RocketDepositPool.sol#377) is not in mixedCase
+Parameter RocketBase.setBytes(bytes32,bytes)._key (../../sb/RocketDepositPool.sol#378) is not in mixedCase
+Parameter RocketBase.setBytes(bytes32,bytes)._value (../../sb/RocketDepositPool.sol#378) is not in mixedCase
+Parameter RocketBase.setBool(bytes32,bool)._key (../../sb/RocketDepositPool.sol#379) is not in mixedCase
+Parameter RocketBase.setBool(bytes32,bool)._value (../../sb/RocketDepositPool.sol#379) is not in mixedCase
+Parameter RocketBase.setInt(bytes32,int256)._key (../../sb/RocketDepositPool.sol#380) is not in mixedCase
+Parameter RocketBase.setInt(bytes32,int256)._value (../../sb/RocketDepositPool.sol#380) is not in mixedCase
+Parameter RocketBase.setBytes32(bytes32,bytes32)._key (../../sb/RocketDepositPool.sol#381) is not in mixedCase
+Parameter RocketBase.setBytes32(bytes32,bytes32)._value (../../sb/RocketDepositPool.sol#381) is not in mixedCase
+Parameter RocketBase.setAddressS(string,address)._key (../../sb/RocketDepositPool.sol#382) is not in mixedCase
+Parameter RocketBase.setAddressS(string,address)._value (../../sb/RocketDepositPool.sol#382) is not in mixedCase
+Parameter RocketBase.setUintS(string,uint256)._key (../../sb/RocketDepositPool.sol#383) is not in mixedCase
+Parameter RocketBase.setUintS(string,uint256)._value (../../sb/RocketDepositPool.sol#383) is not in mixedCase
+Parameter RocketBase.setBytesS(string,bytes)._key (../../sb/RocketDepositPool.sol#384) is not in mixedCase
+Parameter RocketBase.setBytesS(string,bytes)._value (../../sb/RocketDepositPool.sol#384) is not in mixedCase
+Parameter RocketBase.setBoolS(string,bool)._key (../../sb/RocketDepositPool.sol#385) is not in mixedCase
+Parameter RocketBase.setBoolS(string,bool)._value (../../sb/RocketDepositPool.sol#385) is not in mixedCase
+Parameter RocketBase.deleteAddress(bytes32)._key (../../sb/RocketDepositPool.sol#388) is not in mixedCase
+Parameter RocketBase.deleteUint(bytes32)._key (../../sb/RocketDepositPool.sol#389) is not in mixedCase
+Parameter RocketBase.deleteString(bytes32)._key (../../sb/RocketDepositPool.sol#390) is not in mixedCase
+Parameter RocketBase.deleteBytes(bytes32)._key (../../sb/RocketDepositPool.sol#391) is not in mixedCase
+Parameter RocketBase.deleteBool(bytes32)._key (../../sb/RocketDepositPool.sol#392) is not in mixedCase
+Parameter RocketBase.deleteInt(bytes32)._key (../../sb/RocketDepositPool.sol#393) is not in mixedCase
+Parameter RocketBase.deleteBytes32(bytes32)._key (../../sb/RocketDepositPool.sol#394) is not in mixedCase
+Parameter RocketDepositPool.withdrawExcessBalance(uint256)._amount (../../sb/RocketDepositPool.sol#690) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+RocketBase.rocketStorage (../../sb/RocketDepositPool.sol#256) should be immutable 
+RocketBase.version (../../sb/RocketDepositPool.sol#253) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/RocketDepositPool.sol analyzed (12 contracts with 93 detectors), 101 result(s) found

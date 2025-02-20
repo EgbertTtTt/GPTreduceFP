@@ -1,0 +1,120 @@
+'solc --version' running
+'solc /sb/Moloch.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+Moloch (../../sb/Moloch.sol#151-825) contract sets array length with a user-controlled value:
+	- approvedTokens.push(IERC20(_approvedTokens[i])) (../../sb/Moloch.sol#298)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#array-length-assignment
+
+GuildBank.fairShare(uint256,uint256,uint256) (../../sb/Moloch.sol#135-147) performs a multiplication on the result of a division:
+	- (balance / totalShares) * shares (../../sb/Moloch.sol#146)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+GuildBank.fairShare(uint256,uint256,uint256) (../../sb/Moloch.sol#135-147) uses a dangerous strict equality:
+	- balance == 0 (../../sb/Moloch.sol#138)
+GuildBank.fairShare(uint256,uint256,uint256) (../../sb/Moloch.sol#135-147) uses a dangerous strict equality:
+	- prod / balance == shares (../../sb/Moloch.sol#142)
+Moloch._validateProposalForProcessing(uint256) (../../sb/Moloch.sol#657-664) uses a dangerous strict equality:
+	- require(bool,string)(proposal.flags[1] == false,proposal has already been processed) (../../sb/Moloch.sol#662)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Moloch.submitProposal(address,uint256,uint256,uint256,address,uint256,address,string).flags (../../sb/Moloch.sol#343) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+GuildBank.withdraw(address,uint256,uint256,IERC20[]) (../../sb/Moloch.sol#121-128) has external calls inside a loop: amount = fairShare(approvedTokens[i].balanceOf(address(this)),shares,totalShares) (../../sb/Moloch.sol#123)
+GuildBank.withdraw(address,uint256,uint256,IERC20[]) (../../sb/Moloch.sol#121-128) has external calls inside a loop: require(bool)(approvedTokens[i].transfer(receiver,amount)) (../../sb/Moloch.sol#125)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in Moloch.sponsorProposal(uint256) (../../sb/Moloch.sol#409-448):
+	External calls:
+	- require(bool,string)(depositToken.transferFrom(msg.sender,address(this),proposalDeposit),proposal deposit token transfer failed) (../../sb/Moloch.sol#411)
+	State variables written after the call(s):
+	- proposalQueue.push(proposalId) (../../sb/Moloch.sol#446)
+	- proposal.startingPeriod = startingPeriod (../../sb/Moloch.sol#438)
+	- proposal.sponsor = memberAddress (../../sb/Moloch.sol#441)
+	- proposal.flags[0] = true (../../sb/Moloch.sol#443)
+	- proposedToKick[proposal.applicant] = true (../../sb/Moloch.sol#429)
+	- proposedToWhitelist[address(proposal.tributeToken)] = true (../../sb/Moloch.sol#424)
+Reentrancy in Moloch.submitProposal(address,uint256,uint256,uint256,address,uint256,address,string) (../../sb/Moloch.sol#324-347):
+	External calls:
+	- require(bool,string)(IERC20(tributeToken).transferFrom(msg.sender,address(this),tributeOffered),tribute token transfer failed) (../../sb/Moloch.sol#341)
+	State variables written after the call(s):
+	- _submitProposal(applicant,sharesRequested,lootRequested,tributeOffered,tributeToken,paymentRequested,paymentToken,details,flags) (../../sb/Moloch.sol#345)
+		- proposalCount += 1 (../../sb/Moloch.sol#406)
+	- _submitProposal(applicant,sharesRequested,lootRequested,tributeOffered,tributeToken,paymentRequested,paymentToken,details,flags) (../../sb/Moloch.sol#345)
+		- proposals[proposalCount] = proposal (../../sb/Moloch.sol#403)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in GuildBank.withdraw(address,uint256,uint256,IERC20[]) (../../sb/Moloch.sol#121-128):
+	External calls:
+	- require(bool)(approvedTokens[i].transfer(receiver,amount)) (../../sb/Moloch.sol#125)
+	Event emitted after the call(s):
+	- Withdrawal(receiver,address(approvedTokens[i]),amount) (../../sb/Moloch.sol#124)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Moloch.sponsorProposal(uint256) (../../sb/Moloch.sol#409-448) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(proposal.proposer != address(0),proposal must have been proposed) (../../sb/Moloch.sol#415)
+	- require(bool,string)(! proposal.flags[0],proposal has already been sponsored) (../../sb/Moloch.sol#416)
+	- require(bool,string)(! proposal.flags[3],proposal has been cancelled) (../../sb/Moloch.sol#417)
+	- require(bool,string)(members[proposal.applicant].jailed == 0,proposal applicant must not be jailed) (../../sb/Moloch.sol#418)
+	- require(bool,string)(! tokenWhitelist[address(proposal.tributeToken)],cannot already have whitelisted the token) (../../sb/Moloch.sol#422)
+	- require(bool,string)(! proposedToWhitelist[address(proposal.tributeToken)],already proposed to whitelist) (../../sb/Moloch.sol#423)
+	- require(bool,string)(! proposedToKick[proposal.applicant],already proposed to kick) (../../sb/Moloch.sol#428)
+Moloch.submitVote(uint256,uint8) (../../sb/Moloch.sol#450-485) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(getCurrentPeriod() >= proposal.startingPeriod,voting period has not started) (../../sb/Moloch.sol#460)
+Moloch.processProposal(uint256) (../../sb/Moloch.sol#487-562) uses timestamp for comparisons
+	Dangerous comparisons:
+	- ! emergencyProcessing && proposal.paymentToken != IERC20(0) && proposal.paymentRequested > proposal.paymentToken.balanceOf(address(guildBank)) (../../sb/Moloch.sol#505)
+Moloch._didPass(uint256) (../../sb/Moloch.sol#621-655) uses timestamp for comparisons
+	Dangerous comparisons:
+	- didPass = proposal.yesVotes > proposal.noVotes (../../sb/Moloch.sol#624)
+	- getCurrentPeriod() >= proposal.startingPeriod.add(votingPeriodLength).add(gracePeriodLength).add(emergencyProcessingWait) (../../sb/Moloch.sol#628)
+	- proposal.startingPeriod < proposals[proposalQueue[lastEmergencyProposalIndex]].startingPeriod.add(emergencyProcessingWait) (../../sb/Moloch.sol#637)
+	- (totalShares.add(totalLoot)).mul(dilutionBound) < proposal.maxTotalSharesAndLootAtYesVote (../../sb/Moloch.sol#643)
+Moloch._validateProposalForProcessing(uint256) (../../sb/Moloch.sol#657-664) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(getCurrentPeriod() >= proposal.startingPeriod.add(votingPeriodLength).add(gracePeriodLength),proposal is not ready to be processed) (../../sb/Moloch.sol#661)
+	- require(bool,string)(proposal.flags[1] == false,proposal has already been processed) (../../sb/Moloch.sol#662)
+	- require(bool,string)(proposalIndex == 0 || proposals[proposalQueue[proposalIndex.sub(1)]].flags[1],previous proposal must be processed) (../../sb/Moloch.sol#663)
+Moloch.max(uint256,uint256) (../../sb/Moloch.sol#781-783) uses timestamp for comparisons
+	Dangerous comparisons:
+	- x >= y (../../sb/Moloch.sol#782)
+Moloch.canBailout(address) (../../sb/Moloch.sol#803-814) uses timestamp for comparisons
+	Dangerous comparisons:
+	- getCurrentPeriod() >= bailoutWaitStartingPeriod.add(votingPeriodLength).add(gracePeriodLength).add(bailoutWait) (../../sb/Moloch.sol#813)
+Moloch.hasVotingPeriodExpired(uint256) (../../sb/Moloch.sol#816-818) uses timestamp for comparisons
+	Dangerous comparisons:
+	- getCurrentPeriod() >= startingPeriod.add(votingPeriodLength) (../../sb/Moloch.sol#817)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Moloch._validateProposalForProcessing(uint256) (../../sb/Moloch.sol#657-664) compares to a boolean constant:
+	-require(bool,string)(proposal.flags[1] == false,proposal has already been processed) (../../sb/Moloch.sol#662)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#boolean-equality
+
+Pragma version0.5.3 (../../sb/Moloch.sol#1) allows old versions
+solc-0.5.3 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+withdraw(address,uint256,uint256,IERC20[]) should be declared external:
+	- GuildBank.withdraw(address,uint256,uint256,IERC20[]) (../../sb/Moloch.sol#121-128)
+Moreover, the following function parameters should change its data location:
+approvedTokens location should be calldata
+submitProposal(address,uint256,uint256,uint256,address,uint256,address,string) should be declared external:
+	- Moloch.submitProposal(address,uint256,uint256,uint256,address,uint256,address,string) (../../sb/Moloch.sol#324-347)
+Moreover, the following function parameters should change its data location:
+details location should be calldata
+submitWhitelistProposal(address,string) should be declared external:
+	- Moloch.submitWhitelistProposal(address,string) (../../sb/Moloch.sol#349-358)
+Moreover, the following function parameters should change its data location:
+details location should be calldata
+submitGuildKickProposal(address,string) should be declared external:
+	- Moloch.submitGuildKickProposal(address,string) (../../sb/Moloch.sol#360-372)
+Moreover, the following function parameters should change its data location:
+details location should be calldata
+safeRagequit(uint256,uint256,IERC20[]) should be declared external:
+	- Moloch.safeRagequit(uint256,uint256,IERC20[]) (../../sb/Moloch.sol#682-693)
+Moreover, the following function parameters should change its data location:
+tokenList location should be calldata
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#public-function-that-could-be-declared-external
+/sb/Moloch.sol analyzed (5 contracts with 93 detectors), 27 result(s) found

@@ -1,0 +1,295 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 64 Code Findings │
+└──────────────────┘
+                       
+    /sb/MasterChef.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          490┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          494┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          512┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          517┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          522┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+         1223┆ contract SushiToken is ERC20("SushiToken", "SUSHI"), Ownable {
+            ⋮┆----------------------------------------
+         1481┆ contract MasterChef is Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+         1528┆ uint256 public totalAllocPoint = 0;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          969┆ constructor (string memory name_, string memory symbol_) public {
+          970┆     _name = name_;
+          971┆     _symbol = symbol_;
+          972┆     _decimals = 18;
+          973┆ }
+            ⋮┆----------------------------------------
+         1536┆ constructor(
+         1537┆     SushiToken _sushi,
+         1538┆     address _devaddr,
+         1539┆     uint256 _sushiPerBlock,
+         1540┆     uint256 _startBlock,
+         1541┆     uint256 _bonusEndBlock
+         1542┆ ) public {
+         1543┆     sushi = _sushi;
+         1544┆     devaddr = _devaddr;
+         1545┆     sushiPerBlock = _sushiPerBlock;
+             [hid 3 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+         1385┆ Checkpoint memory cp = checkpoints[account][center];
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+         1627┆ for (uint256 pid = 0; pid < length; ++pid) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          161┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          176┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          193┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          210┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          227┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          339┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          343┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          400┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          401┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          425┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          449┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          509┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          510┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          511┆ );
+            ⋮┆----------------------------------------
+          539┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          670┆ require(set._values.length > index, "EnumerableSet: index out of 
+  bounds");                                                                     
+            ⋮┆----------------------------------------
+          896┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          917┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1123┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1124┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1143┆ require(account != address(0), "ERC20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1164┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1187┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1188┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1332┆ require(signatory != address(0), "SUSHI::delegateBySig: invalid  
+  signature");                                                                  
+            ⋮┆----------------------------------------
+         1333┆ require(nonce == nonces[signatory]++, "SUSHI::delegateBySig:     
+  invalid nonce");                                                              
+            ⋮┆----------------------------------------
+         1334┆ require(now <= expiry, "SUSHI::delegateBySig: signature          
+  expired");                                                                    
+            ⋮┆----------------------------------------
+         1364┆ require(blockNumber < block.number, "SUSHI::getPriorVotes: not   
+  yet determined");                                                             
+            ⋮┆----------------------------------------
+         1587┆ require(address(migrator) != address(0), "migrate: no migrator");
+            ⋮┆----------------------------------------
+         1593┆ require(bal == newLpToken.balanceOf(address(this)), "migrate:    
+  bad");                                                                        
+            ⋮┆----------------------------------------
+         1671┆ require(user.amount >= _amount, "withdraw: not good");
+            ⋮┆----------------------------------------
+         1703┆ require(msg.sender == devaddr, "dev: wut?");
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         1410┆ if (srcRep != dstRep && amount > 0) {
+         1411┆     if (srcRep != address(0)) {
+         1412┆         // decrease old representative
+         1413┆         uint32 srcRepNum = numCheckpoints[srcRep];
+         1414┆         uint256 srcRepOld = srcRepNum > 0 ?                      
+  checkpoints[srcRep][srcRepNum - 1].votes : 0;                                 
+         1415┆         uint256 srcRepNew = srcRepOld.sub(amount);
+         1416┆         _writeCheckpoint(srcRep, srcRepNum, srcRepOld,           
+  srcRepNew);                                                                   
+         1417┆     }
+         1418┆ 
+         1419┆     if (dstRep != address(0)) {
+             [hid 7 additional lines, adjust with --max-lines-per-finding] 
+         1439┆ if (nCheckpoints > 0 && checkpoints[delegatee][nCheckpoints -    
+  1].fromBlock == blockNumber) {                                                
+         1440┆     checkpoints[delegatee][nCheckpoints - 1].votes = newVotes;
+         1441┆ } else {
+         1442┆     checkpoints[delegatee][nCheckpoints] =                       
+  Checkpoint(blockNumber, newVotes);                                            
+         1443┆     numCheckpoints[delegatee] = nCheckpoints + 1;
+         1444┆ }
+            ⋮┆----------------------------------------
+         1616┆ if (block.number > pool.lastRewardBlock && lpSupply != 0) {
+         1617┆     uint256 multiplier = getMultiplier(pool.lastRewardBlock,     
+  block.number);                                                                
+         1618┆     uint256 sushiReward =                                        
+  multiplier.mul(sushiPerBlock).mul(pool.allocPoint).div(totalAllocPoint);      
+         1619┆     accSushiPerShare =                                           
+  accSushiPerShare.add(sushiReward.mul(1e12).div(lpSupply));                    
+         1620┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+         1333┆ require(nonce == nonces[signatory]++, "SUSHI::delegateBySig:     
+  invalid nonce");                                                              
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          193┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          343┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          400┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          425┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          449┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          509┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          510┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          511┆ );
+            ⋮┆----------------------------------------
+          539┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          670┆ require(set._values.length > index, "EnumerableSet: index out of 
+  bounds");                                                                     
+            ⋮┆----------------------------------------
+          917┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1123┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1124┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1164┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1187┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1188┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1332┆ require(signatory != address(0), "SUSHI::delegateBySig: invalid  
+  signature");                                                                  
+            ⋮┆----------------------------------------
+         1333┆ require(nonce == nonces[signatory]++, "SUSHI::delegateBySig:     
+  invalid nonce");                                                              
+            ⋮┆----------------------------------------
+         1334┆ require(now <= expiry, "SUSHI::delegateBySig: signature          
+  expired");                                                                    
+            ⋮┆----------------------------------------
+         1364┆ require(blockNumber < block.number, "SUSHI::getPriorVotes: not   
+  yet determined");                                                             
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 64 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

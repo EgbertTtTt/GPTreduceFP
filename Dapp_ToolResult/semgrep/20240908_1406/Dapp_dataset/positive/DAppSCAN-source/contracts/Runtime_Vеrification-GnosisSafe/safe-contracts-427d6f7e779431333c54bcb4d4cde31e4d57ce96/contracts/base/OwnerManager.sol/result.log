@@ -1,0 +1,175 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 39 Code Findings │
+└──────────────────┘
+                         
+    /sb/OwnerManager.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+           43┆ for (uint256 i = 0; i < _owners.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+           48┆ require(owners[owner] == address(0), "Duplicate owner address    
+  provided");                                                                   
+            ⋮┆----------------------------------------
+           49┆ owners[currentOwner] = owner;
+            ⋮┆----------------------------------------
+          173┆ currentOwner = owners[currentOwner];
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+           43┆ for (uint256 i = 0; i < _owners.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+            8┆ require(msg.sender == address(this), "Method can only be called  
+  from this contract");                                                         
+            ⋮┆----------------------------------------
+           36┆ require(threshold == 0, "Owners have already been setup");
+            ⋮┆----------------------------------------
+           38┆ require(_threshold <= _owners.length, "Threshold cannot exceed   
+  owner count");                                                                
+            ⋮┆----------------------------------------
+           40┆ require(_threshold >= 1, "Threshold needs to be greater than 0");
+            ⋮┆----------------------------------------
+           46┆ require(owner != address(0) && owner != SENTINEL_OWNERS, "Invalid
+  owner address provided");                                                     
+            ⋮┆----------------------------------------
+           48┆ require(owners[owner] == address(0), "Duplicate owner address    
+  provided");                                                                   
+            ⋮┆----------------------------------------
+           67┆ require(owner != address(0) && owner != SENTINEL_OWNERS, "Invalid
+  owner address provided");                                                     
+            ⋮┆----------------------------------------
+           69┆ require(owners[owner] == address(0), "Address is already an      
+  owner");                                                                      
+            ⋮┆----------------------------------------
+           91┆ require(ownerCount - 1 >= _threshold, "New owner count needs to  
+  be larger than new threshold");                                               
+            ⋮┆----------------------------------------
+           93┆ require(owner != address(0) && owner != SENTINEL_OWNERS, "Invalid
+  owner address provided");                                                     
+            ⋮┆----------------------------------------
+           94┆ require(owners[prevOwner] == owner, "Invalid prevOwner, owner    
+  pair provided");                                                              
+            ⋮┆----------------------------------------
+          115┆ require(newOwner != address(0) && newOwner != SENTINEL_OWNERS,   
+  "Invalid owner address provided");                                            
+            ⋮┆----------------------------------------
+          117┆ require(owners[newOwner] == address(0), "Address is already an   
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          119┆ require(oldOwner != address(0) && oldOwner != SENTINEL_OWNERS,   
+  "Invalid owner address provided");                                            
+            ⋮┆----------------------------------------
+          120┆ require(owners[prevOwner] == oldOwner, "Invalid prevOwner, owner 
+  pair provided");                                                              
+            ⋮┆----------------------------------------
+          136┆ require(_threshold <= ownerCount, "Threshold cannot exceed owner 
+  count");                                                                      
+            ⋮┆----------------------------------------
+          138┆ require(_threshold >= 1, "Threshold needs to be greater than 0");
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+           46┆ require(owner != address(0) && owner != SENTINEL_OWNERS, "Invalid
+  owner address provided");                                                     
+            ⋮┆----------------------------------------
+           67┆ require(owner != address(0) && owner != SENTINEL_OWNERS, "Invalid
+  owner address provided");                                                     
+            ⋮┆----------------------------------------
+           93┆ require(owner != address(0) && owner != SENTINEL_OWNERS, "Invalid
+  owner address provided");                                                     
+            ⋮┆----------------------------------------
+          115┆ require(newOwner != address(0) && newOwner != SENTINEL_OWNERS,   
+  "Invalid owner address provided");                                            
+            ⋮┆----------------------------------------
+          119┆ require(oldOwner != address(0) && oldOwner != SENTINEL_OWNERS,   
+  "Invalid owner address provided");                                            
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-decrement-not-postfix                    
+          Consider using the prefix decrement expression whenever the return    
+  value is not needed. The                                                      
+          prefix decrement expression is cheaper in terms of gas.               
+                                                                                
+           98┆ ownerCount--;
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+           43┆ for (uint256 i = 0; i < _owners.length; i++) {
+            ⋮┆----------------------------------------
+           73┆ ownerCount++;
+            ⋮┆----------------------------------------
+          174┆ index ++;
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+            8┆ require(msg.sender == address(this), "Method can only be called  
+  from this contract");                                                         
+            ⋮┆----------------------------------------
+           38┆ require(_threshold <= _owners.length, "Threshold cannot exceed   
+  owner count");                                                                
+            ⋮┆----------------------------------------
+           40┆ require(_threshold >= 1, "Threshold needs to be greater than 0");
+            ⋮┆----------------------------------------
+           91┆ require(ownerCount - 1 >= _threshold, "New owner count needs to  
+  be larger than new threshold");                                               
+            ⋮┆----------------------------------------
+           94┆ require(owners[prevOwner] == owner, "Invalid prevOwner, owner    
+  pair provided");                                                              
+            ⋮┆----------------------------------------
+          120┆ require(owners[prevOwner] == oldOwner, "Invalid prevOwner, owner 
+  pair provided");                                                              
+            ⋮┆----------------------------------------
+          136┆ require(_threshold <= ownerCount, "Threshold cannot exceed owner 
+  count");                                                                      
+            ⋮┆----------------------------------------
+          138┆ require(_threshold >= 1, "Threshold needs to be greater than 0");
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 39 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

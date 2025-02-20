@@ -1,0 +1,522 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                     
+                     
+┌───────────────────┐
+│ 125 Code Findings │
+└───────────────────┘
+                                     
+    /sb/PerpetualPositionManager.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          491┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          495┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          513┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          518┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          523┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+         2539┆ contract AddressWhitelist is Ownable, Lockable {
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+         2599┆ for (uint256 i = 0; i < whitelistIndices.length; i++) {
+            ⋮┆----------------------------------------
+         2608┆ for (uint256 i = 0; i < whitelistIndices.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+         1494┆ constructor() internal {
+         1495┆     // Storing an initial non-zero value makes deployment a bit  
+  more                                                                          
+         1496┆     // expensive, but in exchange the refund on every call to    
+  nonReentrant                                                                  
+         1497┆     // will be lower in amount. Since refunds are capped to a    
+  percetange of                                                                 
+         1498┆     // the total transaction's gas, it is best to keep them low  
+  in cases                                                                      
+         1499┆     // like this one, to increase the likelihood of the full     
+  refund coming                                                                 
+         1500┆     // into effect.
+         1501┆     _notEntered = true;
+         1502┆ }
+            ⋮┆----------------------------------------
+         1553┆ constructor() public {
+         1554┆     currentTime = now; // solhint-disable-line not-rely-on-time
+         1555┆ }
+            ⋮┆----------------------------------------
+         2723┆ constructor(
+         2724┆     uint256 _liveness,
+         2725┆     address _finderAddress,
+         2726┆     address _timerAddress
+         2727┆ ) public Testable(_timerAddress) {
+         2728┆     finder = FinderInterface(_finderAddress);
+         2729┆     _validateLiveness(_liveness);
+         2730┆     defaultLiveness = _liveness;
+         2731┆ }
+            ⋮┆----------------------------------------
+         3655┆ constructor(
+         3656┆     uint256 _withdrawalLiveness,
+         3657┆     address _collateralAddress,
+         3658┆     address _tokenAddress,
+         3659┆     address _finderAddress,
+         3660┆     bytes32 _priceIdentifier,
+         3661┆     bytes32 _fundingRateIdentifier,
+         3662┆     FixedPoint.Unsigned memory _minSponsorTokens,
+         3663┆     address _configStoreAddress,
+         3664┆     FixedPoint.Unsigned memory _tokenScaling,
+             [hid 19 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+         2599┆ for (uint256 i = 0; i < whitelistIndices.length; i++) {
+            ⋮┆----------------------------------------
+         2600┆ if (whitelist[whitelistIndices[i]] == Status.In) {
+            ⋮┆----------------------------------------
+         2600┆ if (whitelist[whitelistIndices[i]] == Status.In) {
+            ⋮┆----------------------------------------
+         2608┆ for (uint256 i = 0; i < whitelistIndices.length; i++) {
+            ⋮┆----------------------------------------
+         2609┆ address addr = whitelistIndices[i];
+            ⋮┆----------------------------------------
+         2610┆ if (whitelist[addr] == Status.In) {
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+         2599┆ for (uint256 i = 0; i < whitelistIndices.length; i++) {
+            ⋮┆----------------------------------------
+         2608┆ for (uint256 i = 0; i < whitelistIndices.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           88┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          103┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          120┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          137┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          154┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          340┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          344┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          401┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          402┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          426┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          450┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          510┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          511┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          512┆ );
+            ⋮┆----------------------------------------
+          540┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          570┆ require(!(a == -1 && b == _INT256_MIN), "SignedSafeMath:         
+  multiplication overflow");                                                    
+            ⋮┆----------------------------------------
+          573┆ require(c / a == b, "SignedSafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          591┆ require(b != 0, "SignedSafeMath: division by zero");
+            ⋮┆----------------------------------------
+          592┆ require(!(b == -1 && a == _INT256_MIN), "SignedSafeMath: division
+  overflow");                                                                   
+            ⋮┆----------------------------------------
+          611┆ require((b >= 0 && c <= a) || (b < 0 && c > a), "SignedSafeMath: 
+  subtraction overflow");                                                       
+            ⋮┆----------------------------------------
+          628┆ require((b >= 0 && c >= a) || (b < 0 && c < a), "SignedSafeMath: 
+  addition overflow");                                                          
+            ⋮┆----------------------------------------
+         1019┆ require(a.rawValue >= 0, "Negative value provided");
+            ⋮┆----------------------------------------
+         1024┆ require(a.rawValue <= uint256(type(int256).max), "Unsigned too   
+  large");                                                                      
+            ⋮┆----------------------------------------
+         1532┆ require(_notEntered, "ReentrancyGuard: reentrant call");
+            ⋮┆----------------------------------------
+         1986┆ require(value < 2**128, "SafeCast: value doesn\'t fit in 128     
+  bits");                                                                       
+            ⋮┆----------------------------------------
+         2001┆ require(value < 2**64, "SafeCast: value doesn\'t fit in 64       
+  bits");                                                                       
+            ⋮┆----------------------------------------
+         2016┆ require(value < 2**32, "SafeCast: value doesn\'t fit in 32       
+  bits");                                                                       
+            ⋮┆----------------------------------------
+         2031┆ require(value < 2**16, "SafeCast: value doesn\'t fit in 16       
+  bits");                                                                       
+            ⋮┆----------------------------------------
+         2046┆ require(value < 2**8, "SafeCast: value doesn\'t fit in 8 bits");
+            ⋮┆----------------------------------------
+         2058┆ require(value >= 0, "SafeCast: value must be positive");
+            ⋮┆----------------------------------------
+         2076┆ require(value >= -2**127 && value < 2**127, "SafeCast: value     
+  doesn\'t fit in 128 bits");                                                   
+            ⋮┆----------------------------------------
+         2094┆ require(value >= -2**63 && value < 2**63, "SafeCast: value       
+  doesn\'t fit in 64 bits");                                                    
+            ⋮┆----------------------------------------
+         2112┆ require(value >= -2**31 && value < 2**31, "SafeCast: value       
+  doesn\'t fit in 32 bits");                                                    
+            ⋮┆----------------------------------------
+         2130┆ require(value >= -2**15 && value < 2**15, "SafeCast: value       
+  doesn\'t fit in 16 bits");                                                    
+            ⋮┆----------------------------------------
+         2148┆ require(value >= -2**7 && value < 2**7, "SafeCast: value doesn\'t
+  fit in 8 bits");                                                              
+            ⋮┆----------------------------------------
+         2160┆ require(value < 2**255, "SafeCast: value doesn't fit in an       
+  int256");                                                                     
+            ⋮┆----------------------------------------
+         2509┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+         2530┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+         2752┆ require(getState(msg.sender, identifier, timestamp,              
+  ancillaryData) == State.Invalid, "requestPrice: Invalid");                    
+            ⋮┆----------------------------------------
+         2753┆                                                                  
+  require(_getIdentifierWhitelist().isIdentifierSupported(identifier),          
+  "Unsupported identifier");                                                    
+            ⋮┆----------------------------------------
+         2754┆                                                                  
+  require(_getCollateralWhitelist().isOnWhitelist(address(currency)),           
+  "Unsupported currency");                                                      
+            ⋮┆----------------------------------------
+         2797┆ require(getState(msg.sender, identifier, timestamp,              
+  ancillaryData) == State.Requested, "setBond: Requested");                     
+            ⋮┆----------------------------------------
+         2818┆ require(
+         2819┆     getState(msg.sender, identifier, timestamp, ancillaryData) ==
+  State.Requested,                                                              
+         2820┆     "setRefundOnDispute: Requested"
+         2821┆ );
+            ⋮┆----------------------------------------
+         2839┆ require(
+         2840┆     getState(msg.sender, identifier, timestamp, ancillaryData) ==
+  State.Requested,                                                              
+         2841┆     "setCustomLiveness: Requested"
+         2842┆ );
+            ⋮┆----------------------------------------
+         2867┆ require(
+         2868┆     getState(requester, identifier, timestamp, ancillaryData) == 
+  State.Requested,                                                              
+         2869┆     "proposePriceFor: Requested"
+         2870┆ );
+            ⋮┆----------------------------------------
+         2932┆ require(
+         2933┆     getState(requester, identifier, timestamp, ancillaryData) == 
+  State.Proposed,                                                               
+         2934┆     "disputePriceFor: Proposed"
+         2935┆ );
+            ⋮┆----------------------------------------
+         3149┆ revert("_settle: not settleable");
+            ⋮┆----------------------------------------
+         3181┆ require(_liveness < 5200 weeks, "Liveness too large");
+            ⋮┆----------------------------------------
+         3182┆ require(_liveness > 0, "Liveness cannot be 0");
+            ⋮┆----------------------------------------
+         3349┆ require(fundingRate.proposalTime == 0, "Proposal in progress");
+            ⋮┆----------------------------------------
+         3355┆ require(
+         3356┆     timestamp > updateTime && timestamp >= currentTime.sub(30    
+  minutes) && timestamp <= currentTime.add(90),                                 
+         3357┆     "Invalid proposal time"
+         3358┆ );
+            ⋮┆----------------------------------------
+         3677┆                                                                  
+  require(_getIdentifierWhitelist().isIdentifierSupported(_priceIdentifier),    
+  "Unsupported price identifier");                                              
+            ⋮┆----------------------------------------
+         3703┆ require(collateralAmount.isGreaterThan(0), "Invalid collateral   
+  amount");                                                                     
+            ⋮┆----------------------------------------
+         3742┆ require(collateralAmount.isGreaterThan(0), "Invalid collateral   
+  amount");                                                                     
+            ⋮┆----------------------------------------
+         3769┆ require(
+         3770┆     collateralAmount.isGreaterThan(0) &&
+         3771┆                                                                  
+  collateralAmount.isLessThanOrEqual(_getFeeAdjustedCollateral(positionData.rawC
+  ollateral)),                                                                  
+         3772┆     "Invalid collateral amount"
+         3773┆ );
+            ⋮┆----------------------------------------
+         3797┆ require(
+         3798┆     positionData.withdrawalRequestPassTimestamp != 0 &&
+         3799┆         positionData.withdrawalRequestPassTimestamp <=           
+  getCurrentTime(),                                                             
+         3800┆     "Invalid withdraw request"
+         3801┆ );
+            ⋮┆----------------------------------------
+         3855┆ require(
+         3856┆     (_checkCollateralization(
+         3857┆                                                                  
+  _getFeeAdjustedCollateral(positionData.rawCollateral).add(collateralAmount),  
+         3858┆         positionData.tokensOutstanding.add(numTokens)
+         3859┆     ) || _checkCollateralization(collateralAmount, numTokens)),
+         3860┆     "Insufficient collateral"
+         3861┆ );
+            ⋮┆----------------------------------------
+         3863┆ require(positionData.withdrawalRequestPassTimestamp == 0,        
+  "Pending withdrawal");                                                        
+            ⋮┆----------------------------------------
+         3865┆ require(numTokens.isGreaterThanOrEqual(minSponsorTokens), "Below 
+  minimum sponsor position");                                                   
+            ⋮┆----------------------------------------
+         3904┆                                                                  
+  require(numTokens.isLessThanOrEqual(positionData.tokensOutstanding), "Invalid 
+  token amount");                                                               
+            ⋮┆----------------------------------------
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+         3919┆ require(newTokenCount.isGreaterThanOrEqual(minSponsorTokens),    
+  "Below minimum sponsor position");                                            
+            ⋮┆----------------------------------------
+         4115┆ require(
+         4116┆                                                                  
+  positionData.tokensOutstanding.isGreaterThanOrEqual(minSponsorTokens),        
+         4117┆     "Below minimum sponsor position"
+         4118┆ );
+            ⋮┆----------------------------------------
+         4228┆ require(_checkPositionCollateralization(positionData), "CR below 
+  GCR");                                                                        
+            ⋮┆----------------------------------------
+         4236┆ require(
+         4237┆                                                                  
+  _getFeeAdjustedCollateral(positions[sponsor].rawCollateral).isGreaterThan(0), 
+         4238┆     "Position has no collateral"
+         4239┆ );
+            ⋮┆----------------------------------------
+         4256┆ require(_getPositionData(sponsor).withdrawalRequestPassTimestamp 
+
+Ran 48 rules on 1 file: 125 findings.
+  == 0, "Pending withdrawal");                                                  
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          570┆ require(!(a == -1 && b == _INT256_MIN), "SignedSafeMath:         
+  multiplication overflow");                                                    
+            ⋮┆----------------------------------------
+          592┆ require(!(b == -1 && a == _INT256_MIN), "SignedSafeMath: division
+  overflow");                                                                   
+            ⋮┆----------------------------------------
+          611┆ require((b >= 0 && c <= a) || (b < 0 && c > a), "SignedSafeMath: 
+  subtraction overflow");                                                       
+            ⋮┆----------------------------------------
+          628┆ require((b >= 0 && c >= a) || (b < 0 && c < a), "SignedSafeMath: 
+  addition overflow");                                                          
+            ⋮┆----------------------------------------
+         2076┆ require(value >= -2**127 && value < 2**127, "SafeCast: value     
+  doesn\'t fit in 128 bits");                                                   
+            ⋮┆----------------------------------------
+         2094┆ require(value >= -2**63 && value < 2**63, "SafeCast: value       
+  doesn\'t fit in 64 bits");                                                    
+            ⋮┆----------------------------------------
+         2112┆ require(value >= -2**31 && value < 2**31, "SafeCast: value       
+  doesn\'t fit in 32 bits");                                                    
+            ⋮┆----------------------------------------
+         2130┆ require(value >= -2**15 && value < 2**15, "SafeCast: value       
+  doesn\'t fit in 16 bits");                                                    
+            ⋮┆----------------------------------------
+         2148┆ require(value >= -2**7 && value < 2**7, "SafeCast: value doesn\'t
+  fit in 8 bits");                                                              
+            ⋮┆----------------------------------------
+         3355┆ require(
+         3356┆     timestamp > updateTime && timestamp >= currentTime.sub(30    
+  minutes) && timestamp <= currentTime.add(90),                                 
+         3357┆     "Invalid proposal time"
+         3358┆ );
+            ⋮┆----------------------------------------
+         3769┆ require(
+         3770┆     collateralAmount.isGreaterThan(0) &&
+         3771┆                                                                  
+  collateralAmount.isLessThanOrEqual(_getFeeAdjustedCollateral(positionData.rawC
+  ollateral)),                                                                  
+         3772┆     "Invalid collateral amount"
+         3773┆ );
+            ⋮┆----------------------------------------
+         3797┆ require(
+         3798┆     positionData.withdrawalRequestPassTimestamp != 0 &&
+         3799┆         positionData.withdrawalRequestPassTimestamp <=           
+  getCurrentTime(),                                                             
+         3800┆     "Invalid withdraw request"
+         3801┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         2955┆ if (request.reward > 0 && request.refundOnDispute) {
+         2956┆     refund = request.reward;
+         2957┆     request.reward = 0;
+         2958┆     request.currency.safeTransfer(requester, refund);
+         2959┆ }
+            ⋮┆----------------------------------------
+         4102┆ if (
+         4103┆     tokensToRemove.isEqual(positionData.tokensOutstanding) &&
+         4104┆                                                                  
+  _getFeeAdjustedCollateral(positionData.rawCollateral).isEqual(collateralToRemo
+  ve)                                                                           
+         4105┆ ) {
+         4106┆     _deleteSponsorPosition(sponsor);
+         4107┆     return;
+         4108┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+         2599┆ for (uint256 i = 0; i < whitelistIndices.length; i++) {
+            ⋮┆----------------------------------------
+         2601┆ activeCount++;
+            ⋮┆----------------------------------------
+         2608┆ for (uint256 i = 0; i < whitelistIndices.length; i++) {
+            ⋮┆----------------------------------------
+         2612┆ activeCount++;
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          120┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          344┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          401┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          426┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          450┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          510┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          511┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          512┆ );
+            ⋮┆----------------------------------------
+          540┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          570┆ require(!(a == -1 && b == _INT256_MIN), "SignedSafeMath:         
+  multiplication overflow");                                                    
+            ⋮┆----------------------------------------
+          573┆ require(c / a == b, "SignedSafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          592┆ require(!(b == -1 && a == _INT256_MIN), "SignedSafeMath: division
+  overflow");                                                                   
+            ⋮┆----------------------------------------
+          611┆ require((b >= 0 && c <= a) || (b < 0 && c > a), "SignedSafeMath: 
+  subtraction overflow");                                                       
+            ⋮┆----------------------------------------
+          628┆ require((b >= 0 && c >= a) || (b < 0 && c < a), "SignedSafeMath: 
+  addition overflow");                                                          
+            ⋮┆----------------------------------------
+         1986┆ require(value < 2**128, "SafeCast: value doesn\'t fit in 128     
+  bits");                                                                       
+            ⋮┆----------------------------------------
+         2001┆ require(value < 2**64, "SafeCast: value doesn\'t fit in 64       
+  bits");                                                                       
+            ⋮┆----------------------------------------
+         2016┆ require(value < 2**32, "SafeCast: value doesn\'t fit in 32       
+  bits");                                                                       
+            ⋮┆----------------------------------------
+         2031┆ require(value < 2**16, "SafeCast: value doesn\'t fit in 16       
+  bits");                                                                       
+            ⋮┆----------------------------------------
+         2046┆ require(value < 2**8, "SafeCast: value doesn\'t fit in 8 bits");
+            ⋮┆----------------------------------------
+         2076┆ require(value >= -2**127 && value < 2**127, "SafeCast: value     
+  doesn\'t fit in 128 bits");                                                   
+            ⋮┆----------------------------------------
+         2094┆ require(value >= -2**63 && value < 2**63, "SafeCast: value       
+  doesn\'t fit in 64 bits");                                                    
+            ⋮┆----------------------------------------
+         2112┆ require(value >= -2**31 && value < 2**31, "SafeCast: value       
+  doesn\'t fit in 32 bits");                                                    
+            ⋮┆----------------------------------------
+         2130┆ require(value >= -2**15 && value < 2**15, "SafeCast: value       
+  doesn\'t fit in 16 bits");                                                    
+            ⋮┆----------------------------------------
+         2148┆ require(value >= -2**7 && value < 2**7, "SafeCast: value doesn\'t
+  fit in 8 bits");                                                              
+            ⋮┆----------------------------------------
+         2160┆ require(value < 2**255, "SafeCast: value doesn't fit in an       
+  int256");                                                                     
+            ⋮┆----------------------------------------
+         2530┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

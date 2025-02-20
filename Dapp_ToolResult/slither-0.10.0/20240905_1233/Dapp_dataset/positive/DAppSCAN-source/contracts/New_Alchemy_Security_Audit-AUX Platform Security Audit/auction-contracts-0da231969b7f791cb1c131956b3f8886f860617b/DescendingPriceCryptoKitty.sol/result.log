@@ -1,0 +1,53 @@
+'solc --version' running
+'solc /sb/DescendingPriceCryptoKitty.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/DescendingPriceCryptoKitty.sol:
+/sb/DescendingPriceCryptoKitty.sol:50:3: Warning: Defining constructors as functions with the same name as the contract is deprecated. Use "constructor(...) { ... }" instead.
+  function Ownable() public {
+  ^ (Relevant source part starts here and spans across multiple lines).
+
+
+DescendingPriceAuction.getCurrentPrice(uint256) (../../sb/DescendingPriceCryptoKitty.sol#352-372) performs a multiplication on the result of a division:
+	- priceDecrease = numberOfBlocksElapsed.mul(priceDifference.div(blockDifference)) (../../sb/DescendingPriceCryptoKitty.sol#369)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+DescendingPriceAuction.setAuctionPricing(uint256,uint256,uint256,uint256) (../../sb/DescendingPriceCryptoKitty.sol#378-388) contains a tautology or contradiction:
+	- require(bool)(startPrice > 0 && priceFloor < startPrice && priceFloor >= 0 && duration > 0) (../../sb/DescendingPriceCryptoKitty.sol#379)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#tautology-or-contradiction
+
+Different versions of Solidity are used:
+	- Version used: ['^0.4.11', '^0.4.23']
+	- ^0.4.11 (../../sb/DescendingPriceCryptoKitty.sol#2)
+	- ^0.4.23 (../../sb/DescendingPriceCryptoKitty.sol#1)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+
+Pragma version^0.4.23 (../../sb/DescendingPriceCryptoKitty.sol#1) allows old versions
+Pragma version^0.4.11 (../../sb/DescendingPriceCryptoKitty.sol#2) allows old versions
+solc-0.4.26 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Reentrancy in DescendingPriceCryptoKittyAuction.createAuction(uint256,uint256,uint256,uint256) (../../sb/DescendingPriceCryptoKitty.sol#405-410):
+	External calls:
+	- setAuctionPricing(startPrice,priceFloor,duration,auctionId) (../../sb/DescendingPriceCryptoKitty.sol#407)
+		- msg.sender.transfer(msg.value.sub(feeAmount)) (../../sb/DescendingPriceCryptoKitty.sol#289)
+	State variables written after the call(s):
+	- setAuctionAsset(kittyId,auctionId) (../../sb/DescendingPriceCryptoKitty.sol#408)
+		- auctionIdToKittyId[auctionId] = kittyId (../../sb/DescendingPriceCryptoKitty.sol#234)
+	- setAuctionAsset(kittyId,auctionId) (../../sb/DescendingPriceCryptoKitty.sol#408)
+		- kittyIdToAuctionId[kittyId] = auctionId (../../sb/DescendingPriceCryptoKitty.sol#236)
+Reentrancy in DescendingPriceAuction.setAuctionPricing(uint256,uint256,uint256,uint256) (../../sb/DescendingPriceCryptoKitty.sol#378-388):
+	External calls:
+	- requiresFee(startPrice.div(50)) (../../sb/DescendingPriceCryptoKitty.sol#378)
+		- msg.sender.transfer(msg.value.sub(feeAmount)) (../../sb/DescendingPriceCryptoKitty.sol#289)
+	State variables written after the call(s):
+	- auctionIdToAcceptingBids[auctionId] = true (../../sb/DescendingPriceCryptoKitty.sol#387)
+	- auctionIdToPriceFloor[auctionId] = priceFloor (../../sb/DescendingPriceCryptoKitty.sol#385)
+	- auctionIdToPriceFloorBlock[auctionId] = block.number.add(duration) (../../sb/DescendingPriceCryptoKitty.sol#386)
+	- auctionIdToStartBlock[auctionId] = block.number (../../sb/DescendingPriceCryptoKitty.sol#383)
+	- auctionIdToStartPrice[auctionId] = startPrice (../../sb/DescendingPriceCryptoKitty.sol#384)
+Reentrancy in FeeCollector.withdrawFees() (../../sb/DescendingPriceCryptoKitty.sol#295-300):
+	External calls:
+	- owner.transfer(feeAmountWithdrawn) (../../sb/DescendingPriceCryptoKitty.sol#298)
+	Event emitted after the call(s):
+	- FeesWithdrawn(owner,feeAmountWithdrawn) (../../sb/DescendingPriceCryptoKitty.sol#299)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-4
+/sb/DescendingPriceCryptoKitty.sol analyzed (9 contracts with 93 detectors), 9 result(s) found

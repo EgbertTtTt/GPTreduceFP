@@ -1,0 +1,60 @@
+'solc --version' running
+'solc /sb/Treasury.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/Treasury.sol:
+Warning: This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> /sb/Treasury.sol:46:1:
+   |
+46 | contract Treasury {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> /sb/Treasury.sol:107:5:
+    |
+107 |     fallback() external payable {}
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning: Return value of low-level calls not used.
+   --> /sb/Treasury.sol:104:9:
+    |
+104 |         _target.call(_callData);
+    |         ^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+Treasury.sendFunds(address,uint256,address) (../../sb/Treasury.sol#71-82) ignores return value by IERC20(_token).transfer(_recipient,_amount) (../../sb/Treasury.sol#80)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+Treasury.genericCall(address,bytes) (../../sb/Treasury.sol#100-105) ignores return value by _target.call(_callData) (../../sb/Treasury.sol#104)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-low-level-calls
+
+Treasury.approve(address,address,uint256) (../../sb/Treasury.sol#88-94) ignores return value by IERC20(_token).approve(_spender,_amount) (../../sb/Treasury.sol#93)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+Treasury.constructor(address).__governance (../../sb/Treasury.sol#62) lacks a zero-check on :
+		- _governance = __governance (../../sb/Treasury.sol#63)
+Treasury.sendFunds(address,uint256,address)._recipient (../../sb/Treasury.sol#74) lacks a zero-check on :
+		- address(_recipient).transfer(_amount) (../../sb/Treasury.sol#77)
+Treasury.genericCall(address,bytes)._target (../../sb/Treasury.sol#100) lacks a zero-check on :
+		- _target.call(_callData) (../../sb/Treasury.sol#104)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Pragma version^0.8.3 (../../sb/Treasury.sol#1) allows old versions
+solc-0.8.27 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Treasury.genericCall(address,bytes) (../../sb/Treasury.sol#100-105):
+	- _target.call(_callData) (../../sb/Treasury.sol#104)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter Treasury.sendFunds(address,uint256,address)._token (../../sb/Treasury.sol#72) is not in mixedCase
+Parameter Treasury.sendFunds(address,uint256,address)._amount (../../sb/Treasury.sol#73) is not in mixedCase
+Parameter Treasury.sendFunds(address,uint256,address)._recipient (../../sb/Treasury.sol#74) is not in mixedCase
+Parameter Treasury.approve(address,address,uint256)._token (../../sb/Treasury.sol#89) is not in mixedCase
+Parameter Treasury.approve(address,address,uint256)._spender (../../sb/Treasury.sol#90) is not in mixedCase
+Parameter Treasury.approve(address,address,uint256)._amount (../../sb/Treasury.sol#91) is not in mixedCase
+Parameter Treasury.genericCall(address,bytes)._target (../../sb/Treasury.sol#100) is not in mixedCase
+Parameter Treasury.genericCall(address,bytes)._callData (../../sb/Treasury.sol#100) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Treasury._governance (../../sb/Treasury.sol#48) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/Treasury.sol analyzed (2 contracts with 93 detectors), 18 result(s) found

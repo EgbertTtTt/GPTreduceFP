@@ -1,0 +1,174 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 45 Code Findings │
+└──────────────────┘
+                                  
+    /sb/DistributorGovernance.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+         1331┆ for(uint i; i< _blockProducers.length; i++) {
+            ⋮┆----------------------------------------
+         1357┆ for(uint i; i< producers.length; i++) {
+            ⋮┆----------------------------------------
+         1381┆ for(uint i; i< producers.length; i++) {
+            ⋮┆----------------------------------------
+         1408┆ for(uint i; i< producers.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+         1322┆ constructor(
+         1323┆     address _admin,
+         1324┆     address[] memory _blockProducers,
+         1325┆     address[] memory _collectors
+         1326┆ ) {
+         1327┆     require(_blockProducers.length == _collectors.length, "length
+  mismatch");                                                                   
+         1328┆     _setupRole(GOV_ROLE, _admin);
+         1329┆     _setupRole(DELEGATOR_ROLE, _admin);
+         1330┆     _setupRole(DEFAULT_ADMIN_ROLE, _admin);
+         1331┆     for(uint i; i< _blockProducers.length; i++) {
+             [hid 7 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+         1332┆ blockProducer[_blockProducers[i]] = true;
+            ⋮┆----------------------------------------
+         1335┆ rewardCollector[_blockProducers[i]] = _collectors[i];
+            ⋮┆----------------------------------------
+         1358┆ require(blockProducer[producers[i]] == false, "already block     
+  producer");                                                                   
+            ⋮┆----------------------------------------
+         1359┆ blockProducer[producers[i]] = true;
+            ⋮┆----------------------------------------
+         1382┆ require(blockProducer[producers[i]] == true, "not block          
+  producer");                                                                   
+            ⋮┆----------------------------------------
+         1383┆ blockProducer[producers[i]] = false;
+            ⋮┆----------------------------------------
+         1409┆ rewardCollector[producers[i]] = collectors[i];
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+         1331┆ for(uint i; i< _blockProducers.length; i++) {
+            ⋮┆----------------------------------------
+         1357┆ for(uint i; i< producers.length; i++) {
+            ⋮┆----------------------------------------
+         1381┆ for(uint i; i< producers.length; i++) {
+            ⋮┆----------------------------------------
+         1408┆ for(uint i; i< producers.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          125┆ require(value == 0, "Strings: hex length insufficient");
+            ⋮┆----------------------------------------
+          352┆ require(account == _msgSender(), "AccessControl: can only        
+  renounce roles for self");                                                    
+            ⋮┆----------------------------------------
+          998┆ require(_length + 31 >= _length, "slice_overflow");
+            ⋮┆----------------------------------------
+          999┆ require(_bytes.length >= _start + _length, "slice_outOfBounds");
+            ⋮┆----------------------------------------
+         1059┆ require(_bytes.length >= _start + 20, "toAddress_outOfBounds");
+            ⋮┆----------------------------------------
+         1070┆ require(_bytes.length >= _start + 1 , "toUint8_outOfBounds");
+            ⋮┆----------------------------------------
+         1081┆ require(_bytes.length >= _start + 2, "toUint16_outOfBounds");
+            ⋮┆----------------------------------------
+         1092┆ require(_bytes.length >= _start + 4, "toUint32_outOfBounds");
+            ⋮┆----------------------------------------
+         1103┆ require(_bytes.length >= _start + 8, "toUint64_outOfBounds");
+            ⋮┆----------------------------------------
+         1114┆ require(_bytes.length >= _start + 12, "toUint96_outOfBounds");
+            ⋮┆----------------------------------------
+         1125┆ require(_bytes.length >= _start + 16, "toUint128_outOfBounds");
+            ⋮┆----------------------------------------
+         1136┆ require(_bytes.length >= _start + 32, "toUint256_outOfBounds");
+            ⋮┆----------------------------------------
+         1147┆ require(_bytes.length >= _start + 32, "toBytes32_outOfBounds");
+            ⋮┆----------------------------------------
+         1300┆ require(hasRole(GOV_ROLE, msg.sender), "must be gov");
+            ⋮┆----------------------------------------
+         1306┆ require(hasRole(DELEGATOR_ROLE, msg.sender), "must be            
+  delegator");                                                                  
+            ⋮┆----------------------------------------
+         1312┆ require(hasRole(DELEGATOR_ROLE, msg.sender) || msg.sender ==     
+  producer, "must be producer or delegator");                                   
+            ⋮┆----------------------------------------
+         1327┆ require(_blockProducers.length == _collectors.length, "length    
+  mismatch");                                                                   
+            ⋮┆----------------------------------------
+         1346┆ require(blockProducer[producer] == false, "already block         
+  producer");                                                                   
+            ⋮┆----------------------------------------
+         1358┆ require(blockProducer[producers[i]] == false, "already block     
+  producer");                                                                   
+            ⋮┆----------------------------------------
+         1370┆ require(blockProducer[producer] == true, "not block producer");
+            ⋮┆----------------------------------------
+         1382┆ require(blockProducer[producers[i]] == true, "not block          
+  producer");                                                                   
+            ⋮┆----------------------------------------
+         1406┆ require(producers.length == collectors.length, "length           
+  mismatch");                                                                   
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+           86┆ digits++;
+            ⋮┆----------------------------------------
+          108┆ length++;
+            ⋮┆----------------------------------------
+         1331┆ for(uint i; i< _blockProducers.length; i++) {
+            ⋮┆----------------------------------------
+         1357┆ for(uint i; i< producers.length; i++) {
+            ⋮┆----------------------------------------
+         1381┆ for(uint i; i< producers.length; i++) {
+            ⋮┆----------------------------------------
+         1408┆ for(uint i; i< producers.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          352┆ require(account == _msgSender(), "AccessControl: can only        
+  renounce roles for self");                                                    
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 45 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

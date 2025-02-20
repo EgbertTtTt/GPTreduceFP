@@ -1,0 +1,328 @@
+'solc --version' running
+'solc /sb/moonship.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+Utils.swapETHForTokens(address,address,uint256) (../../sb/moonship.sol#780-799) sends eth to arbitrary user
+	Dangerous calls:
+	- nutRouter.swapExactETHForTokensSupportingFeeOnTransferTokens{value: ethAmount}(0,path,address(recipient),block.timestamp + 360) (../../sb/moonship.sol#793-798)
+Utils.addLiquidity(address,address,uint256,uint256) (../../sb/moonship.sol#801-818) sends eth to arbitrary user
+	Dangerous calls:
+	- nutRouter.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner,block.timestamp + 360) (../../sb/moonship.sol#810-817)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#functions-that-send-ether-to-arbitrary-destinations
+
+Reentrancy in MoonShip._transfer(address,address,uint256,uint256) (../../sb/moonship.sol#1192-1217):
+	External calls:
+	- swapAndLiquify(from,to) (../../sb/moonship.sol#1205)
+		- nutRouter.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner,block.timestamp + 360) (../../sb/moonship.sol#810-817)
+		- nutRouter.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/moonship.sol#771-777)
+		- Utils.swapTokensForEth(address(nutRouter),tokenAmountToBeSwapped) (../../sb/moonship.sol#1415)
+		- Utils.addLiquidity(address(nutRouter),owner(),otherPiece,bnbToBeAddedToLiquidity) (../../sb/moonship.sol#1428)
+	External calls sending eth:
+	- swapAndLiquify(from,to) (../../sb/moonship.sol#1205)
+		- nutRouter.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner,block.timestamp + 360) (../../sb/moonship.sol#810-817)
+	State variables written after the call(s):
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/moonship.sol#1216)
+		- _rOwned[address(this)] = _rOwned[address(this)].add(rLiquidity) (../../sb/moonship.sol#1148)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/moonship.sol#1245)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/moonship.sol#1254)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/moonship.sol#1070)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/moonship.sol#1265)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/moonship.sol#1246)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/moonship.sol#1266)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/moonship.sol#1256)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/moonship.sol#1072)
+	MoonShip._rOwned (../../sb/moonship.sol#891) can be used in cross function reentrancies:
+	- MoonShip._getCurrentSupply() (../../sb/moonship.sol#1133-1143)
+	- MoonShip._takeLiquidity(uint256) (../../sb/moonship.sol#1145-1151)
+	- MoonShip._transferBothExcluded(address,address,uint256) (../../sb/moonship.sol#1067-1076)
+	- MoonShip._transferFromExcluded(address,address,uint256) (../../sb/moonship.sol#1262-1270)
+	- MoonShip._transferStandard(address,address,uint256) (../../sb/moonship.sol#1243-1250)
+	- MoonShip._transferToExcluded(address,address,uint256) (../../sb/moonship.sol#1252-1260)
+	- MoonShip.balanceOf(address) (../../sb/moonship.sol#976-979)
+	- MoonShip.constructor(address) (../../sb/moonship.sol#934-958)
+	- MoonShip.deliver(uint256) (../../sb/moonship.sol#1019-1026)
+	- MoonShip.excludeFromReward(address) (../../sb/moonship.sol#1045-1052)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/moonship.sol#1216)
+		- _rTotal = _rTotal.sub(rFee) (../../sb/moonship.sol#1103)
+	MoonShip._rTotal (../../sb/moonship.sol#903) can be used in cross function reentrancies:
+	- MoonShip._getCurrentSupply() (../../sb/moonship.sol#1133-1143)
+	- MoonShip._reflectFee(uint256,uint256) (../../sb/moonship.sol#1102-1105)
+	- MoonShip.constructor(address) (../../sb/moonship.sol#934-958)
+	- MoonShip.deliver(uint256) (../../sb/moonship.sol#1019-1026)
+	- MoonShip.tokenFromReflection(uint256) (../../sb/moonship.sol#1039-1043)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/moonship.sol#1216)
+		- _tOwned[address(this)] = _tOwned[address(this)].add(tLiquidity) (../../sb/moonship.sol#1150)
+		- _tOwned[sender] = _tOwned[sender].sub(tAmount) (../../sb/moonship.sol#1069)
+		- _tOwned[sender] = _tOwned[sender].sub(tAmount) (../../sb/moonship.sol#1264)
+		- _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount) (../../sb/moonship.sol#1255)
+		- _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount) (../../sb/moonship.sol#1071)
+	MoonShip._tOwned (../../sb/moonship.sol#892) can be used in cross function reentrancies:
+	- MoonShip._getCurrentSupply() (../../sb/moonship.sol#1133-1143)
+	- MoonShip._takeLiquidity(uint256) (../../sb/moonship.sol#1145-1151)
+	- MoonShip._transferBothExcluded(address,address,uint256) (../../sb/moonship.sol#1067-1076)
+	- MoonShip._transferFromExcluded(address,address,uint256) (../../sb/moonship.sol#1262-1270)
+	- MoonShip._transferToExcluded(address,address,uint256) (../../sb/moonship.sol#1252-1260)
+	- MoonShip.balanceOf(address) (../../sb/moonship.sol#976-979)
+	- MoonShip.excludeFromReward(address) (../../sb/moonship.sol#1045-1052)
+	- MoonShip.includeInReward(address) (../../sb/moonship.sol#1054-1065)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities
+
+Reentrancy in MoonShip.claimBNBReward() (../../sb/moonship.sol#1324-1346):
+	External calls:
+	- Utils.swapETHForTokens(address(nutRouter),address(0x000000000000000000000000000000000000dEaD),reward.div(5)) (../../sb/moonship.sol#1332-1336)
+	State variables written after the call(s):
+	- nextAvailableClaimDate[msg.sender] = block.timestamp + getRewardCycleBlock() (../../sb/moonship.sol#1341)
+	MoonShip.nextAvailableClaimDate (../../sb/moonship.sol#1278) can be used in cross function reentrancies:
+	- MoonShip.nextAvailableClaimDate (../../sb/moonship.sol#1278)
+	- MoonShip.topUpClaimCycleAfterTransfer(address,uint256) (../../sb/moonship.sol#1348-1358)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+MoonShip.claimBNBReward() (../../sb/moonship.sol#1324-1346) contains a tautology or contradiction:
+	- require(bool,string)(balanceOf(msg.sender) >= 0,Error: must own MRAT to claim reward) (../../sb/moonship.sol#1326)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#tautology-or-contradiction
+
+Utils.addLiquidity(address,address,uint256,uint256) (../../sb/moonship.sol#801-818) ignores return value by nutRouter.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner,block.timestamp + 360) (../../sb/moonship.sol#810-817)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+MoonShip.allowance(address,address).owner (../../sb/moonship.sol#986) shadows:
+	- Ownable.owner() (../../sb/moonship.sol#422-424) (function)
+MoonShip._approve(address,address,uint256).owner (../../sb/moonship.sol#1184) shadows:
+	- Ownable.owner() (../../sb/moonship.sol#422-424) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+MoonShip.setTaxFeePercent(uint256) (../../sb/moonship.sol#1086-1088) should emit an event for: 
+	- _taxFee = taxFee (../../sb/moonship.sol#1087) 
+MoonShip.setLiquidityFeePercent(uint256) (../../sb/moonship.sol#1090-1092) should emit an event for: 
+	- _liquidityFee = liquidityFee (../../sb/moonship.sol#1091) 
+MoonShip.setMaxTxPercent(uint256) (../../sb/moonship.sol#1293-1295) should emit an event for: 
+	- _maxTxAmount = _tTotal.mul(maxTxPercent).div(10000) (../../sb/moonship.sol#1294) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+Reentrancy in MoonShip._transfer(address,address,uint256,uint256) (../../sb/moonship.sol#1192-1217):
+	External calls:
+	- swapAndLiquify(from,to) (../../sb/moonship.sol#1205)
+		- nutRouter.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner,block.timestamp + 360) (../../sb/moonship.sol#810-817)
+		- nutRouter.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/moonship.sol#771-777)
+		- Utils.swapTokensForEth(address(nutRouter),tokenAmountToBeSwapped) (../../sb/moonship.sol#1415)
+		- Utils.addLiquidity(address(nutRouter),owner(),otherPiece,bnbToBeAddedToLiquidity) (../../sb/moonship.sol#1428)
+	External calls sending eth:
+	- swapAndLiquify(from,to) (../../sb/moonship.sol#1205)
+		- nutRouter.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner,block.timestamp + 360) (../../sb/moonship.sol#810-817)
+	State variables written after the call(s):
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/moonship.sol#1216)
+		- _liquidityFee = _previousLiquidityFee (../../sb/moonship.sol#1177)
+		- _liquidityFee = 0 (../../sb/moonship.sol#1172)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/moonship.sol#1216)
+		- _previousLiquidityFee = _liquidityFee (../../sb/moonship.sol#1169)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/moonship.sol#1216)
+		- _previousTaxFee = _taxFee (../../sb/moonship.sol#1168)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/moonship.sol#1216)
+		- _tFeeTotal = _tFeeTotal.add(tFee) (../../sb/moonship.sol#1104)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/moonship.sol#1216)
+		- _taxFee = _previousTaxFee (../../sb/moonship.sol#1176)
+		- _taxFee = 0 (../../sb/moonship.sol#1171)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/moonship.sol#1216)
+		- nextAvailableClaimDate[recipient] = nextAvailableClaimDate[recipient] + Utils.calculateTopUpClaim(currentRecipientBalance,basedRewardCycleBlock,threshHoldTopUpRate,amount) (../../sb/moonship.sol#1352-1357)
+Reentrancy in MoonShip.transferFrom(address,address,uint256) (../../sb/moonship.sol#995-999):
+	External calls:
+	- _transfer(sender,recipient,amount,0) (../../sb/moonship.sol#996)
+		- nutRouter.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner,block.timestamp + 360) (../../sb/moonship.sol#810-817)
+		- nutRouter.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/moonship.sol#771-777)
+		- Utils.swapTokensForEth(address(nutRouter),tokenAmountToBeSwapped) (../../sb/moonship.sol#1415)
+		- Utils.addLiquidity(address(nutRouter),owner(),otherPiece,bnbToBeAddedToLiquidity) (../../sb/moonship.sol#1428)
+	External calls sending eth:
+	- _transfer(sender,recipient,amount,0) (../../sb/moonship.sol#996)
+		- nutRouter.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner,block.timestamp + 360) (../../sb/moonship.sol#810-817)
+	State variables written after the call(s):
+	- _approve(sender,_msgSender(),_allowances[sender][_msgSender()].sub(amount,BEP20: transfer amount exceeds allowance)) (../../sb/moonship.sol#997)
+		- _allowances[owner][spender] = amount (../../sb/moonship.sol#1188)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in MoonShip._transfer(address,address,uint256,uint256) (../../sb/moonship.sol#1192-1217):
+	External calls:
+	- swapAndLiquify(from,to) (../../sb/moonship.sol#1205)
+		- nutRouter.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner,block.timestamp + 360) (../../sb/moonship.sol#810-817)
+		- nutRouter.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/moonship.sol#771-777)
+		- Utils.swapTokensForEth(address(nutRouter),tokenAmountToBeSwapped) (../../sb/moonship.sol#1415)
+		- Utils.addLiquidity(address(nutRouter),owner(),otherPiece,bnbToBeAddedToLiquidity) (../../sb/moonship.sol#1428)
+	External calls sending eth:
+	- swapAndLiquify(from,to) (../../sb/moonship.sol#1205)
+		- nutRouter.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner,block.timestamp + 360) (../../sb/moonship.sol#810-817)
+	Event emitted after the call(s):
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/moonship.sol#1249)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/moonship.sol#1216)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/moonship.sol#1259)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/moonship.sol#1216)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/moonship.sol#1269)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/moonship.sol#1216)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/moonship.sol#1075)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/moonship.sol#1216)
+Reentrancy in MoonShip.swapAndLiquify(address,address) (../../sb/moonship.sol#1381-1432):
+	External calls:
+	- Utils.swapTokensForEth(address(nutRouter),tokenAmountToBeSwapped) (../../sb/moonship.sol#1415)
+	- Utils.addLiquidity(address(nutRouter),owner(),otherPiece,bnbToBeAddedToLiquidity) (../../sb/moonship.sol#1428)
+	Event emitted after the call(s):
+	- SwapAndLiquify(piece,deltaBalance,otherPiece) (../../sb/moonship.sol#1430)
+Reentrancy in MoonShip.transferFrom(address,address,uint256) (../../sb/moonship.sol#995-999):
+	External calls:
+	- _transfer(sender,recipient,amount,0) (../../sb/moonship.sol#996)
+		- nutRouter.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner,block.timestamp + 360) (../../sb/moonship.sol#810-817)
+		- nutRouter.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/moonship.sol#771-777)
+		- Utils.swapTokensForEth(address(nutRouter),tokenAmountToBeSwapped) (../../sb/moonship.sol#1415)
+		- Utils.addLiquidity(address(nutRouter),owner(),otherPiece,bnbToBeAddedToLiquidity) (../../sb/moonship.sol#1428)
+	External calls sending eth:
+	- _transfer(sender,recipient,amount,0) (../../sb/moonship.sol#996)
+		- nutRouter.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner,block.timestamp + 360) (../../sb/moonship.sol#810-817)
+	Event emitted after the call(s):
+	- Approval(owner,spender,amount) (../../sb/moonship.sol#1189)
+		- _approve(sender,_msgSender(),_allowances[sender][_msgSender()].sub(amount,BEP20: transfer amount exceeds allowance)) (../../sb/moonship.sol#997)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Ownable.unlock() (../../sb/moonship.sol#469-474) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(now > _lockTime,Contract is locked until 7 days) (../../sb/moonship.sol#471)
+Utils.isLotteryWon(uint256,uint256) (../../sb/moonship.sol#699-703) uses timestamp for comparisons
+	Dangerous comparisons:
+	- luckyNumber <= winPercentage (../../sb/moonship.sol#702)
+MoonShip.getRewardCycleBlock() (../../sb/moonship.sol#1319-1322) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp >= disableEasyRewardFrom (../../sb/moonship.sol#1320)
+MoonShip.claimBNBReward() (../../sb/moonship.sol#1324-1346) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(nextAvailableClaimDate[msg.sender] <= block.timestamp,Error: next available not reached) (../../sb/moonship.sol#1325)
+MoonShip.ensureMaxTxAmount(address,address,uint256,uint256) (../../sb/moonship.sol#1360-1374) uses timestamp for comparisons
+	Dangerous comparisons:
+	- value < disruptiveCoverageFee && block.timestamp >= disruptiveTransferEnabledFrom (../../sb/moonship.sol#1370)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/moonship.sol#274-283) uses assembly
+	- INLINE ASM (../../sb/moonship.sol#281)
+Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/moonship.sol#367-388) uses assembly
+	- INLINE ASM (../../sb/moonship.sol#380-383)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+MoonShip.ensureMaxTxAmount(address,address,uint256,uint256) (../../sb/moonship.sol#1360-1374) compares to a boolean constant:
+	-_isExcludedFromMaxTx[from] == false && _isExcludedFromMaxTx[to] == false (../../sb/moonship.sol#1367-1368)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#boolean-equality
+
+MoonShip.includeInReward(address) (../../sb/moonship.sol#1054-1065) has costly operations inside a loop:
+	- _excluded.pop() (../../sb/moonship.sol#1061)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#costly-operations-inside-a-loop
+
+Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/moonship.sol#367-388) is never used and should be removed
+Address.functionCall(address,bytes) (../../sb/moonship.sol#327-329) is never used and should be removed
+Address.functionCall(address,bytes,string) (../../sb/moonship.sol#337-339) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/moonship.sol#352-354) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/moonship.sol#362-365) is never used and should be removed
+Address.isContract(address) (../../sb/moonship.sol#274-283) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/moonship.sol#301-307) is never used and should be removed
+Context._msgData() (../../sb/moonship.sol#247-250) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+MoonShip._rTotal (../../sb/moonship.sol#903) is set pre-construction with a non-constant function or state variable:
+	- (MAX - (MAX % _tTotal))
+MoonShip._maxTxAmount (../../sb/moonship.sol#1276) is set pre-construction with a non-constant function or state variable:
+	- _tTotal
+MoonShip._previousTaxFee (../../sb/moonship.sol#1285) is set pre-construction with a non-constant function or state variable:
+	- _taxFee
+MoonShip._previousLiquidityFee (../../sb/moonship.sol#1288) is set pre-construction with a non-constant function or state variable:
+	- _liquidityFee
+MoonShip.minTokenNumberToSell (../../sb/moonship.sol#1291) is set pre-construction with a non-constant function or state variable:
+	- _tTotal.mul(1).div(10000).div(10)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#function-initializing-state
+
+Pragma version>=0.6.8 (../../sb/moonship.sol#1) allows old versions
+Pragma version>=0.6.8 (../../sb/moonship.sol#2) allows old versions
+Pragma version>=0.6.8 (../../sb/moonship.sol#3) allows old versions
+Pragma version>=0.6.8 (../../sb/moonship.sol#4) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/moonship.sol#301-307):
+	- (success) = recipient.call{value: amount}() (../../sb/moonship.sol#305)
+Low level call in Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/moonship.sol#367-388):
+	- (success,returndata) = target.call{value: weiValue}(data) (../../sb/moonship.sol#371)
+Low level call in MoonShip.claimBNBReward() (../../sb/moonship.sol#1324-1346):
+	- (sent) = address(msg.sender).call{value: reward}() (../../sb/moonship.sol#1344)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Function InutPair.DOMAIN_SEPARATOR() (../../sb/moonship.sol#508) is not in mixedCase
+Function InutPair.PERMIT_TYPEHASH() (../../sb/moonship.sol#509) is not in mixedCase
+Function InutPair.MINIMUM_LIQUIDITY() (../../sb/moonship.sol#526) is not in mixedCase
+Function InutRouter01.WETH() (../../sb/moonship.sol#546) is not in mixedCase
+Parameter MoonShip.setSwapAndLiquifyEnabled(bool)._enabled (../../sb/moonship.sol#1094) is not in mixedCase
+Parameter MoonShip.calculateTaxFee(uint256)._amount (../../sb/moonship.sol#1153) is not in mixedCase
+Parameter MoonShip.calculateLiquidityFee(uint256)._amount (../../sb/moonship.sol#1159) is not in mixedCase
+Parameter MoonShip.setExcludeFromMaxTx(address,bool)._address (../../sb/moonship.sol#1297) is not in mixedCase
+Variable MoonShip._maxTxAmount (../../sb/moonship.sol#1276) is not in mixedCase
+Variable MoonShip._taxFee (../../sb/moonship.sol#1284) is not in mixedCase
+Variable MoonShip._liquidityFee (../../sb/moonship.sol#1287) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/moonship.sol#248)" inContext (../../sb/moonship.sol#242-251)
+Redundant expression "_tTotal (../../sb/moonship.sol#727)" inUtils (../../sb/moonship.sol#680-819)
+Redundant expression "ofAddress (../../sb/moonship.sol#728)" inUtils (../../sb/moonship.sol#680-819)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Variable InutRouter01.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountADesired (../../sb/moonship.sol#551) is too similar to InutRouter01.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountBDesired (../../sb/moonship.sol#552)
+Variable MoonShip._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/moonship.sol#1068) is too similar to MoonShip._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/moonship.sol#1068)
+Variable MoonShip._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/moonship.sol#1263) is too similar to MoonShip._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/moonship.sol#1068)
+Variable MoonShip.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/moonship.sol#1034) is too similar to MoonShip._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/moonship.sol#1068)
+Variable MoonShip._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/moonship.sol#1124) is too similar to MoonShip._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/moonship.sol#1068)
+Variable MoonShip._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/moonship.sol#1263) is too similar to MoonShip._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/moonship.sol#1263)
+Variable MoonShip.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/moonship.sol#1034) is too similar to MoonShip._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/moonship.sol#1263)
+Variable MoonShip._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/moonship.sol#1263) is too similar to MoonShip._getValues(uint256).tTransferAmount (../../sb/moonship.sol#1108)
+Variable MoonShip.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/moonship.sol#1034) is too similar to MoonShip._getValues(uint256).tTransferAmount (../../sb/moonship.sol#1108)
+Variable MoonShip._getValues(uint256).rTransferAmount (../../sb/moonship.sol#1109) is too similar to MoonShip._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/moonship.sol#1068)
+Variable MoonShip._transferStandard(address,address,uint256).rTransferAmount (../../sb/moonship.sol#1244) is too similar to MoonShip._getValues(uint256).tTransferAmount (../../sb/moonship.sol#1108)
+Variable MoonShip._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/moonship.sol#1263) is too similar to MoonShip._transferStandard(address,address,uint256).tTransferAmount (../../sb/moonship.sol#1244)
+Variable MoonShip._getValues(uint256).rTransferAmount (../../sb/moonship.sol#1109) is too similar to MoonShip._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/moonship.sol#1253)
+Variable MoonShip._getValues(uint256).rTransferAmount (../../sb/moonship.sol#1109) is too similar to MoonShip._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/moonship.sol#1263)
+Variable MoonShip._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/moonship.sol#1124) is too similar to MoonShip._transferStandard(address,address,uint256).tTransferAmount (../../sb/moonship.sol#1244)
+Variable MoonShip._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/moonship.sol#1068) is too similar to MoonShip._getValues(uint256).tTransferAmount (../../sb/moonship.sol#1108)
+Variable MoonShip._getValues(uint256).rTransferAmount (../../sb/moonship.sol#1109) is too similar to MoonShip._getTValues(uint256).tTransferAmount (../../sb/moonship.sol#1116)
+Variable MoonShip._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/moonship.sol#1263) is too similar to MoonShip._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/moonship.sol#1253)
+Variable MoonShip._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/moonship.sol#1263) is too similar to MoonShip._getTValues(uint256).tTransferAmount (../../sb/moonship.sol#1116)
+Variable MoonShip._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/moonship.sol#1124) is too similar to MoonShip._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/moonship.sol#1253)
+Variable MoonShip._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/moonship.sol#1124) is too similar to MoonShip._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/moonship.sol#1263)
+Variable MoonShip._getValues(uint256).rTransferAmount (../../sb/moonship.sol#1109) is too similar to MoonShip._getValues(uint256).tTransferAmount (../../sb/moonship.sol#1108)
+Variable MoonShip._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/moonship.sol#1124) is too similar to MoonShip._getTValues(uint256).tTransferAmount (../../sb/moonship.sol#1116)
+Variable MoonShip._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/moonship.sol#1253) is too similar to MoonShip._transferStandard(address,address,uint256).tTransferAmount (../../sb/moonship.sol#1244)
+Variable MoonShip.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/moonship.sol#1034) is too similar to MoonShip._transferStandard(address,address,uint256).tTransferAmount (../../sb/moonship.sol#1244)
+Variable MoonShip._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/moonship.sol#1253) is too similar to MoonShip._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/moonship.sol#1068)
+Variable MoonShip._transferStandard(address,address,uint256).rTransferAmount (../../sb/moonship.sol#1244) is too similar to MoonShip._transferStandard(address,address,uint256).tTransferAmount (../../sb/moonship.sol#1244)
+Variable MoonShip._transferStandard(address,address,uint256).rTransferAmount (../../sb/moonship.sol#1244) is too similar to MoonShip._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/moonship.sol#1068)
+Variable MoonShip._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/moonship.sol#1124) is too similar to MoonShip._getValues(uint256).tTransferAmount (../../sb/moonship.sol#1108)
+Variable MoonShip.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/moonship.sol#1034) is too similar to MoonShip._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/moonship.sol#1253)
+Variable MoonShip._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/moonship.sol#1253) is too similar to MoonShip._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/moonship.sol#1253)
+Variable MoonShip._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/moonship.sol#1253) is too similar to MoonShip._getTValues(uint256).tTransferAmount (../../sb/moonship.sol#1116)
+Variable MoonShip._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/moonship.sol#1253) is too similar to MoonShip._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/moonship.sol#1263)
+Variable MoonShip.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/moonship.sol#1034) is too similar to MoonShip._getTValues(uint256).tTransferAmount (../../sb/moonship.sol#1116)
+Variable MoonShip._transferStandard(address,address,uint256).rTransferAmount (../../sb/moonship.sol#1244) is too similar to MoonShip._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/moonship.sol#1263)
+Variable MoonShip._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/moonship.sol#1068) is too similar to MoonShip._transferStandard(address,address,uint256).tTransferAmount (../../sb/moonship.sol#1244)
+Variable MoonShip._transferStandard(address,address,uint256).rTransferAmount (../../sb/moonship.sol#1244) is too similar to MoonShip._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/moonship.sol#1253)
+Variable MoonShip._transferStandard(address,address,uint256).rTransferAmount (../../sb/moonship.sol#1244) is too similar to MoonShip._getTValues(uint256).tTransferAmount (../../sb/moonship.sol#1116)
+Variable MoonShip._getValues(uint256).rTransferAmount (../../sb/moonship.sol#1109) is too similar to MoonShip._transferStandard(address,address,uint256).tTransferAmount (../../sb/moonship.sol#1244)
+Variable MoonShip._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/moonship.sol#1068) is too similar to MoonShip._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/moonship.sol#1253)
+Variable MoonShip._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/moonship.sol#1068) is too similar to MoonShip._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/moonship.sol#1263)
+Variable MoonShip._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/moonship.sol#1253) is too similar to MoonShip._getValues(uint256).tTransferAmount (../../sb/moonship.sol#1108)
+Variable MoonShip._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/moonship.sol#1068) is too similar to MoonShip._getTValues(uint256).tTransferAmount (../../sb/moonship.sol#1116)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+MoonShip.slitherConstructorVariables() (../../sb/moonship.sol#887-1451) uses literals with too many digits:
+	- _tTotal = 1000000000 * 10 ** 6 * 10 ** 18 (../../sb/moonship.sol#902)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+Loop condition i < _excluded.length (../../sb/moonship.sol#1136) should use cached array length instead of referencing `length` member of the storage array.
+ Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cache-array-length
+
+MoonShip._decimals (../../sb/moonship.sol#908) should be constant 
+MoonShip._name (../../sb/moonship.sol#906) should be constant 
+MoonShip._symbol (../../sb/moonship.sol#907) should be constant 
+MoonShip._tTotal (../../sb/moonship.sol#902) should be constant 
+MoonShip.rewardThreshold (../../sb/moonship.sol#1289) should be constant 
+MoonShip.threshHoldTopUpRate (../../sb/moonship.sol#1275) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+
+MoonShip.minTokenNumberToSell (../../sb/moonship.sol#1291) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/moonship.sol analyzed (12 contracts with 93 detectors), 112 result(s) found

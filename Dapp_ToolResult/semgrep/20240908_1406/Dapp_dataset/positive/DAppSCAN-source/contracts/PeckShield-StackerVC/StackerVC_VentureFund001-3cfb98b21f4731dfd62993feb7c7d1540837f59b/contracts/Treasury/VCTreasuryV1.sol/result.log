@@ -1,0 +1,426 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                     
+                     
+┌───────────────────┐
+│ 112 Code Findings │
+└───────────────────┘
+                         
+    /sb/VCTreasuryV1.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          811┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          815┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          833┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          838┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          843┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          358┆ constructor (string memory name_, string memory symbol_) public {
+          359┆     _name = name_;
+          360┆     _symbol = symbol_;
+          361┆     _decimals = 18;
+          362┆ }
+            ⋮┆----------------------------------------
+         1016┆ constructor(address _multisig, address payable _treasury) public 
+  ERC20("Stacker.vc Fund001", "SVC001") {                                       
+         1017┆    deployer =         
+  msg.sender;                        
+         1018┆    councilMultisig =        
+  _multisig;                               
+         1019┆    treasury =        
+  _treasury;                        
+         1020┆ 
+         1021┆    currentState =               
+  FundStates.setup;                            
+         1022┆ 
+         1023┆                    
+  _setupDecimals(18);             
+         1024┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+         1370┆ require(boughtTokens[_tokens[i]], "!boughtToken");
+            ⋮┆----------------------------------------
+         1373┆ require(!killed, "BET/STACK can only be claimed if fund wasn't   
+  killed");                                                                     
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+         1081┆ for (uint256 i = 0; i < _user.length; i++){
+            ⋮┆----------------------------------------
+         1368┆ for (uint256 i = 0; i < _tokens.length; i++){
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          183┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          198┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          215┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          232┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          249┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          512┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          513┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          532┆ require(account != address(0), "ERC20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+          553┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          576┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          577┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          660┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          664┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          721┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          722┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          746┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          770┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          830┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          831┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          832┆ );
+            ⋮┆----------------------------------------
+          860┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          911┆ require(_status != _ENTERED, "ReentrancyGuard: reentrant call");
+            ⋮┆----------------------------------------
+         1033┆ require(msg.sender == councilMultisig, "TREASURYV1:              
+  !councilMultisig");                                                           
+            ⋮┆----------------------------------------
+         1039┆ require(msg.sender == councilMultisig || msg.sender == deployer, 
+  "TREASURYV1: !(councilMultisig || deployer)");                                
+            ⋮┆----------------------------------------
+         1044┆ require(msg.sender == treasury, "TREASURYV1: !treasury");
+            ⋮┆----------------------------------------
+         1050┆ require(msg.sender == councilMultisig, "TREASURYV1:              
+  !councilMultisig");                                                           
+            ⋮┆----------------------------------------
+         1076┆ require(currentState == FundStates.setup, "TREASURYV1:           
+  !FundStates.setup");                                                          
+            ⋮┆----------------------------------------
+         1077┆ require(msg.sender == deployer, "TREASURYV1: !deployer");
+            ⋮┆----------------------------------------
+         1078┆ require(_user.length == _amount.length, "TREASURYV1: length      
+  mismatch");                                                                   
+            ⋮┆----------------------------------------
+         1079┆ require(_user.length <= LOOP_LIMIT, "TREASURYV1: length >        
+  LOOP_LIMIT"); // don't allow unbounded loops, bad design, gas issues          
+            ⋮┆----------------------------------------
+         1088┆ require(currentState == FundStates.setup, "TREASURYV1:           
+  !FundStates.setup");                                                          
+            ⋮┆----------------------------------------
+         1089┆ require(msg.sender == councilMultisig, "TREASURYV1:              
+  !councilMultisig");                                                           
+            ⋮┆----------------------------------------
+         1090┆ require(totalSupply() > 0, "TREASURYV1: invalid setup"); // means
+  fund tokens were not issued                                                   
+            ⋮┆----------------------------------------
+         1105┆ require(currentState == FundStates.active, "TREASURYV1:          
+  !FundStates.active");                                                         
+            ⋮┆----------------------------------------
+         1106┆ require(msg.sender == councilMultisig, "TREASURYV1:              
+  !councilMultisig");                                                           
+            ⋮┆----------------------------------------
+         1128┆ require(currentState == FundStates.active || currentState ==     
+  FundStates.paused, "TREASURYV1: !(FundStates.active || FundStates.paused)");  
+            ⋮┆----------------------------------------
+         1129┆ require(msg.sender == councilMultisig, "TREASURYV1:              
+  !councilMultisig");                                                           
+            ⋮┆----------------------------------------
+         1132┆ require(_buyId == _buy.buyId, "TREASURYV1: buyId not active");
+            ⋮┆----------------------------------------
+         1143┆ require(currentState == FundStates.active, "TREASURYV1:          
+  !FundStates.active");                                                         
+            ⋮┆----------------------------------------
+         1146┆ require(_buyId == _buy.buyId, "TREASURYV1: buyId not active");
+            ⋮┆----------------------------------------
+         1147┆ require(_buy.tokenAccept != address(0), "TREASURYV1:             
+  !tokenAccept");                                                               
+            ⋮┆----------------------------------------
+         1148┆ require(_amount >= _buy.amountInMin, "TREASURYV1: _amount <      
+  amountInMin");                                                                
+            ⋮┆----------------------------------------
+         1149┆ require(_buy.taker == msg.sender || _buy.taker == address(0),    
+  "TREASURYV1: !taker"); // if taker is set to 0x0, anyone can accept this      
+  investment                                                                    
+            ⋮┆----------------------------------------
+         1150┆ require(block.timestamp <= _buy.maxTime, "TREASURYV1: time >     
+  maxTime");                                                                    
+            ⋮┆----------------------------------------
+         1158┆ require(_after.sub(_before) >= _buy.amountInMin, "TREASURYV1:    
+  received < amountInMin"); // check again to verify received amount was correct
+            ⋮┆----------------------------------------
+         1170┆ require(currentState == FundStates.active, "TREASURYV1:          
+  !FundStates.active");                                                         
+            ⋮┆----------------------------------------
+         1171┆ require(msg.sender == councilMultisig, "TREASURYV1:              
+  !councilMultisig");                                                           
+            ⋮┆----------------------------------------
+         1191┆ require(currentState == FundStates.active || currentState ==     
+  FundStates.paused, "TREASURYV1: !(FundStates.active || FundStates.paused)");  
+            ⋮┆----------------------------------------
+         1192┆ require(msg.sender == councilMultisig, "TREASURYV1:              
+  !councilMultisig");                                                           
+            ⋮┆----------------------------------------
+         1193┆ require(_sellId < nextSellId, "TREASURYV1: !sellId");
+            ⋮┆----------------------------------------
+         1204┆ require(currentState == FundStates.active, "TREASURYV1:          
+  !FundStates.active");                                                         
+            ⋮┆----------------------------------------
+         1207┆ require(_sell.tokenSell != address(0), "TREASURYV1: !tokenSell");
+            ⋮┆----------------------------------------
+         1208┆ require(msg.value >= _sell.ethInMin, "TREASURYV1: <ethInMin");
+            ⋮┆----------------------------------------
+         1209┆ require(_sell.taker == msg.sender || _sell.taker == address(0),  
+  "TREASURYV1: !taker"); // if taker is set to 0x0, anyone can accept this      
+  devestment                                                                    
+            ⋮┆----------------------------------------
+         1210┆ require(block.timestamp > _sell.vetoTime, "TREASURYV1: time <    
+  vetoTime");                                                                   
+            ⋮┆----------------------------------------
+         1211┆ require(block.timestamp <= _sell.maxTime, "TREASURYV1: time >    
+  maxTime");                                                                    
+            ⋮┆----------------------------------------
+         1230┆ require(currentState == FundStates.active || currentState ==     
+  FundStates.paused, "TREASURYV1: !(FundStates.active || FundStates.paused)");  
+            ⋮┆----------------------------------------
+         1231┆ require(balanceOf(msg.sender) >= _amount, "TREASURYV1:           
+  insufficient balance to stakeToPause");                                       
+            ⋮┆----------------------------------------
+         1245┆ require(currentState == FundStates.active || currentState ==     
+  FundStates.paused, "TREASURYV1: !(FundStates.active || FundStates.paused)");  
+            ⋮┆----------------------------------------
+         1246┆ require(balanceOf(msg.sender) >= _amount, "TREASURYV1:           
+  insufficient balance to stakeToKill");                                        
+            ⋮┆----------------------------------------
+         1258┆ require(currentState != FundStates.setup, "TREASURYV1:           
+  FundStates.setup");                                                           
+            ⋮┆----------------------------------------
+         1259┆ require(stakedToPause[msg.sender] >= _amount, "TREASURYV1:       
+  insufficent balance to unstakeToPause");                                      
+            ⋮┆----------------------------------------
+         1271┆ require(currentState != FundStates.setup, "TREASURYV1:           
+  FundStates.setup");                                                           
+            ⋮┆----------------------------------------
+         1272┆ require(stakedToKill[msg.sender] >= _amount, "TREASURYV1:        
+  insufficent balance to unstakeToKill");                                       
+            ⋮┆----------------------------------------
+         1349┆ require(currentState == FundStates.closed, "TREASURYV1:          
+  !FundStates.closed");                                                         
+            ⋮┆----------------------------------------
+         1350┆ require(_tokens.length <= LOOP_LIMIT, "TREASURYV1: length >      
+  LOOP_LIMIT"); // don't allow unbounded loops, bad design, gas issues          
+            ⋮┆----------------------------------------
+         1369┆ require(_tokens[i] != address(this), "can't claim                
+  address(this)");                                                              
+            ⋮┆----------------------------------------
+         1370┆ require(boughtTokens[_tokens[i]], "!boughtToken");
+            ⋮┆----------------------------------------
+         1373┆ require(!killed, "BET/STACK can only be claimed if fund wasn't   
+  killed");                                                                     
+            ⋮┆----------------------------------------
+         1384┆ require(proposedUtilization <= maxInvestment, "TREASURYV1:       
+  utilization > maxInvestment");                                                
+            ⋮┆----------------------------------------
+         1412┆ require(msg.sender == councilMultisig && !killed && currentState 
+  == FundStates.closed, "TREASURYV1: escape check failed");                     
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+         1412┆ require(msg.sender == councilMultisig && !killed && currentState 
+  == FundStates.closed, "TREASURYV1: escape check failed");                     
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         1295┆ if (_pausedStake > pauseQuorumRequirement() && currentState ==   
+  FundStates.active){                                                           
+         1296┆                                     
+  _changeFundState(FundStates.paused);             
+         1297┆        
+  return;             
+         1298┆ }
+            ⋮┆----------------------------------------
+         1299┆ if (_pausedStake <= pauseQuorumRequirement() && currentState ==  
+  FundStates.paused){                                                           
+         1300┆                                     
+  _changeFundState(FundStates.active);             
+         1301┆        
+  return;             
+         1302┆ }
+            ⋮┆----------------------------------------
+         1319┆ if (block.timestamp >= fundCloseTime && currentState !=          
+  FundStates.setup){                                                            
+         1320┆                                     
+  _changeFundState(FundStates.closed);             
+         1321┆ }
+            ⋮┆----------------------------------------
+         1332┆ if (_state == FundStates.closed && !killed){
+         1333┆              
+  _assessFee();             
+         1334┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+         1081┆ for (uint256 i = 0; i < _user.length; i++){
+            ⋮┆----------------------------------------
+         1368┆ for (uint256 i = 0; i < _tokens.length; i++){
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          215┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 112 findings.
+          512┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          513┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          553┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          576┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          577┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          664┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          721┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          746┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          770┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          830┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          831┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          832┆ );
+            ⋮┆----------------------------------------
+          860┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+         1039┆ require(msg.sender == councilMultisig || msg.sender == deployer, 
+  "TREASURYV1: !(councilMultisig || deployer)");                                
+            ⋮┆----------------------------------------
+         1128┆ require(currentState == FundStates.active || currentState ==     
+  FundStates.paused, "TREASURYV1: !(FundStates.active || FundStates.paused)");  
+            ⋮┆----------------------------------------
+         1148┆ require(_amount >= _buy.amountInMin, "TREASURYV1: _amount <      
+  amountInMin");                                                                
+            ⋮┆----------------------------------------
+         1158┆ require(_after.sub(_before) >= _buy.amountInMin, "TREASURYV1:    
+  received < amountInMin"); // check again to verify received amount was correct
+            ⋮┆----------------------------------------
+         1191┆ require(currentState == FundStates.active || currentState ==     
+  FundStates.paused, "TREASURYV1: !(FundStates.active || FundStates.paused)");  
+            ⋮┆----------------------------------------
+         1230┆ require(currentState == FundStates.active || currentState ==     
+  FundStates.paused, "TREASURYV1: !(FundStates.active || FundStates.paused)");  
+            ⋮┆----------------------------------------
+         1231┆ require(balanceOf(msg.sender) >= _amount, "TREASURYV1:           
+  insufficient balance to stakeToPause");                                       
+            ⋮┆----------------------------------------
+         1245┆ require(currentState == FundStates.active || currentState ==     
+  FundStates.paused, "TREASURYV1: !(FundStates.active || FundStates.paused)");  
+            ⋮┆----------------------------------------
+         1246┆ require(balanceOf(msg.sender) >= _amount, "TREASURYV1:           
+  insufficient balance to stakeToKill");                                        
+            ⋮┆----------------------------------------
+         1259┆ require(stakedToPause[msg.sender] >= _amount, "TREASURYV1:       
+  insufficent balance to unstakeToPause");                                      
+            ⋮┆----------------------------------------
+         1272┆ require(stakedToKill[msg.sender] >= _amount, "TREASURYV1:        
+  insufficent balance to unstakeToKill");                                       
+            ⋮┆----------------------------------------
+         1373┆ require(!killed, "BET/STACK can only be claimed if fund wasn't   
+  killed");                                                                     
+            ⋮┆----------------------------------------
+         1384┆ require(proposedUtilization <= maxInvestment, "TREASURYV1:       
+  utilization > maxInvestment");                                                
+
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

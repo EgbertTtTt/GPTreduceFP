@@ -1,0 +1,302 @@
+'solc --version' running
+'solc /sb/CLEToken.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+Reentrancy in CLEToken._transfer(address,address,uint256) (../../sb/CLEToken.sol#1052-1096):
+	External calls:
+	- swapAndLiquify(contractTokenBalance) (../../sb/CLEToken.sol#1083)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,address(this),block.timestamp) (../../sb/CLEToken.sol#1144-1151)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/CLEToken.sol#1130-1136)
+	External calls sending eth:
+	- swapAndLiquify(contractTokenBalance) (../../sb/CLEToken.sol#1083)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,address(this),block.timestamp) (../../sb/CLEToken.sol#1144-1151)
+	State variables written after the call(s):
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/CLEToken.sol#1095)
+		- _rOwned[address(this)] = _rOwned[address(this)].add(rLiquidity) (../../sb/CLEToken.sol#991)
+		- _rOwned[_communityWalletAddress] = _rOwned[_communityWalletAddress].add(rCommunity) (../../sb/CLEToken.sol#999)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/CLEToken.sol#1187)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/CLEToken.sol#1177)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/CLEToken.sol#1178)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/CLEToken.sol#890)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/CLEToken.sol#1199)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/CLEToken.sol#1200)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/CLEToken.sol#1189)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/CLEToken.sol#892)
+	CLEToken._rOwned (../../sb/CLEToken.sol#710) can be used in cross function reentrancies:
+	- CLEToken._getCurrentSupply() (../../sb/CLEToken.sol#976-986)
+	- CLEToken._takeCommunity(uint256) (../../sb/CLEToken.sol#996-1002)
+	- CLEToken._takeLiquidity(uint256) (../../sb/CLEToken.sol#988-994)
+	- CLEToken._transferBothExcluded(address,address,uint256) (../../sb/CLEToken.sol#887-897)
+	- CLEToken._transferFromExcluded(address,address,uint256) (../../sb/CLEToken.sol#1196-1205)
+	- CLEToken._transferStandard(address,address,uint256) (../../sb/CLEToken.sol#1175-1183)
+	- CLEToken._transferToExcluded(address,address,uint256) (../../sb/CLEToken.sol#1185-1194)
+	- CLEToken.balanceOf(address) (../../sb/CLEToken.sol#795-798)
+	- CLEToken.constructor() (../../sb/CLEToken.sol#761-777)
+	- CLEToken.deliver(uint256) (../../sb/CLEToken.sol#838-845)
+	- CLEToken.excludeFromReward(address) (../../sb/CLEToken.sol#864-872)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/CLEToken.sol#1095)
+		- _rTotal = _rTotal.sub(rFee) (../../sb/CLEToken.sol#944)
+	CLEToken._rTotal (../../sb/CLEToken.sol#723) can be used in cross function reentrancies:
+	- CLEToken._getCurrentSupply() (../../sb/CLEToken.sol#976-986)
+	- CLEToken._reflectFee(uint256,uint256) (../../sb/CLEToken.sol#943-946)
+	- CLEToken.constructor() (../../sb/CLEToken.sol#761-777)
+	- CLEToken.deliver(uint256) (../../sb/CLEToken.sol#838-845)
+	- CLEToken.tokenFromReflection(uint256) (../../sb/CLEToken.sol#858-862)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/CLEToken.sol#1095)
+		- _tOwned[address(this)] = _tOwned[address(this)].add(tLiquidity) (../../sb/CLEToken.sol#993)
+		- _tOwned[_communityWalletAddress] = _tOwned[_communityWalletAddress].add(rCommunity) (../../sb/CLEToken.sol#1001)
+		- _tOwned[sender] = _tOwned[sender].sub(tAmount) (../../sb/CLEToken.sol#889)
+		- _tOwned[sender] = _tOwned[sender].sub(tAmount) (../../sb/CLEToken.sol#1198)
+		- _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount) (../../sb/CLEToken.sol#1188)
+		- _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount) (../../sb/CLEToken.sol#891)
+	CLEToken._tOwned (../../sb/CLEToken.sol#711) can be used in cross function reentrancies:
+	- CLEToken._getCurrentSupply() (../../sb/CLEToken.sol#976-986)
+	- CLEToken._takeCommunity(uint256) (../../sb/CLEToken.sol#996-1002)
+	- CLEToken._takeLiquidity(uint256) (../../sb/CLEToken.sol#988-994)
+	- CLEToken._transferBothExcluded(address,address,uint256) (../../sb/CLEToken.sol#887-897)
+	- CLEToken._transferFromExcluded(address,address,uint256) (../../sb/CLEToken.sol#1196-1205)
+	- CLEToken._transferToExcluded(address,address,uint256) (../../sb/CLEToken.sol#1185-1194)
+	- CLEToken.balanceOf(address) (../../sb/CLEToken.sol#795-798)
+	- CLEToken.excludeFromReward(address) (../../sb/CLEToken.sol#864-872)
+	- CLEToken.includeInReward(address) (../../sb/CLEToken.sol#874-885)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities
+
+CLEToken.addLiquidity(uint256,uint256) (../../sb/CLEToken.sol#1139-1152) ignores return value by uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,address(this),block.timestamp) (../../sb/CLEToken.sol#1144-1151)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+CLEToken.allowance(address,address).owner (../../sb/CLEToken.sol#805) shadows:
+	- Ownable.owner() (../../sb/CLEToken.sol#449-451) (function)
+CLEToken._approve(address,address,uint256).owner (../../sb/CLEToken.sol#1044) shadows:
+	- Ownable.owner() (../../sb/CLEToken.sol#449-451) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+CLEToken.setTaxFeePercent(uint256) (../../sb/CLEToken.sol#907-909) should emit an event for: 
+	- _taxFee = taxFee (../../sb/CLEToken.sol#908) 
+CLEToken.setCommunityFeePercent(uint256) (../../sb/CLEToken.sol#911-913) should emit an event for: 
+	- _communityFee = communityFee (../../sb/CLEToken.sol#912) 
+CLEToken.setLiquidityFeePercent(uint256) (../../sb/CLEToken.sol#915-917) should emit an event for: 
+	- _liquidityFee = liquidityFee (../../sb/CLEToken.sol#916) 
+CLEToken.setMaxTxPercent(uint256) (../../sb/CLEToken.sol#919-923) should emit an event for: 
+	- _maxTxAmount = _tTotal.mul(maxTxPercent).div(10 ** 2) (../../sb/CLEToken.sol#920-922) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+CLEToken.setCommunityWalletAddress(address).communityWalletAddress (../../sb/CLEToken.sol#925) lacks a zero-check on :
+		- _communityWalletAddress = communityWalletAddress (../../sb/CLEToken.sol#926)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in CLEToken._transfer(address,address,uint256) (../../sb/CLEToken.sol#1052-1096):
+	External calls:
+	- swapAndLiquify(contractTokenBalance) (../../sb/CLEToken.sol#1083)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,address(this),block.timestamp) (../../sb/CLEToken.sol#1144-1151)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/CLEToken.sol#1130-1136)
+	External calls sending eth:
+	- swapAndLiquify(contractTokenBalance) (../../sb/CLEToken.sol#1083)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,address(this),block.timestamp) (../../sb/CLEToken.sol#1144-1151)
+	State variables written after the call(s):
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/CLEToken.sol#1095)
+		- _communityFee = _previousCommunityFee (../../sb/CLEToken.sol#1036)
+		- _communityFee = 0 (../../sb/CLEToken.sol#1030)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/CLEToken.sol#1095)
+		- _liquidityFee = _previousLiquidityFee (../../sb/CLEToken.sol#1037)
+		- _liquidityFee = 0 (../../sb/CLEToken.sol#1031)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/CLEToken.sol#1095)
+		- _previousCommunityFee = _communityFee (../../sb/CLEToken.sol#1026)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/CLEToken.sol#1095)
+		- _previousLiquidityFee = _liquidityFee (../../sb/CLEToken.sol#1027)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/CLEToken.sol#1095)
+		- _previousTaxFee = _taxFee (../../sb/CLEToken.sol#1025)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/CLEToken.sol#1095)
+		- _tFeeTotal = _tFeeTotal.add(tFee) (../../sb/CLEToken.sol#945)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/CLEToken.sol#1095)
+		- _taxFee = _previousTaxFee (../../sb/CLEToken.sol#1035)
+		- _taxFee = 0 (../../sb/CLEToken.sol#1029)
+Reentrancy in CLEToken.swapAndLiquify(uint256) (../../sb/CLEToken.sol#1098-1119):
+	External calls:
+	- swapTokensForEth(half) (../../sb/CLEToken.sol#1110)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/CLEToken.sol#1130-1136)
+	- addLiquidity(otherHalf,newBalance) (../../sb/CLEToken.sol#1116)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,address(this),block.timestamp) (../../sb/CLEToken.sol#1144-1151)
+	External calls sending eth:
+	- addLiquidity(otherHalf,newBalance) (../../sb/CLEToken.sol#1116)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,address(this),block.timestamp) (../../sb/CLEToken.sol#1144-1151)
+	State variables written after the call(s):
+	- addLiquidity(otherHalf,newBalance) (../../sb/CLEToken.sol#1116)
+		- _allowances[owner][spender] = amount (../../sb/CLEToken.sol#1048)
+Reentrancy in CLEToken.transferFrom(address,address,uint256) (../../sb/CLEToken.sol#814-818):
+	External calls:
+	- _transfer(sender,recipient,amount) (../../sb/CLEToken.sol#815)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,address(this),block.timestamp) (../../sb/CLEToken.sol#1144-1151)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/CLEToken.sol#1130-1136)
+	External calls sending eth:
+	- _transfer(sender,recipient,amount) (../../sb/CLEToken.sol#815)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,address(this),block.timestamp) (../../sb/CLEToken.sol#1144-1151)
+	State variables written after the call(s):
+	- _approve(sender,_msgSender(),_allowances[sender][_msgSender()].sub(amount,BEP20: transfer amount exceeds allowance)) (../../sb/CLEToken.sol#816)
+		- _allowances[owner][spender] = amount (../../sb/CLEToken.sol#1048)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in CLEToken._transfer(address,address,uint256) (../../sb/CLEToken.sol#1052-1096):
+	External calls:
+	- swapAndLiquify(contractTokenBalance) (../../sb/CLEToken.sol#1083)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,address(this),block.timestamp) (../../sb/CLEToken.sol#1144-1151)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/CLEToken.sol#1130-1136)
+	External calls sending eth:
+	- swapAndLiquify(contractTokenBalance) (../../sb/CLEToken.sol#1083)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,address(this),block.timestamp) (../../sb/CLEToken.sol#1144-1151)
+	Event emitted after the call(s):
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/CLEToken.sol#1182)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/CLEToken.sol#1095)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/CLEToken.sol#1204)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/CLEToken.sol#1095)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/CLEToken.sol#1193)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/CLEToken.sol#1095)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/CLEToken.sol#896)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/CLEToken.sol#1095)
+Reentrancy in CLEToken.swapAndLiquify(uint256) (../../sb/CLEToken.sol#1098-1119):
+	External calls:
+	- swapTokensForEth(half) (../../sb/CLEToken.sol#1110)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/CLEToken.sol#1130-1136)
+	- addLiquidity(otherHalf,newBalance) (../../sb/CLEToken.sol#1116)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,address(this),block.timestamp) (../../sb/CLEToken.sol#1144-1151)
+	External calls sending eth:
+	- addLiquidity(otherHalf,newBalance) (../../sb/CLEToken.sol#1116)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,address(this),block.timestamp) (../../sb/CLEToken.sol#1144-1151)
+	Event emitted after the call(s):
+	- Approval(owner,spender,amount) (../../sb/CLEToken.sol#1049)
+		- addLiquidity(otherHalf,newBalance) (../../sb/CLEToken.sol#1116)
+	- SwapAndLiquify(half,newBalance,otherHalf) (../../sb/CLEToken.sol#1118)
+Reentrancy in CLEToken.transferFrom(address,address,uint256) (../../sb/CLEToken.sol#814-818):
+	External calls:
+	- _transfer(sender,recipient,amount) (../../sb/CLEToken.sol#815)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,address(this),block.timestamp) (../../sb/CLEToken.sol#1144-1151)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/CLEToken.sol#1130-1136)
+	External calls sending eth:
+	- _transfer(sender,recipient,amount) (../../sb/CLEToken.sol#815)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,address(this),block.timestamp) (../../sb/CLEToken.sol#1144-1151)
+	Event emitted after the call(s):
+	- Approval(owner,spender,amount) (../../sb/CLEToken.sol#1049)
+		- _approve(sender,_msgSender(),_allowances[sender][_msgSender()].sub(amount,BEP20: transfer amount exceeds allowance)) (../../sb/CLEToken.sol#816)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Ownable.unlock() (../../sb/CLEToken.sol#496-501) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(now > _lockTime,Contract is locked until 7 days) (../../sb/CLEToken.sol#498)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/CLEToken.sol#301-310) uses assembly
+	- INLINE ASM (../../sb/CLEToken.sol#308)
+Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/CLEToken.sol#394-415) uses assembly
+	- INLINE ASM (../../sb/CLEToken.sol#407-410)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+CLEToken.includeInReward(address) (../../sb/CLEToken.sol#874-885) has costly operations inside a loop:
+	- _excluded.pop() (../../sb/CLEToken.sol#881)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#costly-operations-inside-a-loop
+
+Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/CLEToken.sol#394-415) is never used and should be removed
+Address.functionCall(address,bytes) (../../sb/CLEToken.sol#354-356) is never used and should be removed
+Address.functionCall(address,bytes,string) (../../sb/CLEToken.sol#364-366) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/CLEToken.sol#379-381) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/CLEToken.sol#389-392) is never used and should be removed
+Address.isContract(address) (../../sb/CLEToken.sol#301-310) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/CLEToken.sol#328-334) is never used and should be removed
+Context._msgData() (../../sb/CLEToken.sol#274-277) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/CLEToken.sol#247-249) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/CLEToken.sol#263-266) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+CLEToken._rTotal (../../sb/CLEToken.sol#723) is set pre-construction with a non-constant function or state variable:
+	- (MAX - (MAX % _tTotal))
+CLEToken._previousTaxFee (../../sb/CLEToken.sol#731) is set pre-construction with a non-constant function or state variable:
+	- _taxFee
+CLEToken._previousCommunityFee (../../sb/CLEToken.sol#734) is set pre-construction with a non-constant function or state variable:
+	- _communityFee
+CLEToken._previousLiquidityFee (../../sb/CLEToken.sol#736) is set pre-construction with a non-constant function or state variable:
+	- _liquidityFee
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#function-initializing-state
+
+Pragma version^0.6.12 (../../sb/CLEToken.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/CLEToken.sol#328-334):
+	- (success) = recipient.call{value: amount}() (../../sb/CLEToken.sol#332)
+Low level call in Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/CLEToken.sol#394-415):
+	- (success,returndata) = target.call{value: weiValue}(data) (../../sb/CLEToken.sol#398)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Function IUniswapV2Pair.DOMAIN_SEPARATOR() (../../sb/CLEToken.sol#535) is not in mixedCase
+Function IUniswapV2Pair.PERMIT_TYPEHASH() (../../sb/CLEToken.sol#536) is not in mixedCase
+Function IUniswapV2Pair.MINIMUM_LIQUIDITY() (../../sb/CLEToken.sol#553) is not in mixedCase
+Function IUniswapV2Router01.WETH() (../../sb/CLEToken.sol#573) is not in mixedCase
+Parameter CLEToken.setSwapAndLiquifyEnabled(bool)._enabled (../../sb/CLEToken.sol#935) is not in mixedCase
+Parameter CLEToken.calculateTaxFee(uint256)._amount (../../sb/CLEToken.sol#1004) is not in mixedCase
+Parameter CLEToken.calculateCommunityFee(uint256)._amount (../../sb/CLEToken.sol#1010) is not in mixedCase
+Parameter CLEToken.calculateLiquidityFee(uint256)._amount (../../sb/CLEToken.sol#1016) is not in mixedCase
+Variable CLEToken._taxFee (../../sb/CLEToken.sol#730) is not in mixedCase
+Variable CLEToken._communityFee (../../sb/CLEToken.sol#733) is not in mixedCase
+Variable CLEToken._liquidityFee (../../sb/CLEToken.sol#735) is not in mixedCase
+Variable CLEToken._maxTxAmount (../../sb/CLEToken.sol#744) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/CLEToken.sol#275)" inContext (../../sb/CLEToken.sol#269-278)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Variable IUniswapV2Router01.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountADesired (../../sb/CLEToken.sol#578) is too similar to IUniswapV2Router01.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountBDesired (../../sb/CLEToken.sol#579)
+Variable CLEToken._getValues(uint256).rTransferAmount (../../sb/CLEToken.sol#950) is too similar to CLEToken._getTValues(uint256).tTransferAmount (../../sb/CLEToken.sol#958)
+Variable CLEToken._getValues(uint256).rTransferAmount (../../sb/CLEToken.sol#950) is too similar to CLEToken._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/CLEToken.sol#1197)
+Variable CLEToken._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/CLEToken.sol#1197) is too similar to CLEToken._transferStandard(address,address,uint256).tTransferAmount (../../sb/CLEToken.sol#1176)
+Variable CLEToken._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/CLEToken.sol#888) is too similar to CLEToken._transferStandard(address,address,uint256).tTransferAmount (../../sb/CLEToken.sol#1176)
+Variable CLEToken.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/CLEToken.sol#853) is too similar to CLEToken._transferStandard(address,address,uint256).tTransferAmount (../../sb/CLEToken.sol#1176)
+Variable CLEToken._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/CLEToken.sol#1186) is too similar to CLEToken._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/CLEToken.sol#1197)
+Variable CLEToken._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/CLEToken.sol#1197) is too similar to CLEToken._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/CLEToken.sol#888)
+Variable CLEToken._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/CLEToken.sol#888) is too similar to CLEToken._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/CLEToken.sol#888)
+Variable CLEToken._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/CLEToken.sol#1197) is too similar to CLEToken._getTValues(uint256).tTransferAmount (../../sb/CLEToken.sol#958)
+Variable CLEToken._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/CLEToken.sol#888) is too similar to CLEToken._getTValues(uint256).tTransferAmount (../../sb/CLEToken.sol#958)
+Variable CLEToken._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/CLEToken.sol#1186) is too similar to CLEToken._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/CLEToken.sol#1186)
+Variable CLEToken._getRValues(uint256,uint256,uint256,uint256,uint256).rTransferAmount (../../sb/CLEToken.sol#967) is too similar to CLEToken._transferStandard(address,address,uint256).tTransferAmount (../../sb/CLEToken.sol#1176)
+Variable CLEToken._transferStandard(address,address,uint256).rTransferAmount (../../sb/CLEToken.sol#1176) is too similar to CLEToken._transferStandard(address,address,uint256).tTransferAmount (../../sb/CLEToken.sol#1176)
+Variable CLEToken.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/CLEToken.sol#853) is too similar to CLEToken._getTValues(uint256).tTransferAmount (../../sb/CLEToken.sol#958)
+Variable CLEToken._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/CLEToken.sol#1186) is too similar to CLEToken._transferStandard(address,address,uint256).tTransferAmount (../../sb/CLEToken.sol#1176)
+Variable CLEToken._getValues(uint256).rTransferAmount (../../sb/CLEToken.sol#950) is too similar to CLEToken._transferStandard(address,address,uint256).tTransferAmount (../../sb/CLEToken.sol#1176)
+Variable CLEToken._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/CLEToken.sol#1197) is too similar to CLEToken._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/CLEToken.sol#1197)
+Variable CLEToken._getRValues(uint256,uint256,uint256,uint256,uint256).rTransferAmount (../../sb/CLEToken.sol#967) is too similar to CLEToken._getTValues(uint256).tTransferAmount (../../sb/CLEToken.sol#958)
+Variable CLEToken._transferStandard(address,address,uint256).rTransferAmount (../../sb/CLEToken.sol#1176) is too similar to CLEToken._getTValues(uint256).tTransferAmount (../../sb/CLEToken.sol#958)
+Variable CLEToken._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/CLEToken.sol#1186) is too similar to CLEToken._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/CLEToken.sol#888)
+Variable CLEToken._getValues(uint256).rTransferAmount (../../sb/CLEToken.sol#950) is too similar to CLEToken._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/CLEToken.sol#888)
+Variable CLEToken._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/CLEToken.sol#1186) is too similar to CLEToken._getTValues(uint256).tTransferAmount (../../sb/CLEToken.sol#958)
+Variable CLEToken._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/CLEToken.sol#888) is too similar to CLEToken._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/CLEToken.sol#1197)
+Variable CLEToken._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/CLEToken.sol#1197) is too similar to CLEToken._getValues(uint256).tTransferAmount (../../sb/CLEToken.sol#949)
+Variable CLEToken.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/CLEToken.sol#853) is too similar to CLEToken._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/CLEToken.sol#1197)
+Variable CLEToken._getRValues(uint256,uint256,uint256,uint256,uint256).rTransferAmount (../../sb/CLEToken.sol#967) is too similar to CLEToken._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/CLEToken.sol#1197)
+Variable CLEToken.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/CLEToken.sol#853) is too similar to CLEToken._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/CLEToken.sol#888)
+Variable CLEToken._getRValues(uint256,uint256,uint256,uint256,uint256).rTransferAmount (../../sb/CLEToken.sol#967) is too similar to CLEToken._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/CLEToken.sol#888)
+Variable CLEToken._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/CLEToken.sol#1186) is too similar to CLEToken._getValues(uint256).tTransferAmount (../../sb/CLEToken.sol#949)
+Variable CLEToken._transferStandard(address,address,uint256).rTransferAmount (../../sb/CLEToken.sol#1176) is too similar to CLEToken._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/CLEToken.sol#1186)
+Variable CLEToken._transferStandard(address,address,uint256).rTransferAmount (../../sb/CLEToken.sol#1176) is too similar to CLEToken._getValues(uint256).tTransferAmount (../../sb/CLEToken.sol#949)
+Variable CLEToken._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/CLEToken.sol#888) is too similar to CLEToken._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/CLEToken.sol#1186)
+Variable CLEToken.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/CLEToken.sol#853) is too similar to CLEToken._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/CLEToken.sol#1186)
+Variable CLEToken._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/CLEToken.sol#888) is too similar to CLEToken._getValues(uint256).tTransferAmount (../../sb/CLEToken.sol#949)
+Variable CLEToken._getRValues(uint256,uint256,uint256,uint256,uint256).rTransferAmount (../../sb/CLEToken.sol#967) is too similar to CLEToken._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/CLEToken.sol#1186)
+Variable CLEToken.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/CLEToken.sol#853) is too similar to CLEToken._getValues(uint256).tTransferAmount (../../sb/CLEToken.sol#949)
+Variable CLEToken._getRValues(uint256,uint256,uint256,uint256,uint256).rTransferAmount (../../sb/CLEToken.sol#967) is too similar to CLEToken._getValues(uint256).tTransferAmount (../../sb/CLEToken.sol#949)
+Variable CLEToken._transferStandard(address,address,uint256).rTransferAmount (../../sb/CLEToken.sol#1176) is too similar to CLEToken._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/CLEToken.sol#1197)
+Variable CLEToken._getValues(uint256).rTransferAmount (../../sb/CLEToken.sol#950) is too similar to CLEToken._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/CLEToken.sol#1186)
+Variable CLEToken._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/CLEToken.sol#1197) is too similar to CLEToken._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/CLEToken.sol#1186)
+Variable CLEToken._transferStandard(address,address,uint256).rTransferAmount (../../sb/CLEToken.sol#1176) is too similar to CLEToken._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/CLEToken.sol#888)
+Variable CLEToken._getValues(uint256).rTransferAmount (../../sb/CLEToken.sol#950) is too similar to CLEToken._getValues(uint256).tTransferAmount (../../sb/CLEToken.sol#949)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+CLEToken.slitherConstructorVariables() (../../sb/CLEToken.sol#706-1207) uses literals with too many digits:
+	- _tTotal = 1000000 * 10 ** 9 (../../sb/CLEToken.sol#722)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+Loop condition i < _excluded.length (../../sb/CLEToken.sol#979) should use cached array length instead of referencing `length` member of the storage array.
+ Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cache-array-length
+
+CLEToken._decimals (../../sb/CLEToken.sol#728) should be constant 
+CLEToken._name (../../sb/CLEToken.sol#726) should be constant 
+CLEToken._symbol (../../sb/CLEToken.sol#727) should be constant 
+CLEToken._tTotal (../../sb/CLEToken.sol#722) should be constant 
+CLEToken.numTokensSellToAddToLiquidity (../../sb/CLEToken.sol#745) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+/sb/CLEToken.sol analyzed (10 contracts with 93 detectors), 100 result(s) found

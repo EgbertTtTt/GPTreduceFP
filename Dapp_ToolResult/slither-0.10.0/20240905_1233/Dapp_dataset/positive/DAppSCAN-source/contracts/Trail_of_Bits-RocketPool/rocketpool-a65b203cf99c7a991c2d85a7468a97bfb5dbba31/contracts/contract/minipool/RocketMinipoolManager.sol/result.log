@@ -1,0 +1,193 @@
+'solc --version' running
+'solc /sb/RocketMinipoolManager.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/RocketMinipoolManager.sol:
+Warning: Contract code size exceeds 24576 bytes (a limit introduced in Spurious Dragon). This contract may not be deployable on mainnet. Consider enabling the optimizer (with a low "runs" value!), turning off revert strings, or using libraries.
+   --> /sb/RocketMinipoolManager.sol:761:1:
+    |
+761 | contract RocketMinipoolManager is RocketBase, RocketMinipoolManagerInterface {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+RocketMinipool.fallback(bytes) (../../sb/RocketMinipoolManager.sol#426-432) uses delegatecall to a input-controlled function id
+	- (success,data) = delegateContract.delegatecall(_input) (../../sb/RocketMinipoolManager.sol#429)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#controlled-delegatecall
+
+RocketMinipoolStorageLayout.nodeAddress (../../sb/RocketMinipoolManager.sol#305) is never initialized. It is used in:
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-state-variables
+
+RocketMinipool.constructor(RocketStorageInterface,address,MinipoolDeposit)._nodeAddress (../../sb/RocketMinipoolManager.sol#353) lacks a zero-check on :
+		- (success,data) = getContractAddress(rocketMinipoolDelegate).delegatecall(abi.encodeWithSignature(initialise(address,uint8),_nodeAddress,uint8(_depositType))) (../../sb/RocketMinipoolManager.sol#364)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+RocketMinipoolManager.getMinipoolCountPerStatus(uint256,uint256) (../../sb/RocketMinipoolManager.sol#801-832) has external calls inside a loop: minipool = RocketMinipoolInterface(addressSetStorage.getItem(minipoolKey,i)) (../../sb/RocketMinipoolManager.sol#813)
+RocketMinipoolManager.getMinipoolCountPerStatus(uint256,uint256) (../../sb/RocketMinipoolManager.sol#801-832) has external calls inside a loop: status = minipool.getStatus() (../../sb/RocketMinipoolManager.sol#815)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in RocketMinipoolManager.createMinipool(address,MinipoolDeposit) (../../sb/RocketMinipoolManager.sol#935-970):
+	External calls:
+	- contractAddress = address(new RocketMinipool(RocketStorageInterface(rocketStorage),_nodeAddress,_depositType)) (../../sb/RocketMinipoolManager.sol#951)
+	- setBool(keccak256(bytes)(abi.encodePacked(minipool.exists,contractAddress)),true) (../../sb/RocketMinipoolManager.sol#955)
+		- rocketStorage.setBool(_key,_value) (../../sb/RocketMinipoolManager.sol#590)
+	- addressSetStorage.addItem(keccak256(bytes)(abi.encodePacked(minipools.index)),contractAddress) (../../sb/RocketMinipoolManager.sol#957)
+	- addressSetStorage.addItem(keccak256(bytes)(abi.encodePacked(node.minipools.index,_nodeAddress)),contractAddress) (../../sb/RocketMinipoolManager.sol#958)
+	- rocketDAONodeTrusted.incrementMemberUnbondedValidatorCount(_nodeAddress) (../../sb/RocketMinipoolManager.sol#962)
+	Event emitted after the call(s):
+	- MinipoolCreated(contractAddress,_nodeAddress,block.timestamp) (../../sb/RocketMinipoolManager.sol#965)
+Reentrancy in RocketMinipoolManager.destroyMinipool() (../../sb/RocketMinipoolManager.sol#974-987):
+	External calls:
+	- setBool(keccak256(bytes)(abi.encodePacked(minipool.exists,msg.sender)),false) (../../sb/RocketMinipoolManager.sol#981)
+		- rocketStorage.setBool(_key,_value) (../../sb/RocketMinipoolManager.sol#590)
+	- addressSetStorage.removeItem(keccak256(bytes)(abi.encodePacked(minipools.index)),msg.sender) (../../sb/RocketMinipoolManager.sol#983)
+	- addressSetStorage.removeItem(keccak256(bytes)(abi.encodePacked(node.minipools.index,nodeAddress)),msg.sender) (../../sb/RocketMinipoolManager.sol#984)
+	Event emitted after the call(s):
+	- MinipoolDestroyed(msg.sender,nodeAddress,block.timestamp) (../../sb/RocketMinipoolManager.sol#986)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+RocketMinipool.getRevertMessage(bytes) (../../sb/RocketMinipoolManager.sol#442-448) uses assembly
+	- INLINE ASM (../../sb/RocketMinipoolManager.sol#444-446)
+RocketBase.getRevertMsg(bytes) (../../sb/RocketMinipoolManager.sol#560-568) uses assembly
+	- INLINE ASM (../../sb/RocketMinipoolManager.sol#563-566)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+RocketBase.deleteAddress(bytes32) (../../sb/RocketMinipoolManager.sol#595) is never used and should be removed
+RocketBase.deleteBool(bytes32) (../../sb/RocketMinipoolManager.sol#599) is never used and should be removed
+RocketBase.deleteBytes(bytes32) (../../sb/RocketMinipoolManager.sol#598) is never used and should be removed
+RocketBase.deleteBytes32(bytes32) (../../sb/RocketMinipoolManager.sol#601) is never used and should be removed
+RocketBase.deleteInt(bytes32) (../../sb/RocketMinipoolManager.sol#600) is never used and should be removed
+RocketBase.deleteString(bytes32) (../../sb/RocketMinipoolManager.sol#597) is never used and should be removed
+RocketBase.deleteUint(bytes32) (../../sb/RocketMinipoolManager.sol#596) is never used and should be removed
+RocketBase.getBytes32(bytes32) (../../sb/RocketMinipoolManager.sol#583) is never used and should be removed
+RocketBase.getContractAddressUnsafe(string) (../../sb/RocketMinipoolManager.sol#541-546) is never used and should be removed
+RocketBase.getContractName(address) (../../sb/RocketMinipoolManager.sol#550-557) is never used and should be removed
+RocketBase.getInt(bytes32) (../../sb/RocketMinipoolManager.sol#582) is never used and should be removed
+RocketBase.getRevertMsg(bytes) (../../sb/RocketMinipoolManager.sol#560-568) is never used and should be removed
+RocketBase.getString(bytes32) (../../sb/RocketMinipoolManager.sol#579) is never used and should be removed
+RocketBase.setBytes32(bytes32,bytes32) (../../sb/RocketMinipoolManager.sol#592) is never used and should be removed
+RocketBase.setInt(bytes32,int256) (../../sb/RocketMinipoolManager.sol#591) is never used and should be removed
+RocketBase.setString(bytes32,string) (../../sb/RocketMinipoolManager.sol#588) is never used and should be removed
+RocketBase.subUint(bytes32,uint256) (../../sb/RocketMinipoolManager.sol#605) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/RocketMinipoolManager.sol#190-193) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/RocketMinipoolManager.sol#152-155) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/RocketMinipoolManager.sol#210-213) is never used and should be removed
+SafeMath.sub(uint256,uint256,string) (../../sb/RocketMinipoolManager.sol#170-173) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/RocketMinipoolManager.sol#24-28) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/RocketMinipoolManager.sol#60-63) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/RocketMinipoolManager.sol#70-73) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/RocketMinipoolManager.sol#45-53) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/RocketMinipoolManager.sol#35-38) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.7.6 (../../sb/RocketMinipoolManager.sol#1) allows old versions
+solc-0.7.6 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in RocketMinipool.constructor(RocketStorageInterface,address,MinipoolDeposit) (../../sb/RocketMinipoolManager.sol#353-366):
+	- (success,data) = getContractAddress(rocketMinipoolDelegate).delegatecall(abi.encodeWithSignature(initialise(address,uint8),_nodeAddress,uint8(_depositType))) (../../sb/RocketMinipoolManager.sol#364)
+Low level call in RocketMinipool.fallback(bytes) (../../sb/RocketMinipoolManager.sol#426-432):
+	- (success,data) = delegateContract.delegatecall(_input) (../../sb/RocketMinipoolManager.sol#429)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter RocketMinipool.setUseLatestDelegate(bool)._setting (../../sb/RocketMinipoolManager.sol#400) is not in mixedCase
+Parameter RocketMinipool.fallback(bytes)._input (../../sb/RocketMinipoolManager.sol#426) is not in mixedCase
+Parameter RocketMinipool.getContractAddress(string)._contractName (../../sb/RocketMinipoolManager.sol#435) is not in mixedCase
+Parameter RocketMinipool.getRevertMessage(bytes)._returnData (../../sb/RocketMinipoolManager.sol#442) is not in mixedCase
+Parameter RocketBase.getContractAddress(string)._contractName (../../sb/RocketMinipoolManager.sol#530) is not in mixedCase
+Parameter RocketBase.getContractAddressUnsafe(string)._contractName (../../sb/RocketMinipoolManager.sol#541) is not in mixedCase
+Parameter RocketBase.getContractName(address)._contractAddress (../../sb/RocketMinipoolManager.sol#550) is not in mixedCase
+Parameter RocketBase.getRevertMsg(bytes)._returnData (../../sb/RocketMinipoolManager.sol#560) is not in mixedCase
+Parameter RocketBase.getAddress(bytes32)._key (../../sb/RocketMinipoolManager.sol#577) is not in mixedCase
+Parameter RocketBase.getUint(bytes32)._key (../../sb/RocketMinipoolManager.sol#578) is not in mixedCase
+Parameter RocketBase.getString(bytes32)._key (../../sb/RocketMinipoolManager.sol#579) is not in mixedCase
+Parameter RocketBase.getBytes(bytes32)._key (../../sb/RocketMinipoolManager.sol#580) is not in mixedCase
+Parameter RocketBase.getBool(bytes32)._key (../../sb/RocketMinipoolManager.sol#581) is not in mixedCase
+Parameter RocketBase.getInt(bytes32)._key (../../sb/RocketMinipoolManager.sol#582) is not in mixedCase
+Parameter RocketBase.getBytes32(bytes32)._key (../../sb/RocketMinipoolManager.sol#583) is not in mixedCase
+Parameter RocketBase.setAddress(bytes32,address)._key (../../sb/RocketMinipoolManager.sol#586) is not in mixedCase
+Parameter RocketBase.setAddress(bytes32,address)._value (../../sb/RocketMinipoolManager.sol#586) is not in mixedCase
+Parameter RocketBase.setUint(bytes32,uint256)._key (../../sb/RocketMinipoolManager.sol#587) is not in mixedCase
+Parameter RocketBase.setUint(bytes32,uint256)._value (../../sb/RocketMinipoolManager.sol#587) is not in mixedCase
+Parameter RocketBase.setString(bytes32,string)._key (../../sb/RocketMinipoolManager.sol#588) is not in mixedCase
+Parameter RocketBase.setString(bytes32,string)._value (../../sb/RocketMinipoolManager.sol#588) is not in mixedCase
+Parameter RocketBase.setBytes(bytes32,bytes)._key (../../sb/RocketMinipoolManager.sol#589) is not in mixedCase
+Parameter RocketBase.setBytes(bytes32,bytes)._value (../../sb/RocketMinipoolManager.sol#589) is not in mixedCase
+Parameter RocketBase.setBool(bytes32,bool)._key (../../sb/RocketMinipoolManager.sol#590) is not in mixedCase
+Parameter RocketBase.setBool(bytes32,bool)._value (../../sb/RocketMinipoolManager.sol#590) is not in mixedCase
+Parameter RocketBase.setInt(bytes32,int256)._key (../../sb/RocketMinipoolManager.sol#591) is not in mixedCase
+Parameter RocketBase.setInt(bytes32,int256)._value (../../sb/RocketMinipoolManager.sol#591) is not in mixedCase
+Parameter RocketBase.setBytes32(bytes32,bytes32)._key (../../sb/RocketMinipoolManager.sol#592) is not in mixedCase
+Parameter RocketBase.setBytes32(bytes32,bytes32)._value (../../sb/RocketMinipoolManager.sol#592) is not in mixedCase
+Parameter RocketBase.deleteAddress(bytes32)._key (../../sb/RocketMinipoolManager.sol#595) is not in mixedCase
+Parameter RocketBase.deleteUint(bytes32)._key (../../sb/RocketMinipoolManager.sol#596) is not in mixedCase
+Parameter RocketBase.deleteString(bytes32)._key (../../sb/RocketMinipoolManager.sol#597) is not in mixedCase
+Parameter RocketBase.deleteBytes(bytes32)._key (../../sb/RocketMinipoolManager.sol#598) is not in mixedCase
+Parameter RocketBase.deleteBool(bytes32)._key (../../sb/RocketMinipoolManager.sol#599) is not in mixedCase
+Parameter RocketBase.deleteInt(bytes32)._key (../../sb/RocketMinipoolManager.sol#600) is not in mixedCase
+Parameter RocketBase.deleteBytes32(bytes32)._key (../../sb/RocketMinipoolManager.sol#601) is not in mixedCase
+Parameter RocketBase.addUint(bytes32,uint256)._key (../../sb/RocketMinipoolManager.sol#604) is not in mixedCase
+Parameter RocketBase.addUint(bytes32,uint256)._amount (../../sb/RocketMinipoolManager.sol#604) is not in mixedCase
+Parameter RocketBase.subUint(bytes32,uint256)._key (../../sb/RocketMinipoolManager.sol#605) is not in mixedCase
+Parameter RocketBase.subUint(bytes32,uint256)._amount (../../sb/RocketMinipoolManager.sol#605) is not in mixedCase
+Constant RocketBase.calcBase (../../sb/RocketMinipoolManager.sol#457) is not in UPPER_CASE_WITH_UNDERSCORES
+Parameter RocketMinipoolManager.getMinipoolAt(uint256)._index (../../sb/RocketMinipoolManager.sol#835) is not in mixedCase
+Parameter RocketMinipoolManager.getNodeMinipoolCount(address)._nodeAddress (../../sb/RocketMinipoolManager.sol#841) is not in mixedCase
+Parameter RocketMinipoolManager.getNodeActiveMinipoolCount(address)._nodeAddress (../../sb/RocketMinipoolManager.sol#847) is not in mixedCase
+Parameter RocketMinipoolManager.getNodeFinalisedMinipoolCount(address)._nodeAddress (../../sb/RocketMinipoolManager.sol#855) is not in mixedCase
+Parameter RocketMinipoolManager.getNodeStakingMinipoolCount(address)._nodeAddress (../../sb/RocketMinipoolManager.sol#860) is not in mixedCase
+Parameter RocketMinipoolManager.getNodeMinipoolAt(address,uint256)._nodeAddress (../../sb/RocketMinipoolManager.sol#865) is not in mixedCase
+Parameter RocketMinipoolManager.getNodeMinipoolAt(address,uint256)._index (../../sb/RocketMinipoolManager.sol#865) is not in mixedCase
+Parameter RocketMinipoolManager.getNodeValidatingMinipoolCount(address)._nodeAddress (../../sb/RocketMinipoolManager.sol#871) is not in mixedCase
+Parameter RocketMinipoolManager.getNodeValidatingMinipoolAt(address,uint256)._nodeAddress (../../sb/RocketMinipoolManager.sol#877) is not in mixedCase
+Parameter RocketMinipoolManager.getNodeValidatingMinipoolAt(address,uint256)._index (../../sb/RocketMinipoolManager.sol#877) is not in mixedCase
+Parameter RocketMinipoolManager.getMinipoolByPubkey(bytes)._pubkey (../../sb/RocketMinipoolManager.sol#883) is not in mixedCase
+Parameter RocketMinipoolManager.getMinipoolExists(address)._minipoolAddress (../../sb/RocketMinipoolManager.sol#888) is not in mixedCase
+Parameter RocketMinipoolManager.getMinipoolPubkey(address)._minipoolAddress (../../sb/RocketMinipoolManager.sol#893) is not in mixedCase
+Parameter RocketMinipoolManager.incrementNodeStakingMinipoolCount(address)._nodeAddress (../../sb/RocketMinipoolManager.sol#898) is not in mixedCase
+Parameter RocketMinipoolManager.decrementNodeStakingMinipoolCount(address)._nodeAddress (../../sb/RocketMinipoolManager.sol#912) is not in mixedCase
+Parameter RocketMinipoolManager.incrementNodeFinalisedMinipoolCount(address)._nodeAddress (../../sb/RocketMinipoolManager.sol#926) is not in mixedCase
+Parameter RocketMinipoolManager.createMinipool(address,MinipoolDeposit)._nodeAddress (../../sb/RocketMinipoolManager.sol#935) is not in mixedCase
+Parameter RocketMinipoolManager.createMinipool(address,MinipoolDeposit)._depositType (../../sb/RocketMinipoolManager.sol#935) is not in mixedCase
+Parameter RocketMinipoolManager.updateTotalEffectiveRPLStake(address,uint256,uint256)._nodeAddress (../../sb/RocketMinipoolManager.sol#990) is not in mixedCase
+Parameter RocketMinipoolManager.updateTotalEffectiveRPLStake(address,uint256,uint256)._oldCount (../../sb/RocketMinipoolManager.sol#990) is not in mixedCase
+Parameter RocketMinipoolManager.updateTotalEffectiveRPLStake(address,uint256,uint256)._newCount (../../sb/RocketMinipoolManager.sol#990) is not in mixedCase
+Parameter RocketMinipoolManager.setMinipoolPubkey(bytes)._pubkey (../../sb/RocketMinipoolManager.sol#1036) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+RocketMinipoolStorageLayout.status (../../sb/RocketMinipoolManager.sol#296) is never used in RocketMinipool (../../sb/RocketMinipoolManager.sol#335-450)
+RocketMinipoolStorageLayout.statusBlock (../../sb/RocketMinipoolManager.sol#297) is never used in RocketMinipool (../../sb/RocketMinipoolManager.sol#335-450)
+RocketMinipoolStorageLayout.statusTime (../../sb/RocketMinipoolManager.sol#298) is never used in RocketMinipool (../../sb/RocketMinipoolManager.sol#335-450)
+RocketMinipoolStorageLayout.withdrawalBlock (../../sb/RocketMinipoolManager.sol#299) is never used in RocketMinipool (../../sb/RocketMinipoolManager.sol#335-450)
+RocketMinipoolStorageLayout.depositType (../../sb/RocketMinipoolManager.sol#302) is never used in RocketMinipool (../../sb/RocketMinipoolManager.sol#335-450)
+RocketMinipoolStorageLayout.nodeFee (../../sb/RocketMinipoolManager.sol#306) is never used in RocketMinipool (../../sb/RocketMinipoolManager.sol#335-450)
+RocketMinipoolStorageLayout.nodeDepositBalance (../../sb/RocketMinipoolManager.sol#307) is never used in RocketMinipool (../../sb/RocketMinipoolManager.sol#335-450)
+RocketMinipoolStorageLayout.nodeDepositAssigned (../../sb/RocketMinipoolManager.sol#308) is never used in RocketMinipool (../../sb/RocketMinipoolManager.sol#335-450)
+RocketMinipoolStorageLayout.nodeRefundBalance (../../sb/RocketMinipoolManager.sol#309) is never used in RocketMinipool (../../sb/RocketMinipoolManager.sol#335-450)
+RocketMinipoolStorageLayout.nodeSlashBalance (../../sb/RocketMinipoolManager.sol#310) is never used in RocketMinipool (../../sb/RocketMinipoolManager.sol#335-450)
+RocketMinipoolStorageLayout.userDepositBalance (../../sb/RocketMinipoolManager.sol#313) is never used in RocketMinipool (../../sb/RocketMinipoolManager.sol#335-450)
+RocketMinipoolStorageLayout.userDepositAssignedTime (../../sb/RocketMinipoolManager.sol#314) is never used in RocketMinipool (../../sb/RocketMinipoolManager.sol#335-450)
+RocketMinipoolStorageLayout.rocketTokenRETH (../../sb/RocketMinipoolManager.sol#322) is never used in RocketMinipool (../../sb/RocketMinipoolManager.sol#335-450)
+RocketMinipoolStorageLayout.finalised (../../sb/RocketMinipoolManager.sol#331) is never used in RocketMinipool (../../sb/RocketMinipoolManager.sol#335-450)
+RocketBase.calcBase (../../sb/RocketMinipoolManager.sol#457) is never used in RocketMinipoolManager (../../sb/RocketMinipoolManager.sol#761-1049)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-state-variable
+
+RocketMinipoolStorageLayout.finalised (../../sb/RocketMinipoolManager.sol#331) should be constant 
+RocketMinipoolStorageLayout.nodeAddress (../../sb/RocketMinipoolManager.sol#305) should be constant 
+RocketMinipoolStorageLayout.nodeDepositAssigned (../../sb/RocketMinipoolManager.sol#308) should be constant 
+RocketMinipoolStorageLayout.nodeDepositBalance (../../sb/RocketMinipoolManager.sol#307) should be constant 
+RocketMinipoolStorageLayout.nodeFee (../../sb/RocketMinipoolManager.sol#306) should be constant 
+RocketMinipoolStorageLayout.nodeRefundBalance (../../sb/RocketMinipoolManager.sol#309) should be constant 
+RocketMinipoolStorageLayout.nodeSlashBalance (../../sb/RocketMinipoolManager.sol#310) should be constant 
+RocketMinipoolStorageLayout.rocketTokenRETH (../../sb/RocketMinipoolManager.sol#322) should be constant 
+RocketMinipoolStorageLayout.statusBlock (../../sb/RocketMinipoolManager.sol#297) should be constant 
+RocketMinipoolStorageLayout.statusTime (../../sb/RocketMinipoolManager.sol#298) should be constant 
+RocketMinipoolStorageLayout.userDepositAssignedTime (../../sb/RocketMinipoolManager.sol#314) should be constant 
+RocketMinipoolStorageLayout.userDepositBalance (../../sb/RocketMinipoolManager.sol#313) should be constant 
+RocketMinipoolStorageLayout.withdrawalBlock (../../sb/RocketMinipoolManager.sol#299) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+
+RocketBase.rocketStorage (../../sb/RocketMinipoolManager.sol#463) should be immutable 
+RocketBase.version (../../sb/RocketMinipoolManager.sol#460) should be immutable 
+RocketMinipoolStorageLayout.rocketMinipoolPenalty (../../sb/RocketMinipoolManager.sol#325) should be immutable 
+RocketMinipoolStorageLayout.rocketStorage (../../sb/RocketMinipoolManager.sol#293) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/RocketMinipoolManager.sol analyzed (15 contracts with 93 detectors), 134 result(s) found

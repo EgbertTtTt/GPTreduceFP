@@ -1,0 +1,137 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 18 Code Findings │
+└──────────────────┘
+                                 
+    /sb/InterestTokenFactory.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          453┆ for (uint256 i = 0; i < bytePrefix.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          571┆ constructor(
+          572┆     address _tranche,
+          573┆     string memory _strategySymbol,
+          574┆     uint256 _timestamp,
+          575┆     uint8 _decimals
+          576┆ ) ERC20Permit("Element Yield Token ", "eY:") {
+          577┆     tranche = ITranche(_tranche);
+          578┆     _setupDecimals(_decimals);
+          579┆     // Write the strategySymbol and expiration time to name and  
+  symbol                                                                        
+          580┆     DateString.encodeAndWriteTimestamp(_strategySymbol,          
+  _timestamp, name);                                                            
+             [hid 2 additional lines, adjust with --max-lines-per-finding] 
+          653┆ constructor() ERC20Permit("Element Principal Token", "eP:") {
+          654┆     // Assume the caller is the Tranche factory.
+          655┆     ITrancheFactory trancheFactory = ITrancheFactory(msg.sender);
+          656┆     (
+          657┆         address wpAddress,
+          658┆         uint256 expiration,
+          659┆         IInterestToken interestTokenTemp
+          660┆     ) = trancheFactory.getData();
+          661┆     interestToken = interestTokenTemp;
+          662┆ 
+             [hid 19 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          453┆ for (uint256 i = 0; i < bytePrefix.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          246┆ require(balance >= amount, "ERC20: insufficient-balance");
+            ⋮┆----------------------------------------
+          256┆ require(allowed >= amount, "ERC20: insufficient-allowance");
+            ⋮┆----------------------------------------
+          357┆ require(owner != address(0), "ERC20: invalid-address-0");
+            ⋮┆----------------------------------------
+          360┆ require(owner == ecrecover(digest, v, r, s), "ERC20:             
+  invalid-permit");                                                             
+            ⋮┆----------------------------------------
+          362┆ require(
+          363┆     deadline == 0 || block.timestamp <= deadline,
+          364┆     "ERC20: permit-expired"
+          365┆ );
+            ⋮┆----------------------------------------
+          538┆ revert("date decoding error");
+            ⋮┆----------------------------------------
+          593┆ require(
+          594┆     msg.sender == address(tranche),
+          595┆     "caller is not an authorized minter"
+          596┆ );
+            ⋮┆----------------------------------------
+          722┆ require(block.timestamp < unlockTimestamp, "expired");
+            ⋮┆----------------------------------------
+          784┆ require(block.timestamp >= unlockTimestamp, "not expired");
+            ⋮┆----------------------------------------
+          806┆ require(block.timestamp >= unlockTimestamp, "not expired");
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          745┆ if (_valueSupplied > 0 && holdingsValue > _valueSupplied) {
+          746┆     adjustedAmount =
+          747┆         usedUnderlying -
+          748┆         ((holdingsValue - _valueSupplied) * usedUnderlying) /
+          749┆         _interestSupply;
+          750┆ } else {
+          751┆     adjustedAmount = usedUnderlying;
+          752┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          367┆ nonces[owner]++;
+            ⋮┆----------------------------------------
+          453┆ for (uint256 i = 0; i < bytePrefix.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          593┆ require(
+          594┆     msg.sender == address(tranche),
+          595┆     "caller is not an authorized minter"
+          596┆ );
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 18 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

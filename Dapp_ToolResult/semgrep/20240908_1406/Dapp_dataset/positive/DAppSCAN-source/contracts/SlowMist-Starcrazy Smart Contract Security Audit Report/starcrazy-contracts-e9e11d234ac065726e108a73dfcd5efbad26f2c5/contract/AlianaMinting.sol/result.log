@@ -1,0 +1,330 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 82 Code Findings │
+└──────────────────┘
+                          
+    /sb/AlianaMinting.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          820┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          824┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          842┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          847┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          852┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+         1319┆ for (uint256 i = 0; i < _tokenIds.length; i++) {
+            ⋮┆----------------------------------------
+         1373┆ for (uint256 i = 0; i < _tokenIds.length; i++) {
+            ⋮┆----------------------------------------
+         1383┆ for (uint256 i = 0; i < _tokenIds.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+          229┆ bool public paused = false;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          235┆ constructor() public {
+          236┆     ceoAddress = msg.sender;
+          237┆     emit AcceptCEO(ceoAddress);
+          238┆ }
+            ⋮┆----------------------------------------
+         1202┆ constructor(IERC20 _gftToken, IAliana _alianaAddr) public {
+         1203┆     require(_alianaAddr.isAliana(), "AlianaMinting: isAliana     
+  false");                                                                      
+         1204┆     gftToken = _gftToken;
+         1205┆     aliana = _alianaAddr;
+         1206┆     lastRewardBlock = block.number;
+         1207┆     // times 1e10. See below.
+         1208┆     uint256 defaultPerDayIn5SecBlock = 2000;
+         1209┆     setRewardPerBlock(
+         1210┆         defaultPerDayIn5SecBlock.mul(1e18).div((24 * 60 * 60) /  
+  5)                                                                            
+         1211┆     );
+             [hid 1 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+         1410┆ aliana.safeTransferFrom(address(this), address(_from), key, "");
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          136┆ for (uint256 i = 0; i < addrs.length; i++) {
+            ⋮┆----------------------------------------
+          186┆ for (uint256 i = 0; i < addrs.length; i++) {
+            ⋮┆----------------------------------------
+         1319┆ for (uint256 i = 0; i < _tokenIds.length; i++) {
+            ⋮┆----------------------------------------
+         1373┆ for (uint256 i = 0; i < _tokenIds.length; i++) {
+            ⋮┆----------------------------------------
+         1383┆ for (uint256 i = 0; i < _tokenIds.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           91┆ require(whitelist[msg.sender], "not whitelisted");
+            ⋮┆----------------------------------------
+          242┆ require(msg.sender == ceoAddress, "not ceo");
+            ⋮┆----------------------------------------
+          248┆ require(msg.sender == cfoAddress, "not cfo");
+            ⋮┆----------------------------------------
+          254┆ require(msg.sender == cooAddress, "not coo");
+            ⋮┆----------------------------------------
+          259┆ require(
+          260┆     msg.sender == cooAddress ||
+          261┆         msg.sender == ceoAddress ||
+          262┆         msg.sender == cfoAddress,
+          263┆     "not c level"
+          264┆ );
+            ⋮┆----------------------------------------
+          269┆ require(
+          270┆     msg.sender == cooAddress ||
+          271┆         msg.sender == ceoAddress ||
+          272┆         msg.sender == cfoAddress ||
+          273┆         whitelist[msg.sender],
+          274┆     "not c level or whitelisted"
+          275┆ );
+            ⋮┆----------------------------------------
+          282┆ require(_candidateCEO != address(0), "addr can't be 0");
+            ⋮┆----------------------------------------
+          290┆ require(msg.sender == candidateCEOAddress, "you are not the      
+  candidate");                                                                  
+            ⋮┆----------------------------------------
+          299┆ require(_newCFO != address(0), "addr can't be 0");
+            ⋮┆----------------------------------------
+          308┆ require(_newCOO != address(0), "addr can't be 0");
+            ⋮┆----------------------------------------
+          318┆ require(!paused, "paused");
+            ⋮┆----------------------------------------
+          324┆ require(paused, "not paused");
+            ⋮┆----------------------------------------
+          491┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          506┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          523┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          540┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          557┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          669┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          673┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          730┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          731┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          755┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          779┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          839┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          840┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          841┆ );
+            ⋮┆----------------------------------------
+          869┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+         1203┆ require(_alianaAddr.isAliana(), "AlianaMinting: isAliana false");
+            ⋮┆----------------------------------------
+         1274┆ require(
+         1275┆     aliana.ownerOf(_tokenId) == _from,
+         1276┆     "AlianaMinting: must be the owner"
+         1277┆ );
+            ⋮┆----------------------------------------
+         1280┆ require(
+         1281┆     user.amountToken.size < maxMintingNumPerAddress,
+         1282┆     "AlianaMinting: too much mining at the same time"
+         1283┆ );
+            ⋮┆----------------------------------------
+         1286┆ require(_amount > 0, "AlianaMinting: gene _amount must > 0");
+            ⋮┆----------------------------------------
+         1347┆ require(_amount > 0, "AlianaMinting: withdraw: not good 1");
+            ⋮┆----------------------------------------
+         1348┆ require(user.amount >= _amount, "AlianaMinting: withdraw: not    
+  good 2");                                                                     
+            ⋮┆----------------------------------------
+         1358┆ require(
+         1359┆     remove(user.amountToken, _tokenId),
+         1360┆     "AlianaMinting: withdraw: not good, remove from amountToken"
+         1361┆ );
+            ⋮┆----------------------------------------
+         1424┆ require(gaeBalance >= _amount, "AlianaMinting: insufficient      
+  balance");                                                                    
+            ⋮┆----------------------------------------
+         1426┆ require(
+         1427┆     gftToken.transfer(_to, _amount),
+         1428┆     "AlianaMinting: failed to transfer gae token"
+         1429┆ );
+            ⋮┆----------------------------------------
+         1437┆ require(_owner != address(0), "AlianaMinting: zero address");
+            ⋮┆----------------------------------------
+         1462┆ require(_owner != address(0), "AlianaMinting: zero address");
+            ⋮┆----------------------------------------
+         1473┆ require(_value >= 0, "AlianaMinting: approval negative");
+            ⋮┆----------------------------------------
+         1478┆ require(action == 1, "AlianaMinting: unknow action");
+            ⋮┆----------------------------------------
+         1481┆ require(
+         1482┆     _tokenContract == address(aliana),
+         1483┆     "AlianaMinting: approval and want mint use aliana, but used  
+  token isn't Aliana"                                                           
+         1484┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         1235┆ if (block.number > lastRewardBlock && lpSupply > 0) {
+         1236┆     acps = acps.add(rewardPending().mul(1e12).div(lpSupply));
+         1237┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-decrement-not-postfix                    
+          Consider using the prefix decrement expression whenever the return    
+  value is not needed. The                                                      
+          prefix decrement expression is cheaper in terms of gas.               
+                                                                                
+         1104┆ self.size--;
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          136┆ for (uint256 i = 0; i < addrs.length; i++) {
+            ⋮┆----------------------------------------
+          186┆ for (uint256 i = 0; i < addrs.length; i++) {
+            ⋮┆----------------------------------------
+         1091┆ self.size++;
+            ⋮┆----------------------------------------
+         1137┆ keyIndex++;
+            ⋮┆----------------------------------------
+         1139┆ keyIndex++;
+            ⋮┆----------------------------------------
+         1319┆ for (uint256 i = 0; i < _tokenIds.length; i++) {
+            ⋮┆----------------------------------------
+         1373┆ for (uint256 i = 0; i < _tokenIds.length; i++) {
+            ⋮┆----------------------------------------
+         1383┆ for (uint256 i = 0; i < _tokenIds.length; i++) {
+            ⋮┆----------------------------------------
+         1451┆ resultIndex++;
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          523┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          673┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          730┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          755┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          779┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          839┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          840┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          841┆ );
+            ⋮┆----------------------------------------
+          869┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+         1280┆ require(
+         1281┆     user.amountToken.size < maxMintingNumPerAddress,
+         1282┆     "AlianaMinting: too much mining at the same time"
+         1283┆ );
+            ⋮┆----------------------------------------
+         1286┆ require(_amount > 0, "AlianaMinting: gene _amount must > 0");
+            ⋮┆----------------------------------------
+         1347┆ require(_amount > 0, "AlianaMinting: withdraw: not good 1");
+            ⋮┆----------------------------------------
+         1348┆ require(user.amount >= _amount, "AlianaMinting: withdraw: not    
+  good 2");                                                                     
+            ⋮┆----------------------------------------
+         1358┆ require(
+         1359┆     remove(user.amountToken, _tokenId),
+         1360┆     "AlianaMinting: withdraw: not good, remove from amountToken"
+         1361┆ );
+            ⋮┆----------------------------------------
+         1424┆ require(gaeBalance >= _amount, "AlianaMinting: insufficient      
+  balance");                                                                    
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 82 findings.
+            ⋮┆----------------------------------------
+         1426┆ require(
+         1427┆     gftToken.transfer(_to, _amount),
+         1428┆     "AlianaMinting: failed to transfer gae token"
+         1429┆ );
+            ⋮┆----------------------------------------
+         1481┆ require(
+         1482┆     _tokenContract == address(aliana),
+         1483┆     "AlianaMinting: approval and want mint use aliana, but used  
+  token isn't Aliana"                                                           
+         1484┆ );
+
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

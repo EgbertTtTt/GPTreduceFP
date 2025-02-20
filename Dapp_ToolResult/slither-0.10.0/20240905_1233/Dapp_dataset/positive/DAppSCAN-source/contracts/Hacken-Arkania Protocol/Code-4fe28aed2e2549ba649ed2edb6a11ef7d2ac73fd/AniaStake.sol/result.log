@@ -1,0 +1,81 @@
+'solc --version' running
+'solc /sb/AniaStake.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/sb' running
+
+AniaStake.stakeTokens(uint256) (../../sb/AniaStake.sol#579-608) ignores return value by aniaToken.transferFrom(msg.sender,address(this),_amount) (../../sb/AniaStake.sol#607)
+AniaStake.unstakeTokens(uint256) (../../sb/AniaStake.sol#611-638) ignores return value by aniaToken.transfer(msg.sender,_amount) (../../sb/AniaStake.sol#627)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+AniaStake.calculateStakeReward(AniaStake.Stake) (../../sb/AniaStake.sol#550-552) performs a multiplication on the result of a division:
+	- (_current_stake.amount * apy / 100) * (block.timestamp - _current_stake.since) / (31536000) (../../sb/AniaStake.sol#551)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+Contract locking ether found:
+	Contract AniaStake (../../sb/AniaStake.sol#493-693) has payable functions:
+	 - AniaStake.constructor(ArkaniaProtocol) (../../sb/AniaStake.sol#535-543)
+	But does not have a function to withdraw the ether
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#contracts-that-lock-ether
+
+Reentrancy in AniaStake.unstakeTokens(uint256) (../../sb/AniaStake.sol#611-638):
+	External calls:
+	- aniaToken.transfer(msg.sender,_amount) (../../sb/AniaStake.sol#627)
+	State variables written after the call(s):
+	- stakers[index].address_stake = Stake(msg.sender,userStakes + reward - _amount,block.timestamp) (../../sb/AniaStake.sol#630)
+	AniaStake.stakers (../../sb/AniaStake.sol#527) can be used in cross function reentrancies:
+	- AniaStake._addStaker(address) (../../sb/AniaStake.sol#557-567)
+	- AniaStake.constructor(ArkaniaProtocol) (../../sb/AniaStake.sol#535-543)
+	- AniaStake.hasRewards() (../../sb/AniaStake.sol#641-645)
+	- AniaStake.hasStakeWithRewards(address) (../../sb/AniaStake.sol#648-663)
+	- AniaStake.redistributeRewards(address[]) (../../sb/AniaStake.sol#666-680)
+	- AniaStake.stakeTokens(uint256) (../../sb/AniaStake.sol#579-608)
+	- AniaStake.unstakeTokens(uint256) (../../sb/AniaStake.sol#611-638)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+AniaStake.stakeTokens(uint256) (../../sb/AniaStake.sol#579-608) should emit an event for: 
+	- totalStaked += newStake (../../sb/AniaStake.sol#604) 
+AniaStake.changeAPY(uint256,address[]) (../../sb/AniaStake.sol#683-692) should emit an event for: 
+	- apy = _value (../../sb/AniaStake.sol#691) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+Reentrancy in AniaStake.unstakeTokens(uint256) (../../sb/AniaStake.sol#611-638):
+	External calls:
+	- aniaToken.transfer(msg.sender,_amount) (../../sb/AniaStake.sol#627)
+	State variables written after the call(s):
+	- totalStaked -= userStakes (../../sb/AniaStake.sol#634)
+	- totalStaked -= _amount (../../sb/AniaStake.sol#636)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+AniaStake.unstakeTokens(uint256) (../../sb/AniaStake.sol#611-638) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(_amount <= stakedWithRewards,amount has to be less or equal than current stakes with rewards) (../../sb/AniaStake.sol#626)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+AniaStake.redistributeRewards(address[]) (../../sb/AniaStake.sol#666-680) has costly operations inside a loop:
+	- totalStaked += reward (../../sb/AniaStake.sol#678)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#costly-operations-inside-a-loop
+
+Context._msgData() (../../sb/AniaStake.sol#24-26) is never used and should be removed
+ERC20._burn(address,uint256) (../../sb/AniaStake.sol#400-415) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.8.2 (../../sb/AniaStake.sol#1) allows old versions
+solc-0.8.27 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Parameter AniaStake.calculateStakeReward(AniaStake.Stake)._current_stake (../../sb/AniaStake.sol#550) is not in mixedCase
+Parameter AniaStake.stakeTokens(uint256)._amount (../../sb/AniaStake.sol#579) is not in mixedCase
+Parameter AniaStake.unstakeTokens(uint256)._amount (../../sb/AniaStake.sol#611) is not in mixedCase
+Parameter AniaStake.hasStakeWithRewards(address)._address (../../sb/AniaStake.sol#648) is not in mixedCase
+Parameter AniaStake.changeAPY(uint256,address[])._value (../../sb/AniaStake.sol#683) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+ArkaniaProtocol.constructor() (../../sb/AniaStake.sol#486-488) uses literals with too many digits:
+	- _mint(msg.sender,100000000 * 10 ** decimals()) (../../sb/AniaStake.sol#487)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+AniaStake.name (../../sb/AniaStake.sol#494) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+
+AniaStake.aniaToken (../../sb/AniaStake.sol#495) should be immutable 
+AniaStake.owner (../../sb/AniaStake.sol#498) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/AniaStake.sol analyzed (6 contracts with 93 detectors), 23 result(s) found

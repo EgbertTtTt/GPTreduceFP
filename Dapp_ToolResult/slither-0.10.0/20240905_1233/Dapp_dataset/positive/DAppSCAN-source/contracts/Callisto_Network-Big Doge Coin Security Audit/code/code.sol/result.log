@@ -1,0 +1,313 @@
+'solc --version' running
+'solc /sb/code.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+Reentrancy in LiquidityGeneratorToken._transfer(address,address,uint256) (../../sb/code.sol#989-1033):
+	External calls:
+	- swapAndLiquify(contractTokenBalance) (../../sb/code.sol#1020)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (../../sb/code.sol#1081-1088)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/code.sol#1067-1073)
+	External calls sending eth:
+	- swapAndLiquify(contractTokenBalance) (../../sb/code.sol#1020)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (../../sb/code.sol#1081-1088)
+	State variables written after the call(s):
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/code.sol#1032)
+		- _rOwned[address(this)] = _rOwned[address(this)].add(rLiquidity) (../../sb/code.sol#945)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/code.sol#1114)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/code.sol#1123)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/code.sol#1115)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/code.sol#1134)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/code.sol#858)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/code.sol#1135)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/code.sol#1125)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/code.sol#860)
+	LiquidityGeneratorToken._rOwned (../../sb/code.sol#688) can be used in cross function reentrancies:
+	- LiquidityGeneratorToken._getCurrentSupply() (../../sb/code.sol#930-940)
+	- LiquidityGeneratorToken._takeLiquidity(uint256) (../../sb/code.sol#942-948)
+	- LiquidityGeneratorToken._transferBothExcluded(address,address,uint256) (../../sb/code.sol#855-864)
+	- LiquidityGeneratorToken._transferFromExcluded(address,address,uint256) (../../sb/code.sol#1131-1139)
+	- LiquidityGeneratorToken._transferStandard(address,address,uint256) (../../sb/code.sol#1112-1119)
+	- LiquidityGeneratorToken._transferToExcluded(address,address,uint256) (../../sb/code.sol#1121-1129)
+	- LiquidityGeneratorToken.balanceOf(address) (../../sb/code.sol#785-788)
+	- LiquidityGeneratorToken.constructor(address,string,string,uint8,uint256,uint8,uint8,uint256,uint256,uint256) (../../sb/code.sol#737-767)
+	- LiquidityGeneratorToken.deliver(uint256) (../../sb/code.sol#828-835)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/code.sol#1032)
+		- _rTotal = _rTotal.sub(rFee) (../../sb/code.sol#900)
+	LiquidityGeneratorToken._rTotal (../../sb/code.sol#700) can be used in cross function reentrancies:
+	- LiquidityGeneratorToken._getCurrentSupply() (../../sb/code.sol#930-940)
+	- LiquidityGeneratorToken._reflectFee(uint256,uint256) (../../sb/code.sol#899-902)
+	- LiquidityGeneratorToken.constructor(address,string,string,uint8,uint256,uint8,uint8,uint256,uint256,uint256) (../../sb/code.sol#737-767)
+	- LiquidityGeneratorToken.deliver(uint256) (../../sb/code.sol#828-835)
+	- LiquidityGeneratorToken.tokenFromReflection(uint256) (../../sb/code.sol#848-852)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/code.sol#1032)
+		- _tOwned[address(this)] = _tOwned[address(this)].add(tLiquidity) (../../sb/code.sol#947)
+		- _tOwned[sender] = _tOwned[sender].sub(tAmount) (../../sb/code.sol#857)
+		- _tOwned[sender] = _tOwned[sender].sub(tAmount) (../../sb/code.sol#1133)
+		- _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount) (../../sb/code.sol#1124)
+		- _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount) (../../sb/code.sol#859)
+	LiquidityGeneratorToken._tOwned (../../sb/code.sol#689) can be used in cross function reentrancies:
+	- LiquidityGeneratorToken._getCurrentSupply() (../../sb/code.sol#930-940)
+	- LiquidityGeneratorToken._takeLiquidity(uint256) (../../sb/code.sol#942-948)
+	- LiquidityGeneratorToken._transferBothExcluded(address,address,uint256) (../../sb/code.sol#855-864)
+	- LiquidityGeneratorToken._transferFromExcluded(address,address,uint256) (../../sb/code.sol#1131-1139)
+	- LiquidityGeneratorToken._transferToExcluded(address,address,uint256) (../../sb/code.sol#1121-1129)
+	- LiquidityGeneratorToken.balanceOf(address) (../../sb/code.sol#785-788)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities
+
+LiquidityGeneratorToken._isExcluded (../../sb/code.sol#695) is never initialized. It is used in:
+	- LiquidityGeneratorToken.balanceOf(address) (../../sb/code.sol#785-788)
+	- LiquidityGeneratorToken.isExcludedFromReward(address) (../../sb/code.sol#820-822)
+	- LiquidityGeneratorToken.deliver(uint256) (../../sb/code.sol#828-835)
+	- LiquidityGeneratorToken._takeLiquidity(uint256) (../../sb/code.sol#942-948)
+	- LiquidityGeneratorToken._tokenTransfer(address,address,uint256,bool) (../../sb/code.sol#1092-1110)
+LiquidityGeneratorToken._excluded (../../sb/code.sol#696) is never initialized. It is used in:
+	- LiquidityGeneratorToken._getCurrentSupply() (../../sb/code.sol#930-940)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-state-variables
+
+LiquidityGeneratorToken.setTaxFeePercent(uint256) (../../sb/code.sol#874-877) contains a tautology or contradiction:
+	- require(bool,string)(taxFee >= 0 && taxFee <= maxTaxFee,taxFee out of range) (../../sb/code.sol#875)
+LiquidityGeneratorToken.setLiquidityFeePercent(uint256) (../../sb/code.sol#879-882) contains a tautology or contradiction:
+	- require(bool,string)(liquidityFee >= 0 && liquidityFee <= maxLiqFee,liquidityFee out of range) (../../sb/code.sol#880)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#tautology-or-contradiction
+
+LiquidityGeneratorToken.addLiquidity(uint256,uint256) (../../sb/code.sol#1076-1089) ignores return value by uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (../../sb/code.sol#1081-1088)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+LiquidityGeneratorToken.constructor(address,string,string,uint8,uint256,uint8,uint8,uint256,uint256,uint256).name (../../sb/code.sol#737) shadows:
+	- LiquidityGeneratorToken.name() (../../sb/code.sol#769-771) (function)
+LiquidityGeneratorToken.constructor(address,string,string,uint8,uint256,uint8,uint8,uint256,uint256,uint256).symbol (../../sb/code.sol#737) shadows:
+	- LiquidityGeneratorToken.symbol() (../../sb/code.sol#773-775) (function)
+LiquidityGeneratorToken.allowance(address,address).owner (../../sb/code.sol#795) shadows:
+	- Ownable.owner() (../../sb/code.sol#418-420) (function)
+LiquidityGeneratorToken._approve(address,address,uint256).owner (../../sb/code.sol#981) shadows:
+	- Ownable.owner() (../../sb/code.sol#418-420) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+LiquidityGeneratorToken.setTaxFeePercent(uint256) (../../sb/code.sol#874-877) should emit an event for: 
+	- _taxFee = taxFee (../../sb/code.sol#876) 
+LiquidityGeneratorToken.setLiquidityFeePercent(uint256) (../../sb/code.sol#879-882) should emit an event for: 
+	- _liquidityFee = liquidityFee (../../sb/code.sol#881) 
+LiquidityGeneratorToken.setMaxTxPercent(uint256) (../../sb/code.sol#884-889) should emit an event for: 
+	- _maxTxAmount = _tTotal.mul(maxTxPercent).div(10 ** 2) (../../sb/code.sol#886-888) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+Reentrancy in LiquidityGeneratorToken._transfer(address,address,uint256) (../../sb/code.sol#989-1033):
+	External calls:
+	- swapAndLiquify(contractTokenBalance) (../../sb/code.sol#1020)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (../../sb/code.sol#1081-1088)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/code.sol#1067-1073)
+	External calls sending eth:
+	- swapAndLiquify(contractTokenBalance) (../../sb/code.sol#1020)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (../../sb/code.sol#1081-1088)
+	State variables written after the call(s):
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/code.sol#1032)
+		- _liquidityFee = _previousLiquidityFee (../../sb/code.sol#974)
+		- _liquidityFee = 0 (../../sb/code.sol#969)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/code.sol#1032)
+		- _previousLiquidityFee = _liquidityFee (../../sb/code.sol#966)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/code.sol#1032)
+		- _previousTaxFee = _taxFee (../../sb/code.sol#965)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/code.sol#1032)
+		- _tFeeTotal = _tFeeTotal.add(tFee) (../../sb/code.sol#901)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/code.sol#1032)
+		- _taxFee = _previousTaxFee (../../sb/code.sol#973)
+		- _taxFee = 0 (../../sb/code.sol#968)
+Reentrancy in LiquidityGeneratorToken.swapAndLiquify(uint256) (../../sb/code.sol#1035-1056):
+	External calls:
+	- swapTokensForEth(half) (../../sb/code.sol#1047)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/code.sol#1067-1073)
+	- addLiquidity(otherHalf,newBalance) (../../sb/code.sol#1053)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (../../sb/code.sol#1081-1088)
+	External calls sending eth:
+	- addLiquidity(otherHalf,newBalance) (../../sb/code.sol#1053)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (../../sb/code.sol#1081-1088)
+	State variables written after the call(s):
+	- addLiquidity(otherHalf,newBalance) (../../sb/code.sol#1053)
+		- _allowances[owner][spender] = amount (../../sb/code.sol#985)
+Reentrancy in LiquidityGeneratorToken.transferFrom(address,address,uint256) (../../sb/code.sol#804-808):
+	External calls:
+	- _transfer(sender,recipient,amount) (../../sb/code.sol#805)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (../../sb/code.sol#1081-1088)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/code.sol#1067-1073)
+	External calls sending eth:
+	- _transfer(sender,recipient,amount) (../../sb/code.sol#805)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (../../sb/code.sol#1081-1088)
+	State variables written after the call(s):
+	- _approve(sender,_msgSender(),_allowances[sender][_msgSender()].sub(amount,ERC20: transfer amount exceeds allowance)) (../../sb/code.sol#806)
+		- _allowances[owner][spender] = amount (../../sb/code.sol#985)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in LiquidityGeneratorToken._transfer(address,address,uint256) (../../sb/code.sol#989-1033):
+	External calls:
+	- swapAndLiquify(contractTokenBalance) (../../sb/code.sol#1020)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (../../sb/code.sol#1081-1088)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/code.sol#1067-1073)
+	External calls sending eth:
+	- swapAndLiquify(contractTokenBalance) (../../sb/code.sol#1020)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (../../sb/code.sol#1081-1088)
+	Event emitted after the call(s):
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/code.sol#1118)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/code.sol#1032)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/code.sol#1128)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/code.sol#1032)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/code.sol#1138)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/code.sol#1032)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/code.sol#863)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/code.sol#1032)
+Reentrancy in LiquidityGeneratorToken.swapAndLiquify(uint256) (../../sb/code.sol#1035-1056):
+	External calls:
+	- swapTokensForEth(half) (../../sb/code.sol#1047)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/code.sol#1067-1073)
+	- addLiquidity(otherHalf,newBalance) (../../sb/code.sol#1053)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (../../sb/code.sol#1081-1088)
+	External calls sending eth:
+	- addLiquidity(otherHalf,newBalance) (../../sb/code.sol#1053)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (../../sb/code.sol#1081-1088)
+	Event emitted after the call(s):
+	- Approval(owner,spender,amount) (../../sb/code.sol#986)
+		- addLiquidity(otherHalf,newBalance) (../../sb/code.sol#1053)
+	- SwapAndLiquify(half,newBalance,otherHalf) (../../sb/code.sol#1055)
+Reentrancy in LiquidityGeneratorToken.transferFrom(address,address,uint256) (../../sb/code.sol#804-808):
+	External calls:
+	- _transfer(sender,recipient,amount) (../../sb/code.sol#805)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (../../sb/code.sol#1081-1088)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/code.sol#1067-1073)
+	External calls sending eth:
+	- _transfer(sender,recipient,amount) (../../sb/code.sol#805)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (../../sb/code.sol#1081-1088)
+	Event emitted after the call(s):
+	- Approval(owner,spender,amount) (../../sb/code.sol#986)
+		- _approve(sender,_msgSender(),_allowances[sender][_msgSender()].sub(amount,ERC20: transfer amount exceeds allowance)) (../../sb/code.sol#806)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Ownable.unlock() (../../sb/code.sol#465-470) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(now > _lockTime,Contract is locked until 7 days) (../../sb/code.sol#467)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/code.sol#270-279) uses assembly
+	- INLINE ASM (../../sb/code.sol#277)
+Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/code.sol#363-384) uses assembly
+	- INLINE ASM (../../sb/code.sol#376-379)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Different versions of Solidity are used:
+	- Version used: ['>=0.5.0', '>=0.6.2', '^0.6.12']
+	- >=0.5.0 (../../sb/code.sol#3)
+	- >=0.5.0 (../../sb/code.sol#4)
+	- >=0.6.2 (../../sb/code.sol#5)
+	- >=0.6.2 (../../sb/code.sol#6)
+	- ABIEncoderV2 (../../sb/code.sol#2)
+	- ^0.6.12 (../../sb/code.sol#1)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+
+Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/code.sol#363-384) is never used and should be removed
+Address.functionCall(address,bytes) (../../sb/code.sol#323-325) is never used and should be removed
+Address.functionCall(address,bytes,string) (../../sb/code.sol#333-335) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/code.sol#348-350) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/code.sol#358-361) is never used and should be removed
+Address.isContract(address) (../../sb/code.sol#270-279) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/code.sol#297-303) is never used and should be removed
+Context._msgData() (../../sb/code.sol#243-246) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/code.sol#216-218) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/code.sol#232-235) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+LiquidityGeneratorToken._previousTaxFee (../../sb/code.sol#709) is set pre-construction with a non-constant function or state variable:
+	- _taxFee
+LiquidityGeneratorToken._previousLiquidityFee (../../sb/code.sol#712) is set pre-construction with a non-constant function or state variable:
+	- _liquidityFee
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#function-initializing-state
+
+Pragma version^0.6.12 (../../sb/code.sol#1) allows old versions
+Pragma version>=0.5.0 (../../sb/code.sol#3) allows old versions
+Pragma version>=0.5.0 (../../sb/code.sol#4) allows old versions
+Pragma version>=0.6.2 (../../sb/code.sol#5) allows old versions
+Pragma version>=0.6.2 (../../sb/code.sol#6) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/code.sol#297-303):
+	- (success) = recipient.call{value: amount}() (../../sb/code.sol#301)
+Low level call in Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/code.sol#363-384):
+	- (success,returndata) = target.call{value: weiValue}(data) (../../sb/code.sol#367)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Function IUniswapV2Pair.DOMAIN_SEPARATOR() (../../sb/code.sol#506) is not in mixedCase
+Function IUniswapV2Pair.PERMIT_TYPEHASH() (../../sb/code.sol#507) is not in mixedCase
+Function IUniswapV2Pair.MINIMUM_LIQUIDITY() (../../sb/code.sol#524) is not in mixedCase
+Function IUniswapV2Router01.WETH() (../../sb/code.sol#545) is not in mixedCase
+Parameter LiquidityGeneratorToken.setSwapAndLiquifyEnabled(bool)._enabled (../../sb/code.sol#891) is not in mixedCase
+Parameter LiquidityGeneratorToken.calculateTaxFee(uint256)._amount (../../sb/code.sol#950) is not in mixedCase
+Parameter LiquidityGeneratorToken.calculateLiquidityFee(uint256)._amount (../../sb/code.sol#956) is not in mixedCase
+Variable LiquidityGeneratorToken._tTotal (../../sb/code.sol#699) is not in mixedCase
+Variable LiquidityGeneratorToken._name (../../sb/code.sol#704) is not in mixedCase
+Variable LiquidityGeneratorToken._symbol (../../sb/code.sol#705) is not in mixedCase
+Variable LiquidityGeneratorToken._taxFee (../../sb/code.sol#708) is not in mixedCase
+Variable LiquidityGeneratorToken._liquidityFee (../../sb/code.sol#711) is not in mixedCase
+Variable LiquidityGeneratorToken._maxTxAmount (../../sb/code.sol#720) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/code.sol#244)" inContext (../../sb/code.sol#238-247)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Variable IUniswapV2Router01.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountADesired (../../sb/code.sol#550) is too similar to IUniswapV2Router01.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountBDesired (../../sb/code.sol#551)
+Variable LiquidityGeneratorToken._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/code.sol#856) is too similar to LiquidityGeneratorToken._getTValues(uint256).tTransferAmount (../../sb/code.sol#913)
+Variable LiquidityGeneratorToken._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/code.sol#1132) is too similar to LiquidityGeneratorToken._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/code.sol#856)
+Variable LiquidityGeneratorToken._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/code.sol#1132) is too similar to LiquidityGeneratorToken._getValues(uint256).tTransferAmount (../../sb/code.sol#905)
+Variable LiquidityGeneratorToken._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/code.sol#1132) is too similar to LiquidityGeneratorToken._getTValues(uint256).tTransferAmount (../../sb/code.sol#913)
+Variable LiquidityGeneratorToken._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/code.sol#1132) is too similar to LiquidityGeneratorToken._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/code.sol#1132)
+Variable LiquidityGeneratorToken._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/code.sol#856) is too similar to LiquidityGeneratorToken._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/code.sol#1132)
+Variable LiquidityGeneratorToken._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/code.sol#856) is too similar to LiquidityGeneratorToken._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/code.sol#856)
+Variable LiquidityGeneratorToken._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/code.sol#856) is too similar to LiquidityGeneratorToken._getValues(uint256).tTransferAmount (../../sb/code.sol#905)
+Variable LiquidityGeneratorToken.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/code.sol#843) is too similar to LiquidityGeneratorToken._getValues(uint256).tTransferAmount (../../sb/code.sol#905)
+Variable LiquidityGeneratorToken._getValues(uint256).rTransferAmount (../../sb/code.sol#906) is too similar to LiquidityGeneratorToken._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/code.sol#856)
+Variable LiquidityGeneratorToken._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/code.sol#921) is too similar to LiquidityGeneratorToken._getValues(uint256).tTransferAmount (../../sb/code.sol#905)
+Variable LiquidityGeneratorToken._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/code.sol#856) is too similar to LiquidityGeneratorToken._transferStandard(address,address,uint256).tTransferAmount (../../sb/code.sol#1113)
+Variable LiquidityGeneratorToken._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/code.sol#1122) is too similar to LiquidityGeneratorToken._getTValues(uint256).tTransferAmount (../../sb/code.sol#913)
+Variable LiquidityGeneratorToken._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/code.sol#921) is too similar to LiquidityGeneratorToken._transferStandard(address,address,uint256).tTransferAmount (../../sb/code.sol#1113)
+Variable LiquidityGeneratorToken._transferStandard(address,address,uint256).rTransferAmount (../../sb/code.sol#1113) is too similar to LiquidityGeneratorToken._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/code.sol#1132)
+Variable LiquidityGeneratorToken._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/code.sol#1122) is too similar to LiquidityGeneratorToken._getValues(uint256).tTransferAmount (../../sb/code.sol#905)
+Variable LiquidityGeneratorToken._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/code.sol#1122) is too similar to LiquidityGeneratorToken._transferStandard(address,address,uint256).tTransferAmount (../../sb/code.sol#1113)
+Variable LiquidityGeneratorToken.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/code.sol#843) is too similar to LiquidityGeneratorToken._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/code.sol#1122)
+Variable LiquidityGeneratorToken._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/code.sol#921) is too similar to LiquidityGeneratorToken._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/code.sol#856)
+Variable LiquidityGeneratorToken._transferStandard(address,address,uint256).rTransferAmount (../../sb/code.sol#1113) is too similar to LiquidityGeneratorToken._getTValues(uint256).tTransferAmount (../../sb/code.sol#913)
+Variable LiquidityGeneratorToken._getValues(uint256).rTransferAmount (../../sb/code.sol#906) is too similar to LiquidityGeneratorToken._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/code.sol#1122)
+Variable LiquidityGeneratorToken._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/code.sol#1122) is too similar to LiquidityGeneratorToken._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/code.sol#856)
+Variable LiquidityGeneratorToken._transferStandard(address,address,uint256).rTransferAmount (../../sb/code.sol#1113) is too similar to LiquidityGeneratorToken._getValues(uint256).tTransferAmount (../../sb/code.sol#905)
+Variable LiquidityGeneratorToken._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/code.sol#1132) is too similar to LiquidityGeneratorToken._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/code.sol#1122)
+Variable LiquidityGeneratorToken._transferStandard(address,address,uint256).rTransferAmount (../../sb/code.sol#1113) is too similar to LiquidityGeneratorToken._transferStandard(address,address,uint256).tTransferAmount (../../sb/code.sol#1113)
+Variable LiquidityGeneratorToken.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/code.sol#843) is too similar to LiquidityGeneratorToken._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/code.sol#1132)
+Variable LiquidityGeneratorToken._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/code.sol#856) is too similar to LiquidityGeneratorToken._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/code.sol#1122)
+Variable LiquidityGeneratorToken._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/code.sol#921) is too similar to LiquidityGeneratorToken._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/code.sol#1122)
+Variable LiquidityGeneratorToken._getValues(uint256).rTransferAmount (../../sb/code.sol#906) is too similar to LiquidityGeneratorToken._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/code.sol#1132)
+Variable LiquidityGeneratorToken._transferStandard(address,address,uint256).rTransferAmount (../../sb/code.sol#1113) is too similar to LiquidityGeneratorToken._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/code.sol#856)
+Variable LiquidityGeneratorToken.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/code.sol#843) is too similar to LiquidityGeneratorToken._getTValues(uint256).tTransferAmount (../../sb/code.sol#913)
+Variable LiquidityGeneratorToken._getValues(uint256).rTransferAmount (../../sb/code.sol#906) is too similar to LiquidityGeneratorToken._getTValues(uint256).tTransferAmount (../../sb/code.sol#913)
+Variable LiquidityGeneratorToken._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/code.sol#1122) is too similar to LiquidityGeneratorToken._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/code.sol#1122)
+Variable LiquidityGeneratorToken.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/code.sol#843) is too similar to LiquidityGeneratorToken._transferStandard(address,address,uint256).tTransferAmount (../../sb/code.sol#1113)
+Variable LiquidityGeneratorToken.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/code.sol#843) is too similar to LiquidityGeneratorToken._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/code.sol#856)
+Variable LiquidityGeneratorToken._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/code.sol#921) is too similar to LiquidityGeneratorToken._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/code.sol#1132)
+Variable LiquidityGeneratorToken._getValues(uint256).rTransferAmount (../../sb/code.sol#906) is too similar to LiquidityGeneratorToken._getValues(uint256).tTransferAmount (../../sb/code.sol#905)
+Variable LiquidityGeneratorToken._getValues(uint256).rTransferAmount (../../sb/code.sol#906) is too similar to LiquidityGeneratorToken._transferStandard(address,address,uint256).tTransferAmount (../../sb/code.sol#1113)
+Variable LiquidityGeneratorToken._transferStandard(address,address,uint256).rTransferAmount (../../sb/code.sol#1113) is too similar to LiquidityGeneratorToken._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/code.sol#1122)
+Variable LiquidityGeneratorToken._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/code.sol#1132) is too similar to LiquidityGeneratorToken._transferStandard(address,address,uint256).tTransferAmount (../../sb/code.sol#1113)
+Variable LiquidityGeneratorToken._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/code.sol#1122) is too similar to LiquidityGeneratorToken._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/code.sol#1132)
+Variable LiquidityGeneratorToken._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/code.sol#921) is too similar to LiquidityGeneratorToken._getTValues(uint256).tTransferAmount (../../sb/code.sol#913)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+Loop condition i < _excluded.length (../../sb/code.sol#933) should use cached array length instead of referencing `length` member of the storage array.
+ Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cache-array-length
+
+LiquidityGeneratorToken.dead (../../sb/code.sol#682) should be constant 
+LiquidityGeneratorToken.mintedByDxsale (../../sb/code.sol#703) should be constant 
+LiquidityGeneratorToken.router (../../sb/code.sol#697) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+
+LiquidityGeneratorToken._decimals (../../sb/code.sol#706) should be immutable 
+LiquidityGeneratorToken._tTotal (../../sb/code.sol#699) should be immutable 
+LiquidityGeneratorToken.maxLiqFee (../../sb/code.sol#683) should be immutable 
+LiquidityGeneratorToken.maxTaxFee (../../sb/code.sol#684) should be immutable 
+LiquidityGeneratorToken.minMxTxPercentage (../../sb/code.sol#685) should be immutable 
+LiquidityGeneratorToken.numTokensSellToAddToLiquidity (../../sb/code.sol#721) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/code.sol analyzed (10 contracts with 93 detectors), 110 result(s) found

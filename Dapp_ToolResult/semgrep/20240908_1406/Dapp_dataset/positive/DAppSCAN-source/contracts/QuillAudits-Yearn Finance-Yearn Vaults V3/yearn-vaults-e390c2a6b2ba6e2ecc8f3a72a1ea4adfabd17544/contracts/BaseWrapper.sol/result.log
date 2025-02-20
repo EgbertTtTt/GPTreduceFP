@@ -1,0 +1,192 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 44 Code Findings │
+└──────────────────┘
+                        
+    /sb/BaseWrapper.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          483┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          487┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          505┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          510┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          515┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          761┆ for (uint256 id = 0; id < vaults.length; id++) {
+            ⋮┆----------------------------------------
+          769┆ for (uint256 id = 0; id < vaults.length; id++) {
+            ⋮┆----------------------------------------
+          823┆ for (uint256 id = 0; id < vaults.length; id++) {
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          742┆ vaults[vault_id] = _cachedVaults[vault_id];
+            ⋮┆----------------------------------------
+          746┆ vaults[vault_id] = VaultAPI(registry.vaults(address(token),      
+  vault_id));                                                                   
+            ⋮┆----------------------------------------
+          746┆ vaults[vault_id] = VaultAPI(registry.vaults(address(token),      
+  vault_id));                                                                   
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          741┆ for (uint256 vault_id = 0; vault_id < cache_length; vault_id++) {
+            ⋮┆----------------------------------------
+          745┆ for (uint256 vault_id = cache_length; vault_id < num_vaults;     
+  vault_id++) {                                                                 
+            ⋮┆----------------------------------------
+          761┆ for (uint256 id = 0; id < vaults.length; id++) {
+            ⋮┆----------------------------------------
+          769┆ for (uint256 id = 0; id < vaults.length; id++) {
+            ⋮┆----------------------------------------
+          823┆ for (uint256 id = 0; id < vaults.length; id++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          163┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          178┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          195┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          212┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          229┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          341┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          345┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          402┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          403┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          427┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          451┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          502┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          503┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          504┆ );
+            ⋮┆----------------------------------------
+          532┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          808┆ if (depositor != address(this) && afterBal > 0)                  
+  token.transfer(depositor, afterBal);                                          
+            ⋮┆----------------------------------------
+          824┆ if (!withdrawFromBest && vaults[id] == _bestVault) {
+          825┆     continue; // Don't withdraw from the best
+          826┆ }
+            ⋮┆----------------------------------------
+          904┆ if (_depositLimit < UNCAPPED_DEPOSITS && _amount <               
+  WITHDRAW_EVERYTHING) {                                                        
+          905┆     // Can only deposit up to this amount
+          906┆     uint256 _depositLeft = _depositLimit.sub(_totalAssets);
+          907┆     if (_amount > _depositLeft) _amount = _depositLeft;
+          908┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          741┆ for (uint256 vault_id = 0; vault_id < cache_length; vault_id++) {
+            ⋮┆----------------------------------------
+          745┆ for (uint256 vault_id = cache_length; vault_id < num_vaults;     
+  vault_id++) {                                                                 
+            ⋮┆----------------------------------------
+          761┆ for (uint256 id = 0; id < vaults.length; id++) {
+            ⋮┆----------------------------------------
+          769┆ for (uint256 id = 0; id < vaults.length; id++) {
+            ⋮┆----------------------------------------
+          823┆ for (uint256 id = 0; id < vaults.length; id++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          195┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          345┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          402┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          427┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          451┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          502┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          503┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          504┆ );
+            ⋮┆----------------------------------------
+          532┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 44 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

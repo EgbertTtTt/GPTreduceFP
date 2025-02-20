@@ -1,0 +1,162 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 32 Code Findings │
+└──────────────────┘
+                               
+    /sb/BorrowerOperations.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+         2713┆ contract BorrowerOperations is LiquityBase, Ownable,             
+  IBorrowerOperations {                                                         
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+         2670┆ constructor () internal {
+         2671┆     _owner = msg.sender;
+         2672┆     emit OwnershipTransferred(address(0), msg.sender);
+         2673┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          493┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          547┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+         2686┆ require(isOwner(), "Ownable: caller is not the owner");
+            ⋮┆----------------------------------------
+         2897┆ require(msg.value == 0 || _collWithdrawal == 0,                  
+  "BorrowerOperations: Cannot withdraw and add coll");                          
+            ⋮┆----------------------------------------
+         2900┆ require(msg.sender == _borrower || !isWithdrawal, "BorrowerOps:  
+  User must be sender for withdrawals");                                        
+            ⋮┆----------------------------------------
+         2901┆ require(msg.value != 0 || _collWithdrawal != 0 || _debtChange != 
+  0, "BorrowerOps: There must be either a collateral change or a debt change"); 
+            ⋮┆----------------------------------------
+         3072┆ require(status == 1, "BorrowerOps: Trove does not exist or is    
+  closed");                                                                     
+            ⋮┆----------------------------------------
+         3077┆ require(status != 1, "BorrowerOps: Trove is active");
+            ⋮┆----------------------------------------
+         3081┆ require(_checkRecoveryMode() == false, "BorrowerOps: Operation   
+  not permitted during Recovery Mode");                                         
+            ⋮┆----------------------------------------
+         3085┆ require(_newICR >= MCR, "BorrowerOps: An operation that would    
+  result in ICR < MCR is not permitted");                                       
+            ⋮┆----------------------------------------
+         3089┆ require(_newICR >= R_MCR, "BorrowerOps: In Recovery Mode new     
+  troves must have ICR >= R_MCR");                                              
+            ⋮┆----------------------------------------
+         3104┆ require(newTCR >= CCR, "BorrowerOps: An operation that would     
+  result in TCR < CCR is not permitted");                                       
+            ⋮┆----------------------------------------
+         3108┆ require(_debtRepayment <=                                        
+  _currentDebt.sub(LUSD_GAS_COMPENSATION), "BorrowerOps: Amount repaid must not 
+  be larger than the Trove's debt");                                            
+            ⋮┆----------------------------------------
+         3115┆ require(_collWithdrawal <= _currentColl, "BorrowerOps:           
+  Insufficient balance for ETH withdrawal");                                    
+            ⋮┆----------------------------------------
+         3119┆ require(msg.sender == stabilityPoolAddress, "BorrowerOps: Caller 
+  is not Stability Pool");                                                      
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         2915┆ if (_isDebtIncrease && _debtChange > 0) {
+         2916┆     // Decay the baseRate and get the fee
+         2917┆     troveManager.decayBaseRateFromBorrowing();
+         2918┆     L.LUSDFee = troveManager.getBorrowingFee(_debtChange);
+         2919┆ 
+         2920┆     // The raw debt change includes the fee, if there was one
+         2921┆     L.rawDebtChange = L.rawDebtChange.add(L.LUSDFee);
+         2922┆ 
+         2923┆     // Send fee to LQTY staking contract
+         2924┆     lqtyStaking.increaseF_LUSD(L.LUSDFee);
+             [hid 2 additional lines, adjust with --max-lines-per-finding] 
+         2934┆ if (_isDebtIncrease && _debtChange > 0) {
+         2935┆     _requireNewTCRisAboveCCR(L.collChange, L.isCollIncrease,     
+  L.rawDebtChange, _isDebtIncrease, L.price);                                   
+         2936┆ }
+            ⋮┆----------------------------------------
+         2938┆ if (!_isDebtIncrease && _debtChange > 0)                         
+  {_requireLUSDRepaymentAllowed(L.debt, L.rawDebtChange);}                      
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          547┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+         2897┆ require(msg.value == 0 || _collWithdrawal == 0,                  
+  "BorrowerOperations: Cannot withdraw and add coll");                          
+            ⋮┆----------------------------------------
+         2900┆ require(msg.sender == _borrower || !isWithdrawal, "BorrowerOps:  
+  User must be sender for withdrawals");                                        
+            ⋮┆----------------------------------------
+         2901┆ require(msg.value != 0 || _collWithdrawal != 0 || _debtChange != 
+  0, "BorrowerOps: There must be either a collateral change or a debt change"); 
+            ⋮┆----------------------------------------
+         3072┆ require(status == 1, "BorrowerOps: Trove does not exist or is    
+  closed");                                                                     
+            ⋮┆----------------------------------------
+         3081┆ require(_checkRecoveryMode() == false, "BorrowerOps: Operation   
+  not permitted during Recovery Mode");                                         
+            ⋮┆----------------------------------------
+         3085┆ require(_newICR >= MCR, "BorrowerOps: An operation that would    
+  result in ICR < MCR is not permitted");                                       
+            ⋮┆----------------------------------------
+         3089┆ require(_newICR >= R_MCR, "BorrowerOps: In Recovery Mode new     
+  troves must have ICR >= R_MCR");                                              
+            ⋮┆----------------------------------------
+         3104┆ require(newTCR >= CCR, "BorrowerOps: An operation that would     
+  result in TCR < CCR is not permitted");                                       
+            ⋮┆----------------------------------------
+         3108┆ require(_debtRepayment <=                                        
+  _currentDebt.sub(LUSD_GAS_COMPENSATION), "BorrowerOps: Amount repaid must not 
+  be larger than the Trove's debt");                                            
+            ⋮┆----------------------------------------
+         3115┆ require(_collWithdrawal <= _currentColl, "BorrowerOps:           
+  Insufficient balance for ETH withdrawal");                                    
+            ⋮┆----------------------------------------
+         3119┆ require(msg.sender == stabilityPoolAddress, "BorrowerOps: Caller 
+  is not Stability Pool");                                                      
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 32 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

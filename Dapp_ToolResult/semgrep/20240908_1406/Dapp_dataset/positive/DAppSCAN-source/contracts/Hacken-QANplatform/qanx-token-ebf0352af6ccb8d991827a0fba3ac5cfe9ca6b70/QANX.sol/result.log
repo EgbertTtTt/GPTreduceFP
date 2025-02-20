@@ -1,0 +1,151 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 30 Code Findings │
+└──────────────────┘
+                 
+    /sb/QANX.sol 
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+          331┆ _totalSupply += amount;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          144┆ constructor (string memory name_, string memory symbol_) {
+          145┆     _name = name_;
+          146┆     _symbol = symbol_;
+          147┆ }
+            ⋮┆----------------------------------------
+          408┆ constructor() ERC20("QANX Token", "QANX") {
+          409┆ 
+          410┆     // INITIALLY MINT TOTAL SUPPLY TO CREATOR
+          411┆     _mint(_msgSender(), 3333333000 * (10 ** 18));
+          412┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          244┆ require(currentAllowance >= amount, "ERC20: transfer amount      
+  exceeds allowance");                                                          
+            ⋮┆----------------------------------------
+          283┆ require(currentAllowance >= subtractedValue, "ERC20: decreased   
+  allowance below zero");                                                       
+            ⋮┆----------------------------------------
+          304┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          305┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          310┆ require(senderBalance >= amount, "ERC20: transfer amount exceeds 
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          327┆ require(account != address(0), "ERC20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+          348┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          353┆ require(accountBalance >= amount, "ERC20: burn amount exceeds    
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          374┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          375┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          454┆ require(_locks[recipient].tokenAmount == 0, "Only one lock per   
+  address allowed!");                                                           
+            ⋮┆----------------------------------------
+          457┆ require(_balances[_msgSender()] +                                
+  _locks[_msgSender()].tokenAmount >= amount, "Transfer amount exceeds          
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          500┆ require(softLockUntil > hardLockUntil, "SoftLock must be greater 
+  than HardLock!");                                                             
+            ⋮┆----------------------------------------
+          539┆ require(unlockable > 0 && _locks[account].tokenAmount > 0 &&     
+  block.timestamp > _locks[account].hardLockUntil, "No unlockable tokens!");    
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          470┆ require(
+          471┆     hardLockUntil >= _locks[_msgSender()].hardLockUntil &&
+          472┆     softLockUntil >= _locks[_msgSender()].softLockUntil &&
+          473┆     allowedHops < _locks[_msgSender()].allowedHops
+          474┆ );
+            ⋮┆----------------------------------------
+          539┆ require(unlockable > 0 && _locks[account].tokenAmount > 0 &&     
+  block.timestamp > _locks[account].hardLockUntil, "No unlockable tokens!");    
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          244┆ require(currentAllowance >= amount, "ERC20: transfer amount      
+  exceeds allowance");                                                          
+            ⋮┆----------------------------------------
+          283┆ require(currentAllowance >= subtractedValue, "ERC20: decreased   
+  allowance below zero");                                                       
+            ⋮┆----------------------------------------
+          304┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          305┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          310┆ require(senderBalance >= amount, "ERC20: transfer amount exceeds 
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          348┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          353┆ require(accountBalance >= amount, "ERC20: burn amount exceeds    
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          374┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          375┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          454┆ require(_locks[recipient].tokenAmount == 0, "Only one lock per   
+  address allowed!");                                                           
+            ⋮┆----------------------------------------
+          500┆ require(softLockUntil > hardLockUntil, "SoftLock must be greater 
+  than HardLock!");                                                             
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 30 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

@@ -1,0 +1,181 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 26 Code Findings │
+└──────────────────┘
+                           
+    /sb/FlashLoanLogic.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          143┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          152┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          164┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+         4095┆ for (uint256 i = 0; i < assets.length; i++) {
+            ⋮┆----------------------------------------
+         4677┆ for (vars.i = 0; vars.i < params.assets.length; vars.i++) {
+            ⋮┆----------------------------------------
+         4697┆ for (vars.i = 0; vars.i < params.assets.length; vars.i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+         4095┆ for (uint256 i = 0; i < assets.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          127┆ require(address(this).balance >= amount, 'Address: insufficient  
+  balance');                                                                    
+            ⋮┆----------------------------------------
+          131┆ require(success, 'Address: unable to send value, recipient may   
+  have reverted');                                                              
+            ⋮┆----------------------------------------
+          160┆ require(
+          161┆   (value == 0) || (token.allowance(address(this), spender) == 0),
+          162┆   'SafeERC20: approve from non-zero to non-zero allowance'
+          163┆ );
+            ⋮┆----------------------------------------
+          168┆ require(address(token).isContract(), 'SafeERC20: call to         
+  non-contract');                                                               
+            ⋮┆----------------------------------------
+          172┆ require(success, 'SafeERC20: low-level call failed');
+            ⋮┆----------------------------------------
+          177┆ require(abi.decode(returndata, (bool)), 'SafeERC20: ERC20        
+  operation did not succeed');                                                  
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+         3953┆ require(
+         3954┆   (stableRatePreviousTimestamp < uint40(block.timestamp) &&
+         3955┆     DataTypes.InterestRateMode(rateMode) ==                      
+  DataTypes.InterestRateMode.STABLE) ||                                         
+         3956┆     (variableDebtPreviousIndex <                                 
+  reserveCache.nextVariableBorrowIndex &&                                       
+         3957┆       DataTypes.InterestRateMode(rateMode) ==                    
+  DataTypes.InterestRateMode.VARIABLE),                                         
+         3958┆   Errors.VL_SAME_BLOCK_BORROW_REPAY
+         3959┆ );
+            ⋮┆----------------------------------------
+         3961┆ require(
+         3962┆   (stableDebt > 0 &&
+         3963┆     DataTypes.InterestRateMode(rateMode) ==                      
+  DataTypes.InterestRateMode.STABLE) ||                                         
+         3964┆     (variableDebt > 0 &&
+         3965┆       DataTypes.InterestRateMode(rateMode) ==                    
+  DataTypes.InterestRateMode.VARIABLE),                                         
+         3966┆   Errors.VL_NO_DEBT_OF_SELECTED_TYPE
+         3967┆ );
+            ⋮┆----------------------------------------
+         4060┆ require(
+         4061┆   usageRatio >= REBALANCE_UP_USAGE_RATIO_THRESHOLD &&
+         4062┆     currentLiquidityRate <=
+         4063┆                                                                  
+  maxVariableBorrowRate.percentMul(REBALANCE_UP_LIQUIDITY_RATE_THRESHOLD),      
+         4064┆   Errors.P_INTEREST_RATE_REBALANCE_CONDITIONS_NOT_MET
+         4065┆ );
+            ⋮┆----------------------------------------
+         4141┆ require(
+         4142┆   vars.collateralReserveActive && vars.principalReserveActive,
+         4143┆   Errors.VL_NO_ACTIVE_RESERVE
+         4144┆ );
+            ⋮┆----------------------------------------
+         4145┆ require(
+         4146┆   !vars.collateralReservePaused && !vars.principalReservePaused,
+         4147┆   Errors.VL_RESERVE_PAUSED
+         4148┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         3553┆ if (vars.liquidationThreshold != 0 &&                            
+  params.userConfig.isUsingAsCollateral(vars.i)) {                              
+         3554┆   vars.normalizedIncome = currentReserve.getNormalizedIncome();
+         3555┆   vars.userBalance =                                             
+  IScaledBalanceToken(currentReserve.aTokenAddress).scaledBalanceOf(            
+         3556┆     params.user
+         3557┆   );
+         3558┆   vars.userBalance =                                             
+  vars.userBalance.rayMul(vars.normalizedIncome);                               
+         3559┆ 
+         3560┆   vars.userBalanceInBaseCurrency = (vars.assetPrice *            
+  vars.userBalance);                                                            
+         3561┆   unchecked {
+         3562┆     vars.userBalanceInBaseCurrency /= vars.assetUnit;
+             [hid 26 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+         4095┆ for (uint256 i = 0; i < assets.length; i++) {
+            ⋮┆----------------------------------------
+         4305┆ for (uint256 i = 0; i < reservesCount; i++) {
+            ⋮┆----------------------------------------
+         4677┆ for (vars.i = 0; vars.i < params.assets.length; vars.i++) {
+            ⋮┆----------------------------------------
+         4697┆ for (vars.i = 0; vars.i < params.assets.length; vars.i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          131┆ require(success, 'Address: unable to send value, recipient may   
+  have reverted');                                                              
+            ⋮┆----------------------------------------
+          160┆ require(
+          161┆   (value == 0) || (token.allowance(address(this), spender) == 0),
+          162┆   'SafeERC20: approve from non-zero to non-zero allowance'
+          163┆ );
+            ⋮┆----------------------------------------
+          177┆ require(abi.decode(returndata, (bool)), 'SafeERC20: ERC20        
+  operation did not succeed');                                                  
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 26 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

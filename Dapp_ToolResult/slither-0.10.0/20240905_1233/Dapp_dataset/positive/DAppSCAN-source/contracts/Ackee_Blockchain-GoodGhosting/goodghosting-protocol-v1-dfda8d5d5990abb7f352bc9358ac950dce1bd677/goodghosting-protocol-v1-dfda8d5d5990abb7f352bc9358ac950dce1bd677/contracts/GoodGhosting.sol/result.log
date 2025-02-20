@@ -1,0 +1,80 @@
+'solc --version' running
+'solc /sb/GoodGhosting.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+GoodGhosting._joinGame() (../../sb/GoodGhosting.sol#955-981) uses a dangerous strict equality:
+	- require(bool,string)(getCurrentSegment() == 0,Game has already started) (../../sb/GoodGhosting.sol#956)
+GoodGhosting.earlyWithdraw() (../../sb/GoodGhosting.sol#734-762) uses a dangerous strict equality:
+	- currentSegment == 0 (../../sb/GoodGhosting.sol#751)
+GoodGhosting.makeDeposit() (../../sb/GoodGhosting.sol#802-845) uses a dangerous strict equality:
+	- require(bool,string)(players[msg.sender].mostRecentSegmentPaid == currentSegment.sub(1),Player didn't pay the previous segment - game over!) (../../sb/GoodGhosting.sol#833-836)
+GoodGhosting.makeDeposit() (../../sb/GoodGhosting.sol#802-845) uses a dangerous strict equality:
+	- currentSegment == lastSegment.sub(1) (../../sb/GoodGhosting.sol#839)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+GoodGhosting.constructor(IERC20,ILendingPoolAddressesProvider,uint256,uint256,uint256,uint256,uint256,address,uint256,IERC20) (../../sb/GoodGhosting.sol#637-680) ignores return value by (adaiTokenAddress) = dataProvider.getReserveTokensAddresses(address(_inboundCurrency)) (../../sb/GoodGhosting.sol#675-676)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+Reentrancy in GoodGhosting.redeemFromExternalPool() (../../sb/GoodGhosting.sol#855-907):
+	External calls:
+	- lendingPool.withdraw(address(daiToken),type()(uint256).max,address(this)) (../../sb/GoodGhosting.sol#860-864)
+	State variables written after the call(s):
+	- adminFeeAmount = grossInterest (../../sb/GoodGhosting.sol#894)
+	- adminFeeAmount = _adminFeeAmount (../../sb/GoodGhosting.sol#896)
+	- totalGameInterest = grossInterest.sub(_adminFeeAmount) (../../sb/GoodGhosting.sol#886)
+	- totalGameInterest = grossInterest (../../sb/GoodGhosting.sol#889)
+	- totalIncentiveAmount = IERC20(incentiveToken).balanceOf(address(this)) (../../sb/GoodGhosting.sol#869)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in GoodGhosting.redeemFromExternalPool() (../../sb/GoodGhosting.sol#855-907):
+	External calls:
+	- lendingPool.withdraw(address(daiToken),type()(uint256).max,address(this)) (../../sb/GoodGhosting.sol#860-864)
+	Event emitted after the call(s):
+	- FundsRedeemedFromExternalPool(totalBalance,totalGamePrincipal,totalGameInterest,0,totalIncentiveAmount) (../../sb/GoodGhosting.sol#899-905)
+	- WinnersAnnouncement(winners) (../../sb/GoodGhosting.sol#906)
+Reentrancy in GoodGhosting.withdraw() (../../sb/GoodGhosting.sol#765-799):
+	External calls:
+	- redeemFromExternalPool() (../../sb/GoodGhosting.sol#773)
+		- lendingPool.withdraw(address(daiToken),type()(uint256).max,address(this)) (../../sb/GoodGhosting.sol#860-864)
+	Event emitted after the call(s):
+	- Withdrawal(msg.sender,payout,0,playerIncentive) (../../sb/GoodGhosting.sol#786)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+GoodGhosting.earlyWithdraw() (../../sb/GoodGhosting.sol#734-762) uses timestamp for comparisons
+	Dangerous comparisons:
+	- currentSegment == 0 (../../sb/GoodGhosting.sol#751)
+GoodGhosting.makeDeposit() (../../sb/GoodGhosting.sol#802-845) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(currentSegment > 0 && currentSegment < lastSegment,Deposit available only between segment 1 and segment n-1 (penultimate)) (../../sb/GoodGhosting.sol#821-824)
+	- require(bool,string)(players[msg.sender].mostRecentSegmentPaid != currentSegment,Player already paid current segment) (../../sb/GoodGhosting.sol#827-830)
+	- require(bool,string)(players[msg.sender].mostRecentSegmentPaid == currentSegment.sub(1),Player didn't pay the previous segment - game over!) (../../sb/GoodGhosting.sol#833-836)
+	- currentSegment == lastSegment.sub(1) (../../sb/GoodGhosting.sol#839)
+GoodGhosting.isGameCompleted() (../../sb/GoodGhosting.sol#917-920) uses timestamp for comparisons
+	Dangerous comparisons:
+	- getCurrentSegment() > lastSegment (../../sb/GoodGhosting.sol#919)
+GoodGhosting._joinGame() (../../sb/GoodGhosting.sol#955-981) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(getCurrentSegment() == 0,Game has already started) (../../sb/GoodGhosting.sol#956)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Context._msgData() (../../sb/GoodGhosting.sol#20-23) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/GoodGhosting.sol#360-363) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/GoodGhosting.sol#322-325) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/GoodGhosting.sol#380-383) is never used and should be removed
+SafeMath.sub(uint256,uint256,string) (../../sb/GoodGhosting.sol#340-343) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/GoodGhosting.sol#194-198) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/GoodGhosting.sol#230-233) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/GoodGhosting.sol#240-243) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/GoodGhosting.sol#215-223) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/GoodGhosting.sol#205-208) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.6.11 (../../sb/GoodGhosting.sol#1) allows old versions
+solc-0.6.11 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Redundant expression "this (../../sb/GoodGhosting.sol#21)" inContext (../../sb/GoodGhosting.sol#15-24)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+GoodGhosting.lendingPool (../../sb/GoodGhosting.sol#549) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/GoodGhosting.sol analyzed (10 contracts with 93 detectors), 26 result(s) found

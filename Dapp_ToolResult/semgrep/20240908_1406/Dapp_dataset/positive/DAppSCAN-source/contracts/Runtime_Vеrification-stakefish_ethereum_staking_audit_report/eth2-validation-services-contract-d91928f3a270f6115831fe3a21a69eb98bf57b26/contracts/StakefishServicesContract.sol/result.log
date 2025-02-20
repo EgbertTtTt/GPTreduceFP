@@ -1,0 +1,250 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 55 Code Findings │
+└──────────────────┘
+                                      
+    /sb/StakefishServicesContract.sol 
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+          145┆ deposit_count += 1;
+            ⋮┆----------------------------------------
+          988┆ _totalDeposits += acceptedDeposit;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+           73┆ constructor() {
+           74┆     // Compute hashes in empty sparse Merkle tree
+           75┆     for (uint height = 0; height < DEPOSIT_CONTRACT_TREE_DEPTH - 
+  1; height++)                                                                  
+           76┆         zero_hashes[height + 1] =                                
+  sha256(abi.encodePacked(zero_hashes[height], zero_hashes[height]));           
+           77┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+           84┆ node = sha256(abi.encodePacked(branch[height], node));
+            ⋮┆----------------------------------------
+           86┆ node = sha256(abi.encodePacked(node, zero_hashes[height]));
+            ⋮┆----------------------------------------
+          149┆ branch[height] = node;
+            ⋮┆----------------------------------------
+          152┆ node = sha256(abi.encodePacked(branch[height], node));
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+           82┆ for (uint height = 0; height < DEPOSIT_CONTRACT_TREE_DEPTH;      
+  height++) {                                                                   
+            ⋮┆----------------------------------------
+          147┆ for (uint height = 0; height < DEPOSIT_CONTRACT_TREE_DEPTH;      
+  height++) {                                                                   
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          107┆ require(pubkey.length == 48, "DepositContract: invalid pubkey    
+  length");                                                                     
+            ⋮┆----------------------------------------
+          108┆ require(withdrawal_credentials.length == 32, "DepositContract:   
+  invalid withdrawal_credentials length");                                      
+            ⋮┆----------------------------------------
+          109┆ require(signature.length == 96, "DepositContract: invalid        
+  signature length");                                                           
+            ⋮┆----------------------------------------
+          112┆ require(msg.value >= 1 ether, "DepositContract: deposit value too
+  low");                                                                        
+            ⋮┆----------------------------------------
+          113┆ require(msg.value % 1 gwei == 0, "DepositContract: deposit value 
+  not multiple of gwei");                                                       
+            ⋮┆----------------------------------------
+          115┆ require(deposit_amount <= type(uint64).max, "DepositContract:    
+  deposit value too high");                                                     
+            ⋮┆----------------------------------------
+          139┆ require(node == deposit_data_root, "DepositContract:             
+  reconstructed DepositData does not match supplied deposit_data_root");        
+            ⋮┆----------------------------------------
+          142┆ require(deposit_count < MAX_DEPOSIT_COUNT, "DepositContract:     
+  merkle tree full");                                                           
+            ⋮┆----------------------------------------
+          425┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          428┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          498┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          499┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          526┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          553┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          622┆ require(
+          623┆     msg.sender == _operatorAddress,
+          624┆     "Caller is not the operator"
+          625┆ );
+            ⋮┆----------------------------------------
+          630┆ require(
+          631┆     _state == State.NotInitialized,
+          632┆     "Contract is already initialized"
+          633┆ );
+            ⋮┆----------------------------------------
+          662┆ require(
+          663┆     _state == State.PostDeposit,
+          664┆     "Validator is not active"
+          665┆ );
+            ⋮┆----------------------------------------
+          667┆ require(
+          668┆     newExitDate < _exitDate,
+          669┆     "Not earlier than the original value"
+          670┆ );
+            ⋮┆----------------------------------------
+          686┆ require(_state == State.PreDeposit, "Validator has been          
+  created");                                                                    
+            ⋮┆----------------------------------------
+          689┆ require(validatorPubKey.length == 48, "Invalid validator public  
+  key");                                                                        
+            ⋮┆----------------------------------------
+          690┆ require(depositSignature.length == 96, "Invalid deposit          
+  signature");                                                                  
+            ⋮┆----------------------------------------
+          691┆ require(_operatorDataCommitment == keccak256(
+          692┆     abi.encodePacked(
+          693┆         address(this),
+          694┆         validatorPubKey,
+          695┆         depositSignature,
+          696┆         depositDataRoot,
+          697┆         exitDate
+          698┆     )
+          699┆ ), "Data doesn't match commitment");
+            ⋮┆----------------------------------------
+          719┆ require(
+          720┆     _state == State.PreDeposit,
+          721┆     "Validator already created"
+          722┆ );
+            ⋮┆----------------------------------------
+          733┆ require(
+          734┆     _state == State.PreDeposit,
+          735┆     "Validator already created"
+          736┆ );
+            ⋮┆----------------------------------------
+          744┆ require(_state == State.PostDeposit, "Not allowed in the current 
+  state");                                                                      
+            ⋮┆----------------------------------------
+          745┆ require((msg.sender == _operatorAddress) ||
+          746┆         (_deposits[msg.sender] > 0 && block.timestamp > _exitDate
+  + MAX_SECONDS_IN_EXIT_QUEUE), "Not allowed at the current time");             
+            ⋮┆----------------------------------------
+          962┆ require(amount > 0, "Amount shouldn't be zero");
+            ⋮┆----------------------------------------
+         1002┆ require(to != address(0), "Transfer to the zero address");
+            ⋮┆----------------------------------------
+         1017┆ require(spender != address(0), "Approve to the zero address");
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          745┆ require((msg.sender == _operatorAddress) ||
+          746┆         (_deposits[msg.sender] > 0 && block.timestamp > _exitDate
+  + MAX_SECONDS_IN_EXIT_QUEUE), "Not allowed at the current time");             
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+           75┆ for (uint height = 0; height < DEPOSIT_CONTRACT_TREE_DEPTH - 1;  
+  height++)                                                                     
+            ⋮┆----------------------------------------
+           82┆ for (uint height = 0; height < DEPOSIT_CONTRACT_TREE_DEPTH;      
+  height++) {                                                                   
+            ⋮┆----------------------------------------
+          147┆ for (uint height = 0; height < DEPOSIT_CONTRACT_TREE_DEPTH;      
+  height++) {                                                                   
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          107┆ require(pubkey.length == 48, "DepositContract: invalid pubkey    
+  length");                                                                     
+            ⋮┆----------------------------------------
+          108┆ require(withdrawal_credentials.length == 32, "DepositContract:   
+  invalid withdrawal_credentials length");                                      
+            ⋮┆----------------------------------------
+          109┆ require(signature.length == 96, "DepositContract: invalid        
+  signature length");                                                           
+            ⋮┆----------------------------------------
+          112┆ require(msg.value >= 1 ether, "DepositContract: deposit value too
+  low");                                                                        
+            ⋮┆----------------------------------------
+          113┆ require(msg.value % 1 gwei == 0, "DepositContract: deposit value 
+  not multiple of gwei");                                                       
+            ⋮┆----------------------------------------
+          115┆ require(deposit_amount <= type(uint64).max, "DepositContract:    
+  deposit value too high");                                                     
+            ⋮┆----------------------------------------
+          139┆ require(node == deposit_data_root, "DepositContract:             
+  reconstructed DepositData does not match supplied deposit_data_root");        
+            ⋮┆----------------------------------------
+          142┆ require(deposit_count < MAX_DEPOSIT_COUNT, "DepositContract:     
+  merkle tree full");                                                           
+            ⋮┆----------------------------------------
+          428┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          498┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          526┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          553┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          667┆ require(
+          668┆     newExitDate < _exitDate,
+          669┆     "Not earlier than the original value"
+          670┆ );
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 55 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

@@ -1,0 +1,233 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 49 Code Findings │
+└──────────────────┘
+                         
+    /sb/ETHWAXBRIDGE.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          491┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          495┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          513┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          518┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          523┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          685┆ constructor() public {
+          686┆     owner = msg.sender;
+          687┆ }
+            ⋮┆----------------------------------------
+          792┆ constructor(IERC20 rfoxAddress) public {
+          793┆     uint8 chainId;
+          794┆ 
+          795┆     threshold = 3;
+          796┆     rfox = rfoxAddress;
+          797┆ 
+          798┆     assembly {
+          799┆         chainId := chainid()
+          800┆     }
+          801┆ 
+             [hid 2 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          898┆ if (oracles[potential] && !signed[td.id][potential]) {
+            ⋮┆----------------------------------------
+          899┆ signed[td.id][potential] = true;
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          894┆ for (uint8 i = 0; i < signatures.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          162┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          177┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          194┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          211┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          228┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          340┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          344┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          401┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          402┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          426┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          450┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          510┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          511┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          512┆ );
+            ⋮┆----------------------------------------
+          540┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          690┆ require(msg.sender == owner, "Only owner can call");
+            ⋮┆----------------------------------------
+          726┆ require(
+          727┆     oracles[msg.sender] == true,
+          728┆     "Account is not a registered oracle"
+          729┆ );
+            ⋮┆----------------------------------------
+          735┆ require(!oracles[_newOracle], "Oracle is already registered");
+            ⋮┆----------------------------------------
+          741┆ require(oracles[_remOracle] == true, "Oracle is not registered");
+            ⋮┆----------------------------------------
+          864┆ require(thisChainId == td.chainId, "Invalid Chain ID");
+            ⋮┆----------------------------------------
+          865┆ require(
+          866┆     block.timestamp < SafeMath.add(td.ts, (60 * 60 * 24 * 30)),
+          867┆     "Bridge has expired"
+          868┆ );
+            ⋮┆----------------------------------------
+          870┆ require(!claimed[td.id], "Already Claimed");
+            ⋮┆----------------------------------------
+          884┆ require(sigData.length == 69, "Signature data is the wrong       
+  size");                                                                       
+            ⋮┆----------------------------------------
+          885┆ require(
+          886┆     signatures.length <= 10,
+          887┆     "Maximum of 10 signatures can be provided"
+          888┆ );
+            ⋮┆----------------------------------------
+          908┆ require(
+          909┆     numberSigs >= threshold,
+          910┆     "Not enough valid signatures provided"
+          911┆ );
+            ⋮┆----------------------------------------
+          926┆ require(newThreshold <= 10, "Threshold has maximum of 10");
+            ⋮┆----------------------------------------
+          951┆ require(tokenAddress != rfox, "Token locked");
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          637┆ if (v != 27 && v != 28) {
+          638┆     return (address(0));
+          639┆ } else {
+          640┆     // solium-disable-next-line arg-overflow
+          641┆     return ecrecover(message, v, r, s);
+          642┆ }
+            ⋮┆----------------------------------------
+          898┆ if (oracles[potential] && !signed[td.id][potential]) {
+          899┆     signed[td.id][potential] = true;
+          900┆     numberSigs++;
+          901┆ 
+          902┆     if (numberSigs >= 10) {
+          903┆         break;
+          904┆     }
+          905┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          894┆ for (uint8 i = 0; i < signatures.length; i++) {
+            ⋮┆----------------------------------------
+          900┆ numberSigs++;
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          194┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          344┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          401┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          426┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          450┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          510┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          511┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          512┆ );
+            ⋮┆----------------------------------------
+          540┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          726┆ require(
+          727┆     oracles[msg.sender] == true,
+          728┆     "Account is not a registered oracle"
+          729┆ );
+            ⋮┆----------------------------------------
+          885┆ require(
+          886┆     signatures.length <= 10,
+          887┆     "Maximum of 10 signatures can be provided"
+          888┆ );
+            ⋮┆----------------------------------------
+          908┆ require(
+          909┆     numberSigs >= threshold,
+          910┆     "Not enough valid signatures provided"
+          911┆ );
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 49 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

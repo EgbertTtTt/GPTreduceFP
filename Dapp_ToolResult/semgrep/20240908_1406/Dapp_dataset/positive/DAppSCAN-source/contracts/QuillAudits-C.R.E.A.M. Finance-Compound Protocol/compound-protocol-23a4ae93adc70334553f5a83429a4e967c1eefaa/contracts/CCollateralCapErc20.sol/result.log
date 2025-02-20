@@ -1,0 +1,171 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 36 Code Findings │
+└──────────────────┘
+                                
+    /sb/CCollateralCapErc20.sol 
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+         1324┆ require(msg.sender == admin, "only admin may initialize the      
+  market");                                                                     
+            ⋮┆----------------------------------------
+         1325┆ require(accrualBlockNumber == 0 && borrowIndex == 0, "market may 
+  only be initialized once");                                                   
+            ⋮┆----------------------------------------
+         1329┆ require(initialExchangeRateMantissa > 0, "initial exchange rate  
+  must be greater than zero.");                                                 
+            ⋮┆----------------------------------------
+         1333┆ require(err == uint(Error.NO_ERROR), "setting comptroller        
+  failed");                                                                     
+            ⋮┆----------------------------------------
+         1341┆ require(err == uint(Error.NO_ERROR), "setting interest rate model
+  failed");                                                                     
+            ⋮┆----------------------------------------
+         1497┆ require(accrueInterest() == uint(Error.NO_ERROR), "accrue        
+  interest failed");                                                            
+            ⋮┆----------------------------------------
+         1507┆ require(accrueInterest() == uint(Error.NO_ERROR), "accrue        
+  interest failed");                                                            
+            ⋮┆----------------------------------------
+         1549┆ require(accrueInterest() == uint(Error.NO_ERROR), "accrue        
+  interest failed");                                                            
+            ⋮┆----------------------------------------
+         1618┆ require(borrowRateMantissa <= borrowRateMaxMantissa, "borrow rate
+  is absurdly high");                                                           
+            ⋮┆----------------------------------------
+         1975┆ require(amountSeizeError == uint(Error.NO_ERROR),                
+  "LIQUIDATE_COMPTROLLER_CALCULATE_AMOUNT_SEIZE_FAILED");                       
+            ⋮┆----------------------------------------
+         1978┆ require(cTokenCollateral.balanceOf(borrower) >= seizeTokens,     
+  "LIQUIDATE_SEIZE_TOO_MUCH");                                                  
+            ⋮┆----------------------------------------
+         1989┆ require(seizeError == uint(Error.NO_ERROR), "token seizure       
+  failed");                                                                     
+            ⋮┆----------------------------------------
+         2080┆ require(newComptroller.isComptroller(), "marker method returned  
+  false");                                                                      
+            ⋮┆----------------------------------------
+         2298┆ require(newInterestRateModel.isInterestRateModel(), "marker      
+  method returned false");                                                      
+            ⋮┆----------------------------------------
+         2367┆ require(_notEntered, "re-entered");
+            ⋮┆----------------------------------------
+         2666┆ require(msg.sender == admin, "only admin can set collateral      
+  cap");                                                                        
+            ⋮┆----------------------------------------
+         2693┆ require(cashBefore >= amount, "INSUFFICIENT_LIQUIDITY");
+            ⋮┆----------------------------------------
+         2706┆ require(cashOnChainAfter == add_(cashOnChainBefore, totalFee),   
+  "BALANCE_INCONSISTENT");                                                      
+            ⋮┆----------------------------------------
+         2726┆ require(msg.sender == address(comptroller), "only comptroller may
+  register collateral for user");                                               
+            ⋮┆----------------------------------------
+         2741┆ require(msg.sender == address(comptroller), "only comptroller may
+  unregister collateral for user");                                             
+            ⋮┆----------------------------------------
+         2820┆ require(success, "TOKEN_TRANSFER_IN_FAILED");
+            ⋮┆----------------------------------------
+         2856┆ require(success, "TOKEN_TRANSFER_OUT_FAILED");
+            ⋮┆----------------------------------------
+         2986┆ require(comptroller.redeemAllowed(address(this), account, amount)
+  == 0, "comptroller rejection");                                               
+            ⋮┆----------------------------------------
+         3090┆ require(redeemTokensIn == 0 || redeemAmountIn == 0, "one of      
+  redeemTokensIn or redeemAmountIn must be zero");                              
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+         1325┆ require(accrualBlockNumber == 0 && borrowIndex == 0, "market may 
+  only be initialized once");                                                   
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         2958┆ if (collateralCap == 0 || (collateralCap != 0 &&                 
+  totalCollateralTokensNew <= collateralCap)) {                                 
+         2959┆     // 1. If collateral cap is not set,
+         2960┆     // 2. If collateral cap is set but has enough space for this 
+  user,                                                                         
+         2961┆     // give all the user needs.
+         2962┆     totalCollateralTokens = totalCollateralTokensNew;
+         2963┆     accountCollateralTokens[account] =                           
+  add_(accountCollateralTokens[account], amount);                               
+         2964┆ 
+         2965┆     emit UserCollateralChanged(account,                          
+  accountCollateralTokens[account]);                                            
+         2966┆     return amount;
+         2967┆ } else if (collateralCap > totalCollateralTokens) {
+             [hid 9 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+         1324┆ require(msg.sender == admin, "only admin may initialize the      
+  market");                                                                     
+            ⋮┆----------------------------------------
+         1325┆ require(accrualBlockNumber == 0 && borrowIndex == 0, "market may 
+  only be initialized once");                                                   
+            ⋮┆----------------------------------------
+         1329┆ require(initialExchangeRateMantissa > 0, "initial exchange rate  
+  must be greater than zero.");                                                 
+            ⋮┆----------------------------------------
+         1341┆ require(err == uint(Error.NO_ERROR), "setting interest rate model
+  failed");                                                                     
+            ⋮┆----------------------------------------
+         1975┆ require(amountSeizeError == uint(Error.NO_ERROR),                
+  "LIQUIDATE_COMPTROLLER_CALCULATE_AMOUNT_SEIZE_FAILED");                       
+            ⋮┆----------------------------------------
+         2666┆ require(msg.sender == admin, "only admin can set collateral      
+  cap");                                                                        
+            ⋮┆----------------------------------------
+         2726┆ require(msg.sender == address(comptroller), "only comptroller may
+  register collateral for user");                                               
+            ⋮┆----------------------------------------
+         2741┆ require(msg.sender == address(comptroller), "only comptroller may
+  unregister collateral for user");                                             
+            ⋮┆----------------------------------------
+         3090┆ require(redeemTokensIn == 0 || redeemAmountIn == 0, "one of      
+  redeemTokensIn or redeemAmountIn must be zero");                              
+            ⋮┆----------------------------------------
+       solidity.security.compound-borrowfresh-reentrancy                        
+          Function borrowFresh() in Compound performs state update after        
+  doTransferOut()                                                               
+                                                                                
+         1767┆ doTransferOut(borrower, borrowAmount);
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 36 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

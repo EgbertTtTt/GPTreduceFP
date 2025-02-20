@@ -1,0 +1,4934 @@
+pragma solidity ^0.6.8;
+
+
+library SafeMath {
+    /**
+     * @dev Returns the addition of two unsigned integers, with an overflow flag.
+     *
+     * _Available since v3.4._
+     */
+    function tryAdd(uint256 a, uint256 b) internal pure returns (bool, uint256) {
+        uint256 c = a + b;
+        if (c < a) return (false, 0);
+        return (true, c);
+    }
+
+    /**
+     * @dev Returns the substraction of two unsigned integers, with an overflow flag.
+     *
+     * _Available since v3.4._
+     */
+    function trySub(uint256 a, uint256 b) internal pure returns (bool, uint256) {
+        if (b > a) return (false, 0);
+        return (true, a - b);
+    }
+
+    /**
+     * @dev Returns the multiplication of two unsigned integers, with an overflow flag.
+     *
+     * _Available since v3.4._
+     */
+    function tryMul(uint256 a, uint256 b) internal pure returns (bool, uint256) {
+        // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
+        // benefit is lost if 'b' is also tested.
+        // See: https://github.com/OpenZeppelin/openzeppelin-contracts/pull/522
+        if (a == 0) return (true, 0);
+        uint256 c = a * b;
+        if (c / a != b) return (false, 0);
+        return (true, c);
+    }
+
+    /**
+     * @dev Returns the division of two unsigned integers, with a division by zero flag.
+     *
+     * _Available since v3.4._
+     */
+    function tryDiv(uint256 a, uint256 b) internal pure returns (bool, uint256) {
+        if (b == 0) return (false, 0);
+        return (true, a / b);
+    }
+
+    /**
+     * @dev Returns the remainder of dividing two unsigned integers, with a division by zero flag.
+     *
+     * _Available since v3.4._
+     */
+    function tryMod(uint256 a, uint256 b) internal pure returns (bool, uint256) {
+        if (b == 0) return (false, 0);
+        return (true, a % b);
+    }
+
+    /**
+     * @dev Returns the addition of two unsigned integers, reverting on
+     * overflow.
+     *
+     * Counterpart to Solidity's `+` operator.
+     *
+     * Requirements:
+     *
+     * - Addition cannot overflow.
+     */
+    function add(uint256 a, uint256 b) internal pure returns (uint256) {
+        uint256 c = a + b;
+        require(c >= a, "SafeMath: addition overflow");
+        return c;
+    }
+
+    /**
+     * @dev Returns the subtraction of two unsigned integers, reverting on
+     * overflow (when the result is negative).
+     *
+     * Counterpart to Solidity's `-` operator.
+     *
+     * Requirements:
+     *
+     * - Subtraction cannot overflow.
+     */
+    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+        require(b <= a, "SafeMath: subtraction overflow");
+        return a - b;
+    }
+
+    /**
+     * @dev Returns the multiplication of two unsigned integers, reverting on
+     * overflow.
+     *
+     * Counterpart to Solidity's `*` operator.
+     *
+     * Requirements:
+     *
+     * - Multiplication cannot overflow.
+     */
+    function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+        if (a == 0) return 0;
+        uint256 c = a * b;
+        require(c / a == b, "SafeMath: multiplication overflow");
+        return c;
+    }
+
+    /**
+     * @dev Returns the integer division of two unsigned integers, reverting on
+     * division by zero. The result is rounded towards zero.
+     *
+     * Counterpart to Solidity's `/` operator. Note: this function uses a
+     * `revert` opcode (which leaves remaining gas untouched) while Solidity
+     * uses an invalid opcode to revert (consuming all remaining gas).
+     *
+     * Requirements:
+     *
+     * - The divisor cannot be zero.
+     */
+    function div(uint256 a, uint256 b) internal pure returns (uint256) {
+        require(b > 0, "SafeMath: division by zero");
+        return a / b;
+    }
+
+    /**
+     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
+     * reverting when dividing by zero.
+     *
+     * Counterpart to Solidity's `%` operator. This function uses a `revert`
+     * opcode (which leaves remaining gas untouched) while Solidity uses an
+     * invalid opcode to revert (consuming all remaining gas).
+     *
+     * Requirements:
+     *
+     * - The divisor cannot be zero.
+     */
+    function mod(uint256 a, uint256 b) internal pure returns (uint256) {
+        require(b > 0, "SafeMath: modulo by zero");
+        return a % b;
+    }
+
+    /**
+     * @dev Returns the subtraction of two unsigned integers, reverting with custom message on
+     * overflow (when the result is negative).
+     *
+     * CAUTION: This function is deprecated because it requires allocating memory for the error
+     * message unnecessarily. For custom revert reasons use {trySub}.
+     *
+     * Counterpart to Solidity's `-` operator.
+     *
+     * Requirements:
+     *
+     * - Subtraction cannot overflow.
+     */
+    function sub(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+        require(b <= a, errorMessage);
+        return a - b;
+    }
+
+    /**
+     * @dev Returns the integer division of two unsigned integers, reverting with custom message on
+     * division by zero. The result is rounded towards zero.
+     *
+     * CAUTION: This function is deprecated because it requires allocating memory for the error
+     * message unnecessarily. For custom revert reasons use {tryDiv}.
+     *
+     * Counterpart to Solidity's `/` operator. Note: this function uses a
+     * `revert` opcode (which leaves remaining gas untouched) while Solidity
+     * uses an invalid opcode to revert (consuming all remaining gas).
+     *
+     * Requirements:
+     *
+     * - The divisor cannot be zero.
+     */
+    function div(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+        require(b > 0, errorMessage);
+        return a / b;
+    }
+
+    /**
+     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
+     * reverting with custom message when dividing by zero.
+     *
+     * CAUTION: This function is deprecated because it requires allocating memory for the error
+     * message unnecessarily. For custom revert reasons use {tryMod}.
+     *
+     * Counterpart to Solidity's `%` operator. This function uses a `revert`
+     * opcode (which leaves remaining gas untouched) while Solidity uses an
+     * invalid opcode to revert (consuming all remaining gas).
+     *
+     * Requirements:
+     *
+     * - The divisor cannot be zero.
+     */
+    function mod(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+        require(b > 0, errorMessage);
+        return a % b;
+    }
+}
+
+interface IERC20 {
+    /**
+     * @dev Returns the amount of tokens in existence.
+     */
+    function totalSupply() external view returns (uint256);
+
+    /**
+     * @dev Returns the amount of tokens owned by `account`.
+     */
+    function balanceOf(address account) external view returns (uint256);
+
+    /**
+     * @dev Moves `amount` tokens from the caller's account to `recipient`.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * Emits a {Transfer} event.
+     */
+    function transfer(address recipient, uint256 amount) external returns (bool);
+
+    /**
+     * @dev Returns the remaining number of tokens that `spender` will be
+     * allowed to spend on behalf of `owner` through {transferFrom}. This is
+     * zero by default.
+     *
+     * This value changes when {approve} or {transferFrom} are called.
+     */
+    function allowance(address owner, address spender) external view returns (uint256);
+
+    /**
+     * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * IMPORTANT: Beware that changing an allowance with this method brings the risk
+     * that someone may use both the old and the new allowance by unfortunate
+     * transaction ordering. One possible solution to mitigate this race
+     * condition is to first reduce the spender's allowance to 0 and set the
+     * desired value afterwards:
+     * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
+     *
+     * Emits an {Approval} event.
+     */
+    function approve(address spender, uint256 amount) external returns (bool);
+
+    /**
+     * @dev Moves `amount` tokens from `sender` to `recipient` using the
+     * allowance mechanism. `amount` is then deducted from the caller's
+     * allowance.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * Emits a {Transfer} event.
+     */
+    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
+
+    /**
+     * @dev Emitted when `value` tokens are moved from one account (`from`) to
+     * another (`to`).
+     *
+     * Note that `value` may be zero.
+     */
+    event Transfer(address indexed from, address indexed to, uint256 value);
+
+    /**
+     * @dev Emitted when the allowance of a `spender` for an `owner` is set by
+     * a call to {approve}. `value` is the new allowance.
+     */
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+}
+
+abstract contract VersionedInitializable {
+  /**
+   * @dev Indicates that the contract has been initialized.
+   */
+  uint256 private lastInitializedRevision = 0;
+
+  /**
+   * @dev Indicates that the contract is in the process of being initialized.
+   */
+  bool private initializing;
+
+  /**
+   * @dev Modifier to use in the initializer function of a contract.
+   */
+  modifier initializer() {
+    uint256 revision = getRevision();
+    require(
+      initializing || isConstructor() || revision > lastInitializedRevision,
+      'Contract instance has already been initialized'
+    );
+
+    bool isTopLevelCall = !initializing;
+    if (isTopLevelCall) {
+      initializing = true;
+      lastInitializedRevision = revision;
+    }
+
+    _;
+
+    if (isTopLevelCall) {
+      initializing = false;
+    }
+  }
+
+  /// @dev returns the revision number of the contract.
+  /// Needs to be defined in the inherited class as a constant.
+  function getRevision() internal virtual pure returns (uint256);
+
+  /// @dev Returns true if and only if the function is running in the constructor
+  function isConstructor() private view returns (bool) {
+    // extcodesize checks the size of the code stored in an address, and
+    // address returns the current address. Since the code is still not
+    // deployed when running a constructor, any checks on its code size will
+    // yield zero, making it an effective way to detect if a contract is
+    // under construction or not.
+    uint256 cs;
+    //solium-disable-next-line
+    assembly {
+      cs := extcodesize(address())
+    }
+    return cs == 0;
+  }
+
+  // Reserved storage space to allow for layout changes in the future.
+  uint256[50] private ______gap;
+}
+
+interface IERC20 {
+  /**
+   * @dev Returns the amount of tokens in existence.
+   */
+  function totalSupply() external view returns (uint256);
+
+  /**
+   * @dev Returns the amount of tokens owned by `account`.
+   */
+  function balanceOf(address account) external view returns (uint256);
+
+  /**
+   * @dev Moves `amount` tokens from the caller's account to `recipient`.
+   *
+   * Returns a boolean value indicating whether the operation succeeded.
+   *
+   * Emits a {Transfer} event.
+   */
+  function transfer(address recipient, uint256 amount) external returns (bool);
+
+  /**
+   * @dev Returns the remaining number of tokens that `spender` will be
+   * allowed to spend on behalf of `owner` through {transferFrom}. This is
+   * zero by default.
+   *
+   * This value changes when {approve} or {transferFrom} are called.
+   */
+  function allowance(address owner, address spender) external view returns (uint256);
+
+  /**
+   * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
+   *
+   * Returns a boolean value indicating whether the operation succeeded.
+   *
+   * IMPORTANT: Beware that changing an allowance with this method brings the risk
+   * that someone may use both the old and the new allowance by unfortunate
+   * transaction ordering. One possible solution to mitigate this race
+   * condition is to first reduce the spender's allowance to 0 and set the
+   * desired value afterwards:
+   * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
+   *
+   * Emits an {Approval} event.
+   */
+  function approve(address spender, uint256 amount) external returns (bool);
+
+  /**
+   * @dev Moves `amount` tokens from `sender` to `recipient` using the
+   * allowance mechanism. `amount` is then deducted from the caller's
+   * allowance.
+   *
+   * Returns a boolean value indicating whether the operation succeeded.
+   *
+   * Emits a {Transfer} event.
+   */
+  function transferFrom(
+    address sender,
+    address recipient,
+    uint256 amount
+  ) external returns (bool);
+
+  /**
+   * @dev Emitted when `value` tokens are moved from one account (`from`) to
+   * another (`to`).
+   *
+   * Note that `value` may be zero.
+   */
+  event Transfer(address indexed from, address indexed to, uint256 value);
+
+  /**
+   * @dev Emitted when the allowance of a `spender` for an `owner` is set by
+   * a call to {approve}. `value` is the new allowance.
+   */
+  event Approval(address indexed owner, address indexed spender, uint256 value);
+}
+
+interface IScaledBalanceToken {
+
+  /**
+   * @dev emitted after the mint action
+   * @param from the address performing the mint
+   * @param value the amount to be minted
+   * @param index the last index of the reserve
+   **/
+  event Mint(address indexed from, uint256 value, uint256 index);
+
+  /**
+   * @dev mints aTokens to user
+   * only lending pools can call this function
+   * @param user the address receiving the minted tokens
+   * @param amount the amount of tokens to mint
+   * @param index the liquidity index
+   */
+  function mint(
+    address user,
+    uint256 amount,
+    uint256 index
+  ) external;
+
+  /**
+   * @dev returns the principal balance of the user. The principal balance is the last
+   * updated stored balance, which does not consider the perpetually accruing interest.
+   * @param user the address of the user
+   * @return the principal balance of the user
+   **/
+  function scaledBalanceOf(address user) external view returns (uint256);
+
+  /**
+   * @dev returns the principal balance of the user and principal total supply.
+   * @param user the address of the user
+   * @return the principal balance of the user
+   * @return the principal total supply
+   **/
+  function getScaledUserBalanceAndSupply(address user) external view returns (uint256, uint256);
+
+  /**
+   * @dev Returns the scaled total supply of the variable debt token. Represents sum(borrows/index)
+   * @return the scaled total supply
+   **/
+  function scaledTotalSupply() external view returns (uint256);
+}
+
+interface IAToken is IERC20, IScaledBalanceToken {
+  /**
+   * @dev emitted after aTokens are burned
+   * @param from the address performing the redeem
+   * @param value the amount to be redeemed
+   * @param index the last index of the reserve
+   **/
+  event Burn(
+    address indexed from,
+    address indexed target,
+    uint256 value,
+    uint256 index
+  );
+  /**
+   * @dev emitted during the transfer action
+   * @param from the address from which the tokens are being transferred
+   * @param to the adress of the destination
+   * @param value the amount to be minted
+   * @param index the last index of the reserve
+   **/
+  event BalanceTransfer(
+    address indexed from,
+    address indexed to,
+    uint256 value,
+    uint256 index
+  );
+  /**
+   * @dev burns the aTokens and sends the equivalent amount of underlying to the target.
+   * only lending pools can call this function
+   * @param amount the amount being burned
+   * @param index the liquidity index
+   **/
+  function burn(
+    address user,
+    address underlyingTarget,
+    uint256 amount,
+    uint256 index
+  ) external;
+
+  /**
+   * @dev mints aTokens to the reserve treasury
+   * @param amount the amount to mint
+   * @param index the liquidity index of the reserve
+   **/
+  function mintToTreasury(uint256 amount, uint256 index) external;
+
+  /**
+   * @dev transfers tokens in the event of a borrow being liquidated, in case the liquidators reclaims the aToken
+   *      only lending pools can call this function
+   * @param from the address from which transfer the aTokens
+   * @param to the destination address
+   * @param value the amount to transfer
+   **/
+  function transferOnLiquidation(
+    address from,
+    address to,
+    uint256 value
+  ) external;
+
+  
+  function isTransferAllowed(address user, uint256 amount) external view returns (bool);
+
+  /**
+   * @dev transfer the amount of the underlying asset to the user
+   * @param user address of the user
+   * @param amount the amount to transfer
+   * @return the amount transferred
+   **/
+  function transferUnderlyingTo(address user, uint256 amount) external returns (uint256);
+
+
+}
+
+interface IStableDebtToken {
+  /**
+   * @dev emitted when new stable debt is minted
+   * @param user the address of the user
+   * @param amount the amount minted
+   * @param previousBalance the previous balance of the user
+   * @param currentBalance the current balance of the user
+   * @param balanceIncrease the debt increase since the last update
+   * @param newRate the rate of the debt after the minting
+   **/
+  event MintDebt(
+    address user,
+    uint256 amount,
+    uint256 previousBalance,
+    uint256 currentBalance,
+    uint256 balanceIncrease,
+    uint256 newRate
+  );
+
+  /**
+   * @dev emitted when new stable debt is burned
+   * @param user the address of the user
+   * @param amount the amount minted
+   * @param previousBalance the previous balance of the user
+   * @param currentBalance the current balance of the user
+   * @param balanceIncrease the debt increase since the last update
+   **/
+  event BurnDebt(
+    address user,
+    uint256 amount,
+    uint256 previousBalance,
+    uint256 currentBalance,
+    uint256 balanceIncrease
+  );
+
+  /**
+   * @dev mints debt token to the target user. The resulting rate is the weighted average
+   * between the rate of the new debt and the rate of the previous debt
+   * @param user the address of the user
+   * @param amount the amount of debt tokens to mint
+   * @param rate the rate of the debt being minted.
+   **/
+  function mint(
+    address user,
+    uint256 amount,
+    uint256 rate
+  ) external;
+
+  /**
+   * @dev burns debt of the target user.
+   * @param user the address of the user
+   * @param amount the amount of debt tokens to mint
+   **/
+  function burn(address user, uint256 amount) external;
+
+  /**
+   * @dev returns the average rate of all the stable rate loans.
+   * @return the average stable rate
+   **/
+  function getAverageStableRate() external view returns (uint256);
+
+  /**
+   * @dev returns the stable rate of the user debt
+   * @return the stable rate of the user
+   **/
+  function getUserStableRate(address user) external view returns (uint256);
+
+  /**
+   * @dev returns the timestamp of the last update of the user
+   * @return the timestamp
+   **/
+  function getUserLastUpdated(address user) external view returns (uint40);
+
+  /**
+   * @dev returns the principal, the total supply and the average stable rate
+   **/
+  function getSupplyData() external view returns (uint256, uint256, uint256, uint40);
+
+  /**
+   * @dev returns the timestamp of the last update of the total supply
+   * @return the timestamp
+   **/
+  function getTotalSupplyLastUpdated() external view returns (uint40);
+
+  /**
+   * @dev returns the total supply and the average stable rate
+   **/
+  function getTotalSupplyAndAvgRate() external view returns (uint256, uint256);
+
+  /**
+   * @dev Returns the principal debt balance of the user
+   * @return The debt balance of the user since the last burn/mint action
+   **/
+  function principalBalanceOf(address user) external view returns (uint256);
+}
+
+interface IVariableDebtToken is IScaledBalanceToken {  
+  
+  /**
+   * @dev emitted when variable debt is burnt
+   * @param user the user which debt has been burned
+   * @param amount the amount of debt being burned
+   * @param index the index of the user
+   **/
+  event Burn(
+    address indexed user,
+    uint256 amount,
+    uint256 index
+  );
+
+    /**
+   * @dev burns user variable debt
+   * @param user the user which debt is burnt
+   * @param index the variable debt index of the reserve
+   **/
+  function burn(
+    address user,
+    uint256 amount,
+    uint256 index
+  ) external;
+ 
+}
+
+// SPDX-License-Identifier: MIT
+/*
+ * @dev Provides information about the current execution context, including the
+ * sender of the transaction and its data. While these are generally available
+ * via msg.sender and msg.data, they should not be accessed in such a direct
+ * manner, since when dealing with GSN meta-transactions the account sending and
+ * paying for execution may not be the actual sender (as far as an application
+ * is concerned).
+ *
+ * This contract is only required for intermediate, library-like contracts.
+ */
+abstract contract Context {
+    function _msgSender() internal view virtual returns (address payable) {
+        return msg.sender;
+    }
+
+    function _msgData() internal view virtual returns (bytes memory) {
+        this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691
+        return msg.data;
+    }
+}
+
+interface ILendingPoolAddressesProvider {
+  //events
+  event LendingPoolUpdated(address indexed newAddress);
+  event AaveAdminUpdated(address indexed newAddress);
+  event LendingPoolConfiguratorUpdated(address indexed newAddress);
+  event LendingPoolCollateralManagerUpdated(address indexed newAddress);
+  event EthereumAddressUpdated(address indexed newAddress);
+  event PriceOracleUpdated(address indexed newAddress);
+  event LendingRateOracleUpdated(address indexed newAddress);
+
+  event ProxyCreated(bytes32 id, address indexed newAddress);
+
+  function getLendingPool() external view returns (address);
+
+  function setLendingPoolImpl(address pool) external;
+
+  function getLendingPoolConfigurator() external view returns (address);
+
+  function setLendingPoolConfiguratorImpl(address configurator) external;
+
+  function getLendingPoolCollateralManager() external view returns (address);
+
+  function setLendingPoolCollateralManager(address manager) external;
+
+  function getAaveAdmin() external view returns (address);
+
+  function setAaveAdmin(address aaveAdmin) external;
+
+  function getPriceOracle() external view returns (address);
+
+  function setPriceOracle(address priceOracle) external;
+
+  function getLendingRateOracle() external view returns (address);
+
+  function setLendingRateOracle(address lendingRateOracle) external;
+}
+
+abstract contract Ownable is Context {
+    address private _owner;
+
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+
+    /**
+     * @dev Initializes the contract setting the deployer as the initial owner.
+     */
+    constructor () internal {
+        address msgSender = _msgSender();
+        _owner = msgSender;
+        emit OwnershipTransferred(address(0), msgSender);
+    }
+
+    /**
+     * @dev Returns the address of the current owner.
+     */
+    function owner() public view virtual returns (address) {
+        return _owner;
+    }
+
+    /**
+     * @dev Throws if called by any account other than the owner.
+     */
+    modifier onlyOwner() {
+        require(owner() == _msgSender(), "Ownable: caller is not the owner");
+        _;
+    }
+
+    /**
+     * @dev Leaves the contract without owner. It will not be possible to call
+     * `onlyOwner` functions anymore. Can only be called by the current owner.
+     *
+     * NOTE: Renouncing ownership will leave the contract without an owner,
+     * thereby removing any functionality that is only available to the owner.
+     */
+    function renounceOwnership() public virtual onlyOwner {
+        emit OwnershipTransferred(_owner, address(0));
+        _owner = address(0);
+    }
+
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     * Can only be called by the current owner.
+     */
+    function transferOwnership(address newOwner) public virtual onlyOwner {
+        require(newOwner != address(0), "Ownable: new owner is the zero address");
+        emit OwnershipTransferred(_owner, newOwner);
+        _owner = newOwner;
+    }
+}
+
+/**
+ * @title Proxy
+ * @dev Implements delegation of calls to other contracts, with proper
+ * forwarding of return values and bubbling of failures.
+ * It defines a fallback function that delegates all calls to the address
+ * returned by the abstract _implementation() internal function.
+ */
+abstract contract Proxy {
+  /**
+   * @dev Fallback function.
+   * Implemented entirely in `_fallback`.
+   */
+  fallback() external payable {
+    _fallback();
+  }
+
+  /**
+   * @return The Address of the implementation.
+   */
+  function _implementation() internal virtual view returns (address);
+
+  /**
+   * @dev Delegates execution to an implementation contract.
+   * This is a low level function that doesn't return to its internal call site.
+   * It will return to the external caller whatever the implementation returns.
+   * @param implementation Address to delegate.
+   */
+  function _delegate(address implementation) internal {
+    //solium-disable-next-line
+    assembly {
+      // Copy msg.data. We take full control of memory in this inline assembly
+      // block because it will not return to Solidity code. We overwrite the
+      // Solidity scratch pad at memory position 0.
+      calldatacopy(0, 0, calldatasize())
+
+      // Call the implementation.
+      // out and outsize are 0 because we don't know the size yet.
+      let result := delegatecall(gas(), implementation, 0, calldatasize(), 0, 0)
+
+      // Copy the returned data.
+      returndatacopy(0, 0, returndatasize())
+
+      switch result
+        // delegatecall returns 0 on error.
+        case 0 {
+          revert(0, returndatasize())
+        }
+        default {
+          return(0, returndatasize())
+        }
+    }
+  }
+
+  /**
+   * @dev Function that is run as the first thing in the fallback function.
+   * Can be redefined in derived contracts to add functionality.
+   * Redefinitions must call super._willFallback().
+   */
+  function _willFallback() internal virtual {}
+
+  /**
+   * @dev fallback implementation.
+   * Extracted to enable manual triggering.
+   */
+  function _fallback() internal {
+    _willFallback();
+    _delegate(_implementation());
+  }
+}
+
+/**
+ * @dev Collection of functions related to the address type
+ */
+library Address {
+    /**
+     * @dev Returns true if `account` is a contract.
+     *
+     * [IMPORTANT]
+     * ====
+     * It is unsafe to assume that an address for which this function returns
+     * false is an externally-owned account (EOA) and not a contract.
+     *
+     * Among others, `isContract` will return false for the following
+     * types of addresses:
+     *
+     *  - an externally-owned account
+     *  - a contract in construction
+     *  - an address where a contract will be created
+     *  - an address where a contract lived, but was destroyed
+     * ====
+     */
+    function isContract(address account) internal view returns (bool) {
+        // This method relies on extcodesize, which returns 0 for contracts in
+        // construction, since the code is only stored at the end of the
+        // constructor execution.
+
+        uint256 size;
+        // solhint-disable-next-line no-inline-assembly
+        assembly { size := extcodesize(account) }
+        return size > 0;
+    }
+
+    /**
+     * @dev Replacement for Solidity's `transfer`: sends `amount` wei to
+     * `recipient`, forwarding all available gas and reverting on errors.
+     *
+     * https://eips.ethereum.org/EIPS/eip-1884[EIP1884] increases the gas cost
+     * of certain opcodes, possibly making contracts go over the 2300 gas limit
+     * imposed by `transfer`, making them unable to receive funds via
+     * `transfer`. {sendValue} removes this limitation.
+     *
+     * https://diligence.consensys.net/posts/2019/09/stop-using-soliditys-transfer-now/[Learn more].
+     *
+     * IMPORTANT: because control is transferred to `recipient`, care must be
+     * taken to not create reentrancy vulnerabilities. Consider using
+     * {ReentrancyGuard} or the
+     * https://solidity.readthedocs.io/en/v0.5.11/security-considerations.html#use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern].
+     */
+    function sendValue(address payable recipient, uint256 amount) internal {
+        require(address(this).balance >= amount, "Address: insufficient balance");
+
+        // solhint-disable-next-line avoid-low-level-calls, avoid-call-value
+        (bool success, ) = recipient.call{ value: amount }("");
+        require(success, "Address: unable to send value, recipient may have reverted");
+    }
+
+    /**
+     * @dev Performs a Solidity function call using a low level `call`. A
+     * plain`call` is an unsafe replacement for a function call: use this
+     * function instead.
+     *
+     * If `target` reverts with a revert reason, it is bubbled up by this
+     * function (like regular Solidity function calls).
+     *
+     * Returns the raw returned data. To convert to the expected return value,
+     * use https://solidity.readthedocs.io/en/latest/units-and-global-variables.html?highlight=abi.decode#abi-encoding-and-decoding-functions[`abi.decode`].
+     *
+     * Requirements:
+     *
+     * - `target` must be a contract.
+     * - calling `target` with `data` must not revert.
+     *
+     * _Available since v3.1._
+     */
+    function functionCall(address target, bytes memory data) internal returns (bytes memory) {
+      return functionCall(target, data, "Address: low-level call failed");
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`], but with
+     * `errorMessage` as a fallback revert reason when `target` reverts.
+     *
+     * _Available since v3.1._
+     */
+    function functionCall(address target, bytes memory data, string memory errorMessage) internal returns (bytes memory) {
+        return functionCallWithValue(target, data, 0, errorMessage);
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
+     * but also transferring `value` wei to `target`.
+     *
+     * Requirements:
+     *
+     * - the calling contract must have an ETH balance of at least `value`.
+     * - the called Solidity function must be `payable`.
+     *
+     * _Available since v3.1._
+     */
+    function functionCallWithValue(address target, bytes memory data, uint256 value) internal returns (bytes memory) {
+        return functionCallWithValue(target, data, value, "Address: low-level call with value failed");
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCallWithValue-address-bytes-uint256-}[`functionCallWithValue`], but
+     * with `errorMessage` as a fallback revert reason when `target` reverts.
+     *
+     * _Available since v3.1._
+     */
+    function functionCallWithValue(address target, bytes memory data, uint256 value, string memory errorMessage) internal returns (bytes memory) {
+        require(address(this).balance >= value, "Address: insufficient balance for call");
+        require(isContract(target), "Address: call to non-contract");
+
+        // solhint-disable-next-line avoid-low-level-calls
+        (bool success, bytes memory returndata) = target.call{ value: value }(data);
+        return _verifyCallResult(success, returndata, errorMessage);
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
+     * but performing a static call.
+     *
+     * _Available since v3.3._
+     */
+    function functionStaticCall(address target, bytes memory data) internal view returns (bytes memory) {
+        return functionStaticCall(target, data, "Address: low-level static call failed");
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],
+     * but performing a static call.
+     *
+     * _Available since v3.3._
+     */
+    function functionStaticCall(address target, bytes memory data, string memory errorMessage) internal view returns (bytes memory) {
+        require(isContract(target), "Address: static call to non-contract");
+
+        // solhint-disable-next-line avoid-low-level-calls
+        (bool success, bytes memory returndata) = target.staticcall(data);
+        return _verifyCallResult(success, returndata, errorMessage);
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
+     * but performing a delegate call.
+     *
+     * _Available since v3.4._
+     */
+    function functionDelegateCall(address target, bytes memory data) internal returns (bytes memory) {
+        return functionDelegateCall(target, data, "Address: low-level delegate call failed");
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],
+     * but performing a delegate call.
+     *
+     * _Available since v3.4._
+     */
+    function functionDelegateCall(address target, bytes memory data, string memory errorMessage) internal returns (bytes memory) {
+        require(isContract(target), "Address: delegate call to non-contract");
+
+        // solhint-disable-next-line avoid-low-level-calls
+        (bool success, bytes memory returndata) = target.delegatecall(data);
+        return _verifyCallResult(success, returndata, errorMessage);
+    }
+
+    function _verifyCallResult(bool success, bytes memory returndata, string memory errorMessage) private pure returns(bytes memory) {
+        if (success) {
+            return returndata;
+        } else {
+            // Look for revert reason and bubble it up if present
+            if (returndata.length > 0) {
+                // The easiest way to bubble the revert reason is using memory via assembly
+
+                // solhint-disable-next-line no-inline-assembly
+                assembly {
+                    let returndata_size := mload(returndata)
+                    revert(add(32, returndata), returndata_size)
+                }
+            } else {
+                revert(errorMessage);
+            }
+        }
+    }
+}
+
+/**
+ * @title BaseUpgradeabilityProxy
+ * @dev This contract implements a proxy that allows to change the
+ * implementation address to which it will delegate.
+ * Such a change is called an implementation upgrade.
+ */
+contract BaseUpgradeabilityProxy is Proxy {
+  /**
+   * @dev Emitted when the implementation is upgraded.
+   * @param implementation Address of the new implementation.
+   */
+  event Upgraded(address indexed implementation);
+
+  /**
+   * @dev Storage slot with the address of the current implementation.
+   * This is the keccak-256 hash of "eip1967.proxy.implementation" subtracted by 1, and is
+   * validated in the constructor.
+   */
+  bytes32 internal constant IMPLEMENTATION_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
+
+  /**
+   * @dev Returns the current implementation.
+   * @return impl Address of the current implementation
+   */
+  function _implementation() internal override view returns (address impl) {
+    bytes32 slot = IMPLEMENTATION_SLOT;
+    //solium-disable-next-line
+    assembly {
+      impl := sload(slot)
+    }
+  }
+
+  /**
+   * @dev Upgrades the proxy to a new implementation.
+   * @param newImplementation Address of the new implementation.
+   */
+  function _upgradeTo(address newImplementation) internal {
+    _setImplementation(newImplementation);
+    emit Upgraded(newImplementation);
+  }
+
+  /**
+   * @dev Sets the implementation address of the proxy.
+   * @param newImplementation Address of the new implementation.
+   */
+  function _setImplementation(address newImplementation) internal {
+    require(
+      Address.isContract(newImplementation),
+      'Cannot set a proxy implementation to a non-contract address'
+    );
+
+    bytes32 slot = IMPLEMENTATION_SLOT;
+
+    //solium-disable-next-line
+    assembly {
+      sstore(slot, newImplementation)
+    }
+  }
+}
+
+/**
+ * @title UpgradeabilityProxy
+ * @dev Extends BaseUpgradeabilityProxy with a constructor for initializing
+ * implementation and init data.
+ */
+contract UpgradeabilityProxy is BaseUpgradeabilityProxy {
+  /**
+   * @dev Contract constructor.
+   * @param _logic Address of the initial implementation.
+   * @param _data Data to send as msg.data to the implementation to initialize the proxied contract.
+   * It should include the signature and the parameters of the function to be called, as described in
+   * https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#function-selector-and-argument-encoding.
+   * This parameter is optional, if no data is given the initialization call to proxied contract will be skipped.
+   */
+  constructor(address _logic, bytes memory _data) public payable {
+    assert(IMPLEMENTATION_SLOT == bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1));
+    _setImplementation(_logic);
+    if (_data.length > 0) {
+      (bool success, ) = _logic.delegatecall(_data);
+      require(success);
+    }
+  }
+}
+
+/**
+ * @title BaseAdminUpgradeabilityProxy
+ * @dev This contract combines an upgradeability proxy with an authorization
+ * mechanism for administrative tasks.
+ * All external functions in this contract must be guarded by the
+ * `ifAdmin` modifier. See ethereum/solidity#3864 for a Solidity
+ * feature proposal that would enable this to be done automatically.
+ */
+contract BaseAdminUpgradeabilityProxy is BaseUpgradeabilityProxy {
+  /**
+   * @dev Emitted when the administration has been transferred.
+   * @param previousAdmin Address of the previous admin.
+   * @param newAdmin Address of the new admin.
+   */
+  event AdminChanged(address previousAdmin, address newAdmin);
+
+  /**
+   * @dev Storage slot with the admin of the contract.
+   * This is the keccak-256 hash of "eip1967.proxy.admin" subtracted by 1, and is
+   * validated in the constructor.
+   */
+  bytes32 internal constant ADMIN_SLOT = 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103;
+
+  /**
+   * @dev Modifier to check whether the `msg.sender` is the admin.
+   * If it is, it will run the function. Otherwise, it will delegate the call
+   * to the implementation.
+   */
+  modifier ifAdmin() {
+    if (msg.sender == _admin()) {
+      _;
+    } else {
+      _fallback();
+    }
+  }
+
+  /**
+   * @return The address of the proxy admin.
+   */
+  function admin() external ifAdmin returns (address) {
+    return _admin();
+  }
+
+  /**
+   * @return The address of the implementation.
+   */
+  function implementation() external ifAdmin returns (address) {
+    return _implementation();
+  }
+
+  /**
+   * @dev Changes the admin of the proxy.
+   * Only the current admin can call this function.
+   * @param newAdmin Address to transfer proxy administration to.
+   */
+  function changeAdmin(address newAdmin) external ifAdmin {
+    require(newAdmin != address(0), 'Cannot change the admin of a proxy to the zero address');
+    emit AdminChanged(_admin(), newAdmin);
+    _setAdmin(newAdmin);
+  }
+
+  /**
+   * @dev Upgrade the backing implementation of the proxy.
+   * Only the admin can call this function.
+   * @param newImplementation Address of the new implementation.
+   */
+  function upgradeTo(address newImplementation) external ifAdmin {
+    _upgradeTo(newImplementation);
+  }
+
+  /**
+   * @dev Upgrade the backing implementation of the proxy and call a function
+   * on the new implementation.
+   * This is useful to initialize the proxied contract.
+   * @param newImplementation Address of the new implementation.
+   * @param data Data to send as msg.data in the low level call.
+   * It should include the signature and the parameters of the function to be called, as described in
+   * https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#function-selector-and-argument-encoding.
+   */
+  function upgradeToAndCall(address newImplementation, bytes calldata data)
+    external
+    payable
+    ifAdmin
+  {
+    _upgradeTo(newImplementation);
+    (bool success, ) = newImplementation.delegatecall(data);
+    require(success);
+  }
+
+  /**
+   * @return adm The admin slot.
+   */
+  function _admin() internal view returns (address adm) {
+    bytes32 slot = ADMIN_SLOT;
+    //solium-disable-next-line
+    assembly {
+      adm := sload(slot)
+    }
+  }
+
+  /**
+   * @dev Sets the address of the proxy admin.
+   * @param newAdmin Address of the new proxy admin.
+   */
+  function _setAdmin(address newAdmin) internal {
+    bytes32 slot = ADMIN_SLOT;
+    //solium-disable-next-line
+    assembly {
+      sstore(slot, newAdmin)
+    }
+  }
+
+  /**
+   * @dev Only fall back when the sender is not the admin.
+   */
+  function _willFallback() internal virtual override {
+    require(msg.sender != _admin(), 'Cannot call fallback function from the proxy admin');
+    super._willFallback();
+  }
+}
+
+/**
+ * @title InitializableUpgradeabilityProxy
+ * @dev Extends BaseUpgradeabilityProxy with an initializer for initializing
+ * implementation and init data.
+ */
+contract InitializableUpgradeabilityProxy is BaseUpgradeabilityProxy {
+  /**
+   * @dev Contract initializer.
+   * @param _logic Address of the initial implementation.
+   * @param _data Data to send as msg.data to the implementation to initialize the proxied contract.
+   * It should include the signature and the parameters of the function to be called, as described in
+   * https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#function-selector-and-argument-encoding.
+   * This parameter is optional, if no data is given the initialization call to proxied contract will be skipped.
+   */
+  function initialize(address _logic, bytes memory _data) public payable {
+    require(_implementation() == address(0));
+    assert(IMPLEMENTATION_SLOT == bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1));
+    _setImplementation(_logic);
+    if (_data.length > 0) {
+      (bool success, ) = _logic.delegatecall(_data);
+      require(success);
+    }
+  }
+}
+
+contract InitializableAdminUpgradeabilityProxy is
+  BaseAdminUpgradeabilityProxy,
+  InitializableUpgradeabilityProxy {
+  /**
+   * Contract initializer.
+   * @param logic address of the initial implementation.
+   * @param admin Address of the proxy administrator.
+   * @param data Data to send as msg.data to the implementation to initialize the proxied contract.
+   * It should include the signature and the parameters of the function to be called, as described in
+   * https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#function-selector-and-argument-encoding.
+   * This parameter is optional, if no data is given the initialization call to proxied contract will be skipped.
+   */
+  function initialize(
+    address logic,
+    address admin,
+    bytes memory data
+  ) public payable {
+    require(_implementation() == address(0));
+    InitializableUpgradeabilityProxy.initialize(logic, data);
+    assert(ADMIN_SLOT == bytes32(uint256(keccak256('eip1967.proxy.admin')) - 1));
+    _setAdmin(admin);
+  }
+
+  /**
+   * @dev Only fall back when the sender is not the admin.
+   */
+  function _willFallback() internal override(BaseAdminUpgradeabilityProxy, Proxy) {
+    BaseAdminUpgradeabilityProxy._willFallback();
+  }
+}
+
+contract LendingPoolAddressesProvider is Ownable, ILendingPoolAddressesProvider {
+  mapping(bytes32 => address) private _addresses;
+
+  bytes32 private constant LENDING_POOL = 'LENDING_POOL';
+  bytes32 private constant LENDING_POOL_CORE = 'LENDING_POOL_CORE';
+  bytes32 private constant LENDING_POOL_CONFIGURATOR = 'LENDING_POOL_CONFIGURATOR';
+  bytes32 private constant AAVE_ADMIN = 'AAVE_ADMIN';
+  bytes32 private constant LENDING_POOL_COLLATERAL_MANAGER = 'COLLATERAL_MANAGER';
+  bytes32 private constant LENDING_POOL_FLASHLOAN_PROVIDER = 'FLASHLOAN_PROVIDER';
+  bytes32 private constant DATA_PROVIDER = 'DATA_PROVIDER';
+  bytes32 private constant ETHEREUM_ADDRESS = 'ETHEREUM_ADDRESS';
+  bytes32 private constant PRICE_ORACLE = 'PRICE_ORACLE';
+  bytes32 private constant LENDING_RATE_ORACLE = 'LENDING_RATE_ORACLE';
+  bytes32 private constant WALLET_BALANCE_PROVIDER = 'WALLET_BALANCE_PROVIDER';
+
+  /**
+   * @dev returns the address of the LendingPool proxy
+   * @return the lending pool proxy address
+   **/
+  function getLendingPool() external override view returns (address) {
+    return _addresses[LENDING_POOL];
+  }
+
+  /**
+   * @dev updates the implementation of the lending pool
+   * @param pool the new lending pool implementation
+   **/
+  function setLendingPoolImpl(address pool) external override onlyOwner {
+    _updateImpl(LENDING_POOL, pool);
+    emit LendingPoolUpdated(pool);
+  }
+
+  /**
+   * @dev returns the address of the LendingPoolConfigurator proxy
+   * @return the lending pool configurator proxy address
+   **/
+  function getLendingPoolConfigurator() external override view returns (address) {
+    return _addresses[LENDING_POOL_CONFIGURATOR];
+  }
+
+  /**
+   * @dev updates the implementation of the lending pool configurator
+   * @param configurator the new lending pool configurator implementation
+   **/
+  function setLendingPoolConfiguratorImpl(address configurator) external override onlyOwner {
+    _updateImpl(LENDING_POOL_CONFIGURATOR, configurator);
+    emit LendingPoolConfiguratorUpdated(configurator);
+  }
+
+  /**
+   * @dev returns the address of the LendingPoolCollateralManager. Since the manager is used
+   * through delegateCall within the LendingPool contract, the proxy contract pattern does not work properly hence
+   * the addresses are changed directly.
+   * @return the address of the Lending pool collateral manager
+   **/
+
+  function getLendingPoolCollateralManager() external override view returns (address) {
+    return _addresses[LENDING_POOL_COLLATERAL_MANAGER];
+  }
+
+  /**
+   * @dev updates the address of the Lending pool collateral manager
+   * @param manager the new lending pool collateral manager address
+   **/
+  function setLendingPoolCollateralManager(address manager) external override onlyOwner {
+    _addresses[LENDING_POOL_COLLATERAL_MANAGER] = manager;
+    emit LendingPoolCollateralManagerUpdated(manager);
+  }
+
+  /**
+   * @dev the functions below are storing specific addresses that are outside the context of the protocol
+   * hence the upgradable proxy pattern is not used
+   **/
+
+  function getAaveAdmin() external override view returns (address) {
+    return _addresses[AAVE_ADMIN];
+  }
+
+  function setAaveAdmin(address aaveAdmin) external override onlyOwner {
+    _addresses[AAVE_ADMIN] = aaveAdmin;
+    emit AaveAdminUpdated(aaveAdmin);
+  }
+
+  function getPriceOracle() external override view returns (address) {
+    return _addresses[PRICE_ORACLE];
+  }
+
+  function setPriceOracle(address priceOracle) external override onlyOwner {
+    _addresses[PRICE_ORACLE] = priceOracle;
+    emit PriceOracleUpdated(priceOracle);
+  }
+
+  function getLendingRateOracle() external override view returns (address) {
+    return _addresses[LENDING_RATE_ORACLE];
+  }
+
+  function setLendingRateOracle(address lendingRateOracle) external override onlyOwner {
+    _addresses[LENDING_RATE_ORACLE] = lendingRateOracle;
+    emit LendingRateOracleUpdated(lendingRateOracle);
+  }
+
+  /**
+   * @dev internal function to update the implementation of a specific component of the protocol
+   * @param id the id of the contract to be updated
+   * @param newAddress the address of the new implementation
+   **/
+  function _updateImpl(bytes32 id, address newAddress) internal {
+    address payable proxyAddress = payable(_addresses[id]);
+
+    InitializableAdminUpgradeabilityProxy proxy = InitializableAdminUpgradeabilityProxy(
+      proxyAddress
+    );
+    bytes memory params = abi.encodeWithSignature('initialize(address)', address(this));
+
+    if (proxyAddress == address(0)) {
+      proxy = new InitializableAdminUpgradeabilityProxy();
+      proxy.initialize(newAddress, address(this), params);
+      _addresses[id] = address(proxy);
+      emit ProxyCreated(id, address(proxy));
+    } else {
+      proxy.upgradeToAndCall(newAddress, params);
+    }
+  }
+}
+
+library Errors {
+  // require error messages - ValidationLogic
+  string public constant AMOUNT_NOT_GREATER_THAN_0 = '1'; // 'Amount must be greater than 0'
+  string public constant NO_ACTIVE_RESERVE = '2'; // 'Action requires an active reserve'
+  string public constant NO_UNFREEZED_RESERVE = '3'; // 'Action requires an unfreezed reserve'
+  string public constant CURRENT_AVAILABLE_LIQUIDITY_NOT_ENOUGH = '4'; // 'The current liquidity is not enough'
+  string public constant NOT_ENOUGH_AVAILABLE_USER_BALANCE = '5'; // 'User cannot withdraw more than the available balance'
+  string public constant TRANSFER_NOT_ALLOWED = '6'; // 'Transfer cannot be allowed.'
+  string public constant BORROWING_NOT_ENABLED = '7'; // 'Borrowing is not enabled'
+  string public constant INVALID_INTEREST_RATE_MODE_SELECTED = '8'; // 'Invalid interest rate mode selected'
+  string public constant COLLATERAL_BALANCE_IS_0 = '9'; // 'The collateral balance is 0'
+  string public constant HEALTH_FACTOR_LOWER_THAN_LIQUIDATION_THRESHOLD = '10'; // 'Health factor is lesser than the liquidation threshold'
+  string public constant COLLATERAL_CANNOT_COVER_NEW_BORROW = '11'; // 'There is not enough collateral to cover a new borrow'
+  string public constant STABLE_BORROWING_NOT_ENABLED = '12'; // stable borrowing not enabled
+  string public constant CALLATERAL_SAME_AS_BORROWING_CURRENCY = '13'; // collateral is (mostly) the same currency that is being borrowed
+  string public constant AMOUNT_BIGGER_THAN_MAX_LOAN_SIZE_STABLE = '14'; // 'The requested amount is greater than the max loan size in stable rate mode
+  string public constant NO_DEBT_OF_SELECTED_TYPE = '15'; // 'for repayment of stable debt, the user needs to have stable debt, otherwise, he needs to have variable debt'
+  string public constant NO_EXPLICIT_AMOUNT_TO_REPAY_ON_BEHALF = '16'; // 'To repay on behalf of an user an explicit amount to repay is needed'
+  string public constant NO_STABLE_RATE_LOAN_IN_RESERVE = '17'; // 'User does not have a stable rate loan in progress on this reserve'
+  string public constant NO_VARIABLE_RATE_LOAN_IN_RESERVE = '18'; // 'User does not have a variable rate loan in progress on this reserve'
+  string public constant UNDERLYING_BALANCE_NOT_GREATER_THAN_0 = '19'; // 'The underlying balance needs to be greater than 0'
+  string public constant DEPOSIT_ALREADY_IN_USE = '20'; // 'User deposit is already being used as collateral'
+
+  // require error messages - LendingPool
+  string public constant NOT_ENOUGH_STABLE_BORROW_BALANCE = '21'; // 'User does not have any stable rate loan for this reserve'
+  string public constant INTEREST_RATE_REBALANCE_CONDITIONS_NOT_MET = '22'; // 'Interest rate rebalance conditions were not met'
+  string public constant LIQUIDATION_CALL_FAILED = '23'; // 'Liquidation call failed'
+  string public constant NOT_ENOUGH_LIQUIDITY_TO_BORROW = '24'; // 'There is not enough liquidity available to borrow'
+  string public constant REQUESTED_AMOUNT_TOO_SMALL = '25'; // 'The requested amount is too small for a FlashLoan.'
+  string public constant INCONSISTENT_PROTOCOL_ACTUAL_BALANCE = '26'; // 'The actual balance of the protocol is inconsistent'
+  string public constant CALLER_NOT_LENDING_POOL_CONFIGURATOR = '27'; // 'The actual balance of the protocol is inconsistent'
+  string public constant INVALID_FLASHLOAN_MODE = '43'; //Invalid flashloan mode selected
+  string public constant BORROW_ALLOWANCE_ARE_NOT_ENOUGH = '54'; // User borrows on behalf, but allowance are too small
+  string public constant REENTRANCY_NOT_ALLOWED = '57';
+  string public constant FAILED_REPAY_WITH_COLLATERAL = '53';
+  string public constant FAILED_COLLATERAL_SWAP = '55';
+  string public constant INVALID_EQUAL_ASSETS_TO_SWAP = '56';
+  string public constant NO_MORE_RESERVES_ALLOWED = '59';
+
+  // require error messages - aToken
+  string public constant CALLER_MUST_BE_LENDING_POOL = '28'; // 'The caller of this function must be a lending pool'
+  string public constant CANNOT_GIVE_ALLOWANCE_TO_HIMSELF = '30'; // 'User cannot give allowance to himself'
+  string public constant TRANSFER_AMOUNT_NOT_GT_0 = '31'; // 'Transferred amount needs to be greater than zero'
+
+  // require error messages - ReserveLogic
+  string public constant RESERVE_ALREADY_INITIALIZED = '34'; // 'Reserve has already been initialized'
+  string public constant LIQUIDITY_INDEX_OVERFLOW = '47'; //  Liquidity index overflows uint128
+  string public constant VARIABLE_BORROW_INDEX_OVERFLOW = '48'; //  Variable borrow index overflows uint128
+  string public constant LIQUIDITY_RATE_OVERFLOW = '49'; //  Liquidity rate overflows uint128
+  string public constant VARIABLE_BORROW_RATE_OVERFLOW = '50'; //  Variable borrow rate overflows uint128
+  string public constant STABLE_BORROW_RATE_OVERFLOW = '51'; //  Stable borrow rate overflows uint128
+
+  //require error messages - LendingPoolConfiguration
+  string public constant CALLER_NOT_AAVE_ADMIN = '35'; // 'The caller must be the aave admin'
+  string public constant RESERVE_LIQUIDITY_NOT_0 = '36'; // 'The liquidity of the reserve needs to be 0'
+
+  //require error messages - LendingPoolAddressesProviderRegistry
+  string public constant PROVIDER_NOT_REGISTERED = '37'; // 'Provider is not registered'
+
+  //return error messages - LendingPoolCollateralManager
+  string public constant HEALTH_FACTOR_NOT_BELOW_THRESHOLD = '38'; // 'Health factor is not below the threshold'
+  string public constant COLLATERAL_CANNOT_BE_LIQUIDATED = '39'; // 'The collateral chosen cannot be liquidated'
+  string public constant SPECIFIED_CURRENCY_NOT_BORROWED_BY_USER = '40'; // 'User did not borrow the specified currency'
+  string public constant NOT_ENOUGH_LIQUIDITY_TO_LIQUIDATE = '41'; // "There isn't enough liquidity available to liquidate"
+  string public constant NO_ERRORS = '42'; // 'No errors'
+
+  //require error messages - Math libraries
+  string public constant MULTIPLICATION_OVERFLOW = '44';
+  string public constant ADDITION_OVERFLOW = '45';
+  string public constant DIVISION_BY_ZERO = '46';
+
+  // pausable error message
+  string public constant IS_PAUSED = '58'; // 'Pool is paused'
+  enum CollateralManagerErrors {
+    NO_ERROR,
+    NO_COLLATERAL_AVAILABLE,
+    COLLATERAL_CANNOT_BE_LIQUIDATED,
+    CURRRENCY_NOT_BORROWED,
+    HEALTH_FACTOR_ABOVE_THRESHOLD,
+    NOT_ENOUGH_LIQUIDITY,
+    NO_ACTIVE_RESERVE,
+    HEALTH_FACTOR_LOWER_THAN_LIQUIDATION_THRESHOLD,
+    INVALID_EQUAL_ASSETS_TO_SWAP,
+    NO_UNFREEZED_RESERVE
+  }
+}
+
+library WadRayMath {
+  uint256 internal constant WAD = 1e18;
+  uint256 internal constant halfWAD = WAD / 2;
+
+  uint256 internal constant RAY = 1e27;
+  uint256 internal constant halfRAY = RAY / 2;
+
+  uint256 internal constant WAD_RAY_RATIO = 1e9;
+
+  /**
+   * @return one ray, 1e27
+   **/
+  function ray() internal pure returns (uint256) {
+    return RAY;
+  }
+
+  /**
+   * @return one wad, 1e18
+   **/
+
+  function wad() internal pure returns (uint256) {
+    return WAD;
+  }
+
+  /**
+   * @return half ray, 1e27/2
+   **/
+  function halfRay() internal pure returns (uint256) {
+    return halfRAY;
+  }
+
+  /**
+   * @return half ray, 1e18/2
+   **/
+  function halfWad() internal pure returns (uint256) {
+    return halfWAD;
+  }
+
+  /**
+   * @dev multiplies two wad, rounding half up to the nearest wad
+   * @param a wad
+   * @param b wad
+   * @return the result of a*b, in wad
+   **/
+  function wadMul(uint256 a, uint256 b) internal pure returns (uint256) {
+    if (a == 0) {
+      return 0;
+    }
+
+    uint256 result = a * b;
+
+    require(result / a == b, Errors.MULTIPLICATION_OVERFLOW);
+
+    result += halfWAD;
+
+    require(result >= halfWAD, Errors.ADDITION_OVERFLOW);
+
+    return result / WAD;
+  }
+
+  /**
+   * @dev divides two wad, rounding half up to the nearest wad
+   * @param a wad
+   * @param b wad
+   * @return the result of a/b, in wad
+   **/
+  function wadDiv(uint256 a, uint256 b) internal pure returns (uint256) {
+    require(b != 0, Errors.DIVISION_BY_ZERO);
+
+    uint256 halfB = b / 2;
+
+    uint256 result = a * WAD;
+
+    require(result / WAD == a, Errors.MULTIPLICATION_OVERFLOW);
+
+    result += halfB;
+
+    require(result >= halfB, Errors.ADDITION_OVERFLOW);
+
+    return result / b;
+  }
+
+  /**
+   * @dev multiplies two ray, rounding half up to the nearest ray
+   * @param a ray
+   * @param b ray
+   * @return the result of a*b, in ray
+   **/
+  function rayMul(uint256 a, uint256 b) internal pure returns (uint256) {
+    if (a == 0) {
+      return 0;
+    }
+
+    uint256 result = a * b;
+
+    require(result / a == b, Errors.MULTIPLICATION_OVERFLOW);
+
+    result += halfRAY;
+
+    require(result >= halfRAY, Errors.ADDITION_OVERFLOW);
+
+    return result / RAY;
+  }
+
+  /**
+   * @dev divides two ray, rounding half up to the nearest ray
+   * @param a ray
+   * @param b ray
+   * @return the result of a/b, in ray
+   **/
+  function rayDiv(uint256 a, uint256 b) internal pure returns (uint256) {
+    require(b != 0, Errors.DIVISION_BY_ZERO);
+
+    uint256 halfB = b / 2;
+
+    uint256 result = a * RAY;
+
+    require(result / RAY == a, Errors.MULTIPLICATION_OVERFLOW);
+
+    result += halfB;
+
+    require(result >= halfB, Errors.ADDITION_OVERFLOW);
+
+    return result / b;
+  }
+
+  /**
+   * @dev casts ray down to wad
+   * @param a ray
+   * @return a casted to wad, rounded half up to the nearest wad
+   **/
+  function rayToWad(uint256 a) internal pure returns (uint256) {
+    uint256 halfRatio = WAD_RAY_RATIO / 2;
+    uint256 result = halfRatio + a;
+    require(result >= halfRatio, Errors.ADDITION_OVERFLOW);
+
+    return result / WAD_RAY_RATIO;
+  }
+
+  /**
+   * @dev convert wad up to ray
+   * @param a wad
+   * @return a converted in ray
+   **/
+  function wadToRay(uint256 a) internal pure returns (uint256) {
+    uint256 result = a * WAD_RAY_RATIO;
+    require(result / WAD_RAY_RATIO == a, Errors.MULTIPLICATION_OVERFLOW);
+    return result;
+  }
+}
+
+library MathUtils {
+  using SafeMath for uint256;
+  using WadRayMath for uint256;
+
+  uint256 internal constant SECONDS_PER_YEAR = 365 days;
+
+  /**
+   * @dev function to calculate the interest using a linear interest rate formula
+   * @param rate the interest rate, in ray
+   * @param lastUpdateTimestamp the timestamp of the last update of the interest
+   * @return the interest rate linearly accumulated during the timeDelta, in ray
+   **/
+
+  function calculateLinearInterest(uint256 rate, uint40 lastUpdateTimestamp)
+    internal
+    view
+    returns (uint256)
+  {
+    //solium-disable-next-line
+    uint256 timeDifference = block.timestamp.sub(uint256(lastUpdateTimestamp));
+
+    uint256 timeDelta = timeDifference.wadToRay().rayDiv(SECONDS_PER_YEAR.wadToRay());
+
+    return rate.rayMul(timeDelta).add(WadRayMath.ray());
+  }
+
+  /**
+   * @dev function to calculate the interest using a compounded interest rate formula.
+   * To avoid expensive exponentiation, the calculation is performed using a binomial approximation:
+   *
+   *  (1+x)^n = 1+n*x+[n/2*(n-1)]*x^2+[n/6*(n-1)*(n-2)*x^3...
+   *
+   * The approximation slightly underpays liquidity providers, with the advantage of great gas cost reductions.
+   * The whitepaper contains reference to the approximation and a table showing the margin of error per different time periods.
+   *
+   * @param rate the interest rate, in ray
+   * @param lastUpdateTimestamp the timestamp of the last update of the interest
+   * @return the interest rate compounded during the timeDelta, in ray
+   **/
+  function calculateCompoundedInterest(uint256 rate, uint40 lastUpdateTimestamp)
+    internal
+    view
+    returns (uint256)
+  {
+    //solium-disable-next-line
+    uint256 exp = block.timestamp.sub(uint256(lastUpdateTimestamp));
+
+    if (exp == 0) {
+      return WadRayMath.ray();
+    }
+
+    uint256 expMinusOne = exp - 1;
+
+    uint256 expMinusTwo = exp > 2 ? exp - 2 : 0;
+
+    uint256 ratePerSecond = rate / SECONDS_PER_YEAR;
+
+    uint256 basePowerTwo = ratePerSecond.rayMul(ratePerSecond);
+    uint256 basePowerThree = basePowerTwo.rayMul(ratePerSecond);
+
+    uint256 secondTerm = exp.mul(expMinusOne).mul(basePowerTwo) / 2;
+    uint256 thirdTerm = exp.mul(expMinusOne).mul(expMinusTwo).mul(basePowerThree) / 6;
+
+    return WadRayMath.ray().add(ratePerSecond.mul(exp)).add(secondTerm).add(thirdTerm);
+  }
+}
+
+interface IPriceOracleGetter {
+  /**
+   * @dev returns the asset price in ETH
+   * @param asset the address of the asset
+   * @return the ETH price of the asset
+   **/
+  function getAssetPrice(address asset) external view returns (uint256);
+}
+
+/**
+ * @dev Interface of the ERC20 standard as defined in the EIP.
+ */
+
+/**
+ * @dev Wrappers over Solidity's arithmetic operations with added overflow
+ * checks.
+ *
+ * Arithmetic operations in Solidity wrap on overflow. This can easily result
+ * in bugs, because programmers usually assume that an overflow raises an
+ * error, which is the standard behavior in high level programming languages.
+ * `SafeMath` restores this intuition by reverting the transaction when an
+ * operation overflows.
+ *
+ * Using this library instead of the unchecked operations eliminates an entire
+ * class of bugs, so it's recommended to use it always.
+ */
+
+library SafeERC20 {
+    using SafeMath for uint256;
+    using Address for address;
+
+    function safeTransfer(IERC20 token, address to, uint256 value) internal {
+        _callOptionalReturn(token, abi.encodeWithSelector(token.transfer.selector, to, value));
+    }
+
+    function safeTransferFrom(IERC20 token, address from, address to, uint256 value) internal {
+        _callOptionalReturn(token, abi.encodeWithSelector(token.transferFrom.selector, from, to, value));
+    }
+
+    /**
+     * @dev Deprecated. This function has issues similar to the ones found in
+     * {IERC20-approve}, and its usage is discouraged.
+     *
+     * Whenever possible, use {safeIncreaseAllowance} and
+     * {safeDecreaseAllowance} instead.
+     */
+    function safeApprove(IERC20 token, address spender, uint256 value) internal {
+        // safeApprove should only be called when setting an initial allowance,
+        // or when resetting it to zero. To increase and decrease it, use
+        // 'safeIncreaseAllowance' and 'safeDecreaseAllowance'
+        // solhint-disable-next-line max-line-length
+        require((value == 0) || (token.allowance(address(this), spender) == 0),
+            "SafeERC20: approve from non-zero to non-zero allowance"
+        );
+        _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, value));
+    }
+
+    function safeIncreaseAllowance(IERC20 token, address spender, uint256 value) internal {
+        uint256 newAllowance = token.allowance(address(this), spender).add(value);
+        _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));
+    }
+
+    function safeDecreaseAllowance(IERC20 token, address spender, uint256 value) internal {
+        uint256 newAllowance = token.allowance(address(this), spender).sub(value, "SafeERC20: decreased allowance below zero");
+        _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));
+    }
+
+    /**
+     * @dev Imitates a Solidity high-level call (i.e. a regular function call to a contract), relaxing the requirement
+     * on the return value: the return value is optional (but if data is returned, it must not be false).
+     * @param token The token targeted by the call.
+     * @param data The call data (encoded using abi.encode or one of its variants).
+     */
+    function _callOptionalReturn(IERC20 token, bytes memory data) private {
+        // We need to perform a low level call here, to bypass Solidity's return data size checking mechanism, since
+        // we're implementing it ourselves. We use {Address.functionCall} to perform this call, which verifies that
+        // the target address contains contract code and also asserts for success in the low-level call.
+
+        bytes memory returndata = address(token).functionCall(data, "SafeERC20: low-level call failed");
+        if (returndata.length > 0) { // Return data is optional
+            // solhint-disable-next-line max-line-length
+            require(abi.decode(returndata, (bool)), "SafeERC20: ERC20 operation did not succeed");
+        }
+    }
+}
+
+library ReserveConfiguration {
+  uint256 constant LTV_MASK = 0xFFFFFFFFFFFFFFFF0000;
+  uint256 constant LIQUIDATION_THRESHOLD_MASK = 0xFFFFFFFFFFFF0000FFFF;
+  uint256 constant LIQUIDATION_BONUS_MASK = 0xFFFFFFF0000FFFFFFFF;
+  uint256 constant DECIMALS_MASK = 0xFFFFFF00FFFFFFFFFFFF;
+  uint256 constant ACTIVE_MASK = 0xFFFFFEFFFFFFFFFFFFFF;
+  uint256 constant FROZEN_MASK = 0xFFFFFDFFFFFFFFFFFFFF;
+  uint256 constant BORROWING_MASK = 0xFFFFFBFFFFFFFFFFFFFF;
+  uint256 constant STABLE_BORROWING_MASK = 0xFFFF07FFFFFFFFFFFFFF;
+  uint256 constant RESERVE_FACTOR_MASK = 0xFFFFFFFFFFFFFFFF;
+
+  struct Map {
+    //bit 0-15: LTV
+    //bit 16-31: Liq. threshold
+    //bit 32-47: Liq. bonus
+    //bit 48-55: Decimals
+    //bit 56: Reserve is active
+    //bit 57: reserve is freezed
+    //bit 58: borrowing is enabled
+    //bit 59: stable rate borrowing enabled
+    //bit 64-79: reserve factor
+    uint256 data;
+  }
+
+  /**
+   * @dev sets the reserve factor of the reserve
+   * @param self the reserve configuration
+   * @param reserveFactor the reserve factor
+   **/
+  function setReserveFactor(ReserveConfiguration.Map memory self, uint256 reserveFactor) internal pure {
+ 
+    self.data = (self.data & RESERVE_FACTOR_MASK) | reserveFactor << 64;
+  }
+
+  /**
+   * @dev gets the reserve factor of the reserve
+   * @param self the reserve configuration
+   * @return the reserve factor
+   **/
+  function getReserveFactor(ReserveConfiguration.Map storage self) internal view returns (uint256) {
+    return (self.data & ~RESERVE_FACTOR_MASK) >> 64;
+  }
+  /**
+   * @dev sets the Loan to Value of the reserve
+   * @param self the reserve configuration
+   * @param ltv the new ltv
+   **/
+  function setLtv(ReserveConfiguration.Map memory self, uint256 ltv) internal pure {
+    self.data = (self.data & LTV_MASK) | ltv;
+  }
+
+  /**
+   * @dev gets the Loan to Value of the reserve
+   * @param self the reserve configuration
+   * @return the loan to value
+   **/
+  function getLtv(ReserveConfiguration.Map storage self) internal view returns (uint256) {
+    return self.data & ~LTV_MASK;
+  }
+
+  /**
+   * @dev sets the liquidation threshold of the reserve
+   * @param self the reserve configuration
+   * @param threshold the new liquidation threshold
+   **/
+  function setLiquidationThreshold(ReserveConfiguration.Map memory self, uint256 threshold)
+    internal
+    pure
+  {
+    self.data = (self.data & LIQUIDATION_THRESHOLD_MASK) | (threshold << 16);
+  }
+
+  /**
+   * @dev gets the Loan to Value of the reserve
+   * @param self the reserve configuration
+   * @return the liquidation threshold
+   **/
+  function getLiquidationThreshold(ReserveConfiguration.Map storage self)
+    internal
+    view
+    returns (uint256)
+  {
+    return (self.data & ~LIQUIDATION_THRESHOLD_MASK) >> 16;
+  }
+
+  /**
+   * @dev sets the liquidation bonus of the reserve
+   * @param self the reserve configuration
+   * @param bonus the new liquidation bonus
+   **/
+  function setLiquidationBonus(ReserveConfiguration.Map memory self, uint256 bonus) internal pure {
+    self.data = (self.data & LIQUIDATION_BONUS_MASK) | (bonus << 32);
+  }
+
+  /**
+   * @dev gets the liquidation bonus of the reserve
+   * @param self the reserve configuration
+   * @return the liquidation bonus
+   **/
+  function getLiquidationBonus(ReserveConfiguration.Map storage self)
+    internal
+    view
+    returns (uint256)
+  {
+    return (self.data & ~LIQUIDATION_BONUS_MASK) >> 32;
+  }
+
+  /**
+   * @dev sets the decimals of the underlying asset of the reserve
+   * @param self the reserve configuration
+   * @param decimals the decimals
+   **/
+  function setDecimals(ReserveConfiguration.Map memory self, uint256 decimals) internal pure {
+    self.data = (self.data & DECIMALS_MASK) | (decimals << 48);
+  }
+
+  /**
+   * @dev gets the decimals of the underlying asset of the reserve
+   * @param self the reserve configuration
+   * @return the decimals of the asset
+   **/
+  function getDecimals(ReserveConfiguration.Map storage self) internal view returns (uint256) {
+    return (self.data & ~DECIMALS_MASK) >> 48;
+  }
+
+  /**
+   * @dev sets the active state of the reserve
+   * @param self the reserve configuration
+   * @param active the active state
+   **/
+  function setActive(ReserveConfiguration.Map memory self, bool active) internal pure {
+    self.data = (self.data & ACTIVE_MASK) | (uint256(active ? 1 : 0) << 56);
+  }
+
+  /**
+   * @dev gets the active state of the reserve
+   * @param self the reserve configuration
+   * @return the active state
+   **/
+  function getActive(ReserveConfiguration.Map storage self) internal view returns (bool) {
+    return ((self.data & ~ACTIVE_MASK) >> 56) != 0;
+  }
+
+  /**
+   * @dev sets the frozen state of the reserve
+   * @param self the reserve configuration
+   * @param frozen the frozen state
+   **/
+  function setFrozen(ReserveConfiguration.Map memory self, bool frozen) internal pure {
+    self.data = (self.data & FROZEN_MASK) | (uint256(frozen ? 1 : 0) << 57);
+  }
+
+  /**
+   * @dev gets the frozen state of the reserve
+   * @param self the reserve configuration
+   * @return the frozen state
+   **/
+  function getFrozen(ReserveConfiguration.Map storage self) internal view returns (bool) {
+    return ((self.data & ~FROZEN_MASK) >> 57) != 0;
+  }
+
+  /**
+   * @dev enables or disables borrowing on the reserve
+   * @param self the reserve configuration
+   * @param enabled true if the borrowing needs to be enabled, false otherwise
+   **/
+  function setBorrowingEnabled(ReserveConfiguration.Map memory self, bool enabled) internal pure {
+    self.data = (self.data & BORROWING_MASK) | (uint256(enabled ? 1 : 0) << 58);
+  }
+
+  /**
+   * @dev gets the borrowing state of the reserve
+   * @param self the reserve configuration
+   * @return the borrowing state
+   **/
+  function getBorrowingEnabled(ReserveConfiguration.Map storage self) internal view returns (bool) {
+    return ((self.data & ~BORROWING_MASK) >> 58) != 0;
+  }
+
+  /**
+   * @dev enables or disables stable rate borrowing on the reserve
+   * @param self the reserve configuration
+   * @param enabled true if the stable rate borrowing needs to be enabled, false otherwise
+   **/
+  function setStableRateBorrowingEnabled(ReserveConfiguration.Map memory self, bool enabled)
+    internal pure
+  {
+    self.data = (self.data & STABLE_BORROWING_MASK) | (uint256(enabled ? 1 : 0) << 59);
+  }
+
+  /**
+   * @dev gets the stable rate borrowing state of the reserve
+   * @param self the reserve configuration
+   * @return the stable rate borrowing state
+   **/
+  function getStableRateBorrowingEnabled(ReserveConfiguration.Map storage self)
+    internal
+    view
+    returns (bool)
+  {
+    return ((self.data & ~STABLE_BORROWING_MASK) >> 59) != 0;
+  }
+
+  /**
+   * @dev gets the configuration flags of the reserve
+   * @param self the reserve configuration
+   * @return the state flags representing active, freezed, borrowing enabled, stableRateBorrowing enabled
+   **/
+  function getFlags(ReserveConfiguration.Map storage self)
+    internal
+    view
+    returns (
+      bool,
+      bool,
+      bool,
+      bool
+    )
+  {
+    uint256 dataLocal = self.data;
+
+    return (
+      (dataLocal & ~ACTIVE_MASK) >> 56 != 0,
+      (dataLocal & ~FROZEN_MASK) >> 57 != 0,
+      (dataLocal & ~BORROWING_MASK) >> 58 != 0,
+      (dataLocal & ~STABLE_BORROWING_MASK) >> 59 != 0
+    );
+  }
+
+  /**
+   * @dev gets the configuration paramters of the reserve
+   * @param self the reserve configuration
+   * @return the state params representing ltv, liquidation threshold, liquidation bonus, the reserve decimals
+   **/
+  function getParams(ReserveConfiguration.Map storage self)
+    internal
+    view
+    returns (
+      uint256,
+      uint256,
+      uint256,
+      uint256
+    )
+  {
+    uint256 dataLocal = self.data;
+
+    return (
+      dataLocal & ~LTV_MASK,
+      (dataLocal & ~LIQUIDATION_THRESHOLD_MASK) >> 16,
+      (dataLocal & ~LIQUIDATION_BONUS_MASK) >> 32,
+      (dataLocal & ~DECIMALS_MASK) >> 48
+    );
+  }
+}
+
+interface IReserveInterestRateStrategy {
+  /**
+   * @dev returns the base variable borrow rate, in rays
+   */
+  function baseVariableBorrowRate() external view returns (uint256);
+
+  /**
+   * @dev returns the maximum variable borrow rate
+   */
+  function getMaxVariableBorrowRate() external view returns (uint256);
+
+  /**
+   * @dev calculates the liquidity, stable, and variable rates depending on the current utilization rate
+   *      and the base parameters
+   *
+   */
+  function calculateInterestRates(
+    address reserve,
+    uint256 utilizationRate,
+    uint256 totalStableDebt,
+    uint256 totalVariableDebt,
+    uint256 averageStableBorrowRate,
+    uint256 reserveFactor
+  )
+    external
+    view
+    returns (
+      uint256 liquidityRate,
+      uint256 stableBorrowRate,
+      uint256 variableBorrowRate
+    );
+}
+
+library PercentageMath {
+  uint256 constant PERCENTAGE_FACTOR = 1e4; //percentage plus two decimals
+  uint256 constant HALF_PERCENT = PERCENTAGE_FACTOR / 2;
+
+  /**
+   * @dev executes a percentage multiplication
+   * @param value the value of which the percentage needs to be calculated
+   * @param percentage the percentage of the value to be calculated
+   * @return the percentage of value
+   **/
+  function percentMul(uint256 value, uint256 percentage) internal pure returns (uint256) {
+    if (value == 0) {
+      return 0;
+    }
+
+    uint256 result = value * percentage;
+
+    require(result / value == percentage, Errors.MULTIPLICATION_OVERFLOW);
+
+    result += HALF_PERCENT;
+
+    require(result >= HALF_PERCENT, Errors.ADDITION_OVERFLOW);
+
+    return result / PERCENTAGE_FACTOR;
+  }
+
+  /**
+   * @dev executes a percentage division
+   * @param value the value of which the percentage needs to be calculated
+   * @param percentage the percentage of the value to be calculated
+   * @return the value divided the percentage
+   **/
+  function percentDiv(uint256 value, uint256 percentage) internal pure returns (uint256) {
+    require(percentage != 0, Errors.DIVISION_BY_ZERO);
+    uint256 halfPercentage = percentage / 2;
+
+    uint256 result = value * PERCENTAGE_FACTOR;
+
+    require(result / PERCENTAGE_FACTOR == value, Errors.MULTIPLICATION_OVERFLOW);
+
+    result += halfPercentage;
+
+    require(result >= halfPercentage, Errors.ADDITION_OVERFLOW);
+
+    return result / percentage;
+  }
+}
+
+library ReserveLogic {
+  using SafeMath for uint256;
+  using WadRayMath for uint256;
+  using PercentageMath for uint256;
+  using SafeERC20 for IERC20;
+
+  /**
+   * @dev Emitted when the state of a reserve is updated
+   * @param reserve the address of the reserve
+   * @param liquidityRate the new liquidity rate
+   * @param stableBorrowRate the new stable borrow rate
+   * @param variableBorrowRate the new variable borrow rate
+   * @param liquidityIndex the new liquidity index
+   * @param variableBorrowIndex the new variable borrow index
+   **/
+  event ReserveDataUpdated(
+    address indexed reserve,
+    uint256 liquidityRate,
+    uint256 stableBorrowRate,
+    uint256 variableBorrowRate,
+    uint256 liquidityIndex,
+    uint256 variableBorrowIndex
+  );
+
+  using ReserveLogic for ReserveLogic.ReserveData;
+  using ReserveConfiguration for ReserveConfiguration.Map;
+
+  enum InterestRateMode {NONE, STABLE, VARIABLE}
+
+  // refer to the whitepaper, section 1.1 basic concepts for a formal description of these properties.
+  struct ReserveData {
+    //stores the reserve configuration
+    ReserveConfiguration.Map configuration;
+    //the liquidity index. Expressed in ray
+    uint128 liquidityIndex;
+    //variable borrow index. Expressed in ray
+    uint128 variableBorrowIndex;
+    //the current supply rate. Expressed in ray
+    uint128 currentLiquidityRate;
+    //the current variable borrow rate. Expressed in ray
+    uint128 currentVariableBorrowRate;
+    //the current stable borrow rate. Expressed in ray
+    uint128 currentStableBorrowRate;
+    uint40 lastUpdateTimestamp;
+    //tokens addresses
+    address aTokenAddress;
+    address stableDebtTokenAddress;
+    address variableDebtTokenAddress;
+    //address of the interest rate strategy
+    address interestRateStrategyAddress;
+    //the id of the reserve. Represents the position in the list of the active reserves
+    uint8 id;
+  }
+
+  /**
+   * @dev returns the ongoing normalized income for the reserve.
+   * a value of 1e27 means there is no income. As time passes, the income is accrued.
+   * A value of 2*1e27 means for each unit of assset two units of income have been accrued.
+   * @param reserve the reserve object
+   * @return the normalized income. expressed in ray
+   **/
+  function getNormalizedIncome(ReserveData storage reserve) internal view returns (uint256) {
+    uint40 timestamp = reserve.lastUpdateTimestamp;
+
+    //solium-disable-next-line
+    if (timestamp == uint40(block.timestamp)) {
+      //if the index was updated in the same block, no need to perform any calculation
+      return reserve.liquidityIndex;
+    }
+
+    uint256 cumulated = MathUtils
+      .calculateLinearInterest(reserve.currentLiquidityRate, timestamp)
+      .rayMul(reserve.liquidityIndex);
+
+    return cumulated;
+  }
+
+  /**
+   * @dev returns the ongoing normalized variable debt for the reserve.
+   * a value of 1e27 means there is no debt. As time passes, the income is accrued.
+   * A value of 2*1e27 means that the debt of the reserve is double the initial amount.
+   * @param reserve the reserve object
+   * @return the normalized variable debt. expressed in ray
+   **/
+  function getNormalizedDebt(ReserveData storage reserve) internal view returns (uint256) {
+    uint40 timestamp = reserve.lastUpdateTimestamp;
+
+    //solium-disable-next-line
+    if (timestamp == uint40(block.timestamp)) {
+      //if the index was updated in the same block, no need to perform any calculation
+      return reserve.variableBorrowIndex;
+    }
+
+    uint256 cumulated = MathUtils
+      .calculateCompoundedInterest(reserve.currentVariableBorrowRate, timestamp)
+      .rayMul(reserve.variableBorrowIndex);
+
+    return cumulated;
+  }
+
+  /**
+   * @dev returns an address of the debt token used for particular interest rate mode on asset.
+   * @param reserve the reserve object
+   * @param interestRateMode - STABLE or VARIABLE from ReserveLogic.InterestRateMode enum
+   * @return an address of the corresponding debt token from reserve configuration
+   **/
+  function getDebtTokenAddress(ReserveLogic.ReserveData storage reserve, uint256 interestRateMode)
+    external
+    view
+    returns (address)
+  {
+    require(
+      ReserveLogic.InterestRateMode.STABLE == ReserveLogic.InterestRateMode(interestRateMode) ||
+        ReserveLogic.InterestRateMode.VARIABLE == ReserveLogic.InterestRateMode(interestRateMode),
+      Errors.INVALID_INTEREST_RATE_MODE_SELECTED
+    );
+    return
+      ReserveLogic.InterestRateMode.STABLE == ReserveLogic.InterestRateMode(interestRateMode)
+        ? reserve.stableDebtTokenAddress
+        : reserve.variableDebtTokenAddress;
+  }
+
+  /**
+   * @dev Updates the liquidity cumulative index Ci and variable borrow cumulative index Bvc. Refer to the whitepaper for
+   * a formal specification.
+   * @param reserve the reserve object
+   **/
+  function updateState(ReserveData storage reserve) external {
+    address variableDebtToken = reserve.variableDebtTokenAddress;
+    uint256 previousVariableBorrowIndex = reserve.variableBorrowIndex;
+    uint256 previousLiquidityIndex = reserve.liquidityIndex;
+
+    (uint256 newLiquidityIndex, uint256 newVariableBorrowIndex) = _updateIndexes(
+      reserve,
+      variableDebtToken,
+      previousLiquidityIndex,
+      previousVariableBorrowIndex
+    );
+
+    _mintToTreasury(
+      reserve,
+      variableDebtToken,
+      previousVariableBorrowIndex,
+      newLiquidityIndex,
+      newVariableBorrowIndex
+    );
+  }
+
+  /**
+   * @dev accumulates a predefined amount of asset to the reserve as a fixed, one time income. Used for example to accumulate
+   * the flashloan fee to the reserve, and spread it through the depositors.
+   * @param reserve the reserve object
+   * @param totalLiquidity the total liquidity available in the reserve
+   * @param amount the amount to accomulate
+   **/
+  function cumulateToLiquidityIndex(
+    ReserveData storage reserve,
+    uint256 totalLiquidity,
+    uint256 amount
+  ) external {
+    uint256 amountToLiquidityRatio = amount.wadToRay().rayDiv(totalLiquidity.wadToRay());
+
+    uint256 result = amountToLiquidityRatio.add(WadRayMath.ray());
+
+    result = result.rayMul(reserve.liquidityIndex);
+    require(result < (1 << 128), Errors.LIQUIDITY_INDEX_OVERFLOW);
+
+    reserve.liquidityIndex = uint128(result);
+  }
+
+  /**
+   * @dev initializes a reserve
+   * @param reserve the reserve object
+   * @param aTokenAddress the address of the overlying atoken contract
+   * @param interestRateStrategyAddress the address of the interest rate strategy contract
+   **/
+  function init(
+    ReserveData storage reserve,
+    address aTokenAddress,
+    address stableDebtTokenAddress,
+    address variableDebtTokenAddress,
+    address interestRateStrategyAddress
+  ) external {
+    require(reserve.aTokenAddress == address(0), Errors.RESERVE_ALREADY_INITIALIZED);
+    if (reserve.liquidityIndex == 0) {
+      //if the reserve has not been initialized yet
+      reserve.liquidityIndex = uint128(WadRayMath.ray());
+    }
+
+    if (reserve.variableBorrowIndex == 0) {
+      reserve.variableBorrowIndex = uint128(WadRayMath.ray());
+    }
+
+    reserve.aTokenAddress = aTokenAddress;
+    reserve.stableDebtTokenAddress = stableDebtTokenAddress;
+    reserve.variableDebtTokenAddress = variableDebtTokenAddress;
+    reserve.interestRateStrategyAddress = interestRateStrategyAddress;
+  }
+
+  struct UpdateInterestRatesLocalVars {
+    address stableDebtTokenAddress;
+    uint256 availableLiquidity;
+    uint256 totalStableDebt;
+    uint256 newLiquidityRate;
+    uint256 newStableRate;
+    uint256 newVariableRate;
+    uint256 avgStableRate;
+  }
+
+  /**
+   * @dev Updates the reserve current stable borrow rate Rf, the current variable borrow rate Rv and the current liquidity rate Rl.
+   * Also updates the lastUpdateTimestamp value. Please refer to the whitepaper for further information.
+   * @param reserve the address of the reserve to be updated
+   * @param liquidityAdded the amount of liquidity added to the protocol (deposit or repay) in the previous action
+   * @param liquidityTaken the amount of liquidity taken from the protocol (redeem or borrow)
+   **/
+  function updateInterestRates(
+    ReserveData storage reserve,
+    address reserveAddress,
+    address aTokenAddress,
+    uint256 liquidityAdded,
+    uint256 liquidityTaken
+  ) external {
+    UpdateInterestRatesLocalVars memory vars;
+
+    vars.stableDebtTokenAddress = reserve.stableDebtTokenAddress;
+
+    (vars.totalStableDebt, vars.avgStableRate) = IStableDebtToken(vars.stableDebtTokenAddress)
+      .getTotalSupplyAndAvgRate();
+
+    vars.availableLiquidity = IERC20(reserveAddress).balanceOf(aTokenAddress);
+
+    (
+      vars.newLiquidityRate,
+      vars.newStableRate,
+      vars.newVariableRate
+    ) = IReserveInterestRateStrategy(reserve.interestRateStrategyAddress).calculateInterestRates(
+      reserveAddress,
+      vars.availableLiquidity.add(liquidityAdded).sub(liquidityTaken),
+      vars.totalStableDebt,
+      IERC20(reserve.variableDebtTokenAddress).totalSupply(),
+      vars.avgStableRate,
+      reserve.configuration.getReserveFactor()
+    );
+    require(vars.newLiquidityRate < (1 << 128), 'ReserveLogic: Liquidity rate overflow');
+    require(vars.newStableRate < (1 << 128), 'ReserveLogic: Stable borrow rate overflow');
+    require(vars.newVariableRate < (1 << 128), 'ReserveLogic: Variable borrow rate overflow');
+
+    reserve.currentLiquidityRate = uint128(vars.newLiquidityRate);
+    reserve.currentStableBorrowRate = uint128(vars.newStableRate);
+    reserve.currentVariableBorrowRate = uint128(vars.newVariableRate);
+
+    emit ReserveDataUpdated(
+      reserveAddress,
+      vars.newLiquidityRate,
+      vars.newStableRate,
+      vars.newVariableRate,
+      reserve.liquidityIndex,
+      reserve.variableBorrowIndex
+    );
+  }
+
+  struct MintToTreasuryLocalVars {
+    uint256 currentStableDebt;
+    uint256 principalStableDebt;
+    uint256 previousStableDebt;
+    uint256 currentVariableDebt;
+    uint256 scaledVariableDebt;
+    uint256 previousVariableDebt;
+    uint256 avgStableRate;
+    uint256 cumulatedStableInterest;
+    uint256 totalDebtAccrued;
+    uint256 amountToMint;
+    uint256 reserveFactor;
+    uint40 stableSupplyUpdatedTimestamp;
+  }
+
+  /**
+   * @dev mints part of the repaid interest to the reserve treasury, depending on the reserveFactor for the
+   * specific asset.
+   * @param reserve the reserve reserve to be updated
+   * @param variableDebtToken the debt token address
+   * @param previousVariableBorrowIndex the variable borrow index before the last accumulation of the interest
+   * @param newLiquidityIndex the new liquidity index
+   * @param newVariableBorrowIndex the variable borrow index after the last accumulation of the interest
+   **/
+  function _mintToTreasury(
+    ReserveData storage reserve,
+    address variableDebtToken,
+    uint256 previousVariableBorrowIndex,
+    uint256 newLiquidityIndex,
+    uint256 newVariableBorrowIndex
+  ) internal {
+    MintToTreasuryLocalVars memory vars;
+
+    vars.reserveFactor = reserve.configuration.getReserveFactor();
+
+    if (vars.reserveFactor == 0) {
+      return;
+    }
+
+    //fetching the last scaled total variable debt
+    vars.scaledVariableDebt = IVariableDebtToken(variableDebtToken).scaledTotalSupply();
+
+    //fetching the principal, total stable debt and the avg stable rate
+    (
+      vars.principalStableDebt,
+      vars.currentStableDebt,
+      vars.avgStableRate,
+      vars.stableSupplyUpdatedTimestamp
+    ) = IStableDebtToken(reserve.stableDebtTokenAddress).getSupplyData();
+
+    //calculate the last principal variable debt
+    vars.previousVariableDebt = vars.scaledVariableDebt.rayMul(previousVariableBorrowIndex);
+
+    //calculate the new total supply after accumulation of the index
+    vars.currentVariableDebt = vars.scaledVariableDebt.rayMul(newVariableBorrowIndex);
+
+    //calculate the stable debt until the last timestamp update
+    vars.cumulatedStableInterest = MathUtils.calculateCompoundedInterest(
+      vars.avgStableRate,
+      vars.stableSupplyUpdatedTimestamp
+    );
+
+    vars.previousStableDebt = vars.principalStableDebt.rayMul(vars.cumulatedStableInterest);
+
+    //debt accrued is the sum of the current debt minus the sum of the debt at the last update
+    vars.totalDebtAccrued = vars
+      .currentVariableDebt
+      .add(vars.currentStableDebt)
+      .sub(vars.previousVariableDebt)
+      .sub(vars.previousStableDebt);
+
+    vars.amountToMint = vars.totalDebtAccrued.percentMul(vars.reserveFactor);
+
+    IAToken(reserve.aTokenAddress).mintToTreasury(vars.amountToMint, newLiquidityIndex);
+  }
+
+  /**
+   * @dev updates the reserve indexes and the timestamp of the update
+   * @param reserve the reserve reserve to be updated
+   * @param variableDebtToken the debt token address
+   * @param liquidityIndex the last stored liquidity index
+   * @param variableBorrowIndex the last stored variable borrow index
+   **/
+  function _updateIndexes(
+    ReserveData storage reserve,
+    address variableDebtToken,
+    uint256 liquidityIndex,
+    uint256 variableBorrowIndex
+  ) internal returns (uint256, uint256) {
+    uint40 timestamp = reserve.lastUpdateTimestamp;
+
+    uint256 currentLiquidityRate = reserve.currentLiquidityRate;
+
+    uint256 newLiquidityIndex = liquidityIndex;
+    uint256 newVariableBorrowIndex = variableBorrowIndex;
+
+    //only cumulating if there is any income being produced
+    if (currentLiquidityRate > 0) {
+      uint256 cumulatedLiquidityInterest = MathUtils.calculateLinearInterest(
+        currentLiquidityRate,
+        timestamp
+      );
+      newLiquidityIndex = cumulatedLiquidityInterest.rayMul(liquidityIndex);
+      require(newLiquidityIndex < (1 << 128), Errors.LIQUIDITY_INDEX_OVERFLOW);
+
+      reserve.liquidityIndex = uint128(newLiquidityIndex);
+
+      //as the liquidity rate might come only from stable rate loans, we need to ensure
+      //that there is actual variable debt before accumulating
+      if (IERC20(variableDebtToken).totalSupply() > 0) {
+        uint256 cumulatedVariableBorrowInterest = MathUtils.calculateCompoundedInterest(
+          reserve.currentVariableBorrowRate,
+          timestamp
+        );
+        newVariableBorrowIndex = cumulatedVariableBorrowInterest.rayMul(variableBorrowIndex);
+        require(newVariableBorrowIndex < (1 << 128), Errors.VARIABLE_BORROW_INDEX_OVERFLOW);
+        reserve.variableBorrowIndex = uint128(newVariableBorrowIndex);
+      }
+    }
+
+    //solium-disable-next-line
+    reserve.lastUpdateTimestamp = uint40(block.timestamp);
+    return (newLiquidityIndex, newVariableBorrowIndex);
+  }
+}
+
+interface ILendingPool {
+  /**
+   * @dev emitted on deposit
+   * @param reserve the address of the reserve
+   * @param user the address of the user
+   * @param amount the amount to be deposited
+   * @param referral the referral number of the action
+   **/
+  event Deposit(
+    address indexed reserve,
+    address user,
+    address indexed onBehalfOf,
+    uint256 amount,
+    uint16 indexed referral
+  );
+
+  /**
+   * @dev emitted during a withdraw action.
+   * @param reserve the address of the reserve
+   * @param user the address of the user
+   * @param amount the amount to be withdrawn
+   **/
+  event Withdraw(address indexed reserve, address indexed user, uint256 amount);
+
+  event BorrowAllowanceDelegated(
+    address indexed asset,
+    address indexed fromUser,
+    address indexed toUser,
+    uint256 interestRateMode,
+    uint256 amount
+  );
+  /**
+   * @dev emitted on borrow
+   * @param reserve the address of the reserve
+   * @param user the address of the user
+   * @param amount the amount to be deposited
+   * @param borrowRateMode the rate mode, can be either 1-stable or 2-variable
+   * @param borrowRate the rate at which the user has borrowed
+   * @param referral the referral number of the action
+   **/
+  event Borrow(
+    address indexed reserve,
+    address user,
+    address indexed onBehalfOf,
+    uint256 amount,
+    uint256 borrowRateMode,
+    uint256 borrowRate,
+    uint16 indexed referral
+  );
+  /**
+   * @dev emitted on repay
+   * @param reserve the address of the reserve
+   * @param user the address of the user for which the repay has been executed
+   * @param repayer the address of the user that has performed the repay action
+   * @param amount the amount repaid
+   **/
+  event Repay(
+    address indexed reserve,
+    address indexed user,
+    address indexed repayer,
+    uint256 amount
+  );
+  /**
+   * @dev emitted when a user performs a rate swap
+   * @param reserve the address of the reserve
+   * @param user the address of the user executing the swap
+   **/
+  event Swap(address indexed reserve, address indexed user);
+
+  /**
+   * @dev emitted when a user enables a reserve as collateral
+   * @param reserve the address of the reserve
+   * @param user the address of the user
+   **/
+  event ReserveUsedAsCollateralEnabled(address indexed reserve, address indexed user);
+
+  /**
+   * @dev emitted when a user disables a reserve as collateral
+   * @param reserve the address of the reserve
+   * @param user the address of the user
+   **/
+  event ReserveUsedAsCollateralDisabled(address indexed reserve, address indexed user);
+
+  /**
+   * @dev emitted when the stable rate of a user gets rebalanced
+   * @param reserve the address of the reserve
+   * @param user the address of the user for which the rebalance has been executed
+   **/
+  event RebalanceStableBorrowRate(address indexed reserve, address indexed user);
+  /**
+   * @dev emitted when a flashloan is executed
+   * @param target the address of the flashLoanReceiver
+   * @param reserve the address of the reserve
+   * @param amount the amount requested
+   * @param totalPremium the total fee on the amount
+   * @param referralCode the referral code of the caller
+   **/
+  event FlashLoan(
+    address indexed target,
+    address indexed reserve,
+    uint256 amount,
+    uint256 totalPremium,
+    uint16 referralCode
+  );
+  /**
+   * @dev these events are not emitted directly by the LendingPool
+   * but they are declared here as the LendingPoolCollateralManager
+   * is executed using a delegateCall().
+   * This allows to have the events in the generated ABI for LendingPool.
+   **/
+
+  /**
+   * @dev emitted when a borrower is liquidated
+   * @param collateral the address of the collateral being liquidated
+   * @param reserve the address of the reserve
+   * @param user the address of the user being liquidated
+   * @param purchaseAmount the total amount liquidated
+   * @param liquidatedCollateralAmount the amount of collateral being liquidated
+   * @param accruedBorrowInterest the amount of interest accrued by the borrower since the last action
+   * @param liquidator the address of the liquidator
+   * @param receiveAToken true if the liquidator wants to receive aTokens, false otherwise
+   **/
+  event LiquidationCall(
+    address indexed collateral,
+    address indexed reserve,
+    address indexed user,
+    uint256 purchaseAmount,
+    uint256 liquidatedCollateralAmount,
+    uint256 accruedBorrowInterest,
+    address liquidator,
+    bool receiveAToken
+  );
+  /**
+   * @dev Emitted when the pause is triggered.
+   */
+  event Paused();
+
+  /**
+   * @dev Emitted when the pause is lifted.
+   */
+  event Unpaused();
+
+  /**
+   * @dev deposits The underlying asset into the reserve. A corresponding amount of the overlying asset (aTokens)
+   * is minted.
+   * @param reserve the address of the reserve
+   * @param amount the amount to be deposited
+   * @param referralCode integrators are assigned a referral code and can potentially receive rewards.
+   **/
+  function deposit(
+    address reserve,
+    uint256 amount,
+    address onBehalfOf,
+    uint16 referralCode
+  ) external;
+
+  /**
+   * @dev withdraws the assets of user.
+   * @param reserve the address of the reserve
+   * @param amount the underlying amount to be redeemed
+   **/
+  function withdraw(address reserve, uint256 amount) external;
+
+  /**
+   * @dev Sets allowance to borrow on a certain type of debt asset for a certain user address
+   * @param asset The underlying asset of the debt token
+   * @param user The user to give allowance to
+   * @param interestRateMode Type of debt: 1 for stable, 2 for variable
+   * @param amount Allowance amount to borrow
+   **/
+  function delegateBorrowAllowance(
+    address asset,
+    address user,
+    uint256 interestRateMode,
+    uint256 amount
+  ) external;
+
+  function getBorrowAllowance(
+    address fromUser,
+    address toUser,
+    address asset,
+    uint256 interestRateMode
+  ) external view returns (uint256);
+
+  /**
+   * @dev Allows users to borrow a specific amount of the reserve currency, provided that the borrower
+   * already deposited enough collateral.
+   * @param reserve the address of the reserve
+   * @param amount the amount to be borrowed
+   * @param interestRateMode the interest rate mode at which the user wants to borrow. Can be 0 (STABLE) or 1 (VARIABLE)
+   **/
+  function borrow(
+    address reserve,
+    uint256 amount,
+    uint256 interestRateMode,
+    uint16 referralCode,
+    address onBehalfOf
+  ) external;
+
+  /**
+   * @notice repays a borrow on the specific reserve, for the specified amount (or for the whole amount, if uint256(-1) is specified).
+   * @dev the target user is defined by onBehalfOf. If there is no repayment on behalf of another account,
+   * onBehalfOf must be equal to msg.sender.
+   * @param reserve the address of the reserve on which the user borrowed
+   * @param amount the amount to repay, or uint256(-1) if the user wants to repay everything
+   * @param onBehalfOf the address for which msg.sender is repaying.
+   **/
+  function repay(
+    address reserve,
+    uint256 amount,
+    uint256 rateMode,
+    address onBehalfOf
+  ) external;
+
+  /**
+   * @dev borrowers can user this function to swap between stable and variable borrow rate modes.
+   * @param reserve the address of the reserve on which the user borrowed
+   * @param rateMode the rate mode that the user wants to swap
+   **/
+  function swapBorrowRateMode(address reserve, uint256 rateMode) external;
+
+  /**
+   * @dev rebalances the stable interest rate of a user if current liquidity rate > user stable rate.
+   * this is regulated by Aave to ensure that the protocol is not abused, and the user is paying a fair
+   * rate. Anyone can call this function.
+   * @param reserve the address of the reserve
+   * @param user the address of the user to be rebalanced
+   **/
+  function rebalanceStableBorrowRate(address reserve, address user) external;
+
+  /**
+   * @dev allows depositors to enable or disable a specific deposit as collateral.
+   * @param reserve the address of the reserve
+   * @param useAsCollateral true if the user wants to user the deposit as collateral, false otherwise.
+   **/
+  function setUserUseReserveAsCollateral(address reserve, bool useAsCollateral) external;
+
+  /**
+   * @dev users can invoke this function to liquidate an undercollateralized position.
+   * @param reserve the address of the collateral to liquidated
+   * @param reserve the address of the principal reserve
+   * @param user the address of the borrower
+   * @param purchaseAmount the amount of principal that the liquidator wants to repay
+   * @param receiveAToken true if the liquidators wants to receive the aTokens, false if
+   * he wants to receive the underlying asset directly
+   **/
+  function liquidationCall(
+    address collateral,
+    address reserve,
+    address user,
+    uint256 purchaseAmount,
+    bool receiveAToken
+  ) external;
+
+  /**
+   * @dev flashes the underlying collateral on an user to swap for the owed asset and repay
+   * - Both the owner of the position and other liquidators can execute it
+   * - The owner can repay with his collateral at any point, no matter the health factor
+   * - Other liquidators can only use this function below 1 HF. To liquidate 50% of the debt > HF 0.98 or the whole below
+   * @param collateral The address of the collateral asset
+   * @param principal The address of the owed asset
+   * @param user Address of the borrower
+   * @param principalAmount Amount of the debt to repay. type(uint256).max to repay the maximum possible
+   * @param receiver Address of the contract receiving the collateral to swap
+   * @param params Variadic bytes param to pass with extra information to the receiver
+   **/
+  function repayWithCollateral(
+    address collateral,
+    address principal,
+    address user,
+    uint256 principalAmount,
+    address receiver,
+    bytes calldata params
+  ) external;
+
+  /**
+   * @dev allows smartcontracts to access the liquidity of the pool within one transaction,
+   * as long as the amount taken plus a fee is returned. NOTE There are security concerns for developers of flashloan receiver contracts
+   * that must be kept into consideration. For further details please visit https://developers.aave.com
+   * @param receiver The address of the contract receiving the funds. The receiver should implement the IFlashLoanReceiver interface.
+   * @param reserve the address of the principal reserve
+   * @param amount the amount requested for this flashloan
+   * @param params a bytes array to be sent to the flashloan executor
+   * @param referralCode the referral code of the caller
+   **/
+  function flashLoan(
+    address receiver,
+    address reserve,
+    uint256 amount,
+    uint256 debtType,
+    bytes calldata params,
+    uint16 referralCode
+  ) external;
+
+  /**
+   * @dev Allows an user to release one of his assets deposited in the protocol, even if it is used as collateral, to swap for another.
+   * - It's not possible to release one asset to swap for the same
+   * @param receiverAddress The address of the contract receiving the funds. The receiver should implement the ISwapAdapter interface
+   * @param fromAsset Asset to swap from
+   * @param toAsset Asset to swap to
+   * @param params a bytes array to be sent (if needed) to the receiver contract with extra data
+   **/
+  function swapLiquidity(
+    address receiverAddress,
+    address fromAsset,
+    address toAsset,
+    uint256 amountToSwap,
+    bytes calldata params
+  ) external;
+
+  /**
+   * @dev accessory functions to fetch data from the core contract
+   **/
+
+  function getReserveConfigurationData(address reserve)
+    external
+    view
+    returns (
+      uint256 decimals,
+      uint256 ltv,
+      uint256 liquidationThreshold,
+      uint256 liquidationBonus,
+      uint256 reserveFactor,
+      address interestRateStrategyAddress,
+      bool usageAsCollateralEnabled,
+      bool borrowingEnabled,
+      bool stableBorrowRateEnabled,
+      bool isActive,
+      bool isFreezed
+    );
+
+  function getReserveTokensAddresses(address reserve)
+    external
+    view
+    returns (
+      address aTokenAddress,
+      address stableDebtTokenAddress,
+      address variableDebtTokenAddress
+    );
+
+  function getReserveData(address reserve)
+    external
+    view
+    returns (
+      uint256 availableLiquidity,
+      uint256 totalStableDebt,
+      uint256 totalVariableDebt,
+      uint256 liquidityRate,
+      uint256 variableBorrowRate,
+      uint256 stableBorrowRate,
+      uint256 averageStableBorrowRate,
+      uint256 liquidityIndex,
+      uint256 variableBorrowIndex,
+      uint40 lastUpdateTimestamp
+    );
+
+  function getUserAccountData(address user)
+    external
+    view
+    returns (
+      uint256 totalCollateralETH,
+      uint256 totalBorrowsETH,
+      uint256 availableBorrowsETH,
+      uint256 currentLiquidationThreshold,
+      uint256 ltv,
+      uint256 healthFactor
+    );
+
+  function getUserReserveData(address reserve, address user)
+    external
+    view
+    returns (
+      uint256 currentATokenBalance,
+      uint256 currentStableDebt,
+      uint256 currentVariableDebt,
+      uint256 principalStableDebt,
+      uint256 scaledVariableDebt,
+      uint256 stableBorrowRate,
+      uint256 liquidityRate,
+      uint40 stableRateLastUpdated,
+      bool usageAsCollateralEnabled
+    );
+
+  /**
+   * @dev initializes a reserve
+   * @param reserve the address of the reserve
+   * @param aTokenAddress the address of the overlying aToken contract
+   * @param interestRateStrategyAddress the address of the interest rate strategy contract
+   **/
+  function initReserve(
+    address reserve,
+    address aTokenAddress,
+    address stableDebtAddress,
+    address variableDebtAddress,
+    address interestRateStrategyAddress
+  ) external;
+
+  /**
+   * @dev updates the address of the interest rate strategy contract
+   * @param reserve the address of the reserve
+   * @param rateStrategyAddress the address of the interest rate strategy contract
+   **/
+
+  function setReserveInterestRateStrategyAddress(address reserve, address rateStrategyAddress)
+    external;
+
+  function setConfiguration(address reserve, uint256 configuration) external;
+
+  function getConfiguration(address reserve)
+    external
+    view
+    returns (ReserveConfiguration.Map memory);
+
+  function getReserveNormalizedIncome(address reserve) external view returns (uint256);
+
+  function getReserveNormalizedVariableDebt(address reserve) external view returns (uint256);
+
+  function balanceDecreaseAllowed(
+    address reserve,
+    address user,
+    uint256 amount
+  ) external view returns (bool);
+
+  function getReserves() external view returns (address[] memory);
+
+  /**
+   * @dev Set the _pause state
+   * @param val the boolean value to set the current pause state of LendingPool
+   */
+  function setPause(bool val) external;
+
+  /**
+   * @dev Returns if the LendingPool is paused
+   */
+  function paused() external view returns (bool);
+}
+
+abstract contract Context {
+  function _msgSender() internal virtual view returns (address payable) {
+    return msg.sender;
+  }
+
+  function _msgData() internal virtual view returns (bytes memory) {
+    this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691
+    return msg.data;
+  }
+}
+
+interface IERC20Detailed is IERC20 {
+  function name() external view returns (string memory);
+
+  function symbol() external view returns (string memory);
+
+  function decimals() external view returns (uint8);
+}
+
+library SafeMath {
+  /**
+   * @dev Returns the addition of two unsigned integers, reverting on
+   * overflow.
+   *
+   * Counterpart to Solidity's `+` operator.
+   *
+   * Requirements:
+   * - Addition cannot overflow.
+   */
+  function add(uint256 a, uint256 b) internal pure returns (uint256) {
+    uint256 c = a + b;
+    require(c >= a, 'SafeMath: addition overflow');
+
+    return c;
+  }
+
+  /**
+   * @dev Returns the subtraction of two unsigned integers, reverting on
+   * overflow (when the result is negative).
+   *
+   * Counterpart to Solidity's `-` operator.
+   *
+   * Requirements:
+   * - Subtraction cannot overflow.
+   */
+  function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+    return sub(a, b, 'SafeMath: subtraction overflow');
+  }
+
+  /**
+   * @dev Returns the subtraction of two unsigned integers, reverting with custom message on
+   * overflow (when the result is negative).
+   *
+   * Counterpart to Solidity's `-` operator.
+   *
+   * Requirements:
+   * - Subtraction cannot overflow.
+   */
+  function sub(
+    uint256 a,
+    uint256 b,
+    string memory errorMessage
+  ) internal pure returns (uint256) {
+    require(b <= a, errorMessage);
+    uint256 c = a - b;
+
+    return c;
+  }
+
+  /**
+   * @dev Returns the multiplication of two unsigned integers, reverting on
+   * overflow.
+   *
+   * Counterpart to Solidity's `*` operator.
+   *
+   * Requirements:
+   * - Multiplication cannot overflow.
+   */
+  function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+    // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
+    // benefit is lost if 'b' is also tested.
+    // See: https://github.com/OpenZeppelin/openzeppelin-contracts/pull/522
+    if (a == 0) {
+      return 0;
+    }
+
+    uint256 c = a * b;
+    require(c / a == b, 'SafeMath: multiplication overflow');
+
+    return c;
+  }
+
+  /**
+   * @dev Returns the integer division of two unsigned integers. Reverts on
+   * division by zero. The result is rounded towards zero.
+   *
+   * Counterpart to Solidity's `/` operator. Note: this function uses a
+   * `revert` opcode (which leaves remaining gas untouched) while Solidity
+   * uses an invalid opcode to revert (consuming all remaining gas).
+   *
+   * Requirements:
+   * - The divisor cannot be zero.
+   */
+  function div(uint256 a, uint256 b) internal pure returns (uint256) {
+    return div(a, b, 'SafeMath: division by zero');
+  }
+
+  /**
+   * @dev Returns the integer division of two unsigned integers. Reverts with custom message on
+   * division by zero. The result is rounded towards zero.
+   *
+   * Counterpart to Solidity's `/` operator. Note: this function uses a
+   * `revert` opcode (which leaves remaining gas untouched) while Solidity
+   * uses an invalid opcode to revert (consuming all remaining gas).
+   *
+   * Requirements:
+   * - The divisor cannot be zero.
+   */
+  function div(
+    uint256 a,
+    uint256 b,
+    string memory errorMessage
+  ) internal pure returns (uint256) {
+    // Solidity only automatically asserts when dividing by 0
+    require(b > 0, errorMessage);
+    uint256 c = a / b;
+    // assert(a == b * c + a % b); // There is no case in which this doesn't hold
+
+    return c;
+  }
+
+  /**
+   * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
+   * Reverts when dividing by zero.
+   *
+   * Counterpart to Solidity's `%` operator. This function uses a `revert`
+   * opcode (which leaves remaining gas untouched) while Solidity uses an
+   * invalid opcode to revert (consuming all remaining gas).
+   *
+   * Requirements:
+   * - The divisor cannot be zero.
+   */
+  function mod(uint256 a, uint256 b) internal pure returns (uint256) {
+    return mod(a, b, 'SafeMath: modulo by zero');
+  }
+
+  /**
+   * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
+   * Reverts with custom message when dividing by zero.
+   *
+   * Counterpart to Solidity's `%` operator. This function uses a `revert`
+   * opcode (which leaves remaining gas untouched) while Solidity uses an
+   * invalid opcode to revert (consuming all remaining gas).
+   *
+   * Requirements:
+   * - The divisor cannot be zero.
+   */
+  function mod(
+    uint256 a,
+    uint256 b,
+    string memory errorMessage
+  ) internal pure returns (uint256) {
+    require(b != 0, errorMessage);
+    return a % b;
+  }
+}
+
+interface IAaveIncentivesController {
+  function handleAction(
+    address user,
+    uint256 userBalance,
+    uint256 totalSupply
+  ) external;
+}
+
+contract IncentivizedERC20 is Context, IERC20, IERC20Detailed {
+  using SafeMath for uint256;
+
+  IAaveIncentivesController internal immutable _incentivesController;
+
+  mapping(address => uint256) internal _balances;
+
+  mapping(address => mapping(address => uint256)) private _allowances;
+  uint256 internal _totalSupply;
+  string private _name;
+  string private _symbol;
+  uint8 private _decimals;
+
+  constructor(
+    string memory name,
+    string memory symbol,
+    uint8 decimals,
+    address incentivesController
+  ) public {
+    _name = name;
+    _symbol = symbol;
+    _decimals = decimals;
+    _incentivesController = IAaveIncentivesController(incentivesController);
+  }
+
+  /**
+   * @return the name of the token
+   **/
+  function name() public override view returns (string memory) {
+    return _name;
+  }
+
+  /**
+   * @return the symbol of the token
+   **/
+  function symbol() public override view returns (string memory) {
+    return _symbol;
+  }
+
+  /**
+   * @return the decimals of the token
+   **/
+  function decimals() public override view returns (uint8) {
+    return _decimals;
+  }
+
+  /**
+   * @return the total supply of the token
+   **/
+  function totalSupply() public virtual override view returns (uint256) {
+    return _totalSupply;
+  }
+
+  /**
+   * @return the balance of the token
+   **/
+  function balanceOf(address account) public virtual override view returns (uint256) {
+    return _balances[account];
+  }
+
+  /**
+   * @dev executes a transfer of tokens from msg.sender to recipient
+   * @param recipient the recipient of the tokens
+   * @param amount the amount of tokens being transferred
+   * @return true if the transfer succeeds, false otherwise
+   **/
+  function transfer(address recipient, uint256 amount) public virtual override returns (bool) {
+    _transfer(_msgSender(), recipient, amount);
+    emit Transfer(msg.sender, recipient, amount);
+    return true;
+  }
+
+  /**
+   * @dev returns the allowance of spender on the tokens owned by owner
+   * @param owner the owner of the tokens
+   * @param spender the user allowed to spend the owner's tokens
+   * @return the amount of owner's tokens spender is allowed to spend
+   **/
+  function allowance(address owner, address spender)
+    public
+    virtual
+    override
+    view
+    returns (uint256)
+  {
+    return _allowances[owner][spender];
+  }
+
+  /**
+   * @dev allows spender to spend the tokens owned by msg.sender
+   * @param spender the user allowed to spend msg.sender tokens
+   * @return true
+   **/
+  function approve(address spender, uint256 amount) public virtual override returns (bool) {
+    _approve(_msgSender(), spender, amount);
+    return true;
+  }
+
+  /**
+   * @dev executes a transfer of token from sender to recipient, if msg.sender is allowed to do so
+   * @param sender the owner of the tokens
+   * @param recipient the recipient of the tokens
+   * @param amount the amount of tokens being transferred
+   * @return true if the transfer succeeds, false otherwise
+   **/
+  function transferFrom(
+    address sender,
+    address recipient,
+    uint256 amount
+  ) public virtual override returns (bool) {
+    _transfer(sender, recipient, amount);
+    _approve(
+      sender,
+      _msgSender(),
+      _allowances[sender][_msgSender()].sub(amount, 'ERC20: transfer amount exceeds allowance')
+    );
+    emit Transfer(sender, recipient, amount);
+    return true;
+  }
+
+  /**
+   * @dev increases the allowance of spender to spend msg.sender tokens
+   * @param spender the user allowed to spend on behalf of msg.sender
+   * @param addedValue the amount being added to the allowance
+   * @return true
+   **/
+  function increaseAllowance(address spender, uint256 addedValue) public virtual returns (bool) {
+    _approve(_msgSender(), spender, _allowances[_msgSender()][spender].add(addedValue));
+    return true;
+  }
+
+  /**
+   * @dev decreases the allowance of spender to spend msg.sender tokens
+   * @param spender the user allowed to spend on behalf of msg.sender
+   * @param subtractedValue the amount being subtracted to the allowance
+   * @return true
+   **/
+  function decreaseAllowance(address spender, uint256 subtractedValue)
+    public
+    virtual
+    returns (bool)
+  {
+    _approve(
+      _msgSender(),
+      spender,
+      _allowances[_msgSender()][spender].sub(
+        subtractedValue,
+        'ERC20: decreased allowance below zero'
+      )
+    );
+    return true;
+  }
+
+  function _transfer(
+    address sender,
+    address recipient,
+    uint256 amount
+  ) internal virtual {
+    require(sender != address(0), 'ERC20: transfer from the zero address');
+    require(recipient != address(0), 'ERC20: transfer to the zero address');
+
+    _beforeTokenTransfer(sender, recipient, amount);
+
+    uint256 oldSenderBalance = _balances[sender];
+    _balances[sender] = oldSenderBalance.sub(amount, 'ERC20: transfer amount exceeds balance');
+    uint256 oldRecipientBalance = _balances[recipient];
+    _balances[recipient] = _balances[recipient].add(amount);
+
+    if (address(_incentivesController) != address(0)) {
+      uint256 totalSupply = _totalSupply;
+      _incentivesController.handleAction(sender, totalSupply, oldSenderBalance);
+      if (sender != recipient) {
+        _incentivesController.handleAction(recipient, totalSupply, oldRecipientBalance);
+      }
+    }
+  }
+
+  function _mint(address account, uint256 amount) internal virtual {
+    require(account != address(0), 'ERC20: mint to the zero address');
+
+    _beforeTokenTransfer(address(0), account, amount);
+
+    uint256 oldTotalSupply = _totalSupply;
+    _totalSupply = oldTotalSupply.add(amount);
+
+    uint256 oldAccountBalance = _balances[account];
+    _balances[account] = oldAccountBalance.add(amount);
+
+    if (address(_incentivesController) != address(0)) {
+      _incentivesController.handleAction(account, oldTotalSupply, oldAccountBalance);
+    }
+  }
+
+  function _burn(address account, uint256 amount) internal virtual {
+    require(account != address(0), 'ERC20: burn from the zero address');
+
+    _beforeTokenTransfer(account, address(0), amount);
+
+    uint256 oldTotalSupply = _totalSupply;
+    _totalSupply = oldTotalSupply.sub(amount);
+
+    uint256 oldAccountBalance = _balances[account];
+    _balances[account] = oldAccountBalance.sub(amount, 'ERC20: burn amount exceeds balance');
+
+    if (address(_incentivesController) != address(0)) {
+      _incentivesController.handleAction(account, oldTotalSupply, oldAccountBalance);
+    }
+  }
+
+  function _approve(
+    address owner,
+    address spender,
+    uint256 amount
+  ) internal virtual {
+    require(owner != address(0), 'ERC20: approve from the zero address');
+    require(spender != address(0), 'ERC20: approve to the zero address');
+
+    _allowances[owner][spender] = amount;
+    emit Approval(owner, spender, amount);
+  }
+
+  function _setName(string memory newName) internal {
+    _name = newName;
+  }
+
+  function _setSymbol(string memory newSymbol) internal {
+    _symbol = newSymbol;
+  }
+
+  function _setDecimals(uint8 newDecimals) internal {
+    _decimals = newDecimals;
+  }
+
+  function _beforeTokenTransfer(
+    address from,
+    address to,
+    uint256 amount
+  ) internal virtual {}
+}
+
+abstract contract DebtTokenBase is IncentivizedERC20, VersionedInitializable {
+  address internal immutable UNDERLYING_ASSET;
+  ILendingPool internal immutable POOL;
+  mapping(address => uint256) internal _usersData;
+
+  /**
+   * @dev Only lending pool can call functions marked by this modifier
+   **/
+  modifier onlyLendingPool {
+    require(msg.sender == address(POOL), Errors.CALLER_MUST_BE_LENDING_POOL);
+    _;
+  }
+
+  /**
+   * @dev The metadata of the token will be set on the proxy, that the reason of
+   * passing "NULL" and 0 as metadata
+   */
+  constructor(
+    address pool,
+    address underlyingAssetAddress,
+    string memory name,
+    string memory symbol,
+    address incentivesController
+  ) public IncentivizedERC20(name, symbol, 18, incentivesController) {
+    POOL = ILendingPool(pool);
+    UNDERLYING_ASSET = underlyingAssetAddress;
+  }
+
+  /**
+   * @dev Initializes the debt token.
+   * @param name The name of the token
+   * @param symbol The symbol of the token
+   * @param decimals The decimals of the token
+   */
+  function initialize(
+    uint8 decimals,
+    string memory name,
+    string memory symbol
+  ) public initializer {
+    _setName(name);
+    _setSymbol(symbol);
+    _setDecimals(decimals);
+  }
+
+  function underlyingAssetAddress() public view returns (address) {
+    return UNDERLYING_ASSET;
+  }
+
+  /**
+   * @dev Being non transferrable, the debt token does not implement any of the
+   * standard ERC20 functions for transfer and allowance.
+   **/
+  function transfer(address recipient, uint256 amount) public virtual override returns (bool) {
+    recipient;
+    amount;
+    revert('TRANSFER_NOT_SUPPORTED');
+  }
+
+  function allowance(address owner, address spender)
+    public
+    virtual
+    override
+    view
+    returns (uint256)
+  {
+    owner;
+    spender;
+    revert('ALLOWANCE_NOT_SUPPORTED');
+  }
+
+  function approve(address spender, uint256 amount) public virtual override returns (bool) {
+    spender;
+    amount;
+    revert('APPROVAL_NOT_SUPPORTED');
+  }
+
+  function transferFrom(
+    address sender,
+    address recipient,
+    uint256 amount
+  ) public virtual override returns (bool) {
+    sender;
+    recipient;
+    amount;
+    revert('TRANSFER_NOT_SUPPORTED');
+  }
+
+  function increaseAllowance(address spender, uint256 addedValue)
+    public
+    virtual
+    override
+    returns (bool)
+  {
+    spender;
+    addedValue;
+    revert('ALLOWANCE_NOT_SUPPORTED');
+  }
+
+  function decreaseAllowance(address spender, uint256 subtractedValue)
+    public
+    virtual
+    override
+    returns (bool)
+  {
+    spender;
+    subtractedValue;
+    revert('ALLOWANCE_NOT_SUPPORTED');
+  }
+}
+
+library UserConfiguration {
+  uint256 internal constant BORROWING_MASK = 0x5555555555555555555555555555555555555555555555555555555555555555;
+
+  struct Map {
+    uint256 data;
+  }
+
+  /**
+   * @dev sets if the user is borrowing the reserve identified by reserveIndex
+   * @param self the configuration object
+   * @param reserveIndex the index of the reserve in the bitmap
+   * @param borrowing true if the user is borrowing the reserve, false otherwise
+   **/
+  function setBorrowing(
+    UserConfiguration.Map storage self,
+    uint256 reserveIndex,
+    bool borrowing
+  ) internal {
+    self.data =
+      (self.data & ~(1 << (reserveIndex * 2))) |
+      (uint256(borrowing ? 1 : 0) << (reserveIndex * 2));
+  }
+
+  /**
+   * @dev sets if the user is using as collateral the reserve identified by reserveIndex
+   * @param self the configuration object
+   * @param reserveIndex the index of the reserve in the bitmap
+   * @param _usingAsCollateral true if the user is usin the reserve as collateral, false otherwise
+   **/
+  function setUsingAsCollateral(
+    UserConfiguration.Map storage self,
+    uint256 reserveIndex,
+    bool _usingAsCollateral
+  ) internal {
+    self.data =
+      (self.data & ~(1 << (reserveIndex * 2 + 1))) |
+      (uint256(_usingAsCollateral ? 1 : 0) << (reserveIndex * 2 + 1));
+  }
+
+  /**
+   * @dev used to validate if a user has been using the reserve for borrowing or as collateral
+   * @param self the configuration object
+   * @param reserveIndex the index of the reserve in the bitmap
+   * @return true if the user has been using a reserve for borrowing or as collateral, false otherwise
+   **/
+  function isUsingAsCollateralOrBorrowing(UserConfiguration.Map memory self, uint256 reserveIndex)
+    internal
+    pure
+    returns (bool)
+  {
+    return (self.data >> (reserveIndex * 2)) & 3 != 0;
+  }
+
+  /**
+   * @dev used to validate if a user has been using the reserve for borrowing
+   * @param self the configuration object
+   * @param reserveIndex the index of the reserve in the bitmap
+   * @return true if the user has been using a reserve for borrowing, false otherwise
+   **/
+  function isBorrowing(UserConfiguration.Map memory self, uint256 reserveIndex)
+    internal
+    pure
+    returns (bool)
+  {
+    return (self.data >> (reserveIndex * 2)) & 1 != 0;
+  }
+
+  /**
+   * @dev used to validate if a user has been using the reserve as collateral
+   * @param self the configuration object
+   * @param reserveIndex the index of the reserve in the bitmap
+   * @return true if the user has been using a reserve as collateral, false otherwise
+   **/
+  function isUsingAsCollateral(UserConfiguration.Map memory self, uint256 reserveIndex)
+    internal
+    pure
+    returns (bool)
+  {
+    return (self.data >> (reserveIndex * 2 + 1)) & 1 != 0;
+  }
+
+  /**
+   * @dev used to validate if a user has been borrowing from any reserve
+   * @param self the configuration object
+   * @return true if the user has been borrowing any reserve, false otherwise
+   **/
+  function isBorrowingAny(UserConfiguration.Map memory self) internal pure returns (bool) {
+    return self.data & BORROWING_MASK != 0;
+  }
+
+  /**
+   * @dev used to validate if a user has not been using any reserve
+   * @param self the configuration object
+   * @return true if the user has been borrowing any reserve, false otherwise
+   **/
+  function isEmpty(UserConfiguration.Map memory self) internal pure returns (bool) {
+    return self.data == 0;
+  }
+}
+
+library GenericLogic {
+  using ReserveLogic for ReserveLogic.ReserveData;
+  using SafeMath for uint256;
+  using WadRayMath for uint256;
+  using PercentageMath for uint256;
+  using ReserveConfiguration for ReserveConfiguration.Map;
+  using UserConfiguration for UserConfiguration.Map;
+
+  uint256 public constant HEALTH_FACTOR_LIQUIDATION_THRESHOLD = 1 ether;
+  uint256 public constant HEALTH_FACTOR_CRITICAL_THRESHOLD = 0.98 ether;
+
+  struct balanceDecreaseAllowedLocalVars {
+    uint256 decimals;
+    uint256 ltv;
+    uint256 collateralBalanceETH;
+    uint256 borrowBalanceETH;
+    uint256 currentLiquidationThreshold;
+    uint256 reserveLiquidationThreshold;
+    uint256 amountToDecreaseETH;
+    uint256 collateralBalancefterDecrease;
+    uint256 liquidationThresholdAfterDecrease;
+    uint256 healthFactorAfterDecrease;
+    bool reserveUsageAsCollateralEnabled;
+  }
+
+  /**
+   * @dev check if a specific balance decrease is allowed
+   * (i.e. doesn't bring the user borrow position health factor under HEALTH_FACTOR_LIQUIDATION_THRESHOLD)
+   * @param asset the address of the reserve
+   * @param user the address of the user
+   * @param amount the amount to decrease
+   * @param reservesData the data of all the reserves
+   * @param userConfig the user configuration
+   * @param reserves the list of all the active reserves
+   * @param oracle the address of the oracle contract
+   * @return true if the decrease of the balance is allowed
+   **/
+  function balanceDecreaseAllowed(
+    address asset,
+    address user,
+    uint256 amount,
+    mapping(address => ReserveLogic.ReserveData) storage reservesData,
+    UserConfiguration.Map calldata userConfig,
+    address[] calldata reserves,
+    address oracle
+  ) external view returns (bool) {
+    if (
+      !userConfig.isBorrowingAny() ||
+      !userConfig.isUsingAsCollateral(reservesData[asset].id)
+    ) {
+      return true;
+    }
+
+    balanceDecreaseAllowedLocalVars memory vars;
+
+    (vars.ltv, , , vars.decimals) = reservesData[asset].configuration.getParams();
+
+    if (vars.ltv == 0) {
+      return true; //if reserve is not used as collateral, no reasons to block the transfer
+    }
+
+    (
+      vars.collateralBalanceETH,
+      vars.borrowBalanceETH,
+      ,
+      vars.currentLiquidationThreshold,
+
+    ) = calculateUserAccountData(user, reservesData, userConfig, reserves, oracle);
+
+    if (vars.borrowBalanceETH == 0) {
+      return true; //no borrows - no reasons to block the transfer
+    }
+
+    vars.amountToDecreaseETH = IPriceOracleGetter(oracle).getAssetPrice(asset).mul(amount).div(
+      10**vars.decimals
+    );
+
+    vars.collateralBalancefterDecrease = vars.collateralBalanceETH.sub(vars.amountToDecreaseETH);
+
+    //if there is a borrow, there can't be 0 collateral
+    if (vars.collateralBalancefterDecrease == 0) {
+      return false;
+    }
+
+    vars.liquidationThresholdAfterDecrease = vars
+      .collateralBalanceETH
+      .mul(vars.currentLiquidationThreshold)
+      .sub(vars.amountToDecreaseETH.mul(vars.reserveLiquidationThreshold))
+      .div(vars.collateralBalancefterDecrease);
+
+    uint256 healthFactorAfterDecrease = calculateHealthFactorFromBalances(
+      vars.collateralBalancefterDecrease,
+      vars.borrowBalanceETH,
+      vars.liquidationThresholdAfterDecrease
+    );
+
+    return healthFactorAfterDecrease > GenericLogic.HEALTH_FACTOR_LIQUIDATION_THRESHOLD;
+  }
+
+  struct CalculateUserAccountDataVars {
+    uint256 reserveUnitPrice;
+    uint256 tokenUnit;
+    uint256 compoundedLiquidityBalance;
+    uint256 compoundedBorrowBalance;
+    uint256 decimals;
+    uint256 ltv;
+    uint256 liquidationThreshold;
+    uint256 i;
+    uint256 healthFactor;
+    uint256 totalCollateralBalanceETH;
+    uint256 totalBorrowBalanceETH;
+    uint256 totalFeesETH;
+    uint256 avgLtv;
+    uint256 avgLiquidationThreshold;
+    uint256 reservesLength;
+    bool healthFactorBelowThreshold;
+    address currentReserveAddress;
+    bool usageAsCollateralEnabled;
+    bool userUsesReserveAsCollateral;
+  }
+
+  /**
+   * @dev calculates the user data across the reserves.
+   * this includes the total liquidity/collateral/borrow balances in ETH,
+   * the average Loan To Value, the average Liquidation Ratio, and the Health factor.
+   * @param user the address of the user
+   * @param reservesData data of all the reserves
+   * @param userConfig the configuration of the user
+   * @param reserves the list of the available reserves
+   * @param oracle the price oracle address
+   * @return the total collateral and total borrow balance of the user in ETH, the avg ltv and liquidation threshold and the HF
+   * also the average Ltv, liquidation threshold, and the health factor
+   **/
+  function calculateUserAccountData(
+    address user,
+    mapping(address => ReserveLogic.ReserveData) storage reservesData,
+    UserConfiguration.Map memory userConfig,
+    address[] memory reserves,
+    address oracle
+  )
+    internal
+    view
+    returns (
+      uint256,
+      uint256,
+      uint256,
+      uint256,
+      uint256
+    )
+  {
+    CalculateUserAccountDataVars memory vars;
+
+    if (userConfig.isEmpty()) {
+      return (0, 0, 0, 0, uint256(-1));
+    }
+    for (vars.i = 0; vars.i < reserves.length; vars.i++) {
+      if (!userConfig.isUsingAsCollateralOrBorrowing(vars.i)) {
+        continue;
+      }
+
+      vars.currentReserveAddress = reserves[vars.i];
+      ReserveLogic.ReserveData storage currentReserve = reservesData[vars.currentReserveAddress];
+
+      (vars.ltv, vars.liquidationThreshold, , vars.decimals) = currentReserve
+        .configuration
+        .getParams();
+
+      vars.tokenUnit = 10**vars.decimals;
+      vars.reserveUnitPrice = IPriceOracleGetter(oracle).getAssetPrice(vars.currentReserveAddress);
+
+      if (vars.ltv != 0 && userConfig.isUsingAsCollateral(vars.i)) {
+        vars.compoundedLiquidityBalance = IERC20(currentReserve.aTokenAddress).balanceOf(user);
+
+        uint256 liquidityBalanceETH = vars
+          .reserveUnitPrice
+          .mul(vars.compoundedLiquidityBalance)
+          .div(vars.tokenUnit);
+
+        vars.totalCollateralBalanceETH = vars.totalCollateralBalanceETH.add(liquidityBalanceETH);
+
+        vars.avgLtv = vars.avgLtv.add(liquidityBalanceETH.mul(vars.ltv));
+        vars.avgLiquidationThreshold = vars.avgLiquidationThreshold.add(
+          liquidityBalanceETH.mul(vars.liquidationThreshold)
+        );
+      }
+
+      if (userConfig.isBorrowing(vars.i)) {
+        vars.compoundedBorrowBalance = IERC20(currentReserve.stableDebtTokenAddress).balanceOf(
+          user
+        );
+        vars.compoundedBorrowBalance = vars.compoundedBorrowBalance.add(
+          IERC20(currentReserve.variableDebtTokenAddress).balanceOf(user)
+        );
+
+        vars.totalBorrowBalanceETH = vars.totalBorrowBalanceETH.add(
+          vars.reserveUnitPrice.mul(vars.compoundedBorrowBalance).div(vars.tokenUnit)
+        );
+      }
+    }
+
+    vars.avgLtv = vars.totalCollateralBalanceETH > 0
+      ? vars.avgLtv.div(vars.totalCollateralBalanceETH)
+      : 0;
+    vars.avgLiquidationThreshold = vars.totalCollateralBalanceETH > 0
+      ? vars.avgLiquidationThreshold.div(vars.totalCollateralBalanceETH)
+      : 0;
+
+    vars.healthFactor = calculateHealthFactorFromBalances(
+      vars.totalCollateralBalanceETH,
+      vars.totalBorrowBalanceETH,
+      vars.avgLiquidationThreshold
+    );
+    return (
+      vars.totalCollateralBalanceETH,
+      vars.totalBorrowBalanceETH,
+      vars.avgLtv,
+      vars.avgLiquidationThreshold,
+      vars.healthFactor
+    );
+  }
+
+  /**
+   * @dev calculates the health factor from the corresponding balances
+   * @param collateralBalanceETH the total collateral balance in ETH
+   * @param borrowBalanceETH the total borrow balance in ETH
+   * @param liquidationThreshold the avg liquidation threshold
+   * @return the health factor calculated from the balances provided
+   **/
+  function calculateHealthFactorFromBalances(
+    uint256 collateralBalanceETH,
+    uint256 borrowBalanceETH,
+    uint256 liquidationThreshold
+  ) internal pure returns (uint256) {
+    if (borrowBalanceETH == 0) return uint256(-1);
+
+    return (collateralBalanceETH.percentMul(liquidationThreshold)).wadDiv(borrowBalanceETH);
+  }
+
+    /**
+   * @dev calculates the equivalent amount in ETH that an user can borrow, depending on the available collateral and the
+   * average Loan To Value.
+   * @param collateralBalanceETH the total collateral balance
+   * @param borrowBalanceETH the total borrow balance
+   * @param ltv the average loan to value
+   * @return the amount available to borrow in ETH for the user
+   **/
+
+  function calculateAvailableBorrowsETH(
+    uint256 collateralBalanceETH,
+    uint256 borrowBalanceETH,
+    uint256 ltv
+  ) internal pure returns (uint256) {
+    uint256 availableBorrowsETH = collateralBalanceETH.percentMul(ltv); //ltv is in percentage
+
+    if (availableBorrowsETH < borrowBalanceETH) {
+      return 0;
+    }
+
+    availableBorrowsETH = availableBorrowsETH.sub(borrowBalanceETH);
+    return availableBorrowsETH;
+  }
+}
+
+library Helpers {
+  /**
+   * @dev fetches the user current stable and variable debt balances
+   * @param user the user
+   * @param reserve the reserve object
+   * @return the stable and variable debt balance
+   **/
+  function getUserCurrentDebt(address user, ReserveLogic.ReserveData storage reserve)
+    internal
+    view
+    returns (uint256, uint256)
+  {
+    return (
+      DebtTokenBase(reserve.stableDebtTokenAddress).balanceOf(user),
+      DebtTokenBase(reserve.variableDebtTokenAddress).balanceOf(user)
+    );
+  }
+}
+
+interface ISwapAdapter {
+  /**
+   * @dev Swaps an `amountToSwap` of an asset to another, approving a `fundsDestination` to pull the funds
+   * @param assetToSwapFrom Origin asset
+   * @param assetToSwapTo Destination asset
+   * @param amountToSwap How much `assetToSwapFrom` needs to be swapped
+   * @param fundsDestination Address that will be pulling the swapped funds
+   * @param params Additional variadic field to include extra params
+   */
+  function executeOperation(
+    address assetToSwapFrom,
+    address assetToSwapTo,
+    uint256 amountToSwap,
+    address fundsDestination,
+    bytes calldata params
+  ) external;
+}
+
+library ValidationLogic {
+  using ReserveLogic for ReserveLogic.ReserveData;
+  using SafeMath for uint256;
+  using WadRayMath for uint256;
+  using PercentageMath for uint256;
+  using SafeERC20 for IERC20;
+  using ReserveConfiguration for ReserveConfiguration.Map;
+  using UserConfiguration for UserConfiguration.Map;
+
+  /**
+   * @dev validates a deposit.
+   * @param reserve the reserve state on which the user is depositing
+   * @param amount the amount to be deposited
+   */
+  function validateDeposit(ReserveLogic.ReserveData storage reserve, uint256 amount) external view {
+    (bool isActive, bool isFreezed, , ) = reserve.configuration.getFlags();
+
+    require(amount > 0, Errors.AMOUNT_NOT_GREATER_THAN_0);
+    require(isActive, Errors.NO_ACTIVE_RESERVE);
+    require(!isFreezed, Errors.NO_UNFREEZED_RESERVE);
+  }
+
+  /**
+   * @dev validates a withdraw action.
+   * @param reserveAddress the address of the reserve
+   * @param amount the amount to be withdrawn
+   * @param userBalance the balance of the user
+   */
+  function validateWithdraw(
+    address reserveAddress,
+    uint256 amount,
+    uint256 userBalance,
+    mapping(address => ReserveLogic.ReserveData) storage reservesData,
+    UserConfiguration.Map storage userConfig,
+    address[] calldata reserves,
+    address oracle
+  ) external view {
+    require(amount > 0, Errors.AMOUNT_NOT_GREATER_THAN_0);
+
+    require(amount <= userBalance, Errors.NOT_ENOUGH_AVAILABLE_USER_BALANCE);
+
+    require(
+      GenericLogic.balanceDecreaseAllowed(
+        reserveAddress,
+        msg.sender,
+        userBalance,
+        reservesData,
+        userConfig,
+        reserves,
+        oracle
+      ),
+      Errors.TRANSFER_NOT_ALLOWED
+    );
+  }
+
+  struct ValidateBorrowLocalVars {
+    uint256 principalBorrowBalance;
+    uint256 currentLtv;
+    uint256 currentLiquidationThreshold;
+    uint256 requestedBorrowAmountETH;
+    uint256 amountOfCollateralNeededETH;
+    uint256 userCollateralBalanceETH;
+    uint256 userBorrowBalanceETH;
+    uint256 borrowBalanceIncrease;
+    uint256 currentReserveStableRate;
+    uint256 availableLiquidity;
+    uint256 finalUserBorrowRate;
+    uint256 healthFactor;
+    ReserveLogic.InterestRateMode rateMode;
+    bool healthFactorBelowThreshold;
+    bool isActive;
+    bool isFreezed;
+    bool borrowingEnabled;
+    bool stableRateBorrowingEnabled;
+  }
+
+  /**
+   * @dev validates a borrow.
+   * @param reserve the reserve state from which the user is borrowing
+   * @param userAddress the address of the user
+   * @param amount the amount to be borrowed
+   * @param amountInETH the amount to be borrowed, in ETH
+   * @param interestRateMode the interest rate mode at which the user is borrowing
+   * @param maxStableLoanPercent the max amount of the liquidity that can be borrowed at stable rate, in percentage
+   * @param reservesData the state of all the reserves
+   * @param userConfig the state of the user for the specific reserve
+   * @param reserves the addresses of all the active reserves
+   * @param oracle the price oracle
+   */
+
+  function validateBorrow(
+    ReserveLogic.ReserveData storage reserve,
+    address userAddress,
+    uint256 amount,
+    uint256 amountInETH,
+    uint256 interestRateMode,
+    uint256 maxStableLoanPercent,
+    mapping(address => ReserveLogic.ReserveData) storage reservesData,
+    UserConfiguration.Map storage userConfig,
+    address[] calldata reserves,
+    address oracle
+  ) external view {
+    ValidateBorrowLocalVars memory vars;
+
+    (
+      vars.isActive,
+      vars.isFreezed,
+      vars.borrowingEnabled,
+      vars.stableRateBorrowingEnabled
+    ) = reserve.configuration.getFlags();
+
+    require(vars.isActive, Errors.NO_ACTIVE_RESERVE);
+    require(!vars.isFreezed, Errors.NO_UNFREEZED_RESERVE);
+
+    require(vars.borrowingEnabled, Errors.BORROWING_NOT_ENABLED);
+
+    //validate interest rate mode
+    require(
+      uint256(ReserveLogic.InterestRateMode.VARIABLE) == interestRateMode ||
+        uint256(ReserveLogic.InterestRateMode.STABLE) == interestRateMode,
+      Errors.INVALID_INTEREST_RATE_MODE_SELECTED
+    );
+
+    (
+      vars.userCollateralBalanceETH,
+      vars.userBorrowBalanceETH,
+      vars.currentLtv,
+      vars.currentLiquidationThreshold,
+      vars.healthFactor
+    ) = GenericLogic.calculateUserAccountData(
+      userAddress,
+      reservesData,
+      userConfig,
+      reserves,
+      oracle
+    );
+
+    require(vars.userCollateralBalanceETH > 0, Errors.COLLATERAL_BALANCE_IS_0);
+
+    require(
+      vars.healthFactor > GenericLogic.HEALTH_FACTOR_LIQUIDATION_THRESHOLD,
+      Errors.HEALTH_FACTOR_LOWER_THAN_LIQUIDATION_THRESHOLD
+    );
+
+    //add the current already borrowed amount to the amount requested to calculate the total collateral needed.
+    vars.amountOfCollateralNeededETH = vars.userBorrowBalanceETH.add(amountInETH).percentDiv(
+      vars.currentLtv
+    ); //LTV is calculated in percentage
+
+    require(
+      vars.amountOfCollateralNeededETH <= vars.userCollateralBalanceETH,
+      Errors.COLLATERAL_CANNOT_COVER_NEW_BORROW
+    );
+
+    /**
+     * Following conditions need to be met if the user is borrowing at a stable rate:
+     * 1. Reserve must be enabled for stable rate borrowing
+     * 2. Users cannot borrow from the reserve if their collateral is (mostly) the same currency
+     *    they are borrowing, to prevent abuses.
+     * 3. Users will be able to borrow only a relatively small, configurable amount of the total
+     *    liquidity
+     **/
+
+    if (vars.rateMode == ReserveLogic.InterestRateMode.STABLE) {
+      //check if the borrow mode is stable and if stable rate borrowing is enabled on this reserve
+
+      require(vars.stableRateBorrowingEnabled, Errors.STABLE_BORROWING_NOT_ENABLED);
+
+      require(
+        !userConfig.isUsingAsCollateral(reserve.id) ||
+          reserve.configuration.getLtv() == 0 ||
+          amount > IERC20(reserve.aTokenAddress).balanceOf(userAddress),
+        Errors.CALLATERAL_SAME_AS_BORROWING_CURRENCY
+      );
+
+      //calculate the max available loan size in stable rate mode as a percentage of the
+      //available liquidity
+      uint256 maxLoanSizeStable = vars.availableLiquidity.percentMul(maxStableLoanPercent);
+
+      require(amount <= maxLoanSizeStable, Errors.AMOUNT_BIGGER_THAN_MAX_LOAN_SIZE_STABLE);
+    }
+  }
+
+  /**
+   * @dev validates a repay.
+   * @param reserve the reserve state from which the user is repaying
+   * @param amountSent the amount sent for the repayment. Can be an actual value or uint(-1)
+   * @param onBehalfOf the address of the user msg.sender is repaying for
+   * @param stableDebt the borrow balance of the user
+   * @param variableDebt the borrow balance of the user
+   */
+  function validateRepay(
+    ReserveLogic.ReserveData storage reserve,
+    uint256 amountSent,
+    ReserveLogic.InterestRateMode rateMode,
+    address onBehalfOf,
+    uint256 stableDebt,
+    uint256 variableDebt
+  ) external view {
+    bool isActive = reserve.configuration.getActive();
+
+    require(isActive, Errors.NO_ACTIVE_RESERVE);
+
+    require(amountSent > 0, Errors.AMOUNT_NOT_GREATER_THAN_0);
+
+    require(
+      (stableDebt > 0 &&
+        ReserveLogic.InterestRateMode(rateMode) == ReserveLogic.InterestRateMode.STABLE) ||
+        (variableDebt > 0 &&
+          ReserveLogic.InterestRateMode(rateMode) == ReserveLogic.InterestRateMode.VARIABLE),
+      Errors.NO_DEBT_OF_SELECTED_TYPE
+    );
+
+    require(
+      amountSent != uint256(-1) || msg.sender == onBehalfOf,
+      Errors.NO_EXPLICIT_AMOUNT_TO_REPAY_ON_BEHALF
+    );
+  }
+
+  /**
+   * @dev validates a swap of borrow rate mode.
+   * @param reserve the reserve state on which the user is swapping the rate
+   * @param userConfig the user reserves configuration
+   * @param stableBorrowBalance the stable borrow balance of the user
+   * @param variableBorrowBalance the stable borrow balance of the user
+   * @param currentRateMode the rate mode of the borrow
+   */
+  function validateSwapRateMode(
+    ReserveLogic.ReserveData storage reserve,
+    UserConfiguration.Map storage userConfig,
+    uint256 stableBorrowBalance,
+    uint256 variableBorrowBalance,
+    ReserveLogic.InterestRateMode currentRateMode
+  ) external view {
+    (bool isActive, bool isFreezed, , bool stableRateEnabled) = reserve.configuration.getFlags();
+
+    require(isActive, Errors.NO_ACTIVE_RESERVE);
+    require(!isFreezed, Errors.NO_UNFREEZED_RESERVE);
+
+    if (currentRateMode == ReserveLogic.InterestRateMode.STABLE) {
+      require(stableBorrowBalance > 0, Errors.NO_STABLE_RATE_LOAN_IN_RESERVE);
+    } else if (currentRateMode == ReserveLogic.InterestRateMode.VARIABLE) {
+      require(variableBorrowBalance > 0, Errors.NO_VARIABLE_RATE_LOAN_IN_RESERVE);
+      /**
+       * user wants to swap to stable, before swapping we need to ensure that
+       * 1. stable borrow rate is enabled on the reserve
+       * 2. user is not trying to abuse the reserve by depositing
+       * more collateral than he is borrowing, artificially lowering
+       * the interest rate, borrowing at variable, and switching to stable
+       **/
+      require(stableRateEnabled, Errors.STABLE_BORROWING_NOT_ENABLED);
+
+      require(
+        !userConfig.isUsingAsCollateral(reserve.id) ||
+          reserve.configuration.getLtv() == 0 ||
+          stableBorrowBalance.add(variableBorrowBalance) >
+          IERC20(reserve.aTokenAddress).balanceOf(msg.sender),
+        Errors.CALLATERAL_SAME_AS_BORROWING_CURRENCY
+      );
+    } else {
+      revert(Errors.INVALID_INTEREST_RATE_MODE_SELECTED);
+    }
+  }
+
+  /**
+   * @dev validates the choice of a user of setting (or not) an asset as collateral
+   * @param reserve the state of the reserve that the user is enabling or disabling as collateral
+   * @param reserveAddress the address of the reserve
+   * @param reservesData the data of all the reserves
+   * @param userConfig the state of the user for the specific reserve
+   * @param reserves the addresses of all the active reserves
+   * @param oracle the price oracle
+   */
+  function validateSetUseReserveAsCollateral(
+    ReserveLogic.ReserveData storage reserve,
+    address reserveAddress,
+    mapping(address => ReserveLogic.ReserveData) storage reservesData,
+    UserConfiguration.Map storage userConfig,
+    address[] calldata reserves,
+    address oracle
+  ) external view {
+    uint256 underlyingBalance = IERC20(reserve.aTokenAddress).balanceOf(msg.sender);
+
+    require(underlyingBalance > 0, Errors.UNDERLYING_BALANCE_NOT_GREATER_THAN_0);
+
+    require(
+      GenericLogic.balanceDecreaseAllowed(
+        reserveAddress,
+        msg.sender,
+        underlyingBalance,
+        reservesData,
+        userConfig,
+        reserves,
+        oracle
+      ),
+      Errors.DEPOSIT_ALREADY_IN_USE
+    );
+  }
+
+  /**
+   * @dev validates a flashloan action
+   * @param mode the flashloan mode (0 = classic flashloan, 1 = open a stable rate loan, 2 = open a variable rate loan)
+   * @param premium the premium paid on the flashloan
+   **/
+  function validateFlashloan(uint256 mode, uint256 premium) internal pure {
+    require(premium > 0, Errors.REQUESTED_AMOUNT_TOO_SMALL);
+    require(mode <= uint256(ReserveLogic.InterestRateMode.VARIABLE), Errors.INVALID_FLASHLOAN_MODE);
+  }
+
+  /**
+   * @dev Validates the liquidationCall() action
+   * @param collateralReserve The reserve data of the collateral
+   * @param principalReserve The reserve data of the principal
+   * @param userConfig The user configuration
+   * @param userHealthFactor The user's health factor
+   * @param userStableDebt Total stable debt balance of the user
+   * @param userVariableDebt Total variable debt balance of the user
+   **/
+  function validateLiquidationCall(
+    ReserveLogic.ReserveData storage collateralReserve,
+    ReserveLogic.ReserveData storage principalReserve,
+    UserConfiguration.Map storage userConfig,
+    uint256 userHealthFactor,
+    uint256 userStableDebt,
+    uint256 userVariableDebt
+  ) internal view returns (uint256, string memory) {
+    if (
+      !collateralReserve.configuration.getActive() || !principalReserve.configuration.getActive()
+    ) {
+      return (uint256(Errors.CollateralManagerErrors.NO_ACTIVE_RESERVE), Errors.NO_ACTIVE_RESERVE);
+    }
+
+    if (userHealthFactor >= GenericLogic.HEALTH_FACTOR_LIQUIDATION_THRESHOLD) {
+      return (
+        uint256(Errors.CollateralManagerErrors.HEALTH_FACTOR_ABOVE_THRESHOLD),
+        Errors.HEALTH_FACTOR_NOT_BELOW_THRESHOLD
+      );
+    }
+
+    bool isCollateralEnabled = collateralReserve.configuration.getLiquidationThreshold() > 0 &&
+      userConfig.isUsingAsCollateral(collateralReserve.id);
+
+    //if collateral isn't enabled as collateral by user, it cannot be liquidated
+    if (!isCollateralEnabled) {
+      return (
+        uint256(Errors.CollateralManagerErrors.COLLATERAL_CANNOT_BE_LIQUIDATED),
+        Errors.COLLATERAL_CANNOT_BE_LIQUIDATED
+      );
+    }
+
+    if (userStableDebt == 0 && userVariableDebt == 0) {
+      return (
+        uint256(Errors.CollateralManagerErrors.CURRRENCY_NOT_BORROWED),
+        Errors.SPECIFIED_CURRENCY_NOT_BORROWED_BY_USER
+      );
+    }
+
+    return (uint256(Errors.CollateralManagerErrors.NO_ERROR), Errors.NO_ERRORS);
+  }
+
+  /**
+   * @dev Validates the repayWithCollateral() action
+   * @param collateralReserve The reserve data of the collateral
+   * @param principalReserve The reserve data of the principal
+   * @param userConfig The user configuration
+   * @param user The address of the user
+   * @param userHealthFactor The user's health factor
+   * @param userStableDebt Total stable debt balance of the user
+   * @param userVariableDebt Total variable debt balance of the user
+   **/
+  function validateRepayWithCollateral(
+    ReserveLogic.ReserveData storage collateralReserve,
+    ReserveLogic.ReserveData storage principalReserve,
+    UserConfiguration.Map storage userConfig,
+    address user,
+    uint256 userHealthFactor,
+    uint256 userStableDebt,
+    uint256 userVariableDebt
+  ) internal view returns (uint256, string memory) {
+    if (
+      !collateralReserve.configuration.getActive() || !principalReserve.configuration.getActive()
+    ) {
+      return (uint256(Errors.CollateralManagerErrors.NO_ACTIVE_RESERVE), Errors.NO_ACTIVE_RESERVE);
+    }
+
+    if (
+      msg.sender != user && userHealthFactor >= GenericLogic.HEALTH_FACTOR_LIQUIDATION_THRESHOLD
+    ) {
+      return (
+        uint256(Errors.CollateralManagerErrors.HEALTH_FACTOR_ABOVE_THRESHOLD),
+        Errors.HEALTH_FACTOR_NOT_BELOW_THRESHOLD
+      );
+    }
+
+    if (msg.sender != user) {
+      bool isCollateralEnabled = collateralReserve.configuration.getLiquidationThreshold() > 0 &&
+        userConfig.isUsingAsCollateral(collateralReserve.id);
+
+      //if collateral isn't enabled as collateral by user, it cannot be liquidated
+      if (!isCollateralEnabled) {
+        return (
+          uint256(Errors.CollateralManagerErrors.COLLATERAL_CANNOT_BE_LIQUIDATED),
+          Errors.COLLATERAL_CANNOT_BE_LIQUIDATED
+        );
+      }
+    }
+
+    if (userStableDebt == 0 && userVariableDebt == 0) {
+      return (
+        uint256(Errors.CollateralManagerErrors.CURRRENCY_NOT_BORROWED),
+        Errors.SPECIFIED_CURRENCY_NOT_BORROWED_BY_USER
+      );
+    }
+
+    return (uint256(Errors.CollateralManagerErrors.NO_ERROR), Errors.NO_ERRORS);
+  }
+
+  /**
+   * @dev Validates the swapLiquidity() action
+   * @param fromReserve The reserve data of the asset to swap from
+   * @param toReserve The reserve data of the asset to swap to
+   * @param fromAsset Address of the asset to swap from
+   * @param toAsset Address of the asset to swap to
+   **/
+  function validateSwapLiquidity(
+    ReserveLogic.ReserveData storage fromReserve,
+    ReserveLogic.ReserveData storage toReserve,
+    address fromAsset,
+    address toAsset
+  ) internal view returns (uint256, string memory) {
+    if (fromAsset == toAsset) {
+      return (
+        uint256(Errors.CollateralManagerErrors.INVALID_EQUAL_ASSETS_TO_SWAP),
+        Errors.INVALID_EQUAL_ASSETS_TO_SWAP
+      );
+    }
+
+    (bool isToActive, bool isToFreezed, , ) = toReserve.configuration.getFlags();
+    if (!fromReserve.configuration.getActive() || !isToActive) {
+      return (uint256(Errors.CollateralManagerErrors.NO_ACTIVE_RESERVE), Errors.NO_ACTIVE_RESERVE);
+    }
+    if (isToFreezed) {
+      return (
+        uint256(Errors.CollateralManagerErrors.NO_UNFREEZED_RESERVE),
+        Errors.NO_UNFREEZED_RESERVE
+      );
+    }
+
+    return (uint256(Errors.CollateralManagerErrors.NO_ERROR), Errors.NO_ERRORS);
+  }
+}
+
+contract LendingPoolStorage {
+  using ReserveLogic for ReserveLogic.ReserveData;
+  using ReserveConfiguration for ReserveConfiguration.Map;
+  using UserConfiguration for UserConfiguration.Map;
+
+  ILendingPoolAddressesProvider internal _addressesProvider;
+
+  mapping(address => ReserveLogic.ReserveData) internal _reserves;
+  mapping(address => UserConfiguration.Map) internal _usersConfig;
+  // debt token address => user who gives allowance => user who receives allowance => amount
+  mapping(address => mapping(address => mapping(address => uint256))) internal _borrowAllowance;
+
+  address[] internal _reservesList;
+
+  bool internal _flashLiquidationLocked;
+  bool internal _paused;
+
+  /**
+   * @dev returns the list of the initialized reserves
+   **/
+  function getReservesList() external view returns (address[] memory) {
+    return _reservesList;
+  }
+
+  /**
+   * @dev returns the addresses provider
+   **/
+  function getAddressesProvider() external view returns (ILendingPoolAddressesProvider) {
+    return _addressesProvider;
+  }
+}
+
+/**
+ * @title LendingPoolCollateralManager contract
+ * @author Aave
+ * @notice Implements actions involving management of collateral in the protocol.
+ * @notice this contract will be ran always through delegatecall
+ * @dev LendingPoolCollateralManager inherits VersionedInitializable from OpenZeppelin to have the same storage layout as LendingPool
+ **/
+contract LendingPoolCollateralManager is VersionedInitializable, LendingPoolStorage {
+  using SafeERC20 for IERC20;
+  using SafeMath for uint256;
+  using WadRayMath for uint256;
+  using PercentageMath for uint256;
+
+  // IMPORTANT The storage layout of the LendingPool is reproduced here because this contract
+  // is gonna be used through DELEGATECALL
+
+  uint256 internal constant LIQUIDATION_CLOSE_FACTOR_PERCENT = 5000;
+
+  /**
+   * @dev emitted when a borrower is liquidated
+   * @param collateral the address of the collateral being liquidated
+   * @param principal the address of the reserve
+   * @param user the address of the user being liquidated
+   * @param purchaseAmount the total amount liquidated
+   * @param liquidatedCollateralAmount the amount of collateral being liquidated
+   * @param liquidator the address of the liquidator
+   * @param receiveAToken true if the liquidator wants to receive aTokens, false otherwise
+   **/
+  event LiquidationCall(
+    address indexed collateral,
+    address indexed principal,
+    address indexed user,
+    uint256 purchaseAmount,
+    uint256 liquidatedCollateralAmount,
+    address liquidator,
+    bool receiveAToken
+  );
+
+  /**
+    @dev emitted when a borrower/liquidator repays with the borrower's collateral
+    @param collateral the address of the collateral being swapped to repay
+    @param principal the address of the reserve of the debt
+    @param user the borrower's address
+    @param liquidator the address of the liquidator, same as the one of the borrower on self-repayment
+    @param principalAmount the amount of the debt finally covered
+    @param swappedCollateralAmount the amount of collateral finally swapped
+  */
+  event RepaidWithCollateral(
+    address indexed collateral,
+    address indexed principal,
+    address indexed user,
+    address liquidator,
+    uint256 principalAmount,
+    uint256 swappedCollateralAmount
+  );
+
+  struct LiquidationCallLocalVars {
+    uint256 userCollateralBalance;
+    uint256 userStableDebt;
+    uint256 userVariableDebt;
+    uint256 maxPrincipalAmountToLiquidate;
+    uint256 actualAmountToLiquidate;
+    uint256 liquidationRatio;
+    uint256 maxAmountCollateralToLiquidate;
+    ReserveLogic.InterestRateMode borrowRateMode;
+    uint256 userStableRate;
+    uint256 maxCollateralToLiquidate;
+    uint256 principalAmountNeeded;
+    uint256 healthFactor;
+    IAToken collateralAtoken;
+    bool isCollateralEnabled;
+    address principalAToken;
+    uint256 errorCode;
+    string errorMsg;
+  }
+
+  struct SwapLiquidityLocalVars {
+    uint256 healthFactor;
+    uint256 amountToReceive;
+    uint256 userBalanceBefore;
+    IAToken fromReserveAToken;
+    IAToken toReserveAToken;
+    uint256 errorCode;
+    string errorMsg;
+  }
+
+  struct AvailableCollateralToLiquidateLocalVars {
+    uint256 userCompoundedBorrowBalance;
+    uint256 liquidationBonus;
+    uint256 collateralPrice;
+    uint256 principalCurrencyPrice;
+    uint256 maxAmountCollateralToLiquidate;
+    uint256 principalDecimals;
+    uint256 collateralDecimals;
+  }
+
+  /**
+   * @dev as the contract extends the VersionedInitializable contract to match the state
+   * of the LendingPool contract, the getRevision() function is needed.
+   */
+  function getRevision() internal override pure returns (uint256) {
+    return 0;
+  }
+
+  /**
+   * @dev users can invoke this function to liquidate an undercollateralized position.
+   * @param collateral the address of the collateral to liquidated
+   * @param principal the address of the principal reserve
+   * @param user the address of the borrower
+   * @param purchaseAmount the amount of principal that the liquidator wants to repay
+   * @param receiveAToken true if the liquidators wants to receive the aTokens, false if
+   * he wants to receive the underlying asset directly
+   **/
+  function liquidationCall(
+    address collateral,
+    address principal,
+    address user,
+    uint256 purchaseAmount,
+    bool receiveAToken
+  ) external returns (uint256, string memory) {
+    ReserveLogic.ReserveData storage collateralReserve = _reserves[collateral];
+    ReserveLogic.ReserveData storage principalReserve = _reserves[principal];
+    UserConfiguration.Map storage userConfig = _usersConfig[user];
+
+    LiquidationCallLocalVars memory vars;
+
+    (, , , , vars.healthFactor) = GenericLogic.calculateUserAccountData(
+      user,
+      _reserves,
+      _usersConfig[user],
+      _reservesList,
+      _addressesProvider.getPriceOracle()
+    );
+
+    //if the user hasn't borrowed the specific currency defined by asset, it cannot be liquidated
+    (vars.userStableDebt, vars.userVariableDebt) = Helpers.getUserCurrentDebt(
+      user,
+      principalReserve
+    );
+
+    (vars.errorCode, vars.errorMsg) = ValidationLogic.validateLiquidationCall(
+      collateralReserve,
+      principalReserve,
+      userConfig,
+      vars.healthFactor,
+      vars.userStableDebt,
+      vars.userVariableDebt
+    );
+
+    if (Errors.CollateralManagerErrors(vars.errorCode) != Errors.CollateralManagerErrors.NO_ERROR) {
+      return (vars.errorCode, vars.errorMsg);
+    }
+
+    vars.collateralAtoken = IAToken(collateralReserve.aTokenAddress);
+
+    vars.userCollateralBalance = vars.collateralAtoken.balanceOf(user);
+
+    vars.maxPrincipalAmountToLiquidate = vars.userStableDebt.add(vars.userVariableDebt).percentMul(
+      LIQUIDATION_CLOSE_FACTOR_PERCENT
+    );
+
+    vars.actualAmountToLiquidate = purchaseAmount > vars.maxPrincipalAmountToLiquidate
+      ? vars.maxPrincipalAmountToLiquidate
+      : purchaseAmount;
+
+    (
+      vars.maxCollateralToLiquidate,
+      vars.principalAmountNeeded
+    ) = calculateAvailableCollateralToLiquidate(
+      collateralReserve,
+      principalReserve,
+      collateral,
+      principal,
+      vars.actualAmountToLiquidate,
+      vars.userCollateralBalance
+    );
+
+    //if principalAmountNeeded < vars.ActualAmountToLiquidate, there isn't enough
+    //of collateral to cover the actual amount that is being liquidated, hence we liquidate
+    //a smaller amount
+
+    if (vars.principalAmountNeeded < vars.actualAmountToLiquidate) {
+      vars.actualAmountToLiquidate = vars.principalAmountNeeded;
+    }
+
+    //if liquidator reclaims the underlying asset, we make sure there is enough available collateral in the reserve
+    if (!receiveAToken) {
+      uint256 currentAvailableCollateral = IERC20(collateral).balanceOf(
+        address(vars.collateralAtoken)
+      );
+      if (currentAvailableCollateral < vars.maxCollateralToLiquidate) {
+        return (
+          uint256(Errors.CollateralManagerErrors.NOT_ENOUGH_LIQUIDITY),
+          Errors.NOT_ENOUGH_LIQUIDITY_TO_LIQUIDATE
+        );
+      }
+    }
+
+    //update the principal reserve
+    principalReserve.updateState();
+
+    principalReserve.updateInterestRates(
+      principal,
+      principalReserve.aTokenAddress,
+      vars.actualAmountToLiquidate,
+      0
+    );
+
+    if (vars.userVariableDebt >= vars.actualAmountToLiquidate) {
+      IVariableDebtToken(principalReserve.variableDebtTokenAddress).burn(
+        user,
+        vars.actualAmountToLiquidate,
+        principalReserve.variableBorrowIndex
+      );
+    } else {
+      IVariableDebtToken(principalReserve.variableDebtTokenAddress).burn(
+        user,
+        vars.userVariableDebt,
+        principalReserve.variableBorrowIndex
+      );
+
+      IStableDebtToken(principalReserve.stableDebtTokenAddress).burn(
+        user,
+        vars.actualAmountToLiquidate.sub(vars.userVariableDebt)
+      );
+    }
+
+    //if liquidator reclaims the aToken, he receives the equivalent atoken amount
+    if (receiveAToken) {
+      vars.collateralAtoken.transferOnLiquidation(user, msg.sender, vars.maxCollateralToLiquidate);
+    } else {
+      //otherwise receives the underlying asset
+
+      //updating collateral reserve
+      collateralReserve.updateState();
+      collateralReserve.updateInterestRates(
+        collateral,
+        address(vars.collateralAtoken),
+        0,
+        vars.maxCollateralToLiquidate
+      );
+
+      //burn the equivalent amount of atoken
+      vars.collateralAtoken.burn(
+        user,
+        msg.sender,
+        vars.maxCollateralToLiquidate,
+        collateralReserve.liquidityIndex
+      );
+    }
+
+    //transfers the principal currency to the aToken
+    IERC20(principal).safeTransferFrom(
+      msg.sender,
+      principalReserve.aTokenAddress,
+      vars.actualAmountToLiquidate
+    );
+
+    emit LiquidationCall(
+      collateral,
+      principal,
+      user,
+      vars.actualAmountToLiquidate,
+      vars.maxCollateralToLiquidate,
+      msg.sender,
+      receiveAToken
+    );
+
+    return (uint256(Errors.CollateralManagerErrors.NO_ERROR), Errors.NO_ERRORS);
+  }
+
+  /**
+   * @dev flashes the underlying collateral on an user to swap for the owed asset and repay
+   * - Both the owner of the position and other liquidators can execute it.
+   * - The owner can repay with his collateral at any point, no matter the health factor.
+   * - Other liquidators can only use this function below 1 HF. To liquidate 50% of the debt > HF 0.98 or the whole below.
+   * @param collateral The address of the collateral asset.
+   * @param principal The address of the owed asset.
+   * @param user Address of the borrower.
+   * @param principalAmount Amount of the debt to repay.
+   * @param receiver Address of the contract receiving the collateral to swap.
+   * @param params Variadic bytes param to pass with extra information to the receiver
+   **/
+  function repayWithCollateral(
+    address collateral,
+    address principal,
+    address user,
+    uint256 principalAmount,
+    address receiver,
+    bytes calldata params
+  ) external returns (uint256, string memory) {
+    ReserveLogic.ReserveData storage collateralReserve = _reserves[collateral];
+    ReserveLogic.ReserveData storage debtReserve = _reserves[principal];
+    UserConfiguration.Map storage userConfig = _usersConfig[user];
+
+    LiquidationCallLocalVars memory vars;
+
+    (, , , , vars.healthFactor) = GenericLogic.calculateUserAccountData(
+      user,
+      _reserves,
+      _usersConfig[user],
+      _reservesList,
+      _addressesProvider.getPriceOracle()
+    );
+
+    (vars.userStableDebt, vars.userVariableDebt) = Helpers.getUserCurrentDebt(user, debtReserve);
+
+    (vars.errorCode, vars.errorMsg) = ValidationLogic.validateRepayWithCollateral(
+      collateralReserve,
+      debtReserve,
+      userConfig,
+      user,
+      vars.healthFactor,
+      vars.userStableDebt,
+      vars.userVariableDebt
+    );
+
+    if (Errors.CollateralManagerErrors(vars.errorCode) != Errors.CollateralManagerErrors.NO_ERROR) {
+      return (vars.errorCode, vars.errorMsg);
+    }
+
+    vars.maxPrincipalAmountToLiquidate = vars.userStableDebt.add(vars.userVariableDebt);
+
+    vars.actualAmountToLiquidate = principalAmount > vars.maxPrincipalAmountToLiquidate
+      ? vars.maxPrincipalAmountToLiquidate
+      : principalAmount;
+
+    vars.collateralAtoken = IAToken(collateralReserve.aTokenAddress);
+    vars.userCollateralBalance = vars.collateralAtoken.balanceOf(user);
+
+    (
+      vars.maxCollateralToLiquidate,
+      vars.principalAmountNeeded
+    ) = calculateAvailableCollateralToLiquidate(
+      collateralReserve,
+      debtReserve,
+      collateral,
+      principal,
+      vars.actualAmountToLiquidate,
+      vars.userCollateralBalance
+    );
+
+    //if principalAmountNeeded < vars.ActualAmountToLiquidate, there isn't enough
+    //of collateral to cover the actual amount that is being liquidated, hence we liquidate
+    //a smaller amount
+    if (vars.principalAmountNeeded < vars.actualAmountToLiquidate) {
+      vars.actualAmountToLiquidate = vars.principalAmountNeeded;
+    }
+    //updating collateral reserve indexes
+    collateralReserve.updateState();
+
+    vars.collateralAtoken.burn(
+      user,
+      receiver,
+      vars.maxCollateralToLiquidate,
+      collateralReserve.liquidityIndex
+    );
+
+    if (vars.userCollateralBalance == vars.maxCollateralToLiquidate) {
+      _usersConfig[user].setUsingAsCollateral(collateralReserve.id, false);
+    }
+
+    vars.principalAToken = debtReserve.aTokenAddress;
+
+    // Notifies the receiver to proceed, sending as param the underlying already transferred
+    ISwapAdapter(receiver).executeOperation(
+      collateral,
+      principal,
+      vars.maxCollateralToLiquidate,
+      address(this),
+      params
+    );
+
+    //updating debt reserve
+    debtReserve.updateState();
+    debtReserve.updateInterestRates(
+      principal,
+      vars.principalAToken,
+      vars.actualAmountToLiquidate,
+      0
+    );
+    IERC20(principal).transferFrom(receiver, vars.principalAToken, vars.actualAmountToLiquidate);
+
+    if (vars.userVariableDebt >= vars.actualAmountToLiquidate) {
+      IVariableDebtToken(debtReserve.variableDebtTokenAddress).burn(
+        user,
+        vars.actualAmountToLiquidate,
+        debtReserve.variableBorrowIndex
+      );
+    } else {
+      IVariableDebtToken(debtReserve.variableDebtTokenAddress).burn(
+        user,
+        vars.userVariableDebt,
+        debtReserve.variableBorrowIndex
+      );
+      IStableDebtToken(debtReserve.stableDebtTokenAddress).burn(
+        user,
+        vars.actualAmountToLiquidate.sub(vars.userVariableDebt)
+      );
+    }
+
+    //updating collateral reserve
+    collateralReserve.updateInterestRates(
+      collateral,
+      address(vars.collateralAtoken),
+      0,
+      vars.maxCollateralToLiquidate
+    );
+
+    emit RepaidWithCollateral(
+      collateral,
+      principal,
+      user,
+      msg.sender,
+      vars.actualAmountToLiquidate,
+      vars.maxCollateralToLiquidate
+    );
+
+    return (uint256(Errors.CollateralManagerErrors.NO_ERROR), Errors.NO_ERRORS);
+  }
+
+  /**
+   * @dev Allows an user to release one of his assets deposited in the protocol, even if it is used as collateral, to swap for another.
+   * - It's not possible to release one asset to swap for the same
+   * @param receiverAddress The address of the contract receiving the funds. The receiver should implement the ISwapAdapter interface
+   * @param fromAsset Asset to swap from
+   * @param toAsset Asset to swap to
+   * @param params a bytes array to be sent (if needed) to the receiver contract with extra data
+   **/
+  function swapLiquidity(
+    address receiverAddress,
+    address fromAsset,
+    address toAsset,
+    uint256 amountToSwap,
+    bytes calldata params
+  ) external returns (uint256, string memory) {
+    ReserveLogic.ReserveData storage fromReserve = _reserves[fromAsset];
+    ReserveLogic.ReserveData storage toReserve = _reserves[toAsset];
+
+    SwapLiquidityLocalVars memory vars;
+
+    (vars.errorCode, vars.errorMsg) = ValidationLogic.validateSwapLiquidity(
+      fromReserve,
+      toReserve,
+      fromAsset,
+      toAsset
+    );
+
+    if (Errors.CollateralManagerErrors(vars.errorCode) != Errors.CollateralManagerErrors.NO_ERROR) {
+      return (vars.errorCode, vars.errorMsg);
+    }
+
+    vars.fromReserveAToken = IAToken(fromReserve.aTokenAddress);
+    vars.toReserveAToken = IAToken(toReserve.aTokenAddress);
+
+    fromReserve.updateState();
+    toReserve.updateState();
+
+    if (vars.fromReserveAToken.balanceOf(msg.sender) == amountToSwap) {
+      _usersConfig[msg.sender].setUsingAsCollateral(fromReserve.id, false);
+    }
+
+    fromReserve.updateInterestRates(fromAsset, address(vars.fromReserveAToken), 0, amountToSwap);
+    // SWC-105-Unprotected Ether Withdrawal: L490-517
+    vars.fromReserveAToken.burn(
+      msg.sender,
+      receiverAddress,
+      amountToSwap,
+      fromReserve.liquidityIndex
+    );
+    // Notifies the receiver to proceed, sending as param the underlying already transferred
+    ISwapAdapter(receiverAddress).executeOperation(
+      fromAsset,
+      toAsset,
+      amountToSwap,
+      address(this),
+      params
+    );
+
+    vars.amountToReceive = IERC20(toAsset).balanceOf(receiverAddress);
+    if (vars.amountToReceive != 0) {
+      IERC20(toAsset).transferFrom(
+        receiverAddress,
+        address(vars.toReserveAToken),
+        vars.amountToReceive
+      );
+
+      if (vars.toReserveAToken.balanceOf(msg.sender) == 0) {
+        _usersConfig[msg.sender].setUsingAsCollateral(toReserve.id, true);
+      }
+
+      vars.toReserveAToken.mint(msg.sender, vars.amountToReceive, toReserve.liquidityIndex);
+      toReserve.updateInterestRates(
+        toAsset,
+        address(vars.toReserveAToken),
+        vars.amountToReceive,
+        0
+      );
+    }
+
+    (, , , , vars.healthFactor) = GenericLogic.calculateUserAccountData(
+      msg.sender,
+      _reserves,
+      _usersConfig[msg.sender],
+      _reservesList,
+      _addressesProvider.getPriceOracle()
+    );
+
+    if (vars.healthFactor < GenericLogic.HEALTH_FACTOR_LIQUIDATION_THRESHOLD) {
+      return (
+        uint256(Errors.CollateralManagerErrors.HEALTH_FACTOR_LOWER_THAN_LIQUIDATION_THRESHOLD),
+        Errors.HEALTH_FACTOR_LOWER_THAN_LIQUIDATION_THRESHOLD
+      );
+    }
+
+    return (uint256(Errors.CollateralManagerErrors.NO_ERROR), Errors.NO_ERRORS);
+  }
+
+  /**
+   * @dev calculates how much of a specific collateral can be liquidated, given
+   * a certain amount of principal currency. This function needs to be called after
+   * all the checks to validate the liquidation have been performed, otherwise it might fail.
+   * @param collateralAddress the collateral to be liquidated
+   * @param principalAddress the principal currency to be liquidated
+   * @param purchaseAmount the amount of principal being liquidated
+   * @param userCollateralBalance the collatera balance for the specific collateral asset of the user being liquidated
+   * @return collateralAmount the maximum amount that is possible to liquidated given all the liquidation constraints (user balance, close factor)
+   * @return principalAmountNeeded the purchase amount
+   **/
+  function calculateAvailableCollateralToLiquidate(
+    ReserveLogic.ReserveData storage collateralReserve,
+    ReserveLogic.ReserveData storage principalReserve,
+    address collateralAddress,
+    address principalAddress,
+    uint256 purchaseAmount,
+    uint256 userCollateralBalance
+  ) internal view returns (uint256, uint256) {
+    uint256 collateralAmount = 0;
+    uint256 principalAmountNeeded = 0;
+    IPriceOracleGetter oracle = IPriceOracleGetter(_addressesProvider.getPriceOracle());
+
+    AvailableCollateralToLiquidateLocalVars memory vars;
+
+    vars.collateralPrice = oracle.getAssetPrice(collateralAddress);
+    vars.principalCurrencyPrice = oracle.getAssetPrice(principalAddress);
+
+    (, , vars.liquidationBonus, vars.collateralDecimals) = collateralReserve
+      .configuration
+      .getParams();
+    vars.principalDecimals = principalReserve.configuration.getDecimals();
+
+    //this is the maximum possible amount of the selected collateral that can be liquidated, given the
+    //max amount of principal currency that is available for liquidation.
+    vars.maxAmountCollateralToLiquidate = vars
+      .principalCurrencyPrice
+      .mul(purchaseAmount)
+      .mul(10**vars.collateralDecimals)
+      .div(vars.collateralPrice.mul(10**vars.principalDecimals))
+      .percentMul(vars.liquidationBonus);
+
+    if (vars.maxAmountCollateralToLiquidate > userCollateralBalance) {
+      collateralAmount = userCollateralBalance;
+      principalAmountNeeded = vars
+        .collateralPrice
+        .mul(collateralAmount)
+        .mul(10**vars.principalDecimals)
+        .div(vars.principalCurrencyPrice.mul(10**vars.collateralDecimals))
+        .percentDiv(vars.liquidationBonus);
+    } else {
+      collateralAmount = vars.maxAmountCollateralToLiquidate;
+      principalAmountNeeded = purchaseAmount;
+    }
+    return (collateralAmount, principalAmountNeeded);
+  }
+}

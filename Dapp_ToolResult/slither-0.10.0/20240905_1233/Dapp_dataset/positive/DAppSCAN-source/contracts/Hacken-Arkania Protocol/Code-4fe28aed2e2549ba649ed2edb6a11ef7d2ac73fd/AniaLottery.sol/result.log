@@ -1,0 +1,138 @@
+'solc --version' running
+'solc /sb/AniaLottery.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/sb' running
+
+AniaStake.stakeTokens(uint256) (../../sb/AniaLottery.sol#579-608) ignores return value by aniaToken.transferFrom(msg.sender,address(this),_amount) (../../sb/AniaLottery.sol#607)
+AniaStake.unstakeTokens(uint256) (../../sb/AniaLottery.sol#611-638) ignores return value by aniaToken.transfer(msg.sender,_amount) (../../sb/AniaLottery.sol#627)
+AniaLottery.withdrawTokens(uint256,address) (../../sb/AniaLottery.sol#812-817) ignores return value by token.transfer(recipient,token.balanceOf(address(this))) (../../sb/AniaLottery.sol#816)
+AniaLottery.buy(uint256,uint256,address) (../../sb/AniaLottery.sol#1028-1057) ignores return value by token.transfer(msg.sender,tokensToBuy) (../../sb/AniaLottery.sol#1048)
+AniaLottery.buy(uint256,uint256,address) (../../sb/AniaLottery.sol#1028-1057) ignores return value by stableCoin.transferFrom(msg.sender,billingAddress,pay * decimals) (../../sb/AniaLottery.sol#1052)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+AniaStake.calculateStakeReward(AniaStake.Stake) (../../sb/AniaLottery.sol#550-552) performs a multiplication on the result of a division:
+	- (_current_stake.amount * apy / 100) * (block.timestamp - _current_stake.since) / (31536000) (../../sb/AniaLottery.sol#551)
+AniaLottery.buy(uint256,uint256,address) (../../sb/AniaLottery.sol#1028-1057) performs a multiplication on the result of a division:
+	- tokensToBuy = decimals * (pay * decimals) / projects[projectId].tokenPrice * projects[projectId].firstPayoutInPercent / 100 (../../sb/AniaLottery.sol#1036)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+Contract locking ether found:
+	Contract AniaStake (../../sb/AniaLottery.sol#493-693) has payable functions:
+	 - AniaStake.constructor(ArkaniaProtocol) (../../sb/AniaLottery.sol#535-543)
+	But does not have a function to withdraw the ether
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#contracts-that-lock-ether
+
+Reentrancy in AniaLottery.buy(uint256,uint256,address) (../../sb/AniaLottery.sol#1028-1057):
+	External calls:
+	- token.transfer(msg.sender,tokensToBuy) (../../sb/AniaLottery.sol#1048)
+	- stableCoin.transferFrom(msg.sender,billingAddress,pay * decimals) (../../sb/AniaLottery.sol#1052)
+	State variables written after the call(s):
+	- setLotteryWinnerClaimedStatus(projectId,msg.sender) (../../sb/AniaLottery.sol#1055)
+		- lotteryWinners[projectId][index].claimed = true (../../sb/AniaLottery.sol#930)
+	AniaLottery.lotteryWinners (../../sb/AniaLottery.sol#759) can be used in cross function reentrancies:
+	- AniaLottery._checkUserIsProjectWinner(uint256,address) (../../sb/AniaLottery.sol#1085-1095)
+	- AniaLottery.getLotteryWinner(uint256,address) (../../sb/AniaLottery.sol#917-921)
+	- AniaLottery.lotteryDraw(uint256,address[]) (../../sb/AniaLottery.sol#872-901)
+	- AniaLottery.setLotteryWinnerClaimedStatus(uint256,address) (../../sb/AniaLottery.sol#927-931)
+Reentrancy in AniaStake.unstakeTokens(uint256) (../../sb/AniaLottery.sol#611-638):
+	External calls:
+	- aniaToken.transfer(msg.sender,_amount) (../../sb/AniaLottery.sol#627)
+	State variables written after the call(s):
+	- stakers[index].address_stake = Stake(msg.sender,userStakes + reward - _amount,block.timestamp) (../../sb/AniaLottery.sol#630)
+	AniaStake.stakers (../../sb/AniaLottery.sol#527) can be used in cross function reentrancies:
+	- AniaStake._addStaker(address) (../../sb/AniaLottery.sol#557-567)
+	- AniaStake.constructor(ArkaniaProtocol) (../../sb/AniaLottery.sol#535-543)
+	- AniaStake.hasRewards() (../../sb/AniaLottery.sol#641-645)
+	- AniaStake.hasStakeWithRewards(address) (../../sb/AniaLottery.sol#648-663)
+	- AniaStake.redistributeRewards(address[]) (../../sb/AniaLottery.sol#666-680)
+	- AniaStake.stakeTokens(uint256) (../../sb/AniaLottery.sol#579-608)
+	- AniaStake.unstakeTokens(uint256) (../../sb/AniaLottery.sol#611-638)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+AniaStake.stakeTokens(uint256) (../../sb/AniaLottery.sol#579-608) should emit an event for: 
+	- totalStaked += newStake (../../sb/AniaLottery.sol#604) 
+AniaStake.changeAPY(uint256,address[]) (../../sb/AniaLottery.sol#683-692) should emit an event for: 
+	- apy = _value (../../sb/AniaLottery.sol#691) 
+AniaLottery.changeTierOne(uint256) (../../sb/AniaLottery.sol#934-939) should emit an event for: 
+	- tierOne = _value (../../sb/AniaLottery.sol#938) 
+AniaLottery.changeTierTwo(uint256) (../../sb/AniaLottery.sol#940-945) should emit an event for: 
+	- tierTwo = _value (../../sb/AniaLottery.sol#944) 
+AniaLottery.changeTierThree(uint256) (../../sb/AniaLottery.sol#946-951) should emit an event for: 
+	- tierThree = _value (../../sb/AniaLottery.sol#950) 
+AniaLottery.changeTierOneTicketValue(uint256) (../../sb/AniaLottery.sol#952-957) should emit an event for: 
+	- tierOneTicketValue = _value (../../sb/AniaLottery.sol#956) 
+AniaLottery.changeTierTwoTicketValue(uint256) (../../sb/AniaLottery.sol#958-963) should emit an event for: 
+	- tierTwoTicketValue = _value (../../sb/AniaLottery.sol#962) 
+AniaLottery.changeTierThreeTicketValue(uint256) (../../sb/AniaLottery.sol#964-969) should emit an event for: 
+	- tierThreeTicketValue = _value (../../sb/AniaLottery.sol#968) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+AniaLottery.getUserTicketValue(address) (../../sb/AniaLottery.sol#852-862) has external calls inside a loop: userStake = tokenStaking.hasStakeWithRewards(_address) (../../sb/AniaLottery.sol#853)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in AniaLottery.buy(uint256,uint256,address) (../../sb/AniaLottery.sol#1028-1057):
+	External calls:
+	- token.transfer(msg.sender,tokensToBuy) (../../sb/AniaLottery.sol#1048)
+	- stableCoin.transferFrom(msg.sender,billingAddress,pay * decimals) (../../sb/AniaLottery.sol#1052)
+	State variables written after the call(s):
+	- projectRaisedAmount[projectId] += pay (../../sb/AniaLottery.sol#1056)
+Reentrancy in AniaStake.unstakeTokens(uint256) (../../sb/AniaLottery.sol#611-638):
+	External calls:
+	- aniaToken.transfer(msg.sender,_amount) (../../sb/AniaLottery.sol#627)
+	State variables written after the call(s):
+	- totalStaked -= userStakes (../../sb/AniaLottery.sol#634)
+	- totalStaked -= _amount (../../sb/AniaLottery.sol#636)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+AniaStake.unstakeTokens(uint256) (../../sb/AniaLottery.sol#611-638) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(_amount <= stakedWithRewards,amount has to be less or equal than current stakes with rewards) (../../sb/AniaLottery.sol#626)
+AniaLottery._checkOpenProject(uint256) (../../sb/AniaLottery.sol#1097-1099) uses timestamp for comparisons
+	Dangerous comparisons:
+	- projects[projectId].id > 0 && projects[projectId].endDate > block.timestamp (../../sb/AniaLottery.sol#1098)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+AniaStake.redistributeRewards(address[]) (../../sb/AniaLottery.sol#666-680) has costly operations inside a loop:
+	- totalStaked += reward (../../sb/AniaLottery.sol#678)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#costly-operations-inside-a-loop
+
+Context._msgData() (../../sb/AniaLottery.sol#24-26) is never used and should be removed
+ERC20._burn(address,uint256) (../../sb/AniaLottery.sol#400-415) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.8.2 (../../sb/AniaLottery.sol#1) allows old versions
+solc-0.8.27 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Parameter AniaStake.calculateStakeReward(AniaStake.Stake)._current_stake (../../sb/AniaLottery.sol#550) is not in mixedCase
+Parameter AniaStake.stakeTokens(uint256)._amount (../../sb/AniaLottery.sol#579) is not in mixedCase
+Parameter AniaStake.unstakeTokens(uint256)._amount (../../sb/AniaLottery.sol#611) is not in mixedCase
+Parameter AniaStake.hasStakeWithRewards(address)._address (../../sb/AniaLottery.sol#648) is not in mixedCase
+Parameter AniaStake.changeAPY(uint256,address[])._value (../../sb/AniaLottery.sol#683) is not in mixedCase
+Event AniaLottery.eventAddUserToWhitelist(uint256,address,uint256) (../../sb/AniaLottery.sol#710) is not in CapWords
+Event AniaLottery.eventAddUserToLotteryWinners(uint256,address,uint256,uint256) (../../sb/AniaLottery.sol#711) is not in CapWords
+Parameter AniaLottery.setAdmin(address,bool)._admin (../../sb/AniaLottery.sol#767) is not in mixedCase
+Parameter AniaLottery.setStableCoin(address,bool)._address (../../sb/AniaLottery.sol#775) is not in mixedCase
+Parameter AniaLottery.getUserTicketValue(address)._address (../../sb/AniaLottery.sol#852) is not in mixedCase
+Parameter AniaLottery.changeTierOne(uint256)._value (../../sb/AniaLottery.sol#934) is not in mixedCase
+Parameter AniaLottery.changeTierTwo(uint256)._value (../../sb/AniaLottery.sol#940) is not in mixedCase
+Parameter AniaLottery.changeTierThree(uint256)._value (../../sb/AniaLottery.sol#946) is not in mixedCase
+Parameter AniaLottery.changeTierOneTicketValue(uint256)._value (../../sb/AniaLottery.sol#952) is not in mixedCase
+Parameter AniaLottery.changeTierTwoTicketValue(uint256)._value (../../sb/AniaLottery.sol#958) is not in mixedCase
+Parameter AniaLottery.changeTierThreeTicketValue(uint256)._value (../../sb/AniaLottery.sol#964) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+ArkaniaProtocol.constructor() (../../sb/AniaLottery.sol#486-488) uses literals with too many digits:
+	- _mint(msg.sender,100000000 * 10 ** decimals()) (../../sb/AniaLottery.sol#487)
+AniaLottery.slitherConstructorVariables() (../../sb/AniaLottery.sol#697-1127) uses literals with too many digits:
+	- decimals = 1000000000000000000 (../../sb/AniaLottery.sol#708)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+AniaLottery.decimals (../../sb/AniaLottery.sol#708) should be constant 
+AniaStake.name (../../sb/AniaLottery.sol#494) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+
+AniaLottery.owner (../../sb/AniaLottery.sol#701) should be immutable 
+AniaLottery.tokenStaking (../../sb/AniaLottery.sol#699) should be immutable 
+AniaStake.aniaToken (../../sb/AniaLottery.sol#495) should be immutable 
+AniaStake.owner (../../sb/AniaLottery.sol#498) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/AniaLottery.sol analyzed (7 contracts with 93 detectors), 52 result(s) found

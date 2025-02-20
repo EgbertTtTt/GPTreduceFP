@@ -1,0 +1,139 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 21 Code Findings │
+└──────────────────┘
+                          
+    /sb/OtokenFactory.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          454┆ bytes memory initializationCalldata = abi.encodeWithSelector(
+          455┆     OtokenInterface(otokenImpl).init.selector,
+          456┆     addressBook,
+          457┆     _underlyingAsset,
+          458┆     _strikeAsset,
+          459┆     _collateralAsset,
+          460┆     _strikePrice,
+          461┆     _expiry,
+          462┆     _isPut
+          463┆ );
+            ⋮┆----------------------------------------
+          535┆ bytes memory initializationCalldata = abi.encodeWithSelector(
+          536┆     OtokenInterface(otokenImpl).init.selector,
+          537┆     addressBook,
+          538┆     _underlyingAsset,
+          539┆     _strikeAsset,
+          540┆     _collateralAsset,
+          541┆     _strikePrice,
+          542┆     _expiry,
+          543┆     _isPut
+          544┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          397┆ constructor(address _addressBook) public {
+          398┆     addressBook = _addressBook;
+          399┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           51┆ require(address(this).balance >= amount, "Create2: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+           52┆ require(bytecode.length != 0, "Create2: bytecode length is       
+  zero");                                                                       
+            ⋮┆----------------------------------------
+           57┆ require(addr != address(0), "Create2: Failed on deploy");
+            ⋮┆----------------------------------------
+          144┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          200┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          432┆ require(_expiry > now, "OtokenFactory: Can't create expired      
+  option");                                                                     
+            ⋮┆----------------------------------------
+          434┆ require(_expiry < 11865398400, "OtokenFactory: Can't create      
+  option with expiry > 2345/12/31");                                            
+            ⋮┆----------------------------------------
+          435┆ require(_expiry.sub(28800).mod(86400) == 0, "OtokenFactory:      
+  Option has to expire 08:00 UTC");                                             
+            ⋮┆----------------------------------------
+          437┆ require(idToAddress[id] == address(0), "OtokenFactory: Option    
+  already created");                                                            
+            ⋮┆----------------------------------------
+          440┆ require(
+          441┆     WhitelistInterface(whitelist).isWhitelistedProduct(
+          442┆         _underlyingAsset,
+          443┆         _strikeAsset,
+          444┆         _collateralAsset,
+          445┆         _isPut
+          446┆     ),
+          447┆     "OtokenFactory: Unsupported Product"
+          448┆ );
+            ⋮┆----------------------------------------
+          450┆ require(!_isPut || _strikePrice > 0, "OtokenFactory: Can't create
+  a $0 strike put option");                                                     
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          200┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          432┆ require(_expiry > now, "OtokenFactory: Can't create expired      
+  option");                                                                     
+            ⋮┆----------------------------------------
+          434┆ require(_expiry < 11865398400, "OtokenFactory: Can't create      
+  option with expiry > 2345/12/31");                                            
+            ⋮┆----------------------------------------
+          435┆ require(_expiry.sub(28800).mod(86400) == 0, "OtokenFactory:      
+  Option has to expire 08:00 UTC");                                             
+            ⋮┆----------------------------------------
+          437┆ require(idToAddress[id] == address(0), "OtokenFactory: Option    
+  already created");                                                            
+            ⋮┆----------------------------------------
+          440┆ require(
+          441┆     WhitelistInterface(whitelist).isWhitelistedProduct(
+          442┆         _underlyingAsset,
+          443┆         _strikeAsset,
+          444┆         _collateralAsset,
+          445┆         _isPut
+          446┆     ),
+          447┆     "OtokenFactory: Unsupported Product"
+          448┆ );
+            ⋮┆----------------------------------------
+          450┆ require(!_isPut || _strikePrice > 0, "OtokenFactory: Can't create
+  a $0 strike put option");                                                     
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 21 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

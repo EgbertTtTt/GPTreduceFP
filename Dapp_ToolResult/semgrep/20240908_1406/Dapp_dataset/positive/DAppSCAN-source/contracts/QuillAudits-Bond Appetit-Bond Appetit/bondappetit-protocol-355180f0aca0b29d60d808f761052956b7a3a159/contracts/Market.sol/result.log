@@ -1,0 +1,268 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 67 Code Findings │
+└──────────────────┘
+                   
+    /sb/Market.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          810┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          814┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          832┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          837┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          842┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+         1013┆ contract OwnablePausable is Ownable, Pausable {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          357┆ constructor (string memory name_, string memory symbol_) public {
+          358┆     _name = name_;
+          359┆     _symbol = symbol_;
+          360┆     _decimals = 18;
+          361┆ }
+            ⋮┆----------------------------------------
+         1020┆ constructor() internal {
+         1021┆     pauser = owner();
+         1022┆ }
+            ⋮┆----------------------------------------
+         1306┆ constructor(
+         1307┆     address _cumulative,
+         1308┆     address _productToken,
+         1309┆     address _rewardToken,
+         1310┆     address _uniswapRouter,
+         1311┆     address _priceOracle
+         1312┆ ) public {
+         1313┆     cumulative = ERC20(_cumulative);
+         1314┆     productToken = ERC20(_productToken);
+         1315┆     rewardToken = ERC20(_rewardToken);
+             [hid 3 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           87┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          102┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          119┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          136┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          153┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          511┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          512┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          531┆ require(account != address(0), "ERC20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+          552┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          575┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          576┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          659┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          663┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          720┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          721┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          745┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          769┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          829┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          830┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          831┆ );
+            ⋮┆----------------------------------------
+          859┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          901┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          922┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          972┆ require(!paused(), "Pausable: paused");
+            ⋮┆----------------------------------------
+          984┆ require(paused(), "Pausable: not paused");
+            ⋮┆----------------------------------------
+         1037┆ require(pauser == _msgSender() || owner() == _msgSender(),       
+  "OwnablePausable::pause: only pauser and owner must pause contract");         
+            ⋮┆----------------------------------------
+         1045┆ require(pauser == _msgSender() || owner() == _msgSender(),       
+  "OwnablePausable::unpause: only pauser and owner must unpause contract");     
+            ⋮┆----------------------------------------
+         1387┆ require(recipient != address(0), "Market::transfer: cannot       
+  transfer to the zero address");                                               
+            ⋮┆----------------------------------------
+         1390┆ require(amount <= currentBalance, "Market::transfer: not enough  
+  tokens");                                                                     
+            ⋮┆----------------------------------------
+         1422┆ require(isAllowedToken(currency), "Market::price: currency not   
+  allowed");                                                                    
+            ⋮┆----------------------------------------
+         1468┆ require(amountsOut.length != 0, "Market::_amountOut: invalid     
+  amounts out length");                                                         
+            ⋮┆----------------------------------------
+         1482┆ require(productTokenBalance > 0 && product <=                    
+  productTokenBalance, "Market::buy: exceeds balance");                         
+            ⋮┆----------------------------------------
+         1488┆ require(amountOut != 0, "Market::buy: liquidity pool is empty");
+            ⋮┆----------------------------------------
+         1513┆ require(product <= productTokenBalance, "Market::buyFromETH:     
+  balance is empty");                                                           
+            ⋮┆----------------------------------------
+         1517┆ require(amountOut != 0, "Market::buyFromETH: liquidity pool is   
+  empty");                                                                      
+            ⋮┆----------------------------------------
+         1536┆ require(recipient != address(0), "Market::withdraw: cannot       
+  transfer to the zero address");                                               
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+         1482┆ require(productTokenBalance > 0 && product <=                    
+  productTokenBalance, "Market::buy: exceeds balance");                         
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          119┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          511┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          512┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          552┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          575┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          576┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          663┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          720┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          745┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          769┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          829┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          830┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          831┆ );
+            ⋮┆----------------------------------------
+          859┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          922┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1037┆ require(pauser == _msgSender() || owner() == _msgSender(),       
+  "OwnablePausable::pause: only pauser and owner must pause contract");         
+            ⋮┆----------------------------------------
+         1045┆ require(pauser == _msgSender() || owner() == _msgSender(),       
+  "OwnablePausable::unpause: only pauser and owner must unpause contract");     
+            ⋮┆----------------------------------------
+         1387┆ require(recipient != address(0), "Market::transfer: cannot       
+  transfer to the zero address");                                               
+            ⋮┆----------------------------------------
+         1390┆ require(amount <= currentBalance, "Market::transfer: not enough  
+  tokens");                                                                     
+            ⋮┆----------------------------------------
+         1422┆ require(isAllowedToken(currency), "Market::price: currency not   
+  allowed");                                                                    
+            ⋮┆----------------------------------------
+         1468┆ require(amountsOut.length != 0, "Market::_amountOut: invalid     
+  amounts out length");                                                         
+            ⋮┆----------------------------------------
+         1488┆ require(amountOut != 0, "Market::buy: liquidity pool is empty");
+            ⋮┆----------------------------------------
+         1513┆ require(product <= productTokenBalance, "Market::buyFromETH:     
+  balance is empty");                                                           
+            ⋮┆----------------------------------------
+         1517┆ require(amountOut != 0, "Market::buyFromETH: liquidity pool is   
+  empty");                                                                      
+            ⋮┆----------------------------------------
+         1536┆ require(recipient != address(0), "Market::withdraw: cannot       
+  transfer to the zero address");                                               
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 67 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

@@ -1,0 +1,287 @@
+'solc --version' running
+'solc /sb/wildfire.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+Reentrancy in SAFECOVID._transfer(address,address,uint256) (../../sb/wildfire.sol#954-1003):
+	External calls:
+	- swapAndLiquify(contractTokenBalance) (../../sb/wildfire.sol#990)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/wildfire.sol#1051-1058)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/wildfire.sol#1037-1043)
+	External calls sending eth:
+	- swapAndLiquify(contractTokenBalance) (../../sb/wildfire.sol#990)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/wildfire.sol#1051-1058)
+	State variables written after the call(s):
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/wildfire.sol#1002)
+		- _rOwned[address(this)] = _rOwned[address(this)].add(rLiquidity) (../../sb/wildfire.sol#910)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/wildfire.sol#1093)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/wildfire.sol#1084)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/wildfire.sol#1085)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/wildfire.sol#1104)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/wildfire.sol#822)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/wildfire.sol#1105)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/wildfire.sol#1095)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/wildfire.sol#824)
+	SAFECOVID._rOwned (../../sb/wildfire.sol#646) can be used in cross function reentrancies:
+	- SAFECOVID._getCurrentSupply() (../../sb/wildfire.sol#894-905)
+	- SAFECOVID._takeLiquidity(uint256) (../../sb/wildfire.sol#907-913)
+	- SAFECOVID._transferBothExcluded(address,address,uint256) (../../sb/wildfire.sol#819-828)
+	- SAFECOVID._transferFromExcluded(address,address,uint256) (../../sb/wildfire.sol#1101-1109)
+	- SAFECOVID._transferStandard(address,address,uint256) (../../sb/wildfire.sol#1082-1089)
+	- SAFECOVID._transferToExcluded(address,address,uint256) (../../sb/wildfire.sol#1091-1099)
+	- SAFECOVID.balanceOf(address) (../../sb/wildfire.sol#728-731)
+	- SAFECOVID.constructor() (../../sb/wildfire.sol#694-710)
+	- SAFECOVID.deliver(uint256) (../../sb/wildfire.sol#771-778)
+	- SAFECOVID.excludeFromReward(address) (../../sb/wildfire.sol#797-804)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/wildfire.sol#1002)
+		- _rTotal = _rTotal.sub(rFee) (../../sb/wildfire.sol#864)
+	SAFECOVID._rTotal (../../sb/wildfire.sol#657) can be used in cross function reentrancies:
+	- SAFECOVID._getCurrentSupply() (../../sb/wildfire.sol#894-905)
+	- SAFECOVID._reflectFee(uint256,uint256) (../../sb/wildfire.sol#863-866)
+	- SAFECOVID.constructor() (../../sb/wildfire.sol#694-710)
+	- SAFECOVID.deliver(uint256) (../../sb/wildfire.sol#771-778)
+	- SAFECOVID.tokenFromReflection(uint256) (../../sb/wildfire.sol#791-795)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/wildfire.sol#1002)
+		- _tOwned[address(this)] = _tOwned[address(this)].add(tLiquidity) (../../sb/wildfire.sol#912)
+		- _tOwned[sender] = _tOwned[sender].sub(tAmount) (../../sb/wildfire.sol#1103)
+		- _tOwned[sender] = _tOwned[sender].sub(tAmount) (../../sb/wildfire.sol#821)
+		- _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount) (../../sb/wildfire.sol#1094)
+		- _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount) (../../sb/wildfire.sol#823)
+	SAFECOVID._tOwned (../../sb/wildfire.sol#647) can be used in cross function reentrancies:
+	- SAFECOVID._getCurrentSupply() (../../sb/wildfire.sol#894-905)
+	- SAFECOVID._takeLiquidity(uint256) (../../sb/wildfire.sol#907-913)
+	- SAFECOVID._transferBothExcluded(address,address,uint256) (../../sb/wildfire.sol#819-828)
+	- SAFECOVID._transferFromExcluded(address,address,uint256) (../../sb/wildfire.sol#1101-1109)
+	- SAFECOVID._transferToExcluded(address,address,uint256) (../../sb/wildfire.sol#1091-1099)
+	- SAFECOVID.balanceOf(address) (../../sb/wildfire.sol#728-731)
+	- SAFECOVID.excludeFromReward(address) (../../sb/wildfire.sol#797-804)
+	- SAFECOVID.includeInReward(address) (../../sb/wildfire.sol#806-818)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities
+
+SAFECOVID.addLiquidity(uint256,uint256) (../../sb/wildfire.sol#1046-1059) ignores return value by uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/wildfire.sol#1051-1058)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+SAFECOVID.allowance(address,address).owner (../../sb/wildfire.sol#738) shadows:
+	- Ownable.owner() (../../sb/wildfire.sol#385-387) (function)
+SAFECOVID._approve(address,address,uint256).owner (../../sb/wildfire.sol#946) shadows:
+	- Ownable.owner() (../../sb/wildfire.sol#385-387) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+SAFECOVID.setTaxFeePercent(uint256) (../../sb/wildfire.sol#838-840) should emit an event for: 
+	- _taxFee = taxFee (../../sb/wildfire.sol#839) 
+SAFECOVID.setLiquidityFeePercent(uint256) (../../sb/wildfire.sol#842-844) should emit an event for: 
+	- _liquidityFee = liquidityFee (../../sb/wildfire.sol#843) 
+SAFECOVID.setMaxTxPercent(uint256) (../../sb/wildfire.sol#846-850) should emit an event for: 
+	- _maxTxAmount = _tTotal.mul(maxTxPercent).div(10 ** 2) (../../sb/wildfire.sol#847-849) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+Reentrancy in SAFECOVID._transfer(address,address,uint256) (../../sb/wildfire.sol#954-1003):
+	External calls:
+	- swapAndLiquify(contractTokenBalance) (../../sb/wildfire.sol#990)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/wildfire.sol#1051-1058)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/wildfire.sol#1037-1043)
+	External calls sending eth:
+	- swapAndLiquify(contractTokenBalance) (../../sb/wildfire.sol#990)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/wildfire.sol#1051-1058)
+	State variables written after the call(s):
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/wildfire.sol#1002)
+		- _liquidityFee = _previousLiquidityFee (../../sb/wildfire.sol#939)
+		- _liquidityFee = 0 (../../sb/wildfire.sol#934)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/wildfire.sol#1002)
+		- _previousLiquidityFee = _liquidityFee (../../sb/wildfire.sol#931)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/wildfire.sol#1002)
+		- _previousTaxFee = _taxFee (../../sb/wildfire.sol#930)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/wildfire.sol#1002)
+		- _tFeeTotal = _tFeeTotal.add(tFee) (../../sb/wildfire.sol#865)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/wildfire.sol#1002)
+		- _taxFee = _previousTaxFee (../../sb/wildfire.sol#938)
+		- _taxFee = 0 (../../sb/wildfire.sol#933)
+Reentrancy in SAFECOVID.swapAndLiquify(uint256) (../../sb/wildfire.sol#1005-1026):
+	External calls:
+	- swapTokensForEth(half) (../../sb/wildfire.sol#1017)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/wildfire.sol#1037-1043)
+	- addLiquidity(otherHalf,newBalance) (../../sb/wildfire.sol#1023)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/wildfire.sol#1051-1058)
+	External calls sending eth:
+	- addLiquidity(otherHalf,newBalance) (../../sb/wildfire.sol#1023)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/wildfire.sol#1051-1058)
+	State variables written after the call(s):
+	- addLiquidity(otherHalf,newBalance) (../../sb/wildfire.sol#1023)
+		- _allowances[owner][spender] = amount (../../sb/wildfire.sol#950)
+Reentrancy in SAFECOVID.transferFrom(address,address,uint256) (../../sb/wildfire.sol#747-751):
+	External calls:
+	- _transfer(sender,recipient,amount) (../../sb/wildfire.sol#748)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/wildfire.sol#1051-1058)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/wildfire.sol#1037-1043)
+	External calls sending eth:
+	- _transfer(sender,recipient,amount) (../../sb/wildfire.sol#748)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/wildfire.sol#1051-1058)
+	State variables written after the call(s):
+	- _approve(sender,_msgSender(),_allowances[sender][_msgSender()].sub(amount,ERC20: transfer amount exceeds allowance)) (../../sb/wildfire.sol#749)
+		- _allowances[owner][spender] = amount (../../sb/wildfire.sol#950)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in SAFECOVID._transfer(address,address,uint256) (../../sb/wildfire.sol#954-1003):
+	External calls:
+	- swapAndLiquify(contractTokenBalance) (../../sb/wildfire.sol#990)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/wildfire.sol#1051-1058)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/wildfire.sol#1037-1043)
+	External calls sending eth:
+	- swapAndLiquify(contractTokenBalance) (../../sb/wildfire.sol#990)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/wildfire.sol#1051-1058)
+	Event emitted after the call(s):
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/wildfire.sol#1088)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/wildfire.sol#1002)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/wildfire.sol#1098)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/wildfire.sol#1002)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/wildfire.sol#1108)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/wildfire.sol#1002)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/wildfire.sol#827)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/wildfire.sol#1002)
+Reentrancy in SAFECOVID.swapAndLiquify(uint256) (../../sb/wildfire.sol#1005-1026):
+	External calls:
+	- swapTokensForEth(half) (../../sb/wildfire.sol#1017)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/wildfire.sol#1037-1043)
+	- addLiquidity(otherHalf,newBalance) (../../sb/wildfire.sol#1023)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/wildfire.sol#1051-1058)
+	External calls sending eth:
+	- addLiquidity(otherHalf,newBalance) (../../sb/wildfire.sol#1023)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/wildfire.sol#1051-1058)
+	Event emitted after the call(s):
+	- Approval(owner,spender,amount) (../../sb/wildfire.sol#951)
+		- addLiquidity(otherHalf,newBalance) (../../sb/wildfire.sol#1023)
+	- SwapAndLiquify(half,newBalance,otherHalf) (../../sb/wildfire.sol#1025)
+Reentrancy in SAFECOVID.transferFrom(address,address,uint256) (../../sb/wildfire.sol#747-751):
+	External calls:
+	- _transfer(sender,recipient,amount) (../../sb/wildfire.sol#748)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/wildfire.sol#1051-1058)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/wildfire.sol#1037-1043)
+	External calls sending eth:
+	- _transfer(sender,recipient,amount) (../../sb/wildfire.sol#748)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/wildfire.sol#1051-1058)
+	Event emitted after the call(s):
+	- Approval(owner,spender,amount) (../../sb/wildfire.sol#951)
+		- _approve(sender,_msgSender(),_allowances[sender][_msgSender()].sub(amount,ERC20: transfer amount exceeds allowance)) (../../sb/wildfire.sol#749)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Ownable.unlock() (../../sb/wildfire.sol#432-437) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(now > _lockTime,Contract is locked until 7 days) (../../sb/wildfire.sol#434)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/wildfire.sol#249-258) uses assembly
+	- INLINE ASM (../../sb/wildfire.sol#256)
+Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/wildfire.sol#342-363) uses assembly
+	- INLINE ASM (../../sb/wildfire.sol#355-358)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+SAFECOVID.includeInReward(address) (../../sb/wildfire.sol#806-818) has costly operations inside a loop:
+	- _excluded.pop() (../../sb/wildfire.sol#814)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#costly-operations-inside-a-loop
+
+Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/wildfire.sol#342-363) is never used and should be removed
+Address.functionCall(address,bytes) (../../sb/wildfire.sol#302-304) is never used and should be removed
+Address.functionCall(address,bytes,string) (../../sb/wildfire.sol#312-314) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/wildfire.sol#327-329) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/wildfire.sol#337-340) is never used and should be removed
+Address.isContract(address) (../../sb/wildfire.sol#249-258) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/wildfire.sol#276-282) is never used and should be removed
+Context._msgData() (../../sb/wildfire.sol#225-228) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/wildfire.sol#198-200) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/wildfire.sol#214-217) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+SAFECOVID._rTotal (../../sb/wildfire.sol#657) is set pre-construction with a non-constant function or state variable:
+	- (MAX - (MAX % _tTotal))
+SAFECOVID._previousTaxFee (../../sb/wildfire.sol#665) is set pre-construction with a non-constant function or state variable:
+	- _taxFee
+SAFECOVID._previousLiquidityFee (../../sb/wildfire.sol#668) is set pre-construction with a non-constant function or state variable:
+	- _liquidityFee
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#function-initializing-state
+
+Pragma version^0.6.12 (../../sb/wildfire.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/wildfire.sol#276-282):
+	- (success) = recipient.call{value: amount}() (../../sb/wildfire.sol#280)
+Low level call in Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/wildfire.sol#342-363):
+	- (success,returndata) = target.call{value: weiValue}(data) (../../sb/wildfire.sol#346)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Function IUniswapV2Pair.DOMAIN_SEPARATOR() (../../sb/wildfire.sol#471) is not in mixedCase
+Function IUniswapV2Pair.PERMIT_TYPEHASH() (../../sb/wildfire.sol#472) is not in mixedCase
+Function IUniswapV2Pair.MINIMUM_LIQUIDITY() (../../sb/wildfire.sol#489) is not in mixedCase
+Function IUniswapV2Router01.WETH() (../../sb/wildfire.sol#509) is not in mixedCase
+Parameter SAFECOVID.setSwapAndLiquifyEnabled(bool)._enabled (../../sb/wildfire.sol#852) is not in mixedCase
+Parameter SAFECOVID.calculateTaxFee(uint256)._amount (../../sb/wildfire.sol#915) is not in mixedCase
+Parameter SAFECOVID.calculateLiquidityFee(uint256)._amount (../../sb/wildfire.sol#921) is not in mixedCase
+Variable SAFECOVID._taxFee (../../sb/wildfire.sol#664) is not in mixedCase
+Variable SAFECOVID._liquidityFee (../../sb/wildfire.sol#667) is not in mixedCase
+Variable SAFECOVID._maxTxAmount (../../sb/wildfire.sol#677) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/wildfire.sol#226)" inContext (../../sb/wildfire.sol#220-229)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Variable IUniswapV2Router01.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountADesired (../../sb/wildfire.sol#514) is too similar to IUniswapV2Router01.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountBDesired (../../sb/wildfire.sol#515)
+Variable SAFECOVID._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/wildfire.sol#1092) is too similar to SAFECOVID._transferStandard(address,address,uint256).tTransferAmount (../../sb/wildfire.sol#1083)
+Variable SAFECOVID._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/wildfire.sol#820) is too similar to SAFECOVID._transferStandard(address,address,uint256).tTransferAmount (../../sb/wildfire.sol#1083)
+Variable SAFECOVID.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/wildfire.sol#786) is too similar to SAFECOVID._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/wildfire.sol#1102)
+Variable SAFECOVID.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/wildfire.sol#786) is too similar to SAFECOVID._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/wildfire.sol#1092)
+Variable SAFECOVID.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/wildfire.sol#786) is too similar to SAFECOVID._getValues(uint256).tTransferAmount (../../sb/wildfire.sol#869)
+Variable SAFECOVID._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/wildfire.sol#1102) is too similar to SAFECOVID._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/wildfire.sol#1102)
+Variable SAFECOVID._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/wildfire.sol#885) is too similar to SAFECOVID._getTValues(uint256).tTransferAmount (../../sb/wildfire.sol#877)
+Variable SAFECOVID.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/wildfire.sol#786) is too similar to SAFECOVID._transferStandard(address,address,uint256).tTransferAmount (../../sb/wildfire.sol#1083)
+Variable SAFECOVID._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/wildfire.sol#820) is too similar to SAFECOVID._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/wildfire.sol#820)
+Variable SAFECOVID._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/wildfire.sol#1102) is too similar to SAFECOVID._getValues(uint256).tTransferAmount (../../sb/wildfire.sol#869)
+Variable SAFECOVID._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/wildfire.sol#1092) is too similar to SAFECOVID._getTValues(uint256).tTransferAmount (../../sb/wildfire.sol#877)
+Variable SAFECOVID._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/wildfire.sol#820) is too similar to SAFECOVID._getTValues(uint256).tTransferAmount (../../sb/wildfire.sol#877)
+Variable SAFECOVID._getValues(uint256).rTransferAmount (../../sb/wildfire.sol#870) is too similar to SAFECOVID._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/wildfire.sol#1102)
+Variable SAFECOVID._transferStandard(address,address,uint256).rTransferAmount (../../sb/wildfire.sol#1083) is too similar to SAFECOVID._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/wildfire.sol#1102)
+Variable SAFECOVID._getValues(uint256).rTransferAmount (../../sb/wildfire.sol#870) is too similar to SAFECOVID._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/wildfire.sol#1092)
+Variable SAFECOVID._transferStandard(address,address,uint256).rTransferAmount (../../sb/wildfire.sol#1083) is too similar to SAFECOVID._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/wildfire.sol#1092)
+Variable SAFECOVID._getValues(uint256).rTransferAmount (../../sb/wildfire.sol#870) is too similar to SAFECOVID._getValues(uint256).tTransferAmount (../../sb/wildfire.sol#869)
+Variable SAFECOVID._transferStandard(address,address,uint256).rTransferAmount (../../sb/wildfire.sol#1083) is too similar to SAFECOVID._getValues(uint256).tTransferAmount (../../sb/wildfire.sol#869)
+Variable SAFECOVID.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/wildfire.sol#786) is too similar to SAFECOVID._getTValues(uint256).tTransferAmount (../../sb/wildfire.sol#877)
+Variable SAFECOVID._getValues(uint256).rTransferAmount (../../sb/wildfire.sol#870) is too similar to SAFECOVID._transferStandard(address,address,uint256).tTransferAmount (../../sb/wildfire.sol#1083)
+Variable SAFECOVID._transferStandard(address,address,uint256).rTransferAmount (../../sb/wildfire.sol#1083) is too similar to SAFECOVID._transferStandard(address,address,uint256).tTransferAmount (../../sb/wildfire.sol#1083)
+Variable SAFECOVID._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/wildfire.sol#820) is too similar to SAFECOVID._getValues(uint256).tTransferAmount (../../sb/wildfire.sol#869)
+Variable SAFECOVID._getValues(uint256).rTransferAmount (../../sb/wildfire.sol#870) is too similar to SAFECOVID._getTValues(uint256).tTransferAmount (../../sb/wildfire.sol#877)
+Variable SAFECOVID._transferStandard(address,address,uint256).rTransferAmount (../../sb/wildfire.sol#1083) is too similar to SAFECOVID._getTValues(uint256).tTransferAmount (../../sb/wildfire.sol#877)
+Variable SAFECOVID._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/wildfire.sol#885) is too similar to SAFECOVID._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/wildfire.sol#1102)
+Variable SAFECOVID._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/wildfire.sol#885) is too similar to SAFECOVID._getValues(uint256).tTransferAmount (../../sb/wildfire.sol#869)
+Variable SAFECOVID._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/wildfire.sol#820) is too similar to SAFECOVID._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/wildfire.sol#1102)
+Variable SAFECOVID._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/wildfire.sol#885) is too similar to SAFECOVID._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/wildfire.sol#1092)
+Variable SAFECOVID._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/wildfire.sol#820) is too similar to SAFECOVID._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/wildfire.sol#1092)
+Variable SAFECOVID._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/wildfire.sol#1092) is too similar to SAFECOVID._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/wildfire.sol#1102)
+Variable SAFECOVID._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/wildfire.sol#885) is too similar to SAFECOVID._transferStandard(address,address,uint256).tTransferAmount (../../sb/wildfire.sol#1083)
+Variable SAFECOVID._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/wildfire.sol#1092) is too similar to SAFECOVID._getValues(uint256).tTransferAmount (../../sb/wildfire.sol#869)
+Variable SAFECOVID._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/wildfire.sol#1092) is too similar to SAFECOVID._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/wildfire.sol#1092)
+Variable SAFECOVID._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/wildfire.sol#885) is too similar to SAFECOVID._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/wildfire.sol#820)
+Variable SAFECOVID._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/wildfire.sol#1102) is too similar to SAFECOVID._transferStandard(address,address,uint256).tTransferAmount (../../sb/wildfire.sol#1083)
+Variable SAFECOVID.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/wildfire.sol#786) is too similar to SAFECOVID._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/wildfire.sol#820)
+Variable SAFECOVID._getValues(uint256).rTransferAmount (../../sb/wildfire.sol#870) is too similar to SAFECOVID._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/wildfire.sol#820)
+Variable SAFECOVID._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/wildfire.sol#1102) is too similar to SAFECOVID._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/wildfire.sol#1092)
+Variable SAFECOVID._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/wildfire.sol#1102) is too similar to SAFECOVID._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/wildfire.sol#820)
+Variable SAFECOVID._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/wildfire.sol#1102) is too similar to SAFECOVID._getTValues(uint256).tTransferAmount (../../sb/wildfire.sol#877)
+Variable SAFECOVID._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/wildfire.sol#1092) is too similar to SAFECOVID._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/wildfire.sol#820)
+Variable SAFECOVID._transferStandard(address,address,uint256).rTransferAmount (../../sb/wildfire.sol#1083) is too similar to SAFECOVID._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/wildfire.sol#820)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+SAFECOVID.slitherConstructorVariables() (../../sb/wildfire.sol#642-1114) uses literals with too many digits:
+	- _tTotal = 1000000000 * 10 ** 6 * 10 ** 9 (../../sb/wildfire.sol#656)
+SAFECOVID.slitherConstructorVariables() (../../sb/wildfire.sol#642-1114) uses literals with too many digits:
+	- _maxTxAmount = 50000000 * 10 ** 6 * 10 ** 9 (../../sb/wildfire.sol#677)
+SAFECOVID.slitherConstructorVariables() (../../sb/wildfire.sol#642-1114) uses literals with too many digits:
+	- numTokensSellToAddToLiquidity = 5000000 * 10 ** 6 * 10 ** 9 (../../sb/wildfire.sol#678)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+Loop condition i < _excluded.length (../../sb/wildfire.sol#898) should use cached array length instead of referencing `length` member of the storage array.
+ Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cache-array-length
+
+SAFECOVID._decimals (../../sb/wildfire.sol#662) should be constant 
+SAFECOVID._name (../../sb/wildfire.sol#660) should be constant 
+SAFECOVID._symbol (../../sb/wildfire.sol#661) should be constant 
+SAFECOVID._tTotal (../../sb/wildfire.sol#656) should be constant 
+SAFECOVID.numTokensSellToAddToLiquidity (../../sb/wildfire.sol#678) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+/sb/wildfire.sol analyzed (10 contracts with 93 detectors), 97 result(s) found

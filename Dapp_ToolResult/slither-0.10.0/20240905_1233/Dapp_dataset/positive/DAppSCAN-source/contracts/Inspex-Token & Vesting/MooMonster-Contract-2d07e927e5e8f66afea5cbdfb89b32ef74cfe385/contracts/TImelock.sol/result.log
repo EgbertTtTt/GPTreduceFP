@@ -1,0 +1,42 @@
+'solc --version' running
+'solc /sb/TImelock.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/sb' running
+
+MooMonsterTimelock.constructor(address,uint256).admin_ (../../sb/TImelock.sol#46) lacks a zero-check on :
+		- admin = admin_ (../../sb/TImelock.sol#56)
+MooMonsterTimelock.setPendingAdmin(address).pendingAdmin_ (../../sb/TImelock.sol#92) lacks a zero-check on :
+		- pendingAdmin = pendingAdmin_ (../../sb/TImelock.sol#105)
+MooMonsterTimelock.executeTransaction(address,uint256,string,bytes,uint256).target (../../sb/TImelock.sol#165) lacks a zero-check on :
+		- (success,returnData) = target.call{value: value}(callData) (../../sb/TImelock.sol#201-203)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in MooMonsterTimelock.executeTransaction(address,uint256,string,bytes,uint256) (../../sb/TImelock.sol#164-209):
+	External calls:
+	- (success,returnData) = target.call{value: value}(callData) (../../sb/TImelock.sol#201-203)
+	Event emitted after the call(s):
+	- ExecuteTransaction(txHash,target,value,signature,data,eta) (../../sb/TImelock.sol#206)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+MooMonsterTimelock.queueTransaction(address,uint256,string,bytes,uint256) (../../sb/TImelock.sol#110-131) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(eta >= getBlockTimestamp() + delay,Timelock::queueTransaction: Estimated execution block must satisfy delay.) (../../sb/TImelock.sol#121-124)
+MooMonsterTimelock.executeTransaction(address,uint256,string,bytes,uint256) (../../sb/TImelock.sol#164-209) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(getBlockTimestamp() >= eta,Timelock::executeTransaction: Transaction hasn't surpassed time lock.) (../../sb/TImelock.sol#181-184)
+	- require(bool,string)(getBlockTimestamp() <= eta + GRACE_PERIOD,Timelock::executeTransaction: Transaction is stale.) (../../sb/TImelock.sol#185-188)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+MooMonsterTimelock._getRevertMsg(bytes) (../../sb/TImelock.sol#151-162) uses assembly
+	- INLINE ASM (../../sb/TImelock.sol#158-160)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Pragma version0.8.10 (../../sb/TImelock.sol#1) allows old versions
+solc-0.8.10 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in MooMonsterTimelock.executeTransaction(address,uint256,string,bytes,uint256) (../../sb/TImelock.sol#164-209):
+	- (success,returnData) = target.call{value: value}(callData) (../../sb/TImelock.sol#201-203)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Variable MooMonsterTimelock.admin_initialized (../../sb/TImelock.sol#42) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+/sb/TImelock.sol analyzed (1 contracts with 93 detectors), 11 result(s) found

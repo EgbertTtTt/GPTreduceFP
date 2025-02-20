@@ -1,0 +1,70 @@
+'solc --version' running
+'solc /sb/WadzPayToken.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/sb' running
+
+WadzPayToken._applyTGEWhitelist(address,address,uint256) (../../sb/WadzPayToken.sol#941-972) uses a dangerous strict equality:
+	- _tgeTimestamp == 0 && sender != _tgePairAddress && recipient == _tgePairAddress && amount > 0 (../../sb/WadzPayToken.sol#946)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+WadzPayToken.allowance(address,address).owner (../../sb/WadzPayToken.sol#567) shadows:
+	- Ownable.owner() (../../sb/WadzPayToken.sol#168-170) (function)
+WadzPayToken._approve(address,address,uint256).owner (../../sb/WadzPayToken.sol#789) shadows:
+	- Ownable.owner() (../../sb/WadzPayToken.sol#168-170) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+WadzPayToken.setMaxTxPercent(uint256) (../../sb/WadzPayToken.sol#976-978) should emit an event for: 
+	- maxTxPercent = _maxTxPercent (../../sb/WadzPayToken.sol#977) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+WadzPayToken.createTGEWhitelist(address,uint256[],uint256[]).pairAddress (../../sb/WadzPayToken.sol#860) lacks a zero-check on :
+		- _tgePairAddress = pairAddress (../../sb/WadzPayToken.sol#863)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+WadzPayToken.getTGEWhitelistRound() (../../sb/WadzPayToken.sol#916-934) uses timestamp for comparisons
+	Dangerous comparisons:
+	- _tgeTimestamp > 0 (../../sb/WadzPayToken.sol#918)
+	- block.timestamp <= wlCloseTimestampLast (../../sb/WadzPayToken.sol#927)
+WadzPayToken._applyTGEWhitelist(address,address,uint256) (../../sb/WadzPayToken.sol#941-972) uses timestamp for comparisons
+	Dangerous comparisons:
+	- _tgeTimestamp == 0 && sender != _tgePairAddress && recipient == _tgePairAddress && amount > 0 (../../sb/WadzPayToken.sol#946)
+	- wlRoundNumber > 0 (../../sb/WadzPayToken.sol#954)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Context._msgData() (../../sb/WadzPayToken.sol#130-133) is never used and should be removed
+SafeMath.div(uint256,uint256) (../../sb/WadzPayToken.sol#331-333) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/WadzPayToken.sol#387-396) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/WadzPayToken.sol#347-349) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/WadzPayToken.sol#413-422) is never used and should be removed
+SafeMath.mul(uint256,uint256) (../../sb/WadzPayToken.sol#317-319) is never used and should be removed
+SafeMath.sub(uint256,uint256,string) (../../sb/WadzPayToken.sol#364-373) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/WadzPayToken.sol#218-224) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/WadzPayToken.sol#260-265) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/WadzPayToken.sol#272-277) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/WadzPayToken.sol#243-253) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/WadzPayToken.sol#231-236) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.8.0 (../../sb/WadzPayToken.sol#1) allows old versions
+solc-0.8.27 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Parameter WadzPayToken.addBlacklist(address)._bot (../../sb/WadzPayToken.sol#824) is not in mixedCase
+Parameter WadzPayToken.removeBlacklist(address)._addr (../../sb/WadzPayToken.sol#830) is not in mixedCase
+Parameter WadzPayToken.destroyBlackFunds(address)._blackListedUser (../../sb/WadzPayToken.sol#836) is not in mixedCase
+Parameter WadzPayToken.setMaxTxPercent(uint256)._maxTxPercent (../../sb/WadzPayToken.sol#976) is not in mixedCase
+Parameter WadzPayToken.setTransferDelay(uint256)._transferDelay (../../sb/WadzPayToken.sol#981) is not in mixedCase
+Parameter WadzPayToken.setAntibotPaused(bool)._antibotPaused (../../sb/WadzPayToken.sol#986) is not in mixedCase
+Variable WadzPayToken._tgeWhitelistRounds (../../sb/WadzPayToken.sol#471) is not in mixedCase
+Variable WadzPayToken._tgeTimestamp (../../sb/WadzPayToken.sol#473) is not in mixedCase
+Variable WadzPayToken._tgePairAddress (../../sb/WadzPayToken.sol#474) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/WadzPayToken.sol#131)" inContext (../../sb/WadzPayToken.sol#125-134)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+WadzPayToken.constructor() (../../sb/WadzPayToken.sol#488-492) uses literals with too many digits:
+	- _mint(msg.sender,250000000 * (10 ** uint256(decimals()))) (../../sb/WadzPayToken.sol#491)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+Loop condition i < _tgeWhitelistRounds.length (../../sb/WadzPayToken.sol#922) should use cached array length instead of referencing `length` member of the storage array.
+ Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cache-array-length
+/sb/WadzPayToken.sol analyzed (6 contracts with 93 detectors), 33 result(s) found

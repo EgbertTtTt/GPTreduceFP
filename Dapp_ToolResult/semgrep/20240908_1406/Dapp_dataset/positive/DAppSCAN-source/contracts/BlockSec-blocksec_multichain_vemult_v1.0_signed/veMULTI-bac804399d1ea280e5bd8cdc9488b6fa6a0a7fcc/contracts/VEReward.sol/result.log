@@ -1,0 +1,150 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 33 Code Findings │
+└──────────────────┘
+                     
+    /sb/VEReward.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+           24┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+           28┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          459┆ for (uint i = 0; i < rewards.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+           91┆ constructor (
+           92┆     address _ve_,
+           93┆     address rewardToken_
+           94┆ ) {
+           95┆     admin = msg.sender;
+           96┆     _ve = _ve_;
+           97┆     rewardToken = rewardToken_;
+           98┆     // add init point
+           99┆     addCheckpoint();
+          100┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          130┆ if (point_history[_mid].ts <= _time) {
+            ⋮┆----------------------------------------
+          292┆ epoch = epochInfo[i];
+            ⋮┆----------------------------------------
+          302┆ (uint reward_i, bool finished) = _pendingRewardSingle(tokenId,   
+  userLastClaimTime[tokenId][i], epochInfo[i]);                                 
+            ⋮┆----------------------------------------
+          302┆ (uint reward_i, bool finished) = _pendingRewardSingle(tokenId,   
+  userLastClaimTime[tokenId][i], epochInfo[i]);                                 
+            ⋮┆----------------------------------------
+          305┆ userLastClaimTime[tokenId][i] = block.timestamp;
+            ⋮┆----------------------------------------
+          331┆ if (epochInfo[_mid].startTime <= _time) {
+            ⋮┆----------------------------------------
+          447┆ if (block.timestamp < epochInfo[i].startTime) {
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          124┆ for (uint i = 0; i < 128; ++i) {
+            ⋮┆----------------------------------------
+          186┆ for (uint i = 0; i < numberOfEpoch; i++) {
+            ⋮┆----------------------------------------
+          272┆ for (uint i = 0; i < tokenIds.length; i++) {
+            ⋮┆----------------------------------------
+          279┆ for (uint i = 0; i < intervals.length; i++) {
+            ⋮┆----------------------------------------
+          291┆ for (uint i = startEpoch; i <= endEpoch; i++) {
+            ⋮┆----------------------------------------
+          325┆ for (uint i = 0; i < 128; ++i) {
+            ⋮┆----------------------------------------
+          446┆ for (uint i = start; i <= end; i++) {
+            ⋮┆----------------------------------------
+          459┆ for (uint i = 0; i < rewards.length; i++) {
+            ⋮┆----------------------------------------
+          476┆ for (uint i = 0; i < intv+1; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           32┆ require(address(token).isContract(), "SafeERC20: call to         
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+           36┆ require(success, "SafeERC20: low-level call failed");
+            ⋮┆----------------------------------------
+           40┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          288┆ require(endEpoch < epochInfo.length, "claim out of range");
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          186┆ for (uint i = 0; i < numberOfEpoch; i++) {
+            ⋮┆----------------------------------------
+          272┆ for (uint i = 0; i < tokenIds.length; i++) {
+            ⋮┆----------------------------------------
+          279┆ for (uint i = 0; i < intervals.length; i++) {
+            ⋮┆----------------------------------------
+          291┆ for (uint i = startEpoch; i <= endEpoch; i++) {
+            ⋮┆----------------------------------------
+          446┆ for (uint i = start; i <= end; i++) {
+            ⋮┆----------------------------------------
+          459┆ for (uint i = 0; i < rewards.length; i++) {
+            ⋮┆----------------------------------------
+          463┆ intv++;
+            ⋮┆----------------------------------------
+          476┆ for (uint i = 0; i < intv+1; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           40┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 33 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

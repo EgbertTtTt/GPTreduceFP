@@ -1,0 +1,111 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 13 Code Findings │
+└──────────────────┘
+                
+    /sb/Amp.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          752┆ Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+         1104┆ constructor(
+         1105┆     address _swapTokenAddress_,
+         1106┆     string memory _name_,
+         1107┆     string memory _symbol_
+         1108┆ ) public {
+         1109┆     // "Swap token cannot be 0 address"
+         1110┆     require(_swapTokenAddress_ != address(0),                    
+  EC_5A_INVALID_SWAP_TOKEN_ADDRESS);                                            
+         1111┆     swapToken = ISwapToken(_swapTokenAddress_);
+         1112┆ 
+         1113┆     _name = _name_;
+             [hid 15 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           87┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          102┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          119┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          136┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          153┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          274┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          295┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         1908┆ if (totalSupplyByPartition[_partition] == 0 && _partition !=     
+  defaultPartition) {                                                           
+         1909┆     _removePartitionFromTotalPartitions(_partition);
+         1910┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          119┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          295┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+       solidity.security.erc777-reentrancy  
+          ERC777 tokensReceived() reentrancy
+                                            
+         2101┆ IAmpTokensRecipient(recipientImplementation).tokensReceived(
+         2102┆     msg.sig,
+         2103┆     _toPartition,
+         2104┆     _operator,
+         2105┆     _from,
+         2106┆     _to,
+         2107┆     _value,
+         2108┆     _data,
+         2109┆     _operatorData
+         2110┆ );
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 13 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

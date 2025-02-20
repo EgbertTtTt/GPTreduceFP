@@ -1,0 +1,97 @@
+'solc --version' running
+'solc /sb/StakefishServicesContract.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+StakefishServicesContract.createValidator(bytes,bytes,bytes32,uint64) (../../sb/StakefishServicesContract.sol#675-711) calls abi.encodePacked() with multiple dynamic arguments:
+	- require(bool,string)(_operatorDataCommitment == keccak256(bytes)(abi.encodePacked(address(this),validatorPubKey,depositSignature,depositDataRoot,exitDate)),Data doesn't match commitment) (../../sb/StakefishServicesContract.sol#691-699)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#abi-encodePacked-collision
+
+Contract locking ether found:
+	Contract DepositContract (../../sb/StakefishServicesContract.sol#63-177) has payable functions:
+	 - IDepositContract.deposit(bytes,bytes,bytes,bytes32) (../../sb/StakefishServicesContract.sol#32-37)
+	 - DepositContract.deposit(bytes,bytes,bytes,bytes32) (../../sb/StakefishServicesContract.sol#100-158)
+	But does not have a function to withdraw the ether
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#contracts-that-lock-ether
+
+DepositContract.get_deposit_root().node (../../sb/StakefishServicesContract.sol#80) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+StakefishServicesContract.updateExitDate(uint64) (../../sb/StakefishServicesContract.sol#657-673) should emit an event for: 
+	- _exitDate = newExitDate (../../sb/StakefishServicesContract.sol#672) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+StakefishServicesContract.initialize(uint24,address,bytes32).operatorAddress (../../sb/StakefishServicesContract.sol#640) lacks a zero-check on :
+		- _operatorAddress = operatorAddress (../../sb/StakefishServicesContract.sol#647)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in StakefishServicesContract.createValidator(bytes,bytes,bytes32,uint64) (../../sb/StakefishServicesContract.sol#675-711):
+	External calls:
+	- depositContract.deposit{value: 32000000000000000000}(validatorPubKey,abi.encodePacked(uint96(0x010000000000000000000000),address(this)),depositSignature,depositDataRoot) (../../sb/StakefishServicesContract.sol#703-708)
+	Event emitted after the call(s):
+	- ValidatorDeposited(validatorPubKey) (../../sb/StakefishServicesContract.sol#710)
+Reentrancy in StakefishServicesContract.endOperatorServices() (../../sb/StakefishServicesContract.sol#740-758):
+	External calls:
+	- address(_operatorAddress).sendValue(finalCommission) (../../sb/StakefishServicesContract.sol#754)
+	Event emitted after the call(s):
+	- ServiceEnd(block.timestamp) (../../sb/StakefishServicesContract.sol#757)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+StakefishServicesContract.endOperatorServices() (../../sb/StakefishServicesContract.sol#740-758) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)((msg.sender == _operatorAddress) || (_deposits[msg.sender] > 0 && block.timestamp > _exitDate + MAX_SECONDS_IN_EXIT_QUEUE),Not allowed at the current time) (../../sb/StakefishServicesContract.sol#745-746)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/StakefishServicesContract.sol#396-406) uses assembly
+	- INLINE ASM (../../sb/StakefishServicesContract.sol#402-404)
+Address._verifyCallResult(bool,bytes,string) (../../sb/StakefishServicesContract.sol#559-579) uses assembly
+	- INLINE ASM (../../sb/StakefishServicesContract.sol#571-574)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address._verifyCallResult(bool,bytes,string) (../../sb/StakefishServicesContract.sol#559-579) is never used and should be removed
+Address.functionCall(address,bytes) (../../sb/StakefishServicesContract.sol#449-451) is never used and should be removed
+Address.functionCall(address,bytes,string) (../../sb/StakefishServicesContract.sol#459-465) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/StakefishServicesContract.sol#478-484) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/StakefishServicesContract.sol#492-503) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/StakefishServicesContract.sol#538-540) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/StakefishServicesContract.sol#548-557) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/StakefishServicesContract.sol#511-513) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/StakefishServicesContract.sol#521-530) is never used and should be removed
+Address.isContract(address) (../../sb/StakefishServicesContract.sol#396-406) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.8.4 (../../sb/StakefishServicesContract.sol#1) allows old versions
+solc-0.8.4 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/StakefishServicesContract.sol#424-429):
+	- (success) = recipient.call{value: amount}() (../../sb/StakefishServicesContract.sol#427)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/StakefishServicesContract.sol#492-503):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/StakefishServicesContract.sol#501)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/StakefishServicesContract.sol#521-530):
+	- (success,returndata) = target.staticcall(data) (../../sb/StakefishServicesContract.sol#528)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/StakefishServicesContract.sol#548-557):
+	- (success,returndata) = target.delegatecall(data) (../../sb/StakefishServicesContract.sol#555)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter IDepositContract.deposit(bytes,bytes,bytes,bytes32).withdrawal_credentials (../../sb/StakefishServicesContract.sol#34) is not in mixedCase
+Parameter IDepositContract.deposit(bytes,bytes,bytes,bytes32).deposit_data_root (../../sb/StakefishServicesContract.sol#36) is not in mixedCase
+Function IDepositContract.get_deposit_root() (../../sb/StakefishServicesContract.sol#41) is not in mixedCase
+Function IDepositContract.get_deposit_count() (../../sb/StakefishServicesContract.sol#45) is not in mixedCase
+Function DepositContract.get_deposit_root() (../../sb/StakefishServicesContract.sol#79-94) is not in mixedCase
+Function DepositContract.get_deposit_count() (../../sb/StakefishServicesContract.sol#96-98) is not in mixedCase
+Parameter DepositContract.deposit(bytes,bytes,bytes,bytes32).withdrawal_credentials (../../sb/StakefishServicesContract.sol#102) is not in mixedCase
+Parameter DepositContract.deposit(bytes,bytes,bytes,bytes32).deposit_data_root (../../sb/StakefishServicesContract.sol#104) is not in mixedCase
+Function DepositContract.to_little_endian_64(uint64) (../../sb/StakefishServicesContract.sol#164-176) is not in mixedCase
+Variable DepositContract.deposit_count (../../sb/StakefishServicesContract.sol#69) is not in mixedCase
+Variable DepositContract.zero_hashes (../../sb/StakefishServicesContract.sol#71) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+StakefishServicesContract.createValidator(bytes,bytes,bytes32,uint64) (../../sb/StakefishServicesContract.sol#675-711) uses literals with too many digits:
+	- depositContract.deposit{value: 32000000000000000000}(validatorPubKey,abi.encodePacked(uint96(0x010000000000000000000000),address(this)),depositSignature,depositDataRoot) (../../sb/StakefishServicesContract.sol#703-708)
+StakefishServicesContract.slitherConstructorConstantVariables() (../../sb/StakefishServicesContract.sol#593-1022) uses literals with too many digits:
+	- COMMISSION_RATE_SCALE = 1000000 (../../sb/StakefishServicesContract.sol#603)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+StakefishServicesContract.WEEK (../../sb/StakefishServicesContract.sol#598) is never used in StakefishServicesContract (../../sb/StakefishServicesContract.sol#593-1022)
+StakefishServicesContract.MAX_TIME_TO_WITHDRAW (../../sb/StakefishServicesContract.sol#602) is never used in StakefishServicesContract (../../sb/StakefishServicesContract.sol#593-1022)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-state-variable
+/sb/StakefishServicesContract.sol analyzed (6 contracts with 93 detectors), 41 result(s) found

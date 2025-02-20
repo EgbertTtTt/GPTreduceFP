@@ -1,0 +1,178 @@
+'solc --version' running
+'solc /sb/StrategyUtils.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/StrategyUtils.sol:
+Warning: Contract code size exceeds 24576 bytes (a limit introduced in Spurious Dragon). This contract may not be deployable on mainnet. Consider enabling the optimizer (with a low "runs" value!), turning off revert strings, or using libraries.
+    --> /sb/StrategyUtils.sol:1370:1:
+     |
+1370 | contract StrategyUtils is Ownable {
+     | ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+StrategyUtils.makeRepay(uint256,address,address,uint256,bool) (../../sb/StrategyUtils.sol#1547-1593) uses arbitrary from in transferFrom: IERC20(token0).safeTransferFrom(address(strategy),address(this),amount0) (../../sb/StrategyUtils.sol#1579)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#arbitrary-from-in-transferfrom
+
+StrategyUtils.makeFeeTransfer(address,uint256,uint256,address) (../../sb/StrategyUtils.sol#1400-1408) performs a multiplication on the result of a division:
+	- feeValue = IERC20(_token).balanceOf(strategy).mul(_balancerate).div(1e9).mul(_feerate).div(1e9) (../../sb/StrategyUtils.sol#1404)
+StrategyUtils._optimalDepositA(uint256,uint256,uint256,uint256) (../../sb/StrategyUtils.sol#1652-1668) performs a multiplication on the result of a division:
+	- c = _c.mul(1000).div(amtB.add(resB)).mul(resA) (../../sb/StrategyUtils.sol#1662)
+StrategyUtils.getLPToken2TokenAmount(address,address,uint256) (../../sb/StrategyUtils.sol#1670-1683) performs a multiplication on the result of a division:
+	- amount = _lpTokenAmount.mul(b).div(ERC20(_lpToken).totalSupply()).mul(2) (../../sb/StrategyUtils.sol#1678)
+StrategyUtils.getLPToken2TokenAmount(address,address,uint256) (../../sb/StrategyUtils.sol#1670-1683) performs a multiplication on the result of a division:
+	- amount = _lpTokenAmount.mul(a).div(ERC20(_lpToken).totalSupply()).mul(2) (../../sb/StrategyUtils.sol#1676)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+StrategyUtils.getAmountIn(address,uint256,address) (../../sb/StrategyUtils.sol#1701-1714) uses a dangerous strict equality:
+	- result.length == 0 (../../sb/StrategyUtils.sol#1710)
+StrategyUtils.getAmountOut(address,address,uint256) (../../sb/StrategyUtils.sol#1685-1699) uses a dangerous strict equality:
+	- result.length == 0 (../../sb/StrategyUtils.sol#1695)
+StrategyUtils.getTokenInTo(address,address,uint256,address) (../../sb/StrategyUtils.sol#1731-1750) uses a dangerous strict equality:
+	- result.length == 0 (../../sb/StrategyUtils.sol#1745)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+StrategyUtils.checkDepositLimit(uint256,address,uint256) (../../sb/StrategyUtils.sol#1477-1487) ignores return value by (totalLPRefund) = IStrategyLink(strategy).getPoolInfo(_pid) (../../sb/StrategyUtils.sol#1485)
+StrategyUtils.checkSlippageLimit(uint256,uint256,uint256) (../../sb/StrategyUtils.sol#1489-1502) ignores return value by (a,b) = IMdexPair(pairs).getReserves() (../../sb/StrategyUtils.sol#1499)
+StrategyUtils.optimalDepositAmount(address,uint256,uint256) (../../sb/StrategyUtils.sol#1629-1644) ignores return value by (resA,resB,None) = IMdexPair(lpToken).getReserves() (../../sb/StrategyUtils.sol#1636)
+StrategyUtils.getLPToken2TokenAmount(address,address,uint256) (../../sb/StrategyUtils.sol#1670-1683) ignores return value by (a,b) = IMdexPair(_lpToken).getReserves() (../../sb/StrategyUtils.sol#1672)
+StrategyUtils.getTokenInTo(address,address,uint256,address) (../../sb/StrategyUtils.sol#1731-1750) ignores return value by IERC20(_tokenIn).approve(address(router),uint256(- 1)) (../../sb/StrategyUtils.sol#1741)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+StrategyUtils.getTokenInTo(address,address,uint256,address) (../../sb/StrategyUtils.sol#1731-1750) uses timestamp for comparisons
+	Dangerous comparisons:
+	- result.length == 0 (../../sb/StrategyUtils.sol#1745)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/StrategyUtils.sol#311-320) uses assembly
+	- INLINE ASM (../../sb/StrategyUtils.sol#318)
+Address._verifyCallResult(bool,bytes,string) (../../sb/StrategyUtils.sol#456-473) uses assembly
+	- INLINE ASM (../../sb/StrategyUtils.sol#465-468)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.functionCall(address,bytes) (../../sb/StrategyUtils.sol#364-366) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/StrategyUtils.sol#389-391) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/StrategyUtils.sol#438-440) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/StrategyUtils.sol#448-454) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/StrategyUtils.sol#414-416) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/StrategyUtils.sol#424-430) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/StrategyUtils.sol#338-344) is never used and should be removed
+Context._msgData() (../../sb/StrategyUtils.sol#559-562) is never used and should be removed
+ERC20._burn(address,uint256) (../../sb/StrategyUtils.sol#805-813) is never used and should be removed
+ERC20._mint(address,uint256) (../../sb/StrategyUtils.sol#784-792) is never used and should be removed
+ERC20._setupDecimals(uint8) (../../sb/StrategyUtils.sol#843-845) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/StrategyUtils.sol#504-513) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/StrategyUtils.sol#520-523) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/StrategyUtils.sol#515-518) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/StrategyUtils.sol#264-267) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/StrategyUtils.sol#226-229) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/StrategyUtils.sol#284-287) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/StrategyUtils.sol#98-102) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/StrategyUtils.sol#134-137) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/StrategyUtils.sol#144-147) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/StrategyUtils.sol#119-127) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/StrategyUtils.sol#109-112) is never used and should be removed
+TenMath.safeSub(uint256,uint256) (../../sb/StrategyUtils.sol#1318-1320) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.6.12 (../../sb/StrategyUtils.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/StrategyUtils.sol#338-344):
+	- (success) = recipient.call{value: amount}() (../../sb/StrategyUtils.sol#342)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/StrategyUtils.sol#399-406):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/StrategyUtils.sol#404)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/StrategyUtils.sol#424-430):
+	- (success,returndata) = target.staticcall(data) (../../sb/StrategyUtils.sol#428)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/StrategyUtils.sol#448-454):
+	- (success,returndata) = target.delegatecall(data) (../../sb/StrategyUtils.sol#452)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Function IMdexRouter.WHT() (../../sb/StrategyUtils.sol#931) is not in mixedCase
+Parameter StrategyUtils.setSConfig(address)._sconfig (../../sb/StrategyUtils.sol#1385) is not in mixedCase
+Parameter StrategyUtils.makeDepositFee(uint256)._pid (../../sb/StrategyUtils.sol#1390) is not in mixedCase
+Parameter StrategyUtils.makeFeeTransfer(address,uint256,uint256,address)._token (../../sb/StrategyUtils.sol#1400) is not in mixedCase
+Parameter StrategyUtils.makeFeeTransfer(address,uint256,uint256,address)._feerate (../../sb/StrategyUtils.sol#1400) is not in mixedCase
+Parameter StrategyUtils.makeFeeTransfer(address,uint256,uint256,address)._balancerate (../../sb/StrategyUtils.sol#1400) is not in mixedCase
+Parameter StrategyUtils.makeFeeTransfer(address,uint256,uint256,address)._gather (../../sb/StrategyUtils.sol#1400) is not in mixedCase
+Parameter StrategyUtils.makeFeeTransferByValue(address,uint256,address)._token (../../sb/StrategyUtils.sol#1410) is not in mixedCase
+Parameter StrategyUtils.makeFeeTransferByValue(address,uint256,address)._feeValue (../../sb/StrategyUtils.sol#1410) is not in mixedCase
+Parameter StrategyUtils.makeFeeTransferByValue(address,uint256,address)._gather (../../sb/StrategyUtils.sol#1410) is not in mixedCase
+Parameter StrategyUtils.makeWithdrawRewardFee(uint256,uint256,uint256)._pid (../../sb/StrategyUtils.sol#1419) is not in mixedCase
+Parameter StrategyUtils.makeWithdrawRewardFee(uint256,uint256,uint256)._borrowRate (../../sb/StrategyUtils.sol#1419) is not in mixedCase
+Parameter StrategyUtils.makeWithdrawRewardFee(uint256,uint256,uint256)._rewardsRate (../../sb/StrategyUtils.sol#1419) is not in mixedCase
+Parameter StrategyUtils.makeRefundFee(uint256,uint256)._pid (../../sb/StrategyUtils.sol#1434) is not in mixedCase
+Parameter StrategyUtils.makeRefundFee(uint256,uint256)._newRewardBase (../../sb/StrategyUtils.sol#1434) is not in mixedCase
+Parameter StrategyUtils.makeLiquidationFee(uint256,address,uint256)._pid (../../sb/StrategyUtils.sol#1446) is not in mixedCase
+Parameter StrategyUtils.makeLiquidationFee(uint256,address,uint256)._baseToken (../../sb/StrategyUtils.sol#1446) is not in mixedCase
+Parameter StrategyUtils.checkAddPoolLimit(uint256,address,address)._pid (../../sb/StrategyUtils.sol#1459) is not in mixedCase
+Parameter StrategyUtils.checkAddPoolLimit(uint256,address,address)._baseToken (../../sb/StrategyUtils.sol#1459) is not in mixedCase
+Parameter StrategyUtils.checkAddPoolLimit(uint256,address,address)._lpTokenInPools (../../sb/StrategyUtils.sol#1459) is not in mixedCase
+Parameter StrategyUtils.checkDepositLimit(uint256,address,uint256)._pid (../../sb/StrategyUtils.sol#1477) is not in mixedCase
+Parameter StrategyUtils.checkDepositLimit(uint256,address,uint256)._lpAmount (../../sb/StrategyUtils.sol#1477) is not in mixedCase
+Parameter StrategyUtils.checkSlippageLimit(uint256,uint256,uint256)._pid (../../sb/StrategyUtils.sol#1489) is not in mixedCase
+Parameter StrategyUtils.checkSlippageLimit(uint256,uint256,uint256)._desirePrice (../../sb/StrategyUtils.sol#1489) is not in mixedCase
+Parameter StrategyUtils.checkSlippageLimit(uint256,uint256,uint256)._slippage (../../sb/StrategyUtils.sol#1489) is not in mixedCase
+Parameter StrategyUtils.checkBorrowLimit(uint256,address,address,uint256)._pid (../../sb/StrategyUtils.sol#1504) is not in mixedCase
+Parameter StrategyUtils.checkBorrowLimit(uint256,address,address,uint256)._account (../../sb/StrategyUtils.sol#1504) is not in mixedCase
+Parameter StrategyUtils.checkBorrowLimit(uint256,address,address,uint256)._borrowFrom (../../sb/StrategyUtils.sol#1504) is not in mixedCase
+Parameter StrategyUtils.checkBorrowLimit(uint256,address,address,uint256)._borrowAmount (../../sb/StrategyUtils.sol#1504) is not in mixedCase
+Parameter StrategyUtils.checkBorrowGetHoldAmount(address,uint256,address)._strategy (../../sb/StrategyUtils.sol#1522) is not in mixedCase
+Parameter StrategyUtils.checkBorrowGetHoldAmount(address,uint256,address)._pid (../../sb/StrategyUtils.sol#1522) is not in mixedCase
+Parameter StrategyUtils.checkLiquidationLimit(uint256,address,uint256)._pid (../../sb/StrategyUtils.sol#1538) is not in mixedCase
+Parameter StrategyUtils.checkLiquidationLimit(uint256,address,uint256)._borrowRate (../../sb/StrategyUtils.sol#1538) is not in mixedCase
+Parameter StrategyUtils.makeRepay(uint256,address,address,uint256,bool)._pid (../../sb/StrategyUtils.sol#1547) is not in mixedCase
+Parameter StrategyUtils.makeRepay(uint256,address,address,uint256,bool)._borrowFrom (../../sb/StrategyUtils.sol#1547) is not in mixedCase
+Parameter StrategyUtils.makeRepay(uint256,address,address,uint256,bool)._account (../../sb/StrategyUtils.sol#1547) is not in mixedCase
+Parameter StrategyUtils.makeRepay(uint256,address,address,uint256,bool)._rate (../../sb/StrategyUtils.sol#1547) is not in mixedCase
+Parameter StrategyUtils.makeRepay(uint256,address,address,uint256,bool)._fast (../../sb/StrategyUtils.sol#1547) is not in mixedCase
+Parameter StrategyUtils.getBorrowAmount(uint256,address)._pid (../../sb/StrategyUtils.sol#1595) is not in mixedCase
+Parameter StrategyUtils.getBorrowAmount(uint256,address)._account (../../sb/StrategyUtils.sol#1595) is not in mixedCase
+Parameter StrategyUtils.transferFromAllToken(address,address,address,address)._from (../../sb/StrategyUtils.sol#1606) is not in mixedCase
+Parameter StrategyUtils.transferFromAllToken(address,address,address,address)._to (../../sb/StrategyUtils.sol#1606) is not in mixedCase
+Parameter StrategyUtils.transferFromAllToken(address,address,address,address)._token0 (../../sb/StrategyUtils.sol#1606) is not in mixedCase
+Parameter StrategyUtils.transferFromAllToken(address,address,address,address)._token1 (../../sb/StrategyUtils.sol#1606) is not in mixedCase
+Parameter StrategyUtils.transferFromToken(address,address,address)._from (../../sb/StrategyUtils.sol#1613) is not in mixedCase
+Parameter StrategyUtils.transferFromToken(address,address,address)._to (../../sb/StrategyUtils.sol#1613) is not in mixedCase
+Parameter StrategyUtils.transferFromToken(address,address,address)._token (../../sb/StrategyUtils.sol#1613) is not in mixedCase
+Parameter StrategyUtils.getLPToken2TokenAmount(address,address,uint256)._lpToken (../../sb/StrategyUtils.sol#1670) is not in mixedCase
+Parameter StrategyUtils.getLPToken2TokenAmount(address,address,uint256)._baseToken (../../sb/StrategyUtils.sol#1670) is not in mixedCase
+Parameter StrategyUtils.getLPToken2TokenAmount(address,address,uint256)._lpTokenAmount (../../sb/StrategyUtils.sol#1670) is not in mixedCase
+Parameter StrategyUtils.getAmountOut(address,address,uint256)._tokenIn (../../sb/StrategyUtils.sol#1685) is not in mixedCase
+Parameter StrategyUtils.getAmountOut(address,address,uint256)._tokenOut (../../sb/StrategyUtils.sol#1685) is not in mixedCase
+Parameter StrategyUtils.getAmountOut(address,address,uint256)._amountOut (../../sb/StrategyUtils.sol#1685) is not in mixedCase
+Parameter StrategyUtils.getAmountIn(address,uint256,address)._tokenIn (../../sb/StrategyUtils.sol#1701) is not in mixedCase
+Parameter StrategyUtils.getAmountIn(address,uint256,address)._amountIn (../../sb/StrategyUtils.sol#1701) is not in mixedCase
+Parameter StrategyUtils.getAmountIn(address,uint256,address)._tokenOut (../../sb/StrategyUtils.sol#1701) is not in mixedCase
+Parameter StrategyUtils.getTokenOut(address,address,uint256)._tokenIn (../../sb/StrategyUtils.sol#1716) is not in mixedCase
+Parameter StrategyUtils.getTokenOut(address,address,uint256)._tokenOut (../../sb/StrategyUtils.sol#1716) is not in mixedCase
+Parameter StrategyUtils.getTokenOut(address,address,uint256)._amountOut (../../sb/StrategyUtils.sol#1716) is not in mixedCase
+Parameter StrategyUtils.getTokenIn(address,uint256,address)._tokenIn (../../sb/StrategyUtils.sol#1724) is not in mixedCase
+Parameter StrategyUtils.getTokenIn(address,uint256,address)._amountIn (../../sb/StrategyUtils.sol#1724) is not in mixedCase
+Parameter StrategyUtils.getTokenIn(address,uint256,address)._tokenOut (../../sb/StrategyUtils.sol#1724) is not in mixedCase
+Parameter StrategyUtils.getTokenInTo(address,address,uint256,address)._toAddress (../../sb/StrategyUtils.sol#1731) is not in mixedCase
+Parameter StrategyUtils.getTokenInTo(address,address,uint256,address)._tokenIn (../../sb/StrategyUtils.sol#1731) is not in mixedCase
+Parameter StrategyUtils.getTokenInTo(address,address,uint256,address)._amountIn (../../sb/StrategyUtils.sol#1731) is not in mixedCase
+Parameter StrategyUtils.getTokenInTo(address,address,uint256,address)._tokenOut (../../sb/StrategyUtils.sol#1731) is not in mixedCase
+Constant StrategyUtils.factory (../../sb/StrategyUtils.sol#1377) is not in UPPER_CASE_WITH_UNDERSCORES
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/StrategyUtils.sol#560)" inContext (../../sb/StrategyUtils.sol#554-563)
+Redundant expression "_borrowAmount (../../sb/StrategyUtils.sol#1451)" inStrategyUtils (../../sb/StrategyUtils.sol#1370-1751)
+Redundant expression "_account (../../sb/StrategyUtils.sol#1479)" inStrategyUtils (../../sb/StrategyUtils.sol#1370-1751)
+Redundant expression "_account (../../sb/StrategyUtils.sol#1540)" inStrategyUtils (../../sb/StrategyUtils.sol#1370-1751)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Variable IMdexRouter.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountADesired (../../sb/StrategyUtils.sol#938) is too similar to IMdexRouter.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountBDesired (../../sb/StrategyUtils.sol#939)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+TenMath.sqrt(uint256) (../../sb/StrategyUtils.sol#1324-1367) uses literals with too many digits:
+	- xx >= 0x100000000000000000000000000000000 (../../sb/StrategyUtils.sol#1329)
+TenMath.sqrt(uint256) (../../sb/StrategyUtils.sol#1324-1367) uses literals with too many digits:
+	- xx >= 0x10000000000000000 (../../sb/StrategyUtils.sol#1334)
+TenMath.sqrt(uint256) (../../sb/StrategyUtils.sol#1324-1367) uses literals with too many digits:
+	- xx >= 0x100000000 (../../sb/StrategyUtils.sol#1338)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+StrategyUtils.strategy (../../sb/StrategyUtils.sol#1375) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/StrategyUtils.sol analyzed (16 contracts with 93 detectors), 121 result(s) found

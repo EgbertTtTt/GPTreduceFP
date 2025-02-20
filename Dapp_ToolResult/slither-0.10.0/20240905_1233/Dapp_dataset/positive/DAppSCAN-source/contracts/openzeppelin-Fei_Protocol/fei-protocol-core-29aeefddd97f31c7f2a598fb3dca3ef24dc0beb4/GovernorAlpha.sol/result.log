@@ -1,0 +1,211 @@
+'solc --version' running
+'solc /sb/GovernorAlpha.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/GovernorAlpha.sol:
+Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.
+  --> /sb/GovernorAlpha.sol:41:14:
+   |
+41 |         uint id;
+   |              ^^
+
+Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.
+  --> /sb/GovernorAlpha.sol:44:17:
+   |
+44 |         address proposer;
+   |                 ^^^^^^^^
+
+Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.
+  --> /sb/GovernorAlpha.sol:47:14:
+   |
+47 |         uint eta;
+   |              ^^^
+
+Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.
+  --> /sb/GovernorAlpha.sol:50:19:
+   |
+50 |         address[] targets;
+   |                   ^^^^^^^
+
+Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.
+  --> /sb/GovernorAlpha.sol:53:16:
+   |
+53 |         uint[] values;
+   |                ^^^^^^
+
+Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.
+  --> /sb/GovernorAlpha.sol:56:18:
+   |
+56 |         string[] signatures;
+   |                  ^^^^^^^^^^
+
+Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.
+  --> /sb/GovernorAlpha.sol:59:17:
+   |
+59 |         bytes[] calldatas;
+   |                 ^^^^^^^^^
+
+Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.
+  --> /sb/GovernorAlpha.sol:62:14:
+   |
+62 |         uint startBlock;
+   |              ^^^^^^^^^^
+
+Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.
+  --> /sb/GovernorAlpha.sol:65:14:
+   |
+65 |         uint endBlock;
+   |              ^^^^^^^^
+
+Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.
+  --> /sb/GovernorAlpha.sol:68:14:
+   |
+68 |         uint forVotes;
+   |              ^^^^^^^^
+
+Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.
+  --> /sb/GovernorAlpha.sol:71:14:
+   |
+71 |         uint againstVotes;
+   |              ^^^^^^^^^^^^
+
+Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.
+  --> /sb/GovernorAlpha.sol:74:14:
+   |
+74 |         bool canceled;
+   |              ^^^^^^^^
+
+Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.
+  --> /sb/GovernorAlpha.sol:77:14:
+   |
+77 |         bool executed;
+   |              ^^^^^^^^
+
+Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.
+  --> /sb/GovernorAlpha.sol:80:38:
+   |
+80 |         mapping (address => Receipt) receipts;
+   |                                      ^^^^^^^^
+
+Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.
+  --> /sb/GovernorAlpha.sol:86:14:
+   |
+86 |         bool hasVoted;
+   |              ^^^^^^^^
+
+Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.
+  --> /sb/GovernorAlpha.sol:89:14:
+   |
+89 |         bool support;
+   |              ^^^^^^^
+
+Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.
+  --> /sb/GovernorAlpha.sol:92:16:
+   |
+92 |         uint96 votes;
+   |                ^^^^^
+
+Warning: SPDX license identifier not provided in source file. Before publishing, consider adding a comment containing "SPDX-License-Identifier: <SPDX-License>" to each source file. Use "SPDX-License-Identifier: UNLICENSED" for non-open-source code. Please see https://spdx.org for more information.
+--> /sb/GovernorAlpha.sol
+
+
+
+GovernorAlpha.execute(uint256) (../../sb/GovernorAlpha.sol#197-205) sends eth to arbitrary user
+	Dangerous calls:
+	- timelock.executeTransaction{value: proposal.values[i]}(proposal.targets[i],proposal.values[i],proposal.signatures[i],proposal.calldatas[i],proposal.eta) (../../sb/GovernorAlpha.sol#202)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#functions-that-send-ether-to-arbitrary-destinations
+
+Reentrancy in GovernorAlpha.queue(uint256) (../../sb/GovernorAlpha.sol#180-190):
+	External calls:
+	- _queueOrRevert(proposal.targets[i],proposal.values[i],proposal.signatures[i],proposal.calldatas[i],eta) (../../sb/GovernorAlpha.sol#186)
+		- timelock.queueTransaction(target,value,signature,data,eta) (../../sb/GovernorAlpha.sol#194)
+	State variables written after the call(s):
+	- proposal.eta = eta (../../sb/GovernorAlpha.sol#188)
+	GovernorAlpha.proposals (../../sb/GovernorAlpha.sol#108) can be used in cross function reentrancies:
+	- GovernorAlpha._castVote(address,uint256,bool) (../../sb/GovernorAlpha.sol#267-285)
+	- GovernorAlpha.cancel(uint256) (../../sb/GovernorAlpha.sol#207-220)
+	- GovernorAlpha.execute(uint256) (../../sb/GovernorAlpha.sol#197-205)
+	- GovernorAlpha.getActions(uint256) (../../sb/GovernorAlpha.sol#222-225)
+	- GovernorAlpha.getReceipt(uint256,address) (../../sb/GovernorAlpha.sol#227-229)
+	- GovernorAlpha.proposals (../../sb/GovernorAlpha.sol#108)
+	- GovernorAlpha.propose(address[],uint256[],string[],bytes[],string) (../../sb/GovernorAlpha.sol#140-178)
+	- GovernorAlpha.queue(uint256) (../../sb/GovernorAlpha.sol#180-190)
+	- GovernorAlpha.state(uint256) (../../sb/GovernorAlpha.sol#231-252)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+GovernorAlpha._queueOrRevert(address,uint256,string,bytes,uint256) (../../sb/GovernorAlpha.sol#192-195) ignores return value by timelock.queueTransaction(target,value,signature,data,eta) (../../sb/GovernorAlpha.sol#194)
+GovernorAlpha.execute(uint256) (../../sb/GovernorAlpha.sol#197-205) ignores return value by timelock.executeTransaction{value: proposal.values[i]}(proposal.targets[i],proposal.values[i],proposal.signatures[i],proposal.calldatas[i],proposal.eta) (../../sb/GovernorAlpha.sol#202)
+GovernorAlpha.__queueSetTimelockPendingAdmin(address,uint256) (../../sb/GovernorAlpha.sol#297-300) ignores return value by timelock.queueTransaction(address(timelock),0,setPendingAdmin(address),abi.encode(newPendingAdmin),eta) (../../sb/GovernorAlpha.sol#299)
+GovernorAlpha.__executeSetTimelockPendingAdmin(address,uint256) (../../sb/GovernorAlpha.sol#302-305) ignores return value by timelock.executeTransaction(address(timelock),0,setPendingAdmin(address),abi.encode(newPendingAdmin),eta) (../../sb/GovernorAlpha.sol#304)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+GovernorAlpha.cancel(uint256).state (../../sb/GovernorAlpha.sol#208) shadows:
+	- GovernorAlpha.state(uint256) (../../sb/GovernorAlpha.sol#231-252) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+GovernorAlpha.constructor(address,address,address).guardian_ (../../sb/GovernorAlpha.sol#134) lacks a zero-check on :
+		- guardian = guardian_ (../../sb/GovernorAlpha.sol#137)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+GovernorAlpha._queueOrRevert(address,uint256,string,bytes,uint256) (../../sb/GovernorAlpha.sol#192-195) has external calls inside a loop: require(bool,string)(! timelock.queuedTransactions(keccak256(bytes)(abi.encode(target,value,signature,data,eta))),GovernorAlpha::_queueOrRevert: proposal action already queued at eta) (../../sb/GovernorAlpha.sol#193)
+GovernorAlpha._queueOrRevert(address,uint256,string,bytes,uint256) (../../sb/GovernorAlpha.sol#192-195) has external calls inside a loop: timelock.queueTransaction(target,value,signature,data,eta) (../../sb/GovernorAlpha.sol#194)
+GovernorAlpha.execute(uint256) (../../sb/GovernorAlpha.sol#197-205) has external calls inside a loop: timelock.executeTransaction{value: proposal.values[i]}(proposal.targets[i],proposal.values[i],proposal.signatures[i],proposal.calldatas[i],proposal.eta) (../../sb/GovernorAlpha.sol#202)
+GovernorAlpha.cancel(uint256) (../../sb/GovernorAlpha.sol#207-220) has external calls inside a loop: timelock.cancelTransaction(proposal.targets[i],proposal.values[i],proposal.signatures[i],proposal.calldatas[i],proposal.eta) (../../sb/GovernorAlpha.sol#216)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in GovernorAlpha.cancel(uint256) (../../sb/GovernorAlpha.sol#207-220):
+	External calls:
+	- timelock.cancelTransaction(proposal.targets[i],proposal.values[i],proposal.signatures[i],proposal.calldatas[i],proposal.eta) (../../sb/GovernorAlpha.sol#216)
+	Event emitted after the call(s):
+	- ProposalCanceled(proposalId) (../../sb/GovernorAlpha.sol#219)
+Reentrancy in GovernorAlpha.execute(uint256) (../../sb/GovernorAlpha.sol#197-205):
+	External calls:
+	- timelock.executeTransaction{value: proposal.values[i]}(proposal.targets[i],proposal.values[i],proposal.signatures[i],proposal.calldatas[i],proposal.eta) (../../sb/GovernorAlpha.sol#202)
+	Event emitted after the call(s):
+	- ProposalExecuted(proposalId) (../../sb/GovernorAlpha.sol#204)
+Reentrancy in GovernorAlpha.queue(uint256) (../../sb/GovernorAlpha.sol#180-190):
+	External calls:
+	- _queueOrRevert(proposal.targets[i],proposal.values[i],proposal.signatures[i],proposal.calldatas[i],eta) (../../sb/GovernorAlpha.sol#186)
+		- timelock.queueTransaction(target,value,signature,data,eta) (../../sb/GovernorAlpha.sol#194)
+	Event emitted after the call(s):
+	- ProposalQueued(proposalId,eta) (../../sb/GovernorAlpha.sol#189)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+GovernorAlpha._queueOrRevert(address,uint256,string,bytes,uint256) (../../sb/GovernorAlpha.sol#192-195) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(! timelock.queuedTransactions(keccak256(bytes)(abi.encode(target,value,signature,data,eta))),GovernorAlpha::_queueOrRevert: proposal action already queued at eta) (../../sb/GovernorAlpha.sol#193)
+GovernorAlpha.state(uint256) (../../sb/GovernorAlpha.sol#231-252) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp >= add256(proposal.eta,timelock.GRACE_PERIOD()) (../../sb/GovernorAlpha.sol#247)
+GovernorAlpha.add256(uint256,uint256) (../../sb/GovernorAlpha.sol#307-311) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(c >= a,addition overflow) (../../sb/GovernorAlpha.sol#309)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+GovernorAlpha.getChainId() (../../sb/GovernorAlpha.sol#318-323) uses assembly
+	- INLINE ASM (../../sb/GovernorAlpha.sol#321)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+GovernorAlpha._castVote(address,uint256,bool) (../../sb/GovernorAlpha.sol#267-285) compares to a boolean constant:
+	-require(bool,string)(receipt.hasVoted == false,GovernorAlpha::_castVote: voter already voted) (../../sb/GovernorAlpha.sol#271)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#boolean-equality
+
+Pragma version^0.6.0 (../../sb/GovernorAlpha.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Function GovernorAlpha.__acceptAdmin() (../../sb/GovernorAlpha.sol#287-290) is not in mixedCase
+Function GovernorAlpha.__abdicate() (../../sb/GovernorAlpha.sol#292-295) is not in mixedCase
+Function GovernorAlpha.__queueSetTimelockPendingAdmin(address,uint256) (../../sb/GovernorAlpha.sol#297-300) is not in mixedCase
+Function GovernorAlpha.__executeSetTimelockPendingAdmin(address,uint256) (../../sb/GovernorAlpha.sol#302-305) is not in mixedCase
+Function TimelockInterface.GRACE_PERIOD() (../../sb/GovernorAlpha.sol#329) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+GovernorAlpha.quorumVotes() (../../sb/GovernorAlpha.sol#13) uses literals with too many digits:
+	- 1000000e18 (../../sb/GovernorAlpha.sol#13)
+GovernorAlpha.proposalThreshold() (../../sb/GovernorAlpha.sol#16) uses literals with too many digits:
+	- 100000e18 (../../sb/GovernorAlpha.sol#16)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+GovernorAlpha.timelock (../../sb/GovernorAlpha.sol#28) should be immutable 
+GovernorAlpha.tribe (../../sb/GovernorAlpha.sol#31) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/GovernorAlpha.sol analyzed (3 contracts with 93 detectors), 31 result(s) found

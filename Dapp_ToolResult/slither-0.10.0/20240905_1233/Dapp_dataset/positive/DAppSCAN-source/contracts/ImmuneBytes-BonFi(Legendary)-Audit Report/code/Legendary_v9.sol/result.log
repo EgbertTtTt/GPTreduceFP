@@ -1,0 +1,121 @@
+'solc --version' running
+'solc /sb/Legendary_v9.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+Legendary_v8.emergencyWithdraw() (../../sb/Legendary_v9.sol#413-423) uses a dangerous strict equality:
+	- require(bool,string)(deposits[from].paid == false,Already paid out) (../../sb/Legendary_v9.sol#420)
+Legendary_v8.withdraw() (../../sb/Legendary_v9.sol#381-390) uses a dangerous strict equality:
+	- require(bool,string)(deposits[from].paid == false,Already paid out) (../../sb/Legendary_v9.sol#388)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Legendary_v8._stake(address,uint256).stakerEligibility (../../sb/Legendary_v9.sol#357) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+Legendary_v8.changeLockDuration(uint256) (../../sb/Legendary_v9.sol#263-265) should emit an event for: 
+	- lockDuration = lockduration_ (../../sb/Legendary_v9.sol#264) 
+Legendary_v8.setEligibilityAmount(uint256) (../../sb/Legendary_v9.sol#276-280) should emit an event for: 
+	- eligibilityAmount = eligibilityAmount_ (../../sb/Legendary_v9.sol#279) 
+Legendary_v8.addReward(uint256) (../../sb/Legendary_v9.sol#288-303) should emit an event for: 
+	- rewardBalance = rewardBalance.add(rewardAmount) (../../sb/Legendary_v9.sol#301) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+Reentrancy in Legendary_v8._stake(address,uint256) (../../sb/Legendary_v9.sol#351-376):
+	External calls:
+	- ! _payMe(from,amount) (../../sb/Legendary_v9.sol#352)
+		- ERC20Interface.transferFrom(allower,receiver,amount) (../../sb/Legendary_v9.sol#511)
+	State variables written after the call(s):
+	- deposits[from] = Deposits(amount,block.timestamp,block.timestamp.add((lockDuration.mul(86400))),index,false,stakerEligibility) (../../sb/Legendary_v9.sol#362-369)
+	- hasStaked[from] = true (../../sb/Legendary_v9.sol#356)
+	- stakedBalance = stakedBalance.add(amount) (../../sb/Legendary_v9.sol#373)
+	- stakedTotal = stakedTotal.add(amount) (../../sb/Legendary_v9.sol#374)
+Reentrancy in Legendary_v8.addReward(uint256) (../../sb/Legendary_v9.sol#288-303):
+	External calls:
+	- ! _payMe(from,rewardAmount) (../../sb/Legendary_v9.sol#296)
+		- ERC20Interface.transferFrom(allower,receiver,amount) (../../sb/Legendary_v9.sol#511)
+	State variables written after the call(s):
+	- rewardBalance = rewardBalance.add(rewardAmount) (../../sb/Legendary_v9.sol#301)
+	- totalReward = totalReward.add(rewardAmount) (../../sb/Legendary_v9.sol#300)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in Legendary_v8._emergencyWithdraw(address) (../../sb/Legendary_v9.sol#425-439):
+	External calls:
+	- principalPaid = _payDirect(from,amount) (../../sb/Legendary_v9.sol#434)
+		- ERC20Interface.transfer(to,amount) (../../sb/Legendary_v9.sol#516)
+	Event emitted after the call(s):
+	- PaidOut(tokenAddress,from,amount,0) (../../sb/Legendary_v9.sol#436)
+Reentrancy in Legendary_v8._stake(address,uint256) (../../sb/Legendary_v9.sol#351-376):
+	External calls:
+	- ! _payMe(from,amount) (../../sb/Legendary_v9.sol#352)
+		- ERC20Interface.transferFrom(allower,receiver,amount) (../../sb/Legendary_v9.sol#511)
+	Event emitted after the call(s):
+	- Staked(tokenAddress,from,amount) (../../sb/Legendary_v9.sol#371)
+Reentrancy in Legendary_v8._withdraw(address) (../../sb/Legendary_v9.sol#392-411):
+	External calls:
+	- _payDirect(from,payOut) (../../sb/Legendary_v9.sol#406)
+		- ERC20Interface.transfer(to,amount) (../../sb/Legendary_v9.sol#516)
+	Event emitted after the call(s):
+	- PaidOut(tokenAddress,from,amount,reward) (../../sb/Legendary_v9.sol#407)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Legendary_v8.withdraw() (../../sb/Legendary_v9.sol#381-390) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp >= deposits[from].endTime,Requesting before lock time) (../../sb/Legendary_v9.sol#384-387)
+	- require(bool,string)(deposits[from].paid == false,Already paid out) (../../sb/Legendary_v9.sol#388)
+Legendary_v8._withdraw(address) (../../sb/Legendary_v9.sol#392-411) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(reward <= rewardBalance,Not enough rewards) (../../sb/Legendary_v9.sol#396)
+Legendary_v8.emergencyWithdraw() (../../sb/Legendary_v9.sol#413-423) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp >= deposits[from].endTime,Requesting before lock time) (../../sb/Legendary_v9.sol#416-419)
+	- require(bool,string)(deposits[from].paid == false,Already paid out) (../../sb/Legendary_v9.sol#420)
+Legendary_v8._emergencyWithdraw(address) (../../sb/Legendary_v9.sol#425-439) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(principalPaid,Error paying) (../../sb/Legendary_v9.sol#435)
+Legendary_v8._calculate(address) (../../sb/Legendary_v9.sol#452-499) uses timestamp for comparisons
+	Dangerous comparisons:
+	- i < index (../../sb/Legendary_v9.sol#470)
+	- endTime < rates[i + 1].timeStamp (../../sb/Legendary_v9.sol#472)
+	- depositTime < endTime (../../sb/Legendary_v9.sol#486)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Legendary_v8.stake(uint256) (../../sb/Legendary_v9.sol#339-349) compares to a boolean constant:
+	-require(bool,string)(hasStaked[from] == false,Already Staked) (../../sb/Legendary_v9.sol#347)
+Legendary_v8.withdraw() (../../sb/Legendary_v9.sol#381-390) compares to a boolean constant:
+	-require(bool,string)(deposits[from].paid == false,Already paid out) (../../sb/Legendary_v9.sol#388)
+Legendary_v8.withdraw() (../../sb/Legendary_v9.sol#381-390) compares to a boolean constant:
+	-require(bool,string)(hasStaked[from] == true,No stakes found for user) (../../sb/Legendary_v9.sol#383)
+Legendary_v8.emergencyWithdraw() (../../sb/Legendary_v9.sol#413-423) compares to a boolean constant:
+	-require(bool,string)(hasStaked[from] == true,No stakes found for user) (../../sb/Legendary_v9.sol#415)
+Legendary_v8.emergencyWithdraw() (../../sb/Legendary_v9.sol#413-423) compares to a boolean constant:
+	-require(bool,string)(deposits[from].paid == false,Already paid out) (../../sb/Legendary_v9.sol#420)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#boolean-equality
+
+Context._msgData() (../../sb/Legendary_v9.sol#94-97) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/Legendary_v9.sol#79-82) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.5.0 (../../sb/Legendary_v9.sol#1) allows old versions
+Pragma version^0.5.0 (../../sb/Legendary_v9.sol#2) allows old versions
+Pragma version^0.5.0 (../../sb/Legendary_v9.sol#3) allows old versions
+Pragma version^0.5.0 (../../sb/Legendary_v9.sol#4) allows old versions
+Pragma version^0.5.0 (../../sb/Legendary_v9.sol#5) allows old versions
+solc-0.5.17 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Legendary_v8 (../../sb/Legendary_v9.sol#150-542) should inherit from IRookieProfessionalCheck (../../sb/Legendary_v9.sol#146-148)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-inheritance
+
+Contract Legendary_v8 (../../sb/Legendary_v9.sol#150-542) is not in CapWords
+Variable Legendary_v8.ERC20Interface (../../sb/Legendary_v9.sol#190) is not in mixedCase
+Variable Legendary_v8.RookieInstance (../../sb/Legendary_v9.sol#191) is not in mixedCase
+Variable Legendary_v8.ProfessionalInstance (../../sb/Legendary_v9.sol#192) is not in mixedCase
+Modifier Legendary_v8._hasAllowance(address,uint256) (../../sb/Legendary_v9.sol#519-525) is not in mixedCase
+Modifier Legendary_v8._isEligible(address) (../../sb/Legendary_v9.sol#531-541) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/Legendary_v9.sol#95)" inContext (../../sb/Legendary_v9.sol#85-98)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Variable Legendary_v8._calculate(address)._lockduration (../../sb/Legendary_v9.sol#469) is too similar to Legendary_v8.constructor(string,address,uint64,uint256,address,address).lockDuration_ (../../sb/Legendary_v9.sol#226)
+Variable Legendary_v8._calculate(address)._lockduration (../../sb/Legendary_v9.sol#469) is too similar to Legendary_v8.changeLockDuration(uint256).lockduration_ (../../sb/Legendary_v9.sol#263)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+/sb/Legendary_v9.sol analyzed (6 contracts with 93 detectors), 39 result(s) found

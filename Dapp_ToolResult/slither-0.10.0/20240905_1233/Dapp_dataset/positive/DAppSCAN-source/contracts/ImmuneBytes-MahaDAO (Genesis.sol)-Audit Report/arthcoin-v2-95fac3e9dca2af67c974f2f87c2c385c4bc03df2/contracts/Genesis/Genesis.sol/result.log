@@ -1,0 +1,188 @@
+'solc --version' running
+'solc /sb/Genesis.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/sb' running
+
+Genesis._distributeToWETHPool(uint256) (../../sb/Genesis.sol#1658-1669) sends eth to arbitrary user
+	Dangerous calls:
+	- _WETH.deposit{value: amount}() (../../sb/Genesis.sol#1663)
+Genesis._distributeToUniswapPair(address,uint256) (../../sb/Genesis.sol#1671-1714) sends eth to arbitrary user
+	Dangerous calls:
+	- (amountToken,amountETH,liquidity) = _ROUTER.addLiquidityETH{value: amount}(tokenAddress,amount,amount,amount,address(this),block.timestamp) (../../sb/Genesis.sol#1699-1707)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#functions-that-send-ether-to-arbitrary-destinations
+
+Genesis._distributeToUniswapPair(address,uint256) (../../sb/Genesis.sol#1671-1714) ignores return value by _ARTH.approve(address(_ROUTER),amount) (../../sb/Genesis.sol#1685)
+Genesis._distributeToUniswapPair(address,uint256) (../../sb/Genesis.sol#1671-1714) ignores return value by _ARTHX.approve(address(_ROUTER),amount) (../../sb/Genesis.sol#1691)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+Genesis.setHardCap(uint256) (../../sb/Genesis.sol#1548-1550) should emit an event for: 
+	- hardCap = _hardCap (../../sb/Genesis.sol#1549) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+Genesis.setPoolAndPairs(address,address,address)._arthETHPool (../../sb/Genesis.sol#1539) lacks a zero-check on :
+		- arthWETHPoolAddres = _arthETHPool (../../sb/Genesis.sol#1543)
+Genesis.setPoolAndPairs(address,address,address)._arthETHPair (../../sb/Genesis.sol#1540) lacks a zero-check on :
+		- arthETHPairAddress = _arthETHPair (../../sb/Genesis.sol#1544)
+Genesis.setPoolAndPairs(address,address,address)._arthxETHPair (../../sb/Genesis.sol#1541) lacks a zero-check on :
+		- arthxETHPairAddress = _arthxETHPair (../../sb/Genesis.sol#1545)
+Genesis.setARTHWETHPoolAddress(address).poolAddress (../../sb/Genesis.sol#1552) lacks a zero-check on :
+		- arthWETHPoolAddres = poolAddress (../../sb/Genesis.sol#1556)
+Genesis.setARTHETHPairAddress(address).pairAddress (../../sb/Genesis.sol#1559) lacks a zero-check on :
+		- arthETHPairAddress = pairAddress (../../sb/Genesis.sol#1563)
+Genesis.setARTHXETHPairAddress(address).pairAddress (../../sb/Genesis.sol#1566) lacks a zero-check on :
+		- arthxETHPairAddress = pairAddress (../../sb/Genesis.sol#1570)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in Genesis._distributeToUniswapPair(address,uint256) (../../sb/Genesis.sol#1671-1714):
+	External calls:
+	- _ARTH.poolMint(address(this),amount) (../../sb/Genesis.sol#1684)
+	- _ARTH.approve(address(_ROUTER),amount) (../../sb/Genesis.sol#1685)
+	- _ARTHX.poolMint(address(this),amount) (../../sb/Genesis.sol#1690)
+	- _ARTHX.approve(address(_ROUTER),amount) (../../sb/Genesis.sol#1691)
+	- (amountToken,amountETH,liquidity) = _ROUTER.addLiquidityETH{value: amount}(tokenAddress,amount,amount,amount,address(this),block.timestamp) (../../sb/Genesis.sol#1699-1707)
+	External calls sending eth:
+	- (amountToken,amountETH,liquidity) = _ROUTER.addLiquidityETH{value: amount}(tokenAddress,amount,amount,amount,address(this),block.timestamp) (../../sb/Genesis.sol#1699-1707)
+	Event emitted after the call(s):
+	- Distribute(pair,amount,amount) (../../sb/Genesis.sol#1713)
+Reentrancy in Genesis._distributeToWETHPool(uint256) (../../sb/Genesis.sol#1658-1669):
+	External calls:
+	- _WETH.deposit{value: amount}() (../../sb/Genesis.sol#1663)
+	- assert(bool)(_WETH.transfer(arthWETHPoolAddres,amount)) (../../sb/Genesis.sol#1666)
+	External calls sending eth:
+	- _WETH.deposit{value: amount}() (../../sb/Genesis.sol#1663)
+	Event emitted after the call(s):
+	- Distribute(arthWETHPoolAddres,amount,0) (../../sb/Genesis.sol#1668)
+Reentrancy in Genesis._redeemARTHX(uint256) (../../sb/Genesis.sol#1716-1723):
+	External calls:
+	- _ARTH.poolMint(msg.sender,amount) (../../sb/Genesis.sol#1720)
+	Event emitted after the call(s):
+	- RedeemARTHX(msg.sender,amount) (../../sb/Genesis.sol#1722)
+Reentrancy in Genesis._redeemARTHXAndMAHA(uint256) (../../sb/Genesis.sol#1725-1739):
+	External calls:
+	- _ARTH.poolMint(msg.sender,amount) (../../sb/Genesis.sol#1729)
+	- _MAHA.mint(msg.sender,mahaAmount) (../../sb/Genesis.sol#1736)
+	Event emitted after the call(s):
+	- RedeemARTHXAndMAHA(msg.sender,amount,mahaAmount) (../../sb/Genesis.sol#1738)
+Reentrancy in Genesis.distribute() (../../sb/Genesis.sol#1625-1635):
+	External calls:
+	- _distributeToWETHPool(arthWETHPoolAmount) (../../sb/Genesis.sol#1632)
+		- _WETH.deposit{value: amount}() (../../sb/Genesis.sol#1663)
+		- assert(bool)(_WETH.transfer(arthWETHPoolAddres,amount)) (../../sb/Genesis.sol#1666)
+	- _distributeToUniswapPair(arthETHPairAddress,arthETHPairAmount) (../../sb/Genesis.sol#1633)
+		- _ARTH.poolMint(address(this),amount) (../../sb/Genesis.sol#1684)
+		- _ARTH.approve(address(_ROUTER),amount) (../../sb/Genesis.sol#1685)
+		- _ARTHX.poolMint(address(this),amount) (../../sb/Genesis.sol#1690)
+		- _ARTHX.approve(address(_ROUTER),amount) (../../sb/Genesis.sol#1691)
+		- (amountToken,amountETH,liquidity) = _ROUTER.addLiquidityETH{value: amount}(tokenAddress,amount,amount,amount,address(this),block.timestamp) (../../sb/Genesis.sol#1699-1707)
+	External calls sending eth:
+	- _distributeToWETHPool(arthWETHPoolAmount) (../../sb/Genesis.sol#1632)
+		- _WETH.deposit{value: amount}() (../../sb/Genesis.sol#1663)
+	- _distributeToUniswapPair(arthETHPairAddress,arthETHPairAmount) (../../sb/Genesis.sol#1633)
+		- (amountToken,amountETH,liquidity) = _ROUTER.addLiquidityETH{value: amount}(tokenAddress,amount,amount,amount,address(this),block.timestamp) (../../sb/Genesis.sol#1699-1707)
+	Event emitted after the call(s):
+	- Distribute(pair,amount,amount) (../../sb/Genesis.sol#1713)
+		- _distributeToUniswapPair(arthETHPairAddress,arthETHPairAmount) (../../sb/Genesis.sol#1633)
+Reentrancy in Genesis.distribute() (../../sb/Genesis.sol#1625-1635):
+	External calls:
+	- _distributeToWETHPool(arthWETHPoolAmount) (../../sb/Genesis.sol#1632)
+		- _WETH.deposit{value: amount}() (../../sb/Genesis.sol#1663)
+		- assert(bool)(_WETH.transfer(arthWETHPoolAddres,amount)) (../../sb/Genesis.sol#1666)
+	- _distributeToUniswapPair(arthETHPairAddress,arthETHPairAmount) (../../sb/Genesis.sol#1633)
+		- _ARTH.poolMint(address(this),amount) (../../sb/Genesis.sol#1684)
+		- _ARTH.approve(address(_ROUTER),amount) (../../sb/Genesis.sol#1685)
+		- _ARTHX.poolMint(address(this),amount) (../../sb/Genesis.sol#1690)
+		- _ARTHX.approve(address(_ROUTER),amount) (../../sb/Genesis.sol#1691)
+		- (amountToken,amountETH,liquidity) = _ROUTER.addLiquidityETH{value: amount}(tokenAddress,amount,amount,amount,address(this),block.timestamp) (../../sb/Genesis.sol#1699-1707)
+	- _distributeToUniswapPair(arthxETHPairAddress,arthxETHPairAmount) (../../sb/Genesis.sol#1634)
+		- _ARTH.poolMint(address(this),amount) (../../sb/Genesis.sol#1684)
+		- _ARTH.approve(address(_ROUTER),amount) (../../sb/Genesis.sol#1685)
+		- _ARTHX.poolMint(address(this),amount) (../../sb/Genesis.sol#1690)
+		- _ARTHX.approve(address(_ROUTER),amount) (../../sb/Genesis.sol#1691)
+		- (amountToken,amountETH,liquidity) = _ROUTER.addLiquidityETH{value: amount}(tokenAddress,amount,amount,amount,address(this),block.timestamp) (../../sb/Genesis.sol#1699-1707)
+	External calls sending eth:
+	- _distributeToWETHPool(arthWETHPoolAmount) (../../sb/Genesis.sol#1632)
+		- _WETH.deposit{value: amount}() (../../sb/Genesis.sol#1663)
+	- _distributeToUniswapPair(arthETHPairAddress,arthETHPairAmount) (../../sb/Genesis.sol#1633)
+		- (amountToken,amountETH,liquidity) = _ROUTER.addLiquidityETH{value: amount}(tokenAddress,amount,amount,amount,address(this),block.timestamp) (../../sb/Genesis.sol#1699-1707)
+	- _distributeToUniswapPair(arthxETHPairAddress,arthxETHPairAmount) (../../sb/Genesis.sol#1634)
+		- (amountToken,amountETH,liquidity) = _ROUTER.addLiquidityETH{value: amount}(tokenAddress,amount,amount,amount,address(this),block.timestamp) (../../sb/Genesis.sol#1699-1707)
+	Event emitted after the call(s):
+	- Distribute(pair,amount,amount) (../../sb/Genesis.sol#1713)
+		- _distributeToUniswapPair(arthxETHPairAddress,arthxETHPairAmount) (../../sb/Genesis.sol#1634)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Genesis.redeem(uint256) (../../sb/Genesis.sol#1616-1623) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp >= startTime.add(duration) (../../sb/Genesis.sol#1617)
+Genesis._distributeToUniswapPair(address,uint256) (../../sb/Genesis.sol#1671-1714) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(liquidity > 0,Genesis: distribute pair failed) (../../sb/Genesis.sol#1709)
+	- require(bool,string)(amountETH > 0,Genesis: distribute pair failed) (../../sb/Genesis.sol#1710)
+	- require(bool,string)(amountToken > 0,Genesis: distribute pair failed) (../../sb/Genesis.sol#1711)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/Genesis.sol#207-218) uses assembly
+	- INLINE ASM (../../sb/Genesis.sol#214-216)
+Address._verifyCallResult(bool,bytes,string) (../../sb/Genesis.sol#411-432) uses assembly
+	- INLINE ASM (../../sb/Genesis.sol#424-427)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address._verifyCallResult(bool,bytes,string) (../../sb/Genesis.sol#411-432) is never used and should be removed
+Address.functionCall(address,bytes) (../../sb/Genesis.sol#268-273) is never used and should be removed
+Address.functionCall(address,bytes,string) (../../sb/Genesis.sol#281-287) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/Genesis.sol#300-312) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/Genesis.sol#320-336) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/Genesis.sol#381-391) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/Genesis.sol#399-409) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/Genesis.sol#344-355) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/Genesis.sol#363-373) is never used and should be removed
+Address.isContract(address) (../../sb/Genesis.sol#207-218) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/Genesis.sol#236-248) is never used and should be removed
+Context._msgData() (../../sb/Genesis.sol#645-648) is never used and should be removed
+ERC20._burnFrom(address,uint256) (../../sb/Genesis.sol#994-1004) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/Genesis.sol#610-615) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/Genesis.sol#570-572) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/Genesis.sol#632-637) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/Genesis.sol#441-447) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/Genesis.sol#483-488) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/Genesis.sol#495-500) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/Genesis.sol#466-476) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/Genesis.sol#454-459) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.8.0 (../../sb/Genesis.sol#1) allows old versions
+solc-0.8.27 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/Genesis.sol#236-248):
+	- (success) = recipient.call{value: amount}() (../../sb/Genesis.sol#243)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/Genesis.sol#320-336):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/Genesis.sol#333-334)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/Genesis.sol#363-373):
+	- (success,returndata) = target.staticcall(data) (../../sb/Genesis.sol#371)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/Genesis.sol#399-409):
+	- (success,returndata) = target.delegatecall(data) (../../sb/Genesis.sol#407)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Function IAnyswapV4Token.Swapin(bytes32,address,uint256) (../../sb/Genesis.sol#131-135) is not in mixedCase
+Function IAnyswapV4Token.Swapout(uint256,address) (../../sb/Genesis.sol#137) is not in mixedCase
+Function IUniswapV2Router01.WETH() (../../sb/Genesis.sol#1221) is not in mixedCase
+Parameter Genesis.setDuration(uint256)._duration (../../sb/Genesis.sol#1534) is not in mixedCase
+Parameter Genesis.setPoolAndPairs(address,address,address)._arthETHPool (../../sb/Genesis.sol#1539) is not in mixedCase
+Parameter Genesis.setPoolAndPairs(address,address,address)._arthETHPair (../../sb/Genesis.sol#1540) is not in mixedCase
+Parameter Genesis.setPoolAndPairs(address,address,address)._arthxETHPair (../../sb/Genesis.sol#1541) is not in mixedCase
+Parameter Genesis.setHardCap(uint256)._hardCap (../../sb/Genesis.sol#1548) is not in mixedCase
+Variable Genesis._WETH (../../sb/Genesis.sol#1431) is not in mixedCase
+Variable Genesis._ARTH (../../sb/Genesis.sol#1432) is not in mixedCase
+Variable Genesis._ARTHX (../../sb/Genesis.sol#1433) is not in mixedCase
+Variable Genesis._MAHA (../../sb/Genesis.sol#1434) is not in mixedCase
+Variable Genesis._ROUTER (../../sb/Genesis.sol#1435) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/Genesis.sol#646)" inContext (../../sb/Genesis.sol#640-649)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Variable IUniswapV2Router01.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountADesired (../../sb/Genesis.sol#1226) is too similar to IUniswapV2Router01.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountBDesired (../../sb/Genesis.sol#1227)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+Genesis.startTime (../../sb/Genesis.sol#1444) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/Genesis.sol analyzed (20 contracts with 93 detectors), 64 result(s) found

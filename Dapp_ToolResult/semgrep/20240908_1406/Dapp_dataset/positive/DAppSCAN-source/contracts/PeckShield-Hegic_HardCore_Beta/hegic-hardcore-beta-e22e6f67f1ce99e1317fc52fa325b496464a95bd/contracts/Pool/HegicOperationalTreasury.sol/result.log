@@ -1,0 +1,313 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 76 Code Findings │
+└──────────────────┘
+                                     
+    /sb/HegicOperationalTreasury.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+         2021┆ bytes memory returndata = to.functionCall(abi.encodeWithSelector(
+         2022┆     IERC721Receiver(to).onERC721Received.selector,
+         2023┆     _msgSender(),
+         2024┆     from,
+         2025┆     tokenId,
+         2026┆     _data
+         2027┆ ), "ERC721: transfer to non ERC721Receiver implementer");
+            ⋮┆----------------------------------------
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+         2317┆ totalLocked += amount;
+            ⋮┆----------------------------------------
+         2326┆ lockedPremium += premium;
+            ⋮┆----------------------------------------
+         2412┆ totalBalance += transferAmount;
+            ⋮┆----------------------------------------
+         2431┆ totalBalance += amount;
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+         2085┆ uint256 public nextTokenId = 0;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+         1673┆ constructor (string memory name_, string memory symbol_) public {
+         1674┆     _name = name_;
+         1675┆     _symbol = symbol_;
+         1676┆ 
+         1677┆     // register the supported interfaces to conform to ERC721 via
+  ERC165                                                                        
+         1678┆     _registerInterface(_INTERFACE_ID_ERC721);
+         1679┆     _registerInterface(_INTERFACE_ID_ERC721_METADATA);
+         1680┆     _registerInterface(_INTERFACE_ID_ERC721_ENUMERABLE);
+         1681┆ }
+            ⋮┆----------------------------------------
+         2088┆ constructor() {
+         2089┆     _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+         2090┆ }
+            ⋮┆----------------------------------------
+         2270┆ constructor(
+         2271┆     IERC20 _token,
+         2272┆     IOptionsManager _manager,
+         2273┆     uint256 _maxLockupPeriod,
+         2274┆     IHegicStakeAndCover _stakeandcoverPool,
+         2275┆     uint256 _benchmark
+         2276┆ ) {
+         2277┆     _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+         2278┆     token = _token;
+         2279┆     manager = _manager;
+             [hid 4 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          131┆ require(set._values.length > index, "EnumerableSet: index out of 
+  bounds");                                                                     
+            ⋮┆----------------------------------------
+          348┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          352┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          409┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          410┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          434┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          458┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          633┆ require(hasRole(_roles[role].adminRole, _msgSender()),           
+  "AccessControl: sender must be an admin to grant");                           
+            ⋮┆----------------------------------------
+          648┆ require(hasRole(_roles[role].adminRole, _msgSender()),           
+  "AccessControl: sender must be an admin to revoke");                          
+            ⋮┆----------------------------------------
+          668┆ require(account == _msgSender(), "AccessControl: can only        
+  renounce roles for self");                                                    
+            ⋮┆----------------------------------------
+         1087┆ require(interfaceId != 0xffffffff, "ERC165: invalid interface    
+  id");                                                                         
+            ⋮┆----------------------------------------
+         1174┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+         1189┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+         1206┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+         1223┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+         1240┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+         1438┆ require(map._entries.length > index, "EnumerableMap: index out of
+  bounds");                                                                     
+            ⋮┆----------------------------------------
+         1463┆ require(keyIndex != 0, "EnumerableMap: nonexistent key"); //     
+  Equivalent to contains(map, key)                                              
+            ⋮┆----------------------------------------
+         1687┆ require(owner != address(0), "ERC721: balance query for the zero 
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1716┆ require(_exists(tokenId), "ERC721Metadata: URI query for         
+  nonexistent token");                                                          
+            ⋮┆----------------------------------------
+         1770┆ require(to != owner, "ERC721: approval to current owner");
+            ⋮┆----------------------------------------
+         1772┆ require(_msgSender() == owner || ERC721.isApprovedForAll(owner,  
+  _msgSender()),                                                                
+         1773┆     "ERC721: approve caller is not owner nor approved for all"
+         1774┆ );
+            ⋮┆----------------------------------------
+         1783┆ require(_exists(tokenId), "ERC721: approved query for nonexistent
+  token");                                                                      
+            ⋮┆----------------------------------------
+         1792┆ require(operator != _msgSender(), "ERC721: approve to caller");
+            ⋮┆----------------------------------------
+         1810┆ require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721:      
+  transfer caller is not owner nor approved");                                  
+            ⋮┆----------------------------------------
+         1826┆ require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721:      
+  transfer caller is not owner nor approved");                                  
+            ⋮┆----------------------------------------
+         1850┆ require(_checkOnERC721Received(from, to, tokenId, _data),        
+  "ERC721: transfer to non ERC721Receiver implementer");                        
+            ⋮┆----------------------------------------
+         1873┆ require(_exists(tokenId), "ERC721: operator query for nonexistent
+  token");                                                                      
+            ⋮┆----------------------------------------
+         1898┆ require(_checkOnERC721Received(address(0), to, tokenId, _data),  
+  "ERC721: transfer to non ERC721Receiver implementer");                        
+            ⋮┆----------------------------------------
+         1914┆ require(to != address(0), "ERC721: mint to the zero address");
+            ⋮┆----------------------------------------
+         1915┆ require(!_exists(tokenId), "ERC721: token already minted");
+            ⋮┆----------------------------------------
+         1968┆ require(ERC721.ownerOf(tokenId) == from, "ERC721: transfer of    
+  token that is not own"); // internal owner                                    
+            ⋮┆----------------------------------------
+         1969┆ require(to != address(0), "ERC721: transfer to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1992┆ require(_exists(tokenId), "ERC721Metadata: URI set of nonexistent
+  token");                                                                      
+            ⋮┆----------------------------------------
+         2321┆ require(totalLocked <= availableBalance, "The amount is too      
+  large");                                                                      
+            ⋮┆----------------------------------------
+         2322┆ require(
+         2323┆     block.timestamp + maxLockupPeriod >= expiration,
+         2324┆     "The period is too long"
+         2325┆ );
+            ⋮┆----------------------------------------
+         2349┆ require(
+         2350┆     ll.state == LockedLiquidityState.Locked,
+         2351┆     "The liquidity has already been unlocked"
+         2352┆ );
+            ⋮┆----------------------------------------
+         2366┆ require(
+         2367┆     block.timestamp > ll.expiration,
+         2368┆     "The expiration time has not yet come"
+         2369┆ );
+            ⋮┆----------------------------------------
+         2388┆ require(
+         2389┆     ll.expiration > block.timestamp,
+         2390┆     "The option has already expired"
+         2391┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+         1583┆ digits++;
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          131┆ require(set._values.length > index, "EnumerableSet: index out of 
+  bounds");                                                                     
+            ⋮┆----------------------------------------
+          352┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          409┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          434┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          458┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          633┆ require(hasRole(_roles[role].adminRole, _msgSender()),           
+  "AccessControl: sender must be an admin to grant");                           
+            ⋮┆----------------------------------------
+          648┆ require(hasRole(_roles[role].adminRole, _msgSender()),           
+  "AccessControl: sender must be an admin to revoke");                          
+            ⋮┆----------------------------------------
+          668┆ require(account == _msgSender(), "AccessControl: can only        
+  renounce roles for self");                                                    
+            ⋮┆----------------------------------------
+         1206┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+         1438┆ require(map._entries.length > index, "EnumerableMap: index out of
+  bounds");                                                                     
+            ⋮┆----------------------------------------
+         1687┆ require(owner != address(0), "ERC721: balance query for the zero 
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1716┆ require(_exists(tokenId), "ERC721Metadata: URI query for         
+  nonexistent token");                                                          
+            ⋮┆----------------------------------------
+         1770┆ require(to != owner, "ERC721: approval to current owner");
+            ⋮┆----------------------------------------
+         1772┆ require(_msgSender() == owner || ERC721.isApprovedForAll(owner,  
+  _msgSender()),                                                                
+         1773┆     "ERC721: approve caller is not owner nor approved for all"
+         1774┆ );
+            ⋮┆----------------------------------------
+         1783┆ require(_exists(tokenId), "ERC721: approved query for nonexistent
+  token");                                                                      
+            ⋮┆----------------------------------------
+         1810┆ require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721:      
+  transfer caller is not owner nor approved");                                  
+            ⋮┆----------------------------------------
+         1826┆ require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721:      
+  transfer caller is not owner nor approved");                                  
+            ⋮┆----------------------------------------
+         1850┆ require(_checkOnERC721Received(from, to, tokenId, _data),        
+  "ERC721: transfer to non ERC721Receiver implementer");                        
+            ⋮┆----------------------------------------
+         1873┆ require(_exists(tokenId), "ERC721: operator query for nonexistent
+  token");                                                                      
+            ⋮┆----------------------------------------
+         1898┆ require(_checkOnERC721Received(address(0), to, tokenId, _data),  
+  "ERC721: transfer to non ERC721Receiver implementer");                        
+            ⋮┆----------------------------------------
+         1968┆ require(ERC721.ownerOf(tokenId) == from, "ERC721: transfer of    
+  token that is not own"); // internal owner                                    
+            ⋮┆----------------------------------------
+         1969┆ require(to != address(0), "ERC721: transfer to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1992┆ require(_exists(tokenId), "ERC721Metadata: URI set of nonexistent
+  token");                                                                      
+            ⋮┆----------------------------------------
+         2349┆ require(
+         2350┆     ll.state == LockedLiquidityState.Locked,
+         2351┆     "The liquidity has already been unlocked"
+         2352┆ );
+            ⋮┆----------------------------------------
+         2366┆ require(
+         2367┆     block.timestamp > ll.expiration,
+         2368┆     "The expiration time has not yet come"
+         2369┆ );
+            ⋮┆----------------------------------------
+       solidity.security.erc721-reentrancy    
+          ERC721 onERC721Received() reentrancy
+                                              
+         1850┆ require(_checkOnERC721Received(from, to, tokenId, _data),        
+  "ERC721: transfer to non ERC721Receiver implementer");                        
+            ⋮┆----------------------------------------
+         1898┆ require(_checkOnERC721Received(address(0), to, tokenId, _data),  
+  "ERC721: transfer to non ERC721Receiver implementer");                        
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 76 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

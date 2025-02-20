@@ -1,0 +1,115 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 18 Code Findings │
+└──────────────────┘
+                            
+    /sb/PrimitiveEngine.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+         1248┆ (bool success, bytes memory returnData) = address(token).call(
+         1249┆     abi.encodeWithSelector(token.transfer.selector, to, value)
+         1250┆ );
+            ⋮┆----------------------------------------
+         1786┆ (bool success, bytes memory data) = risky.staticcall(
+         1787┆     abi.encodeWithSelector(IERC20.balanceOf.selector,            
+  address(this))                                                                
+         1788┆ );
+            ⋮┆----------------------------------------
+         1795┆ (bool success, bytes memory data) = stable.staticcall(
+         1796┆     abi.encodeWithSelector(IERC20.balanceOf.selector,            
+  address(this))                                                                
+         1797┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+         1779┆ constructor() {
+         1780┆     (factory, risky, stable, scaleFactorRisky, scaleFactorStable,
+  MIN_LIQUIDITY) = IPrimitiveFactory(msg.sender)                                
+         1781┆         .args();
+         1782┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+         1251┆ require(success && (returnData.length == 0 ||                    
+  abi.decode(returnData, (bool))), "Transfer fail");                            
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+           87┆ require(x >= -0x8000000000000000 && x <= 0x7FFFFFFFFFFFFFFF);
+            ⋮┆----------------------------------------
+          143┆ require(result >= MIN_64x64 && result <= MAX_64x64);
+            ⋮┆----------------------------------------
+          171┆ require(result >= MIN_64x64 && result <= MAX_64x64);
+            ⋮┆----------------------------------------
+          186┆ require(result >= MIN_64x64 && result <= MAX_64x64);
+            ⋮┆----------------------------------------
+          201┆ require(result >= MIN_64x64 && result <= MAX_64x64);
+            ⋮┆----------------------------------------
+          217┆ require(
+          218┆     y >= -0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF &&
+          219┆         y <= 0x1000000000000000000000000000000000000000000000000
+          220┆ );
+            ⋮┆----------------------------------------
+          281┆ require(result >= MIN_64x64 && result <= MAX_64x64);
+            ⋮┆----------------------------------------
+          372┆ require(result >= MIN_64x64 && result <= MAX_64x64);
+            ⋮┆----------------------------------------
+          503┆ require(result >= MIN_64x64 && result <= MAX_64x64);
+            ⋮┆----------------------------------------
+         1251┆ require(success && (returnData.length == 0 ||                    
+  abi.decode(returnData, (bool))), "Transfer fail");                            
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          868┆ if (p <= HIGH_TAIL && p >= LOW_TAIL) {
+          869┆     return central(p);
+          870┆ } else if (p < LOW_TAIL) {
+          871┆     return tail(p);
+          872┆ } else {
+          873┆     int128 negativeTail = -tail(ONE_INT.sub(p));
+          874┆     return negativeTail;
+          875┆ }
+            ⋮┆----------------------------------------
+         1903┆ if (delRisky == 0 && delStable == 0) revert ZeroDeltasError();
+            ⋮┆----------------------------------------
+         1923┆ if (delRisky == 0 && delStable == 0) revert ZeroDeltasError();
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 18 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

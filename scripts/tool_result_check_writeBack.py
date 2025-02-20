@@ -172,9 +172,9 @@ def process_directory(input_dir, vul_info_path, mapping_rules_path, output_file)
     return total_tp, total_fp, total_fn, total_tn
 
 # 执行函数
-input_directory = "Dapp_ToolResult/slither"  # 样本目录
-vul_info_file = "vul_info/filtered_vul_exist_info.json"  # 样本标签文件
-mapping_rules_file = "vulname_mapping/slither.json"  # 映射规则文件
-output_json_file = "scripts/tool_result_check/slither/temp.json"  # 输出文件
+input_directory = "TOSEM/Dapp_ToolResult/confuzzius"  # 样本目录
+vul_info_file = "TOSEM/vul_info/filtered_vul_exist_info.json"  # 样本标签文件
+mapping_rules_file = "TOSEM/vulname_mapping/confuzzius.json"  # 映射规则文件
+output_json_file = "TOSEM/scripts/RQ1_tool_results_check/confuzzius.json"  # 输出文件
 
 process_directory(input_directory, vul_info_file, mapping_rules_file, output_json_file)

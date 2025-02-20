@@ -1,0 +1,312 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 78 Code Findings │
+└──────────────────┘
+                               
+    /sb/NFYTradingPlatform.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          491┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          495┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          513┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          518┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          523┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          606┆ contract NFYTradingPlatform is Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          778┆ for (uint i = 0; i < stakeTokenList.length; i++) {
+            ⋮┆----------------------------------------
+          819┆ while(i < orders.length && remaining > 0) {
+            ⋮┆----------------------------------------
+          825┆ if(orders.length.sub(i) == 1 && remaining > 0){
+            ⋮┆----------------------------------------
+          843┆ while(i < orders.length && remaining > 0) {
+            ⋮┆----------------------------------------
+          848┆ if(orders.length.sub(i) == 1 && remaining > 0){
+            ⋮┆----------------------------------------
+          864┆ while(i < orders.length && orders[i].filled == orders[i].amount) 
+  {                                                                             
+            ⋮┆----------------------------------------
+          865┆ for(uint j = i; j < orders.length.sub(1); j = j.add(1) ) {
+            ⋮┆----------------------------------------
+         1007┆ while(i < orders.length){
+            ⋮┆----------------------------------------
+         1019┆ for(uint c = i; c < orders.length.sub(1); c = c.add(1)){
+            ⋮┆----------------------------------------
+       solidity.performance.non-optimal-variables-swap                          
+          Consider swapping variables using `(orders[i.sub(1)], orders[i]) =    
+  (orders[i],                                                                   
+          orders[i.sub(1)])` to save gas                                        
+                                                                                
+          910┆ Order memory order = orders[i.sub(1)];
+          911┆ orders[i.sub(1)] = orders[i];
+          912┆ orders[i] = order;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          584┆ constructor(address _dev) public {
+          585┆     owner = _msgSender();
+          586┆     dev = _dev;
+          587┆ }
+            ⋮┆----------------------------------------
+          675┆ constructor(address _nfy, address _rewardPool, uint _fee, address
+  _devFeeAddress, address _communityFundAddress, address _dev) Ownable(_dev)    
+  public {                                                                      
+          676┆     NFYToken = IERC20(_nfy);
+          677┆     rewardPool = _rewardPool;
+          678┆     platformFee = _fee;
+          679┆     devAddress = _devFeeAddress;
+          680┆     communityFund = _communityFundAddress;
+          681┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          778┆ for (uint i = 0; i < stakeTokenList.length; i++) {
+            ⋮┆----------------------------------------
+          780┆ tokens[stakeTokenList[i]].ticker,
+            ⋮┆----------------------------------------
+          780┆ tokens[stakeTokenList[i]].ticker,
+            ⋮┆----------------------------------------
+          781┆ tokens[stakeTokenList[i]].nftContract,
+            ⋮┆----------------------------------------
+          781┆ tokens[stakeTokenList[i]].nftContract,
+            ⋮┆----------------------------------------
+          782┆ tokens[stakeTokenList[i]].nftAddress,
+            ⋮┆----------------------------------------
+          782┆ tokens[stakeTokenList[i]].nftAddress,
+            ⋮┆----------------------------------------
+          783┆ tokens[stakeTokenList[i]].stakingAddress
+            ⋮┆----------------------------------------
+          783┆ tokens[stakeTokenList[i]].stakingAddress
+            ⋮┆----------------------------------------
+          823┆ nextTradeId = nextTradeId.add(1);
+            ⋮┆----------------------------------------
+          823┆ nextTradeId = nextTradeId.add(1);
+            ⋮┆----------------------------------------
+          846┆ nextTradeId = nextTradeId.add(1);
+            ⋮┆----------------------------------------
+          846┆ nextTradeId = nextTradeId.add(1);
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          778┆ for (uint i = 0; i < stakeTokenList.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           88┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          103┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          120┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          137┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          154┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          340┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          344┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          401┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          402┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          426┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          450┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          510┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          511┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          512┆ );
+            ⋮┆----------------------------------------
+          540┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          575┆ require(_msgSender() == owner, "Owner only");
+            ⋮┆----------------------------------------
+          580┆ require(_msgSender() == dev, "Dev only");
+            ⋮┆----------------------------------------
+          720┆ require(tokens[_ticker].nftContract.ownerOf(_tokenId) ==         
+  _msgSender(), "Owner of token is not user");                                  
+            ⋮┆----------------------------------------
+          723┆ require(success == true, "decrement call failed");
+            ⋮┆----------------------------------------
+          737┆ require(traderBalances[_msgSender()][_ticker] >= _amount,        
+  'balance too low');                                                           
+            ⋮┆----------------------------------------
+          740┆ require(success == true, "increment call failed");
+            ⋮┆----------------------------------------
+          752┆ require(_amount > 0, "cannot withdraw 0 eth");
+            ⋮┆----------------------------------------
+          753┆ require(ethBalance[_msgSender()] >= _amount, "Not enough eth in  
+  trading balance");                                                            
+            ⋮┆----------------------------------------
+          765┆ require(success == true, "add stakeholder call failed");
+            ⋮┆----------------------------------------
+          791┆ require(NFYToken.balanceOf(_msgSender()) >= platformFee, "Do not 
+  have enough NFY to cover fee");                                               
+            ⋮┆----------------------------------------
+          808┆ require(_amount > 0, "Amount can not be 0");
+            ⋮┆----------------------------------------
+          876┆ require(ethBalance[_msgSender()] > 0, "Can not purchase no       
+  stake");                                                                      
+            ⋮┆----------------------------------------
+          877┆ require(ethBalance[_msgSender()] >=                              
+  _amount.mul(_price).div(1e18), "Eth too low");                                
+            ⋮┆----------------------------------------
+          883┆ require(traderBalances[_msgSender()][_ticker] >= _amount, "Token 
+  too low");                                                                    
+            ⋮┆----------------------------------------
+          957┆ require(ethBalance[_msgSender()] >=                              
+  matched.mul(orders[i].price).div(1e18), 'eth balance too low');               
+            ⋮┆----------------------------------------
+          999┆ require(userOrders >= 0, 'users has no pending order');
+            ⋮┆----------------------------------------
+         1036┆ require(tokens[_ticker].stakingAddress != address(0), "staking   
+  NFT does not exist");                                                         
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          825┆ if(orders.length.sub(i) == 1 && remaining > 0){
+          826┆     _createOrder(_ticker, remaining, _price, _side);
+          827┆ }
+            ⋮┆----------------------------------------
+          848┆ if(orders.length.sub(i) == 1 && remaining > 0){
+          849┆     _createOrder(_ticker, remaining, _price, _side);
+          850┆ }
+            ⋮┆----------------------------------------
+          904┆ if(_side == Side.BUY && orders[i.sub(1)].price > orders[i].price)
+  {                                                                             
+          905┆     break;
+          906┆ }
+            ⋮┆----------------------------------------
+          907┆ if(_side == Side.SELL && orders[i.sub(1)].price <                
+  orders[i].price) {                                                            
+          908┆     break;
+          909┆ }
+            ⋮┆----------------------------------------
+          945┆ if(pending[b].id == id && orders[i].filled == orders[i].amount){
+          946┆     for(uint o = b; o < userOrders.sub(1); o = o.add(1)){
+          947┆         pending[o] = pending[o.add(1)];
+          948┆         b = userOrders;
+          949┆     }
+          950┆     pending.pop();
+          951┆ }
+            ⋮┆----------------------------------------
+          966┆ if(pending[b].id == orders[i].id && orders[i].filled ==          
+  orders[i].amount){                                                            
+          967┆     for(uint o = b; o < userOrders.sub(1); o = o.add(1)){
+          968┆         pending[o] = pending[o.add(1)];
+          969┆         b = userOrders;
+          970┆     }
+          971┆     pending.pop();
+          972┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          778┆ for (uint i = 0; i < stakeTokenList.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          120┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          344┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          401┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          426┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          450┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          510┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          511┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          512┆ );
+            ⋮┆----------------------------------------
+          540┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          753┆ require(ethBalance[_msgSender()] >= _amount, "Not enough eth in  
+  trading balance");                                                            
+            ⋮┆----------------------------------------
+          791┆ require(NFYToken.balanceOf(_msgSender()) >= platformFee, "Do not 
+  have enough NFY to cover fee");                                               
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 78 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

@@ -1,0 +1,285 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 70 Code Findings │
+└──────────────────┘
+                            
+    /sb/ThorusAutoStake.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          754┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          763┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          785┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          794┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          806┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          980┆ contract ThorusAutoStake is ERC20("sTHO", "sTHO"), Ownable,      
+  Pausable, ReentrancyGuard {                                                   
+            ⋮┆----------------------------------------
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+          429┆ _totalSupply += amount;
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+         1009┆ bool public hadEmergencyWithdrawn = false;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          226┆ constructor(string memory name_, string memory symbol_) {
+          227┆     _name = name_;
+          228┆     _symbol = symbol_;
+          229┆ }
+            ⋮┆----------------------------------------
+         1023┆ constructor(
+         1024┆     IERC20 _thorus,
+         1025┆     IThorusMaster _thorusMaster,
+         1026┆     uint256 _stakingPid,
+         1027┆     address _treasury
+         1028┆ ) {
+         1029┆     thorus = _thorus;
+         1030┆     thorusMaster = _thorusMaster;
+         1031┆     stakingPid = _stakingPid;
+         1032┆     treasury = _treasury;
+             [hid 3 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           63┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+           72┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          330┆ require(currentAllowance >= amount, "ERC20: transfer amount      
+  exceeds allowance");                                                          
+            ⋮┆----------------------------------------
+          371┆ require(currentAllowance >= subtractedValue, "ERC20: decreased   
+  allowance below zero");                                                       
+            ⋮┆----------------------------------------
+          398┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          399┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          404┆ require(senderBalance >= amount, "ERC20: transfer amount exceeds 
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          425┆ require(account != address(0), "ERC20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+          448┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          453┆ require(accountBalance >= amount, "ERC20: burn amount exceeds    
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          482┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          483┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          580┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          583┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          653┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          654┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          681┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          708┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          781┆ require(
+          782┆     (value == 0) || (token.allowance(address(this), spender) ==  
+  0),                                                                           
+          783┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          784┆ );
+            ⋮┆----------------------------------------
+          804┆ require(oldAllowance >= value, "SafeERC20: decreased allowance   
+  below zero");                                                                 
+            ⋮┆----------------------------------------
+          824┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          866┆ require(!paused(), "Pausable: paused");
+            ⋮┆----------------------------------------
+          878┆ require(paused(), "Pausable: not paused");
+            ⋮┆----------------------------------------
+          953┆ require(_status != _ENTERED, "ReentrancyGuard: reentrant call");
+            ⋮┆----------------------------------------
+         1038┆ require(_proxy != address(0), 'zero address');
+            ⋮┆----------------------------------------
+         1039┆ require(!whitelistedProxies[_proxy], 'proxy already              
+  whitelisted');                                                                
+            ⋮┆----------------------------------------
+         1045┆ require(_proxy != address(0), 'zero address');
+            ⋮┆----------------------------------------
+         1046┆ require(whitelistedProxies[_proxy], 'proxy not whitelisted');
+            ⋮┆----------------------------------------
+         1052┆ require(_amount > 0, "Nothing to deposit");
+            ⋮┆----------------------------------------
+         1053┆ require(_user == msg.sender || whitelistedProxies[msg.sender],   
+  'msg.sender is not allowed proxy');                                           
+            ⋮┆----------------------------------------
+         1098┆ require(_treasury != address(0), "Cannot be zero address");
+            ⋮┆----------------------------------------
+         1104┆ require(_performanceFee <= MAX_PERFORMANCE_FEE, "performanceFee  
+  cannot be more than MAX_PERFORMANCE_FEE");                                    
+            ⋮┆----------------------------------------
+         1110┆ require(_callFee <= MAX_CALL_FEE, "callFee cannot be more than   
+  MAX_CALL_FEE");                                                               
+            ⋮┆----------------------------------------
+         1116┆ require(_withdrawFee <= MAX_WITHDRAW_FEE, "withdrawFee cannot be 
+  more than MAX_WITHDRAW_FEE");                                                 
+            ⋮┆----------------------------------------
+         1122┆ require(
+         1123┆     _withdrawFeePeriod <= MAX_WITHDRAW_FEE_PERIOD,
+         1124┆     "withdrawFeePeriod cannot be more than                       
+  MAX_WITHDRAW_FEE_PERIOD"                                                      
+         1125┆ );
+            ⋮┆----------------------------------------
+         1142┆ require(!hadEmergencyWithdrawn, 'cannot unpause after emergency  
+  withdraw');                                                                   
+            ⋮┆----------------------------------------
+         1167┆ require(_amount > 0, "Nothing to withdraw");
+            ⋮┆----------------------------------------
+         1168┆ require(_amount <= balanceOf(msg.sender), "Withdraw amount       
+  exceeds balance");                                                            
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           72┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          330┆ require(currentAllowance >= amount, "ERC20: transfer amount      
+  exceeds allowance");                                                          
+            ⋮┆----------------------------------------
+          371┆ require(currentAllowance >= subtractedValue, "ERC20: decreased   
+  allowance below zero");                                                       
+            ⋮┆----------------------------------------
+          398┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          399┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          404┆ require(senderBalance >= amount, "ERC20: transfer amount exceeds 
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          448┆ require(account != address(0), "ERC20: burn from the zero        
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 70 findings.
+  address");                                                                    
+            ⋮┆----------------------------------------
+          453┆ require(accountBalance >= amount, "ERC20: burn amount exceeds    
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          482┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          483┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          583┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          653┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          681┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          708┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          781┆ require(
+          782┆     (value == 0) || (token.allowance(address(this), spender) ==  
+  0),                                                                           
+          783┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          784┆ );
+            ⋮┆----------------------------------------
+          804┆ require(oldAllowance >= value, "SafeERC20: decreased allowance   
+  below zero");                                                                 
+            ⋮┆----------------------------------------
+          824┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+         1104┆ require(_performanceFee <= MAX_PERFORMANCE_FEE, "performanceFee  
+  cannot be more than MAX_PERFORMANCE_FEE");                                    
+            ⋮┆----------------------------------------
+         1110┆ require(_callFee <= MAX_CALL_FEE, "callFee cannot be more than   
+  MAX_CALL_FEE");                                                               
+            ⋮┆----------------------------------------
+         1116┆ require(_withdrawFee <= MAX_WITHDRAW_FEE, "withdrawFee cannot be 
+  more than MAX_WITHDRAW_FEE");                                                 
+            ⋮┆----------------------------------------
+         1122┆ require(
+         1123┆     _withdrawFeePeriod <= MAX_WITHDRAW_FEE_PERIOD,
+         1124┆     "withdrawFeePeriod cannot be more than                       
+  MAX_WITHDRAW_FEE_PERIOD"                                                      
+         1125┆ );
+            ⋮┆----------------------------------------
+         1142┆ require(!hadEmergencyWithdrawn, 'cannot unpause after emergency  
+  withdraw');                                                                   
+
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

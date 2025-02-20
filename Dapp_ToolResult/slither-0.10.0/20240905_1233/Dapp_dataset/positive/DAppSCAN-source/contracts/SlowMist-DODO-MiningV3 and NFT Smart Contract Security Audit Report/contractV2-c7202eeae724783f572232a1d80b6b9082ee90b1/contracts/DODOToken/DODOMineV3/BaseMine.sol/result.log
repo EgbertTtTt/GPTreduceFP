@@ -1,0 +1,89 @@
+'solc --version' running
+'solc /sb/BaseMine.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+BaseMine.addRewardToken(address,uint256,uint256,uint256) (../../sb/BaseMine.sol#481-512) ignores return value by IERC20(rewardToken).transfer(rt.rewardVault,rewardAmount) (../../sb/BaseMine.sol#508)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+BaseMine._totalSupply (../../sb/BaseMine.sol#371) is never initialized. It is used in:
+	- BaseMine.totalSupply() (../../sb/BaseMine.sol#403-405)
+BaseMine._balances (../../sb/BaseMine.sol#372) is never initialized. It is used in:
+	- BaseMine.balanceOf(address) (../../sb/BaseMine.sol#407-409)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-state-variables
+
+RewardVault.reward(address,uint256) (../../sb/BaseMine.sol#320-324) should emit an event for: 
+	- _REWARD_RESERVE_ = _REWARD_RESERVE_.sub(amount) (../../sb/BaseMine.sol#322) 
+RewardVault.withdrawLeftOver(address,uint256) (../../sb/BaseMine.sol#326-330) should emit an event for: 
+	- _REWARD_RESERVE_ = _REWARD_RESERVE_.sub(amount) (../../sb/BaseMine.sol#328) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+Ownable.transferOwnership(address).newOwner (../../sb/BaseMine.sol#285) lacks a zero-check on :
+		- _NEW_OWNER_ = newOwner (../../sb/BaseMine.sol#287)
+RewardVault.constructor(address)._rewardToken (../../sb/BaseMine.sol#316) lacks a zero-check on :
+		- _REWARD_TOKEN_ = _rewardToken (../../sb/BaseMine.sol#317)
+InitializableOwnable.initOwner(address).newOwner (../../sb/BaseMine.sol#243) lacks a zero-check on :
+		- _OWNER_ = newOwner (../../sb/BaseMine.sol#245)
+InitializableOwnable.transferOwnership(address).newOwner (../../sb/BaseMine.sol#248) lacks a zero-check on :
+		- _NEW_OWNER_ = newOwner (../../sb/BaseMine.sol#250)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+BaseMine.getVaultDebtByRewardToken(address) (../../sb/BaseMine.sol#441-456) has external calls inside a loop: totalDepositReward = IRewardVault(rewardTokenInfos[i].rewardVault)._TOTAL_REWARD_() (../../sb/BaseMine.sol#445)
+BaseMine.claimReward(uint256) (../../sb/BaseMine.sol#460-470) has external calls inside a loop: IRewardVault(rt.rewardVault).reward(msg.sender,reward) (../../sb/BaseMine.sol#467)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in BaseMine.addRewardToken(address,uint256,uint256,uint256) (../../sb/BaseMine.sol#481-512):
+	External calls:
+	- IERC20(rewardToken).transfer(rt.rewardVault,rewardAmount) (../../sb/BaseMine.sol#508)
+	- RewardVault(rt.rewardVault).syncValue() (../../sb/BaseMine.sol#509)
+	Event emitted after the call(s):
+	- NewRewardToken(len,rewardToken) (../../sb/BaseMine.sol#511)
+Reentrancy in BaseMine.claimReward(uint256) (../../sb/BaseMine.sol#460-470):
+	External calls:
+	- IRewardVault(rt.rewardVault).reward(msg.sender,reward) (../../sb/BaseMine.sol#467)
+	Event emitted after the call(s):
+	- Claim(i,msg.sender,reward) (../../sb/BaseMine.sol#468)
+Reentrancy in BaseMine.withdrawLeftOver(uint256,uint256) (../../sb/BaseMine.sol#558-567):
+	External calls:
+	- IRewardVault(rt.rewardVault).withdrawLeftOver(msg.sender,amount) (../../sb/BaseMine.sol#564)
+	Event emitted after the call(s):
+	- WithdrawLeftOver(msg.sender,i) (../../sb/BaseMine.sol#566)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+BaseMine._updateAllReward(address) (../../sb/BaseMine.sol#590-595) is never used and should be removed
+DecimalMath.divCeil(uint256,uint256) (../../sb/BaseMine.sol#205-207) is never used and should be removed
+DecimalMath.mulCeil(uint256,uint256) (../../sb/BaseMine.sol#197-199) is never used and should be removed
+DecimalMath.reciprocalCeil(uint256) (../../sb/BaseMine.sol#213-215) is never used and should be removed
+DecimalMath.reciprocalFloor(uint256) (../../sb/BaseMine.sol#209-211) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/BaseMine.sol#143-157) is never used and should be removed
+SafeERC20.safeTransferFrom(IERC20,address,address,uint256) (../../sb/BaseMine.sol#131-141) is never used and should be removed
+SafeMath.divCeil(uint256,uint256) (../../sb/BaseMine.sol#89-97) is never used and should be removed
+SafeMath.sqrt(uint256) (../../sb/BaseMine.sol#110-117) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.6.9 (../../sb/BaseMine.sol#1) is known to contain severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+solc-0.6.9 is known to contain severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in SafeERC20._callOptionalReturn(IERC20,bytes) (../../sb/BaseMine.sol#165-184):
+	- (success,returndata) = address(token).call(data) (../../sb/BaseMine.sol#176)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Variable InitializableOwnable._OWNER_ (../../sb/BaseMine.sol#219) is not in mixedCase
+Variable InitializableOwnable._NEW_OWNER_ (../../sb/BaseMine.sol#220) is not in mixedCase
+Variable InitializableOwnable._INITIALIZED_ (../../sb/BaseMine.sol#221) is not in mixedCase
+Variable Ownable._OWNER_ (../../sb/BaseMine.sol#262) is not in mixedCase
+Variable Ownable._NEW_OWNER_ (../../sb/BaseMine.sol#263) is not in mixedCase
+Function IRewardVault._TOTAL_REWARD_() (../../sb/BaseMine.sol#302) is not in mixedCase
+Variable RewardVault._REWARD_RESERVE_ (../../sb/BaseMine.sol#309) is not in mixedCase
+Variable RewardVault._TOTAL_REWARD_ (../../sb/BaseMine.sol#310) is not in mixedCase
+Variable RewardVault._REWARD_TOKEN_ (../../sb/BaseMine.sol#311) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+DecimalMath.ONE (../../sb/BaseMine.sol#190) is never used in DecimalMath (../../sb/BaseMine.sol#187-216)
+DecimalMath.ONE2 (../../sb/BaseMine.sol#191) is never used in DecimalMath (../../sb/BaseMine.sol#187-216)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-state-variable
+
+BaseMine._totalSupply (../../sb/BaseMine.sol#371) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+
+RewardVault._REWARD_TOKEN_ (../../sb/BaseMine.sol#311) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/BaseMine.sol analyzed (9 contracts with 93 detectors), 39 result(s) found

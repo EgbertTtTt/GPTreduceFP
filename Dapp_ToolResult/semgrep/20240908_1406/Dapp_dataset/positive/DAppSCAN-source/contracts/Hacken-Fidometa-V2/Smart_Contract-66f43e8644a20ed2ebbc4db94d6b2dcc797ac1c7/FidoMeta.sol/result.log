@@ -1,0 +1,372 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 72 Code Findings │
+└──────────────────┘
+                     
+    /sb/FidoMeta.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          306┆ contract Fidometa is Context, IERC20, Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+          341┆ uint256 public _surcharge2 = 0;
+            ⋮┆----------------------------------------
+          342┆ uint256 public _surcharge3 = 0;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          276┆ constructor() {
+          277┆     address msgSender = _msgSender();
+          278┆     _owner = msgSender;
+          279┆     emit OwnershipTransferred(address(0), msgSender);
+          280┆ }
+            ⋮┆----------------------------------------
+          386┆ constructor() {
+          387┆     _rOwned[_msgSender()] = _rTotal;
+          388┆ 
+          389┆     //exclude owner and this contract from fees
+          390┆     _isExcludedFromCommunity_charge[owner()] = true;
+          391┆     _isExcludedFromCommunity_charge[address(this)] = true;
+          392┆ 
+          393┆     _isExcludedFromEcoSysFee[owner()] = true;
+          394┆     _isExcludedFromEcoSysFee[address(this)] = true;
+          395┆ 
+             [hid 11 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          777┆ _rOwned[_excluded[i]] > rSupply ||
+            ⋮┆----------------------------------------
+          777┆ _rOwned[_excluded[i]] > rSupply ||
+            ⋮┆----------------------------------------
+          778┆ _tOwned[_excluded[i]] > tSupply
+            ⋮┆----------------------------------------
+          778┆ _tOwned[_excluded[i]] > tSupply
+            ⋮┆----------------------------------------
+          779┆ ) return (_rTotal, _tTotal);
+            ⋮┆----------------------------------------
+          779┆ ) return (_rTotal, _tTotal);
+            ⋮┆----------------------------------------
+          780┆ rSupply = rSupply.sub(_rOwned[_excluded[i]]);
+            ⋮┆----------------------------------------
+          780┆ rSupply = rSupply.sub(_rOwned[_excluded[i]]);
+            ⋮┆----------------------------------------
+          781┆ tSupply = tSupply.sub(_tOwned[_excluded[i]]);
+            ⋮┆----------------------------------------
+          781┆ tSupply = tSupply.sub(_tOwned[_excluded[i]]);
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          775┆ for (uint256 i = 0; i < cacheLength; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          113┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          172┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          287┆ require(_owner == _msgSender(), "Ownable: caller is not the      
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          297┆ require(
+          298┆     newOwner != address(0),
+          299┆     "Ownable: new owner is the zero address"
+          300┆ );
+            ⋮┆----------------------------------------
+          517┆ require(owner != address(0), "BEP20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          518┆ require(spender != address(0), "BEP20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          527┆ require(value > 0, "BEP20: burn amount not valid");
+            ⋮┆----------------------------------------
+          528┆ require(
+          529┆     value <= balanceOf(msg.sender),
+          530┆     "BEP20: burn amount exceeds balance"
+          531┆ );
+            ⋮┆----------------------------------------
+          540┆ require(value > 0, "BEP20: mint amount not valid");
+            ⋮┆----------------------------------------
+          541┆ require(totalSupply() + value <= _cap, "BEP20Capped: cap         
+  exceeded");                                                                   
+            ⋮┆----------------------------------------
+          562┆ require(
+          563┆     community_charge <= (100 * 10**uint256(decimals)),
+          564┆     "Community Charge % should be less than equal to 100%"
+          565┆ );
+            ⋮┆----------------------------------------
+          566┆ require(
+          567┆     ecoSysFee <= (100 * 10**uint256(decimals)),
+          568┆     "EcoSysFee % should be less than equal to 100%"
+          569┆ );
+            ⋮┆----------------------------------------
+          570┆ require(
+          571┆     surcharge1 <= (100 * 10**uint256(decimals)),
+          572┆     "surcharge1 % should be less than equal to 100%"
+          573┆ );
+            ⋮┆----------------------------------------
+          574┆ require(
+          575┆     surcharge2 <= (100 * 10**uint256(decimals)),
+          576┆     "surcharge2 % should be less than equal to 100%"
+          577┆ );
+            ⋮┆----------------------------------------
+          578┆ require(
+          579┆     surcharge3 <= (100 * 10**uint256(decimals)),
+          580┆     "surcharge3 % should be less than equal to 100%"
+          581┆ );
+            ⋮┆----------------------------------------
+          603┆ require(
+          604┆     ecoSysWallet != address(0),
+          605┆     "Ecosystem wallet wallet is not valid"
+          606┆ );
+            ⋮┆----------------------------------------
+          634┆ require(
+          635┆     rAmount <= _rTotal,
+          636┆     "Amount must be less than total reflections"
+          637┆ );
+            ⋮┆----------------------------------------
+          664┆ require(!_isExcludedFromReward[account], "Account is already     
+  excluded");                                                                   
+            ⋮┆----------------------------------------
+          863┆ require(from != address(0), "BEP20: transfer from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          864┆ require(to != address(0), "BEP20: transfer to the zero address");
+            ⋮┆----------------------------------------
+          865┆ require(from != to, "Invalid target");
+            ⋮┆----------------------------------------
+          867┆ require(
+          868┆     amount <= _maxTxAmount,
+          869┆     "Transfer amount exceeds the maxTxAmount."
+          870┆ );
+            ⋮┆----------------------------------------
+          877┆ require(
+          878┆     amount <= withdrawable,
+          879┆     "Not enough Unlocked token Available"
+          880┆ );
+            ⋮┆----------------------------------------
+          995┆ require(target_ != address(0), "Invalid target");
+            ⋮┆----------------------------------------
+          996┆ require(_msgSender() == target_, "Invalid target");
+            ⋮┆----------------------------------------
+         1002┆ require(remainedToken != 0, "All tokens are unlocked");
+            ⋮┆----------------------------------------
+         1004┆ require(
+         1005┆     block.timestamp > startTime + (initialLock * 1 days),
+         1006┆     "UnLocking period is not opened"
+         1007┆ );
+            ⋮┆----------------------------------------
+         1018┆ require(remainedMonth > 0, "Releasable token till now is         
+  released");                                                                   
+            ⋮┆----------------------------------------
+         1041┆ require(recipient != address(0), "Invalid target");
+            ⋮┆----------------------------------------
+         1042┆ require(
+         1043┆     locks[recipient].lockedToken == 0,
+         1044┆     "This address is already in vesting period"
+         1045┆ );
+            ⋮┆----------------------------------------
+         1047┆ require(
+         1048┆     initialLock >= 0,
+         1049┆     "timeindays should be greater than or equal to 0"
+         1050┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          866┆ if (from != owner() && to != owner())
+          867┆     require(
+          868┆         amount <= _maxTxAmount,
+          869┆         "Transfer amount exceeds the maxTxAmount."
+          870┆     );
+            ⋮┆----------------------------------------
+          961┆ if (
+          962┆     _isExcludedFromReward[sender] &&                             
+  !_isExcludedFromReward[recipient]                                             
+          963┆ ) {
+          964┆     _transferFromExcluded(sender, recipient, amount);
+          965┆ } else if (
+          966┆     !_isExcludedFromReward[sender] &&                            
+  _isExcludedFromReward[recipient]                                              
+          967┆ ) {
+          968┆     _transferToExcluded(sender, recipient, amount);
+          969┆ } else if (
+          970┆     !_isExcludedFromReward[sender] &&                            
+  !_isExcludedFromReward[recipient]                                             
+             [hid 10 additional lines, adjust with --max-lines-per-finding] 
+          965┆ } else if (
+          966┆     !_isExcludedFromReward[sender] &&                            
+  _isExcludedFromReward[recipient]                                              
+          967┆ ) {
+          968┆     _transferToExcluded(sender, recipient, amount);
+          969┆ } else if (
+          970┆     !_isExcludedFromReward[sender] &&                            
+  !_isExcludedFromReward[recipient]                                             
+          971┆ ) {
+          972┆     _transferStandard(sender, recipient, amount);
+          973┆ } else if (
+          974┆     _isExcludedFromReward[sender] &&                             
+  _isExcludedFromReward[recipient]                                              
+             [hid 6 additional lines, adjust with --max-lines-per-finding] 
+          969┆ } else if (
+          970┆     !_isExcludedFromReward[sender] &&                            
+  !_isExcludedFromReward[recipient]                                             
+          971┆ ) {
+          972┆     _transferStandard(sender, recipient, amount);
+          973┆ } else if (
+          974┆     _isExcludedFromReward[sender] &&                             
+  _isExcludedFromReward[recipient]                                              
+          975┆ ) {
+          976┆     _transferBothExcluded(sender, recipient, amount);
+          977┆     // SWC-135-Code With No Effects: L977 - L979
+          978┆ } else {
+             [hid 2 additional lines, adjust with --max-lines-per-finding] 
+          973┆ } else if (
+          974┆     _isExcludedFromReward[sender] &&                             
+  _isExcludedFromReward[recipient]                                              
+          975┆ ) {
+          976┆     _transferBothExcluded(sender, recipient, amount);
+          977┆     // SWC-135-Code With No Effects: L977 - L979
+          978┆ } else {
+          979┆     _transferStandard(sender, recipient, amount);
+          980┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          775┆ for (uint256 i = 0; i < cacheLength; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          172┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          297┆ require(
+          298┆     newOwner != address(0),
+          299┆     "Ownable: new owner is the zero address"
+          300┆ );
+            ⋮┆----------------------------------------
+          517┆ require(owner != address(0), "BEP20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          518┆ require(spender != address(0), "BEP20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          528┆ require(
+          529┆     value <= balanceOf(msg.sender),
+          530┆     "BEP20: burn amount exceeds balance"
+          531┆ );
+            ⋮┆----------------------------------------
+          562┆ require(
+          563┆     community_charge <= (100 * 10**uint256(decimals)),
+          564┆     "Community Charge % should be less than equal to 100%"
+          565┆ );
+            ⋮┆----------------------------------------
+          566┆ require(
+          567┆     ecoSysFee <= (100 * 10**uint256(decimals)),
+          568┆     "EcoSysFee % should be less than equal to 100%"
+          569┆ );
+            ⋮┆----------------------------------------
+          570┆ require(
+          571┆     surcharge1 <= (100 * 10**uint256(decimals)),
+          572┆     "surcharge1 % should be less than equal to 100%"
+          573┆ );
+            ⋮┆----------------------------------------
+          574┆ require(
+          575┆     surcharge2 <= (100 * 10**uint256(decimals)),
+          576┆     "surcharge2 % should be less than equal to 100%"
+          577┆ );
+            ⋮┆----------------------------------------
+          578┆ require(
+          579┆     surcharge3 <= (100 * 10**uint256(decimals)),
+          580┆     "surcharge3 % should be less than equal to 100%"
+          581┆ );
+            ⋮┆----------------------------------------
+          603┆ require(
+          604┆     ecoSysWallet != address(0),
+          605┆     "Ecosystem wallet wallet is not valid"
+          606┆ );
+            ⋮┆----------------------------------------
+          634┆ require(
+          635┆     rAmount <= _rTotal,
+          636┆     "Amount must be less than total reflections"
+          637┆ );
+            ⋮┆----------------------------------------
+          863┆ require(from != address(0), "BEP20: transfer from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          864┆ require(to != address(0), "BEP20: transfer to the zero address");
+            ⋮┆----------------------------------------
+          867┆ require(
+          868┆     amount <= _maxTxAmount,
+          869┆     "Transfer amount exceeds the maxTxAmount."
+          870┆ );
+            ⋮┆----------------------------------------
+          877┆ require(
+          878┆     amount <= withdrawable,
+          879┆     "Not enough Unlocked token Available"
+          880┆ );
+            ⋮┆----------------------------------------
+         1018┆ require(remainedMonth > 0, "Releasable token till now is         
+  released");                                                                   
+            ⋮┆----------------------------------------
+         1042┆ require(
+         1043┆     locks[recipient].lockedToken == 0,
+         1044┆     "This address is already in vesting period"
+         1045┆ );
+            ⋮┆----------------------------------------
+         1047┆ require(
+         1048┆     initialLock >= 0,
+         1049┆     "timeindays should be greater than or equal to 0"
+         1050┆ );
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 72 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

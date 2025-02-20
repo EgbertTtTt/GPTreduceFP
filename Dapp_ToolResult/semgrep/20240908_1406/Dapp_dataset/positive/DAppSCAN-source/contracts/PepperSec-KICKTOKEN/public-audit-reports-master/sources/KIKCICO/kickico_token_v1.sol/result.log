@@ -1,0 +1,255 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 67 Code Findings │
+└──────────────────┘
+                             
+    /sb/kickico_token_v1.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          240┆ for (uint256 i = 0; i < _recipients.length; i++) {
+            ⋮┆----------------------------------------
+          340┆ for (uint256 i = 0; i < _recipients.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+           58┆ constructor (string memory _name, string memory _symbol, uint8   
+  _decimals) public {                                                           
+           59┆     name = _name;
+           60┆     symbol = _symbol;
+           61┆     decimals = _decimals;
+           62┆     burnallowed = true;
+           63┆     paused = false;
+           64┆     owner = msg.sender;
+           65┆     _whitelisteds[msg.sender] = true;
+           66┆ }
+            ⋮┆----------------------------------------
+          349┆ constructor(string memory name, string memory symbol, uint8      
+  decimals)                                                                     
+          350┆ public CToken(name, symbol, decimals) {super.mint(msg.sender,    
+  100000000000);}                                                               
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          240┆ for (uint256 i = 0; i < _recipients.length; i++) {
+            ⋮┆----------------------------------------
+          340┆ for (uint256 i = 0; i < _recipients.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+            8┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+           14┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+           72┆ require(_whitelisteds[msg.sender] == true, "caller does not have 
+  the Whitelisted role");                                                       
+            ⋮┆----------------------------------------
+           89┆ require(burnallowed, "Burnable: not Burn");
+            ⋮┆----------------------------------------
+           96┆ require (_whitelisteds[msg.sender] == true, "can't perform an    
+  action");                                                                     
+            ⋮┆----------------------------------------
+          102┆ require(msg.sender == owner, "caller is not the owner");
+            ⋮┆----------------------------------------
+          136┆ require(recipient != address(this), "can't transfer tokens to the
+  contract address");                                                           
+            ⋮┆----------------------------------------
+          152┆ require(recipient != address(this), "can't transfer tokens to the
+  contract address");                                                           
+            ⋮┆----------------------------------------
+          173┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          174┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          183┆ require(account != address(0), "ERC20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+          184┆ require(account != address(this), "ERC20: mint to the contract   
+  address");                                                                    
+            ⋮┆----------------------------------------
+          185┆ require(amount > 0, "ERC20: mint amount should be > 0");
+            ⋮┆----------------------------------------
+          200┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          208┆ require(_owner != address(0), "ERC20: approve from the zero      
+  address");                                                                    
+            ⋮┆----------------------------------------
+          209┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          238┆ require(_recipients.length > 0, "dropBatchToken: transfer should 
+  be to at least one address");                                                 
+            ⋮┆----------------------------------------
+          239┆ require(_recipients.length == _amounts.length, "dropBatchToken:  
+  recipients.length != amounts.length");                                        
+            ⋮┆----------------------------------------
+          254┆ require(account != address(0), "ERC20: freeze from the zero      
+  address");                                                                    
+            ⋮┆----------------------------------------
+          255┆ require(amount > 0, "ERC20: freeze from the address: amount      
+  should be > 0");                                                              
+            ⋮┆----------------------------------------
+          256┆ require(_balances[account] >= amount, "ERC20: freeze from the    
+  address: balance < value");                                                   
+            ⋮┆----------------------------------------
+          264┆ require(account != address(0), "ERC20: mint frozen to the zero   
+  address");                                                                    
+            ⋮┆----------------------------------------
+          265┆ require(account != address(this), "ERC20: mint frozen to the     
+  contract address");                                                           
+            ⋮┆----------------------------------------
+          266┆ require(amount > 0, "ERC20: mint frozen amount should be > 0");
+            ⋮┆----------------------------------------
+          277┆ require(account != address(0), "ERC20: melt from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          278┆ require(amount > 0, "ERC20: melt from the address: value should  
+  be > 0");                                                                     
+            ⋮┆----------------------------------------
+          279┆ require(_frozen_balanceOf(account) >= amount, "ERC20: melt from  
+  the address: balance < amount");                                              
+            ⋮┆----------------------------------------
+          288┆ require(account != address(0), "ERC20: frozen burn from the zero 
+  address");                                                                    
+            ⋮┆----------------------------------------
+          299┆ require(from != address(0), "ERC20: transfer from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          300┆ require(to != address(0), "ERC20: transfer to the zero address");
+            ⋮┆----------------------------------------
+          302┆ require(_frozen_balanceOf(from) >= amount, "ERC20: transfer      
+  frozen tokens: balance of sender should be >= amount");                       
+            ⋮┆----------------------------------------
+          338┆ require(_recipients.length > 0, "FrozenToken: transfer should be 
+  to at least one address");                                                    
+            ⋮┆----------------------------------------
+          339┆ require(_recipients.length == _amounts.length, "FrozenToken:     
+  recipients.length != amounts.length");                                        
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          240┆ for (uint256 i = 0; i < _recipients.length; i++) {
+            ⋮┆----------------------------------------
+          340┆ for (uint256 i = 0; i < _recipients.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           72┆ require(_whitelisteds[msg.sender] == true, "caller does not have 
+  the Whitelisted role");                                                       
+            ⋮┆----------------------------------------
+          136┆ require(recipient != address(this), "can't transfer tokens to the
+  contract address");                                                           
+            ⋮┆----------------------------------------
+          152┆ require(recipient != address(this), "can't transfer tokens to the
+  contract address");                                                           
+            ⋮┆----------------------------------------
+          173┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          174┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          184┆ require(account != address(this), "ERC20: mint to the contract   
+  address");                                                                    
+            ⋮┆----------------------------------------
+          200┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          208┆ require(_owner != address(0), "ERC20: approve from the zero      
+  address");                                                                    
+            ⋮┆----------------------------------------
+          209┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          238┆ require(_recipients.length > 0, "dropBatchToken: transfer should 
+  be to at least one address");                                                 
+            ⋮┆----------------------------------------
+          239┆ require(_recipients.length == _amounts.length, "dropBatchToken:  
+  recipients.length != amounts.length");                                        
+            ⋮┆----------------------------------------
+          254┆ require(account != address(0), "ERC20: freeze from the zero      
+  address");                                                                    
+            ⋮┆----------------------------------------
+          255┆ require(amount > 0, "ERC20: freeze from the address: amount      
+  should be > 0");                                                              
+            ⋮┆----------------------------------------
+          256┆ require(_balances[account] >= amount, "ERC20: freeze from the    
+  address: balance < value");                                                   
+            ⋮┆----------------------------------------
+          264┆ require(account != address(0), "ERC20: mint frozen to the zero   
+  address");                                                                    
+            ⋮┆----------------------------------------
+          265┆ require(account != address(this), "ERC20: mint frozen to the     
+  contract address");                                                           
+            ⋮┆----------------------------------------
+          266┆ require(amount > 0, "ERC20: mint frozen amount should be > 0");
+            ⋮┆----------------------------------------
+          277┆ require(account != address(0), "ERC20: melt from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          278┆ require(amount > 0, "ERC20: melt from the address: value should  
+  be > 0");                                                                     
+            ⋮┆----------------------------------------
+          279┆ require(_frozen_balanceOf(account) >= amount, "ERC20: melt from  
+  the address: balance < amount");                                              
+            ⋮┆----------------------------------------
+          288┆ require(account != address(0), "ERC20: frozen burn from the zero 
+  address");                                                                    
+            ⋮┆----------------------------------------
+          299┆ require(from != address(0), "ERC20: transfer from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          300┆ require(to != address(0), "ERC20: transfer to the zero address");
+            ⋮┆----------------------------------------
+          302┆ require(_frozen_balanceOf(from) >= amount, "ERC20: transfer      
+  frozen tokens: balance of sender should be >= amount");                       
+            ⋮┆----------------------------------------
+          338┆ require(_recipients.length > 0, "FrozenToken: transfer should be 
+  to at least one address");                                                    
+            ⋮┆----------------------------------------
+          339┆ require(_recipients.length == _amounts.length, "FrozenToken:     
+  recipients.length != amounts.length");                                        
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 67 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

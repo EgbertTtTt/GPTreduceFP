@@ -1,0 +1,117 @@
+'solc --version' running
+'solc /sb/BitBookStake.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+BitBookStake.safeTransferFrom(address,address,uint256) (../../sb/BitBookStake.sol#188-190) ignores return value by bitBookToken.transferFrom(from,to,amount) (../../sb/BitBookStake.sol#189)
+BitBookStake.safeTransfer(address,uint256) (../../sb/BitBookStake.sol#192-194) ignores return value by bitBookToken.transfer(_to,_amount) (../../sb/BitBookStake.sol#193)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+BitBookStake.rewardCalc(address,uint256) (../../sb/BitBookStake.sol#242-248) performs a multiplication on the result of a division:
+	- percent = amount.mul(100).div(totalSupply).mul(1e8) (../../sb/BitBookStake.sol#244)
+BitBookStake.rewardCalc(address,uint256) (../../sb/BitBookStake.sol#242-248) performs a multiplication on the result of a division:
+	- count = (block.timestamp.sub(userDetails[_user][_id].depositTime)).div(86400) (../../sb/BitBookStake.sol#245)
+	- reward = (dailyReward.mul(percent).div(100e18)).mul(count) (../../sb/BitBookStake.sol#246)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+Reentrancy in BitBookStake.withdraw(uint256) (../../sb/BitBookStake.sol#228-240):
+	External calls:
+	- safeTransfer(msg.sender,amount) (../../sb/BitBookStake.sol#236)
+		- bitBookToken.transfer(_to,_amount) (../../sb/BitBookStake.sol#193)
+	State variables written after the call(s):
+	- userDetails[msg.sender][_stakerID].claim = true (../../sb/BitBookStake.sol#237)
+	BitBookStake.userDetails (../../sb/BitBookStake.sol#154) can be used in cross function reentrancies:
+	- BitBookStake.calculateFee(address,uint256) (../../sb/BitBookStake.sol#212-226)
+	- BitBookStake.deposit(uint256) (../../sb/BitBookStake.sol#173-186)
+	- BitBookStake.rewardCalc(address,uint256) (../../sb/BitBookStake.sol#242-248)
+	- BitBookStake.userDetails (../../sb/BitBookStake.sol#154)
+	- BitBookStake.withdraw(uint256) (../../sb/BitBookStake.sol#228-240)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+BitBookStake.updateReward(uint256,uint256) (../../sb/BitBookStake.sol#255-258) should emit an event for: 
+	- dailyReward = _daily (../../sb/BitBookStake.sol#256) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+Ownable.constructor().msgSender (../../sb/BitBookStake.sol#108) lacks a zero-check on :
+		- _owner = msgSender (../../sb/BitBookStake.sol#109)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in BitBookStake.deposit(uint256) (../../sb/BitBookStake.sol#173-186):
+	External calls:
+	- safeTransferFrom(msg.sender,address(this),_amount) (../../sb/BitBookStake.sol#176)
+		- bitBookToken.transferFrom(from,to,amount) (../../sb/BitBookStake.sol#189)
+	State variables written after the call(s):
+	- stakeID ++ (../../sb/BitBookStake.sol#184)
+	- stakings[msg.sender].stakingId.push(stakeID) (../../sb/BitBookStake.sol#181)
+	- totalSupply = totalSupply.add(_amount) (../../sb/BitBookStake.sol#185)
+	- userDetails[msg.sender][stakeID].amount = _amount (../../sb/BitBookStake.sol#178)
+	- userDetails[msg.sender][stakeID].depositTime = block.timestamp (../../sb/BitBookStake.sol#179)
+	- userDetails[msg.sender][stakeID].ID = stakeID (../../sb/BitBookStake.sol#180)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in BitBookStake.deposit(uint256) (../../sb/BitBookStake.sol#173-186):
+	External calls:
+	- safeTransferFrom(msg.sender,address(this),_amount) (../../sb/BitBookStake.sol#176)
+		- bitBookToken.transferFrom(from,to,amount) (../../sb/BitBookStake.sol#189)
+	Event emitted after the call(s):
+	- Deposit(msg.sender,_amount,stakeID) (../../sb/BitBookStake.sol#183)
+Reentrancy in BitBookStake.failsafe(address,uint256) (../../sb/BitBookStake.sol#260-265):
+	External calls:
+	- safeTransfer(_to,_amount) (../../sb/BitBookStake.sol#262)
+		- bitBookToken.transfer(_to,_amount) (../../sb/BitBookStake.sol#193)
+	Event emitted after the call(s):
+	- Failsafe(_to,_amount) (../../sb/BitBookStake.sol#264)
+Reentrancy in BitBookStake.withdraw(uint256) (../../sb/BitBookStake.sol#228-240):
+	External calls:
+	- safeTransfer(msg.sender,amount) (../../sb/BitBookStake.sol#236)
+		- bitBookToken.transfer(_to,_amount) (../../sb/BitBookStake.sol#193)
+	Event emitted after the call(s):
+	- Withdraw(msg.sender,amount) (../../sb/BitBookStake.sol#239)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+BitBookStake.calculateFee(address,uint256) (../../sb/BitBookStake.sol#212-226) uses timestamp for comparisons
+	Dangerous comparisons:
+	- 259200 >= staketime (../../sb/BitBookStake.sol#215)
+	- 864000 >= staketime (../../sb/BitBookStake.sol#217)
+	- 2592000 >= staketime (../../sb/BitBookStake.sol#219)
+	- 7776000 >= staketime (../../sb/BitBookStake.sol#221)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Context._msgData() (../../sb/BitBookStake.sol#43-46) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/BitBookStake.sol#92-94) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/BitBookStake.sol#96-99) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.8.0 (../../sb/BitBookStake.sol#1) allows old versions
+solc-0.8.0 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Struct BitBookStake._StakeingId (../../sb/BitBookStake.sol#149-151) is not in CapWords
+Parameter BitBookStake.deposit(uint256)._amount (../../sb/BitBookStake.sol#173) is not in mixedCase
+Parameter BitBookStake.safeTransfer(address,uint256)._to (../../sb/BitBookStake.sol#192) is not in mixedCase
+Parameter BitBookStake.safeTransfer(address,uint256)._amount (../../sb/BitBookStake.sol#192) is not in mixedCase
+Parameter BitBookStake.setFeePercentage(uint256,uint256,uint256)._from (../../sb/BitBookStake.sol#198) is not in mixedCase
+Parameter BitBookStake.setFeePercentage(uint256,uint256,uint256)._to (../../sb/BitBookStake.sol#198) is not in mixedCase
+Parameter BitBookStake.setFeePercentage(uint256,uint256,uint256)._pcent (../../sb/BitBookStake.sol#198) is not in mixedCase
+Parameter BitBookStake.viewFeePercentage(uint256,uint256)._from (../../sb/BitBookStake.sol#205) is not in mixedCase
+Parameter BitBookStake.viewFeePercentage(uint256,uint256)._to (../../sb/BitBookStake.sol#205) is not in mixedCase
+Parameter BitBookStake.calculateFee(address,uint256)._account (../../sb/BitBookStake.sol#212) is not in mixedCase
+Parameter BitBookStake.calculateFee(address,uint256)._stakerID (../../sb/BitBookStake.sol#212) is not in mixedCase
+Parameter BitBookStake.withdraw(uint256)._stakerID (../../sb/BitBookStake.sol#228) is not in mixedCase
+Parameter BitBookStake.rewardCalc(address,uint256)._user (../../sb/BitBookStake.sol#242) is not in mixedCase
+Parameter BitBookStake.rewardCalc(address,uint256)._id (../../sb/BitBookStake.sol#242) is not in mixedCase
+Parameter BitBookStake.stakingId(address)._staker (../../sb/BitBookStake.sol#251) is not in mixedCase
+Parameter BitBookStake.updateReward(uint256,uint256)._daily (../../sb/BitBookStake.sol#255) is not in mixedCase
+Parameter BitBookStake.updateReward(uint256,uint256)._monthly (../../sb/BitBookStake.sol#255) is not in mixedCase
+Parameter BitBookStake.failsafe(address,uint256)._to (../../sb/BitBookStake.sol#260) is not in mixedCase
+Parameter BitBookStake.failsafe(address,uint256)._amount (../../sb/BitBookStake.sol#260) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/BitBookStake.sol#44)" inContext (../../sb/BitBookStake.sol#35-47)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+BitBookStake.slitherConstructorVariables() (../../sb/BitBookStake.sol#133-266) uses literals with too many digits:
+	- monthlyReward = 400000e18 (../../sb/BitBookStake.sol#139)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+BitBookStake.bitBookToken (../../sb/BitBookStake.sol#136) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/BitBookStake.sol analyzed (5 contracts with 93 detectors), 39 result(s) found

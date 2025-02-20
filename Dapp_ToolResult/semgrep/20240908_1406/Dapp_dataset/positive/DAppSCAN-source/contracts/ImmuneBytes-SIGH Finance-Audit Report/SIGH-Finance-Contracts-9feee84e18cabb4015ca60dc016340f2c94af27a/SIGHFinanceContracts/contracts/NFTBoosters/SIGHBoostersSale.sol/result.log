@@ -1,0 +1,254 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 64 Code Findings │
+└──────────────────┘
+                             
+    /sb/SIGHBoostersSale.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          791┆ contract SIGHBoostersSale is                                     
+  IERC721Receiver,Ownable,ISIGHBoostersSale {                                   
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          625┆ for (uint i = 0; i < h.length; i ++)
+            ⋮┆----------------------------------------
+          630┆  ... n.length && (i + subindex) < h.length && h[i + subindex] == 
+  n[subindex]) // search until the chars don't match or until we reach the end  
+  of a or b ... [0m                                                             
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+          630┆  ... h.length && h[i + subindex] == n[subindex]) // search until 
+  the chars don't match or until we reach the end of a or b ... [0m             
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+          634┆ if(subindex == n.length)
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          332┆ constructor (string memory name_, string memory symbol_) {
+          333┆     _name = name_;
+          334┆     _symbol = symbol_;
+          335┆     _decimals = 18;
+          336┆ }
+            ⋮┆----------------------------------------
+          812┆ constructor(address _SIGHNFTBoostersContract) {
+          813┆     require(_SIGHNFTBoostersContract != address(0),'SIGH Finance 
+  : Invalid _SIGHNFTBoostersContract address');                                 
+          814┆     _SIGH_NFT_BoostersContract =                                 
+  ISIGHBoosters(_SIGHNFTBoostersContract);                                      
+          815┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          940┆ uint256 _boosterId =                                             
+  listOfBoosters[_BoosterType].boosterIdsList[0];  // current BoosterID         
+            ⋮┆----------------------------------------
+          942┆ if (boosterIdsForSale[_boosterId]) {
+            ⋮┆----------------------------------------
+          944┆                                                                  
+  _SIGH_NFT_BoostersContract.safeTransferFrom(address(this),to,_boosterId);     
+            ⋮┆----------------------------------------
+          945┆ require(to ==                                                    
+  _SIGH_NFT_BoostersContract.ownerOfBooster(_boosterId),"Booster Transfer       
+  failed");                                                                     
+            ⋮┆----------------------------------------
+          948┆ listOfBoosters[_BoosterType].boosterIdsList[0] =                 
+  listOfBoosters[_BoosterType].boosterIdsList[listLength.sub(1)];               
+            ⋮┆----------------------------------------
+          948┆ listOfBoosters[_BoosterType].boosterIdsList[0] =                 
+  listOfBoosters[_BoosterType].boosterIdsList[listLength.sub(1)];               
+            ⋮┆----------------------------------------
+          949┆ listOfBoosters[_BoosterType].boosterIdsList.pop();
+            ⋮┆----------------------------------------
+          953┆ listOfBoosters[_BoosterType].totalAvailable =                    
+  listOfBoosters[_BoosterType].totalAvailable.sub(1);                           
+            ⋮┆----------------------------------------
+          953┆ listOfBoosters[_BoosterType].totalAvailable =                    
+  listOfBoosters[_BoosterType].totalAvailable.sub(1);                           
+            ⋮┆----------------------------------------
+          954┆ listOfBoosters[_BoosterType].totalBoostersSold =                 
+  listOfBoosters[_BoosterType].totalBoostersSold.add(1);                        
+            ⋮┆----------------------------------------
+          954┆ listOfBoosters[_BoosterType].totalBoostersSold =                 
+  listOfBoosters[_BoosterType].totalBoostersSold.add(1);                        
+            ⋮┆----------------------------------------
+          957┆ boosterIdsForSale[_boosterId] = false;
+            ⋮┆----------------------------------------
+          959┆ emit BoosterSold(to, _BoosterType, _boosterId,                   
+  listOfBoosters[_BoosterType].salePrice );                                     
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          625┆ for (uint i = 0; i < h.length; i ++)
+            ⋮┆----------------------------------------
+          939┆ for (uint i=0; i < totalBoosters; i++ ) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           52┆ require(_owner == _msgSender(), "Ownable: caller is not the      
+  owner");                                                                      
+            ⋮┆----------------------------------------
+           73┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+           92┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          147┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          486┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          487┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          506┆ require(account != address(0), "ERC20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+          527┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          550┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          551┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          813┆ require(_SIGHNFTBoostersContract != address(0),'SIGH Finance :   
+  Invalid _SIGHNFTBoostersContract address');                                   
+            ⋮┆----------------------------------------
+          830┆ require(                                                         
+  _SIGH_NFT_BoostersContract.isCategorySupported(_BoosterType),"Invalid Type"); 
+            ⋮┆----------------------------------------
+          831┆ require( boosterTypes[_BoosterType] ,"Not yet initialized");
+            ⋮┆----------------------------------------
+          838┆ require( token != address(0) ,"Invalid address");
+            ⋮┆----------------------------------------
+          845┆ require( to != address(0) ,"Invalid address");
+            ⋮┆----------------------------------------
+          846┆ require( amount <= getCurrentFundsBalance() ,"Invalid amount");
+            ⋮┆----------------------------------------
+          853┆ require( block.timestamp < timestamp,'Invalid stamp');
+            ⋮┆----------------------------------------
+          860┆ require( to != address(0) ,"Invalid address");
+            ⋮┆----------------------------------------
+          863┆ require( amount <= balance ,"Invalid amount");
+            ⋮┆----------------------------------------
+          874┆ require( block.timestamp > initiateTimestamp,'Sale not begin');
+            ⋮┆----------------------------------------
+          875┆ require(boostersToBuy >= 1,"Invalid number of boosters");
+            ⋮┆----------------------------------------
+          876┆ require(boosterTypes[_BoosterType],"Invalid Booster Type");
+            ⋮┆----------------------------------------
+          877┆ require(listOfBoosters[_BoosterType].totalAvailable >=           
+  boostersToBuy,"Boosters not available");                                      
+            ⋮┆----------------------------------------
+          881┆ require(transferFunds(msg.sender,amountToBePaid),'Funds transfer 
+  Failed');                                                                     
+            ⋮┆----------------------------------------
+          882┆ require(transferBoosters(receiver, _BoosterType,                 
+  boostersToBuy),'Boosters transfer Failed');                                   
+            ⋮┆----------------------------------------
+          893┆ require(                                                         
+  _SIGH_NFT_BoostersContract.isCategorySupported(_Boostertype),"SIGH Finance :  
+  Not a valid Booster Type");                                                   
+            ⋮┆----------------------------------------
+          922┆ require( !boosterIdsForSale[boosterId], "Already Added");
+            ⋮┆----------------------------------------
+          945┆ require(to ==                                                    
+  _SIGH_NFT_BoostersContract.ownerOfBooster(_boosterId),"Booster Transfer       
+  failed");                                                                     
+            ⋮┆----------------------------------------
+          970┆ require(newBalance == prevBalance.add(amount),'Funds Transfer    
+  failed');                                                                     
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          596┆ for (uint i = 0; i < minLength; i ++)
+            ⋮┆----------------------------------------
+          625┆ for (uint i = 0; i < h.length; i ++)
+            ⋮┆----------------------------------------
+          632┆ subindex++;
+            ⋮┆----------------------------------------
+          939┆ for (uint i=0; i < totalBoosters; i++ ) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           73┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          147┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          486┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          487┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          527┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          550┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          551┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          813┆ require(_SIGHNFTBoostersContract != address(0),'SIGH Finance :   
+  Invalid _SIGHNFTBoostersContract address');                                   
+            ⋮┆----------------------------------------
+          893┆ require(                                                         
+  _SIGH_NFT_BoostersContract.isCategorySupported(_Boostertype),"SIGH Finance :  
+  Not a valid Booster Type");                                                   
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 64 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

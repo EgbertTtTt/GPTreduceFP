@@ -1,0 +1,106 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 13 Code Findings │
+└──────────────────┘
+                                             
+    /sb/InteractiveCrowdsaleTestContract.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          570┆ for(uint256 i = 0; i < _saleData.length; i += 3){
+            ⋮┆----------------------------------------
+          724┆ while((index < self.milestoneTimes.length) &&                    
+  (self.milestoneTimes[index] < timestamp)) {                                   
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          306┆ require((self.owner == msg.sender) && (_newOwner > 0));
+            ⋮┆----------------------------------------
+          318┆ require((self.owner == msg.sender) && self.stillMinting);
+            ⋮┆----------------------------------------
+         1175┆ require((self.personalCaps[msg.sender] == 0) &&                  
+  (self.base.hasContributed[msg.sender] == 0));                                 
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          601┆ if (crowdsaleActive(self) && nonZeroPurchase) {
+          602┆   return true;
+          603┆ } else {
+          604┆   LogErrorMsg(msg.value, "Invalid Purchase! Check start time and 
+  amount of ether.");                                                           
+          605┆   return false;
+          606┆ }
+            ⋮┆----------------------------------------
+          662┆ if ((!crowdsaleEnded(self)) && (self.token.balanceOf(this)>0)) {
+          663┆   LogErrorMsg(0, "Cannot withdraw owner ether until after the    
+  sale!");                                                                      
+          664┆   return false;
+          665┆ }
+            ⋮┆----------------------------------------
+          804┆ if (self.list[_node][PREV] == HEAD && self.list[_node][NEXT] ==  
+  HEAD) {                                                                       
+          805┆     if (self.list[HEAD][NEXT] == _node) {
+          806┆         return true;
+          807┆     } else {
+          808┆         return false;
+          809┆     }
+          810┆ } else {
+          811┆     return true;
+          812┆ }
+            ⋮┆----------------------------------------
+          888┆ if(!nodeExists(self,_new) && nodeExists(self,_node)) {
+          889┆     uint256 c = self.list[_node][_direction];
+          890┆     createLink(self, _node, _new, _direction);
+          891┆     createLink(self, _new, c, _direction);
+          892┆     return true;
+          893┆ } else {
+          894┆     return false;
+          895┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          725┆ index++;
+            ⋮┆----------------------------------------
+          728┆ index++;
+            ⋮┆----------------------------------------
+          823┆ numElements++;
+            ⋮┆----------------------------------------
+         1109┆ _digits++;
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 13 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

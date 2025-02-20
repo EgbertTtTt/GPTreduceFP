@@ -1,0 +1,413 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 98 Code Findings │
+└──────────────────┘
+                       
+    /sb/MasterChef.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          490┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          494┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          512┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          517┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          522┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+         1064┆ contract YetiMaster is Ownable, ReentrancyGuard {
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+         1438┆ for (; i < withdrawalFeeIntervals.length; i++) {
+            ⋮┆----------------------------------------
+         1448┆ for (uint i = 0; i < _withdrawalFeeIntervals.length - 1; i++) {
+            ⋮┆----------------------------------------
+         1451┆ for (uint i = 0; i < _withdrawalFeeBP.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+         1094┆ uint256 public totalAllocPoint = 0; // Total allocation points.  
+  Must be the sum of all allocation points in all pools.                        
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          734┆ constructor (string memory name_, string memory symbol_) public {
+          735┆     _name = name_;
+          736┆     _symbol = symbol_;
+          737┆     _decimals = 18;
+          738┆ }
+            ⋮┆----------------------------------------
+         1024┆ constructor() public ERC20("Honey token", "HONEY") {
+         1025┆     _operator = _msgSender();
+         1026┆     emit OperatorTransferred(address(0), _operator);
+         1027┆ }
+            ⋮┆----------------------------------------
+         1115┆ constructor(
+         1116┆     address _devaddr,
+         1117┆     address _feeAddr,
+         1118┆     uint256 _startTimestamp,
+         1119┆     uint256 _endTimestamp,
+         1120┆     address _earningToken
+         1121┆ ) public {
+         1122┆     devaddr = _devaddr;
+         1123┆     feeAddr = _feeAddr;
+         1124┆     startTimestamp = _startTimestamp;
+             [hid 3 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+         1438┆ for (; i < withdrawalFeeIntervals.length; i++) {
+            ⋮┆----------------------------------------
+         1439┆ if (TimeElapsed < withdrawalFeeIntervals[i])
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+         1217┆ for (uint256 pid = 0; pid < length; ++pid) {
+            ⋮┆----------------------------------------
+         1448┆ for (uint i = 0; i < _withdrawalFeeIntervals.length - 1; i++) {
+            ⋮┆----------------------------------------
+         1451┆ for (uint i = 0; i < _withdrawalFeeBP.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          128┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          132┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          189┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          190┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          214┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          238┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          347┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          362┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          379┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          396┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          413┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          509┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          510┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          511┆ );
+            ⋮┆----------------------------------------
+          539┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          590┆ require(_status != _ENTERED, "ReentrancyGuard: reentrant call");
+            ⋮┆----------------------------------------
+          661┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          682┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          888┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          889┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          908┆ require(account != address(0), "ERC20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+          929┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          952┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          953┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1020┆ require(_operator == msg.sender, "operator: caller is not the    
+  operator");                                                                   
+            ⋮┆----------------------------------------
+         1039┆ require(amount == sendAmount + taxAmount, "HONEY::transfer: Tax  
+  value invalid");                                                              
+            ⋮┆----------------------------------------
+         1048┆ require(_transferTaxRate <= MAXIMUM_TRANSFER_TAX_RATE,           
+  "HONEY::updateTransferTaxRate: Transfer tax rate must not exceed the maximum  
+  rate.");                                                                      
+            ⋮┆----------------------------------------
+         1058┆ require(newOperator != address(0), "HONEY::transferOperator: new 
+  operator is the zero address");                                               
+            ⋮┆----------------------------------------
+         1130┆ require(pid < poolInfo.length, "pool inexistent");
+            ⋮┆----------------------------------------
+         1142┆ require(_depositFeeBP <= MAX_DEPOSIT_FEE_BP, "add: invalid       
+  deposit fee basis points");                                                   
+            ⋮┆----------------------------------------
+         1169┆ require(_depositFeeBP <= MAX_DEPOSIT_FEE_BP, "set: invalid       
+  deposit fee basis points");                                                   
+            ⋮┆----------------------------------------
+         1306┆ require(user.amount > 0, "user.amount is 0");
+            ⋮┆----------------------------------------
+         1307┆ require(total > 0, "Total is 0");
+            ⋮┆----------------------------------------
+         1390┆ require(_token != earningToken, "!safe");
+            ⋮┆----------------------------------------
+         1409┆ require(_referralCommissionRate <=                               
+  MAXIMUM_REFERRAL_COMMISSION_RATE, "setReferralCommissionRate: invalid referral
+  commission rate basis points");                                               
+            ⋮┆----------------------------------------
+         1427┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1446┆ require (_withdrawalFeeIntervals.length + 1 ==                   
+  _withdrawalFeeBP.length, 'setWithdrawFee: _withdrawalFeeBP length is one more 
+  than _withdrawalFeeIntervals length ... [0m                                   
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+         1447┆ require (_withdrawalFeeBP.length > 0, 'setWithdrawFee:           
+  _withdrawalFeeBP length is one more than 0');                                 
+            ⋮┆----------------------------------------
+         1449┆ require (_withdrawalFeeIntervals[i] < _withdrawalFeeIntervals[i +
+  1], 'setWithdrawFee: The interval must be ascending');                        
+            ⋮┆----------------------------------------
+         1452┆ require (_withdrawalFeeBP[i] <= MAX_WITHDRAWAL_FEE_BP,           
+  'setWithdrawFee: invalid withdrawal fee basis points');                       
+            ⋮┆----------------------------------------
+         1466┆ require(block.timestamp < startTimestamp, 'setStartTimestamp: The
+  farming has already started');                                                
+            ⋮┆----------------------------------------
+         1467┆ require(block.timestamp < _startTimestamp, 'setStartTimestamp:   
+  _startTimestamp must be larger than now');                                    
+            ⋮┆----------------------------------------
+         1468┆ require(_startTimestamp < endTimestamp, 'setStartTimestamp:      
+  _startTimestamp must be smaller than endTimestamp');                          
+            ⋮┆----------------------------------------
+         1473┆ require(startTimestamp < _endTimestamp, 'setEndTimestamp:        
+  _endTimestamp must be larger than startTimestamp');                           
+            ⋮┆----------------------------------------
+         1474┆ require(block.timestamp < _endTimestamp, 'setEndTimestamp:       
+  _endTimestamp must be larger than now');                                      
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         1201┆ if (lastTimestamp > pool.lastRewardTimestamp && wantLockedTotal  
+  != 0) {                                                                       
+         1202┆     uint256 multiplier =
+         1203┆         getMultiplier(pool.lastRewardTimestamp, lastTimestamp);
+         1204┆     uint256 earningsReward =
+         1205┆                                                                  
+  multiplier.mul(earningsPerSecond).mul(pool.allocPoint).div(                   
+         1206┆             totalAllocPoint
+         1207┆         );
+         1208┆     accEarningsPerShare = accEarningsPerShare.add(
+         1209┆         earningsReward.mul(1e12).div(wantLockedTotal)
+         1210┆     );
+             [hid 1 additional lines, adjust with --max-lines-per-finding] 
+         1263┆ if (_wantAmt > 0 && address(earningReferral) != address(0) &&    
+  _referrer != address(0) && _referrer != msg.sender) {                         
+         1264┆     earningReferral.recordReferral(msg.sender, _referrer);
+         1265┆ }
+            ⋮┆----------------------------------------
+         1414┆ if (address(earningReferral) != address(0) &&                    
+  referralCommissionRate > 0) {                                                 
+         1415┆     address referrer = earningReferral.getReferrer(_user);
+         1416┆     uint256 commissionAmount =                                   
+  _pending.mul(referralCommissionRate).div(10000);                              
+         1417┆ 
+         1418┆     if (referrer != address(0) && commissionAmount > 0) {
+         1419┆         HoneyToken(earningToken).mint(referrer,                  
+  commissionAmount);                                                            
+         1420┆         earningReferral.recordReferralCommission(referrer,       
+  commissionAmount);                                                            
+         1421┆         emit ReferralCommissionPaid(_user, referrer,             
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+  commissionAmount);                                                            
+         1422┆     }
+         1423┆ }
+            ⋮┆----------------------------------------
+         1418┆ if (referrer != address(0) && commissionAmount > 0) {
+         1419┆     HoneyToken(earningToken).mint(referrer, commissionAmount);
+         1420┆     earningReferral.recordReferralCommission(referrer,           
+  commissionAmount);                                                            
+         1421┆     emit ReferralCommissionPaid(_user, referrer,                 
+  commissionAmount);                                                            
+         1422┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+         1438┆ for (; i < withdrawalFeeIntervals.length; i++) {
+            ⋮┆----------------------------------------
+         1448┆ for (uint i = 0; i < _withdrawalFeeIntervals.length - 1; i++) {
+            ⋮┆----------------------------------------
+         1451┆ for (uint i = 0; i < _withdrawalFeeBP.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          132┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          189┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          214┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          238┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          379┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          509┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          510┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          511┆ );
+            ⋮┆----------------------------------------
+          539┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          682┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          888┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          889┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          929┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          952┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          953┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1020┆ require(_operator == msg.sender, "operator: caller is not the    
+  operator");                                                                   
+            ⋮┆----------------------------------------
+         1039┆ require(amount == sendAmount + taxAmount, "HONEY::transfer: Tax  
+  value invalid");                                                              
+            ⋮┆----------------------------------------
+         1048┆ require(_transferTaxRate <= MAXIMUM_TRANSFER_TAX_RATE,           
+  "HONEY::updateTransferTaxRate: Transfer tax rate must not exceed the maximum  
+  rate.");                                                                      
+            ⋮┆----------------------------------------
+         1058┆ require(newOperator != address(0), "HONEY::transferOperator: new 
+  operator is the zero address");                                               
+            ⋮┆----------------------------------------
+         1142┆ require(_depositFeeBP <= MAX_DEPOSIT_FEE_BP, "add: invalid       
+  deposit fee basis points");                                                   
+            ⋮┆----------------------------------------
+         1169┆ require(_depositFeeBP <= MAX_DEPOSIT_FEE_BP, "set: invalid       
+  deposit fee basis points");                                                   
+            ⋮┆----------------------------------------
+         1409┆ require(_referralCommissionRate <=                               
+  MAXIMUM_REFERRAL_COMMISSION_RATE, "setReferralCommissionRate: invalid referral
+  commission rate basis points");                                               
+            ⋮┆----------------------------------------
+         1427┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1446┆ require (_withdrawalFeeIntervals.length + 1 ==                   
+  _withdrawalFeeBP.length, 'setWithdrawFee: _withdrawalFeeBP length is one more 
+  than _withdrawalFeeIntervals length ... [0m                                   
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+         1447┆ require (_withdrawalFeeBP.length > 0, 'setWithdrawFee:           
+  _withdrawalFeeBP length is one more than 0');                                 
+            ⋮┆----------------------------------------
+         1449┆ require (_withdrawalFeeIntervals[i] < _withdrawalFeeIntervals[i +
+  1], 'setWithdrawFee: The interval must be ascending');                        
+            ⋮┆----------------------------------------
+         1452┆ require (_withdrawalFeeBP[i] <= MAX_WITHDRAWAL_FEE_BP,           
+  'setWithdrawFee: invalid withdrawal fee basis points');                       
+            ⋮┆----------------------------------------
+         1466┆ require(block.timestamp < startTimestamp, 'setStartTimestamp: The
+  farming has already started');                                                
+            ⋮┆----------------------------------------
+         1467┆ require(block.timestamp < _startTimestamp, 'setStartTimestamp:   
+  _startTimestamp must be larger than now');                                    
+            ⋮┆----------------------------------------
+         1468┆ require(_startTimestamp < endTimestamp, 'setStartTimestamp:      
+  _startTimestamp must be smaller than endTimestamp');                          
+            ⋮┆----------------------------------------
+         1473┆ require(startTimestamp < _endTimestamp, 'setEndTimestamp:        
+  _endTimestamp must be larger than startTimestamp');                           
+            ⋮┆----------------------------------------
+         1474┆ require(block.timestamp < _endTimestamp, 'setEndTimestamp:       
+  _endTimestamp must be larger than now');                                      
+
+
+Ran 48 rules on 1 file: 98 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

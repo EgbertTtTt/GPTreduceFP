@@ -1,0 +1,842 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                     
+                     
+┌───────────────────┐
+│ 199 Code Findings │
+└───────────────────┘
+                             
+    /sb/PerpetualCreator.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+         1866┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+         1870┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+         1888┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+         1893┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+         1898┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          290┆ contract AddressWhitelist is Ownable, Lockable {
+            ⋮┆----------------------------------------
+         5949┆ contract ConfigStore is ConfigStoreInterface, Testable, Lockable,
+  Ownable {                                                                     
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          350┆ for (uint256 i = 0; i < whitelistIndices.length; i++) {
+            ⋮┆----------------------------------------
+          359┆ for (uint256 i = 0; i < whitelistIndices.length; i++) {
+            ⋮┆----------------------------------------
+          411┆ for (uint256 i = 0; i < initialMembers.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          234┆ constructor() internal {
+          235┆     // Storing an initial non-zero value makes deployment a bit  
+  more                                                                          
+          236┆     // expensive, but in exchange the refund on every call to    
+  nonReentrant                                                                  
+          237┆     // will be lower in amount. Since refunds are capped to a    
+  percetange of                                                                 
+          238┆     // the total transaction's gas, it is best to keep them low  
+  in cases                                                                      
+          239┆     // like this one, to increase the likelihood of the full     
+  refund coming                                                                 
+          240┆     // into effect.
+          241┆     _notEntered = true;
+          242┆ }
+            ⋮┆----------------------------------------
+          924┆ constructor() public {
+          925┆     _createExclusiveRole(uint256(Roles.Owner),                   
+  uint256(Roles.Owner), msg.sender);                                            
+          926┆     // Start with no contract creators registered.
+          927┆     _createSharedRole(uint256(Roles.ContractCreator),            
+  uint256(Roles.Owner), new address[](0));                                      
+          928┆ }
+            ⋮┆----------------------------------------
+         1107┆ constructor() public {
+         1108┆     currentTime = now; // solhint-disable-line not-rely-on-time
+         1109┆ }
+            ⋮┆----------------------------------------
+         1224┆ constructor (string memory name_, string memory symbol_) public {
+         1225┆     _name = name_;
+         1226┆     _symbol = symbol_;
+         1227┆     _decimals = 18;
+         1228┆ }
+            ⋮┆----------------------------------------
+         1497┆ constructor(
+         1498┆     string memory _tokenName,
+         1499┆     string memory _tokenSymbol,
+         1500┆     uint8 _tokenDecimals
+         1501┆ ) public ERC20(_tokenName, _tokenSymbol) {
+         1502┆     _setupDecimals(_tokenDecimals);
+         1503┆     _createExclusiveRole(uint256(Roles.Owner),                   
+  uint256(Roles.Owner), msg.sender);                                            
+         1504┆     _createSharedRole(uint256(Roles.Minter),                     
+  uint256(Roles.Owner), new address[](0));                                      
+         1505┆     _createSharedRole(uint256(Roles.Burner),                     
+  uint256(Roles.Owner), new address[](0));                                      
+         1506┆ }
+            ⋮┆----------------------------------------
+         1571┆ constructor(
+         1572┆     string memory tokenName,
+         1573┆     string memory tokenSymbol,
+         1574┆     uint8 tokenDecimals
+         1575┆ ) public ExpandedERC20(tokenName, tokenSymbol, tokenDecimals)    
+  nonReentrant() {}                                                             
+            ⋮┆----------------------------------------
+         3737┆ constructor(
+         3738┆     uint256 _liveness,
+         3739┆     address _finderAddress,
+         3740┆     address _timerAddress
+         3741┆ ) public Testable(_timerAddress) {
+         3742┆     finder = FinderInterface(_finderAddress);
+         3743┆     _validateLiveness(_liveness);
+         3744┆     defaultLiveness = _liveness;
+         3745┆ }
+            ⋮┆----------------------------------------
+         4669┆ constructor(
+         4670┆     uint256 _withdrawalLiveness,
+         4671┆     address _collateralAddress,
+         4672┆     address _tokenAddress,
+         4673┆     address _finderAddress,
+         4674┆     bytes32 _priceIdentifier,
+         4675┆     bytes32 _fundingRateIdentifier,
+         4676┆     FixedPoint.Unsigned memory _minSponsorTokens,
+         4677┆     address _configStoreAddress,
+         4678┆     FixedPoint.Unsigned memory _tokenScaling,
+             [hid 19 additional lines, adjust with --max-lines-per-finding] 
+         5470┆ constructor(ConstructorParams memory params)
+         5471┆     public
+         5472┆     PerpetualPositionManager(
+         5473┆         params.withdrawalLiveness,
+         5474┆         params.collateralAddress,
+         5475┆         params.tokenAddress,
+         5476┆         params.finderAddress,
+         5477┆         params.priceFeedIdentifier,
+         5478┆         params.fundingRateIdentifier,
+         5479┆         params.minSponsorTokens,
+             [hid 18 additional lines, adjust with --max-lines-per-finding] 
+         5917┆ constructor(ConstructorParams memory params)
+         5918┆     public
+         5919┆     PerpetualLiquidatable(params)
+         5920┆ // Note: since there is no logic here, there is no need to add a 
+  re-entrancy guard.                                                            
+         5921┆ {
+         5922┆ 
+         5923┆ }
+            ⋮┆----------------------------------------
+         5994┆ constructor(ConfigSettings memory _initialConfig, address        
+  _timerAddress) public Testable(_timerAddress) {                               
+         5995┆     _validateConfig(_initialConfig);
+         5996┆     currentConfig = _initialConfig;
+         5997┆ }
+            ⋮┆----------------------------------------
+         6139┆ constructor(
+         6140┆     address _finderAddress,
+         6141┆     address _tokenFactoryAddress,
+         6142┆     address _timerAddress
+         6143┆ ) public ContractCreator(_finderAddress) Testable(_timerAddress) 
+  nonReentrant() {                                                              
+         6144┆     tokenFactoryAddress = _tokenFactoryAddress;
+         6145┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          350┆ for (uint256 i = 0; i < whitelistIndices.length; i++) {
+            ⋮┆----------------------------------------
+          351┆ if (whitelist[whitelistIndices[i]] == Status.In) {
+            ⋮┆----------------------------------------
+          351┆ if (whitelist[whitelistIndices[i]] == Status.In) {
+            ⋮┆----------------------------------------
+          359┆ for (uint256 i = 0; i < whitelistIndices.length; i++) {
+            ⋮┆----------------------------------------
+          360┆ address addr = whitelistIndices[i];
+            ⋮┆----------------------------------------
+          361┆ if (whitelist[addr] == Status.In) {
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          350┆ for (uint256 i = 0; i < whitelistIndices.length; i++) {
+            ⋮┆----------------------------------------
+          359┆ for (uint256 i = 0; i < whitelistIndices.length; i++) {
+            ⋮┆----------------------------------------
+          411┆ for (uint256 i = 0; i < initialMembers.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          199┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          220┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          272┆ require(_notEntered, "ReentrancyGuard: reentrant call");
+            ⋮┆----------------------------------------
+          379┆ require(newMember != address(0x0), "Cannot set an exclusive role 
+  to 0x0");                                                                     
+            ⋮┆----------------------------------------
+          402┆ require(memberToAdd != address(0x0), "Cannot add 0x0 to a shared 
+  role");                                                                       
+            ⋮┆----------------------------------------
+          443┆ require(holdsRole(roleId, msg.sender), "Sender does not hold     
+  required role");                                                              
+            ⋮┆----------------------------------------
+          451┆ require(holdsRole(roles[roleId].managingRole, msg.sender), "Can  
+  only be called by a role manager");                                           
+            ⋮┆----------------------------------------
+          459┆ require(roles[roleId].roleType == RoleType.Exclusive, "Must be   
+  called on an initialized Exclusive role");                                    
+            ⋮┆----------------------------------------
+          467┆ require(roles[roleId].roleType == RoleType.Shared, "Must be      
+  called on an initialized Shared role");                                       
+            ⋮┆----------------------------------------
+          485┆ revert("Invalid roleId");
+            ⋮┆----------------------------------------
+          549┆ require(roles[roleId].roleType != RoleType.Invalid, "Attempted to
+  use an invalid roleId");                                                      
+            ⋮┆----------------------------------------
+          557┆ require(roles[roleId].roleType == RoleType.Invalid, "Cannot use a
+  pre-existing role");                                                          
+            ⋮┆----------------------------------------
+          576┆ require(
+          577┆     roles[managingRoleId].roleType != RoleType.Invalid,
+          578┆     "Attempted to use an invalid role to manage a shared role"
+          579┆ );
+            ⋮┆----------------------------------------
+          597┆ require(
+          598┆     roles[managingRoleId].roleType != RoleType.Invalid,
+          599┆     "Attempted to use an invalid role to manage an exclusive     
+  role"                                                                         
+          600┆ );
+            ⋮┆----------------------------------------
+          742┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          757┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          774┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          791┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          808┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          946┆ require(contractMap[contractAddress].valid == Validity.Invalid,  
+  "Can only register once");                                                    
+            ⋮┆----------------------------------------
+          970┆ require(contractMap[contractAddress].valid == Validity.Valid,    
+  "Can only add to valid contract");                                            
+            ⋮┆----------------------------------------
+          985┆ require(numberOfContracts != 0, "Party has no contracts");
+            ⋮┆----------------------------------------
+          986┆ require(contractMap[contractAddress].valid == Validity.Valid,    
+  "Remove only from valid contract");                                           
+            ⋮┆----------------------------------------
+          987┆ require(isPartyMemberOfContract(partyAddress, contractAddress),  
+  "Can only remove existing party");                                            
+            ⋮┆----------------------------------------
+         1055┆ require(!isPartyMemberOfContract(party, contractAddress), "Can   
+  only register a party once");                                                 
+            ⋮┆----------------------------------------
+         1091┆ require(collateralWhitelist.isOnWhitelist(collateralAddress),    
+  "Collateral not whitelisted");                                                
+            ⋮┆----------------------------------------
+         1378┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1379┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1398┆ require(account != address(0), "ERC20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1419┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1442┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1443┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1715┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+         1719┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+         1776┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+         1777┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+         1801┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+         1825┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+         1885┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+         1886┆     "SafeERC20: approve from non-zero to non-zero allowance"
+         1887┆ );
+            ⋮┆----------------------------------------
+         1915┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+         1945┆ require(!(a == -1 && b == _INT256_MIN), "SignedSafeMath:         
+  multiplication overflow");                                                    
+            ⋮┆----------------------------------------
+         1948┆ require(c / a == b, "SignedSafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+         1966┆ require(b != 0, "SignedSafeMath: division by zero");
+            ⋮┆----------------------------------------
+         1967┆ require(!(b == -1 && a == _INT256_MIN), "SignedSafeMath: division
+  overflow");                                                                   
+            ⋮┆----------------------------------------
+         1986┆ require((b >= 0 && c <= a) || (b < 0 && c > a), "SignedSafeMath: 
+  subtraction overflow");                                                       
+            ⋮┆----------------------------------------
+         2003┆ require((b >= 0 && c >= a) || (b < 0 && c < a), "SignedSafeMath: 
+  addition overflow");                                                          
+            ⋮┆----------------------------------------
+         2394┆ require(a.rawValue >= 0, "Negative value provided");
+            ⋮┆----------------------------------------
+         2399┆ require(a.rawValue <= uint256(type(int256).max), "Unsigned too   
+  large");                                                                      
+            ⋮┆----------------------------------------
+         3167┆ require(value < 2**128, "SafeCast: value doesn\'t fit in 128     
+  bits");                                                                       
+            ⋮┆----------------------------------------
+         3182┆ require(value < 2**64, "SafeCast: value doesn\'t fit in 64       
+  bits");                                                                       
+            ⋮┆----------------------------------------
+         3197┆ require(value < 2**32, "SafeCast: value doesn\'t fit in 32       
+  bits");                                                                       
+            ⋮┆----------------------------------------
+         3212┆ require(value < 2**16, "SafeCast: value doesn\'t fit in 16       
+  bits");                                                                       
+            ⋮┆----------------------------------------
+         3227┆ require(value < 2**8, "SafeCast: value doesn\'t fit in 8 bits");
+            ⋮┆----------------------------------------
+         3239┆ require(value >= 0, "SafeCast: value must be positive");
+            ⋮┆----------------------------------------
+         3257┆ require(value >= -2**127 && value < 2**127, "SafeCast: value     
+  doesn\'t fit in 128 bits");                                                   
+            ⋮┆----------------------------------------
+         3275┆ require(value >= -2**63 && value < 2**63, "SafeCast: value       
+  doesn\'t fit in 64 bits");                                                    
+            ⋮┆----------------------------------------
+         3293┆ require(value >= -2**31 && value < 2**31, "SafeCast: value       
+  doesn\'t fit in 32 bits");                                                    
+            ⋮┆----------------------------------------
+         3311┆ require(value >= -2**15 && value < 2**15, "SafeCast: value       
+  doesn\'t fit in 16 bits");                                                    
+            ⋮┆----------------------------------------
+         3329┆ require(value >= -2**7 && value < 2**7, "SafeCast: value doesn\'t
+  fit in 8 bits");                                                              
+            ⋮┆----------------------------------------
+         3341┆ require(value < 2**255, "SafeCast: value doesn't fit in an       
+  int256");                                                                     
+            ⋮┆----------------------------------------
+         3766┆ require(getState(msg.sender, identifier, timestamp,              
+  ancillaryData) == State.Invalid, "requestPrice: Invalid");                    
+            ⋮┆----------------------------------------
+         3767┆                                                                  
+  require(_getIdentifierWhitelist().isIdentifierSupported(identifier),          
+  "Unsupported identifier");                                                    
+            ⋮┆----------------------------------------
+         3768┆                                                                  
+  require(_getCollateralWhitelist().isOnWhitelist(address(currency)),           
+  "Unsupported currency");                                                      
+            ⋮┆----------------------------------------
+         3811┆ require(getState(msg.sender, identifier, timestamp,              
+  ancillaryData) == State.Requested, "setBond: Requested");                     
+            ⋮┆----------------------------------------
+         3832┆ require(
+         3833┆     getState(msg.sender, identifier, timestamp, ancillaryData) ==
+  State.Requested,                                                              
+         3834┆     "setRefundOnDispute: Requested"
+         3835┆ );
+            ⋮┆----------------------------------------
+         3853┆ require(
+         3854┆     getState(msg.sender, identifier, timestamp, ancillaryData) ==
+  State.Requested,                                                              
+         3855┆     "setCustomLiveness: Requested"
+         3856┆ );
+            ⋮┆----------------------------------------
+         3881┆ require(
+         3882┆     getState(requester, identifier, timestamp, ancillaryData) == 
+  State.Requested,                                                              
+         3883┆     "proposePriceFor: Requested"
+         3884┆ );
+            ⋮┆----------------------------------------
+         3946┆ require(
+         3947┆     getState(requester, identifier, timestamp, ancillaryData) == 
+  State.Proposed,                                                               
+         3948┆     "disputePriceFor: Proposed"
+         3949┆ );
+            ⋮┆----------------------------------------
+         4163┆ revert("_settle: not settleable");
+            ⋮┆----------------------------------------
+         4195┆ require(_liveness < 5200 weeks, "Liveness too large");
+            ⋮┆----------------------------------------
+         4196┆ require(_liveness > 0, "Liveness cannot be 0");
+            ⋮┆----------------------------------------
+         4363┆ require(fundingRate.proposalTime == 0, "Proposal in progress");
+            ⋮┆----------------------------------------
+         4369┆ require(
+         4370┆     timestamp > updateTime && timestamp >= currentTime.sub(30    
+  minutes) && timestamp <= currentTime.add(90),                                 
+         4371┆     "Invalid proposal time"
+         4372┆ );
+            ⋮┆----------------------------------------
+         4691┆                                                                  
+  require(_getIdentifierWhitelist().isIdentifierSupported(_priceIdentifier),    
+  "Unsupported price identifier");                                              
+            ⋮┆----------------------------------------
+         4717┆ require(collateralAmount.isGreaterThan(0), "Invalid collateral   
+  amount");                                                                     
+            ⋮┆----------------------------------------
+         4756┆ require(collateralAmount.isGreaterThan(0), "Invalid collateral   
+  amount");                                                                     
+            ⋮┆----------------------------------------
+         4783┆ require(
+         4784┆     collateralAmount.isGreaterThan(0) &&
+         4785┆                                                                  
+  collateralAmount.isLessThanOrEqual(_getFeeAdjustedCollateral(positionData.rawC
+  ollateral)),                                                                  
+         4786┆     "Invalid collateral amount"
+         4787┆ );
+            ⋮┆----------------------------------------
+         4811┆ require(
+         4812┆     positionData.withdrawalRequestPassTimestamp != 0 &&
+         4813┆         positionData.withdrawalRequestPassTimestamp <=           
+  getCurrentTime(),                                                             
+         4814┆     "Invalid withdraw request"
+         4815┆ );
+            ⋮┆----------------------------------------
+         4869┆ require(
+         4870┆     (_checkCollateralization(
+         4871┆                                                                  
+  _getFeeAdjustedCollateral(positionData.rawCollateral).add(collateralAmount),  
+         4872┆         positionData.tokensOutstanding.add(numTokens)
+         4873┆     ) || _checkCollateralization(collateralAmount, numTokens)),
+         4874┆     "Insufficient collateral"
+         4875┆ );
+            ⋮┆----------------------------------------
+         4877┆ require(positionData.withdrawalRequestPassTimestamp == 0,        
+  "Pending withdrawal");                                                        
+            ⋮┆----------------------------------------
+         4879┆ require(numTokens.isGreaterThanOrEqual(minSponsorTokens), "Below 
+  minimum sponsor position");                                                   
+            ⋮┆----------------------------------------
+         4918┆                                                                  
+  require(numTokens.isLessThanOrEqual(positionData.tokensOutstanding), "Invalid 
+  token amount");                                                               
+            ⋮┆----------------------------------------
+         4933┆ require(newTokenCount.isGreaterThanOrEqual(minSponsorTokens),    
+  "Below minimum sponsor position");                                            
+            ⋮┆----------------------------------------
+         5129┆ require(
+         5130┆                                                                  
+  positionData.tokensOutstanding.isGreaterThanOrEqual(minSponsorTokens),        
+         5131┆     "Below minimum sponsor position"
+         5132┆ );
+            ⋮┆----------------------------------------
+         5242┆ require(_checkPositionCollateralization(positionData), "CR below 
+  GCR");                                                                        
+            ⋮┆----------------------------------------
+         5250┆ require(
+         5251┆                                                                  
+  _getFeeAdjustedCollateral(positions[sponsor].rawCollateral).isGreaterThan(0), 
+         5252┆     "Position has no collateral"
+         5253┆ );
+            ⋮┆----------------------------------------
+         5270┆ require(_getPositionData(sponsor).withdrawalRequestPassTimestamp 
+  == 0, "Pending withdrawal");                                                  
+            ⋮┆----------------------------------------
+         5485┆ require(params.collateralRequirement.isGreaterThan(1), "CR is    
+  more than 100%");                                                             
+            ⋮┆----------------------------------------
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+         5486┆ require(
+         5487┆                                                                  
+  params.sponsorDisputeRewardPct.add(params.disputerDisputeRewardPct).isLessThan
+  (1),                                                                          
+         5488┆     "Rewards are more than 100%"
+
+Ran 48 rules on 1 file: 199 findings.
+         5489┆ );
+            ⋮┆----------------------------------------
+         5537┆ require(getCurrentTime() <= deadline, "Mined after deadline");
+            ⋮┆----------------------------------------
+         5543┆ require(tokensLiquidated.isGreaterThan(0), "Liquidating 0        
+  tokens");                                                                     
+            ⋮┆----------------------------------------
+         5558┆ require(
+         5559┆                                                                  
+  maxCollateralPerToken.mul(startTokens).isGreaterThanOrEqual(startCollateralNet
+  OfWithdrawal),                                                                
+         5560┆     "CR is more than max liq. price"
+         5561┆ );
+            ⋮┆----------------------------------------
+         5563┆ require(
+         5564┆                                                                  
+  minCollateralPerToken.mul(startTokens).isLessThanOrEqual(startCollateralNetOfW
+  ithdrawal),                                                                   
+         5565┆     "CR is less than min liq. price"
+         5566┆ );
+            ⋮┆----------------------------------------
+         5872┆ require(
+         5873┆     liquidationId < liquidationArray.length &&                   
+  liquidationArray[liquidationId].state != Status.Uninitialized,                
+         5874┆     "Invalid liquidation ID"
+         5875┆ );
+            ⋮┆----------------------------------------
+         5888┆ require(
+         5889┆     (getCurrentTime() < _getLiquidationExpiry(liquidation)) &&   
+  (liquidation.state == Status.PreDispute),                                     
+         5890┆     "Liquidation not disputable"
+         5891┆ );
+            ⋮┆----------------------------------------
+         5899┆ require(
+         5900┆     (state > Status.PreDispute) ||
+         5901┆         ((_getLiquidationExpiry(liquidation) <= getCurrentTime())
+  && (state == Status.PreDispute)),                                             
+         5902┆     "Liquidation not withdrawable"
+         5903┆ );
+            ⋮┆----------------------------------------
+         6077┆ require(config.timelockLiveness <= 7 days &&                     
+  config.timelockLiveness >= 1 days, "Invalid timelockLiveness");               
+            ⋮┆----------------------------------------
+         6085┆ require(config.proposerBondPct.isLessThan(maxProposerBond),      
+  "Invalid proposerBondPct");                                                   
+            ⋮┆----------------------------------------
+         6090┆                                                                  
+  require(config.rewardRatePerSecond.isLessThan(maxRewardRatePerSecond),        
+  "Invalid rewardRatePerSecond");                                               
+            ⋮┆----------------------------------------
+         6163┆ require(bytes(params.syntheticName).length != 0, "Missing        
+  synthetic name");                                                             
+            ⋮┆----------------------------------------
+         6164┆ require(bytes(params.syntheticSymbol).length != 0, "Missing      
+  synthetic symbol");                                                           
+            ⋮┆----------------------------------------
+         6200┆ require(params.withdrawalLiveness != 0, "Withdrawal liveness     
+  cannot be 0");                                                                
+            ⋮┆----------------------------------------
+         6201┆ require(params.liquidationLiveness != 0, "Liquidation liveness   
+  cannot be 0");                                                                
+            ⋮┆----------------------------------------
+         6209┆ require(params.withdrawalLiveness < 5200 weeks, "Withdrawal      
+  liveness too large");                                                         
+            ⋮┆----------------------------------------
+         6210┆ require(params.liquidationLiveness < 5200 weeks, "Liquidation    
+  liveness too large");                                                         
+            ⋮┆----------------------------------------
+         6215┆ require(
+         6216┆     params.tokenScaling.isGreaterThan(minScaling) &&             
+  params.tokenScaling.isLessThan(maxScaling),                                   
+         6217┆     "Invalid tokenScaling"
+         6218┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+         1945┆ require(!(a == -1 && b == _INT256_MIN), "SignedSafeMath:         
+  multiplication overflow");                                                    
+            ⋮┆----------------------------------------
+         1967┆ require(!(b == -1 && a == _INT256_MIN), "SignedSafeMath: division
+  overflow");                                                                   
+            ⋮┆----------------------------------------
+         1986┆ require((b >= 0 && c <= a) || (b < 0 && c > a), "SignedSafeMath: 
+  subtraction overflow");                                                       
+            ⋮┆----------------------------------------
+         2003┆ require((b >= 0 && c >= a) || (b < 0 && c < a), "SignedSafeMath: 
+  addition overflow");                                                          
+            ⋮┆----------------------------------------
+         3257┆ require(value >= -2**127 && value < 2**127, "SafeCast: value     
+  doesn\'t fit in 128 bits");                                                   
+            ⋮┆----------------------------------------
+         3275┆ require(value >= -2**63 && value < 2**63, "SafeCast: value       
+  doesn\'t fit in 64 bits");                                                    
+            ⋮┆----------------------------------------
+         3293┆ require(value >= -2**31 && value < 2**31, "SafeCast: value       
+  doesn\'t fit in 32 bits");                                                    
+            ⋮┆----------------------------------------
+         3311┆ require(value >= -2**15 && value < 2**15, "SafeCast: value       
+  doesn\'t fit in 16 bits");                                                    
+            ⋮┆----------------------------------------
+         3329┆ require(value >= -2**7 && value < 2**7, "SafeCast: value doesn\'t
+  fit in 8 bits");                                                              
+            ⋮┆----------------------------------------
+         4369┆ require(
+         4370┆     timestamp > updateTime && timestamp >= currentTime.sub(30    
+  minutes) && timestamp <= currentTime.add(90),                                 
+         4371┆     "Invalid proposal time"
+         4372┆ );
+            ⋮┆----------------------------------------
+         4783┆ require(
+         4784┆     collateralAmount.isGreaterThan(0) &&
+         4785┆                                                                  
+  collateralAmount.isLessThanOrEqual(_getFeeAdjustedCollateral(positionData.rawC
+  ollateral)),                                                                  
+         4786┆     "Invalid collateral amount"
+         4787┆ );
+            ⋮┆----------------------------------------
+         4811┆ require(
+         4812┆     positionData.withdrawalRequestPassTimestamp != 0 &&
+         4813┆         positionData.withdrawalRequestPassTimestamp <=           
+  getCurrentTime(),                                                             
+         4814┆     "Invalid withdraw request"
+         4815┆ );
+            ⋮┆----------------------------------------
+         5872┆ require(
+         5873┆     liquidationId < liquidationArray.length &&                   
+  liquidationArray[liquidationId].state != Status.Uninitialized,                
+         5874┆     "Invalid liquidation ID"
+         5875┆ );
+            ⋮┆----------------------------------------
+         5888┆ require(
+         5889┆     (getCurrentTime() < _getLiquidationExpiry(liquidation)) &&   
+  (liquidation.state == Status.PreDispute),                                     
+         5890┆     "Liquidation not disputable"
+         5891┆ );
+            ⋮┆----------------------------------------
+         5899┆ require(
+         5900┆     (state > Status.PreDispute) ||
+         5901┆         ((_getLiquidationExpiry(liquidation) <= getCurrentTime())
+  && (state == Status.PreDispute)),                                             
+         5902┆     "Liquidation not withdrawable"
+         5903┆ );
+            ⋮┆----------------------------------------
+         6077┆ require(config.timelockLiveness <= 7 days &&                     
+  config.timelockLiveness >= 1 days, "Invalid timelockLiveness");               
+            ⋮┆----------------------------------------
+         6215┆ require(
+         6216┆     params.tokenScaling.isGreaterThan(minScaling) &&             
+  params.tokenScaling.isLessThan(maxScaling),                                   
+         6217┆     "Invalid tokenScaling"
+         6218┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         3969┆ if (request.reward > 0 && request.refundOnDispute) {
+         3970┆     refund = request.reward;
+         3971┆     request.reward = 0;
+         3972┆     request.currency.safeTransfer(requester, refund);
+         3973┆ }
+            ⋮┆----------------------------------------
+         5116┆ if (
+         5117┆     tokensToRemove.isEqual(positionData.tokensOutstanding) &&
+         5118┆                                                                  
+  _getFeeAdjustedCollateral(positionData.rawCollateral).isEqual(collateralToRemo
+  ve)                                                                           
+         5119┆ ) {
+         5120┆     _deleteSponsorPosition(sponsor);
+         5121┆     return;
+         5122┆ }
+            ⋮┆----------------------------------------
+         5627┆ if (
+         5628┆     positionToLiquidate.withdrawalRequestPassTimestamp > 0 && // 
+  The position is undergoing a slow withdrawal.                                 
+         5629┆     positionToLiquidate.withdrawalRequestPassTimestamp >         
+  getCurrentTime() && // The slow withdrawal has not yet expired.               
+         5630┆     tokensLiquidated.isGreaterThanOrEqual(griefingThreshold) //  
+  The liquidated token count is above a "griefing threshold".                   
+         5631┆ ) {
+         5632┆     positionToLiquidate.withdrawalRequestPassTimestamp =         
+  getCurrentTime().add(withdrawalLiveness);                                     
+         5633┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          350┆ for (uint256 i = 0; i < whitelistIndices.length; i++) {
+            ⋮┆----------------------------------------
+          352┆ activeCount++;
+            ⋮┆----------------------------------------
+          359┆ for (uint256 i = 0; i < whitelistIndices.length; i++) {
+            ⋮┆----------------------------------------
+          363┆ activeCount++;
+            ⋮┆----------------------------------------
+          411┆ for (uint256 i = 0; i < initialMembers.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          220┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          379┆ require(newMember != address(0x0), "Cannot set an exclusive role 
+  to 0x0");                                                                     
+            ⋮┆----------------------------------------
+          443┆ require(holdsRole(roleId, msg.sender), "Sender does not hold     
+  required role");                                                              
+            ⋮┆----------------------------------------
+          451┆ require(holdsRole(roles[roleId].managingRole, msg.sender), "Can  
+  only be called by a role manager");                                           
+            ⋮┆----------------------------------------
+          459┆ require(roles[roleId].roleType == RoleType.Exclusive, "Must be   
+  called on an initialized Exclusive role");                                    
+            ⋮┆----------------------------------------
+          467┆ require(roles[roleId].roleType == RoleType.Shared, "Must be      
+  called on an initialized Shared role");                                       
+            ⋮┆----------------------------------------
+          549┆ require(roles[roleId].roleType != RoleType.Invalid, "Attempted to
+  use an invalid roleId");                                                      
+            ⋮┆----------------------------------------
+          576┆ require(
+          577┆     roles[managingRoleId].roleType != RoleType.Invalid,
+          578┆     "Attempted to use an invalid role to manage a shared role"
+          579┆ );
+            ⋮┆----------------------------------------
+          597┆ require(
+          598┆     roles[managingRoleId].roleType != RoleType.Invalid,
+          599┆     "Attempted to use an invalid role to manage an exclusive     
+  role"                                                                         
+          600┆ );
+            ⋮┆----------------------------------------
+          774┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+         1378┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1379┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1419┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1442┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1443┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1719┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+         1776┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+         1801┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+         1825┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+         1885┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+         1886┆     "SafeERC20: approve from non-zero to non-zero allowance"
+         1887┆ );
+            ⋮┆----------------------------------------
+         1915┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+         1945┆ require(!(a == -1 && b == _INT256_MIN), "SignedSafeMath:         
+  multiplication overflow");                                                    
+            ⋮┆----------------------------------------
+         1948┆ require(c / a == b, "SignedSafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+         1967┆ require(!(b == -1 && a == _INT256_MIN), "SignedSafeMath: division
+  overflow");                                                                   
+            ⋮┆----------------------------------------
+         1986┆ require((b >= 0 && c <= a) || (b < 0 && c > a), "SignedSafeMath: 
+  subtraction overflow");                                                       
+            ⋮┆----------------------------------------
+         2003┆ require((b >= 0 && c >= a) || (b < 0 && c < a), "SignedSafeMath: 
+  addition overflow");                                                          
+            ⋮┆----------------------------------------
+         3167┆ require(value < 2**128, "SafeCast: value doesn\'t fit in 128     
+  bits");                                                                       
+            ⋮┆----------------------------------------
+         3182┆ require(value < 2**64, "SafeCast: value doesn\'t fit in 64       
+  bits");                                                                       
+            ⋮┆----------------------------------------
+         3197┆ require(value < 2**32, "SafeCast: value doesn\'t fit in 32       
+  bits");                                                                       
+            ⋮┆----------------------------------------
+         3212┆ require(value < 2**16, "SafeCast: value doesn\'t fit in 16       
+  bits");                                                                       
+            ⋮┆----------------------------------------
+         3227┆ require(value < 2**8, "SafeCast: value doesn\'t fit in 8 bits");
+            ⋮┆----------------------------------------
+         3257┆ require(value >= -2**127 && value < 2**127, "SafeCast: value     
+  doesn\'t fit in 128 bits");                                                   
+            ⋮┆----------------------------------------
+         3275┆ require(value >= -2**63 && value < 2**63, "SafeCast: value       
+  doesn\'t fit in 64 bits");                                                    
+            ⋮┆----------------------------------------
+         3293┆ require(value >= -2**31 && value < 2**31, "SafeCast: value       
+  doesn\'t fit in 32 bits");                                                    
+            ⋮┆----------------------------------------
+         3311┆ require(value >= -2**15 && value < 2**15, "SafeCast: value       
+  doesn\'t fit in 16 bits");                                                    
+            ⋮┆----------------------------------------
+         3329┆ require(value >= -2**7 && value < 2**7, "SafeCast: value doesn\'t
+  fit in 8 bits");                                                              
+            ⋮┆----------------------------------------
+         3341┆ require(value < 2**255, "SafeCast: value doesn't fit in an       
+  int256");                                                                     
+
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

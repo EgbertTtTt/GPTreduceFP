@@ -1,0 +1,133 @@
+/sb/BridgeExecutorBase.sol
+line 2:7 mismatched input 'abicoder' expecting {'solidity', 'experimental'}
+line 301:0 extraneous input 'abstract' expecting {<EOF>, 'pragma', 'import', 'contract', 'library', 'interface'}
+line 304:27 mismatched input 'override' expecting {';', '='}
+line 305:27 mismatched input 'override' expecting {';', '='}
+line 306:27 mismatched input 'override' expecting {';', '='}
+line 548:41 no viable alternative at input '.call{'
+line 548:41 missing ';' at '{'
+jar:file:/usr/local/lib/node_modules/@smartdec/smartcheck/jdeploy-bundle/smartcheck-2.0-jar-with-dependencies.jar!/solidity-rules.xmlruleId: SOLIDITY_EXTRA_GAS_IN_LOOPS
+patternId: d3j11j
+severity: 1
+line: 350
+column: 4
+content: for(uint256i=0;i<actionsSet.targets.length;i++){_executeTransaction(actionsSet.targets[i],actionsSet.values[i],actionsSet.signatures[i],actionsSet.calldatas[i],actionsSet.executionTime,actionsSet.withDelegatecalls[i]);}
+
+ruleId: SOLIDITY_EXTRA_GAS_IN_LOOPS
+patternId: d3j11j
+severity: 1
+line: 373
+column: 4
+content: for(uint256i=0;i<actionsSet.targets.length;i++){_cancelTransaction(actionsSet.targets[i],actionsSet.values[i],actionsSet.signatures[i],actionsSet.calldatas[i],actionsSet.executionTime,actionsSet.withDelegatecalls[i]);}
+
+ruleId: SOLIDITY_EXTRA_GAS_IN_LOOPS
+patternId: d3j11j
+severity: 1
+line: 482
+column: 4
+content: for(uint256i=0;i<targets.length;i++){bytes32actionHash=keccak256(abi.encode(targets[i],values[i],signatures[i],calldatas[i],executionTime,withDelegatecalls[i]));require(!isActionQueued(actionHash),'DUPLICATED_ACTION');_queuedActions[actionHash]=true;}
+
+ruleId: SOLIDITY_GAS_LIMIT_IN_LOOPS
+patternId: f6f853
+severity: 2
+line: 350
+column: 4
+content: for(uint256i=0;i<actionsSet.targets.length;i++){_executeTransaction(actionsSet.targets[i],actionsSet.values[i],actionsSet.signatures[i],actionsSet.calldatas[i],actionsSet.executionTime,actionsSet.withDelegatecalls[i]);}
+
+ruleId: SOLIDITY_GAS_LIMIT_IN_LOOPS
+patternId: f6f853
+severity: 2
+line: 373
+column: 4
+content: for(uint256i=0;i<actionsSet.targets.length;i++){_cancelTransaction(actionsSet.targets[i],actionsSet.values[i],actionsSet.signatures[i],actionsSet.calldatas[i],actionsSet.executionTime,actionsSet.withDelegatecalls[i]);}
+
+ruleId: SOLIDITY_GAS_LIMIT_IN_LOOPS
+patternId: f6f853
+severity: 2
+line: 482
+column: 4
+content: for(uint256i=0;i<targets.length;i++){bytes32actionHash=keccak256(abi.encode(targets[i],values[i],signatures[i],calldatas[i],executionTime,withDelegatecalls[i]));require(!isActionQueued(actionHash),'DUPLICATED_ACTION');_queuedActions[actionHash]=true;}
+
+ruleId: SOLIDITY_LOCKED_MONEY
+patternId: 30281d
+severity: 3
+line: 301
+column: 9
+content: contractBridgeExecutorBaseisIBridgeExecutor{usingSafeMathforuint256;uint256publicimmutableoverrideGRACE_PERIOD;uint256publicimmutableoverrideMINIMUM_DELAY;uint256publicimmutableoverrideMAXIMUM_DELAY;uint256private_actionsSetCounter;addressprivate_guardian;uint256private_delay;mapping(uint256=>ActionsSet)private_actionsSets;mapping(bytes32=>bool)private_queuedActions;modifieronlyGuardian(){require(msg.sender==_guardian,'ONLY_BY_GUARDIAN');_;}constructor(uint256delay,uint256gracePeriod,uint256minimumDelay,uint256maximumDelay,addressguardian){require(delay>=minimumDelay,'DELAY_SHORTER_THAN_MINIMUM');require(delay<=maximumDelay,'DELAY_LONGER_THAN_MAXIMUM');_delay=delay;GRACE_PERIOD=gracePeriod;MINIMUM_DELAY=minimumDelay;MAXIMUM_DELAY=maximumDelay;_guardian=guardian;emitNewDelay(delay);}functionexecute(uint256actionsSetId)externalpayableoverride{require(getActionsSetState(actionsSetId)==ActionsSetState.Queued,'ONLY_QUEUED_ACTIONS');ActionsSetstorageactionsSet=_actionsSets[actionsSetId];require(block.timestamp>=actionsSet.executionTime,'TIMELOCK_NOT_FINISHED');actionsSet.executed=true;for(uint256i=0;i<actionsSet.targets.length;i++){_executeTransaction(actionsSet.targets[i],actionsSet.values[i],actionsSet.signatures[i],actionsSet.calldatas[i],actionsSet.executionTime,actionsSet.withDelegatecalls[i]);}emitActionsSetExecuted(actionsSetId,msg.sender);}functioncancel(uint256actionsSetId)externaloverrideonlyGuardian{ActionsSetStatestate=getActionsSetState(actionsSetId);require(state==ActionsSetState.Queued,'ONLY_BEFORE_EXECUTED');ActionsSetstorageactionsSet=_actionsSets[actionsSetId];actionsSet.canceled=true;for(uint256i=0;i<actionsSet.targets.length;i++){_cancelTransaction(actionsSet.targets[i],actionsSet.values[i],actionsSet.signatures[i],actionsSet.calldatas[i],actionsSet.executionTime,actionsSet.withDelegatecalls[i]);}emitActionsSetCanceled(actionsSetId);}functionsetDelay(uint256delay)publicoverrideonlyGuardian{_validateDelay(delay);_delay=delay;emitNewDelay(delay);}functiongetActionsSetById(uint256actionsSetId)externalviewoverridereturns(ActionsSetmemory){return_actionsSets[actionsSetId];}functiongetActionsSetState(uint256actionsSetId)publicviewoverridereturns(ActionsSetState){require(_actionsSetCounter>=actionsSetId,'INVALID_ACTION_ID');ActionsSetstorageactionsSet=_actionsSets[actionsSetId];if(actionsSet.canceled){returnActionsSetState.Canceled;}elseif(actionsSet.executed){returnActionsSetState.Executed;}elseif(block.timestamp>actionsSet.executionTime.add(GRACE_PERIOD)){returnActionsSetState.Expired;}else{returnActionsSetState.Queued;}}functionisActionQueued(bytes32actionHash)publicviewoverridereturns(bool){return_queuedActions[actionHash];}functionreceiveFunds()externalpayable{}functiongetDelay()externalviewoverridereturns(uint256){return_delay;}function_queue(address[]memorytargets,uint256[]memoryvalues,string[]memorysignatures,bytes[]memorycalldatas,bool[]memorywithDelegatecalls)internal{require(targets.length!=0,'INVALID_EMPTY_TARGETS');require(targets.length==values.length&&targets.length==signatures.length&&targets.length==calldatas.length&&targets.length==withDelegatecalls.length,'INCONSISTENT_PARAMS_LENGTH');uint256actionsSetId=_actionsSetCounter;uint256executionTime=block.timestamp.add(_delay);_actionsSetCounter++;for(uint256i=0;i<targets.length;i++){bytes32actionHash=keccak256(abi.encode(targets[i],values[i],signatures[i],calldatas[i],executionTime,withDelegatecalls[i]));require(!isActionQueued(actionHash),'DUPLICATED_ACTION');_queuedActions[actionHash]=true;}ActionsSetstorageactionsSet=_actionsSets[actionsSetId];actionsSet.id=actionsSetId;actionsSet.targets=targets;actionsSet.values=values;actionsSet.signatures=signatures;actionsSet.calldatas=calldatas;actionsSet.withDelegatecalls=withDelegatecalls;actionsSet.executionTime=executionTime;emitActionsSetQueued(actionsSetId,targets,values,signatures,calldatas,withDelegatecalls,executionTime);}function_executeTransaction(addresstarget,uint256value,stringmemorysignature,bytesmemorydata,uint256executionTime,boolwithDelegatecall)internal{bytes32actionHash=keccak256(abi.encode(target,value,signature,data,executionTime,withDelegatecall));_queuedActions[actionHash]=false;bytesmemorycallData;if(bytes(signature).length==0){callData=data;}else{callData=abi.encodePacked(bytes4(keccak256(bytes(signature))),data);}boolsuccess;bytesmemoryresultData;if(withDelegatecall){require(msg.value>=value,'NOT_ENOUGH_MSG_VALUE');(success,resultData)=target.delegatecall(callData);}else{(success,resultData)=target.call<missing ';'>{value:value}(callData);}require(success,'FAILED_ACTION_EXECUTION');}function_cancelTransaction(addresstarget,uint256value,stringmemorysignature,bytesmemorydata,uint256executionTime,boolwithDelegatecall)internal{bytes32actionHash=keccak256(abi.encode(target,value,signature,data,executionTime,withDelegatecall));_queuedActions[actionHash]=false;}function_validateDelay(uint256delay)internalview{require(delay>=MINIMUM_DELAY,'DELAY_SHORTER_THAN_MINIMUM');require(delay<=MAXIMUM_DELAY,'DELAY_LONGER_THAN_MAXIMUM');}}
+
+ruleId: SOLIDITY_PRIVATE_MODIFIER_DONT_HIDE_DATA
+patternId: 5616b2
+severity: 1
+line: 308
+column: 10
+content: private
+
+ruleId: SOLIDITY_PRIVATE_MODIFIER_DONT_HIDE_DATA
+patternId: 5616b2
+severity: 1
+line: 309
+column: 10
+content: private
+
+ruleId: SOLIDITY_PRIVATE_MODIFIER_DONT_HIDE_DATA
+patternId: 5616b2
+severity: 1
+line: 310
+column: 10
+content: private
+
+ruleId: SOLIDITY_PRIVATE_MODIFIER_DONT_HIDE_DATA
+patternId: 5616b2
+severity: 1
+line: 312
+column: 33
+content: private
+
+ruleId: SOLIDITY_PRIVATE_MODIFIER_DONT_HIDE_DATA
+patternId: 5616b2
+severity: 1
+line: 313
+column: 27
+content: private
+
+ruleId: SOLIDITY_SAFEMATH
+patternId: 837cac
+severity: 1
+line: 302
+column: 2
+content: usingSafeMathforuint256;
+
+ruleId: SOLIDITY_VISIBILITY
+patternId: 910067
+severity: 1
+line: 320
+column: 2
+content: constructor(uint256delay,uint256gracePeriod,uint256minimumDelay,uint256maximumDelay,addressguardian){require(delay>=minimumDelay,'DELAY_SHORTER_THAN_MINIMUM');require(delay<=maximumDelay,'DELAY_LONGER_THAN_MAXIMUM');_delay=delay;GRACE_PERIOD=gracePeriod;MINIMUM_DELAY=minimumDelay;MAXIMUM_DELAY=maximumDelay;_guardian=guardian;emitNewDelay(delay);}
+
+ruleId: SOLIDITY_VISIBILITY
+patternId: b51ce0
+severity: 1
+line: 304
+column: 27
+content: overrideGRACE_PERIOD;
+
+ruleId: SOLIDITY_VISIBILITY
+patternId: b51ce0
+severity: 1
+line: 305
+column: 27
+content: overrideMINIMUM_DELAY;
+
+ruleId: SOLIDITY_VISIBILITY
+patternId: b51ce0
+severity: 1
+line: 306
+column: 27
+content: overrideMAXIMUM_DELAY;
+
+SOLIDITY_VISIBILITY :4
+SOLIDITY_SAFEMATH :1
+SOLIDITY_LOCKED_MONEY :1
+SOLIDITY_PRIVATE_MODIFIER_DONT_HIDE_DATA :5
+SOLIDITY_EXTRA_GAS_IN_LOOPS :3
+SOLIDITY_GAS_LIMIT_IN_LOOPS :3

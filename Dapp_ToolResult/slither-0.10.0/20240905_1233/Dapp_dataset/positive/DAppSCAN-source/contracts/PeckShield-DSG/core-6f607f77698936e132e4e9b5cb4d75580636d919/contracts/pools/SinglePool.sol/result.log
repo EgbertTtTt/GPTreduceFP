@@ -1,0 +1,187 @@
+'solc --version' running
+'solc /sb/SinglePool.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+SinglePool.pendingReward(address) (../../sb/SinglePool.sol#723-734) performs a multiplication on the result of a division:
+	- tokenReward = multiplier.mul(rewardPerBlock).mul(pool.allocPoint).div(totalAllocPoint) (../../sb/SinglePool.sol#730)
+	- accRewardsPerShare = accRewardsPerShare.add(tokenReward.mul(1e18).div(lpSupply)) (../../sb/SinglePool.sol#731)
+SinglePool.updatePool(uint256) (../../sb/SinglePool.sol#737-751) performs a multiplication on the result of a division:
+	- tokenReward = multiplier.mul(rewardPerBlock).mul(pool.allocPoint).div(totalAllocPoint) (../../sb/SinglePool.sol#748)
+	- pool.accRewardsPerShare = pool.accRewardsPerShare.add(tokenReward.mul(1e18).div(lpSupply)) (../../sb/SinglePool.sol#749)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+Reentrancy in SinglePool.deposit(uint256) (../../sb/SinglePool.sol#762-792):
+	External calls:
+	- rewardToken.safeTransfer(address(msg.sender),pending) (../../sb/SinglePool.sol#775)
+	- rewardToken.safeTransfer(address(msg.sender),bal) (../../sb/SinglePool.sol#777)
+	- pool.lpToken.safeTransferFrom(address(msg.sender),address(this),_amount) (../../sb/SinglePool.sol#783)
+	State variables written after the call(s):
+	- totalDeposit = totalDeposit.add(_amount) (../../sb/SinglePool.sol#787)
+	SinglePool.totalDeposit (../../sb/SinglePool.sol#664) can be used in cross function reentrancies:
+	- SinglePool.deposit(uint256) (../../sb/SinglePool.sol#762-792)
+	- SinglePool.emergencyWithdraw() (../../sb/SinglePool.sol#821-833)
+	- SinglePool.pendingReward(address) (../../sb/SinglePool.sol#723-734)
+	- SinglePool.totalDeposit (../../sb/SinglePool.sol#664)
+	- SinglePool.updatePool(uint256) (../../sb/SinglePool.sol#737-751)
+	- SinglePool.withdraw(uint256) (../../sb/SinglePool.sol#795-817)
+	- user.amount = user.amount.add(_amount) (../../sb/SinglePool.sol#786)
+	SinglePool.userInfo (../../sb/SinglePool.sol#662) can be used in cross function reentrancies:
+	- SinglePool.deposit(uint256) (../../sb/SinglePool.sol#762-792)
+	- SinglePool.emergencyWithdraw() (../../sb/SinglePool.sol#821-833)
+	- SinglePool.pendingReward(address) (../../sb/SinglePool.sol#723-734)
+	- SinglePool.userInfo (../../sb/SinglePool.sol#662)
+	- SinglePool.withdraw(uint256) (../../sb/SinglePool.sol#795-817)
+	- user.rewardDebt = user.amount.mul(pool.accRewardsPerShare).div(1e18) (../../sb/SinglePool.sol#789)
+	SinglePool.userInfo (../../sb/SinglePool.sol#662) can be used in cross function reentrancies:
+	- SinglePool.deposit(uint256) (../../sb/SinglePool.sol#762-792)
+	- SinglePool.emergencyWithdraw() (../../sb/SinglePool.sol#821-833)
+	- SinglePool.pendingReward(address) (../../sb/SinglePool.sol#723-734)
+	- SinglePool.userInfo (../../sb/SinglePool.sol#662)
+	- SinglePool.withdraw(uint256) (../../sb/SinglePool.sol#795-817)
+Reentrancy in SinglePool.emergencyWithdraw() (../../sb/SinglePool.sol#821-833):
+	External calls:
+	- pool.lpToken.safeTransfer(address(msg.sender),user.amount) (../../sb/SinglePool.sol#824)
+	State variables written after the call(s):
+	- user.amount = 0 (../../sb/SinglePool.sol#830)
+	SinglePool.userInfo (../../sb/SinglePool.sol#662) can be used in cross function reentrancies:
+	- SinglePool.deposit(uint256) (../../sb/SinglePool.sol#762-792)
+	- SinglePool.emergencyWithdraw() (../../sb/SinglePool.sol#821-833)
+	- SinglePool.pendingReward(address) (../../sb/SinglePool.sol#723-734)
+	- SinglePool.userInfo (../../sb/SinglePool.sol#662)
+	- SinglePool.withdraw(uint256) (../../sb/SinglePool.sol#795-817)
+	- user.rewardDebt = 0 (../../sb/SinglePool.sol#831)
+	SinglePool.userInfo (../../sb/SinglePool.sol#662) can be used in cross function reentrancies:
+	- SinglePool.deposit(uint256) (../../sb/SinglePool.sol#762-792)
+	- SinglePool.emergencyWithdraw() (../../sb/SinglePool.sol#821-833)
+	- SinglePool.pendingReward(address) (../../sb/SinglePool.sol#723-734)
+	- SinglePool.userInfo (../../sb/SinglePool.sol#662)
+	- SinglePool.withdraw(uint256) (../../sb/SinglePool.sol#795-817)
+Reentrancy in SinglePool.withdraw(uint256) (../../sb/SinglePool.sol#795-817):
+	External calls:
+	- rewardToken.safeTransfer(address(msg.sender),pending) (../../sb/SinglePool.sol#804)
+	- rewardToken.safeTransfer(address(msg.sender),bal) (../../sb/SinglePool.sol#806)
+	State variables written after the call(s):
+	- totalDeposit = totalDeposit.sub(_amount) (../../sb/SinglePool.sol#811)
+	SinglePool.totalDeposit (../../sb/SinglePool.sol#664) can be used in cross function reentrancies:
+	- SinglePool.deposit(uint256) (../../sb/SinglePool.sol#762-792)
+	- SinglePool.emergencyWithdraw() (../../sb/SinglePool.sol#821-833)
+	- SinglePool.pendingReward(address) (../../sb/SinglePool.sol#723-734)
+	- SinglePool.totalDeposit (../../sb/SinglePool.sol#664)
+	- SinglePool.updatePool(uint256) (../../sb/SinglePool.sol#737-751)
+	- SinglePool.withdraw(uint256) (../../sb/SinglePool.sol#795-817)
+	- user.amount = user.amount.sub(_amount) (../../sb/SinglePool.sol#810)
+	SinglePool.userInfo (../../sb/SinglePool.sol#662) can be used in cross function reentrancies:
+	- SinglePool.deposit(uint256) (../../sb/SinglePool.sol#762-792)
+	- SinglePool.emergencyWithdraw() (../../sb/SinglePool.sol#821-833)
+	- SinglePool.pendingReward(address) (../../sb/SinglePool.sol#723-734)
+	- SinglePool.userInfo (../../sb/SinglePool.sol#662)
+	- SinglePool.withdraw(uint256) (../../sb/SinglePool.sol#795-817)
+Reentrancy in SinglePool.withdraw(uint256) (../../sb/SinglePool.sol#795-817):
+	External calls:
+	- rewardToken.safeTransfer(address(msg.sender),pending) (../../sb/SinglePool.sol#804)
+	- rewardToken.safeTransfer(address(msg.sender),bal) (../../sb/SinglePool.sol#806)
+	- pool.lpToken.safeTransfer(address(msg.sender),_amount) (../../sb/SinglePool.sol#812)
+	State variables written after the call(s):
+	- user.rewardDebt = user.amount.mul(pool.accRewardsPerShare).div(1e18) (../../sb/SinglePool.sol#814)
+	SinglePool.userInfo (../../sb/SinglePool.sol#662) can be used in cross function reentrancies:
+	- SinglePool.deposit(uint256) (../../sb/SinglePool.sol#762-792)
+	- SinglePool.emergencyWithdraw() (../../sb/SinglePool.sol#821-833)
+	- SinglePool.pendingReward(address) (../../sb/SinglePool.sol#723-734)
+	- SinglePool.userInfo (../../sb/SinglePool.sol#662)
+	- SinglePool.withdraw(uint256) (../../sb/SinglePool.sol#795-817)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+SinglePool.updateMultiplier(uint256) (../../sb/SinglePool.sol#718-720) should emit an event for: 
+	- BONUS_MULTIPLIER = multiplierNumber (../../sb/SinglePool.sol#719) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+Reentrancy in SinglePool.emergencyWithdraw() (../../sb/SinglePool.sol#821-833):
+	External calls:
+	- pool.lpToken.safeTransfer(address(msg.sender),user.amount) (../../sb/SinglePool.sol#824)
+	State variables written after the call(s):
+	- totalDeposit = totalDeposit.sub(user.amount) (../../sb/SinglePool.sol#826)
+	- totalDeposit = 0 (../../sb/SinglePool.sol#828)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in SinglePool.deposit(uint256) (../../sb/SinglePool.sol#762-792):
+	External calls:
+	- rewardToken.safeTransfer(address(msg.sender),pending) (../../sb/SinglePool.sol#775)
+	- rewardToken.safeTransfer(address(msg.sender),bal) (../../sb/SinglePool.sol#777)
+	- pool.lpToken.safeTransferFrom(address(msg.sender),address(this),_amount) (../../sb/SinglePool.sol#783)
+	Event emitted after the call(s):
+	- Deposit(msg.sender,_amount) (../../sb/SinglePool.sol#791)
+Reentrancy in SinglePool.emergencyWithdraw() (../../sb/SinglePool.sol#821-833):
+	External calls:
+	- pool.lpToken.safeTransfer(address(msg.sender),user.amount) (../../sb/SinglePool.sol#824)
+	Event emitted after the call(s):
+	- EmergencyWithdraw(msg.sender,user.amount) (../../sb/SinglePool.sol#832)
+Reentrancy in SinglePool.withdraw(uint256) (../../sb/SinglePool.sol#795-817):
+	External calls:
+	- rewardToken.safeTransfer(address(msg.sender),pending) (../../sb/SinglePool.sol#804)
+	- rewardToken.safeTransfer(address(msg.sender),bal) (../../sb/SinglePool.sol#806)
+	- pool.lpToken.safeTransfer(address(msg.sender),_amount) (../../sb/SinglePool.sol#812)
+	Event emitted after the call(s):
+	- Withdraw(msg.sender,_amount) (../../sb/SinglePool.sol#816)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Address.isContract(address) (../../sb/SinglePool.sol#397-406) uses assembly
+	- INLINE ASM (../../sb/SinglePool.sol#404)
+Address._verifyCallResult(bool,bytes,string) (../../sb/SinglePool.sol#542-559) uses assembly
+	- INLINE ASM (../../sb/SinglePool.sol#551-554)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.functionCall(address,bytes) (../../sb/SinglePool.sol#450-452) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/SinglePool.sol#475-477) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/SinglePool.sol#524-526) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/SinglePool.sol#534-540) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/SinglePool.sol#500-502) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/SinglePool.sol#510-516) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/SinglePool.sol#424-430) is never used and should be removed
+Context._msgData() (../../sb/SinglePool.sol#21-24) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/SinglePool.sol#590-599) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/SinglePool.sol#606-609) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/SinglePool.sol#601-604) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/SinglePool.sol#350-353) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/SinglePool.sol#312-315) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/SinglePool.sol#370-373) is never used and should be removed
+SafeMath.sub(uint256,uint256,string) (../../sb/SinglePool.sol#330-333) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/SinglePool.sol#184-188) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/SinglePool.sol#220-223) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/SinglePool.sol#230-233) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/SinglePool.sol#205-213) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/SinglePool.sol#195-198) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version=0.6.12 (../../sb/SinglePool.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/SinglePool.sol#424-430):
+	- (success) = recipient.call{value: amount}() (../../sb/SinglePool.sol#428)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/SinglePool.sol#485-492):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/SinglePool.sol#490)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/SinglePool.sol#510-516):
+	- (success,returndata) = target.staticcall(data) (../../sb/SinglePool.sol#514)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/SinglePool.sol#534-540):
+	- (success,returndata) = target.delegatecall(data) (../../sb/SinglePool.sol#538)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter SinglePool.getMultiplier(uint256,uint256)._from (../../sb/SinglePool.sol#708) is not in mixedCase
+Parameter SinglePool.getMultiplier(uint256,uint256)._to (../../sb/SinglePool.sol#708) is not in mixedCase
+Parameter SinglePool.pendingReward(address)._user (../../sb/SinglePool.sol#723) is not in mixedCase
+Parameter SinglePool.updatePool(uint256)._pid (../../sb/SinglePool.sol#737) is not in mixedCase
+Parameter SinglePool.deposit(uint256)._amount (../../sb/SinglePool.sol#762) is not in mixedCase
+Parameter SinglePool.withdraw(uint256)._amount (../../sb/SinglePool.sol#795) is not in mixedCase
+Parameter SinglePool.emergencyRewardWithdraw(uint256)._amount (../../sb/SinglePool.sol#836) is not in mixedCase
+Variable SinglePool.BONUS_MULTIPLIER (../../sb/SinglePool.sol#657) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/SinglePool.sol#22)" inContext (../../sb/SinglePool.sol#16-25)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+SinglePool.depositToken (../../sb/SinglePool.sol#648) should be immutable 
+SinglePool.rewardPerBlock (../../sb/SinglePool.sol#654) should be immutable 
+SinglePool.rewardToken (../../sb/SinglePool.sol#649) should be immutable 
+SinglePool.startBlock (../../sb/SinglePool.sol#668) should be immutable 
+SinglePool.totalAllocPoint (../../sb/SinglePool.sol#666) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/SinglePool.sol analyzed (7 contracts with 93 detectors), 53 result(s) found

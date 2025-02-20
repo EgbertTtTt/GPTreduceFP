@@ -1,0 +1,455 @@
+'solc --version' running
+'solc /sb/MutiRewardPool.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/MutiRewardPool.sol:
+Warning: Contract code size exceeds 24576 bytes (a limit introduced in Spurious Dragon). This contract may not be deployable on mainnet. Consider enabling the optimizer (with a low "runs" value!), turning off revert strings, or using libraries.
+    --> /sb/MutiRewardPool.sol:1015:1:
+     |
+1015 | contract MutiRewardPool is Ownable, IERC20, BasicMetaTransaction {
+     | ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+MutiRewardPool.withdraw(uint256) (../../sb/MutiRewardPool.sol#1428-1450) uses arbitrary from in transferFrom: pool.lpToken.safeTransferFrom(address(poolVault),address(msgSender()),_amount) (../../sb/MutiRewardPool.sol#1441)
+MutiRewardPool.emergencyWithdraw(uint256) (../../sb/MutiRewardPool.sol#1453-1477) uses arbitrary from in transferFrom: pool.lpToken.safeTransferFrom(address(poolVault),address(msgSender()),amount) (../../sb/MutiRewardPool.sol#1473)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#arbitrary-from-in-transferfrom
+
+Reentrancy in MutiRewardPool.withdraw(uint256) (../../sb/MutiRewardPool.sol#1428-1450):
+	External calls:
+	- harvest(_stakingId) (../../sb/MutiRewardPool.sol#1436)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/MutiRewardPool.sol#622)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/MutiRewardPool.sol#490)
+		- rewardToken0.safeTransfer(address(msgSender()),reward0) (../../sb/MutiRewardPool.sol#1417)
+		- rewardToken1.safeTransfer(address(msgSender()),reward1) (../../sb/MutiRewardPool.sol#1421)
+	External calls sending eth:
+	- harvest(_stakingId) (../../sb/MutiRewardPool.sol#1436)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/MutiRewardPool.sol#490)
+	State variables written after the call(s):
+	- pool.totalDeposit = pool.totalDeposit.sub(_amount) (../../sb/MutiRewardPool.sol#1440)
+	MutiRewardPool.poolInfo (../../sb/MutiRewardPool.sol#1113) can be used in cross function reentrancies:
+	- MutiRewardPool.addPool(uint256,uint256) (../../sb/MutiRewardPool.sol#1178-1200)
+	- MutiRewardPool.balanceOf(address) (../../sb/MutiRewardPool.sol#1712-1724)
+	- MutiRewardPool.deposit(uint256,uint256) (../../sb/MutiRewardPool.sol#1322-1350)
+	- MutiRewardPool.donate(IERC20,uint256) (../../sb/MutiRewardPool.sol#1500-1531)
+	- MutiRewardPool.emergencyWithdraw(uint256) (../../sb/MutiRewardPool.sol#1453-1477)
+	- MutiRewardPool.getAllPoolViews() (../../sb/MutiRewardPool.sol#1651-1657)
+	- MutiRewardPool.getPoolView(uint256) (../../sb/MutiRewardPool.sol#1606-1649)
+	- MutiRewardPool.getStakingView(uint256) (../../sb/MutiRewardPool.sol#1659-1675)
+	- MutiRewardPool.harvest(uint256) (../../sb/MutiRewardPool.sol#1376-1425)
+	- MutiRewardPool.massUpdatePools() (../../sb/MutiRewardPool.sol#1314-1319)
+	- MutiRewardPool.poolInfo (../../sb/MutiRewardPool.sol#1113)
+	- MutiRewardPool.token0PendingReward(uint256) (../../sb/MutiRewardPool.sol#1203-1233)
+	- MutiRewardPool.token1PendingReward(uint256) (../../sb/MutiRewardPool.sol#1236-1265)
+	- MutiRewardPool.totalSupply() (../../sb/MutiRewardPool.sol#1704-1710)
+	- MutiRewardPool.updatePool(uint256) (../../sb/MutiRewardPool.sol#1268-1311)
+	- MutiRewardPool.withdraw(uint256) (../../sb/MutiRewardPool.sol#1428-1450)
+	- staking.amount = 0 (../../sb/MutiRewardPool.sol#1439)
+	MutiRewardPool.stakingInfo (../../sb/MutiRewardPool.sol#1117) can be used in cross function reentrancies:
+	- MutiRewardPool.balanceOf(address) (../../sb/MutiRewardPool.sol#1712-1724)
+	- MutiRewardPool.deposit(uint256,uint256) (../../sb/MutiRewardPool.sol#1322-1350)
+	- MutiRewardPool.emergencyWithdraw(uint256) (../../sb/MutiRewardPool.sol#1453-1477)
+	- MutiRewardPool.getStakingView(uint256) (../../sb/MutiRewardPool.sol#1659-1675)
+	- MutiRewardPool.harvest(uint256) (../../sb/MutiRewardPool.sol#1376-1425)
+	- MutiRewardPool.harvestPool(uint256) (../../sb/MutiRewardPool.sol#1362-1374)
+	- MutiRewardPool.stakingInfo (../../sb/MutiRewardPool.sol#1117)
+	- MutiRewardPool.token0PendingReward(uint256) (../../sb/MutiRewardPool.sol#1203-1233)
+	- MutiRewardPool.token1PendingReward(uint256) (../../sb/MutiRewardPool.sol#1236-1265)
+	- MutiRewardPool.totalStaking(address) (../../sb/MutiRewardPool.sol#1491-1498)
+	- MutiRewardPool.withdraw(uint256) (../../sb/MutiRewardPool.sol#1428-1450)
+Reentrancy in MutiRewardPool.withdraw(uint256) (../../sb/MutiRewardPool.sol#1428-1450):
+	External calls:
+	- harvest(_stakingId) (../../sb/MutiRewardPool.sol#1436)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/MutiRewardPool.sol#622)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/MutiRewardPool.sol#490)
+		- rewardToken0.safeTransfer(address(msgSender()),reward0) (../../sb/MutiRewardPool.sol#1417)
+		- rewardToken1.safeTransfer(address(msgSender()),reward1) (../../sb/MutiRewardPool.sol#1421)
+	- pool.lpToken.safeTransferFrom(address(poolVault),address(msgSender()),_amount) (../../sb/MutiRewardPool.sol#1441)
+	External calls sending eth:
+	- harvest(_stakingId) (../../sb/MutiRewardPool.sol#1436)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/MutiRewardPool.sol#490)
+	State variables written after the call(s):
+	- staking.token0RewardDebt = _amount.mul(pool.token0AccRewardsPerShare).add(_amount.mul(pool.token0AccAdditionalRewardsPerShare)).div(1e12) (../../sb/MutiRewardPool.sol#1443)
+	MutiRewardPool.stakingInfo (../../sb/MutiRewardPool.sol#1117) can be used in cross function reentrancies:
+	- MutiRewardPool.balanceOf(address) (../../sb/MutiRewardPool.sol#1712-1724)
+	- MutiRewardPool.deposit(uint256,uint256) (../../sb/MutiRewardPool.sol#1322-1350)
+	- MutiRewardPool.emergencyWithdraw(uint256) (../../sb/MutiRewardPool.sol#1453-1477)
+	- MutiRewardPool.getStakingView(uint256) (../../sb/MutiRewardPool.sol#1659-1675)
+	- MutiRewardPool.harvest(uint256) (../../sb/MutiRewardPool.sol#1376-1425)
+	- MutiRewardPool.harvestPool(uint256) (../../sb/MutiRewardPool.sol#1362-1374)
+	- MutiRewardPool.stakingInfo (../../sb/MutiRewardPool.sol#1117)
+	- MutiRewardPool.token0PendingReward(uint256) (../../sb/MutiRewardPool.sol#1203-1233)
+	- MutiRewardPool.token1PendingReward(uint256) (../../sb/MutiRewardPool.sol#1236-1265)
+	- MutiRewardPool.totalStaking(address) (../../sb/MutiRewardPool.sol#1491-1498)
+	- MutiRewardPool.withdraw(uint256) (../../sb/MutiRewardPool.sol#1428-1450)
+	- staking.token1RewardDebt = _amount.mul(pool.token1AccRewardsPerShare).add(_amount.mul(pool.token1AccAdditionalRewardsPerShare)).div(1e12) (../../sb/MutiRewardPool.sol#1444)
+	MutiRewardPool.stakingInfo (../../sb/MutiRewardPool.sol#1117) can be used in cross function reentrancies:
+	- MutiRewardPool.balanceOf(address) (../../sb/MutiRewardPool.sol#1712-1724)
+	- MutiRewardPool.deposit(uint256,uint256) (../../sb/MutiRewardPool.sol#1322-1350)
+	- MutiRewardPool.emergencyWithdraw(uint256) (../../sb/MutiRewardPool.sol#1453-1477)
+	- MutiRewardPool.getStakingView(uint256) (../../sb/MutiRewardPool.sol#1659-1675)
+	- MutiRewardPool.harvest(uint256) (../../sb/MutiRewardPool.sol#1376-1425)
+	- MutiRewardPool.harvestPool(uint256) (../../sb/MutiRewardPool.sol#1362-1374)
+	- MutiRewardPool.stakingInfo (../../sb/MutiRewardPool.sol#1117)
+	- MutiRewardPool.token0PendingReward(uint256) (../../sb/MutiRewardPool.sol#1203-1233)
+	- MutiRewardPool.token1PendingReward(uint256) (../../sb/MutiRewardPool.sol#1236-1265)
+	- MutiRewardPool.totalStaking(address) (../../sb/MutiRewardPool.sol#1491-1498)
+	- MutiRewardPool.withdraw(uint256) (../../sb/MutiRewardPool.sol#1428-1450)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities
+
+MutiRewardPool.userInfo (../../sb/MutiRewardPool.sol#1116) is never initialized. It is used in:
+	- MutiRewardPool.deposit(uint256,uint256) (../../sb/MutiRewardPool.sol#1322-1350)
+	- MutiRewardPool.harvestAll() (../../sb/MutiRewardPool.sol#1352-1360)
+	- MutiRewardPool.harvestPool(uint256) (../../sb/MutiRewardPool.sol#1362-1374)
+	- MutiRewardPool.harvest(uint256) (../../sb/MutiRewardPool.sol#1376-1425)
+	- MutiRewardPool.withdraw(uint256) (../../sb/MutiRewardPool.sol#1428-1450)
+	- MutiRewardPool.emergencyWithdraw(uint256) (../../sb/MutiRewardPool.sol#1453-1477)
+	- MutiRewardPool.totalStaking(address) (../../sb/MutiRewardPool.sol#1491-1498)
+	- MutiRewardPool.getStakingViews(address) (../../sb/MutiRewardPool.sol#1677-1688)
+	- MutiRewardPool.balanceOf(address) (../../sb/MutiRewardPool.sol#1712-1724)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-state-variables
+
+MutiRewardPool.token0PendingReward(uint256) (../../sb/MutiRewardPool.sol#1203-1233) performs a multiplication on the result of a division:
+	- tokenReward = multiplier.mul(token0RewardPerBlock).mul(pool.allocPoint).div(totalAllocPoint) (../../sb/MutiRewardPool.sol#1218)
+	- accRewardsPerShare = accRewardsPerShare.add(tokenReward.mul(1e12).div(lpSupply)) (../../sb/MutiRewardPool.sol#1219)
+MutiRewardPool.token0PendingReward(uint256) (../../sb/MutiRewardPool.sol#1203-1233) performs a multiplication on the result of a division:
+	- additionalTokenReward = additionalMultiplier.mul(token0AdditionalRewardPerBlock).mul(pool.allocPoint).div(totalAllocPoint) (../../sb/MutiRewardPool.sol#1226)
+	- accAdditionalRewardsPerShare = accAdditionalRewardsPerShare.add(additionalTokenReward.mul(1e12).div(lpSupply)) (../../sb/MutiRewardPool.sol#1227)
+MutiRewardPool.token1PendingReward(uint256) (../../sb/MutiRewardPool.sol#1236-1265) performs a multiplication on the result of a division:
+	- tokenReward = multiplier.mul(token1RewardPerBlock).mul(pool.allocPoint).div(totalAllocPoint) (../../sb/MutiRewardPool.sol#1250)
+	- accRewardsPerShare = accRewardsPerShare.add(tokenReward.mul(1e12).div(lpSupply)) (../../sb/MutiRewardPool.sol#1251)
+MutiRewardPool.token1PendingReward(uint256) (../../sb/MutiRewardPool.sol#1236-1265) performs a multiplication on the result of a division:
+	- additionalTokenReward = additionalMultiplier.mul(token1AdditionalRewardPerBlock).mul(pool.allocPoint).div(totalAllocPoint) (../../sb/MutiRewardPool.sol#1258)
+	- accAdditionalRewardsPerShare = accAdditionalRewardsPerShare.add(additionalTokenReward.mul(1e12).div(lpSupply)) (../../sb/MutiRewardPool.sol#1259)
+MutiRewardPool.updatePool(uint256) (../../sb/MutiRewardPool.sol#1268-1311) performs a multiplication on the result of a division:
+	- token0Reward = multiplier.mul(token0RewardPerBlock).mul(pool.allocPoint).div(totalAllocPoint) (../../sb/MutiRewardPool.sol#1280)
+	- pool.token0AccRewardsPerShare = pool.token0AccRewardsPerShare.add(token0Reward.mul(1e12).div(lpSupply)) (../../sb/MutiRewardPool.sol#1281)
+MutiRewardPool.updatePool(uint256) (../../sb/MutiRewardPool.sol#1268-1311) performs a multiplication on the result of a division:
+	- token1Reward = multiplier.mul(token1RewardPerBlock).mul(pool.allocPoint).div(totalAllocPoint) (../../sb/MutiRewardPool.sol#1295)
+	- pool.token1AccRewardsPerShare = pool.token1AccRewardsPerShare.add(token1Reward.mul(1e12).div(lpSupply)) (../../sb/MutiRewardPool.sol#1296)
+MutiRewardPool.updatePool(uint256) (../../sb/MutiRewardPool.sol#1268-1311) performs a multiplication on the result of a division:
+	- additionalTokenReward_scope_2 = additionalMultiplier_scope_1.mul(token1AdditionalRewardPerBlock).mul(pool.allocPoint).div(totalAllocPoint) (../../sb/MutiRewardPool.sol#1301)
+	- pool.token1AccAdditionalRewardsPerShare = pool.token1AccAdditionalRewardsPerShare.add(additionalTokenReward_scope_2.mul(1e12).div(lpSupply)) (../../sb/MutiRewardPool.sol#1302)
+MutiRewardPool.updatePool(uint256) (../../sb/MutiRewardPool.sol#1268-1311) performs a multiplication on the result of a division:
+	- additionalTokenReward = additionalMultiplier.mul(token0AdditionalRewardPerBlock).mul(pool.allocPoint).div(totalAllocPoint) (../../sb/MutiRewardPool.sol#1286)
+	- pool.token0AccAdditionalRewardsPerShare = pool.token0AccAdditionalRewardsPerShare.add(additionalTokenReward.mul(1e12).div(lpSupply)) (../../sb/MutiRewardPool.sol#1287)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+Reentrancy in MutiRewardPool.addAdditionalRewards(IERC20,uint256,uint256) (../../sb/MutiRewardPool.sol#1533-1575):
+	External calls:
+	- IERC20(token).safeTransferFrom(msgSender(),address(this),amount) (../../sb/MutiRewardPool.sol#1539)
+	State variables written after the call(s):
+	- token0AdditionalRewardEndBlock = block.number.add(rewardsBlocks) (../../sb/MutiRewardPool.sol#1554)
+	MutiRewardPool.token0AdditionalRewardEndBlock (../../sb/MutiRewardPool.sol#1106) can be used in cross function reentrancies:
+	- MutiRewardPool.addAdditionalRewards(IERC20,uint256,uint256) (../../sb/MutiRewardPool.sol#1533-1575)
+	- MutiRewardPool.getBaseInfo() (../../sb/MutiRewardPool.sol#1577-1604)
+	- MutiRewardPool.token0AdditionalRewardEndBlock (../../sb/MutiRewardPool.sol#1106)
+	- MutiRewardPool.token0PendingReward(uint256) (../../sb/MutiRewardPool.sol#1203-1233)
+	- MutiRewardPool.updatePool(uint256) (../../sb/MutiRewardPool.sol#1268-1311)
+	- token0AdditionalRewardEndBlock = startBlock.add(rewardsBlocks) (../../sb/MutiRewardPool.sol#1556)
+	MutiRewardPool.token0AdditionalRewardEndBlock (../../sb/MutiRewardPool.sol#1106) can be used in cross function reentrancies:
+	- MutiRewardPool.addAdditionalRewards(IERC20,uint256,uint256) (../../sb/MutiRewardPool.sol#1533-1575)
+	- MutiRewardPool.getBaseInfo() (../../sb/MutiRewardPool.sol#1577-1604)
+	- MutiRewardPool.token0AdditionalRewardEndBlock (../../sb/MutiRewardPool.sol#1106)
+	- MutiRewardPool.token0PendingReward(uint256) (../../sb/MutiRewardPool.sol#1203-1233)
+	- MutiRewardPool.updatePool(uint256) (../../sb/MutiRewardPool.sol#1268-1311)
+	- token0AdditionalRewardPerBlock = remainingBal.div(rewardsBlocks) (../../sb/MutiRewardPool.sol#1551)
+	MutiRewardPool.token0AdditionalRewardPerBlock (../../sb/MutiRewardPool.sol#1102) can be used in cross function reentrancies:
+	- MutiRewardPool.addAdditionalRewards(IERC20,uint256,uint256) (../../sb/MutiRewardPool.sol#1533-1575)
+	- MutiRewardPool.getBaseInfo() (../../sb/MutiRewardPool.sol#1577-1604)
+	- MutiRewardPool.getPoolView(uint256) (../../sb/MutiRewardPool.sol#1606-1649)
+	- MutiRewardPool.token0AdditionalRewardPerBlock (../../sb/MutiRewardPool.sol#1102)
+	- MutiRewardPool.token0PendingReward(uint256) (../../sb/MutiRewardPool.sol#1203-1233)
+	- MutiRewardPool.updatePool(uint256) (../../sb/MutiRewardPool.sol#1268-1311)
+	- token1AdditionalRewardEndBlock = block.number.add(rewardsBlocks) (../../sb/MutiRewardPool.sol#1570)
+	MutiRewardPool.token1AdditionalRewardEndBlock (../../sb/MutiRewardPool.sol#1107) can be used in cross function reentrancies:
+	- MutiRewardPool.addAdditionalRewards(IERC20,uint256,uint256) (../../sb/MutiRewardPool.sol#1533-1575)
+	- MutiRewardPool.getBaseInfo() (../../sb/MutiRewardPool.sol#1577-1604)
+	- MutiRewardPool.token1AdditionalRewardEndBlock (../../sb/MutiRewardPool.sol#1107)
+	- MutiRewardPool.token1PendingReward(uint256) (../../sb/MutiRewardPool.sol#1236-1265)
+	- MutiRewardPool.updatePool(uint256) (../../sb/MutiRewardPool.sol#1268-1311)
+	- token1AdditionalRewardEndBlock = startBlock.add(rewardsBlocks) (../../sb/MutiRewardPool.sol#1572)
+	MutiRewardPool.token1AdditionalRewardEndBlock (../../sb/MutiRewardPool.sol#1107) can be used in cross function reentrancies:
+	- MutiRewardPool.addAdditionalRewards(IERC20,uint256,uint256) (../../sb/MutiRewardPool.sol#1533-1575)
+	- MutiRewardPool.getBaseInfo() (../../sb/MutiRewardPool.sol#1577-1604)
+	- MutiRewardPool.token1AdditionalRewardEndBlock (../../sb/MutiRewardPool.sol#1107)
+	- MutiRewardPool.token1PendingReward(uint256) (../../sb/MutiRewardPool.sol#1236-1265)
+	- MutiRewardPool.updatePool(uint256) (../../sb/MutiRewardPool.sol#1268-1311)
+	- token1AdditionalRewardPerBlock = remainingBal_scope_1.div(rewardsBlocks) (../../sb/MutiRewardPool.sol#1567)
+	MutiRewardPool.token1AdditionalRewardPerBlock (../../sb/MutiRewardPool.sol#1103) can be used in cross function reentrancies:
+	- MutiRewardPool.addAdditionalRewards(IERC20,uint256,uint256) (../../sb/MutiRewardPool.sol#1533-1575)
+	- MutiRewardPool.getBaseInfo() (../../sb/MutiRewardPool.sol#1577-1604)
+	- MutiRewardPool.getPoolView(uint256) (../../sb/MutiRewardPool.sol#1606-1649)
+	- MutiRewardPool.token1AdditionalRewardPerBlock (../../sb/MutiRewardPool.sol#1103)
+	- MutiRewardPool.token1PendingReward(uint256) (../../sb/MutiRewardPool.sol#1236-1265)
+	- MutiRewardPool.updatePool(uint256) (../../sb/MutiRewardPool.sol#1268-1311)
+Reentrancy in MutiRewardPool.deposit(uint256,uint256) (../../sb/MutiRewardPool.sol#1322-1350):
+	External calls:
+	- pool.lpToken.safeTransferFrom(address(msgSender()),address(poolVault),_amount) (../../sb/MutiRewardPool.sol#1333)
+	State variables written after the call(s):
+	- pool.totalDeposit = pool.totalDeposit.add(_amount) (../../sb/MutiRewardPool.sol#1337)
+	MutiRewardPool.poolInfo (../../sb/MutiRewardPool.sol#1113) can be used in cross function reentrancies:
+	- MutiRewardPool.addPool(uint256,uint256) (../../sb/MutiRewardPool.sol#1178-1200)
+	- MutiRewardPool.balanceOf(address) (../../sb/MutiRewardPool.sol#1712-1724)
+	- MutiRewardPool.deposit(uint256,uint256) (../../sb/MutiRewardPool.sol#1322-1350)
+	- MutiRewardPool.donate(IERC20,uint256) (../../sb/MutiRewardPool.sol#1500-1531)
+	- MutiRewardPool.emergencyWithdraw(uint256) (../../sb/MutiRewardPool.sol#1453-1477)
+	- MutiRewardPool.getAllPoolViews() (../../sb/MutiRewardPool.sol#1651-1657)
+	- MutiRewardPool.getPoolView(uint256) (../../sb/MutiRewardPool.sol#1606-1649)
+	- MutiRewardPool.getStakingView(uint256) (../../sb/MutiRewardPool.sol#1659-1675)
+	- MutiRewardPool.harvest(uint256) (../../sb/MutiRewardPool.sol#1376-1425)
+	- MutiRewardPool.massUpdatePools() (../../sb/MutiRewardPool.sol#1314-1319)
+	- MutiRewardPool.poolInfo (../../sb/MutiRewardPool.sol#1113)
+	- MutiRewardPool.token0PendingReward(uint256) (../../sb/MutiRewardPool.sol#1203-1233)
+	- MutiRewardPool.token1PendingReward(uint256) (../../sb/MutiRewardPool.sol#1236-1265)
+	- MutiRewardPool.totalSupply() (../../sb/MutiRewardPool.sol#1704-1710)
+	- MutiRewardPool.updatePool(uint256) (../../sb/MutiRewardPool.sol#1268-1311)
+	- MutiRewardPool.withdraw(uint256) (../../sb/MutiRewardPool.sol#1428-1450)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+MutiRewardPool.harvest(uint256).reward0 (../../sb/MutiRewardPool.sol#1385) is a local variable never initialized
+MutiRewardPool.token0PendingReward(uint256).amount (../../sb/MutiRewardPool.sol#1213) is a local variable never initialized
+MutiRewardPool.token1PendingReward(uint256).amount (../../sb/MutiRewardPool.sol#1245) is a local variable never initialized
+MutiRewardPool.harvest(uint256).reward1 (../../sb/MutiRewardPool.sol#1386) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+PoolVault.approve(address) (../../sb/MutiRewardPool.sol#938-940) ignores return value by IERC20(token).approve(msg.sender,uint256(- 1)) (../../sb/MutiRewardPool.sol#939)
+MutiRewardPool.constructor(IERC20,IERC20,IERC20,uint256,uint256,uint256,uint256) (../../sb/MutiRewardPool.sol#1136-1155) ignores return value by poolVault.approve(address(depositToken)) (../../sb/MutiRewardPool.sol#1154)
+MutiRewardPool.deposit(uint256,uint256) (../../sb/MutiRewardPool.sol#1322-1350) ignores return value by user.stakingIds.add(lastStakingId) (../../sb/MutiRewardPool.sol#1346)
+MutiRewardPool.withdraw(uint256) (../../sb/MutiRewardPool.sol#1428-1450) ignores return value by user.stakingIds.remove(_stakingId) (../../sb/MutiRewardPool.sol#1446)
+MutiRewardPool.emergencyWithdraw(uint256) (../../sb/MutiRewardPool.sol#1453-1477) ignores return value by user.stakingIds.remove(_stakingId) (../../sb/MutiRewardPool.sol#1471)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+MutiRewardPool.getPoolView(uint256).symbol (../../sb/MutiRewardPool.sol#1611) shadows:
+	- MutiRewardPool.symbol() (../../sb/MutiRewardPool.sol#1696-1698) (function)
+MutiRewardPool.getPoolView(uint256).name (../../sb/MutiRewardPool.sol#1612) shadows:
+	- MutiRewardPool.name() (../../sb/MutiRewardPool.sol#1692-1694) (function)
+MutiRewardPool.getPoolView(uint256).decimals (../../sb/MutiRewardPool.sol#1613) shadows:
+	- MutiRewardPool.decimals() (../../sb/MutiRewardPool.sol#1700-1702) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+MutiRewardPool.updateMultiplier(uint256) (../../sb/MutiRewardPool.sol#1173-1176) should emit an event for: 
+	- BONUS_MULTIPLIER = multiplierNumber (../../sb/MutiRewardPool.sol#1175) 
+MutiRewardPool.addPool(uint256,uint256) (../../sb/MutiRewardPool.sol#1178-1200) should emit an event for: 
+	- totalAllocPoint = totalAllocPoint.add(_allocPoint) (../../sb/MutiRewardPool.sol#1199) 
+MutiRewardPool.addAdditionalRewards(IERC20,uint256,uint256) (../../sb/MutiRewardPool.sol#1533-1575) should emit an event for: 
+	- token0AdditionalRewardPerBlock = remainingBal.div(rewardsBlocks) (../../sb/MutiRewardPool.sol#1551) 
+	- token0AdditionalRewardEndBlock = block.number.add(rewardsBlocks) (../../sb/MutiRewardPool.sol#1554) 
+	- token0AdditionalRewardEndBlock = startBlock.add(rewardsBlocks) (../../sb/MutiRewardPool.sol#1556) 
+	- token1AdditionalRewardPerBlock = remainingBal_scope_1.div(rewardsBlocks) (../../sb/MutiRewardPool.sol#1567) 
+	- token1AdditionalRewardEndBlock = block.number.add(rewardsBlocks) (../../sb/MutiRewardPool.sol#1570) 
+	- token1AdditionalRewardEndBlock = startBlock.add(rewardsBlocks) (../../sb/MutiRewardPool.sol#1572) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+MutiRewardPool.harvest(uint256) (../../sb/MutiRewardPool.sol#1376-1425) has external calls inside a loop: bal = rewardToken0.balanceOf(address(this)) (../../sb/MutiRewardPool.sol#1391)
+MutiRewardPool.harvest(uint256) (../../sb/MutiRewardPool.sol#1376-1425) has external calls inside a loop: bal_scope_1 = rewardToken1.balanceOf(address(this)) (../../sb/MutiRewardPool.sol#1403)
+Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/MutiRewardPool.sol#485-492) has external calls inside a loop: (success,returndata) = target.call{value: value}(data) (../../sb/MutiRewardPool.sol#490)
+MutiRewardPool.getPoolView(uint256) (../../sb/MutiRewardPool.sol#1606-1649) has external calls inside a loop: symbol = IERC20Metadata(address(pool.lpToken)).symbol() (../../sb/MutiRewardPool.sol#1611)
+MutiRewardPool.getPoolView(uint256) (../../sb/MutiRewardPool.sol#1606-1649) has external calls inside a loop: name = IERC20Metadata(address(pool.lpToken)).name() (../../sb/MutiRewardPool.sol#1612)
+MutiRewardPool.getPoolView(uint256) (../../sb/MutiRewardPool.sol#1606-1649) has external calls inside a loop: decimals = IERC20Metadata(address(pool.lpToken)).decimals() (../../sb/MutiRewardPool.sol#1613)
+MutiRewardPool.getPoolView(uint256) (../../sb/MutiRewardPool.sol#1606-1649) has external calls inside a loop: PoolView({pid:pid,lpToken:address(pool.lpToken),totalDeposit:pool.totalDeposit,duration:pool.duration,allocPoint:pool.allocPoint,lastRewardBlock:pool.lastRewardBlock,token0AccRewardsPerShare:pool.token0AccRewardsPerShare,token1AccRewardsPerShare:pool.token1AccRewardsPerShare,token0AccAdditionalRewardsPerShare:pool.token0AccAdditionalRewardsPerShare,token1AccAdditionalRewardsPerShare:pool.token1AccAdditionalRewardsPerShare,token0AccDonateAmount:pool.token0AccDonateAmount,token1AccDonateAmount:pool.token1AccDonateAmount,token0RewardsPerBlock:rewardsPerBlock0,token1RewardsPerBlock:rewardsPerBlock1,token0AdditionalRewardPerBlock:additionalRewardsPerBlock0,token1AdditionalRewardPerBlock:additionalRewardsPerBlock1,lpSymbol:symbol,lpName:name,lpDecimals:decimals,rewardToken0Symbol:IERC20Metadata(address(rewardToken0)).symbol(),rewardToken0Name:IERC20Metadata(address(rewardToken0)).name(),rewardToken0Decimals:IERC20Metadata(address(rewardToken0)).decimals(),rewardToken1Symbol:IERC20Metadata(address(rewardToken1)).symbol(),rewardToken1Name:IERC20Metadata(address(rewardToken1)).name(),rewardToken1Decimals:IERC20Metadata(address(rewardToken1)).decimals()}) (../../sb/MutiRewardPool.sol#1621-1648)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in MutiRewardPool.deposit(uint256,uint256) (../../sb/MutiRewardPool.sol#1322-1350):
+	External calls:
+	- pool.lpToken.safeTransferFrom(address(msgSender()),address(poolVault),_amount) (../../sb/MutiRewardPool.sol#1333)
+	State variables written after the call(s):
+	- lastStakingId ++ (../../sb/MutiRewardPool.sol#1336)
+	- stakingInfo[lastStakingId] = StakingInfo({pid:pid,amount:_amount,token0RewardDebt:_amount.mul(pool.token0AccRewardsPerShare).add(_amount.mul(pool.token0AccAdditionalRewardsPerShare)).div(1e12),token1RewardDebt:_amount.mul(pool.token1AccRewardsPerShare).add(_amount.mul(pool.token1AccAdditionalRewardsPerShare)).div(1e12),time:block.timestamp}) (../../sb/MutiRewardPool.sol#1339-1345)
+Reentrancy in MutiRewardPool.donate(IERC20,uint256) (../../sb/MutiRewardPool.sol#1500-1531):
+	External calls:
+	- IERC20(token).safeTransferFrom(msgSender(),address(this),donateAmount) (../../sb/MutiRewardPool.sol#1504)
+	State variables written after the call(s):
+	- updatePool(pid) (../../sb/MutiRewardPool.sol#1510)
+		- pool.lastRewardBlock = block.number (../../sb/MutiRewardPool.sol#1275)
+		- pool.token0AccRewardsPerShare = pool.token0AccRewardsPerShare.add(token0Reward.mul(1e12).div(lpSupply)) (../../sb/MutiRewardPool.sol#1281)
+		- pool.token0AccAdditionalRewardsPerShare = pool.token0AccAdditionalRewardsPerShare.add(additionalTokenReward.mul(1e12).div(lpSupply)) (../../sb/MutiRewardPool.sol#1287)
+		- pool.token1AccRewardsPerShare = pool.token1AccRewardsPerShare.add(token1Reward.mul(1e12).div(lpSupply)) (../../sb/MutiRewardPool.sol#1296)
+		- pool.token1AccAdditionalRewardsPerShare = pool.token1AccAdditionalRewardsPerShare.add(additionalTokenReward_scope_2.mul(1e12).div(lpSupply)) (../../sb/MutiRewardPool.sol#1302)
+		- pool.lastRewardBlock = block.number (../../sb/MutiRewardPool.sol#1310)
+	- pool.token0AccRewardsPerShare = pool.token0AccRewardsPerShare.add(tokenReward.div(pool.totalDeposit)) (../../sb/MutiRewardPool.sol#1523)
+	- pool.token0AccDonateAmount = pool.token0AccDonateAmount.add(tokenReward) (../../sb/MutiRewardPool.sol#1524)
+	- pool.token1AccRewardsPerShare = pool.token1AccRewardsPerShare.add(tokenReward.div(pool.totalDeposit)) (../../sb/MutiRewardPool.sol#1526)
+	- pool.token1AccDonateAmount = pool.token1AccDonateAmount.add(tokenReward) (../../sb/MutiRewardPool.sol#1527)
+	- updatePool(pid) (../../sb/MutiRewardPool.sol#1510)
+		- token0AdditionalRewardPerBlock = 0 (../../sb/MutiRewardPool.sol#1291)
+	- updatePool(pid) (../../sb/MutiRewardPool.sol#1510)
+		- token1AdditionalRewardPerBlock = 0 (../../sb/MutiRewardPool.sol#1306)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in MutiRewardPool.deposit(uint256,uint256) (../../sb/MutiRewardPool.sol#1322-1350):
+	External calls:
+	- pool.lpToken.safeTransferFrom(address(msgSender()),address(poolVault),_amount) (../../sb/MutiRewardPool.sol#1333)
+	Event emitted after the call(s):
+	- Deposit(msgSender(),pid,lastStakingId,_amount) (../../sb/MutiRewardPool.sol#1348)
+	- Transfer(address(0),msgSender(),_amount) (../../sb/MutiRewardPool.sol#1349)
+Reentrancy in MutiRewardPool.donate(IERC20,uint256) (../../sb/MutiRewardPool.sol#1500-1531):
+	External calls:
+	- IERC20(token).safeTransferFrom(msgSender(),address(this),donateAmount) (../../sb/MutiRewardPool.sol#1504)
+	Event emitted after the call(s):
+	- Donate(msgSender(),pid,address(token),tokenReward.div(1e12),tokenReward.div(1e12)) (../../sb/MutiRewardPool.sol#1529)
+Reentrancy in MutiRewardPool.emergencyWithdraw(uint256) (../../sb/MutiRewardPool.sol#1453-1477):
+	External calls:
+	- pool.lpToken.safeTransferFrom(address(poolVault),address(msgSender()),amount) (../../sb/MutiRewardPool.sol#1473)
+	Event emitted after the call(s):
+	- EmergencyWithdraw(msgSender(),staking.pid,_stakingId,amount) (../../sb/MutiRewardPool.sol#1475)
+	- Transfer(msgSender(),address(0),amount) (../../sb/MutiRewardPool.sol#1476)
+Reentrancy in BasicMetaTransaction.executeMetaTransaction(address,bytes,bytes32,bytes32,uint8) (../../sb/MutiRewardPool.sol#969-981):
+	External calls:
+	- (success,returnData) = address(this).call(abi.encodePacked(functionSignature,userAddress)) (../../sb/MutiRewardPool.sol#976)
+	Event emitted after the call(s):
+	- MetaTransactionExecuted(userAddress,msg.sender,functionSignature) (../../sb/MutiRewardPool.sol#979)
+Reentrancy in MutiRewardPool.harvest(uint256) (../../sb/MutiRewardPool.sol#1376-1425):
+	External calls:
+	- rewardToken0.safeTransfer(address(msgSender()),reward0) (../../sb/MutiRewardPool.sol#1417)
+	- rewardToken1.safeTransfer(address(msgSender()),reward1) (../../sb/MutiRewardPool.sol#1421)
+	Event emitted after the call(s):
+	- Harvest(msgSender(),staking.pid,_stakingId,reward0,reward1) (../../sb/MutiRewardPool.sol#1424)
+Reentrancy in MutiRewardPool.withdraw(uint256) (../../sb/MutiRewardPool.sol#1428-1450):
+	External calls:
+	- harvest(_stakingId) (../../sb/MutiRewardPool.sol#1436)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/MutiRewardPool.sol#622)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/MutiRewardPool.sol#490)
+		- rewardToken0.safeTransfer(address(msgSender()),reward0) (../../sb/MutiRewardPool.sol#1417)
+		- rewardToken1.safeTransfer(address(msgSender()),reward1) (../../sb/MutiRewardPool.sol#1421)
+	- pool.lpToken.safeTransferFrom(address(poolVault),address(msgSender()),_amount) (../../sb/MutiRewardPool.sol#1441)
+	External calls sending eth:
+	- harvest(_stakingId) (../../sb/MutiRewardPool.sol#1436)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/MutiRewardPool.sol#490)
+	Event emitted after the call(s):
+	- Transfer(msgSender(),address(0),_amount) (../../sb/MutiRewardPool.sol#1449)
+	- Withdraw(msgSender(),staking.pid,_stakingId,_amount) (../../sb/MutiRewardPool.sol#1448)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+MutiRewardPool.withdraw(uint256) (../../sb/MutiRewardPool.sol#1428-1450) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp.sub(staking.time) >= pool.duration,not time) (../../sb/MutiRewardPool.sol#1434)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/MutiRewardPool.sol#397-406) uses assembly
+	- INLINE ASM (../../sb/MutiRewardPool.sol#404)
+Address._verifyCallResult(bool,bytes,string) (../../sb/MutiRewardPool.sol#542-559) uses assembly
+	- INLINE ASM (../../sb/MutiRewardPool.sol#551-554)
+BasicMetaTransaction.getChainID() (../../sb/MutiRewardPool.sol#950-956) uses assembly
+	- INLINE ASM (../../sb/MutiRewardPool.sol#952-954)
+BasicMetaTransaction.msgSender() (../../sb/MutiRewardPool.sol#1001-1012) uses assembly
+	- INLINE ASM (../../sb/MutiRewardPool.sol#1005-1008)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+MutiRewardPool.updatePool(uint256) (../../sb/MutiRewardPool.sol#1268-1311) has costly operations inside a loop:
+	- token0AdditionalRewardPerBlock = 0 (../../sb/MutiRewardPool.sol#1291)
+MutiRewardPool.updatePool(uint256) (../../sb/MutiRewardPool.sol#1268-1311) has costly operations inside a loop:
+	- token1AdditionalRewardPerBlock = 0 (../../sb/MutiRewardPool.sol#1306)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#costly-operations-inside-a-loop
+
+Address.functionCall(address,bytes) (../../sb/MutiRewardPool.sol#450-452) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/MutiRewardPool.sol#475-477) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/MutiRewardPool.sol#524-526) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/MutiRewardPool.sol#534-540) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/MutiRewardPool.sol#500-502) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/MutiRewardPool.sol#510-516) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/MutiRewardPool.sol#424-430) is never used and should be removed
+Context._msgData() (../../sb/MutiRewardPool.sol#21-24) is never used and should be removed
+EnumerableSet.add(EnumerableSet.Bytes32Set,bytes32) (../../sb/MutiRewardPool.sol#772-774) is never used and should be removed
+EnumerableSet.at(EnumerableSet.Bytes32Set,uint256) (../../sb/MutiRewardPool.sol#810-812) is never used and should be removed
+EnumerableSet.contains(EnumerableSet.Bytes32Set,bytes32) (../../sb/MutiRewardPool.sol#789-791) is never used and should be removed
+EnumerableSet.length(EnumerableSet.Bytes32Set) (../../sb/MutiRewardPool.sol#796-798) is never used and should be removed
+EnumerableSet.remove(EnumerableSet.Bytes32Set,bytes32) (../../sb/MutiRewardPool.sol#782-784) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/MutiRewardPool.sol#590-599) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/MutiRewardPool.sol#606-609) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/MutiRewardPool.sol#601-604) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/MutiRewardPool.sol#350-353) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/MutiRewardPool.sol#312-315) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/MutiRewardPool.sol#370-373) is never used and should be removed
+SafeMath.sub(uint256,uint256,string) (../../sb/MutiRewardPool.sol#330-333) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/MutiRewardPool.sol#184-188) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/MutiRewardPool.sol#220-223) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/MutiRewardPool.sol#230-233) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/MutiRewardPool.sol#205-213) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/MutiRewardPool.sol#195-198) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version=0.6.12 (../../sb/MutiRewardPool.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/MutiRewardPool.sol#424-430):
+	- (success) = recipient.call{value: amount}() (../../sb/MutiRewardPool.sol#428)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/MutiRewardPool.sol#485-492):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/MutiRewardPool.sol#490)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/MutiRewardPool.sol#510-516):
+	- (success,returndata) = target.staticcall(data) (../../sb/MutiRewardPool.sol#514)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/MutiRewardPool.sol#534-540):
+	- (success,returndata) = target.delegatecall(data) (../../sb/MutiRewardPool.sol#538)
+Low level call in BasicMetaTransaction.executeMetaTransaction(address,bytes,bytes32,bytes32,uint8) (../../sb/MutiRewardPool.sol#969-981):
+	- (success,returnData) = address(this).call(abi.encodePacked(functionSignature,userAddress)) (../../sb/MutiRewardPool.sol#976)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+MutiRewardPool (../../sb/MutiRewardPool.sol#1015-1772) should inherit from IERC20Metadata (../../sb/MutiRewardPool.sol#924-932)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-inheritance
+
+Parameter MutiRewardPool.getMultiplier(uint256,uint256)._from (../../sb/MutiRewardPool.sol#1163) is not in mixedCase
+Parameter MutiRewardPool.getMultiplier(uint256,uint256)._to (../../sb/MutiRewardPool.sol#1163) is not in mixedCase
+Parameter MutiRewardPool.addPool(uint256,uint256)._stakingDuration (../../sb/MutiRewardPool.sol#1179) is not in mixedCase
+Parameter MutiRewardPool.addPool(uint256,uint256)._allocPoint (../../sb/MutiRewardPool.sol#1180) is not in mixedCase
+Parameter MutiRewardPool.token0PendingReward(uint256)._stakingId (../../sb/MutiRewardPool.sol#1203) is not in mixedCase
+Parameter MutiRewardPool.token1PendingReward(uint256)._stakingId (../../sb/MutiRewardPool.sol#1236) is not in mixedCase
+Parameter MutiRewardPool.updatePool(uint256)._pid (../../sb/MutiRewardPool.sol#1268) is not in mixedCase
+Parameter MutiRewardPool.deposit(uint256,uint256)._amount (../../sb/MutiRewardPool.sol#1322) is not in mixedCase
+Parameter MutiRewardPool.harvest(uint256)._stakingId (../../sb/MutiRewardPool.sol#1376) is not in mixedCase
+Parameter MutiRewardPool.withdraw(uint256)._stakingId (../../sb/MutiRewardPool.sol#1428) is not in mixedCase
+Parameter MutiRewardPool.emergencyWithdraw(uint256)._stakingId (../../sb/MutiRewardPool.sol#1453) is not in mixedCase
+Parameter MutiRewardPool.emergencyRewardWithdrawToken0(uint256)._amount (../../sb/MutiRewardPool.sol#1480) is not in mixedCase
+Parameter MutiRewardPool.emergencyRewardWithdrawToken1(uint256)._amount (../../sb/MutiRewardPool.sol#1486) is not in mixedCase
+Parameter MutiRewardPool.addCaller(address)._newCaller (../../sb/MutiRewardPool.sol#1750) is not in mixedCase
+Parameter MutiRewardPool.delCaller(address)._delCaller (../../sb/MutiRewardPool.sol#1755) is not in mixedCase
+Parameter MutiRewardPool.isCaller(address)._caller (../../sb/MutiRewardPool.sol#1764) is not in mixedCase
+Parameter MutiRewardPool.getCaller(uint256)._index (../../sb/MutiRewardPool.sol#1768) is not in mixedCase
+Variable MutiRewardPool.BONUS_MULTIPLIER (../../sb/MutiRewardPool.sol#1110) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/MutiRewardPool.sol#22)" inContext (../../sb/MutiRewardPool.sol#16-25)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Variable MutiRewardPool.constructor(IERC20,IERC20,IERC20,uint256,uint256,uint256,uint256)._rewardToken0 (../../sb/MutiRewardPool.sol#1138) is too similar to MutiRewardPool.constructor(IERC20,IERC20,IERC20,uint256,uint256,uint256,uint256)._rewardToken1 (../../sb/MutiRewardPool.sol#1139)
+Variable MutiRewardPool.constructor(IERC20,IERC20,IERC20,uint256,uint256,uint256,uint256)._token0RewardPerBlock (../../sb/MutiRewardPool.sol#1140) is too similar to MutiRewardPool.constructor(IERC20,IERC20,IERC20,uint256,uint256,uint256,uint256)._token1RewardPerBlock (../../sb/MutiRewardPool.sol#1141)
+Variable MutiRewardPool.getPoolView(uint256).additionalRewardsPerBlock0 (../../sb/MutiRewardPool.sol#1618) is too similar to MutiRewardPool.getPoolView(uint256).additionalRewardsPerBlock1 (../../sb/MutiRewardPool.sol#1619)
+Variable MutiRewardPool.constructor(IERC20,IERC20,IERC20,uint256,uint256,uint256,uint256)._bonusEndBlock (../../sb/MutiRewardPool.sol#1143) is too similar to MutiRewardPool.getBaseInfo().bonusEndBlock_ (../../sb/MutiRewardPool.sol#1590)
+Variable MutiRewardPool.constructor(IERC20,IERC20,IERC20,uint256,uint256,uint256,uint256)._depositToken (../../sb/MutiRewardPool.sol#1137) is too similar to MutiRewardPool.getBaseInfo().depositToken_ (../../sb/MutiRewardPool.sol#1579)
+Variable MutiRewardPool.rewardToken0 (../../sb/MutiRewardPool.sol#1091) is too similar to MutiRewardPool.rewardToken1 (../../sb/MutiRewardPool.sol#1092)
+Variable MutiRewardPool.constructor(IERC20,IERC20,IERC20,uint256,uint256,uint256,uint256)._rewardToken0 (../../sb/MutiRewardPool.sol#1138) is too similar to MutiRewardPool.getBaseInfo().rewardToken0_ (../../sb/MutiRewardPool.sol#1580)
+Variable MutiRewardPool.getBaseInfo().rewardToken0_ (../../sb/MutiRewardPool.sol#1580) is too similar to MutiRewardPool.getBaseInfo().rewardToken1_ (../../sb/MutiRewardPool.sol#1581)
+Variable MutiRewardPool.constructor(IERC20,IERC20,IERC20,uint256,uint256,uint256,uint256)._rewardToken1 (../../sb/MutiRewardPool.sol#1139) is too similar to MutiRewardPool.getBaseInfo().rewardToken1_ (../../sb/MutiRewardPool.sol#1581)
+Variable MutiRewardPool.getPoolView(uint256).rewardsPerBlock0 (../../sb/MutiRewardPool.sol#1615) is too similar to MutiRewardPool.getPoolView(uint256).rewardsPerBlock1 (../../sb/MutiRewardPool.sol#1616)
+Variable MutiRewardPool.constructor(IERC20,IERC20,IERC20,uint256,uint256,uint256,uint256)._startBlock (../../sb/MutiRewardPool.sol#1142) is too similar to MutiRewardPool.getBaseInfo().startBlock_ (../../sb/MutiRewardPool.sol#1589)
+Variable MutiRewardPool.token0AdditionalRewardEndBlock (../../sb/MutiRewardPool.sol#1106) is too similar to MutiRewardPool.token1AdditionalRewardEndBlock (../../sb/MutiRewardPool.sol#1107)
+Variable MutiRewardPool.getBaseInfo().token0AdditionalRewardEndBlock_ (../../sb/MutiRewardPool.sol#1586) is too similar to MutiRewardPool.getBaseInfo().token1AdditionalRewardEndBlock_ (../../sb/MutiRewardPool.sol#1587)
+Variable MutiRewardPool.token0AdditionalRewardEndBlock (../../sb/MutiRewardPool.sol#1106) is too similar to MutiRewardPool.token0AdditionalRewardPerBlock (../../sb/MutiRewardPool.sol#1102)
+Variable MutiRewardPool.token0AdditionalRewardPerBlock (../../sb/MutiRewardPool.sol#1102) is too similar to MutiRewardPool.token1AdditionalRewardPerBlock (../../sb/MutiRewardPool.sol#1103)
+Variable MutiRewardPool.getBaseInfo().token0AdditionalRewardEndBlock_ (../../sb/MutiRewardPool.sol#1586) is too similar to MutiRewardPool.getBaseInfo().token0AdditionalRewardPerBlock_ (../../sb/MutiRewardPool.sol#1584)
+Variable MutiRewardPool.getBaseInfo().token0AdditionalRewardPerBlock_ (../../sb/MutiRewardPool.sol#1584) is too similar to MutiRewardPool.getBaseInfo().token1AdditionalRewardEndBlock_ (../../sb/MutiRewardPool.sol#1587)
+Variable MutiRewardPool.getBaseInfo().token0AdditionalRewardPerBlock_ (../../sb/MutiRewardPool.sol#1584) is too similar to MutiRewardPool.getBaseInfo().token1AdditionalRewardPerBlock_ (../../sb/MutiRewardPool.sol#1585)
+Variable MutiRewardPool.updatePool(uint256).token0Reward (../../sb/MutiRewardPool.sol#1280) is too similar to MutiRewardPool.updatePool(uint256).token1Reward (../../sb/MutiRewardPool.sol#1295)
+Variable MutiRewardPool.token0RewardPerBlock (../../sb/MutiRewardPool.sol#1098) is too similar to MutiRewardPool.token1RewardPerBlock (../../sb/MutiRewardPool.sol#1099)
+Variable MutiRewardPool.constructor(IERC20,IERC20,IERC20,uint256,uint256,uint256,uint256)._token0RewardPerBlock (../../sb/MutiRewardPool.sol#1140) is too similar to MutiRewardPool.getBaseInfo().token0RewardPerBlock_ (../../sb/MutiRewardPool.sol#1582)
+Variable MutiRewardPool.constructor(IERC20,IERC20,IERC20,uint256,uint256,uint256,uint256)._token1RewardPerBlock (../../sb/MutiRewardPool.sol#1141) is too similar to MutiRewardPool.getBaseInfo().token0RewardPerBlock_ (../../sb/MutiRewardPool.sol#1582)
+Variable MutiRewardPool.getBaseInfo().token0RewardPerBlock_ (../../sb/MutiRewardPool.sol#1582) is too similar to MutiRewardPool.getBaseInfo().token1RewardPerBlock_ (../../sb/MutiRewardPool.sol#1583)
+Variable MutiRewardPool.getStakingView(uint256).token0UnclaimedRewards (../../sb/MutiRewardPool.sol#1662) is too similar to MutiRewardPool.getStakingView(uint256).token1UnclaimedRewards (../../sb/MutiRewardPool.sol#1663)
+Variable MutiRewardPool.token1AdditionalRewardEndBlock (../../sb/MutiRewardPool.sol#1107) is too similar to MutiRewardPool.token1AdditionalRewardPerBlock (../../sb/MutiRewardPool.sol#1103)
+Variable MutiRewardPool.getBaseInfo().token0AdditionalRewardEndBlock_ (../../sb/MutiRewardPool.sol#1586) is too similar to MutiRewardPool.getBaseInfo().token1AdditionalRewardPerBlock_ (../../sb/MutiRewardPool.sol#1585)
+Variable MutiRewardPool.getBaseInfo().token1AdditionalRewardEndBlock_ (../../sb/MutiRewardPool.sol#1587) is too similar to MutiRewardPool.getBaseInfo().token1AdditionalRewardPerBlock_ (../../sb/MutiRewardPool.sol#1585)
+Variable MutiRewardPool.constructor(IERC20,IERC20,IERC20,uint256,uint256,uint256,uint256)._token0RewardPerBlock (../../sb/MutiRewardPool.sol#1140) is too similar to MutiRewardPool.getBaseInfo().token1RewardPerBlock_ (../../sb/MutiRewardPool.sol#1583)
+Variable MutiRewardPool.constructor(IERC20,IERC20,IERC20,uint256,uint256,uint256,uint256)._token1RewardPerBlock (../../sb/MutiRewardPool.sol#1141) is too similar to MutiRewardPool.getBaseInfo().token1RewardPerBlock_ (../../sb/MutiRewardPool.sol#1583)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+Loop condition i < poolInfo.length (../../sb/MutiRewardPool.sol#1706) should use cached array length instead of referencing `length` member of the storage array.
+ Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cache-array-length
+
+MutiRewardPool.bonusEndBlock (../../sb/MutiRewardPool.sol#1128) should be immutable 
+MutiRewardPool.depositToken (../../sb/MutiRewardPool.sol#1090) should be immutable 
+MutiRewardPool.poolVault (../../sb/MutiRewardPool.sol#1093) should be immutable 
+MutiRewardPool.rewardToken0 (../../sb/MutiRewardPool.sol#1091) should be immutable 
+MutiRewardPool.rewardToken1 (../../sb/MutiRewardPool.sol#1092) should be immutable 
+MutiRewardPool.startBlock (../../sb/MutiRewardPool.sol#1126) should be immutable 
+MutiRewardPool.token0RewardPerBlock (../../sb/MutiRewardPool.sol#1098) should be immutable 
+MutiRewardPool.token1RewardPerBlock (../../sb/MutiRewardPool.sol#1099) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/MutiRewardPool.sol analyzed (11 contracts with 93 detectors), 142 result(s) found

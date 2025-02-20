@@ -1,0 +1,132 @@
+{
+    "errors": [],
+    "fails": [],
+    "findings": [
+        {
+            "confidence": "Medium",
+            "contract": "WusdAaveStrategy",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Inspex-WusdAaveStrategy/WUSD-main/WusdAaveStrategy.sol",
+            "function": "withdrawAll",
+            "impact": "Medium",
+            "line": 568,
+            "line_end": 583,
+            "message": "Reentrancy in WusdAaveStrategy.withdrawAll() (WusdAaveStrategy.sol#568-583):\n\tExternal calls:\n\t- usdcWithdrawn = lendingPool.withdraw(address(usdc),amUsdcBalance,address(this)) (WusdAaveStrategy.sol#570)\n\t- usdc.safeTransfer(treasury(),usdcWithdrawn - usdcInvestedAmount) (WusdAaveStrategy.sol#572)\n\t- usdc.safeTransfer(address(wusdMaster),usdcInvestedAmount) (WusdAaveStrategy.sol#573)\n\t- usdc.safeTransfer(address(wusdMaster),usdcWithdrawn) (WusdAaveStrategy.sol#578)\n\tState variables written after the call(s):\n\t- usdcInvestedAmount = 0 (WusdAaveStrategy.sol#582)\n\tWusdAaveStrategy.usdcInvestedAmount (WusdAaveStrategy.sol#494) can be used in cross function reentrancies:\n\t- WusdAaveStrategy.expectedUsdcRewards() (WusdAaveStrategy.sol#515-517)\n\t- WusdAaveStrategy.invest(uint256) (WusdAaveStrategy.sol#524-533)\n\t- WusdAaveStrategy.usdcInvestedAmount (WusdAaveStrategy.sol#494)\n\t- WusdAaveStrategy.withdrawAll() (WusdAaveStrategy.sol#568-583)\n\t- WusdAaveStrategy.withdrawToMaster(uint256) (WusdAaveStrategy.sol#539-548)\n\t- WusdAaveStrategy.withdrawUsdcRewards(uint256) (WusdAaveStrategy.sol#550-558)\n",
+            "name": "reentrancy-no-eth",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "WusdAaveStrategy",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Inspex-WusdAaveStrategy/WUSD-main/WusdAaveStrategy.sol",
+            "function": "withdrawToMaster",
+            "impact": "Medium",
+            "line": 539,
+            "line_end": 548,
+            "message": "Reentrancy in WusdAaveStrategy.withdrawToMaster(uint256) (WusdAaveStrategy.sol#539-548):\n\tExternal calls:\n\t- usdcWithdrawn = withdraw(address(wusdMaster),amUsdcAmount) (WusdAaveStrategy.sol#544)\n\t\t- lendingPool.withdraw(address(usdc),amUsdcAmount,to) (WusdAaveStrategy.sol#536)\n\tState variables written after the call(s):\n\t- usdcInvestedAmount -= usdcWithdrawn (WusdAaveStrategy.sol#545)\n\tWusdAaveStrategy.usdcInvestedAmount (WusdAaveStrategy.sol#494) can be used in cross function reentrancies:\n\t- WusdAaveStrategy.expectedUsdcRewards() (WusdAaveStrategy.sol#515-517)\n\t- WusdAaveStrategy.invest(uint256) (WusdAaveStrategy.sol#524-533)\n\t- WusdAaveStrategy.usdcInvestedAmount (WusdAaveStrategy.sol#494)\n\t- WusdAaveStrategy.withdrawAll() (WusdAaveStrategy.sol#568-583)\n\t- WusdAaveStrategy.withdrawToMaster(uint256) (WusdAaveStrategy.sol#539-548)\n\t- WusdAaveStrategy.withdrawUsdcRewards(uint256) (WusdAaveStrategy.sol#550-558)\n",
+            "name": "reentrancy-no-eth",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "WusdAaveStrategy",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Inspex-WusdAaveStrategy/WUSD-main/WusdAaveStrategy.sol",
+            "function": "invest",
+            "impact": "Medium",
+            "line": 524,
+            "line_end": 533,
+            "message": "WusdAaveStrategy.invest(uint256) (WusdAaveStrategy.sol#524-533) ignores return value by usdc.approve(address(lendingPool),usdcAmount) (WusdAaveStrategy.sol#528)\n",
+            "name": "unused-return",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "WusdAaveStrategy",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Inspex-WusdAaveStrategy/WUSD-main/WusdAaveStrategy.sol",
+            "function": "invest",
+            "impact": "Low",
+            "line": 524,
+            "line_end": 533,
+            "message": "Reentrancy in WusdAaveStrategy.invest(uint256) (WusdAaveStrategy.sol#524-533):\n\tExternal calls:\n\t- usdc.approve(address(lendingPool),usdcAmount) (WusdAaveStrategy.sol#528)\n\t- lendingPool.deposit(address(usdc),usdcAmount,address(this),0) (WusdAaveStrategy.sol#529)\n\tState variables written after the call(s):\n\t- usdcInvestedAmount += usdcAmount (WusdAaveStrategy.sol#530)\n",
+            "name": "reentrancy-benign",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "WusdAaveStrategy",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Inspex-WusdAaveStrategy/WUSD-main/WusdAaveStrategy.sol",
+            "function": "withdrawAll",
+            "impact": "Low",
+            "line": 568,
+            "line_end": 583,
+            "message": "Reentrancy in WusdAaveStrategy.withdrawAll() (WusdAaveStrategy.sol#568-583):\n\tExternal calls:\n\t- usdcWithdrawn = lendingPool.withdraw(address(usdc),amUsdcBalance,address(this)) (WusdAaveStrategy.sol#570)\n\t- usdc.safeTransfer(address(wusdMaster),usdcWithdrawn) (WusdAaveStrategy.sol#578)\n\tEvent emitted after the call(s):\n\t- UsdcWithdrawnToMaster(usdcWithdrawn) (WusdAaveStrategy.sol#580)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "WusdAaveStrategy",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Inspex-WusdAaveStrategy/WUSD-main/WusdAaveStrategy.sol",
+            "function": "withdrawToMaster",
+            "impact": "Low",
+            "line": 539,
+            "line_end": 548,
+            "message": "Reentrancy in WusdAaveStrategy.withdrawToMaster(uint256) (WusdAaveStrategy.sol#539-548):\n\tExternal calls:\n\t- usdcWithdrawn = withdraw(address(wusdMaster),amUsdcAmount) (WusdAaveStrategy.sol#544)\n\t\t- lendingPool.withdraw(address(usdc),amUsdcAmount,to) (WusdAaveStrategy.sol#536)\n\tEvent emitted after the call(s):\n\t- UsdcWithdrawnToTreasury(usdcWithdrawn) (WusdAaveStrategy.sol#547)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "WusdAaveStrategy",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Inspex-WusdAaveStrategy/WUSD-main/WusdAaveStrategy.sol",
+            "function": "returnUsdcToMaster",
+            "impact": "Low",
+            "line": 585,
+            "line_end": 590,
+            "message": "Reentrancy in WusdAaveStrategy.returnUsdcToMaster() (WusdAaveStrategy.sol#585-590):\n\tExternal calls:\n\t- usdc.safeTransfer(address(wusdMaster),amount) (WusdAaveStrategy.sol#587)\n\tEvent emitted after the call(s):\n\t- UsdcWithdrawnToMaster(amount) (WusdAaveStrategy.sol#589)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "WusdAaveStrategy",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Inspex-WusdAaveStrategy/WUSD-main/WusdAaveStrategy.sol",
+            "function": "withdrawAll",
+            "impact": "Low",
+            "line": 568,
+            "line_end": 583,
+            "message": "Reentrancy in WusdAaveStrategy.withdrawAll() (WusdAaveStrategy.sol#568-583):\n\tExternal calls:\n\t- usdcWithdrawn = lendingPool.withdraw(address(usdc),amUsdcBalance,address(this)) (WusdAaveStrategy.sol#570)\n\t- usdc.safeTransfer(treasury(),usdcWithdrawn - usdcInvestedAmount) (WusdAaveStrategy.sol#572)\n\t- usdc.safeTransfer(address(wusdMaster),usdcInvestedAmount) (WusdAaveStrategy.sol#573)\n\tEvent emitted after the call(s):\n\t- UsdcWithdrawnToMaster(usdcInvestedAmount) (WusdAaveStrategy.sol#576)\n\t- UsdcWithdrawnToTreasury(usdcWithdrawn - usdcInvestedAmount) (WusdAaveStrategy.sol#575)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "WusdAaveStrategy",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Inspex-WusdAaveStrategy/WUSD-main/WusdAaveStrategy.sol",
+            "function": "invest",
+            "impact": "Low",
+            "line": 524,
+            "line_end": 533,
+            "message": "Reentrancy in WusdAaveStrategy.invest(uint256) (WusdAaveStrategy.sol#524-533):\n\tExternal calls:\n\t- usdc.approve(address(lendingPool),usdcAmount) (WusdAaveStrategy.sol#528)\n\t- lendingPool.deposit(address(usdc),usdcAmount,address(this),0) (WusdAaveStrategy.sol#529)\n\tEvent emitted after the call(s):\n\t- UsdcInvested(usdcAmount) (WusdAaveStrategy.sol#532)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "WusdAaveStrategy",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Inspex-WusdAaveStrategy/WUSD-main/WusdAaveStrategy.sol",
+            "function": "withdrawUsdcRewards",
+            "impact": "Low",
+            "line": 550,
+            "line_end": 558,
+            "message": "Reentrancy in WusdAaveStrategy.withdrawUsdcRewards(uint256) (WusdAaveStrategy.sol#550-558):\n\tExternal calls:\n\t- usdcWithdrawn = withdraw(treasury(),amUsdcAmount) (WusdAaveStrategy.sol#555)\n\t\t- lendingPool.withdraw(address(usdc),amUsdcAmount,to) (WusdAaveStrategy.sol#536)\n\tEvent emitted after the call(s):\n\t- UsdcWithdrawnToTreasury(usdcWithdrawn) (WusdAaveStrategy.sol#557)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        }
+    ],
+    "infos": [],
+    "parser": {
+        "id": "slither-0.10.0",
+        "mode": "solidity",
+        "version": "2024/04/30"
+    }
+}

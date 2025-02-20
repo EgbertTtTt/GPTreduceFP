@@ -1,0 +1,251 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 63 Code Findings │
+└──────────────────┘
+                      
+    /sb/LeadStake.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          376┆ contract LeadStake is Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          426┆ constructor(
+          427┆     address _token,
+          428┆     uint8 _stakingTaxRate,
+          429┆     uint8 _unstakingTaxRate,
+          430┆     uint8 _dailyROI,
+          431┆     uint _registrationTax,
+          432┆     uint _referralTaxAllocation,
+          433┆     uint _minimumStakeValue) public {
+          434┆ 
+          435┆     //set initial state variables
+             [hid 8 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          596┆ for (uint i = 0; i < index; i += 1){
+            ⋮┆----------------------------------------
+          598┆ if (_address == userIndex[i]) {
+            ⋮┆----------------------------------------
+          660┆ for(uint i = 0; i < index; i++){
+            ⋮┆----------------------------------------
+          662┆ stakeRewards[userIndex[i]] =                                     
+  stakeRewards[userIndex[i]].add(calculateEarnings(userIndex[i]));              
+            ⋮┆----------------------------------------
+          662┆ stakeRewards[userIndex[i]] =                                     
+  stakeRewards[userIndex[i]].add(calculateEarnings(userIndex[i]));              
+            ⋮┆----------------------------------------
+          662┆ stakeRewards[userIndex[i]] =                                     
+  stakeRewards[userIndex[i]].add(calculateEarnings(userIndex[i]));              
+            ⋮┆----------------------------------------
+          662┆ stakeRewards[userIndex[i]] =                                     
+  stakeRewards[userIndex[i]].add(calculateEarnings(userIndex[i]));              
+            ⋮┆----------------------------------------
+          662┆ stakeRewards[userIndex[i]] =                                     
+  stakeRewards[userIndex[i]].add(calculateEarnings(userIndex[i]));              
+            ⋮┆----------------------------------------
+          664┆ uint remainder = (now.sub(lastClock[userIndex[i]])).mod(86400);
+            ⋮┆----------------------------------------
+          664┆ uint remainder = (now.sub(lastClock[userIndex[i]])).mod(86400);
+            ⋮┆----------------------------------------
+          666┆ lastClock[userIndex[i]] = now.sub(remainder);
+            ⋮┆----------------------------------------
+          666┆ lastClock[userIndex[i]] = now.sub(remainder);
+            ⋮┆----------------------------------------
+          701┆ for(uint i = 0; i < index; i++){
+            ⋮┆----------------------------------------
+          703┆ totalClaimable =                                                 
+  stakeRewards[userIndex[i]].add(referralRewards[userIndex[i]]).add(stakes[userI
+  ndex[i]]).add(calculateEarnings(userIndex[i]));                               
+            ⋮┆----------------------------------------
+          703┆ totalClaimable =                                                 
+  stakeRewards[userIndex[i]].add(referralRewards[userIndex[i]]).add(stakes[userI
+  ndex[i]]).add(calculateEarnings(userIndex[i]));                               
+            ⋮┆----------------------------------------
+          703┆ totalClaimable =                                                 
+  stakeRewards[userIndex[i]].add(referralRewards[userIndex[i]]).add(stakes[userI
+  ndex[i]]).add(calculateEarnings(userIndex[i]));                               
+            ⋮┆----------------------------------------
+          703┆ totalClaimable =                                                 
+  stakeRewards[userIndex[i]].add(referralRewards[userIndex[i]]).add(stakes[userI
+  ndex[i]]).add(calculateEarnings(userIndex[i]));                               
+            ⋮┆----------------------------------------
+          703┆ totalClaimable =                                                 
+  stakeRewards[userIndex[i]].add(referralRewards[userIndex[i]]).add(stakes[userI
+  ndex[i]]).add(calculateEarnings(userIndex[i]));                               
+            ⋮┆----------------------------------------
+          703┆ totalClaimable =                                                 
+  stakeRewards[userIndex[i]].add(referralRewards[userIndex[i]]).add(stakes[userI
+  ndex[i]]).add(calculateEarnings(userIndex[i]));                               
+            ⋮┆----------------------------------------
+          703┆ totalClaimable =                                                 
+  stakeRewards[userIndex[i]].add(referralRewards[userIndex[i]]).add(stakes[userI
+  ndex[i]]).add(calculateEarnings(userIndex[i]));                               
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          660┆ for(uint i = 0; i < index; i++){
+            ⋮┆----------------------------------------
+          701┆ for(uint i = 0; i < index; i++){
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           87┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          102┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          119┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          136┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          153┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          348┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          369┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          447┆ require(registered[msg.sender] == true, "Staker must be          
+  registered");                                                                 
+            ⋮┆----------------------------------------
+          453┆ require(registered[msg.sender] == false, "Staker is already      
+  registered");                                                                 
+            ⋮┆----------------------------------------
+          459┆ require(active == true, "Smart contract is curently inactive");
+            ⋮┆----------------------------------------
+          472┆ require(msg.sender != _referrer, "Cannot refer self");
+            ⋮┆----------------------------------------
+          474┆ require(registered[_referrer] || address(0x0) == _referrer,      
+  "Referrer must be registered");                                               
+            ⋮┆----------------------------------------
+          476┆ require(IERC20(lead).balanceOf(msg.sender) >= _amount, "Must have
+  enough balance to stake");                                                    
+            ⋮┆----------------------------------------
+          478┆ require(IERC20(lead).transferFrom(msg.sender, address(this),     
+  _amount), "Stake failed due to failed amount transfer.");                     
+            ⋮┆----------------------------------------
+          480┆ require(_amount >= registrationTax.add(minimumStakeValue), "Must 
+  send at least enough LEAD to pay registration fee.");                         
+            ⋮┆----------------------------------------
+          525┆ require(_amount >= minimumStakeValue, "Amount is below minimum   
+  stake value.");                                                               
+            ⋮┆----------------------------------------
+          527┆ require(IERC20(lead).balanceOf(msg.sender) >= _amount, "Must have
+  enough balance to stake");                                                    
+            ⋮┆----------------------------------------
+          529┆ require(IERC20(lead).transferFrom(msg.sender, address(this),     
+  _amount), "Stake failed due to failed amount transfer.");                     
+            ⋮┆----------------------------------------
+          558┆ require(_amount <= stakes[msg.sender] && _amount > 0,            
+  'Insufficient balance to unstake');                                           
+            ⋮┆----------------------------------------
+          623┆ require(totalReward > 0, 'No reward to withdraw');
+            ⋮┆----------------------------------------
+          689┆ require(IERC20(lead).balanceOf(address(this)) >= _amount,        
+  'Insufficient LEAD balance in smart contract');                               
+            ⋮┆----------------------------------------
+          706┆ require(totalClaimable > IERC20(lead).balanceOf(address(this)),  
+  'Still have enough pool reserve');                                            
+            ⋮┆----------------------------------------
+          710┆ require(IERC20(lead).balanceOf(msg.sender) >= difference,        
+  'Insufficient LEAD balance in owner wallet');                                 
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          558┆ require(_amount <= stakes[msg.sender] && _amount > 0,            
+  'Insufficient balance to unstake');                                           
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          490┆ referralCount[_referrer]++;
+            ⋮┆----------------------------------------
+          501┆ index++;
+            ⋮┆----------------------------------------
+          660┆ for(uint i = 0; i < index; i++){
+            ⋮┆----------------------------------------
+          701┆ for(uint i = 0; i < index; i++){
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          119┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          369┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          459┆ require(active == true, "Smart contract is curently inactive");
+            ⋮┆----------------------------------------
+          476┆ require(IERC20(lead).balanceOf(msg.sender) >= _amount, "Must have
+  enough balance to stake");                                                    
+            ⋮┆----------------------------------------
+          478┆ require(IERC20(lead).transferFrom(msg.sender, address(this),     
+  _amount), "Stake failed due to failed amount transfer.");                     
+            ⋮┆----------------------------------------
+          480┆ require(_amount >= registrationTax.add(minimumStakeValue), "Must 
+  send at least enough LEAD to pay registration fee.");                         
+            ⋮┆----------------------------------------
+          525┆ require(_amount >= minimumStakeValue, "Amount is below minimum   
+  stake value.");                                                               
+            ⋮┆----------------------------------------
+          527┆ require(IERC20(lead).balanceOf(msg.sender) >= _amount, "Must have
+  enough balance to stake");                                                    
+            ⋮┆----------------------------------------
+          529┆ require(IERC20(lead).transferFrom(msg.sender, address(this),     
+  _amount), "Stake failed due to failed amount transfer.");                     
+            ⋮┆----------------------------------------
+          689┆ require(IERC20(lead).balanceOf(address(this)) >= _amount,        
+  'Insufficient LEAD balance in smart contract');                               
+            ⋮┆----------------------------------------
+          710┆ require(IERC20(lead).balanceOf(msg.sender) >= difference,        
+  'Insufficient LEAD balance in owner wallet');                                 
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 63 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

@@ -1,0 +1,258 @@
+'solc --version' running
+'solc /sb/StratX2_PCS.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/StratX2_PCS.sol:
+Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.
+    --> /sb/StratX2_PCS.sol:1862:23:
+     |
+1862 |     function withdraw(address _userAddress, uint256 _wantAmt)
+     |                       ^^^^^^^^^^^^^^^^^^^^
+
+Warning: Contract code size exceeds 24576 bytes (a limit introduced in Spurious Dragon). This contract may not be deployable on mainnet. Consider enabling the optimizer (with a low "runs" value!), turning off revert strings, or using libraries.
+    --> /sb/StratX2_PCS.sol:2291:1:
+     |
+2291 | contract StratX2_PCS is StratX2 {
+     | ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+Reentrancy in StratX2.withdraw(address,uint256) (../../sb/StratX2_PCS.sol#1862-1901):
+	External calls:
+	- _unfarm(_wantAmt) (../../sb/StratX2_PCS.sol#1884)
+		- IPancakeswapFarm(farmContractAddress).leaveStaking(_wantAmt) (../../sb/StratX2_PCS.sol#1856)
+		- IPancakeswapFarm(farmContractAddress).withdraw(pid,_wantAmt) (../../sb/StratX2_PCS.sol#1858)
+	State variables written after the call(s):
+	- wantLockedTotal = wantLockedTotal.sub(_wantAmt) (../../sb/StratX2_PCS.sol#1896)
+	StratX2.wantLockedTotal (../../sb/StratX2_PCS.sol#1740) can be used in cross function reentrancies:
+	- StratX2.wantLockedTotal (../../sb/StratX2_PCS.sol#1740)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+StratX2.earn() (../../sb/StratX2_PCS.sol#1907-2009) ignores return value by IPancakeRouter02(uniRouterAddress).addLiquidity(token0Address,token1Address,token0Amt,token1Amt,0,0,address(this),block.timestamp.add(600)) (../../sb/StratX2_PCS.sol#1994-2003)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+StratX2.setGov(address)._govAddress (../../sb/StratX2_PCS.sol#2181) lacks a zero-check on :
+		- govAddress = _govAddress (../../sb/StratX2_PCS.sol#2182)
+StratX2.setUniRouterAddress(address)._uniRouterAddress (../../sb/StratX2_PCS.sol#2191) lacks a zero-check on :
+		- uniRouterAddress = _uniRouterAddress (../../sb/StratX2_PCS.sol#2196)
+StratX2.setBuyBackAddress(address)._buyBackAddress (../../sb/StratX2_PCS.sol#2200) lacks a zero-check on :
+		- buyBackAddress = _buyBackAddress (../../sb/StratX2_PCS.sol#2205)
+StratX2.setRewardsAddress(address)._rewardsAddress (../../sb/StratX2_PCS.sol#2209) lacks a zero-check on :
+		- rewardsAddress = _rewardsAddress (../../sb/StratX2_PCS.sol#2214)
+StratX2.setSimpliStakingAddress(address)._simpliStakingAddress (../../sb/StratX2_PCS.sol#2218) lacks a zero-check on :
+		- simpliStakingAddress = _simpliStakingAddress (../../sb/StratX2_PCS.sol#2223)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in StratX2.deposit(address,uint256) (../../sb/StratX2_PCS.sol#1797-1835):
+	External calls:
+	- IERC20(wantAddress).safeTransferFrom(address(msg.sender),address(this),_wantAmt) (../../sb/StratX2_PCS.sol#1807-1811)
+	State variables written after the call(s):
+	- sharesTotal = sharesTotal.add(sharesAdded) (../../sb/StratX2_PCS.sol#1826)
+	- wantLockedTotal = wantLockedTotal.add(_wantAmt) (../../sb/StratX2_PCS.sol#1831)
+Reentrancy in StratX2.earn() (../../sb/StratX2_PCS.sol#1907-2009):
+	External calls:
+	- _unfarm(0) (../../sb/StratX2_PCS.sol#1914)
+		- IPancakeswapFarm(farmContractAddress).leaveStaking(_wantAmt) (../../sb/StratX2_PCS.sol#1856)
+		- IPancakeswapFarm(farmContractAddress).withdraw(pid,_wantAmt) (../../sb/StratX2_PCS.sol#1858)
+	- _wrapBNB() (../../sb/StratX2_PCS.sol#1917)
+		- IWBNB(wbnbAddress).deposit{value: bnbBal}() (../../sb/StratX2_PCS.sol#2242)
+	- earnedAmt = distributeFees(earnedAmt,simpliStakingAddress,stakingFee,stakingFeeMax) (../../sb/StratX2_PCS.sol#1925-1930)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/StratX2_PCS.sol#946-950)
+		- IPancakeRouter02(_uniRouterAddress).swapExactTokensForTokensSupportingFeeOnTransferTokens(_amountIn,amountOut.mul(_slippageFactor).div(1000),_path,_to,_deadline) (../../sb/StratX2_PCS.sol#2264-2271)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/StratX2_PCS.sol#743-744)
+		- IERC20(earnedAddress).safeTransfer(_to,fee) (../../sb/StratX2_PCS.sol#2053)
+		- IERC20(earnedAddress).safeIncreaseAllowance(uniRouterAddress,fee) (../../sb/StratX2_PCS.sol#2055-2058)
+	- earnedAmt = distributeFees(earnedAmt,rewardsAddress,controllerFee,controllerFeeMax) (../../sb/StratX2_PCS.sol#1932-1937)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/StratX2_PCS.sol#946-950)
+		- IPancakeRouter02(_uniRouterAddress).swapExactTokensForTokensSupportingFeeOnTransferTokens(_amountIn,amountOut.mul(_slippageFactor).div(1000),_path,_to,_deadline) (../../sb/StratX2_PCS.sol#2264-2271)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/StratX2_PCS.sol#743-744)
+		- IERC20(earnedAddress).safeTransfer(_to,fee) (../../sb/StratX2_PCS.sol#2053)
+		- IERC20(earnedAddress).safeIncreaseAllowance(uniRouterAddress,fee) (../../sb/StratX2_PCS.sol#2055-2058)
+	- earnedAmt = distributeFees(earnedAmt,buyBackAddress,buyBackRate,buyBackRateMax) (../../sb/StratX2_PCS.sol#1939-1944)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/StratX2_PCS.sol#946-950)
+		- IPancakeRouter02(_uniRouterAddress).swapExactTokensForTokensSupportingFeeOnTransferTokens(_amountIn,amountOut.mul(_slippageFactor).div(1000),_path,_to,_deadline) (../../sb/StratX2_PCS.sol#2264-2271)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/StratX2_PCS.sol#743-744)
+		- IERC20(earnedAddress).safeTransfer(_to,fee) (../../sb/StratX2_PCS.sol#2053)
+		- IERC20(earnedAddress).safeIncreaseAllowance(uniRouterAddress,fee) (../../sb/StratX2_PCS.sol#2055-2058)
+	External calls sending eth:
+	- _wrapBNB() (../../sb/StratX2_PCS.sol#1917)
+		- IWBNB(wbnbAddress).deposit{value: bnbBal}() (../../sb/StratX2_PCS.sol#2242)
+	- earnedAmt = distributeFees(earnedAmt,simpliStakingAddress,stakingFee,stakingFeeMax) (../../sb/StratX2_PCS.sol#1925-1930)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/StratX2_PCS.sol#743-744)
+	- earnedAmt = distributeFees(earnedAmt,rewardsAddress,controllerFee,controllerFeeMax) (../../sb/StratX2_PCS.sol#1932-1937)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/StratX2_PCS.sol#743-744)
+	- earnedAmt = distributeFees(earnedAmt,buyBackAddress,buyBackRate,buyBackRateMax) (../../sb/StratX2_PCS.sol#1939-1944)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/StratX2_PCS.sol#743-744)
+	State variables written after the call(s):
+	- lastEarnBlock = block.number (../../sb/StratX2_PCS.sol#1947)
+Reentrancy in StratX2.earn() (../../sb/StratX2_PCS.sol#1907-2009):
+	External calls:
+	- _unfarm(0) (../../sb/StratX2_PCS.sol#1914)
+		- IPancakeswapFarm(farmContractAddress).leaveStaking(_wantAmt) (../../sb/StratX2_PCS.sol#1856)
+		- IPancakeswapFarm(farmContractAddress).withdraw(pid,_wantAmt) (../../sb/StratX2_PCS.sol#1858)
+	- _wrapBNB() (../../sb/StratX2_PCS.sol#1917)
+		- IWBNB(wbnbAddress).deposit{value: bnbBal}() (../../sb/StratX2_PCS.sol#2242)
+	- earnedAmt = distributeFees(earnedAmt,simpliStakingAddress,stakingFee,stakingFeeMax) (../../sb/StratX2_PCS.sol#1925-1930)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/StratX2_PCS.sol#946-950)
+		- IPancakeRouter02(_uniRouterAddress).swapExactTokensForTokensSupportingFeeOnTransferTokens(_amountIn,amountOut.mul(_slippageFactor).div(1000),_path,_to,_deadline) (../../sb/StratX2_PCS.sol#2264-2271)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/StratX2_PCS.sol#743-744)
+		- IERC20(earnedAddress).safeTransfer(_to,fee) (../../sb/StratX2_PCS.sol#2053)
+		- IERC20(earnedAddress).safeIncreaseAllowance(uniRouterAddress,fee) (../../sb/StratX2_PCS.sol#2055-2058)
+	- earnedAmt = distributeFees(earnedAmt,rewardsAddress,controllerFee,controllerFeeMax) (../../sb/StratX2_PCS.sol#1932-1937)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/StratX2_PCS.sol#946-950)
+		- IPancakeRouter02(_uniRouterAddress).swapExactTokensForTokensSupportingFeeOnTransferTokens(_amountIn,amountOut.mul(_slippageFactor).div(1000),_path,_to,_deadline) (../../sb/StratX2_PCS.sol#2264-2271)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/StratX2_PCS.sol#743-744)
+		- IERC20(earnedAddress).safeTransfer(_to,fee) (../../sb/StratX2_PCS.sol#2053)
+		- IERC20(earnedAddress).safeIncreaseAllowance(uniRouterAddress,fee) (../../sb/StratX2_PCS.sol#2055-2058)
+	- earnedAmt = distributeFees(earnedAmt,buyBackAddress,buyBackRate,buyBackRateMax) (../../sb/StratX2_PCS.sol#1939-1944)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/StratX2_PCS.sol#946-950)
+		- IPancakeRouter02(_uniRouterAddress).swapExactTokensForTokensSupportingFeeOnTransferTokens(_amountIn,amountOut.mul(_slippageFactor).div(1000),_path,_to,_deadline) (../../sb/StratX2_PCS.sol#2264-2271)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/StratX2_PCS.sol#743-744)
+		- IERC20(earnedAddress).safeTransfer(_to,fee) (../../sb/StratX2_PCS.sol#2053)
+		- IERC20(earnedAddress).safeIncreaseAllowance(uniRouterAddress,fee) (../../sb/StratX2_PCS.sol#2055-2058)
+	- IERC20(earnedAddress).safeApprove(uniRouterAddress,0) (../../sb/StratX2_PCS.sol#1952)
+	- IERC20(earnedAddress).safeIncreaseAllowance(uniRouterAddress,earnedAmt) (../../sb/StratX2_PCS.sol#1953-1956)
+	- _safeSwap(uniRouterAddress,earnedAmt.div(2),slippageFactor,earnedToToken0Path,address(this),block.timestamp.add(600)) (../../sb/StratX2_PCS.sol#1960-1967)
+		- IPancakeRouter02(_uniRouterAddress).swapExactTokensForTokensSupportingFeeOnTransferTokens(_amountIn,amountOut.mul(_slippageFactor).div(1000),_path,_to,_deadline) (../../sb/StratX2_PCS.sol#2264-2271)
+	- _safeSwap(uniRouterAddress,earnedAmt.div(2),slippageFactor,earnedToToken1Path,address(this),block.timestamp.add(600)) (../../sb/StratX2_PCS.sol#1972-1979)
+		- IPancakeRouter02(_uniRouterAddress).swapExactTokensForTokensSupportingFeeOnTransferTokens(_amountIn,amountOut.mul(_slippageFactor).div(1000),_path,_to,_deadline) (../../sb/StratX2_PCS.sol#2264-2271)
+	- IERC20(token0Address).safeIncreaseAllowance(uniRouterAddress,token0Amt) (../../sb/StratX2_PCS.sol#1986-1989)
+	- IERC20(token1Address).safeIncreaseAllowance(uniRouterAddress,token1Amt) (../../sb/StratX2_PCS.sol#1990-1993)
+	- IPancakeRouter02(uniRouterAddress).addLiquidity(token0Address,token1Address,token0Amt,token1Amt,0,0,address(this),block.timestamp.add(600)) (../../sb/StratX2_PCS.sol#1994-2003)
+	External calls sending eth:
+	- _wrapBNB() (../../sb/StratX2_PCS.sol#1917)
+		- IWBNB(wbnbAddress).deposit{value: bnbBal}() (../../sb/StratX2_PCS.sol#2242)
+	- earnedAmt = distributeFees(earnedAmt,simpliStakingAddress,stakingFee,stakingFeeMax) (../../sb/StratX2_PCS.sol#1925-1930)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/StratX2_PCS.sol#743-744)
+	- earnedAmt = distributeFees(earnedAmt,rewardsAddress,controllerFee,controllerFeeMax) (../../sb/StratX2_PCS.sol#1932-1937)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/StratX2_PCS.sol#743-744)
+	- earnedAmt = distributeFees(earnedAmt,buyBackAddress,buyBackRate,buyBackRateMax) (../../sb/StratX2_PCS.sol#1939-1944)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/StratX2_PCS.sol#743-744)
+	State variables written after the call(s):
+	- lastEarnBlock = block.number (../../sb/StratX2_PCS.sol#2006)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in StratX2.inCaseTokensGetStuck(address,uint256,address) (../../sb/StratX2_PCS.sol#2227-2236):
+	External calls:
+	- IERC20(_token).safeTransfer(_to,_amount) (../../sb/StratX2_PCS.sol#2234)
+	Event emitted after the call(s):
+	- InCaseTokensGetStuck(_token,_amount,_to) (../../sb/StratX2_PCS.sol#2235)
+Reentrancy in StratX2.wrapBNB() (../../sb/StratX2_PCS.sol#2246-2249):
+	External calls:
+	- _wrapBNB() (../../sb/StratX2_PCS.sol#2247)
+		- IWBNB(wbnbAddress).deposit{value: bnbBal}() (../../sb/StratX2_PCS.sol#2242)
+	Event emitted after the call(s):
+	- WrapBNB() (../../sb/StratX2_PCS.sol#2248)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Address.isContract(address) (../../sb/StratX2_PCS.sol#617-628) uses assembly
+	- INLINE ASM (../../sb/StratX2_PCS.sol#624-626)
+Address._verifyCallResult(bool,bytes,string) (../../sb/StratX2_PCS.sol#821-842) uses assembly
+	- INLINE ASM (../../sb/StratX2_PCS.sol#834-837)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.functionCall(address,bytes) (../../sb/StratX2_PCS.sol#678-683) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/StratX2_PCS.sol#710-722) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/StratX2_PCS.sol#791-801) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/StratX2_PCS.sol#809-819) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/StratX2_PCS.sol#754-765) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/StratX2_PCS.sol#773-783) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/StratX2_PCS.sol#646-658) is never used and should be removed
+Context._msgData() (../../sb/StratX2_PCS.sol#14-17) is never used and should be removed
+ERC20._burn(address,uint256) (../../sb/StratX2_PCS.sol#528-539) is never used and should be removed
+ERC20._mint(address,uint256) (../../sb/StratX2_PCS.sol#507-515) is never used and should be removed
+ERC20._setupDecimals(uint8) (../../sb/StratX2_PCS.sol#573-575) is never used and should be removed
+EnumerableSet._add(EnumerableSet.Set,bytes32) (../../sb/StratX2_PCS.sol#987-997) is never used and should be removed
+EnumerableSet._at(EnumerableSet.Set,uint256) (../../sb/StratX2_PCS.sol#1068-1078) is never used and should be removed
+EnumerableSet._contains(EnumerableSet.Set,bytes32) (../../sb/StratX2_PCS.sol#1043-1049) is never used and should be removed
+EnumerableSet._length(EnumerableSet.Set) (../../sb/StratX2_PCS.sol#1054-1056) is never used and should be removed
+EnumerableSet._remove(EnumerableSet.Set,bytes32) (../../sb/StratX2_PCS.sol#1005-1038) is never used and should be removed
+EnumerableSet.add(EnumerableSet.AddressSet,address) (../../sb/StratX2_PCS.sol#1160-1165) is never used and should be removed
+EnumerableSet.add(EnumerableSet.Bytes32Set,bytes32) (../../sb/StratX2_PCS.sol#1092-1097) is never used and should be removed
+EnumerableSet.add(EnumerableSet.UintSet,uint256) (../../sb/StratX2_PCS.sol#1228-1230) is never used and should be removed
+EnumerableSet.at(EnumerableSet.AddressSet,uint256) (../../sb/StratX2_PCS.sol#1208-1214) is never used and should be removed
+EnumerableSet.at(EnumerableSet.Bytes32Set,uint256) (../../sb/StratX2_PCS.sol#1140-1146) is never used and should be removed
+EnumerableSet.at(EnumerableSet.UintSet,uint256) (../../sb/StratX2_PCS.sol#1273-1279) is never used and should be removed
+EnumerableSet.contains(EnumerableSet.AddressSet,address) (../../sb/StratX2_PCS.sol#1183-1189) is never used and should be removed
+EnumerableSet.contains(EnumerableSet.Bytes32Set,bytes32) (../../sb/StratX2_PCS.sol#1115-1121) is never used and should be removed
+EnumerableSet.contains(EnumerableSet.UintSet,uint256) (../../sb/StratX2_PCS.sol#1248-1254) is never used and should be removed
+EnumerableSet.length(EnumerableSet.AddressSet) (../../sb/StratX2_PCS.sol#1194-1196) is never used and should be removed
+EnumerableSet.length(EnumerableSet.Bytes32Set) (../../sb/StratX2_PCS.sol#1126-1128) is never used and should be removed
+EnumerableSet.length(EnumerableSet.UintSet) (../../sb/StratX2_PCS.sol#1259-1261) is never used and should be removed
+EnumerableSet.remove(EnumerableSet.AddressSet,address) (../../sb/StratX2_PCS.sol#1173-1178) is never used and should be removed
+EnumerableSet.remove(EnumerableSet.Bytes32Set,bytes32) (../../sb/StratX2_PCS.sol#1105-1110) is never used and should be removed
+EnumerableSet.remove(EnumerableSet.UintSet,uint256) (../../sb/StratX2_PCS.sol#1238-1243) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/StratX2_PCS.sol#915-933) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/StratX2_PCS.sol#149-151) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/StratX2_PCS.sol#165-172) is never used and should be removed
+StratX2.buyBack(uint256) (../../sb/StratX2_PCS.sol#2011-2037) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.6.12 (../../sb/StratX2_PCS.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/StratX2_PCS.sol#646-658):
+	- (success) = recipient.call{value: amount}() (../../sb/StratX2_PCS.sol#653)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/StratX2_PCS.sol#730-746):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/StratX2_PCS.sol#743-744)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/StratX2_PCS.sol#773-783):
+	- (success,returndata) = target.staticcall(data) (../../sb/StratX2_PCS.sol#781)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/StratX2_PCS.sol#809-819):
+	- (success,returndata) = target.delegatecall(data) (../../sb/StratX2_PCS.sol#817)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Function IPancakeRouter01.WETH() (../../sb/StratX2_PCS.sol#1377) is not in mixedCase
+Parameter StratX2.deposit(address,uint256)._userAddress (../../sb/StratX2_PCS.sol#1797) is not in mixedCase
+Parameter StratX2.deposit(address,uint256)._wantAmt (../../sb/StratX2_PCS.sol#1797) is not in mixedCase
+Parameter StratX2.withdraw(address,uint256)._wantAmt (../../sb/StratX2_PCS.sol#1862) is not in mixedCase
+Parameter StratX2.buyBack(uint256)._earnedAmt (../../sb/StratX2_PCS.sol#2011) is not in mixedCase
+Parameter StratX2.distributeFees(uint256,address,uint256,uint256)._earnedAmt (../../sb/StratX2_PCS.sol#2039) is not in mixedCase
+Parameter StratX2.distributeFees(uint256,address,uint256,uint256)._to (../../sb/StratX2_PCS.sol#2039) is not in mixedCase
+Parameter StratX2.distributeFees(uint256,address,uint256,uint256)._fee (../../sb/StratX2_PCS.sol#2039) is not in mixedCase
+Parameter StratX2.distributeFees(uint256,address,uint256,uint256)._feeMax (../../sb/StratX2_PCS.sol#2039) is not in mixedCase
+Parameter StratX2.setSettings(uint256,uint256,uint256,uint256,uint256,uint256)._entranceFeeFactor (../../sb/StratX2_PCS.sol#2128) is not in mixedCase
+Parameter StratX2.setSettings(uint256,uint256,uint256,uint256,uint256,uint256)._withdrawFeeFactor (../../sb/StratX2_PCS.sol#2129) is not in mixedCase
+Parameter StratX2.setSettings(uint256,uint256,uint256,uint256,uint256,uint256)._controllerFee (../../sb/StratX2_PCS.sol#2130) is not in mixedCase
+Parameter StratX2.setSettings(uint256,uint256,uint256,uint256,uint256,uint256)._buyBackRate (../../sb/StratX2_PCS.sol#2131) is not in mixedCase
+Parameter StratX2.setSettings(uint256,uint256,uint256,uint256,uint256,uint256)._slippageFactor (../../sb/StratX2_PCS.sol#2132) is not in mixedCase
+Parameter StratX2.setSettings(uint256,uint256,uint256,uint256,uint256,uint256)._stakingFeeFactor (../../sb/StratX2_PCS.sol#2133) is not in mixedCase
+Parameter StratX2.setGov(address)._govAddress (../../sb/StratX2_PCS.sol#2181) is not in mixedCase
+Parameter StratX2.setOnlyGov(bool)._onlyGov (../../sb/StratX2_PCS.sol#2186) is not in mixedCase
+Parameter StratX2.setUniRouterAddress(address)._uniRouterAddress (../../sb/StratX2_PCS.sol#2191) is not in mixedCase
+Parameter StratX2.setBuyBackAddress(address)._buyBackAddress (../../sb/StratX2_PCS.sol#2200) is not in mixedCase
+Parameter StratX2.setRewardsAddress(address)._rewardsAddress (../../sb/StratX2_PCS.sol#2209) is not in mixedCase
+Parameter StratX2.setSimpliStakingAddress(address)._simpliStakingAddress (../../sb/StratX2_PCS.sol#2218) is not in mixedCase
+Parameter StratX2.inCaseTokensGetStuck(address,uint256,address)._token (../../sb/StratX2_PCS.sol#2228) is not in mixedCase
+Parameter StratX2.inCaseTokensGetStuck(address,uint256,address)._amount (../../sb/StratX2_PCS.sol#2229) is not in mixedCase
+Parameter StratX2.inCaseTokensGetStuck(address,uint256,address)._to (../../sb/StratX2_PCS.sol#2230) is not in mixedCase
+Parameter StratX2.isMember(address)._member (../../sb/StratX2_PCS.sol#2274) is not in mixedCase
+Parameter StratX2.addMember(address)._member (../../sb/StratX2_PCS.sol#2278) is not in mixedCase
+Parameter StratX2.removeMember(address)._member (../../sb/StratX2_PCS.sol#2284) is not in mixedCase
+Variable StratX2.SIMPLIAddress (../../sb/StratX2_PCS.sol#1729) is not in mixedCase
+Contract StratX2_PCS (../../sb/StratX2_PCS.sol#2291-2346) is not in CapWords
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/StratX2_PCS.sol#15)" inContext (../../sb/StratX2_PCS.sol#9-18)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Variable IPancakeRouter01.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountADesired (../../sb/StratX2_PCS.sol#1382) is too similar to IPancakeRouter01.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountBDesired (../../sb/StratX2_PCS.sol#1383)
+Variable StratX2.earnedToToken0Path (../../sb/StratX2_PCS.sol#1765) is too similar to StratX2.earnedToToken1Path (../../sb/StratX2_PCS.sol#1766)
+Variable StratX2.token0Address (../../sb/StratX2_PCS.sol#1722) is too similar to StratX2.token1Address (../../sb/StratX2_PCS.sol#1723)
+Variable StratX2.token0ToEarnedPath (../../sb/StratX2_PCS.sol#1767) is too similar to StratX2.token1ToEarnedPath (../../sb/StratX2_PCS.sol#1768)
+Variable StratX2_PCS.constructor(address[],uint256,bool,bool,bool,address[],address[],address[],address[],address[],uint256,uint256,uint256,uint256,uint256)._earnedToToken0Path (../../sb/StratX2_PCS.sol#2299) is too similar to StratX2_PCS.constructor(address[],uint256,bool,bool,bool,address[],address[],address[],address[],address[],uint256,uint256,uint256,uint256,uint256)._earnedToToken1Path (../../sb/StratX2_PCS.sol#2300)
+Variable StratX2_PCS.constructor(address[],uint256,bool,bool,bool,address[],address[],address[],address[],address[],uint256,uint256,uint256,uint256,uint256)._token0ToEarnedPath (../../sb/StratX2_PCS.sol#2301) is too similar to StratX2_PCS.constructor(address[],uint256,bool,bool,bool,address[],address[],address[],address[],address[],uint256,uint256,uint256,uint256,uint256)._token1ToEarnedPath (../../sb/StratX2_PCS.sol#2302)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+StratX2.SIMPLIAddress (../../sb/StratX2_PCS.sol#1729) should be immutable 
+StratX2.earnedAddress (../../sb/StratX2_PCS.sol#1724) should be immutable 
+StratX2.farmContractAddress (../../sb/StratX2_PCS.sol#1719) should be immutable 
+StratX2.isAutoComp (../../sb/StratX2_PCS.sol#1717) should be immutable 
+StratX2.isCAKEStaking (../../sb/StratX2_PCS.sol#1715) should be immutable 
+StratX2.isSameAssetDeposit (../../sb/StratX2_PCS.sol#1716) should be immutable 
+StratX2.pid (../../sb/StratX2_PCS.sol#1720) should be immutable 
+StratX2.simpliFarmAddress (../../sb/StratX2_PCS.sol#1728) should be immutable 
+StratX2.token0Address (../../sb/StratX2_PCS.sol#1722) should be immutable 
+StratX2.token1Address (../../sb/StratX2_PCS.sol#1723) should be immutable 
+StratX2.wantAddress (../../sb/StratX2_PCS.sol#1721) should be immutable 
+StratX2.wbnbAddress (../../sb/StratX2_PCS.sol#1727) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/StratX2_PCS.sol analyzed (16 contracts with 93 detectors), 103 result(s) found

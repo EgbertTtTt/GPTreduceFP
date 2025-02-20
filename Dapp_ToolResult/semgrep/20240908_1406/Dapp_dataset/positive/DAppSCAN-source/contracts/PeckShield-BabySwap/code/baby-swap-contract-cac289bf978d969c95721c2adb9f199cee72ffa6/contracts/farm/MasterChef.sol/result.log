@@ -1,0 +1,346 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 76 findings.
+                    
+                    
+┌──────────────────┐
+│ 76 Code Findings │
+└──────────────────┘
+                       
+    /sb/MasterChef.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          462┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          471┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          494┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          503┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          515┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          647┆ contract BEP20 is Context, IBEP20, Ownable {
+            ⋮┆----------------------------------------
+         1464┆ contract MasterChef is Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+         1509┆ uint256 public totalAllocPoint = 0;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          670┆ constructor(string memory name_, string memory symbol_) {
+          671┆     _name = name_;
+          672┆     _symbol = symbol_;
+          673┆     _decimals = 18;
+          674┆ }
+            ⋮┆----------------------------------------
+         1197┆ constructor(
+         1198┆     BabyToken _cake
+         1199┆ ) {
+         1200┆     cake = _cake;
+         1201┆ }
+            ⋮┆----------------------------------------
+         1517┆ constructor(
+         1518┆     BabyToken _cake,
+         1519┆     SyrupBar _syrup,
+         1520┆     uint256 _cakePerBlock,
+         1521┆     uint256 _startBlock
+         1522┆ ) {
+         1523┆     cake = _cake;
+         1524┆     syrup = _syrup;
+         1525┆     cakePerBlock = _cakePerBlock;
+         1526┆     startBlock = _startBlock;
+             [hid 12 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+         1103┆ Checkpoint memory cp = checkpoints[account][center];
+            ⋮┆----------------------------------------
+         1367┆ Checkpoint memory cp = checkpoints[account][center];
+            ⋮┆----------------------------------------
+         1582┆ points = points.add(poolInfo[pid].allocPoint);
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+         1581┆ for (uint256 pid = 1; pid < length; ++pid) {
+            ⋮┆----------------------------------------
+         1630┆ for (uint256 pid = 0; pid < length; ++pid) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           31┆ require(c >= a, 'SafeMath: addition overflow');
+            ⋮┆----------------------------------------
+           90┆ require(c / a == b, 'SafeMath: multiplication overflow');
+            ⋮┆----------------------------------------
+          337┆ require(address(this).balance >= amount, 'Address: insufficient  
+  balance');                                                                    
+            ⋮┆----------------------------------------
+          341┆ require(success, 'Address: unable to send value, recipient may   
+  have reverted');                                                              
+            ⋮┆----------------------------------------
+          411┆ require(address(this).balance >= value, 'Address: insufficient   
+  balance for call');                                                           
+            ⋮┆----------------------------------------
+          421┆ require(isContract(target), 'Address: call to non-contract');
+            ⋮┆----------------------------------------
+          490┆ require(
+          491┆     (value == 0) || (token.allowance(address(this), spender) ==  
+  0),                                                                           
+          492┆     'SafeBEP20: approve from non-zero to non-zero allowance'
+          493┆ );
+            ⋮┆----------------------------------------
+          533┆ require(abi.decode(returndata, (bool)), 'SafeBEP20: BEP20        
+  operation did not succeed');                                                  
+            ⋮┆----------------------------------------
+          596┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          617┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          848┆ require(sender != address(0), 'BEP20: transfer from the zero     
+  address');                                                                    
+            ⋮┆----------------------------------------
+          849┆ require(recipient != address(0), 'BEP20: transfer to the zero    
+  address');                                                                    
+            ⋮┆----------------------------------------
+          866┆ require(account != address(0), 'BEP20: mint to the zero          
+  address');                                                                    
+            ⋮┆----------------------------------------
+          885┆ require(account != address(0), 'BEP20: burn from the zero        
+  address');                                                                    
+            ⋮┆----------------------------------------
+          910┆ require(owner != address(0), 'BEP20: approve from the zero       
+  address');                                                                    
+            ⋮┆----------------------------------------
+          911┆ require(spender != address(0), 'BEP20: approve to the zero       
+  address');                                                                    
+            ⋮┆----------------------------------------
+          940┆ require(totalSupply() <= maxSupply, "reach max supply");
+            ⋮┆----------------------------------------
+          946┆ require(totalSupply() <= maxSupply, "reach max supply");
+            ⋮┆----------------------------------------
+         1050┆ require(signatory != address(0), "CAKE::delegateBySig: invalid   
+  signature");                                                                  
+            ⋮┆----------------------------------------
+         1051┆ require(nonce == nonces[signatory]++, "CAKE::delegateBySig:      
+  invalid nonce");                                                              
+            ⋮┆----------------------------------------
+         1052┆ require(block.timestamp <= expiry, "CAKE::delegateBySig:         
+  signature expired");                                                          
+            ⋮┆----------------------------------------
+         1082┆ require(blockNumber < block.number, "CAKE::getPriorVotes: not yet
+  determined");                                                                 
+            ⋮┆----------------------------------------
+         1314┆ require(signatory != address(0), "CAKE::delegateBySig: invalid   
+  signature");                                                                  
+            ⋮┆----------------------------------------
+         1315┆ require(nonce == nonces[signatory]++, "CAKE::delegateBySig:      
+  invalid nonce");                                                              
+            ⋮┆----------------------------------------
+         1316┆ require(block.timestamp <= expiry, "CAKE::delegateBySig:         
+  signature expired");                                                          
+            ⋮┆----------------------------------------
+         1346┆ require(blockNumber < block.number, "CAKE::getPriorVotes: not yet
+  determined");                                                                 
+            ⋮┆----------------------------------------
+         1598┆ require(address(migrator) != address(0), "migrate: no migrator");
+            ⋮┆----------------------------------------
+         1604┆ require(bal == newLpToken.balanceOf(address(this)), "migrate:    
+  bad");                                                                        
+            ⋮┆----------------------------------------
+         1657┆ require (_pid != 0, 'deposit CAKE by staking');
+            ⋮┆----------------------------------------
+         1680┆ require (_pid != 0, 'withdraw CAKE by unstaking');
+            ⋮┆----------------------------------------
+         1683┆ require(user.amount >= _amount, "withdraw: not good");
+            ⋮┆----------------------------------------
+         1723┆ require(user.amount >= _amount, "withdraw: not good");
+            ⋮┆----------------------------------------
+         1759┆ require(newOwner_ != address(0), 'illegal address');
+            ⋮┆----------------------------------------
+         1764┆ require(newOwner_ != address(0), 'illegal address');
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         1128┆ if (srcRep != dstRep && amount > 0) {
+         1129┆     if (srcRep != address(0)) {
+         1130┆         // decrease old representative
+         1131┆         uint32 srcRepNum = numCheckpoints[srcRep];
+         1132┆         uint256 srcRepOld = srcRepNum > 0 ?                      
+  checkpoints[srcRep][srcRepNum - 1].votes : 0;                                 
+         1133┆         uint256 srcRepNew = srcRepOld.sub(amount);
+         1134┆         _writeCheckpoint(srcRep, srcRepNum, srcRepOld,           
+  srcRepNew);                                                                   
+         1135┆     }
+         1136┆ 
+         1137┆     if (dstRep != address(0)) {
+             [hid 7 additional lines, adjust with --max-lines-per-finding] 
+         1157┆ if (nCheckpoints > 0 && checkpoints[delegatee][nCheckpoints -    
+  1].fromBlock == blockNumber) {                                                
+         1158┆     checkpoints[delegatee][nCheckpoints - 1].votes = newVotes;
+         1159┆ } else {
+         1160┆     checkpoints[delegatee][nCheckpoints] =                       
+  Checkpoint(blockNumber, newVotes);                                            
+         1161┆     numCheckpoints[delegatee] = nCheckpoints + 1;
+         1162┆ }
+            ⋮┆----------------------------------------
+         1392┆ if (srcRep != dstRep && amount > 0) {
+         1393┆     if (srcRep != address(0)) {
+         1394┆         // decrease old representative
+         1395┆         uint32 srcRepNum = numCheckpoints[srcRep];
+         1396┆         uint256 srcRepOld = srcRepNum > 0 ?                      
+  checkpoints[srcRep][srcRepNum - 1].votes : 0;                                 
+         1397┆         uint256 srcRepNew = srcRepOld.sub(amount);
+         1398┆         _writeCheckpoint(srcRep, srcRepNum, srcRepOld,           
+  srcRepNew);                                                                   
+         1399┆     }
+         1400┆ 
+         1401┆     if (dstRep != address(0)) {
+             [hid 7 additional lines, adjust with --max-lines-per-finding] 
+         1421┆ if (nCheckpoints > 0 && checkpoints[delegatee][nCheckpoints -    
+  1].fromBlock == blockNumber) {                                                
+         1422┆     checkpoints[delegatee][nCheckpoints - 1].votes = newVotes;
+         1423┆ } else {
+         1424┆     checkpoints[delegatee][nCheckpoints] =                       
+  Checkpoint(blockNumber, newVotes);                                            
+         1425┆     numCheckpoints[delegatee] = nCheckpoints + 1;
+         1426┆ }
+            ⋮┆----------------------------------------
+         1619┆ if (block.number > pool.lastRewardBlock && lpSupply != 0) {
+         1620┆     uint256 multiplier = getMultiplier(pool.lastRewardBlock,     
+  block.number);                                                                
+         1621┆     uint256 cakeReward =                                         
+  multiplier.mul(cakePerBlock).mul(pool.allocPoint).div(totalAllocPoint);       
+         1622┆     accCakePerShare =                                            
+  accCakePerShare.add(cakeReward.mul(1e12).div(lpSupply));                      
+         1623┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+         1051┆ require(nonce == nonces[signatory]++, "CAKE::delegateBySig:      
+  invalid nonce");                                                              
+            ⋮┆----------------------------------------
+         1315┆ require(nonce == nonces[signatory]++, "CAKE::delegateBySig:      
+  invalid nonce");                                                              
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           90┆ require(c / a == b, 'SafeMath: multiplication overflow');
+            ⋮┆----------------------------------------
+          341┆ require(success, 'Address: unable to send value, recipient may   
+  have reverted');                                                              
+            ⋮┆----------------------------------------
+          411┆ require(address(this).balance >= value, 'Address: insufficient   
+  balance for call');                                                           
+            ⋮┆----------------------------------------
+          490┆ require(
+          491┆     (value == 0) || (token.allowance(address(this), spender) ==  
+  0),                                                                           
+          492┆     'SafeBEP20: approve from non-zero to non-zero allowance'
+          493┆ );
+            ⋮┆----------------------------------------
+          533┆ require(abi.decode(returndata, (bool)), 'SafeBEP20: BEP20        
+  operation did not succeed');                                                  
+            ⋮┆----------------------------------------
+          617┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          848┆ require(sender != address(0), 'BEP20: transfer from the zero     
+  address');                                                                    
+            ⋮┆----------------------------------------
+          849┆ require(recipient != address(0), 'BEP20: transfer to the zero    
+  address');                                                                    
+            ⋮┆----------------------------------------
+          885┆ require(account != address(0), 'BEP20: burn from the zero        
+  address');                                                                    
+            ⋮┆----------------------------------------
+          910┆ require(owner != address(0), 'BEP20: approve from the zero       
+  address');                                                                    
+            ⋮┆----------------------------------------
+          911┆ require(spender != address(0), 'BEP20: approve to the zero       
+  address');                                                                    
+            ⋮┆----------------------------------------
+         1050┆ require(signatory != address(0), "CAKE::delegateBySig: invalid   
+  signature");                                                                  
+            ⋮┆----------------------------------------
+         1051┆ require(nonce == nonces[signatory]++, "CAKE::delegateBySig:      
+  invalid nonce");                                                              
+            ⋮┆----------------------------------------
+         1052┆ require(block.timestamp <= expiry, "CAKE::delegateBySig:         
+  signature expired");                                                          
+            ⋮┆----------------------------------------
+         1082┆ require(blockNumber < block.number, "CAKE::getPriorVotes: not yet
+  determined");                                                                 
+            ⋮┆----------------------------------------
+         1314┆ require(signatory != address(0), "CAKE::delegateBySig: invalid   
+  signature");                                                                  
+            ⋮┆----------------------------------------
+         1315┆ require(nonce == nonces[signatory]++, "CAKE::delegateBySig:      
+  invalid nonce");                                                              
+            ⋮┆----------------------------------------
+         1316┆ require(block.timestamp <= expiry, "CAKE::delegateBySig:         
+  signature expired");                                                          
+            ⋮┆----------------------------------------
+         1346┆ require(blockNumber < block.number, "CAKE::getPriorVotes: not yet
+  determined");                                                                 
+
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

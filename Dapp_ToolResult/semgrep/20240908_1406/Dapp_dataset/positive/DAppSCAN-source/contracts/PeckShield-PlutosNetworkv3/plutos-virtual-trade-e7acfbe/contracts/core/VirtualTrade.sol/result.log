@@ -1,0 +1,294 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 74 Code Findings │
+└──────────────────┘
+                         
+    /sb/VirtualTrade.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          563┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          567┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          574┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          579┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          584┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          610┆ contract VirtualTrade is Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          110┆ for (uint i = 0; i< self.length;i++){
+            ⋮┆----------------------------------------
+          119┆ for (uint i = 0; i< self.length;i++){
+            ⋮┆----------------------------------------
+          513┆ for(uint i = 0; i < transferListeners.length; i++){
+            ⋮┆----------------------------------------
+          681┆ for (uint i = 0; i< all_names.length;i++){
+            ⋮┆----------------------------------------
+          715┆ for (uint i = 0; i < all_names.length; i++){
+            ⋮┆----------------------------------------
+          723┆ for (uint i = 0; i < all_names.length; i++){
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+           39┆ constructor () internal {
+           40┆     address msgSender = msg.sender;
+           41┆     _contract_owner = msgSender;
+           42┆     emit OwnershipTransferred(address(0), msgSender);
+           43┆ }
+            ⋮┆----------------------------------------
+          221┆ constructor(
+          222┆     ERC20Base _parentToken,
+          223┆     uint _parentSnapShotBlock,
+          224┆     string memory _tokenName,
+          225┆     uint8 _decimalUnits,
+          226┆     string memory _tokenSymbol,
+          227┆     bool _transfersEnabled
+          228┆ )  public
+          229┆ {
+          230┆     name = _tokenName;                                 // Set the
+  name                                                                          
+             [hid 7 additional lines, adjust with --max-lines-per-finding] 
+          625┆ constructor (address _chip, address _oracle) public{
+          626┆     chip = _chip;
+          627┆     oracle = OracleInterface(_oracle);
+          628┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          513┆ for(uint i = 0; i < transferListeners.length; i++){
+            ⋮┆----------------------------------------
+          514┆ TransferEventCallBack t =                                        
+  TransferEventCallBack(transferListeners[i]);                                  
+            ⋮┆----------------------------------------
+          681┆ for (uint i = 0; i< all_names.length;i++){
+            ⋮┆----------------------------------------
+          682┆ if (keccak256(abi.encodePacked(all_names[i])) ==                 
+  keccak256(abi.encodePacked(str))){                                            
+            ⋮┆----------------------------------------
+          715┆ for (uint i = 0; i < all_names.length; i++){
+            ⋮┆----------------------------------------
+          716┆ amount =                                                         
+  amount.safeAdd(all_assets[all_names[i]].total_position.safeMul(oracle.get_asse
+  t_price(all_names[i])).safeDiv(1e18));                                        
+            ⋮┆----------------------------------------
+          716┆ amount =                                                         
+  amount.safeAdd(all_assets[all_names[i]].total_position.safeMul(oracle.get_asse
+  t_price(all_names[i])).safeDiv(1e18));                                        
+            ⋮┆----------------------------------------
+          716┆ amount =                                                         
+  amount.safeAdd(all_assets[all_names[i]].total_position.safeMul(oracle.get_asse
+  t_price(all_names[i])).safeDiv(1e18));                                        
+            ⋮┆----------------------------------------
+          716┆ amount =                                                         
+  amount.safeAdd(all_assets[all_names[i]].total_position.safeMul(oracle.get_asse
+  t_price(all_names[i])).safeDiv(1e18));                                        
+            ⋮┆----------------------------------------
+          723┆ for (uint i = 0; i < all_names.length; i++){
+            ⋮┆----------------------------------------
+          724┆ amount =                                                         
+  amount.safeAdd(all_assets[all_names[i]].position[addr].safeMul(oracle.get_asse
+  t_price(all_names[i])).safeDiv(1e18));                                        
+            ⋮┆----------------------------------------
+          724┆ amount =                                                         
+  amount.safeAdd(all_assets[all_names[i]].position[addr].safeMul(oracle.get_asse
+  t_price(all_names[i])).safeDiv(1e18));                                        
+            ⋮┆----------------------------------------
+          724┆ amount =                                                         
+  amount.safeAdd(all_assets[all_names[i]].position[addr].safeMul(oracle.get_asse
+  t_price(all_names[i])).safeDiv(1e18));                                        
+            ⋮┆----------------------------------------
+          724┆ amount =                                                         
+  amount.safeAdd(all_assets[all_names[i]].position[addr].safeMul(oracle.get_asse
+  t_price(all_names[i])).safeDiv(1e18));                                        
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          110┆ for (uint i = 0; i< self.length;i++){
+            ⋮┆----------------------------------------
+          119┆ for (uint i = 0; i< self.length;i++){
+            ⋮┆----------------------------------------
+          513┆ for(uint i = 0; i < transferListeners.length; i++){
+            ⋮┆----------------------------------------
+          681┆ for (uint i = 0; i< all_names.length;i++){
+            ⋮┆----------------------------------------
+          715┆ for (uint i = 0; i < all_names.length; i++){
+            ⋮┆----------------------------------------
+          723┆ for (uint i = 0; i < all_names.length; i++){
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           26┆ require(status, "call failed");
+            ⋮┆----------------------------------------
+           56┆ require(_contract_owner == msg.sender, "Ownable: caller is not   
+  the owner");                                                                  
+            ⋮┆----------------------------------------
+           72┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+           81┆ require(c >= a, "add");
+            ⋮┆----------------------------------------
+           84┆ require(b <= a, "sub");
+            ⋮┆----------------------------------------
+           89┆ require(a == 0 || c / a == b, "mul");
+            ⋮┆----------------------------------------
+           92┆ require(b > 0, "div");
+            ⋮┆----------------------------------------
+          124┆ require(false, "AddressArray:index_of, not exist");
+            ⋮┆----------------------------------------
+          550┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          554┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          571┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          572┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          573┆ );
+            ⋮┆----------------------------------------
+          587┆ require(address(token).isContract(), "SafeERC20: call to         
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          591┆ require(success, "SafeERC20: low-level call failed");
+            ⋮┆----------------------------------------
+          595┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          638┆ require(IERC20(chip).balanceOf(owner) >= amount, "not enough     
+  chip");                                                                       
+            ⋮┆----------------------------------------
+          639┆ require(owner == msg.sender || allowed[owner][msg.sender],       
+  "permission denied");                                                         
+            ⋮┆----------------------------------------
+          641┆ require(asset.exist, "invalid asset");
+            ⋮┆----------------------------------------
+          643┆ require(price > min_price, "price too low");
+            ⋮┆----------------------------------------
+          645┆ require (rec_amount >= min_rec, "Buy sllipage");
+            ⋮┆----------------------------------------
+          657┆ require(asset.exist, "invalid asset");
+            ⋮┆----------------------------------------
+          658┆ require(owner == msg.sender || allowed[owner][msg.sender],       
+  "permission denied");                                                         
+            ⋮┆----------------------------------------
+          659┆ require(asset.position[owner] >= amount, "not enough position");
+            ⋮┆----------------------------------------
+          661┆ require(chip_amount >= min_rec, "Sell sllipage");
+            ⋮┆----------------------------------------
+          673┆ require(asset.exist, "invalid asset");
+            ⋮┆----------------------------------------
+          674┆ require(asset.position[msg.sender] >= amount, "not enough        
+  position");                                                                   
+            ⋮┆----------------------------------------
+          686┆ require(false, "name not found");
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          281┆ require((_to != address(0)) && (_to != address(this)));
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-decrement-not-postfix                    
+          Consider using the prefix decrement expression whenever the return    
+  value is not needed. The                                                      
+          prefix decrement expression is cheaper in terms of gas.               
+                                                                                
+          132┆ self.length--;
+            ⋮┆----------------------------------------
+          694┆ all_names.length--;
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          110┆ for (uint i = 0; i< self.length;i++){
+            ⋮┆----------------------------------------
+          119┆ for (uint i = 0; i< self.length;i++){
+            ⋮┆----------------------------------------
+          513┆ for(uint i = 0; i < transferListeners.length; i++){
+            ⋮┆----------------------------------------
+          681┆ for (uint i = 0; i< all_names.length;i++){
+            ⋮┆----------------------------------------
+          715┆ for (uint i = 0; i < all_names.length; i++){
+            ⋮┆----------------------------------------
+          723┆ for (uint i = 0; i < all_names.length; i++){
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           72┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          554┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          571┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          572┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          573┆ );
+            ⋮┆----------------------------------------
+          595┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 74 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

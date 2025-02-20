@@ -1,0 +1,181 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 38 Code Findings │
+└──────────────────┘
+               
+    /sb/ve.sol 
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          427┆ constructor(
+          428┆     address token_addr
+          429┆ ) {
+          430┆     token = token_addr;
+          431┆     voter = msg.sender;
+          432┆     point_history[0].blk = block.number;
+          433┆     point_history[0].ts = block.timestamp;
+          434┆ 
+          435┆     supportedInterfaces[ERC165_INTERFACE_ID] = true;
+          436┆     supportedInterfaces[ERC721_INTERFACE_ID] = true;
+             [hid 7 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          834┆ d_slope = slope_changes[t_i];
+            ⋮┆----------------------------------------
+          854┆ point_history[_epoch] = last_point;
+            ⋮┆----------------------------------------
+         1124┆ if (point_history[_mid].blk <= _block) {
+            ⋮┆----------------------------------------
+         1194┆ if (user_point_history[_tokenId][_mid].blk <= _block) {
+            ⋮┆----------------------------------------
+         1246┆ d_slope = slope_changes[t_i];
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          826┆ for (uint i = 0; i < 255; ++i) {
+            ⋮┆----------------------------------------
+         1118┆ for (uint i = 0; i < 128; ++i) {
+            ⋮┆----------------------------------------
+         1188┆ for (uint i = 0; i < 128; ++i) {
+            ⋮┆----------------------------------------
+         1240┆ for (uint i = 0; i < 255; ++i) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          618┆ require(attachments[_tokenId] == 0 && !voted[_tokenId],          
+  "attached");                                                                  
+            ⋮┆----------------------------------------
+          689┆ revert('ERC721: transfer to non ERC721Receiver implementer');
+            ⋮┆----------------------------------------
+          975┆ require(attachments[_from] == 0 && !voted[_from], "attached");
+            ⋮┆----------------------------------------
+         1009┆ require(_locked.amount > 0, 'No existing lock found');
+            ⋮┆----------------------------------------
+         1010┆ require(_locked.end > block.timestamp, 'Cannot add to expired    
+  lock. Withdraw');                                                             
+            ⋮┆----------------------------------------
+         1022┆ require(unlock_time > block.timestamp, 'Can only lock until time 
+  in the future');                                                              
+            ⋮┆----------------------------------------
+         1023┆ require(unlock_time <= block.timestamp + MAXTIME, 'Voting lock   
+  can be 4 years max');                                                         
+            ⋮┆----------------------------------------
+         1056┆ require(_locked.amount > 0, 'No existing lock found');
+            ⋮┆----------------------------------------
+         1057┆ require(_locked.end > block.timestamp, 'Cannot add to expired    
+  lock. Withdraw');                                                             
+            ⋮┆----------------------------------------
+         1070┆ require(_locked.end > block.timestamp, 'Lock expired');
+            ⋮┆----------------------------------------
+         1071┆ require(_locked.amount > 0, 'Nothing is locked');
+            ⋮┆----------------------------------------
+         1072┆ require(unlock_time > _locked.end, 'Can only increase lock       
+  duration');                                                                   
+            ⋮┆----------------------------------------
+         1073┆ require(unlock_time <= block.timestamp + MAXTIME, 'Voting lock   
+  can be 4 years max');                                                         
+            ⋮┆----------------------------------------
+         1082┆ require(attachments[_tokenId] == 0 && !voted[_tokenId],          
+  "attached");                                                                  
+            ⋮┆----------------------------------------
+         1085┆ require(block.timestamp >= _locked.end, "The lock didn't         
+  expire");                                                                     
+            ⋮┆----------------------------------------
+         1155┆ require(idToOwner[_tokenId] != address(0), "Query for nonexistent
+  token");                                                                      
+            ⋮┆----------------------------------------
+         1333┆ require(_isApprovedOrOwner(msg.sender, _tokenId), "caller is not 
+  owner nor approved");                                                         
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          618┆ require(attachments[_tokenId] == 0 && !voted[_tokenId],          
+  "attached");                                                                  
+            ⋮┆----------------------------------------
+          975┆ require(attachments[_from] == 0 && !voted[_from], "attached");
+            ⋮┆----------------------------------------
+         1082┆ require(attachments[_tokenId] == 0 && !voted[_tokenId],          
+  "attached");                                                                  
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          785┆ if (old_locked.end > block.timestamp && old_locked.amount > 0) {
+          786┆     u_old.slope = old_locked.amount / iMAXTIME;
+          787┆     u_old.bias = u_old.slope * int128(int256(old_locked.end -    
+  block.timestamp));                                                            
+          788┆ }
+            ⋮┆----------------------------------------
+          789┆ if (new_locked.end > block.timestamp && new_locked.amount > 0) {
+          790┆     u_new.slope = new_locked.amount / iMAXTIME;
+          791┆     u_new.bias = u_new.slope * int128(int256(new_locked.end -    
+  block.timestamp));                                                            
+          792┆ }
+            ⋮┆----------------------------------------
+          941┆ if (_value != 0 && deposit_type != DepositType.MERGE_TYPE) {
+          942┆     assert(IERC20(token).transferFrom(from, address(this),       
+  _value));                                                                     
+          943┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+         1320┆ digits++;
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          689┆ revert('ERC721: transfer to non ERC721Receiver implementer');
+            ⋮┆----------------------------------------
+         1010┆ require(_locked.end > block.timestamp, 'Cannot add to expired    
+  lock. Withdraw');                                                             
+            ⋮┆----------------------------------------
+         1022┆ require(unlock_time > block.timestamp, 'Can only lock until time 
+  in the future');                                                              
+            ⋮┆----------------------------------------
+         1057┆ require(_locked.end > block.timestamp, 'Cannot add to expired    
+  lock. Withdraw');                                                             
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 38 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

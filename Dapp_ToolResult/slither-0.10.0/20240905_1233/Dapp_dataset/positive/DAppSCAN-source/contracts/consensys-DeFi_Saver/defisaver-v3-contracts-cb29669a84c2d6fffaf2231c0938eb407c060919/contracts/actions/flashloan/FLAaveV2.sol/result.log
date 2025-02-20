@@ -1,0 +1,152 @@
+'solc --version' running
+'solc /sb/FLAaveV2.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+TokenUtils.pullTokens(address,address,uint256) (../../sb/FLAaveV2.sol#1683-1701) uses arbitrary from in transferFrom: IERC20(_token).safeTransferFrom(_from,address(this),_amount) (../../sb/FLAaveV2.sol#1697)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#arbitrary-from-in-transferfrom
+
+IWETH (../../sb/FLAaveV2.sol#1645-1663) has incorrect ERC20 function interface:IWETH.approve(address,uint256) (../../sb/FLAaveV2.sol#1650)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-erc20-interface
+
+FLAaveV2.executeOperation(address[],uint256[],uint256[],address,bytes) (../../sb/FLAaveV2.sol#1837-1868) ignores return value by _assets[i].withdrawTokens(proxy,_amounts[i]) (../../sb/FLAaveV2.sol#1851)
+FLAaveV2.executeOperation(address[],uint256[],uint256[],address,bytes) (../../sb/FLAaveV2.sol#1837-1868) ignores return value by IDSProxy(proxy).execute{value: address(this).balance}(taskExecutor,abi.encodeWithSelector(CALLBACK_SELECTOR,currTask,bytes32(_amounts[0] + _fees[0]))) (../../sb/FLAaveV2.sol#1857-1860)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+AdminVault.changeOwner(address)._owner (../../sb/FLAaveV2.sol#285) lacks a zero-check on :
+		- owner = _owner (../../sb/FLAaveV2.sol#287)
+AdminVault.changeAdmin(address)._admin (../../sb/FLAaveV2.sol#292) lacks a zero-check on :
+		- admin = _admin (../../sb/FLAaveV2.sol#294)
+AdminAuth.withdrawStuckFunds(address,address,uint256)._receiver (../../sb/FLAaveV2.sol#316) lacks a zero-check on :
+		- address(_receiver).transfer(_amount) (../../sb/FLAaveV2.sol#318)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+DFSRegistry.approveContractChange(bytes32) (../../sb/FLAaveV2.sol#466-488) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp >= (entries[_id].changeStartTime + entries[_id].waitPeriod),ERR_CHANGE_NOT_READY) (../../sb/FLAaveV2.sol#469-472)
+DFSRegistry.approveWaitPeriodChange(bytes32) (../../sb/FLAaveV2.sol#532-554) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp >= (entries[_id].changeStartTime + entries[_id].waitPeriod),ERR_CHANGE_NOT_READY) (../../sb/FLAaveV2.sol#535-538)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/FLAaveV2.sol#48-59) uses assembly
+	- INLINE ASM (../../sb/FLAaveV2.sol#55-57)
+Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/FLAaveV2.sol#100-126) uses assembly
+	- INLINE ASM (../../sb/FLAaveV2.sol#118-121)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+ActionBase._parseParamABytes32(bytes32,uint8,bytes[],bytes32[]) (../../sb/FLAaveV2.sol#677-692) is never used and should be removed
+ActionBase._parseParamAddr(address,uint8,bytes[],bytes32[]) (../../sb/FLAaveV2.sol#655-670) is never used and should be removed
+ActionBase._parseParamUint(uint256,uint8,bytes[],bytes32[]) (../../sb/FLAaveV2.sol#632-647) is never used and should be removed
+ActionBase.getReturnIndex(uint8) (../../sb/FLAaveV2.sol#708-712) is never used and should be removed
+ActionBase.getSubIndex(uint8) (../../sb/FLAaveV2.sol#716-720) is never used and should be removed
+ActionBase.isReplacable(uint8) (../../sb/FLAaveV2.sol#696-698) is never used and should be removed
+ActionBase.isReturnInjection(uint8) (../../sb/FLAaveV2.sol#702-704) is never used and should be removed
+Address.functionCall(address,bytes) (../../sb/FLAaveV2.sol#69-71) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/FLAaveV2.sol#81-88) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/FLAaveV2.sol#90-98) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/FLAaveV2.sol#61-67) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/FLAaveV2.sol#245-258) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/FLAaveV2.sol#233-243) is never used and should be removed
+SafeERC20.safeTransferFrom(IERC20,address,address,uint256) (../../sb/FLAaveV2.sol#208-218) is never used and should be removed
+SafeMath.add(uint256,uint256) (../../sb/FLAaveV2.sol#130-135) is never used and should be removed
+SafeMath.div(uint256,uint256) (../../sb/FLAaveV2.sol#166-168) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/FLAaveV2.sol#170-180) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/FLAaveV2.sol#182-184) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/FLAaveV2.sol#186-193) is never used and should be removed
+SafeMath.mul(uint256,uint256) (../../sb/FLAaveV2.sol#152-164) is never used and should be removed
+SafeMath.sub(uint256,uint256) (../../sb/FLAaveV2.sol#137-139) is never used and should be removed
+SafeMath.sub(uint256,uint256,string) (../../sb/FLAaveV2.sol#141-150) is never used and should be removed
+TokenUtils.depositWeth(uint256) (../../sb/FLAaveV2.sol#1723-1725) is never used and should be removed
+TokenUtils.getTokenDecimals(address) (../../sb/FLAaveV2.sol#1739-1743) is never used and should be removed
+TokenUtils.pullTokens(address,address,uint256) (../../sb/FLAaveV2.sol#1683-1701) is never used and should be removed
+TokenUtils.withdrawWeth(uint256) (../../sb/FLAaveV2.sol#1727-1729) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.7.0 (../../sb/FLAaveV2.sol#1) allows old versions
+solc-0.7.6 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/FLAaveV2.sol#61-67):
+	- (success) = recipient.call{value: amount}() (../../sb/FLAaveV2.sol#65)
+Low level call in Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/FLAaveV2.sol#100-126):
+	- (success,returndata) = target.call{value: weiValue}(data) (../../sb/FLAaveV2.sol#109)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter AdminVault.changeOwner(address)._owner (../../sb/FLAaveV2.sol#285) is not in mixedCase
+Parameter AdminVault.changeAdmin(address)._admin (../../sb/FLAaveV2.sol#292) is not in mixedCase
+Parameter AdminAuth.withdrawStuckFunds(address,address,uint256)._token (../../sb/FLAaveV2.sol#316) is not in mixedCase
+Parameter AdminAuth.withdrawStuckFunds(address,address,uint256)._receiver (../../sb/FLAaveV2.sol#316) is not in mixedCase
+Parameter AdminAuth.withdrawStuckFunds(address,address,uint256)._amount (../../sb/FLAaveV2.sol#316) is not in mixedCase
+Function DefisaverLogger.Log(address,address,string,bytes) (../../sb/FLAaveV2.sol#339-346) is not in mixedCase
+Parameter DefisaverLogger.Log(address,address,string,bytes)._contract (../../sb/FLAaveV2.sol#340) is not in mixedCase
+Parameter DefisaverLogger.Log(address,address,string,bytes)._caller (../../sb/FLAaveV2.sol#341) is not in mixedCase
+Parameter DefisaverLogger.Log(address,address,string,bytes)._logName (../../sb/FLAaveV2.sol#342) is not in mixedCase
+Parameter DefisaverLogger.Log(address,address,string,bytes)._data (../../sb/FLAaveV2.sol#343) is not in mixedCase
+Parameter DFSRegistry.getAddr(bytes32)._id (../../sb/FLAaveV2.sol#382) is not in mixedCase
+Parameter DFSRegistry.isRegistered(bytes32)._id (../../sb/FLAaveV2.sol#388) is not in mixedCase
+Parameter DFSRegistry.addNewContract(bytes32,address,uint256)._id (../../sb/FLAaveV2.sol#399) is not in mixedCase
+Parameter DFSRegistry.addNewContract(bytes32,address,uint256)._contractAddr (../../sb/FLAaveV2.sol#400) is not in mixedCase
+Parameter DFSRegistry.addNewContract(bytes32,address,uint256)._waitPeriod (../../sb/FLAaveV2.sol#401) is not in mixedCase
+Parameter DFSRegistry.revertToPreviousAddress(bytes32)._id (../../sb/FLAaveV2.sol#428) is not in mixedCase
+Parameter DFSRegistry.startContractChange(bytes32,address)._id (../../sb/FLAaveV2.sol#447) is not in mixedCase
+Parameter DFSRegistry.startContractChange(bytes32,address)._newContractAddr (../../sb/FLAaveV2.sol#447) is not in mixedCase
+Parameter DFSRegistry.approveContractChange(bytes32)._id (../../sb/FLAaveV2.sol#466) is not in mixedCase
+Parameter DFSRegistry.cancelContractChange(bytes32)._id (../../sb/FLAaveV2.sol#492) is not in mixedCase
+Parameter DFSRegistry.startWaitPeriodChange(bytes32,uint256)._id (../../sb/FLAaveV2.sol#513) is not in mixedCase
+Parameter DFSRegistry.startWaitPeriodChange(bytes32,uint256)._newWaitPeriod (../../sb/FLAaveV2.sol#513) is not in mixedCase
+Parameter DFSRegistry.approveWaitPeriodChange(bytes32)._id (../../sb/FLAaveV2.sol#532) is not in mixedCase
+Parameter DFSRegistry.cancelWaitPeriodChange(bytes32)._id (../../sb/FLAaveV2.sol#558) is not in mixedCase
+Parameter ActionBase.isReplacable(uint8)._type (../../sb/FLAaveV2.sol#696) is not in mixedCase
+Parameter ActionBase.isReturnInjection(uint8)._type (../../sb/FLAaveV2.sol#702) is not in mixedCase
+Parameter ActionBase.getReturnIndex(uint8)._type (../../sb/FLAaveV2.sol#708) is not in mixedCase
+Parameter ActionBase.getSubIndex(uint8)._type (../../sb/FLAaveV2.sol#716) is not in mixedCase
+Parameter Subscriptions.createStrategy(uint256,bool,bytes[][],bytes[][])._templateId (../../sb/FLAaveV2.sol#791) is not in mixedCase
+Parameter Subscriptions.createStrategy(uint256,bool,bytes[][],bytes[][])._active (../../sb/FLAaveV2.sol#792) is not in mixedCase
+Parameter Subscriptions.createStrategy(uint256,bool,bytes[][],bytes[][])._subData (../../sb/FLAaveV2.sol#793) is not in mixedCase
+Parameter Subscriptions.createStrategy(uint256,bool,bytes[][],bytes[][])._triggerData (../../sb/FLAaveV2.sol#794) is not in mixedCase
+Parameter Subscriptions.createTemplate(string,bytes32[],bytes32[],uint8[][])._name (../../sb/FLAaveV2.sol#823) is not in mixedCase
+Parameter Subscriptions.createTemplate(string,bytes32[],bytes32[],uint8[][])._triggerIds (../../sb/FLAaveV2.sol#824) is not in mixedCase
+Parameter Subscriptions.createTemplate(string,bytes32[],bytes32[],uint8[][])._actionIds (../../sb/FLAaveV2.sol#825) is not in mixedCase
+Parameter Subscriptions.createTemplate(string,bytes32[],bytes32[],uint8[][])._paramMapping (../../sb/FLAaveV2.sol#826) is not in mixedCase
+Parameter Subscriptions.updateStrategy(uint256,uint256,bool,bytes[][],bytes[][])._startegyId (../../sb/FLAaveV2.sol#853) is not in mixedCase
+Parameter Subscriptions.updateStrategy(uint256,uint256,bool,bytes[][],bytes[][])._templateId (../../sb/FLAaveV2.sol#854) is not in mixedCase
+Parameter Subscriptions.updateStrategy(uint256,uint256,bool,bytes[][],bytes[][])._active (../../sb/FLAaveV2.sol#855) is not in mixedCase
+Parameter Subscriptions.updateStrategy(uint256,uint256,bool,bytes[][],bytes[][])._subData (../../sb/FLAaveV2.sol#856) is not in mixedCase
+Parameter Subscriptions.updateStrategy(uint256,uint256,bool,bytes[][],bytes[][])._triggerData (../../sb/FLAaveV2.sol#857) is not in mixedCase
+Parameter Subscriptions.removeStrategy(uint256)._subId (../../sb/FLAaveV2.sol#877) is not in mixedCase
+Parameter Subscriptions.getTemplateFromStrategy(uint256)._strategyId (../../sb/FLAaveV2.sol#902) is not in mixedCase
+Parameter Subscriptions.getStrategy(uint256)._strategyId (../../sb/FLAaveV2.sol#907) is not in mixedCase
+Parameter Subscriptions.getTemplate(uint256)._templateId (../../sb/FLAaveV2.sol#911) is not in mixedCase
+Parameter Subscriptions.userHasStrategies(address)._user (../../sb/FLAaveV2.sol#931) is not in mixedCase
+Parameter Subscriptions.getUserStrategies(address)._user (../../sb/FLAaveV2.sol#935) is not in mixedCase
+Parameter Subscriptions.getPaginatedStrategies(uint256,uint256)._page (../../sb/FLAaveV2.sol#945) is not in mixedCase
+Parameter Subscriptions.getPaginatedStrategies(uint256,uint256)._perPage (../../sb/FLAaveV2.sol#945) is not in mixedCase
+Parameter Subscriptions.getPaginatedTemplates(uint256,uint256)._page (../../sb/FLAaveV2.sol#962) is not in mixedCase
+Parameter Subscriptions.getPaginatedTemplates(uint256,uint256)._perPage (../../sb/FLAaveV2.sol#962) is not in mixedCase
+Parameter TokenUtils.approveToken(address,address,uint256)._tokenAddr (../../sb/FLAaveV2.sol#1672) is not in mixedCase
+Parameter TokenUtils.approveToken(address,address,uint256)._to (../../sb/FLAaveV2.sol#1673) is not in mixedCase
+Parameter TokenUtils.approveToken(address,address,uint256)._amount (../../sb/FLAaveV2.sol#1674) is not in mixedCase
+Parameter TokenUtils.pullTokens(address,address,uint256)._token (../../sb/FLAaveV2.sol#1684) is not in mixedCase
+Parameter TokenUtils.pullTokens(address,address,uint256)._from (../../sb/FLAaveV2.sol#1685) is not in mixedCase
+Parameter TokenUtils.pullTokens(address,address,uint256)._amount (../../sb/FLAaveV2.sol#1686) is not in mixedCase
+Parameter TokenUtils.withdrawTokens(address,address,uint256)._token (../../sb/FLAaveV2.sol#1704) is not in mixedCase
+Parameter TokenUtils.withdrawTokens(address,address,uint256)._to (../../sb/FLAaveV2.sol#1705) is not in mixedCase
+Parameter TokenUtils.withdrawTokens(address,address,uint256)._amount (../../sb/FLAaveV2.sol#1706) is not in mixedCase
+Parameter TokenUtils.depositWeth(uint256)._amount (../../sb/FLAaveV2.sol#1723) is not in mixedCase
+Parameter TokenUtils.withdrawWeth(uint256)._amount (../../sb/FLAaveV2.sol#1727) is not in mixedCase
+Parameter TokenUtils.getBalance(address,address)._tokenAddr (../../sb/FLAaveV2.sol#1731) is not in mixedCase
+Parameter TokenUtils.getBalance(address,address)._acc (../../sb/FLAaveV2.sol#1731) is not in mixedCase
+Parameter TokenUtils.getTokenDecimals(address)._token (../../sb/FLAaveV2.sol#1739) is not in mixedCase
+Parameter FLAaveV2.executeAction(bytes[],bytes[],uint8[],bytes32[])._callData (../../sb/FLAaveV2.sol#1781) is not in mixedCase
+Parameter FLAaveV2.executeOperation(address[],uint256[],uint256[],address,bytes)._assets (../../sb/FLAaveV2.sol#1838) is not in mixedCase
+Parameter FLAaveV2.executeOperation(address[],uint256[],uint256[],address,bytes)._amounts (../../sb/FLAaveV2.sol#1839) is not in mixedCase
+Parameter FLAaveV2.executeOperation(address[],uint256[],uint256[],address,bytes)._fees (../../sb/FLAaveV2.sol#1840) is not in mixedCase
+Parameter FLAaveV2.executeOperation(address[],uint256[],uint256[],address,bytes)._initiator (../../sb/FLAaveV2.sol#1841) is not in mixedCase
+Parameter FLAaveV2.executeOperation(address[],uint256[],uint256[],address,bytes)._params (../../sb/FLAaveV2.sol#1842) is not in mixedCase
+Parameter FLAaveV2.parseInputs(bytes[])._callData (../../sb/FLAaveV2.sol#1870) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Variable ActionBase.RETURN_MAX_INDEX_VALUE (../../sb/FLAaveV2.sol#595) is too similar to ActionBase.RETURN_MIN_INDEX_VALUE (../../sb/FLAaveV2.sol#594)
+Variable Subscriptions.updateStrategy(uint256,uint256,bool,bytes[][],bytes[][])._startegyId (../../sb/FLAaveV2.sol#853) is too similar to Subscriptions.getTemplateFromStrategy(uint256)._strategyId (../../sb/FLAaveV2.sol#902)
+Variable Subscriptions.updateStrategy(uint256,uint256,bool,bytes[][],bytes[][])._startegyId (../../sb/FLAaveV2.sol#853) is too similar to Subscriptions.getStrategy(uint256)._strategyId (../../sb/FLAaveV2.sol#907)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+/sb/FLAaveV2.sol analyzed (21 contracts with 93 detectors), 116 result(s) found

@@ -1,0 +1,131 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 24 Code Findings │
+└──────────────────┘
+                            
+    /sb/PromissoryToken.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          272┆ for (uint i = 0; i < backers[msg.sender].length; i++) {
+            ⋮┆----------------------------------------
+          294┆ for(i = 0; i < withdrawals[_withdrawalID].destination.length;    
+  i++){                                                                         
+            ⋮┆----------------------------------------
+          344┆ for (uint i = 0; i < backers[_backerAddr].length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+          173┆ prepaidUnits +=_tokenAmount;
+            ⋮┆----------------------------------------
+          202┆ claimedPrepaidUnits += _tokenAmount;
+            ⋮┆----------------------------------------
+          234┆ claimedUnits += tokenAmount;
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+           47┆ uint public prepaidUnits = 0; //prepaid and set by founder out of
+  3 million tokens                                                              
+            ⋮┆----------------------------------------
+           48┆ uint public claimedUnits = 0; //claimed tokens out of 3 million  
+  tokens                                                                        
+            ⋮┆----------------------------------------
+           49┆ uint public claimedPrepaidUnits = 0; //claimed tokens out of the 
+  early backer's tokens/prepaidUnits                                            
+            ⋮┆----------------------------------------
+           50┆ uint public redeemedTokens = 0; //number of tokens out of claimed
+  tokens, redeemed by superdao token call                                       
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          272┆ for (uint i = 0; i < backers[msg.sender].length; i++) {
+            ⋮┆----------------------------------------
+          273┆ backerStake += backers[msg.sender][i].tokenAmount;
+            ⋮┆----------------------------------------
+          294┆ for(i = 0; i < withdrawals[_withdrawalID].destination.length;    
+  i++){                                                                         
+            ⋮┆----------------------------------------
+          295┆                                                                  
+  if(!withdrawals[_withdrawalID].destination[i].send(amountPerAddr)) throw;     
+            ⋮┆----------------------------------------
+          344┆ for (uint i = 0; i < backers[_backerAddr].length; i++) {
+            ⋮┆----------------------------------------
+          345┆ if (backers[_backerAddr][i].claimed == false) {
+            ⋮┆----------------------------------------
+          348┆ totalTokens += backers[_backerAddr][i].tokenAmount;
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          272┆ for (uint i = 0; i < backers[msg.sender].length; i++) {
+            ⋮┆----------------------------------------
+          344┆ for (uint i = 0; i < backers[_backerAddr].length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          166┆ if (earlyBackerList.length == numOfBackers &&                    
+  backers[_backer].length == 0) throw ;                                         
+            ⋮┆----------------------------------------
+          194┆ if(backers[msg.sender][_index].prepaid == true &&
+          195┆    backers[msg.sender][_index].claimed == false &&
+          196┆    backers[msg.sender][_index].tokenAmount == _tokenAmount &&
+          197┆    backers[msg.sender][_index].tokenPrice == _boughtTokensPrice  
+  &&                                                                            
+          198┆    backers[msg.sender][_index].privateHash == sha3(              
+  _privatePhrase, msg.sender) &&                                                
+          199┆    backers[msg.sender][_index].backerRank == _backerRank)
+          200┆ {
+          201┆     backers[msg.sender][_index].claimed = true;
+          202┆     claimedPrepaidUnits += _tokenAmount;
+          203┆ 
+             [hid 4 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          272┆ for (uint i = 0; i < backers[msg.sender].length; i++) {
+            ⋮┆----------------------------------------
+          294┆ for(i = 0; i < withdrawals[_withdrawalID].destination.length;    
+  i++){                                                                         
+            ⋮┆----------------------------------------
+          344┆ for (uint i = 0; i < backers[_backerAddr].length; i++) {
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 24 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

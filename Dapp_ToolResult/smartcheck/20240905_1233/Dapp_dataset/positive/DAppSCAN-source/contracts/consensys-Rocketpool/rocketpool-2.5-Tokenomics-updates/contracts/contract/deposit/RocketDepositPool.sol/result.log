@@ -1,0 +1,134 @@
+/sb/RocketDepositPool.sol
+line 230:53 extraneous input '_value' expecting {',', ')'}
+line 231:51 extraneous input '_value' expecting {',', ')'}
+line 249:0 extraneous input 'abstract' expecting {<EOF>, 'pragma', 'import', 'contract', 'library', 'interface'}
+line 351:47 no viable alternative at input '(string))'
+line 351:46 no viable alternative at input 'string)'
+line 351:47 extraneous input ')' expecting ';'
+line 425:0 extraneous input 'enum' expecting {<EOF>, 'pragma', 'import', 'contract', 'library', 'interface'}
+line 463:34 extraneous input '_validatorPubkey' expecting {',', ')'}
+line 463:67 extraneous input '_validatorSignature' expecting {',', ')'}
+line 463:86 mismatched input ',' expecting {'solidity', 'experimental', 'from', 'constructor', 'block', 'coinbase', 'difficulty', 'gaslimit', 'number', 'timestamp', 'blockhash', 'msg', 'data', 'gas', 'sender', 'sig', 'value', 'now', 'this', 'tx', 'origin', 'gasprice', 'public', 'internal', 'external', 'private', 'constant', 'length', 'balance', 'emit', '_', 'revert', Identifier}
+line 463:112 mismatched input ')' expecting {';', '='}
+line 658:32 missing ';' at '{'
+line 683:32 missing ';' at '{'
+line 699:37 missing ';' at '{'
+jar:file:/usr/local/lib/node_modules/@smartdec/smartcheck/jdeploy-bundle/smartcheck-2.0-jar-with-dependencies.jar!/solidity-rules.xmlruleId: SOLIDITY_ADDRESS_HARDCODED
+patternId: c67a09
+severity: 1
+line: 327
+column: 43
+content: 0x0
+
+ruleId: SOLIDITY_LOCKED_MONEY
+patternId: 30281d
+severity: 3
+line: 577
+column: 0
+content: contractRocketDepositPoolisRocketBase,RocketDepositPoolInterface,RocketVaultWithdrawerInterface{usingSafeMathforuint;eventDepositReceived(addressindexedfrom,uint256amount,uint256time);eventDepositRecycled(addressindexedfrom,uint256amount,uint256time);eventDepositAssigned(addressindexedminipool,uint256amount,uint256time);eventExcessWithdrawn(addressindexedto,uint256amount,uint256time);constructor(address_rocketStorageAddress)RocketBase(_rocketStorageAddress){version=1;}functiongetBalance()overridepublicviewreturns(uint256){RocketVaultInterfacerocketVault=RocketVaultInterface(getContractAddress("rocketVault"));returnrocketVault.balanceOf("rocketDepositPool");}functiongetExcessBalance()overridepublicviewreturns(uint256){RocketMinipoolQueueInterfacerocketMinipoolQueue=RocketMinipoolQueueInterface(getContractAddress("rocketMinipoolQueue"));uint256minipoolCapacity=rocketMinipoolQueue.getEffectiveCapacity();uint256balance=getBalance();if(minipoolCapacity>=balance){return0;}else{returnbalance.sub(minipoolCapacity);}}functionreceiveVaultWithdrawalETH()overrideexternalpayableonlyLatestContract("rocketDepositPool",address(this))onlyLatestContract("rocketVault",msg.sender){}functiondeposit()overrideexternalpayableonlyLatestContract("rocketDepositPool",address(this)){RocketDAOProtocolSettingsDepositInterfacerocketDAOProtocolSettingsDeposit=RocketDAOProtocolSettingsDepositInterface(getContractAddress("rocketDAOProtocolSettingsDeposit"));RocketTokenRETHInterfacerocketTokenRETH=RocketTokenRETHInterface(getContractAddress("rocketTokenRETH"));require(rocketDAOProtocolSettingsDeposit.getDepositEnabled(),"Deposits into Rocket Pool are currently disabled");require(msg.value>=rocketDAOProtocolSettingsDeposit.getMinimumDeposit(),"The deposited amount is less than the minimum deposit size");require(getBalance().add(msg.value)<=rocketDAOProtocolSettingsDeposit.getMaximumDepositPoolSize(),"The deposit pool size after depositing exceeds the maximum size");rocketTokenRETH.mint(msg.value,msg.sender);emitDepositReceived(msg.sender,msg.value,block.timestamp);processDeposit();}functionrecycleDissolvedDeposit()overrideexternalpayableonlyLatestContract("rocketDepositPool",address(this))onlyRegisteredMinipool(msg.sender){emitDepositRecycled(msg.sender,msg.value,block.timestamp);processDeposit();}functionrecycleWithdrawnDeposit()overrideexternalpayableonlyLatestContract("rocketDepositPool",address(this))onlyLatestContract("rocketNetworkWithdrawal",msg.sender){emitDepositRecycled(msg.sender,msg.value,block.timestamp);processDeposit();}functionrecycleLiquidatedStake()overrideexternalpayableonlyLatestContract("rocketDepositPool",address(this))onlyLatestContract("rocketAuctionManager",msg.sender){emitDepositRecycled(msg.sender,msg.value,block.timestamp);processDeposit();}functionprocessDeposit()private{RocketDAOProtocolSettingsDepositInterfacerocketDAOProtocolSettingsDeposit=RocketDAOProtocolSettingsDepositInterface(getContractAddress("rocketDAOProtocolSettingsDeposit"));RocketVaultInterfacerocketVault=RocketVaultInterface(getContractAddress("rocketVault"));rocketVault.depositEther<missing ';'>{value:msg.value}();if(rocketDAOProtocolSettingsDeposit.getAssignDepositsEnabled()){assignDeposits();}}functionassignDeposits()overridepubliconlyLatestContract("rocketDepositPool",address(this)){RocketDAOProtocolSettingsDepositInterfacerocketDAOProtocolSettingsDeposit=RocketDAOProtocolSettingsDepositInterface(getContractAddress("rocketDAOProtocolSettingsDeposit"));RocketMinipoolQueueInterfacerocketMinipoolQueue=RocketMinipoolQueueInterface(getContractAddress("rocketMinipoolQueue"));RocketVaultInterfacerocketVault=RocketVaultInterface(getContractAddress("rocketVault"));require(rocketDAOProtocolSettingsDeposit.getAssignDepositsEnabled(),"Deposit assignments are currently disabled");for(uint256i=0;i<rocketDAOProtocolSettingsDeposit.getMaximumDepositAssignments();++i){uint256minipoolCapacity=rocketMinipoolQueue.getNextCapacity();if(minipoolCapacity==0||getBalance()<minipoolCapacity){break;}addressminipoolAddress=rocketMinipoolQueue.dequeueMinipool();RocketMinipoolInterfaceminipool=RocketMinipoolInterface(minipoolAddress);rocketVault.withdrawEther(minipoolCapacity);minipool.userDeposit<missing ';'>{value:minipoolCapacity}();emitDepositAssigned(minipoolAddress,minipoolCapacity,block.timestamp);}}functionwithdrawExcessBalance(uint256_amount)overrideexternalonlyLatestContract("rocketDepositPool",address(this))onlyLatestContract("rocketTokenRETH",msg.sender){RocketTokenRETHInterfacerocketTokenRETH=RocketTokenRETHInterface(getContractAddress("rocketTokenRETH"));RocketVaultInterfacerocketVault=RocketVaultInterface(getContractAddress("rocketVault"));require(_amount<=getExcessBalance(),"Insufficient excess balance for withdrawal");rocketVault.withdrawEther(_amount);rocketTokenRETH.depositExcess<missing ';'>{value:_amount}();emitExcessWithdrawn(msg.sender,_amount,block.timestamp);}}
+
+ruleId: SOLIDITY_SAFEMATH
+patternId: 837cac
+severity: 1
+line: 580
+column: 4
+content: usingSafeMathforuint;
+
+ruleId: SOLIDITY_SHOULD_NOT_BE_PURE
+patternId: 11314f
+severity: 1
+line: 344
+column: 4
+content: functiongetRevertMsg(bytesmemory_returnData)internalpurereturns(stringmemory){if(_returnData.length<68)return'Transaction reverted silently';assembly{_returnData:=add(_returnData,0x04)}returnabi.decode(_returnData,<missing ')'>(string));}
+
+ruleId: SOLIDITY_SHOULD_RETURN_STRUCT
+patternId: 83hf3l
+severity: 1
+line: 24
+column: 64
+content: (bool,uint256)
+
+ruleId: SOLIDITY_SHOULD_RETURN_STRUCT
+patternId: 83hf3l
+severity: 1
+line: 35
+column: 64
+content: (bool,uint256)
+
+ruleId: SOLIDITY_SHOULD_RETURN_STRUCT
+patternId: 83hf3l
+severity: 1
+line: 45
+column: 64
+content: (bool,uint256)
+
+ruleId: SOLIDITY_SHOULD_RETURN_STRUCT
+patternId: 83hf3l
+severity: 1
+line: 60
+column: 64
+content: (bool,uint256)
+
+ruleId: SOLIDITY_SHOULD_RETURN_STRUCT
+patternId: 83hf3l
+severity: 1
+line: 70
+column: 64
+content: (bool,uint256)
+
+ruleId: SOLIDITY_USING_INLINE_ASSEMBLY
+patternId: 109cd5
+severity: 1
+line: 347
+column: 8
+content: assembly{_returnData:=add(_returnData,0x04)}
+
+ruleId: SOLIDITY_VISIBILITY
+patternId: 910067
+severity: 1
+line: 316
+column: 4
+content: constructor(address_rocketStorageAddress){rocketStorage=RocketStorageInterface(_rocketStorageAddress);}
+
+ruleId: SOLIDITY_VISIBILITY
+patternId: 910067
+severity: 1
+line: 463
+column: 4
+content: functionstake(bytescalldata_validatorPubkey,bytescalldata<missing ')'>
+
+ruleId: SOLIDITY_VISIBILITY
+patternId: 910067
+severity: 1
+line: 589
+column: 4
+content: constructor(address_rocketStorageAddress)RocketBase(_rocketStorageAddress){version=1;}
+
+ruleId: SOLIDITY_VISIBILITY
+patternId: b51ce0
+severity: 1
+line: 256
+column: 4
+content: RocketStorageInterfacerocketStorage=RocketStorageInterface(0);
+
+ruleId: SOLIDITY_VISIBILITY
+patternId: b51ce0
+severity: 1
+line: 463
+column: 67
+content: _validatorSignature,
+
+ruleId: SOLIDITY_VISIBILITY
+patternId: b51ce0
+severity: 1
+line: 463
+column: 88
+content: bytes32_depositDataRoot)external;
+
+SOLIDITY_VISIBILITY :6
+SOLIDITY_SAFEMATH :1
+SOLIDITY_LOCKED_MONEY :1
+SOLIDITY_ADDRESS_HARDCODED :1
+SOLIDITY_USING_INLINE_ASSEMBLY :1
+SOLIDITY_SHOULD_RETURN_STRUCT :5
+SOLIDITY_SHOULD_NOT_BE_PURE :1

@@ -1,0 +1,123 @@
+'solc --version' running
+'solc /sb/CoreVoting.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/CoreVoting.sol:
+Warning: Return value of low-level calls not used.
+   --> /sb/CoreVoting.sol:336:13:
+    |
+336 |             targets[i].call(calldatas[i]);
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+CoreVoting.proposal(address[],bytes[],address[],bytes[],CoreVoting.Ballot) (../../sb/CoreVoting.sol#192-251) calls abi.encodePacked() with multiple dynamic arguments:
+	- proposalHash = keccak256(bytes)(abi.encodePacked(targets,abi.encode(calldatas))) (../../sb/CoreVoting.sol#202-203)
+CoreVoting.execute(uint256,address[],bytes[]) (../../sb/CoreVoting.sol#306-345) calls abi.encodePacked() with multiple dynamic arguments:
+	- require(bool,string)(keccak256(bytes)(abi.encodePacked(targets,abi.encode(calldatas))) == proposals[proposalId].proposalHash,hash mismatch) (../../sb/CoreVoting.sol#316-320)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#abi-encodePacked-collision
+
+CoreVoting.execute(uint256,address[],bytes[]) (../../sb/CoreVoting.sol#306-345) uses a dangerous strict equality:
+	- require(bool,string)(keccak256(bytes)(abi.encodePacked(targets,abi.encode(calldatas))) == proposals[proposalId].proposalHash,hash mismatch) (../../sb/CoreVoting.sol#316-320)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Reentrancy in CoreVoting.execute(uint256,address[],bytes[]) (../../sb/CoreVoting.sol#306-345):
+	External calls:
+	- targets[i].call(calldatas[i]) (../../sb/CoreVoting.sol#336)
+	State variables written after the call(s):
+	- delete proposals[proposalId] (../../sb/CoreVoting.sol#344)
+	CoreVoting.proposals (../../sb/CoreVoting.sol#124) can be used in cross function reentrancies:
+	- CoreVoting.execute(uint256,address[],bytes[]) (../../sb/CoreVoting.sol#306-345)
+	- CoreVoting.proposal(address[],bytes[],address[],bytes[],CoreVoting.Ballot) (../../sb/CoreVoting.sol#192-251)
+	- CoreVoting.proposals (../../sb/CoreVoting.sol#124)
+	- CoreVoting.vote(address[],bytes[],uint256,CoreVoting.Ballot) (../../sb/CoreVoting.sol#261-298)
+Reentrancy in CoreVoting.proposal(address[],bytes[],address[],bytes[],CoreVoting.Ballot) (../../sb/CoreVoting.sol#192-251):
+	External calls:
+	- votingPower = vote(votingVaults,extraVaultData,proposalCount,ballot) (../../sb/CoreVoting.sol#229-230)
+		- votingPower += uint128(IVotingVault(votingVaults[i]).queryVotePower(msg.sender,proposals[proposalId].created,extraVaultData[i])) (../../sb/CoreVoting.sol#278-284)
+	State variables written after the call(s):
+	- proposalCount += 1 (../../sb/CoreVoting.sol#250)
+	CoreVoting.proposalCount (../../sb/CoreVoting.sol#96) can be used in cross function reentrancies:
+	- CoreVoting.proposal(address[],bytes[],address[],bytes[],CoreVoting.Ballot) (../../sb/CoreVoting.sol#192-251)
+	- CoreVoting.proposalCount (../../sb/CoreVoting.sol#96)
+Reentrancy in CoreVoting.vote(address[],bytes[],uint256,CoreVoting.Ballot) (../../sb/CoreVoting.sol#261-298):
+	External calls:
+	- votingPower += uint128(IVotingVault(votingVaults[i]).queryVotePower(msg.sender,proposals[proposalId].created,extraVaultData[i])) (../../sb/CoreVoting.sol#278-284)
+	State variables written after the call(s):
+	- proposals[proposalId].votingPower[uint256(_votes[msg.sender][proposalId].castBallot)] -= _votes[msg.sender][proposalId].votingPower (../../sb/CoreVoting.sol#290-292)
+	CoreVoting.proposals (../../sb/CoreVoting.sol#124) can be used in cross function reentrancies:
+	- CoreVoting.execute(uint256,address[],bytes[]) (../../sb/CoreVoting.sol#306-345)
+	- CoreVoting.proposal(address[],bytes[],address[],bytes[],CoreVoting.Ballot) (../../sb/CoreVoting.sol#192-251)
+	- CoreVoting.proposals (../../sb/CoreVoting.sol#124)
+	- CoreVoting.vote(address[],bytes[],uint256,CoreVoting.Ballot) (../../sb/CoreVoting.sol#261-298)
+	- proposals[proposalId].votingPower[uint256(ballot)] += votingPower (../../sb/CoreVoting.sol#296)
+	CoreVoting.proposals (../../sb/CoreVoting.sol#124) can be used in cross function reentrancies:
+	- CoreVoting.execute(uint256,address[],bytes[]) (../../sb/CoreVoting.sol#306-345)
+	- CoreVoting.proposal(address[],bytes[],address[],bytes[],CoreVoting.Ballot) (../../sb/CoreVoting.sol#192-251)
+	- CoreVoting.proposals (../../sb/CoreVoting.sol#124)
+	- CoreVoting.vote(address[],bytes[],uint256,CoreVoting.Ballot) (../../sb/CoreVoting.sol#261-298)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+CoreVoting.execute(uint256,address[],bytes[]) (../../sb/CoreVoting.sol#306-345) ignores return value by targets[i].call(calldatas[i]) (../../sb/CoreVoting.sol#336)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-low-level-calls
+
+CoreVoting.proposal(address[],bytes[],address[],bytes[],CoreVoting.Ballot).quorum (../../sb/CoreVoting.sol#207) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+Authorizable.setOwner(address) (../../sb/CoreVoting.sol#64-66) should emit an event for: 
+	- owner = who (../../sb/CoreVoting.sol#65) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-access-control
+
+CoreVoting.setDefaultQuorum(uint256) (../../sb/CoreVoting.sol#368-370) should emit an event for: 
+	- baseQuorum = quorum (../../sb/CoreVoting.sol#369) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+Authorizable.setOwner(address).who (../../sb/CoreVoting.sol#64) lacks a zero-check on :
+		- owner = who (../../sb/CoreVoting.sol#65)
+CoreVoting.constructor(address,uint256,uint256,address,address[])._timelock (../../sb/CoreVoting.sol#170) lacks a zero-check on :
+		- owner = address(_timelock) (../../sb/CoreVoting.sol#181)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+CoreVoting.vote(address[],bytes[],uint256,CoreVoting.Ballot) (../../sb/CoreVoting.sol#261-298) has external calls inside a loop: votingPower += uint128(IVotingVault(votingVaults[i]).queryVotePower(msg.sender,proposals[proposalId].created,extraVaultData[i])) (../../sb/CoreVoting.sol#278-284)
+CoreVoting.execute(uint256,address[],bytes[]) (../../sb/CoreVoting.sol#306-345) has external calls inside a loop: targets[i].call(calldatas[i]) (../../sb/CoreVoting.sol#336)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in CoreVoting.vote(address[],bytes[],uint256,CoreVoting.Ballot) (../../sb/CoreVoting.sol#261-298):
+	External calls:
+	- votingPower += uint128(IVotingVault(votingVaults[i]).queryVotePower(msg.sender,proposals[proposalId].created,extraVaultData[i])) (../../sb/CoreVoting.sol#278-284)
+	State variables written after the call(s):
+	- _votes[msg.sender][proposalId] = Vote(votingPower,ballot) (../../sb/CoreVoting.sol#294)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in CoreVoting.execute(uint256,address[],bytes[]) (../../sb/CoreVoting.sol#306-345):
+	External calls:
+	- targets[i].call(calldatas[i]) (../../sb/CoreVoting.sol#336)
+	Event emitted after the call(s):
+	- ProposalExecuted(proposalId) (../../sb/CoreVoting.sol#339)
+Reentrancy in CoreVoting.proposal(address[],bytes[],address[],bytes[],CoreVoting.Ballot) (../../sb/CoreVoting.sol#192-251):
+	External calls:
+	- votingPower = vote(votingVaults,extraVaultData,proposalCount,ballot) (../../sb/CoreVoting.sol#229-230)
+		- votingPower += uint128(IVotingVault(votingVaults[i]).queryVotePower(msg.sender,proposals[proposalId].created,extraVaultData[i])) (../../sb/CoreVoting.sol#278-284)
+	Event emitted after the call(s):
+	- ProposalCreated(proposalCount,block.number,block.number + lockDuration,block.number + lockDuration + extraVoteTime) (../../sb/CoreVoting.sol#243-248)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+CoreVoting._getSelector(bytes) (../../sb/CoreVoting.sol#391-402) uses assembly
+	- INLINE ASM (../../sb/CoreVoting.sol#396-401)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Pragma version^0.8.0 (../../sb/CoreVoting.sol#1) allows old versions
+solc-0.8.27 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in CoreVoting.execute(uint256,address[],bytes[]) (../../sb/CoreVoting.sol#306-345):
+	- targets[i].call(calldatas[i]) (../../sb/CoreVoting.sol#336)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter CoreVoting.setMinProposalPower(uint256)._minProposalPower (../../sb/CoreVoting.sol#374) is not in mixedCase
+Parameter CoreVoting.setLockDuration(uint256)._lockDuration (../../sb/CoreVoting.sol#380) is not in mixedCase
+Parameter CoreVoting.changeExtraVotingTime(uint256)._extraVoteTime (../../sb/CoreVoting.sol#386) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+CoreVoting._getSelector(bytes) (../../sb/CoreVoting.sol#391-402) uses literals with too many digits:
+	- out = mload(uint256)(_calldata + 32) & 0xFFFFFFFFF0000000000000000000000000000000000000000000000000000000 (../../sb/CoreVoting.sol#397-400)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+/sb/CoreVoting.sol analyzed (3 contracts with 93 detectors), 25 result(s) found

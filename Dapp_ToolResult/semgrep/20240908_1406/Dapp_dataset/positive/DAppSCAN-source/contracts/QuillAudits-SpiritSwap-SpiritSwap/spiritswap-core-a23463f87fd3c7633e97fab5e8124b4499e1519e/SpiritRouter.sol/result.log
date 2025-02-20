@@ -1,0 +1,354 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 92 Code Findings │
+└──────────────────┘
+                         
+    /sb/SpiritRouter.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+           27┆ (bool success, bytes memory data) =                              
+  token.call(abi.encodeWithSelector(0x095ea7b3, to, value));                    
+            ⋮┆----------------------------------------
+           33┆ (bool success, bytes memory data) =                              
+  token.call(abi.encodeWithSelector(0xa9059cbb, to, value));                    
+            ⋮┆----------------------------------------
+           39┆ (bool success, bytes memory data) =                              
+  token.call(abi.encodeWithSelector(0x23b872dd, from, to, value));              
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          310┆ for (uint i; i < path.length - 1; i++) {
+            ⋮┆----------------------------------------
+          321┆ for (uint i = path.length - 1; i > 0; i--) {
+            ⋮┆----------------------------------------
+          551┆ for (uint i; i < path.length - 1; i++) {
+            ⋮┆----------------------------------------
+          556┆ address to = i < path.length - 2 ?                               
+  PancakeLibrary.pairFor(factory, output, path[i + 2]) : _to;                   
+            ⋮┆----------------------------------------
+          666┆ for (uint i; i < path.length - 1; i++) {
+            ⋮┆----------------------------------------
+          679┆ address to = i < path.length - 2 ?                               
+  PancakeLibrary.pairFor(factory, output, path[i + 2]) : _to;                   
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          361┆ constructor(address _factory, address _WETH) public {
+          362┆     factory = _factory;
+          363┆     WETH = _WETH;
+          364┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          310┆ for (uint i; i < path.length - 1; i++) {
+            ⋮┆----------------------------------------
+          551┆ for (uint i; i < path.length - 1; i++) {
+            ⋮┆----------------------------------------
+          666┆ for (uint i; i < path.length - 1; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           28┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'TransferHelper: APPROVE_FAILED');                                  
+            ⋮┆----------------------------------------
+           34┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'TransferHelper: TRANSFER_FAILED');                                 
+            ⋮┆----------------------------------------
+           40┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'TransferHelper: TRANSFER_FROM_FAILED');                            
+            ⋮┆----------------------------------------
+           45┆ require(success, 'TransferHelper: ETH_TRANSFER_FAILED');
+            ⋮┆----------------------------------------
+          238┆ require((z = x + y) >= x, 'ds-math-add-overflow');
+            ⋮┆----------------------------------------
+          242┆ require((z = x - y) <= x, 'ds-math-sub-underflow');
+            ⋮┆----------------------------------------
+          246┆ require(y == 0 || (z = x * y) / y == x, 'ds-math-mul-overflow');
+            ⋮┆----------------------------------------
+          255┆ require(tokenA != tokenB, 'SpiritLibrary: IDENTICAL_ADDRESSES');
+            ⋮┆----------------------------------------
+          257┆ require(token0 != address(0), 'SpiritLibrary: ZERO_ADDRESS');
+            ⋮┆----------------------------------------
+          281┆ require(amountA > 0, 'SpiritLibrary: INSUFFICIENT_AMOUNT');
+            ⋮┆----------------------------------------
+          282┆ require(reserveA > 0 && reserveB > 0, 'SpiritLibrary:            
+  INSUFFICIENT_LIQUIDITY');                                                     
+            ⋮┆----------------------------------------
+          288┆ require(amountIn > 0, 'SpiritLibrary:                            
+  INSUFFICIENT_INPUT_AMOUNT');                                                  
+            ⋮┆----------------------------------------
+          289┆ require(reserveIn > 0 && reserveOut > 0, 'SpiritLibrary:         
+  INSUFFICIENT_LIQUIDITY');                                                     
+            ⋮┆----------------------------------------
+          298┆ require(amountOut > 0, 'SpiritLibrary:                           
+  INSUFFICIENT_OUTPUT_AMOUNT');                                                 
+            ⋮┆----------------------------------------
+          299┆ require(reserveIn > 0 && reserveOut > 0, 'SpiritLibrary:         
+  INSUFFICIENT_LIQUIDITY');                                                     
+            ⋮┆----------------------------------------
+          307┆ require(path.length >= 2, 'SpiritLibrary: INVALID_PATH');
+            ⋮┆----------------------------------------
+          318┆ require(path.length >= 2, 'SpiritLibrary: INVALID_PATH');
+            ⋮┆----------------------------------------
+          357┆ require(deadline >= block.timestamp, 'SpiritRouter: EXPIRED');
+            ⋮┆----------------------------------------
+          389┆ require(amountBOptimal >= amountBMin, 'SpiritRouter:             
+  INSUFFICIENT_B_AMOUNT');                                                      
+            ⋮┆----------------------------------------
+          394┆ require(amountAOptimal >= amountAMin, 'SpiritRouter:             
+  INSUFFICIENT_A_AMOUNT');                                                      
+            ⋮┆----------------------------------------
+          455┆ require(amountA >= amountAMin, 'SpiritRouter:                    
+  INSUFFICIENT_A_AMOUNT');                                                      
+            ⋮┆----------------------------------------
+          456┆ require(amountB >= amountBMin, 'SpiritRouter:                    
+  INSUFFICIENT_B_AMOUNT');                                                      
+            ⋮┆----------------------------------------
+          569┆ require(!IPancakeFactory(factory).locked(), 'SpiritRouter:       
+  Permission Denied');                                                          
+            ⋮┆----------------------------------------
+          571┆ require(amounts[amounts.length - 1] >= amountOutMin,             
+  'SpiritRouter: INSUFFICIENT_OUTPUT_AMOUNT');                                  
+            ⋮┆----------------------------------------
+          584┆ require(!IPancakeFactory(factory).locked(), 'SpiritRouter:       
+  Permission Denied');                                                          
+            ⋮┆----------------------------------------
+          586┆ require(amounts[0] <= amountInMax, 'SpiritRouter:                
+  EXCESSIVE_INPUT_AMOUNT');                                                     
+            ⋮┆----------------------------------------
+          600┆ require(!IPancakeFactory(factory).locked(), 'SpiritRouter:       
+  Permission Denied');                                                          
+            ⋮┆----------------------------------------
+          601┆ require(path[0] == WETH, 'SpiritRouter: INVALID_PATH');
+            ⋮┆----------------------------------------
+          603┆ require(amounts[amounts.length - 1] >= amountOutMin,             
+  'SpiritRouter: INSUFFICIENT_OUTPUT_AMOUNT');                                  
+            ⋮┆----------------------------------------
+          615┆ require(!IPancakeFactory(factory).locked(), 'SpiritRouter:       
+  Permission Denied');                                                          
+            ⋮┆----------------------------------------
+          616┆ require(path[path.length - 1] == WETH, 'SpiritRouter:            
+  INVALID_PATH');                                                               
+            ⋮┆----------------------------------------
+          618┆ require(amounts[0] <= amountInMax, 'SpiritRouter:                
+  EXCESSIVE_INPUT_AMOUNT');                                                     
+            ⋮┆----------------------------------------
+          633┆ require(!IPancakeFactory(factory).locked(), 'SpiritRouter:       
+  Permission Denied');                                                          
+            ⋮┆----------------------------------------
+          634┆ require(path[path.length - 1] == WETH, 'SpiritRouter:            
+  INVALID_PATH');                                                               
+            ⋮┆----------------------------------------
+          636┆ require(amounts[amounts.length - 1] >= amountOutMin,             
+  'SpiritRouter: INSUFFICIENT_OUTPUT_AMOUNT');                                  
+            ⋮┆----------------------------------------
+          652┆ require(!IPancakeFactory(factory).locked(), 'SpiritRouter:       
+  Permission Denied');                                                          
+            ⋮┆----------------------------------------
+          653┆ require(path[0] == WETH, 'SpiritRouter: INVALID_PATH');
+            ⋮┆----------------------------------------
+          655┆ require(amounts[0] <= msg.value, 'SpiritRouter:                  
+  EXCESSIVE_INPUT_AMOUNT');                                                     
+            ⋮┆----------------------------------------
+          690┆ require(!IPancakeFactory(factory).locked(), 'SpiritRouter:       
+  Permission Denied');                                                          
+            ⋮┆----------------------------------------
+          696┆ require(
+          697┆     IERC20(path[path.length -                                    
+  1]).balanceOf(to).sub(balanceBefore) >= amountOutMin,                         
+          698┆     'SpiritRouter: INSUFFICIENT_OUTPUT_AMOUNT'
+          699┆ );
+            ⋮┆----------------------------------------
+          713┆ require(!IPancakeFactory(factory).locked(), 'SpiritRouter:       
+  Permission Denied');                                                          
+            ⋮┆----------------------------------------
+          714┆ require(path[0] == WETH, 'SpiritRouter: INVALID_PATH');
+            ⋮┆----------------------------------------
+          720┆ require(
+          721┆     IERC20(path[path.length -                                    
+  1]).balanceOf(to).sub(balanceBefore) >= amountOutMin,                         
+          722┆     'SpiritRouter: INSUFFICIENT_OUTPUT_AMOUNT'
+          723┆ );
+            ⋮┆----------------------------------------
+          737┆ require(!IPancakeFactory(factory).locked(), 'SpiritRouter:       
+  Permission Denied');                                                          
+            ⋮┆----------------------------------------
+          738┆ require(path[path.length - 1] == WETH, 'SpiritRouter:            
+  INVALID_PATH');                                                               
+            ⋮┆----------------------------------------
+          744┆ require(amountOut >= amountOutMin, 'SpiritRouter:                
+  INSUFFICIENT_OUTPUT_AMOUNT');                                                 
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+           28┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'TransferHelper: APPROVE_FAILED');                                  
+            ⋮┆----------------------------------------
+           34┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'TransferHelper: TRANSFER_FAILED');                                 
+            ⋮┆----------------------------------------
+           40┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'TransferHelper: TRANSFER_FROM_FAILED');                            
+            ⋮┆----------------------------------------
+          282┆ require(reserveA > 0 && reserveB > 0, 'SpiritLibrary:            
+  INSUFFICIENT_LIQUIDITY');                                                     
+            ⋮┆----------------------------------------
+          289┆ require(reserveIn > 0 && reserveOut > 0, 'SpiritLibrary:         
+  INSUFFICIENT_LIQUIDITY');                                                     
+            ⋮┆----------------------------------------
+          299┆ require(reserveIn > 0 && reserveOut > 0, 'SpiritLibrary:         
+  INSUFFICIENT_LIQUIDITY');                                                     
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          384┆ if (reserveA == 0 && reserveB == 0) {
+          385┆     (amountA, amountB) = (amountADesired, amountBDesired);
+          386┆ } else {
+          387┆     uint amountBOptimal = PancakeLibrary.quote(amountADesired,   
+  reserveA, reserveB);                                                          
+          388┆     if (amountBOptimal <= amountBDesired) {
+          389┆         require(amountBOptimal >= amountBMin, 'SpiritRouter:     
+  INSUFFICIENT_B_AMOUNT');                                                      
+          390┆         (amountA, amountB) = (amountADesired, amountBOptimal);
+          391┆     } else {
+          392┆         uint amountAOptimal =                                    
+  PancakeLibrary.quote(amountBDesired, reserveB, reserveA);                     
+          393┆         assert(amountAOptimal <= amountADesired);
+             [hid 4 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-prefix-decrement-not-postfix                    
+          Consider using the prefix decrement expression whenever the return    
+  value is not needed. The                                                      
+          prefix decrement expression is cheaper in terms of gas.               
+                                                                                
+          321┆ for (uint i = path.length - 1; i > 0; i--) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          310┆ for (uint i; i < path.length - 1; i++) {
+            ⋮┆----------------------------------------
+          551┆ for (uint i; i < path.length - 1; i++) {
+            ⋮┆----------------------------------------
+          666┆ for (uint i; i < path.length - 1; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           40┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'TransferHelper: TRANSFER_FROM_FAILED');                            
+            ⋮┆----------------------------------------
+           45┆ require(success, 'TransferHelper: ETH_TRANSFER_FAILED');
+            ⋮┆----------------------------------------
+          255┆ require(tokenA != tokenB, 'SpiritLibrary: IDENTICAL_ADDRESSES');
+            ⋮┆----------------------------------------
+          281┆ require(amountA > 0, 'SpiritLibrary: INSUFFICIENT_AMOUNT');
+            ⋮┆----------------------------------------
+          282┆ require(reserveA > 0 && reserveB > 0, 'SpiritLibrary:            
+  INSUFFICIENT_LIQUIDITY');                                                     
+            ⋮┆----------------------------------------
+          288┆ require(amountIn > 0, 'SpiritLibrary:                            
+  INSUFFICIENT_INPUT_AMOUNT');                                                  
+            ⋮┆----------------------------------------
+          289┆ require(reserveIn > 0 && reserveOut > 0, 'SpiritLibrary:         
+  INSUFFICIENT_LIQUIDITY');                                                     
+            ⋮┆----------------------------------------
+          298┆ require(amountOut > 0, 'SpiritLibrary:                           
+  INSUFFICIENT_OUTPUT_AMOUNT');                                                 
+            ⋮┆----------------------------------------
+          299┆ require(reserveIn > 0 && reserveOut > 0, 'SpiritLibrary:         
+  INSUFFICIENT_LIQUIDITY');                                                     
+            ⋮┆----------------------------------------
+          389┆ require(amountBOptimal >= amountBMin, 'SpiritRouter:             
+  INSUFFICIENT_B_AMOUNT');                                                      
+            ⋮┆----------------------------------------
+          394┆ require(amountAOptimal >= amountAMin, 'SpiritRouter:             
+  INSUFFICIENT_A_AMOUNT');                                                      
+            ⋮┆----------------------------------------
+          455┆ require(amountA >= amountAMin, 'SpiritRouter:                    
+  INSUFFICIENT_A_AMOUNT');                                                      
+            ⋮┆----------------------------------------
+          456┆ require(amountB >= amountBMin, 'SpiritRouter:                    
+  INSUFFICIENT_B_AMOUNT');                                                      
+            ⋮┆----------------------------------------
+          571┆ require(amounts[amounts.length - 1] >= amountOutMin,             
+  'SpiritRouter: INSUFFICIENT_OUTPUT_AMOUNT');                                  
+            ⋮┆----------------------------------------
+          586┆ require(amounts[0] <= amountInMax, 'SpiritRouter:                
+  EXCESSIVE_INPUT_AMOUNT');                                                     
+            ⋮┆----------------------------------------
+          603┆ require(amounts[amounts.length - 1] >= amountOutMin,             
+  'SpiritRouter: INSUFFICIENT_OUTPUT_AMOUNT');                                  
+            ⋮┆----------------------------------------
+          618┆ require(amounts[0] <= amountInMax, 'SpiritRouter:                
+  EXCESSIVE_INPUT_AMOUNT');                                                     
+            ⋮┆----------------------------------------
+          636┆ require(amounts[amounts.length - 1] >= amountOutMin,             
+  'SpiritRouter: INSUFFICIENT_OUTPUT_AMOUNT');                                  
+            ⋮┆----------------------------------------
+          655┆ require(amounts[0] <= msg.value, 'SpiritRouter:                  
+  EXCESSIVE_INPUT_AMOUNT');                                                     
+            ⋮┆----------------------------------------
+          696┆ require(
+          697┆     IERC20(path[path.length -                                    
+  1]).balanceOf(to).sub(balanceBefore) >= amountOutMin,                         
+          698┆     'SpiritRouter: INSUFFICIENT_OUTPUT_AMOUNT'
+          699┆ );
+            ⋮┆----------------------------------------
+          720┆ require(
+          721┆     IERC20(path[path.length -                                    
+  1]).balanceOf(to).sub(balanceBefore) >= amountOutMin,                         
+          722┆     'SpiritRouter: INSUFFICIENT_OUTPUT_AMOUNT'
+          723┆ );
+            ⋮┆----------------------------------------
+          744┆ require(amountOut >= amountOutMin, 'SpiritRouter:                
+  INSUFFICIENT_OUTPUT_AMOUNT');                                                 
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 92 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

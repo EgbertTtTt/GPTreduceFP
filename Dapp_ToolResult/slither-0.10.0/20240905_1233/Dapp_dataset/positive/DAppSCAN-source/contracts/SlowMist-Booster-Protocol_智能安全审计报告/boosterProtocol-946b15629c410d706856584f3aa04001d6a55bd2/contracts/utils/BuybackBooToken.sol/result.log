@@ -1,0 +1,111 @@
+'solc --version' running
+'solc /sb/BuybackBooToken.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+BuybackBooToken.buyback(address,uint256) (../../sb/BuybackBooToken.sol#1102-1146) ignores return value by IERC20(booToken).transfer(lockedAddr,valueOut) (../../sb/BuybackBooToken.sol#1145)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+BuybackBooToken.buyback(address,uint256) (../../sb/BuybackBooToken.sol#1102-1146) uses a dangerous strict equality:
+	- result.length == 0 (../../sb/BuybackBooToken.sol#1135)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+BuybackBooToken.buyback(address,uint256) (../../sb/BuybackBooToken.sol#1102-1146) ignores return value by IERC20(_token).approve(address(router),_value) (../../sb/BuybackBooToken.sol#1131)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+BuybackBooToken.constructor(address)._booToken (../../sb/BuybackBooToken.sol#1093) lacks a zero-check on :
+		- booToken = _booToken (../../sb/BuybackBooToken.sol#1094)
+BuybackBooToken.setLockedAddr(address)._lockedAddr (../../sb/BuybackBooToken.sol#1097) lacks a zero-check on :
+		- lockedAddr = _lockedAddr (../../sb/BuybackBooToken.sol#1099)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in BuybackBooToken.buyback(address,uint256) (../../sb/BuybackBooToken.sol#1102-1146):
+	External calls:
+	- IERC20(_token).safeTransferFrom(msg.sender,address(this),_value) (../../sb/BuybackBooToken.sol#1130)
+	- IERC20(_token).approve(address(router),_value) (../../sb/BuybackBooToken.sol#1131)
+	- result = router.swapExactTokensForTokens(_value,0,path,address(this),block.timestamp.add(60)) (../../sb/BuybackBooToken.sol#1134)
+	State variables written after the call(s):
+	- burnAmount[_token] = burnAmount[_token].add(valueOut) (../../sb/BuybackBooToken.sol#1143)
+	- burnSource[_token] = burnSource[_token].add(_value) (../../sb/BuybackBooToken.sol#1142)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+BuybackBooToken.buyback(address,uint256) (../../sb/BuybackBooToken.sol#1102-1146) uses timestamp for comparisons
+	Dangerous comparisons:
+	- result.length == 0 (../../sb/BuybackBooToken.sol#1135)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/BuybackBooToken.sol#311-320) uses assembly
+	- INLINE ASM (../../sb/BuybackBooToken.sol#318)
+Address._verifyCallResult(bool,bytes,string) (../../sb/BuybackBooToken.sol#456-473) uses assembly
+	- INLINE ASM (../../sb/BuybackBooToken.sol#465-468)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.functionCall(address,bytes) (../../sb/BuybackBooToken.sol#364-366) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/BuybackBooToken.sol#389-391) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/BuybackBooToken.sol#438-440) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/BuybackBooToken.sol#448-454) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/BuybackBooToken.sol#414-416) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/BuybackBooToken.sol#424-430) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/BuybackBooToken.sol#338-344) is never used and should be removed
+Context._msgData() (../../sb/BuybackBooToken.sol#559-562) is never used and should be removed
+ERC20._burn(address,uint256) (../../sb/BuybackBooToken.sol#805-813) is never used and should be removed
+ERC20._mint(address,uint256) (../../sb/BuybackBooToken.sol#784-792) is never used and should be removed
+ERC20._setupDecimals(uint8) (../../sb/BuybackBooToken.sol#843-845) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/BuybackBooToken.sol#504-513) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/BuybackBooToken.sol#520-523) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/BuybackBooToken.sol#515-518) is never used and should be removed
+SafeERC20.safeTransfer(IERC20,address,uint256) (../../sb/BuybackBooToken.sol#489-491) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/BuybackBooToken.sol#264-267) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/BuybackBooToken.sol#226-229) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/BuybackBooToken.sol#284-287) is never used and should be removed
+SafeMath.mul(uint256,uint256) (../../sb/BuybackBooToken.sol#190-195) is never used and should be removed
+SafeMath.sub(uint256,uint256) (../../sb/BuybackBooToken.sol#175-178) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/BuybackBooToken.sol#98-102) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/BuybackBooToken.sol#134-137) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/BuybackBooToken.sol#144-147) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/BuybackBooToken.sol#119-127) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/BuybackBooToken.sol#109-112) is never used and should be removed
+TenMath.safeSub(uint256,uint256) (../../sb/BuybackBooToken.sol#1029-1031) is never used and should be removed
+TenMath.sqrt(uint256) (../../sb/BuybackBooToken.sol#1035-1078) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.6.12 (../../sb/BuybackBooToken.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/BuybackBooToken.sol#338-344):
+	- (success) = recipient.call{value: amount}() (../../sb/BuybackBooToken.sol#342)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/BuybackBooToken.sol#399-406):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/BuybackBooToken.sol#404)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/BuybackBooToken.sol#424-430):
+	- (success,returndata) = target.staticcall(data) (../../sb/BuybackBooToken.sol#428)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/BuybackBooToken.sol#448-454):
+	- (success,returndata) = target.delegatecall(data) (../../sb/BuybackBooToken.sol#452)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Function IMdexRouter.WHT() (../../sb/BuybackBooToken.sol#867) is not in mixedCase
+Parameter BuybackBooToken.setLockedAddr(address)._lockedAddr (../../sb/BuybackBooToken.sol#1097) is not in mixedCase
+Parameter BuybackBooToken.buyback(address,uint256)._token (../../sb/BuybackBooToken.sol#1102) is not in mixedCase
+Parameter BuybackBooToken.buyback(address,uint256)._value (../../sb/BuybackBooToken.sol#1102) is not in mixedCase
+Constant BuybackBooToken.router (../../sb/BuybackBooToken.sol#1085) is not in UPPER_CASE_WITH_UNDERSCORES
+Variable BuybackBooToken.USDT (../../sb/BuybackBooToken.sol#1087) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/BuybackBooToken.sol#560)" inContext (../../sb/BuybackBooToken.sol#554-563)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Variable IMdexRouter.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountADesired (../../sb/BuybackBooToken.sol#874) is too similar to IMdexRouter.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountBDesired (../../sb/BuybackBooToken.sol#875)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+TenMath.sqrt(uint256) (../../sb/BuybackBooToken.sol#1035-1078) uses literals with too many digits:
+	- xx >= 0x100000000000000000000000000000000 (../../sb/BuybackBooToken.sol#1040)
+TenMath.sqrt(uint256) (../../sb/BuybackBooToken.sol#1035-1078) uses literals with too many digits:
+	- xx >= 0x10000000000000000 (../../sb/BuybackBooToken.sol#1045)
+TenMath.sqrt(uint256) (../../sb/BuybackBooToken.sol#1035-1078) uses literals with too many digits:
+	- xx >= 0x100000000 (../../sb/BuybackBooToken.sol#1049)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+BuybackBooToken.USDT (../../sb/BuybackBooToken.sol#1087) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+
+BuybackBooToken.booToken (../../sb/BuybackBooToken.sol#1088) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/BuybackBooToken.sol analyzed (10 contracts with 93 detectors), 55 result(s) found

@@ -1,0 +1,390 @@
+'solc --version' running
+'solc /sb/ArgonFreelancers.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+WorkContract._payFreelancer() (../../sb/ArgonFreelancers.sol#721-750) sends eth to arbitrary user
+	Dangerous calls:
+	- deployedFromContract.feeAddress().transfer(workPrice.safeSub(amount)) (../../sb/ArgonFreelancers.sol#731-733)
+WorkContract._payEmployer() (../../sb/ArgonFreelancers.sol#752-758) sends eth to arbitrary user
+	Dangerous calls:
+	- employerAddress.transfer(workPrice) (../../sb/ArgonFreelancers.sol#754)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#functions-that-send-ether-to-arbitrary-destinations
+
+MainContract (../../sb/ArgonFreelancers.sol#202-473) contract sets array length with a user-controlled value:
+	- allPersons.push(msg.sender) (../../sb/ArgonFreelancers.sol#338)
+MainContract (../../sb/ArgonFreelancers.sol#202-473) contract sets array length with a user-controlled value:
+	- data.WorkAddresses.push(newWork) (../../sb/ArgonFreelancers.sol#398)
+MainContract (../../sb/ArgonFreelancers.sol#202-473) contract sets array length with a user-controlled value:
+	- data.personPuan.push(_puan) (../../sb/ArgonFreelancers.sol#410)
+MainContract (../../sb/ArgonFreelancers.sol#202-473) contract sets array length with a user-controlled value:
+	- data.WorkAddresses.push(_workAddress) (../../sb/ArgonFreelancers.sol#420)
+WorkContract (../../sb/ArgonFreelancers.sol#475-845) contract sets array length with a user-controlled value:
+	- allFreelancerAddress.push(msg.sender) (../../sb/ArgonFreelancers.sol#604)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#array-length-assignment
+
+Reentrancy in WorkContract.employerReceiveFile(uint256,string) (../../sb/ArgonFreelancers.sol#760-772):
+	External calls:
+	- _payFreelancer() (../../sb/ArgonFreelancers.sol#767)
+		- amount = workPrice.safeSub((workPrice.safeMul(deployedFromContract.bnbFeeRate())).safeDiv(1e6)) (../../sb/ArgonFreelancers.sol#725-729)
+		- deployedFromContract.feeAddress().transfer(workPrice.safeSub(amount)) (../../sb/ArgonFreelancers.sol#731-733)
+		- amount = workPrice.safeSub((workPrice.safeMul(deployedFromContract.feeRates(tokenContractAddress))).safeDiv(1e6)) (../../sb/ArgonFreelancers.sol#735-742)
+		- IERC20(tokenContractAddress).transfer(freelancerAddress,amount) (../../sb/ArgonFreelancers.sol#744)
+		- IERC20(tokenContractAddress).transfer(deployedFromContract.feeAddress(),workPrice.safeSub(amount)) (../../sb/ArgonFreelancers.sol#745-748)
+	- deployedFromContract.setPuan(_puan,freelancerAddress) (../../sb/ArgonFreelancers.sol#768)
+	External calls sending eth:
+	- _payFreelancer() (../../sb/ArgonFreelancers.sol#767)
+		- freelancerAddress.transfer(amount) (../../sb/ArgonFreelancers.sol#730)
+		- deployedFromContract.feeAddress().transfer(workPrice.safeSub(amount)) (../../sb/ArgonFreelancers.sol#731-733)
+	State variables written after the call(s):
+	- employerReceiveFiles = true (../../sb/ArgonFreelancers.sol#770)
+	WorkContract.employerReceiveFiles (../../sb/ArgonFreelancers.sol#513) can be used in cross function reentrancies:
+	- WorkContract.constructor(string,string,string,string,address,address) (../../sb/ArgonFreelancers.sol#535-557)
+	- WorkContract.employerCancel(string) (../../sb/ArgonFreelancers.sol#774-784)
+	- WorkContract.employerReceiveFiles (../../sb/ArgonFreelancers.sol#513)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities
+
+MainContract.sendArgonTokenAdmin(address,uint256) (../../sb/ArgonFreelancers.sol#283-289) ignores return value by argonToken.transfer(_address,amount) (../../sb/ArgonFreelancers.sol#288)
+MainContract.unLock() (../../sb/ArgonFreelancers.sol#291-304) ignores return value by argonToken.transfer(msg.sender,approverLockBalances[msg.sender]) (../../sb/ArgonFreelancers.sol#302)
+MainContract.sendApproverArgonCoin(address) (../../sb/ArgonFreelancers.sol#466-472) ignores return value by argonToken.transfer(_approveraddress,amount) (../../sb/ArgonFreelancers.sol#470)
+WorkContract._payFreelancer() (../../sb/ArgonFreelancers.sol#721-750) ignores return value by IERC20(tokenContractAddress).transfer(freelancerAddress,amount) (../../sb/ArgonFreelancers.sol#744)
+WorkContract._payFreelancer() (../../sb/ArgonFreelancers.sol#721-750) ignores return value by IERC20(tokenContractAddress).transfer(deployedFromContract.feeAddress(),workPrice.safeSub(amount)) (../../sb/ArgonFreelancers.sol#745-748)
+WorkContract._payEmployer() (../../sb/ArgonFreelancers.sol#752-758) ignores return value by IERC20(tokenContractAddress).transfer(employerAddress,workPrice) (../../sb/ArgonFreelancers.sol#756)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+WorkContract.employerCancel(string) (../../sb/ArgonFreelancers.sol#774-784) uses a dangerous strict equality:
+	- require(bool)(approverStartDate == 0) (../../sb/ArgonFreelancers.sol#777)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Reentrancy in WorkContract.cancelApprover(string) (../../sb/ArgonFreelancers.sol#810-828):
+	External calls:
+	- deployedFromContract.deleteApproverWorkAddress(this,approverAddress) (../../sb/ArgonFreelancers.sol#819-822)
+	- deployedFromContract.sendApproverArgonCoin(approverAddress) (../../sb/ArgonFreelancers.sol#823)
+	State variables written after the call(s):
+	- approverConfirmStatus = 2 (../../sb/ArgonFreelancers.sol#825)
+	WorkContract.approverConfirmStatus (../../sb/ArgonFreelancers.sol#504) can be used in cross function reentrancies:
+	- WorkContract.approverConfirmStatus (../../sb/ArgonFreelancers.sol#504)
+	- WorkContract.employerCancel(string) (../../sb/ArgonFreelancers.sol#774-784)
+Reentrancy in WorkContract.confirmApprover(string) (../../sb/ArgonFreelancers.sol#786-808):
+	External calls:
+	- deployedFromContract.deleteApproverWorkAddress(this,approverAddress) (../../sb/ArgonFreelancers.sol#796-799)
+	- deployedFromContract.sendApproverArgonCoin(approverAddress) (../../sb/ArgonFreelancers.sol#801)
+	State variables written after the call(s):
+	- approverConfirmStatus = 1 (../../sb/ArgonFreelancers.sol#804)
+	WorkContract.approverConfirmStatus (../../sb/ArgonFreelancers.sol#504) can be used in cross function reentrancies:
+	- WorkContract.approverConfirmStatus (../../sb/ArgonFreelancers.sol#504)
+	- WorkContract.employerCancel(string) (../../sb/ArgonFreelancers.sol#774-784)
+Reentrancy in MainContract.createWork(string,string,string,string) (../../sb/ArgonFreelancers.sol#381-401):
+	External calls:
+	- newWork = new WorkContract(_workTitle,_workCategory,_workDescription,_workAvarageBudget,msg.sender,this) (../../sb/ArgonFreelancers.sol#389-397)
+	State variables written after the call(s):
+	- data.WorkAddresses.push(newWork) (../../sb/ArgonFreelancers.sol#398)
+	MainContract.accounts (../../sb/ArgonFreelancers.sol#213) can be used in cross function reentrancies:
+	- MainContract._removeApproverWorkAddressArray(uint256,address) (../../sb/ArgonFreelancers.sol#423-436)
+	- MainContract.createWork(string,string,string,string) (../../sb/ArgonFreelancers.sol#381-401)
+	- MainContract.deleteApproverWorkAddress(address,address) (../../sb/ArgonFreelancers.sol#438-450)
+	- MainContract.getPersonAccountType(address) (../../sb/ArgonFreelancers.sol#363-370)
+	- MainContract.getPersonInfoData(address) (../../sb/ArgonFreelancers.sol#342-361)
+	- MainContract.setApproverWorkAddress(address,address) (../../sb/ArgonFreelancers.sol#413-421)
+	- MainContract.setPuan(uint256,address) (../../sb/ArgonFreelancers.sol#407-411)
+	- MainContract.updatePerson(string) (../../sb/ArgonFreelancers.sol#372-379)
+Reentrancy in MainContract.sendApproverArgonCoin(address) (../../sb/ArgonFreelancers.sol#466-472):
+	External calls:
+	- argonToken.transfer(_approveraddress,amount) (../../sb/ArgonFreelancers.sol#470)
+	State variables written after the call(s):
+	- remainingArgonToken = remainingArgonToken.safeSub(amount) (../../sb/ArgonFreelancers.sol#471)
+	MainContract.remainingArgonToken (../../sb/ArgonFreelancers.sol#221) can be used in cross function reentrancies:
+	- MainContract.constructor(address,uint8,address) (../../sb/ArgonFreelancers.sol#247-258)
+	- MainContract.remainingArgonToken (../../sb/ArgonFreelancers.sol#221)
+	- MainContract.sendApproverArgonCoin(address) (../../sb/ArgonFreelancers.sol#466-472)
+Reentrancy in MainContract.unLock() (../../sb/ArgonFreelancers.sol#291-304):
+	External calls:
+	- argonToken.transfer(msg.sender,approverLockBalances[msg.sender]) (../../sb/ArgonFreelancers.sol#302)
+	State variables written after the call(s):
+	- approverLockBalances[msg.sender] = 0 (../../sb/ArgonFreelancers.sol#303)
+	MainContract.approverLockBalances (../../sb/ArgonFreelancers.sol#217) can be used in cross function reentrancies:
+	- MainContract.approverLockBalances (../../sb/ArgonFreelancers.sol#217)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+MainContract.changeSettings(uint256,uint8,address) (../../sb/ArgonFreelancers.sol#273-281) should emit an event for: 
+	- approverMinArgonLimit = _approverMinArgonLimit (../../sb/ArgonFreelancers.sol#278) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+MainContract.constructor(address,uint8,address)._feeAddress (../../sb/ArgonFreelancers.sol#250) lacks a zero-check on :
+		- feeAddress = _feeAddress (../../sb/ArgonFreelancers.sol#256)
+MainContract.constructor(address,uint8,address)._argonTokenAddress (../../sb/ArgonFreelancers.sol#248) lacks a zero-check on :
+		- argonTokenContractAddress = _argonTokenAddress (../../sb/ArgonFreelancers.sol#257)
+MainContract.changeSettings(uint256,uint8,address)._feeAddress (../../sb/ArgonFreelancers.sol#276) lacks a zero-check on :
+		- feeAddress = _feeAddress (../../sb/ArgonFreelancers.sol#280)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in MainContract.addPerson(uint8,string) (../../sb/ArgonFreelancers.sol#310-340):
+	External calls:
+	- require(bool)(argonToken.transferFrom(msg.sender,address(this),approverMinArgonLimit)) (../../sb/ArgonFreelancers.sol#318-324)
+	State variables written after the call(s):
+	- accounts[msg.sender] = newAccount (../../sb/ArgonFreelancers.sol#337)
+	- allPersons.push(msg.sender) (../../sb/ArgonFreelancers.sol#338)
+	- personsAddress[msg.sender] = true (../../sb/ArgonFreelancers.sol#339)
+Reentrancy in WorkContract.autoConfirm() (../../sb/ArgonFreelancers.sol#830-838):
+	External calls:
+	- _payFreelancer() (../../sb/ArgonFreelancers.sol#834)
+		- amount = workPrice.safeSub((workPrice.safeMul(deployedFromContract.bnbFeeRate())).safeDiv(1e6)) (../../sb/ArgonFreelancers.sol#725-729)
+		- deployedFromContract.feeAddress().transfer(workPrice.safeSub(amount)) (../../sb/ArgonFreelancers.sol#731-733)
+		- amount = workPrice.safeSub((workPrice.safeMul(deployedFromContract.feeRates(tokenContractAddress))).safeDiv(1e6)) (../../sb/ArgonFreelancers.sol#735-742)
+		- IERC20(tokenContractAddress).transfer(freelancerAddress,amount) (../../sb/ArgonFreelancers.sol#744)
+		- IERC20(tokenContractAddress).transfer(deployedFromContract.feeAddress(),workPrice.safeSub(amount)) (../../sb/ArgonFreelancers.sol#745-748)
+	- deployedFromContract.setPuan(5,freelancerAddress) (../../sb/ArgonFreelancers.sol#835)
+	External calls sending eth:
+	- _payFreelancer() (../../sb/ArgonFreelancers.sol#834)
+		- freelancerAddress.transfer(amount) (../../sb/ArgonFreelancers.sol#730)
+		- deployedFromContract.feeAddress().transfer(workPrice.safeSub(amount)) (../../sb/ArgonFreelancers.sol#731-733)
+	State variables written after the call(s):
+	- employerRemark = Auto Confirmed By Smart Contract (../../sb/ArgonFreelancers.sol#836)
+	- workEndDate = now (../../sb/ArgonFreelancers.sol#837)
+Reentrancy in WorkContract.cancelApprover(string) (../../sb/ArgonFreelancers.sol#810-828):
+	External calls:
+	- deployedFromContract.deleteApproverWorkAddress(this,approverAddress) (../../sb/ArgonFreelancers.sol#819-822)
+	- deployedFromContract.sendApproverArgonCoin(approverAddress) (../../sb/ArgonFreelancers.sol#823)
+	State variables written after the call(s):
+	- approverReport = _description (../../sb/ArgonFreelancers.sol#826)
+Reentrancy in WorkContract.confirmApprover(string) (../../sb/ArgonFreelancers.sol#786-808):
+	External calls:
+	- deployedFromContract.deleteApproverWorkAddress(this,approverAddress) (../../sb/ArgonFreelancers.sol#796-799)
+	- deployedFromContract.sendApproverArgonCoin(approverAddress) (../../sb/ArgonFreelancers.sol#801)
+	- _payFreelancer() (../../sb/ArgonFreelancers.sol#805)
+		- amount = workPrice.safeSub((workPrice.safeMul(deployedFromContract.bnbFeeRate())).safeDiv(1e6)) (../../sb/ArgonFreelancers.sol#725-729)
+		- deployedFromContract.feeAddress().transfer(workPrice.safeSub(amount)) (../../sb/ArgonFreelancers.sol#731-733)
+		- amount = workPrice.safeSub((workPrice.safeMul(deployedFromContract.feeRates(tokenContractAddress))).safeDiv(1e6)) (../../sb/ArgonFreelancers.sol#735-742)
+		- IERC20(tokenContractAddress).transfer(freelancerAddress,amount) (../../sb/ArgonFreelancers.sol#744)
+		- IERC20(tokenContractAddress).transfer(deployedFromContract.feeAddress(),workPrice.safeSub(amount)) (../../sb/ArgonFreelancers.sol#745-748)
+	External calls sending eth:
+	- _payFreelancer() (../../sb/ArgonFreelancers.sol#805)
+		- freelancerAddress.transfer(amount) (../../sb/ArgonFreelancers.sol#730)
+		- deployedFromContract.feeAddress().transfer(workPrice.safeSub(amount)) (../../sb/ArgonFreelancers.sol#731-733)
+	State variables written after the call(s):
+	- approverReport = _description (../../sb/ArgonFreelancers.sol#806)
+	- workEndDate = now (../../sb/ArgonFreelancers.sol#807)
+Reentrancy in WorkContract.createOffer(uint256,string,uint256,string,address,bool,bool) (../../sb/ArgonFreelancers.sol#578-606):
+	External calls:
+	- require(bool)(deployedFromContract.getPersonAccountType(msg.sender) == 0) (../../sb/ArgonFreelancers.sol#587)
+	- require(bool)(deployedFromContract.availableTokens(_tokenContract)) (../../sb/ArgonFreelancers.sol#590)
+	- mustActive() (../../sb/ArgonFreelancers.sol#586)
+		- require(bool)(deployedFromContract.isActive()) (../../sb/ArgonFreelancers.sol#525)
+	State variables written after the call(s):
+	- allFreelancerAddress.push(msg.sender) (../../sb/ArgonFreelancers.sol#604)
+	- offers[msg.sender] = newOffer (../../sb/ArgonFreelancers.sol#603)
+	- workOfferCount ++ (../../sb/ArgonFreelancers.sol#605)
+Reentrancy in MainContract.createWork(string,string,string,string) (../../sb/ArgonFreelancers.sol#381-401):
+	External calls:
+	- newWork = new WorkContract(_workTitle,_workCategory,_workDescription,_workAvarageBudget,msg.sender,this) (../../sb/ArgonFreelancers.sol#389-397)
+	State variables written after the call(s):
+	- deployedWorks.push(newWork) (../../sb/ArgonFreelancers.sol#399)
+	- isDeployedWorks[newWork] = true (../../sb/ArgonFreelancers.sol#400)
+Reentrancy in WorkContract.deleteOffer() (../../sb/ArgonFreelancers.sol#608-611):
+	External calls:
+	- mustActive() (../../sb/ArgonFreelancers.sol#608)
+		- require(bool)(deployedFromContract.isActive()) (../../sb/ArgonFreelancers.sol#525)
+	State variables written after the call(s):
+	- delete offers[msg.sender] (../../sb/ArgonFreelancers.sol#609)
+	- workOfferCount -- (../../sb/ArgonFreelancers.sol#610)
+Reentrancy in WorkContract.employerReceiveFile(uint256,string) (../../sb/ArgonFreelancers.sol#760-772):
+	External calls:
+	- _payFreelancer() (../../sb/ArgonFreelancers.sol#767)
+		- amount = workPrice.safeSub((workPrice.safeMul(deployedFromContract.bnbFeeRate())).safeDiv(1e6)) (../../sb/ArgonFreelancers.sol#725-729)
+		- deployedFromContract.feeAddress().transfer(workPrice.safeSub(amount)) (../../sb/ArgonFreelancers.sol#731-733)
+		- amount = workPrice.safeSub((workPrice.safeMul(deployedFromContract.feeRates(tokenContractAddress))).safeDiv(1e6)) (../../sb/ArgonFreelancers.sol#735-742)
+		- IERC20(tokenContractAddress).transfer(freelancerAddress,amount) (../../sb/ArgonFreelancers.sol#744)
+		- IERC20(tokenContractAddress).transfer(deployedFromContract.feeAddress(),workPrice.safeSub(amount)) (../../sb/ArgonFreelancers.sol#745-748)
+	- deployedFromContract.setPuan(_puan,freelancerAddress) (../../sb/ArgonFreelancers.sol#768)
+	External calls sending eth:
+	- _payFreelancer() (../../sb/ArgonFreelancers.sol#767)
+		- freelancerAddress.transfer(amount) (../../sb/ArgonFreelancers.sol#730)
+		- deployedFromContract.feeAddress().transfer(workPrice.safeSub(amount)) (../../sb/ArgonFreelancers.sol#731-733)
+	State variables written after the call(s):
+	- employerRemark = _remark (../../sb/ArgonFreelancers.sol#769)
+	- workEndDate = now (../../sb/ArgonFreelancers.sol#771)
+Reentrancy in WorkContract.selectOffer(address,address) (../../sb/ArgonFreelancers.sol#653-678):
+	External calls:
+	- require(bool)(deployedFromContract.approverLockBalances(_approveraddress) >= deployedFromContract.approverMinArgonLimit()) (../../sb/ArgonFreelancers.sol#662-665)
+	- mustActive() (../../sb/ArgonFreelancers.sol#656)
+		- require(bool)(deployedFromContract.isActive()) (../../sb/ArgonFreelancers.sol#525)
+	State variables written after the call(s):
+	- approverAddress = _approveraddress (../../sb/ArgonFreelancers.sol#666)
+Reentrancy in WorkContract.selectOffer(address,address) (../../sb/ArgonFreelancers.sol#653-678):
+	External calls:
+	- require(bool)(deployedFromContract.approverLockBalances(_approveraddress) >= deployedFromContract.approverMinArgonLimit()) (../../sb/ArgonFreelancers.sol#662-665)
+	- deployedFromContract.setApproverWorkAddress(this,_approveraddress) (../../sb/ArgonFreelancers.sol#667)
+	- mustActive() (../../sb/ArgonFreelancers.sol#656)
+		- require(bool)(deployedFromContract.isActive()) (../../sb/ArgonFreelancers.sol#525)
+	State variables written after the call(s):
+	- argonShield = data.ArgonShield (../../sb/ArgonFreelancers.sol#677)
+	- deadLine = data.deadline (../../sb/ArgonFreelancers.sol#674)
+	- freelancerAddress = data.freelancerAddress (../../sb/ArgonFreelancers.sol#671)
+	- isBNB = true (../../sb/ArgonFreelancers.sol#676)
+	- workPrice = data.offerPrice (../../sb/ArgonFreelancers.sol#675)
+	- workStartDate = now (../../sb/ArgonFreelancers.sol#673)
+	- workStatus = true (../../sb/ArgonFreelancers.sol#672)
+Reentrancy in WorkContract.selectOfferWithToken(address,address) (../../sb/ArgonFreelancers.sol#680-711):
+	External calls:
+	- require(bool)(deployedFromContract.approverLockBalances(_approveraddress) >= deployedFromContract.approverMinArgonLimit()) (../../sb/ArgonFreelancers.sol#688-691)
+	- mustActive() (../../sb/ArgonFreelancers.sol#683)
+		- require(bool)(deployedFromContract.isActive()) (../../sb/ArgonFreelancers.sol#525)
+	State variables written after the call(s):
+	- approverAddress = _approveraddress (../../sb/ArgonFreelancers.sol#693)
+Reentrancy in WorkContract.selectOfferWithToken(address,address) (../../sb/ArgonFreelancers.sol#680-711):
+	External calls:
+	- require(bool)(deployedFromContract.approverLockBalances(_approveraddress) >= deployedFromContract.approverMinArgonLimit()) (../../sb/ArgonFreelancers.sol#688-691)
+	- deployedFromContract.setApproverWorkAddress(this,_approveraddress) (../../sb/ArgonFreelancers.sol#694)
+	- mustActive() (../../sb/ArgonFreelancers.sol#683)
+		- require(bool)(deployedFromContract.isActive()) (../../sb/ArgonFreelancers.sol#525)
+	State variables written after the call(s):
+	- deadLine = data.deadline (../../sb/ArgonFreelancers.sol#699)
+	- freelancerAddress = data.freelancerAddress (../../sb/ArgonFreelancers.sol#696)
+	- isBNB = false (../../sb/ArgonFreelancers.sol#701)
+	- tokenContractAddress = data.offerTokenContract (../../sb/ArgonFreelancers.sol#702)
+	- workPrice = data.offerPrice (../../sb/ArgonFreelancers.sol#700)
+	- workStartDate = now (../../sb/ArgonFreelancers.sol#698)
+	- workStatus = true (../../sb/ArgonFreelancers.sol#697)
+Reentrancy in WorkContract.selectOfferWithToken(address,address) (../../sb/ArgonFreelancers.sol#680-711):
+	External calls:
+	- require(bool)(deployedFromContract.approverLockBalances(_approveraddress) >= deployedFromContract.approverMinArgonLimit()) (../../sb/ArgonFreelancers.sol#688-691)
+	- deployedFromContract.setApproverWorkAddress(this,_approveraddress) (../../sb/ArgonFreelancers.sol#694)
+	- require(bool)(IERC20(data.offerTokenContract).transferFrom(msg.sender,address(this),data.offerPrice)) (../../sb/ArgonFreelancers.sol#703-709)
+	- mustActive() (../../sb/ArgonFreelancers.sol#683)
+		- require(bool)(deployedFromContract.isActive()) (../../sb/ArgonFreelancers.sol#525)
+	State variables written after the call(s):
+	- argonShield = data.ArgonShield (../../sb/ArgonFreelancers.sol#710)
+Reentrancy in WorkContract.updateOffer(uint256,string,string,bool) (../../sb/ArgonFreelancers.sol#613-624):
+	External calls:
+	- mustActive() (../../sb/ArgonFreelancers.sol#618)
+		- require(bool)(deployedFromContract.isActive()) (../../sb/ArgonFreelancers.sol#525)
+	State variables written after the call(s):
+	- data.offerPrice = _offerPrice (../../sb/ArgonFreelancers.sol#620)
+	- data.description = _description (../../sb/ArgonFreelancers.sol#621)
+	- data.title = _title (../../sb/ArgonFreelancers.sol#622)
+	- data.ArgonShield = _ArgonShield (../../sb/ArgonFreelancers.sol#623)
+Reentrancy in WorkContract.updateWork(string,string,string,string,address) (../../sb/ArgonFreelancers.sol#563-576):
+	External calls:
+	- mustActive() (../../sb/ArgonFreelancers.sol#569)
+		- require(bool)(deployedFromContract.isActive()) (../../sb/ArgonFreelancers.sol#525)
+	State variables written after the call(s):
+	- workAvarageBudget = _workAvarageBudget (../../sb/ArgonFreelancers.sol#575)
+	- workCategory = _workCategory (../../sb/ArgonFreelancers.sol#573)
+	- workDescription = _workDescription (../../sb/ArgonFreelancers.sol#574)
+	- workTitle = _workTitle (../../sb/ArgonFreelancers.sol#572)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+MainContract.checkDeadline(address) (../../sb/ArgonFreelancers.sol#452-464) uses timestamp for comparisons
+	Dangerous comparisons:
+	- now > deployedWork.deadLine() && deployedWork.deadLine() != 0 (../../sb/ArgonFreelancers.sol#459)
+WorkContract.employerCancel(string) (../../sb/ArgonFreelancers.sol#774-784) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool)(approverStartDate == 0) (../../sb/ArgonFreelancers.sol#777)
+WorkContract.confirmApprover(string) (../../sb/ArgonFreelancers.sol#786-808) uses timestamp for comparisons
+	Dangerous comparisons:
+	- now > approverStartDate.safeAdd(432000) (../../sb/ArgonFreelancers.sol#791)
+WorkContract.cancelApprover(string) (../../sb/ArgonFreelancers.sol#810-828) uses timestamp for comparisons
+	Dangerous comparisons:
+	- now > approverStartDate.safeAdd(432000) (../../sb/ArgonFreelancers.sol#815)
+WorkContract.autoConfirm() (../../sb/ArgonFreelancers.sol#830-838) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool)(now > freelancerSendFilesDate.safeAdd(432000)) (../../sb/ArgonFreelancers.sol#831)
+WorkContract.sendDeadline() (../../sb/ArgonFreelancers.sol#840-844) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool)(now > deadLine) (../../sb/ArgonFreelancers.sol#841)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+MainContract.unLock() (../../sb/ArgonFreelancers.sol#291-304) has costly operations inside a loop:
+	- delete allPersons[x] (../../sb/ArgonFreelancers.sol#299)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#costly-operations-inside-a-loop
+
+Pragma version^0.4.24 (../../sb/ArgonFreelancers.sol#1) allows old versions
+solc-0.4.26 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Parameter MainContract.changeActive(bool)._active (../../sb/ArgonFreelancers.sol#260) is not in mixedCase
+Parameter MainContract.changeAvailableTokenFee(address,uint8,bool)._tokenAddress (../../sb/ArgonFreelancers.sol#265) is not in mixedCase
+Parameter MainContract.changeAvailableTokenFee(address,uint8,bool)._feeRate (../../sb/ArgonFreelancers.sol#266) is not in mixedCase
+Parameter MainContract.changeAvailableTokenFee(address,uint8,bool)._available (../../sb/ArgonFreelancers.sol#267) is not in mixedCase
+Parameter MainContract.changeSettings(uint256,uint8,address)._approverMinArgonLimit (../../sb/ArgonFreelancers.sol#274) is not in mixedCase
+Parameter MainContract.changeSettings(uint256,uint8,address)._bnbFeeRate (../../sb/ArgonFreelancers.sol#275) is not in mixedCase
+Parameter MainContract.changeSettings(uint256,uint8,address)._feeAddress (../../sb/ArgonFreelancers.sol#276) is not in mixedCase
+Parameter MainContract.sendArgonTokenAdmin(address,uint256)._address (../../sb/ArgonFreelancers.sol#283) is not in mixedCase
+Parameter MainContract.addPerson(uint8,string)._accountType (../../sb/ArgonFreelancers.sol#310) is not in mixedCase
+Parameter MainContract.addPerson(uint8,string)._personInfoData (../../sb/ArgonFreelancers.sol#310) is not in mixedCase
+Parameter MainContract.getPersonInfoData(address)._personAddress (../../sb/ArgonFreelancers.sol#342) is not in mixedCase
+Parameter MainContract.getPersonAccountType(address)._personAddress (../../sb/ArgonFreelancers.sol#363) is not in mixedCase
+Parameter MainContract.updatePerson(string)._personInfoData (../../sb/ArgonFreelancers.sol#372) is not in mixedCase
+Parameter MainContract.createWork(string,string,string,string)._workTitle (../../sb/ArgonFreelancers.sol#382) is not in mixedCase
+Parameter MainContract.createWork(string,string,string,string)._workCategory (../../sb/ArgonFreelancers.sol#383) is not in mixedCase
+Parameter MainContract.createWork(string,string,string,string)._workDescription (../../sb/ArgonFreelancers.sol#384) is not in mixedCase
+Parameter MainContract.createWork(string,string,string,string)._workAvarageBudget (../../sb/ArgonFreelancers.sol#385) is not in mixedCase
+Parameter MainContract.setPuan(uint256,address)._puan (../../sb/ArgonFreelancers.sol#407) is not in mixedCase
+Parameter MainContract.setPuan(uint256,address)._freelancerAddress (../../sb/ArgonFreelancers.sol#407) is not in mixedCase
+Parameter MainContract.setApproverWorkAddress(address,address)._workAddress (../../sb/ArgonFreelancers.sol#414) is not in mixedCase
+Parameter MainContract.setApproverWorkAddress(address,address)._approveraddress (../../sb/ArgonFreelancers.sol#415) is not in mixedCase
+Parameter MainContract.deleteApproverWorkAddress(address,address)._workAddress (../../sb/ArgonFreelancers.sol#439) is not in mixedCase
+Parameter MainContract.deleteApproverWorkAddress(address,address)._approveraddress (../../sb/ArgonFreelancers.sol#440) is not in mixedCase
+Parameter MainContract.checkDeadline(address)._workAddress (../../sb/ArgonFreelancers.sol#452) is not in mixedCase
+Parameter MainContract.sendApproverArgonCoin(address)._approveraddress (../../sb/ArgonFreelancers.sol#466) is not in mixedCase
+Parameter WorkContract.updateWork(string,string,string,string,address)._workTitle (../../sb/ArgonFreelancers.sol#564) is not in mixedCase
+Parameter WorkContract.updateWork(string,string,string,string,address)._workCategory (../../sb/ArgonFreelancers.sol#565) is not in mixedCase
+Parameter WorkContract.updateWork(string,string,string,string,address)._workDescription (../../sb/ArgonFreelancers.sol#566) is not in mixedCase
+Parameter WorkContract.updateWork(string,string,string,string,address)._workAvarageBudget (../../sb/ArgonFreelancers.sol#567) is not in mixedCase
+Parameter WorkContract.updateWork(string,string,string,string,address)._workaddress (../../sb/ArgonFreelancers.sol#568) is not in mixedCase
+Parameter WorkContract.createOffer(uint256,string,uint256,string,address,bool,bool)._offerPrice (../../sb/ArgonFreelancers.sol#579) is not in mixedCase
+Parameter WorkContract.createOffer(uint256,string,uint256,string,address,bool,bool)._description (../../sb/ArgonFreelancers.sol#580) is not in mixedCase
+Parameter WorkContract.createOffer(uint256,string,uint256,string,address,bool,bool)._deadline (../../sb/ArgonFreelancers.sol#581) is not in mixedCase
+Parameter WorkContract.createOffer(uint256,string,uint256,string,address,bool,bool)._title (../../sb/ArgonFreelancers.sol#582) is not in mixedCase
+Parameter WorkContract.createOffer(uint256,string,uint256,string,address,bool,bool)._tokenContract (../../sb/ArgonFreelancers.sol#583) is not in mixedCase
+Parameter WorkContract.createOffer(uint256,string,uint256,string,address,bool,bool)._isBNB (../../sb/ArgonFreelancers.sol#584) is not in mixedCase
+Parameter WorkContract.createOffer(uint256,string,uint256,string,address,bool,bool)._ArgonShield (../../sb/ArgonFreelancers.sol#585) is not in mixedCase
+Parameter WorkContract.updateOffer(uint256,string,string,bool)._offerPrice (../../sb/ArgonFreelancers.sol#614) is not in mixedCase
+Parameter WorkContract.updateOffer(uint256,string,string,bool)._description (../../sb/ArgonFreelancers.sol#615) is not in mixedCase
+Parameter WorkContract.updateOffer(uint256,string,string,bool)._title (../../sb/ArgonFreelancers.sol#616) is not in mixedCase
+Parameter WorkContract.updateOffer(uint256,string,string,bool)._ArgonShield (../../sb/ArgonFreelancers.sol#617) is not in mixedCase
+Parameter WorkContract.getOfferData(address)._freelancerAddress (../../sb/ArgonFreelancers.sol#626) is not in mixedCase
+Parameter WorkContract.selectOffer(address,address)._freelancerAddress (../../sb/ArgonFreelancers.sol#653) is not in mixedCase
+Parameter WorkContract.selectOffer(address,address)._approveraddress (../../sb/ArgonFreelancers.sol#653) is not in mixedCase
+Parameter WorkContract.selectOfferWithToken(address,address)._freelancerAddress (../../sb/ArgonFreelancers.sol#681) is not in mixedCase
+Parameter WorkContract.selectOfferWithToken(address,address)._approveraddress (../../sb/ArgonFreelancers.sol#682) is not in mixedCase
+Parameter WorkContract.freelancerSendFile(string)._workFilesLink (../../sb/ArgonFreelancers.sol#713) is not in mixedCase
+Parameter WorkContract.employerReceiveFile(uint256,string)._puan (../../sb/ArgonFreelancers.sol#760) is not in mixedCase
+Parameter WorkContract.employerReceiveFile(uint256,string)._remark (../../sb/ArgonFreelancers.sol#760) is not in mixedCase
+Parameter WorkContract.employerCancel(string)._depscription (../../sb/ArgonFreelancers.sol#774) is not in mixedCase
+Parameter WorkContract.confirmApprover(string)._description (../../sb/ArgonFreelancers.sol#786) is not in mixedCase
+Parameter WorkContract.cancelApprover(string)._description (../../sb/ArgonFreelancers.sol#810) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Reentrancy in WorkContract.autoConfirm() (../../sb/ArgonFreelancers.sol#830-838):
+	External calls:
+	- _payFreelancer() (../../sb/ArgonFreelancers.sol#834)
+		- freelancerAddress.transfer(amount) (../../sb/ArgonFreelancers.sol#730)
+		- deployedFromContract.feeAddress().transfer(workPrice.safeSub(amount)) (../../sb/ArgonFreelancers.sol#731-733)
+	State variables written after the call(s):
+	- employerRemark = Auto Confirmed By Smart Contract (../../sb/ArgonFreelancers.sol#836)
+	- workEndDate = now (../../sb/ArgonFreelancers.sol#837)
+Reentrancy in WorkContract.confirmApprover(string) (../../sb/ArgonFreelancers.sol#786-808):
+	External calls:
+	- _payFreelancer() (../../sb/ArgonFreelancers.sol#805)
+		- freelancerAddress.transfer(amount) (../../sb/ArgonFreelancers.sol#730)
+		- deployedFromContract.feeAddress().transfer(workPrice.safeSub(amount)) (../../sb/ArgonFreelancers.sol#731-733)
+	State variables written after the call(s):
+	- approverReport = _description (../../sb/ArgonFreelancers.sol#806)
+	- workEndDate = now (../../sb/ArgonFreelancers.sol#807)
+Reentrancy in WorkContract.employerReceiveFile(uint256,string) (../../sb/ArgonFreelancers.sol#760-772):
+	External calls:
+	- _payFreelancer() (../../sb/ArgonFreelancers.sol#767)
+		- freelancerAddress.transfer(amount) (../../sb/ArgonFreelancers.sol#730)
+		- deployedFromContract.feeAddress().transfer(workPrice.safeSub(amount)) (../../sb/ArgonFreelancers.sol#731-733)
+	State variables written after the call(s):
+	- employerReceiveFiles = true (../../sb/ArgonFreelancers.sol#770)
+	- employerRemark = _remark (../../sb/ArgonFreelancers.sol#769)
+	- workEndDate = now (../../sb/ArgonFreelancers.sol#771)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-4
+
+Variable MainContract.getPersonAccountType(address)._personAddress (../../sb/ArgonFreelancers.sol#363) is too similar to MainContract.personsAddress (../../sb/ArgonFreelancers.sol#214)
+Variable MainContract.getPersonInfoData(address)._personAddress (../../sb/ArgonFreelancers.sol#342) is too similar to MainContract.personsAddress (../../sb/ArgonFreelancers.sol#214)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+Loop condition x < allPersons.length (../../sb/ArgonFreelancers.sol#297) should use cached array length instead of referencing `length` member of the storage array.
+ Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cache-array-length
+/sb/ArgonFreelancers.sol analyzed (7 contracts with 93 detectors), 106 result(s) found

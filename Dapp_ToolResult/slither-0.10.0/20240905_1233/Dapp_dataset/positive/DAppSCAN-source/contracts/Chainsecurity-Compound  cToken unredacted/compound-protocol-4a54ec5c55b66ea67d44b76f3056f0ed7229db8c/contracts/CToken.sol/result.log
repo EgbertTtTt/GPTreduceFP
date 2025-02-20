@@ -1,0 +1,245 @@
+'solc --version' running
+'solc /sb/CToken.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/sb' running
+
+EIP20NonStandardInterface (../../sb/CToken.sol#108-170) has incorrect ERC20 function interface:EIP20NonStandardInterface.transfer(address,uint256) (../../sb/CToken.sol#134)
+EIP20NonStandardInterface (../../sb/CToken.sol#108-170) has incorrect ERC20 function interface:EIP20NonStandardInterface.transferFrom(address,address,uint256) (../../sb/CToken.sol#148)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-erc20-interface
+
+CToken.accrueInterest() (../../sb/CToken.sol#1139-1191) uses a dangerous strict equality:
+	- accrualBlockNumberPrior == currentBlockNumber (../../sb/CToken.sol#1145)
+CToken.exchangeRateStoredInternal() (../../sb/CToken.sol#1105-1124) uses a dangerous strict equality:
+	- _totalSupply == 0 (../../sb/CToken.sol#1107)
+CToken.initialize(ComptrollerInterface,InterestRateModel,uint256,string,string,uint8) (../../sb/CToken.sol#838-869) uses a dangerous strict equality:
+	- require(bool,string)(accrualBlockNumber == 0 && borrowIndex == 0,market may only be initialized once) (../../sb/CToken.sol#845)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Reentrancy in CToken.liquidateBorrowInternal(address,uint256,CTokenInterface) (../../sb/CToken.sol#1536-1551):
+	External calls:
+	- error = cTokenCollateral.accrueInterest() (../../sb/CToken.sol#1543)
+	- liquidateBorrowFresh(msg.sender,borrower,repayAmount,cTokenCollateral) (../../sb/CToken.sol#1550)
+		- allowed = comptroller.liquidateBorrowAllowed(address(this),address(cTokenCollateral),liquidator,borrower,repayAmount) (../../sb/CToken.sol#1563)
+		- allowed = comptroller.seizeAllowed(address(this),seizerToken,liquidator,borrower,seizeTokens) (../../sb/CToken.sol#1644)
+		- allowed = comptroller.repayBorrowAllowed(address(this),payer,borrower,repayAmount) (../../sb/CToken.sol#1481)
+		- require(bool,string)(cTokenCollateral.seize(liquidator,borrower,seizeTokens) == NO_ERROR,token seizure failed) (../../sb/CToken.sol#1611)
+	State variables written after the call(s):
+	- liquidateBorrowFresh(msg.sender,borrower,repayAmount,cTokenCollateral) (../../sb/CToken.sol#1550)
+		- totalBorrows = totalBorrowsNew (../../sb/CToken.sol#1521)
+	CTokenStorage.totalBorrows (../../sb/CToken.sol#375) can be used in cross function reentrancies:
+	- CToken.accrueInterest() (../../sb/CToken.sol#1139-1191)
+	- CToken.borrowRatePerBlock() (../../sb/CToken.sol#1019-1021)
+	- CToken.exchangeRateStoredInternal() (../../sb/CToken.sol#1105-1124)
+	- CToken.supplyRatePerBlock() (../../sb/CToken.sol#1027-1029)
+	- CTokenStorage.totalBorrows (../../sb/CToken.sol#375)
+	- liquidateBorrowFresh(msg.sender,borrower,repayAmount,cTokenCollateral) (../../sb/CToken.sol#1550)
+		- totalReserves = totalReservesNew (../../sb/CToken.sol#1671)
+	CTokenStorage.totalReserves (../../sb/CToken.sol#380) can be used in cross function reentrancies:
+	- CToken.accrueInterest() (../../sb/CToken.sol#1139-1191)
+	- CToken.borrowRatePerBlock() (../../sb/CToken.sol#1019-1021)
+	- CToken.exchangeRateStoredInternal() (../../sb/CToken.sol#1105-1124)
+	- CToken.supplyRatePerBlock() (../../sb/CToken.sol#1027-1029)
+	- CTokenStorage.totalReserves (../../sb/CToken.sol#380)
+Reentrancy in CToken.redeemFresh(address,uint256,uint256) (../../sb/CToken.sol#1304-1373):
+	External calls:
+	- allowed = comptroller.redeemAllowed(address(this),redeemer,redeemTokens) (../../sb/CToken.sol#1332)
+	State variables written after the call(s):
+	- totalSupply = totalSupply - redeemTokens (../../sb/CToken.sol#1356)
+	CTokenStorage.totalSupply (../../sb/CToken.sol#385) can be used in cross function reentrancies:
+	- CToken.exchangeRateStoredInternal() (../../sb/CToken.sol#1105-1124)
+	- CTokenStorage.totalSupply (../../sb/CToken.sol#385)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+CToken._addReservesFresh(uint256).actualAddAmount (../../sb/CToken.sol#1831) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+CToken.initialize(ComptrollerInterface,InterestRateModel,uint256,string,string,uint8) (../../sb/CToken.sol#838-869) should emit an event for: 
+	- initialExchangeRateMantissa = initialExchangeRateMantissa_ (../../sb/CToken.sol#848) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+CToken._setPendingAdmin(address).newPendingAdmin (../../sb/CToken.sol#1691) lacks a zero-check on :
+		- pendingAdmin = newPendingAdmin (../../sb/CToken.sol#1701)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in CToken.borrowFresh(address,uint256) (../../sb/CToken.sol#1393-1441):
+	External calls:
+	- allowed = comptroller.borrowAllowed(address(this),borrower,borrowAmount) (../../sb/CToken.sol#1395)
+	State variables written after the call(s):
+	- accountBorrows[borrower].principal = accountBorrowsNew (../../sb/CToken.sol#1427)
+	- accountBorrows[borrower].interestIndex = borrowIndex (../../sb/CToken.sol#1428)
+	- totalBorrows = totalBorrowsNew (../../sb/CToken.sol#1429)
+Reentrancy in CToken.mintFresh(address,uint256) (../../sb/CToken.sol#1214-1265):
+	External calls:
+	- allowed = comptroller.mintAllowed(address(this),minter,mintAmount) (../../sb/CToken.sol#1216)
+	State variables written after the call(s):
+	- accountTokens[minter] = accountTokens[minter] + mintTokens (../../sb/CToken.sol#1256)
+	- totalSupply = totalSupply + mintTokens (../../sb/CToken.sol#1255)
+Reentrancy in CToken.redeemFresh(address,uint256,uint256) (../../sb/CToken.sol#1304-1373):
+	External calls:
+	- allowed = comptroller.redeemAllowed(address(this),redeemer,redeemTokens) (../../sb/CToken.sol#1332)
+	State variables written after the call(s):
+	- accountTokens[redeemer] = accountTokens[redeemer] - redeemTokens (../../sb/CToken.sol#1357)
+Reentrancy in CToken.repayBorrowFresh(address,address,uint256) (../../sb/CToken.sol#1479-1527):
+	External calls:
+	- allowed = comptroller.repayBorrowAllowed(address(this),payer,borrower,repayAmount) (../../sb/CToken.sol#1481)
+	State variables written after the call(s):
+	- accountBorrows[borrower].principal = accountBorrowsNew (../../sb/CToken.sol#1519)
+	- accountBorrows[borrower].interestIndex = borrowIndex (../../sb/CToken.sol#1520)
+	- totalBorrows = totalBorrowsNew (../../sb/CToken.sol#1521)
+Reentrancy in CToken.seizeInternal(address,address,address,uint256) (../../sb/CToken.sol#1642-1680):
+	External calls:
+	- allowed = comptroller.seizeAllowed(address(this),seizerToken,liquidator,borrower,seizeTokens) (../../sb/CToken.sol#1644)
+	State variables written after the call(s):
+	- accountTokens[borrower] = accountTokens[borrower] - seizeTokens (../../sb/CToken.sol#1673)
+	- accountTokens[liquidator] = accountTokens[liquidator] + liquidatorSeizeTokens (../../sb/CToken.sol#1674)
+	- totalReserves = totalReservesNew (../../sb/CToken.sol#1671)
+	- totalSupply = totalSupply - protocolSeizeTokens (../../sb/CToken.sol#1672)
+Reentrancy in CToken.transferTokens(address,address,address,uint256) (../../sb/CToken.sol#880-924):
+	External calls:
+	- allowed = comptroller.transferAllowed(address(this),src,dst,tokens) (../../sb/CToken.sol#882)
+	State variables written after the call(s):
+	- accountTokens[src] = srcTokensNew (../../sb/CToken.sol#909)
+	- accountTokens[dst] = dstTokensNew (../../sb/CToken.sol#910)
+	- transferAllowances[src][spender] = allowanceNew (../../sb/CToken.sol#914)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in CToken.borrowFresh(address,uint256) (../../sb/CToken.sol#1393-1441):
+	External calls:
+	- allowed = comptroller.borrowAllowed(address(this),borrower,borrowAmount) (../../sb/CToken.sol#1395)
+	Event emitted after the call(s):
+	- Borrow(borrower,borrowAmount,accountBorrowsNew,totalBorrowsNew) (../../sb/CToken.sol#1440)
+Reentrancy in CToken.liquidateBorrowFresh(address,address,uint256,CTokenInterface) (../../sb/CToken.sol#1561-1616):
+	External calls:
+	- allowed = comptroller.liquidateBorrowAllowed(address(this),address(cTokenCollateral),liquidator,borrower,repayAmount) (../../sb/CToken.sol#1563)
+	- actualRepayAmount = repayBorrowFresh(liquidator,borrower,repayAmount) (../../sb/CToken.sol#1594)
+		- allowed = comptroller.repayBorrowAllowed(address(this),payer,borrower,repayAmount) (../../sb/CToken.sol#1481)
+	Event emitted after the call(s):
+	- RepayBorrow(payer,borrower,actualRepayAmount,accountBorrowsNew,totalBorrowsNew) (../../sb/CToken.sol#1524)
+		- actualRepayAmount = repayBorrowFresh(liquidator,borrower,repayAmount) (../../sb/CToken.sol#1594)
+Reentrancy in CToken.liquidateBorrowFresh(address,address,uint256,CTokenInterface) (../../sb/CToken.sol#1561-1616):
+	External calls:
+	- allowed = comptroller.liquidateBorrowAllowed(address(this),address(cTokenCollateral),liquidator,borrower,repayAmount) (../../sb/CToken.sol#1563)
+	- actualRepayAmount = repayBorrowFresh(liquidator,borrower,repayAmount) (../../sb/CToken.sol#1594)
+		- allowed = comptroller.repayBorrowAllowed(address(this),payer,borrower,repayAmount) (../../sb/CToken.sol#1481)
+	- seizeInternal(address(this),liquidator,borrower,seizeTokens) (../../sb/CToken.sol#1609)
+		- allowed = comptroller.seizeAllowed(address(this),seizerToken,liquidator,borrower,seizeTokens) (../../sb/CToken.sol#1644)
+	Event emitted after the call(s):
+	- ReservesAdded(address(this),protocolSeizeAmount,totalReservesNew) (../../sb/CToken.sol#1679)
+		- seizeInternal(address(this),liquidator,borrower,seizeTokens) (../../sb/CToken.sol#1609)
+	- Transfer(borrower,liquidator,liquidatorSeizeTokens) (../../sb/CToken.sol#1677)
+		- seizeInternal(address(this),liquidator,borrower,seizeTokens) (../../sb/CToken.sol#1609)
+	- Transfer(borrower,address(this),protocolSeizeTokens) (../../sb/CToken.sol#1678)
+		- seizeInternal(address(this),liquidator,borrower,seizeTokens) (../../sb/CToken.sol#1609)
+Reentrancy in CToken.liquidateBorrowFresh(address,address,uint256,CTokenInterface) (../../sb/CToken.sol#1561-1616):
+	External calls:
+	- allowed = comptroller.liquidateBorrowAllowed(address(this),address(cTokenCollateral),liquidator,borrower,repayAmount) (../../sb/CToken.sol#1563)
+	- actualRepayAmount = repayBorrowFresh(liquidator,borrower,repayAmount) (../../sb/CToken.sol#1594)
+		- allowed = comptroller.repayBorrowAllowed(address(this),payer,borrower,repayAmount) (../../sb/CToken.sol#1481)
+	- seizeInternal(address(this),liquidator,borrower,seizeTokens) (../../sb/CToken.sol#1609)
+		- allowed = comptroller.seizeAllowed(address(this),seizerToken,liquidator,borrower,seizeTokens) (../../sb/CToken.sol#1644)
+	- require(bool,string)(cTokenCollateral.seize(liquidator,borrower,seizeTokens) == NO_ERROR,token seizure failed) (../../sb/CToken.sol#1611)
+	Event emitted after the call(s):
+	- LiquidateBorrow(liquidator,borrower,actualRepayAmount,address(cTokenCollateral),seizeTokens) (../../sb/CToken.sol#1615)
+Reentrancy in CToken.mintFresh(address,uint256) (../../sb/CToken.sol#1214-1265):
+	External calls:
+	- allowed = comptroller.mintAllowed(address(this),minter,mintAmount) (../../sb/CToken.sol#1216)
+	Event emitted after the call(s):
+	- Mint(minter,actualMintAmount,mintTokens) (../../sb/CToken.sol#1259)
+	- Transfer(address(this),minter,mintTokens) (../../sb/CToken.sol#1260)
+Reentrancy in CToken.redeemFresh(address,uint256,uint256) (../../sb/CToken.sol#1304-1373):
+	External calls:
+	- allowed = comptroller.redeemAllowed(address(this),redeemer,redeemTokens) (../../sb/CToken.sol#1332)
+	Event emitted after the call(s):
+	- Redeem(redeemer,redeemAmount,redeemTokens) (../../sb/CToken.sol#1369)
+	- Transfer(redeemer,address(this),redeemTokens) (../../sb/CToken.sol#1368)
+Reentrancy in CToken.repayBorrowFresh(address,address,uint256) (../../sb/CToken.sol#1479-1527):
+	External calls:
+	- allowed = comptroller.repayBorrowAllowed(address(this),payer,borrower,repayAmount) (../../sb/CToken.sol#1481)
+	Event emitted after the call(s):
+	- RepayBorrow(payer,borrower,actualRepayAmount,accountBorrowsNew,totalBorrowsNew) (../../sb/CToken.sol#1524)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+CToken._addReservesFresh(uint256) (../../sb/CToken.sol#1828-1862) is never used and should be removed
+CToken._addReservesInternal(uint256) (../../sb/CToken.sol#1810-1820) is never used and should be removed
+CToken.borrowFresh(address,uint256) (../../sb/CToken.sol#1393-1441) is never used and should be removed
+CToken.borrowInternal(uint256) (../../sb/CToken.sol#1379-1387) is never used and should be removed
+CToken.liquidateBorrowFresh(address,address,uint256,CTokenInterface) (../../sb/CToken.sol#1561-1616) is never used and should be removed
+CToken.liquidateBorrowInternal(address,uint256,CTokenInterface) (../../sb/CToken.sol#1536-1551) is never used and should be removed
+CToken.mintFresh(address,uint256) (../../sb/CToken.sol#1214-1265) is never used and should be removed
+CToken.mintInternal(uint256) (../../sb/CToken.sol#1198-1206) is never used and should be removed
+CToken.redeemFresh(address,uint256,uint256) (../../sb/CToken.sol#1304-1373) is never used and should be removed
+CToken.redeemInternal(uint256) (../../sb/CToken.sol#1272-1280) is never used and should be removed
+CToken.redeemUnderlyingInternal(uint256) (../../sb/CToken.sol#1287-1295) is never used and should be removed
+CToken.repayBorrowBehalfInternal(address,uint256) (../../sb/CToken.sol#1462-1470) is never used and should be removed
+CToken.repayBorrowFresh(address,address,uint256) (../../sb/CToken.sol#1479-1527) is never used and should be removed
+CToken.repayBorrowInternal(uint256) (../../sb/CToken.sol#1447-1455) is never used and should be removed
+ComptrollerErrorReporter.fail(ComptrollerErrorReporter.Error,ComptrollerErrorReporter.FailureInfo) (../../sb/CToken.sol#226-230) is never used and should be removed
+ComptrollerErrorReporter.failOpaque(ComptrollerErrorReporter.Error,ComptrollerErrorReporter.FailureInfo,uint256) (../../sb/CToken.sol#235-239) is never used and should be removed
+ExponentialNoError.add_(ExponentialNoError.Double,ExponentialNoError.Double) (../../sb/CToken.sol#742-744) is never used and should be removed
+ExponentialNoError.add_(ExponentialNoError.Exp,ExponentialNoError.Exp) (../../sb/CToken.sol#738-740) is never used and should be removed
+ExponentialNoError.div_(ExponentialNoError.Double,ExponentialNoError.Double) (../../sb/CToken.sol#802-804) is never used and should be removed
+ExponentialNoError.div_(ExponentialNoError.Double,uint256) (../../sb/CToken.sol#806-808) is never used and should be removed
+ExponentialNoError.div_(ExponentialNoError.Exp,ExponentialNoError.Exp) (../../sb/CToken.sol#790-792) is never used and should be removed
+ExponentialNoError.div_(ExponentialNoError.Exp,uint256) (../../sb/CToken.sol#794-796) is never used and should be removed
+ExponentialNoError.div_(uint256,ExponentialNoError.Double) (../../sb/CToken.sol#810-812) is never used and should be removed
+ExponentialNoError.div_(uint256,ExponentialNoError.Exp) (../../sb/CToken.sol#798-800) is never used and should be removed
+ExponentialNoError.div_(uint256,uint256) (../../sb/CToken.sol#814-816) is never used and should be removed
+ExponentialNoError.fraction(uint256,uint256) (../../sb/CToken.sol#818-820) is never used and should be removed
+ExponentialNoError.greaterThanExp(ExponentialNoError.Exp,ExponentialNoError.Exp) (../../sb/CToken.sol#717-719) is never used and should be removed
+ExponentialNoError.isZeroExp(ExponentialNoError.Exp) (../../sb/CToken.sol#724-726) is never used and should be removed
+ExponentialNoError.lessThanExp(ExponentialNoError.Exp,ExponentialNoError.Exp) (../../sb/CToken.sol#703-705) is never used and should be removed
+ExponentialNoError.lessThanOrEqualExp(ExponentialNoError.Exp,ExponentialNoError.Exp) (../../sb/CToken.sol#710-712) is never used and should be removed
+ExponentialNoError.mul_(ExponentialNoError.Double,ExponentialNoError.Double) (../../sb/CToken.sol#774-776) is never used and should be removed
+ExponentialNoError.mul_(ExponentialNoError.Double,uint256) (../../sb/CToken.sol#778-780) is never used and should be removed
+ExponentialNoError.mul_(ExponentialNoError.Exp,ExponentialNoError.Exp) (../../sb/CToken.sol#762-764) is never used and should be removed
+ExponentialNoError.mul_(uint256,ExponentialNoError.Double) (../../sb/CToken.sol#782-784) is never used and should be removed
+ExponentialNoError.safe224(uint256,string) (../../sb/CToken.sol#728-731) is never used and should be removed
+ExponentialNoError.safe32(uint256,string) (../../sb/CToken.sol#733-736) is never used and should be removed
+ExponentialNoError.sub_(ExponentialNoError.Double,ExponentialNoError.Double) (../../sb/CToken.sol#754-756) is never used and should be removed
+ExponentialNoError.sub_(ExponentialNoError.Exp,ExponentialNoError.Exp) (../../sb/CToken.sol#750-752) is never used and should be removed
+ExponentialNoError.sub_(uint256,uint256) (../../sb/CToken.sol#758-760) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.8.6 (../../sb/CToken.sol#1) allows old versions
+solc-0.8.27 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Constant CTokenStorage.borrowRateMaxMantissa (../../sb/CToken.sol#329) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant CTokenStorage.reserveFactorMaxMantissa (../../sb/CToken.sol#332) is not in UPPER_CASE_WITH_UNDERSCORES
+Function CTokenInterface._setPendingAdmin(address) (../../sb/CToken.sol#523) is not in mixedCase
+Function CTokenInterface._acceptAdmin() (../../sb/CToken.sol#524) is not in mixedCase
+Function CTokenInterface._setComptroller(ComptrollerInterface) (../../sb/CToken.sol#525) is not in mixedCase
+Function CTokenInterface._setReserveFactor(uint256) (../../sb/CToken.sol#526) is not in mixedCase
+Function CTokenInterface._reduceReserves(uint256) (../../sb/CToken.sol#527) is not in mixedCase
+Function CTokenInterface._setInterestRateModel(InterestRateModel) (../../sb/CToken.sol#528) is not in mixedCase
+Function CErc20Interface._addReserves(uint256) (../../sb/CToken.sol#554) is not in mixedCase
+Function CDelegatorInterface._setImplementation(address,bool,bytes) (../../sb/CToken.sol#576) is not in mixedCase
+Function CDelegateInterface._becomeImplementation(bytes) (../../sb/CToken.sol#585) is not in mixedCase
+Function CDelegateInterface._resignImplementation() (../../sb/CToken.sol#590) is not in mixedCase
+Function ExponentialNoError.mul_ScalarTruncate(ExponentialNoError.Exp,uint256) (../../sb/CToken.sol#687-690) is not in mixedCase
+Function ExponentialNoError.mul_ScalarTruncateAddUInt(ExponentialNoError.Exp,uint256,uint256) (../../sb/CToken.sol#695-698) is not in mixedCase
+Constant ExponentialNoError.expScale (../../sb/CToken.sol#662) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant ExponentialNoError.doubleScale (../../sb/CToken.sol#663) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant ExponentialNoError.halfExpScale (../../sb/CToken.sol#664) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant ExponentialNoError.mantissaOne (../../sb/CToken.sol#665) is not in UPPER_CASE_WITH_UNDERSCORES
+Function CToken._setPendingAdmin(address) (../../sb/CToken.sol#1691-1707) is not in mixedCase
+Function CToken._acceptAdmin() (../../sb/CToken.sol#1714-1734) is not in mixedCase
+Function CToken._setComptroller(ComptrollerInterface) (../../sb/CToken.sol#1742-1759) is not in mixedCase
+Function CToken._setReserveFactor(uint256) (../../sb/CToken.sol#1766-1774) is not in mixedCase
+Function CToken._reduceReserves(uint256) (../../sb/CToken.sol#1870-1878) is not in mixedCase
+Function CToken._setInterestRateModel(InterestRateModel) (../../sb/CToken.sol#1933-1941) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Variable CToken.seize(address,address,uint256).seizeTokens (../../sb/CToken.sol#1627) is too similar to CToken.seizeInternal(address,address,address,uint256).seizerToken (../../sb/CToken.sol#1642)
+Variable CToken.liquidateBorrowFresh(address,address,uint256,CTokenInterface).seizeTokens (../../sb/CToken.sol#1601) is too similar to CToken.seizeInternal(address,address,address,uint256).seizerToken (../../sb/CToken.sol#1642)
+Variable CTokenInterface.seize(address,address,uint256).seizeTokens (../../sb/CToken.sol#518) is too similar to CToken.seizeInternal(address,address,address,uint256).seizerToken (../../sb/CToken.sol#1642)
+Variable CToken.seizeInternal(address,address,address,uint256).seizeTokens (../../sb/CToken.sol#1642) is too similar to CToken.seizeInternal(address,address,address,uint256).seizerToken (../../sb/CToken.sol#1642)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+CToken (../../sb/CToken.sol#828-2013) does not implement functions:
+	- CToken.doTransferIn(address,uint256) (../../sb/CToken.sol#1992)
+	- CToken.doTransferOut(address,uint256) (../../sb/CToken.sol#1999)
+	- CToken.getCashPrior() (../../sb/CToken.sol#1986)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unimplemented-functions
+
+ExponentialNoError.halfExpScale (../../sb/CToken.sol#664) is never used in CToken (../../sb/CToken.sol#828-2013)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-state-variable
+/sb/CToken.sol analyzed (15 contracts with 93 detectors), 94 result(s) found

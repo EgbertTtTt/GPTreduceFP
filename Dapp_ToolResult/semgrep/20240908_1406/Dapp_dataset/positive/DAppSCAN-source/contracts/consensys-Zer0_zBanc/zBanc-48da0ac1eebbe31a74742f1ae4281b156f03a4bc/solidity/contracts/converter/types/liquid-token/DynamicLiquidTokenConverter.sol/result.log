@@ -1,0 +1,298 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 70 Code Findings │
+└──────────────────┘
+                                        
+    /sb/DynamicLiquidTokenConverter.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          449┆ (bool success, bytes memory data) =                              
+  address(_token).call(abi.encodeWithSelector(APPROVE_FUNC_SELECTOR, _spender,  
+  _value));                                                                     
+            ⋮┆----------------------------------------
+          463┆ (bool success, bytes memory data) =                              
+  address(_token).call(abi.encodeWithSelector(TRANSFER_FUNC_SELECTOR, _to,      
+  _value));                                                                     
+            ⋮┆----------------------------------------
+          478┆ (bool success, bytes memory data) =                              
+  address(_token).call(abi.encodeWithSelector(TRANSFER_FROM_FUNC_SELECTOR,      
+  _from, _to, _value));                                                         
+            ⋮┆----------------------------------------
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+          930┆ reserveRatio += _weight;
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+          349┆ bool private locked = false;
+            ⋮┆----------------------------------------
+          589┆ uint32 public reserveRatio = 0;                     // ratio     
+  between the reserves and the market cap, equal to the total reserve weights   
+            ⋮┆----------------------------------------
+          590┆ uint32 public override maxConversionFee = 0;        // maximum   
+  conversion fee for the lifetime of the contract,                              
+            ⋮┆----------------------------------------
+          592┆ uint32 public override conversionFee = 0;           // current   
+  conversion fee, represented in ppm, 0...maxConversionFee                      
+            ⋮┆----------------------------------------
+         1440┆ uint256 public lastWeightAdjustmentMarketCap = 0;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          159┆ constructor() public {
+          160┆     owner = msg.sender;
+          161┆ }
+            ⋮┆----------------------------------------
+          283┆ constructor(IContractRegistry _registry) internal                
+  validAddress(address(_registry)) {                                            
+          284┆     registry = IContractRegistry(_registry);
+          285┆     prevRegistry = IContractRegistry(_registry);
+          286┆ }
+            ⋮┆----------------------------------------
+          354┆ constructor() internal {}
+            ⋮┆----------------------------------------
+         1170┆ constructor(
+         1171┆     IDSToken _token,
+         1172┆     IContractRegistry _registry,
+         1173┆     uint32 _maxConversionFee
+         1174┆ )
+         1175┆     ConverterBase(_token, _registry, _maxConversionFee)
+         1176┆     public
+         1177┆ {
+         1178┆ }
+            ⋮┆----------------------------------------
+         1455┆ constructor(
+         1456┆     IDSToken _token,
+         1457┆     IContractRegistry _registry,
+         1458┆     uint32 _maxConversionFee
+         1459┆ )
+         1460┆     LiquidTokenConverter(_token, _registry, _maxConversionFee)
+         1461┆     public
+         1462┆ {
+         1463┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          171┆ require(msg.sender == owner, "ERR_ACCESS_DENIED");
+            ⋮┆----------------------------------------
+          182┆ require(_newOwner != owner, "ERR_SAME_OWNER");
+            ⋮┆----------------------------------------
+          190┆ require(msg.sender == newOwner, "ERR_ACCESS_DENIED");
+            ⋮┆----------------------------------------
+          209┆ require(_value > 0, "ERR_ZERO_VALUE");
+            ⋮┆----------------------------------------
+          220┆ require(_address != address(0), "ERR_INVALID_ADDRESS");
+            ⋮┆----------------------------------------
+          231┆ require(_address != address(this), "ERR_ADDRESS_IS_SELF");
+            ⋮┆----------------------------------------
+          275┆ require(msg.sender == addressOf(_contractName),                  
+  "ERR_ACCESS_DENIED");                                                         
+            ⋮┆----------------------------------------
+          293┆ require(msg.sender == owner || !onlyOwnerCanUpdateRegistry,      
+  "ERR_ACCESS_DENIED");                                                         
+            ⋮┆----------------------------------------
+          299┆ require(newRegistry != registry && address(newRegistry) !=       
+  address(0), "ERR_INVALID_REGISTRY");                                          
+            ⋮┆----------------------------------------
+          302┆ require(newRegistry.addressOf(CONTRACT_REGISTRY) != address(0),  
+  "ERR_INVALID_REGISTRY");                                                      
+            ⋮┆----------------------------------------
+          366┆ require(!locked, "ERR_REENTRANCY");
+            ⋮┆----------------------------------------
+          384┆ require(z >= _x, "ERR_OVERFLOW");
+            ⋮┆----------------------------------------
+          397┆ require(_x >= _y, "ERR_UNDERFLOW");
+            ⋮┆----------------------------------------
+          415┆ require(z / _x == _y, "ERR_OVERFLOW");
+            ⋮┆----------------------------------------
+          428┆ require(_y > 0, "ERR_DIVIDE_BY_ZERO");
+            ⋮┆----------------------------------------
+          450┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'ERR_APPROVE_FAILED');                                              
+            ⋮┆----------------------------------------
+          464┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'ERR_TRANSFER_FAILED');                                             
+            ⋮┆----------------------------------------
+          479┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'ERR_TRANSFER_FROM_FAILED');                                        
+            ⋮┆----------------------------------------
+          677┆ require(isActive(), "ERR_INACTIVE");
+            ⋮┆----------------------------------------
+          688┆ require(!isActive(), "ERR_ACTIVE");
+            ⋮┆----------------------------------------
+          699┆ require(reserves[_address].isSet, "ERR_INVALID_RESERVE");
+            ⋮┆----------------------------------------
+          710┆ require(_conversionFee <= PPM_RESOLUTION,                        
+  "ERR_INVALID_CONVERSION_FEE");                                                
+            ⋮┆----------------------------------------
+          721┆ require(_weight > 0 && _weight <= PPM_RESOLUTION,                
+  "ERR_INVALID_RESERVE_WEIGHT");                                                
+            ⋮┆----------------------------------------
+          740┆ require(reserves[ETH_RESERVE_ADDRESS].isSet,                     
+  "ERR_INVALID_RESERVE"); // require(hasETHReserve(), "ERR_INVALID_RESERVE");   
+            ⋮┆----------------------------------------
+          764┆ require(!isActive() || owner == converterUpgrader,               
+  "ERR_ACCESS_DENIED");                                                         
+            ⋮┆----------------------------------------
+          831┆ require(reserveTokenCount() > 0, "ERR_INVALID_RESERVE_COUNT");
+            ⋮┆----------------------------------------
+          843┆ require(_conversionFee <= maxConversionFee,                      
+  "ERR_INVALID_CONVERSION_FEE");                                                
+            ⋮┆----------------------------------------
+          869┆ require(!reserves[_token].isSet || !isActive() || owner ==       
+  converterUpgrader, "ERR_ACCESS_DENIED");                                      
+            ⋮┆----------------------------------------
+          921┆ require(address(_token) != address(anchor) &&                    
+  !reserves[_token].isSet, "ERR_INVALID_RESERVE");                              
+            ⋮┆----------------------------------------
+          922┆ require(_weight <= PPM_RESOLUTION - reserveRatio,                
+  "ERR_INVALID_RESERVE_WEIGHT");                                                
+            ⋮┆----------------------------------------
+          923┆ require(reserveTokenCount() < uint16(-1),                        
+  "ERR_INVALID_RESERVE_COUNT");                                                 
+            ⋮┆----------------------------------------
+          998┆ require(_sourceToken != _targetToken, "ERR_SAME_SOURCE_TARGET");
+            ⋮┆----------------------------------------
+         1001┆ require(address(conversionWhitelist) == address(0) ||
+         1002┆         (conversionWhitelist.isWhitelisted(_trader) &&           
+  conversionWhitelist.isWhitelisted(_beneficiary)),                             
+         1003┆         "ERR_NOT_WHITELISTED");
+            ⋮┆----------------------------------------
+         1211┆ require(reserveTokenCount() == 0, "ERR_INVALID_RESERVE_COUNT");
+            ⋮┆----------------------------------------
+         1233┆ revert("ERR_INVALID_TOKEN");
+            ⋮┆----------------------------------------
+         1266┆ revert("ERR_INVALID_TOKEN");
+            ⋮┆----------------------------------------
+         1358┆ require(amount != 0, "ERR_ZERO_TARGET_AMOUNT");
+            ⋮┆----------------------------------------
+         1364┆ require(msg.value == _amount, "ERR_ETH_AMOUNT_MISMATCH");
+            ⋮┆----------------------------------------
+         1366┆ require(msg.value == 0 &&                                        
+  reserveToken.balanceOf(address(this)).sub(reserveBalance(reserveToken)) >=    
+  _amount, "ERR_INVALID_AMOUNT");                                               
+            ⋮┆----------------------------------------
+         1391┆ require(_amount <=                                               
+  IDSToken(address(anchor)).balanceOf(address(this)), "ERR_INVALID_AMOUNT");    
+            ⋮┆----------------------------------------
+         1397┆ require(amount != 0, "ERR_ZERO_TARGET_AMOUNT");
+            ⋮┆----------------------------------------
+         1552┆ require(currentMarketCap >                                       
+  (lastWeightAdjustmentMarketCap.add(marketCapThreshold)),                      
+  "ERR_MARKET_CAP_BELOW_THRESHOLD");                                            
+            ⋮┆----------------------------------------
+         1557┆ require(newWeight >= minimumWeight,                              
+  "ERR_INVALID_RESERVE_WEIGHT");                                                
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          299┆ require(newRegistry != registry && address(newRegistry) !=       
+  address(0), "ERR_INVALID_REGISTRY");                                          
+            ⋮┆----------------------------------------
+          450┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'ERR_APPROVE_FAILED');                                              
+            ⋮┆----------------------------------------
+          464┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'ERR_TRANSFER_FAILED');                                             
+            ⋮┆----------------------------------------
+          479┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'ERR_TRANSFER_FROM_FAILED');                                        
+            ⋮┆----------------------------------------
+          721┆ require(_weight > 0 && _weight <= PPM_RESOLUTION,                
+  "ERR_INVALID_RESERVE_WEIGHT");                                                
+            ⋮┆----------------------------------------
+          921┆ require(address(_token) != address(anchor) &&                    
+  !reserves[_token].isSet, "ERR_INVALID_RESERVE");                              
+            ⋮┆----------------------------------------
+         1001┆ require(address(conversionWhitelist) == address(0) ||
+         1002┆         (conversionWhitelist.isWhitelisted(_trader) &&           
+  conversionWhitelist.isWhitelisted(_beneficiary)),                             
+         1003┆         "ERR_NOT_WHITELISTED");
+            ⋮┆----------------------------------------
+         1366┆ require(msg.value == 0 &&                                        
+  reserveToken.balanceOf(address(this)).sub(reserveBalance(reserveToken)) >=    
+  _amount, "ERR_INVALID_AMOUNT");                                               
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         1227┆ if (_targetToken == IDSToken(address(anchor)) &&                 
+  reserves[_sourceToken].isSet)                                                 
+         1228┆     return purchaseTargetAmount(_amount);
+            ⋮┆----------------------------------------
+         1229┆ if (_sourceToken == IDSToken(address(anchor)) &&                 
+  reserves[_targetToken].isSet)                                                 
+         1230┆     return saleTargetAmount(_amount);
+            ⋮┆----------------------------------------
+         1256┆ if (_targetToken == IDSToken(address(anchor)) &&                 
+  reserves[_sourceToken].isSet) {                                               
+         1257┆     reserveToken = _sourceToken;
+         1258┆     targetAmount = buy(_amount, _trader, _beneficiary);
+         1259┆ }
+         1260┆ else if (_sourceToken == IDSToken(address(anchor)) &&            
+  reserves[_targetToken].isSet) {                                               
+         1261┆     reserveToken = _targetToken;
+         1262┆     targetAmount = sell(_amount, _trader, _beneficiary);
+         1263┆ }
+         1264┆ else {
+         1265┆     // invalid input
+             [hid 2 additional lines, adjust with --max-lines-per-finding] 
+         1260┆ else if (_sourceToken == IDSToken(address(anchor)) &&            
+  reserves[_targetToken].isSet) {                                               
+         1261┆     reserveToken = _targetToken;
+         1262┆     targetAmount = sell(_amount, _trader, _beneficiary);
+         1263┆ }
+         1264┆ else {
+         1265┆     // invalid input
+         1266┆     revert("ERR_INVALID_TOKEN");
+         1267┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+         1058┆ for (uint256 i = 0; i < reserveCount; i++)
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 70 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

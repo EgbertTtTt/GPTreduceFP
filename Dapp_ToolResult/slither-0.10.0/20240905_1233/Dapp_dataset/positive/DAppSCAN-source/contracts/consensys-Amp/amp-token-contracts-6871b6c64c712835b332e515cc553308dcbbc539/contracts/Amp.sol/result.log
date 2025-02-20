@@ -1,0 +1,299 @@
+'solc --version' running
+'solc /sb/Amp.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/Amp.sol:
+Warning: Contract code size exceeds 24576 bytes (a limit introduced in Spurious Dragon). This contract may not be deployable on mainnet. Consider enabling the optimizer (with a low "runs" value!), turning off revert strings, or using libraries.
+   --> /sb/Amp.sol:746:1:
+    |
+746 | contract Amp is
+    | ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+Amp.swap(address) (../../sb/Amp.sol#1280-1289) uses arbitrary from in transferFrom: swapToken.transferFrom(_from,swapTokenGraveyard,amount) (../../sb/Amp.sol#1284)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#arbitrary-from-in-transferfrom
+
+Amp.swap(address) (../../sb/Amp.sol#1280-1289) ignores return value by swapToken.transferFrom(_from,swapTokenGraveyard,amount) (../../sb/Amp.sol#1284)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+Reentrancy in Amp._transferByPartition(bytes32,address,address,address,uint256,bytes,bytes) (../../sb/Amp.sol#1808-1866):
+	External calls:
+	- _callPreTransferHooks(_fromPartition,_operator,_from,_to,_value,_data,_operatorData) (../../sb/Amp.sol#1827-1835)
+		- IAmpTokensSender(senderImplementation).tokensToTransfer(msg.sig,_fromPartition,_operator,_from,_to,_value,_data,_operatorData) (../../sb/Amp.sol#2016-2025)
+		- IAmpPartitionStrategyValidator(fromPartitionValidatorImplementation).tokensFromPartitionToValidate(msg.sig,_fromPartition,_operator,_from,_to,_value,_data,_operatorData) (../../sb/Amp.sol#2038-2048)
+	State variables written after the call(s):
+	- _removeTokenFromPartition(_from,_fromPartition,_value) (../../sb/Amp.sol#1837)
+		- _balanceOfByPartition[_from][_partition] = _balanceOfByPartition[_from][_partition].sub(_value) (../../sb/Amp.sol#1900-1901)
+	Amp._balanceOfByPartition (../../sb/Amp.sol#858) can be used in cross function reentrancies:
+	- Amp._addTokenToPartition(address,bytes32,uint256) (../../sb/Amp.sol#1937-1957)
+	- Amp._removeTokenFromPartition(address,bytes32,uint256) (../../sb/Amp.sol#1895-1929)
+	- Amp._transferByPartition(bytes32,address,address,address,uint256,bytes,bytes) (../../sb/Amp.sol#1808-1866)
+	- Amp.balanceOf(address) (../../sb/Amp.sol#1150-1152)
+	- Amp.balanceOfByPartition(bytes32,address) (../../sb/Amp.sol#1310-1316)
+	- _addTokenToPartition(_to,toPartition,_value) (../../sb/Amp.sol#1839)
+		- _balanceOfByPartition[_to][_partition] = _balanceOfByPartition[_to][_partition].add(_value) (../../sb/Amp.sol#1947-1948)
+	Amp._balanceOfByPartition (../../sb/Amp.sol#858) can be used in cross function reentrancies:
+	- Amp._addTokenToPartition(address,bytes32,uint256) (../../sb/Amp.sol#1937-1957)
+	- Amp._removeTokenFromPartition(address,bytes32,uint256) (../../sb/Amp.sol#1895-1929)
+	- Amp._transferByPartition(bytes32,address,address,address,uint256,bytes,bytes) (../../sb/Amp.sol#1808-1866)
+	- Amp.balanceOf(address) (../../sb/Amp.sol#1150-1152)
+	- Amp.balanceOfByPartition(bytes32,address) (../../sb/Amp.sol#1310-1316)
+Reentrancy in Amp.setPartitionStrategy(bytes4,address) (../../sb/Amp.sol#1743-1757):
+	External calls:
+	- ERC1820Client.setInterfaceImplementation(iname,_implementation) (../../sb/Amp.sol#1752)
+		- ERC1820REGISTRY.setInterfaceImplementer(address(this),interfaceHash,_implementation) (../../sb/Amp.sol#404-408)
+	State variables written after the call(s):
+	- _isPartitionStrategy[_prefix] = true (../../sb/Amp.sol#1754)
+	Amp._isPartitionStrategy (../../sb/Amp.sol#918) can be used in cross function reentrancies:
+	- Amp._callPartitionStrategyOperatorHook(bytes32,address,address) (../../sb/Amp.sol#2213-2237)
+	- Amp._callPostTransferHooks(bytes32,address,address,address,uint256,bytes,bytes) (../../sb/Amp.sol#2064-2112)
+	- Amp._callPreTransferHooks(bytes32,address,address,address,uint256,bytes,bytes) (../../sb/Amp.sol#2004-2051)
+	- Amp.isPartitionStrategy(bytes4) (../../sb/Amp.sol#1765-1767)
+	- Amp.setPartitionStrategy(bytes4,address) (../../sb/Amp.sol#1743-1757)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+Amp.allowance(address,address)._owner (../../sb/Amp.sol#1172) shadows:
+	- Ownable._owner (../../sb/Amp.sol#250) (state variable)
+Amp.allowanceByPartition(bytes32,address,address)._owner (../../sb/Amp.sol#1622) shadows:
+	- Ownable._owner (../../sb/Amp.sol#250) (state variable)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+Reentrancy in Amp._transferByPartition(bytes32,address,address,address,uint256,bytes,bytes) (../../sb/Amp.sol#1808-1866):
+	External calls:
+	- _callPreTransferHooks(_fromPartition,_operator,_from,_to,_value,_data,_operatorData) (../../sb/Amp.sol#1827-1835)
+		- IAmpTokensSender(senderImplementation).tokensToTransfer(msg.sig,_fromPartition,_operator,_from,_to,_value,_data,_operatorData) (../../sb/Amp.sol#2016-2025)
+		- IAmpPartitionStrategyValidator(fromPartitionValidatorImplementation).tokensFromPartitionToValidate(msg.sig,_fromPartition,_operator,_from,_to,_value,_data,_operatorData) (../../sb/Amp.sol#2038-2048)
+	State variables written after the call(s):
+	- _transfer(_from,_to,_value) (../../sb/Amp.sol#1838)
+		- _balances[_from] = _balances[_from].sub(_value) (../../sb/Amp.sol#1789)
+		- _balances[_to] = _balances[_to].add(_value) (../../sb/Amp.sol#1790)
+	- _removeTokenFromPartition(_from,_fromPartition,_value) (../../sb/Amp.sol#1837)
+		- _indexOfPartitionsOf[_from][lastValue] = index (../../sb/Amp.sol#1924)
+		- _indexOfPartitionsOf[_from][_partition] = 0 (../../sb/Amp.sol#1927)
+	- _addTokenToPartition(_to,toPartition,_value) (../../sb/Amp.sol#1839)
+		- _indexOfPartitionsOf[_to][_partition] = _partitionsOf[_to].length (../../sb/Amp.sol#1945)
+	- _removeTokenFromPartition(_from,_fromPartition,_value) (../../sb/Amp.sol#1837)
+		- _indexOfTotalPartitions[lastValue] = index (../../sb/Amp.sol#1982)
+		- _indexOfTotalPartitions[_partition] = 0 (../../sb/Amp.sol#1985)
+	- _addTokenToPartition(_to,toPartition,_value) (../../sb/Amp.sol#1839)
+		- _indexOfTotalPartitions[_partition] = _totalPartitions.length (../../sb/Amp.sol#1965)
+	- _removeTokenFromPartition(_from,_fromPartition,_value) (../../sb/Amp.sol#1837)
+		- _partitionsOf[_from][index - 1] = lastValue (../../sb/Amp.sol#1923)
+		- _partitionsOf[_from].pop() (../../sb/Amp.sol#1926)
+	- _addTokenToPartition(_to,toPartition,_value) (../../sb/Amp.sol#1839)
+		- _partitionsOf[_to].push(_partition) (../../sb/Amp.sol#1944)
+	- _removeTokenFromPartition(_from,_fromPartition,_value) (../../sb/Amp.sol#1837)
+		- _totalPartitions[index - 1] = lastValue (../../sb/Amp.sol#1981)
+		- _totalPartitions.pop() (../../sb/Amp.sol#1984)
+	- _addTokenToPartition(_to,toPartition,_value) (../../sb/Amp.sol#1839)
+		- _totalPartitions.push(_partition) (../../sb/Amp.sol#1964)
+	- _removeTokenFromPartition(_from,_fromPartition,_value) (../../sb/Amp.sol#1837)
+		- totalSupplyByPartition[_partition] = totalSupplyByPartition[_partition].sub(_value) (../../sb/Amp.sol#1902-1904)
+	- _addTokenToPartition(_to,toPartition,_value) (../../sb/Amp.sol#1839)
+		- totalSupplyByPartition[_partition] = totalSupplyByPartition[_partition].add(_value) (../../sb/Amp.sol#1953-1955)
+Reentrancy in Amp.setPartitionStrategy(bytes4,address) (../../sb/Amp.sol#1743-1757):
+	External calls:
+	- ERC1820Client.setInterfaceImplementation(iname,_implementation) (../../sb/Amp.sol#1752)
+		- ERC1820REGISTRY.setInterfaceImplementer(address(this),interfaceHash,_implementation) (../../sb/Amp.sol#404-408)
+	State variables written after the call(s):
+	- partitionStrategies.push(_prefix) (../../sb/Amp.sol#1753)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in Amp._mint(address,address,uint256,bytes) (../../sb/Amp.sol#2251-2275):
+	External calls:
+	- _callPostTransferHooks(defaultPartition,_operator,address(0),_to,_value,_data,) (../../sb/Amp.sol#2263-2271)
+		- IAmpPartitionStrategyValidator(partitionManagerImplementation).tokensToPartitionToValidate(msg.sig,_toPartition,_operator,_from,_to,_value,_data,_operatorData) (../../sb/Amp.sol#2081-2091)
+		- IAmpTokensRecipient(recipientImplementation).tokensReceived(msg.sig,_toPartition,_operator,_from,_to,_value,_data,_operatorData) (../../sb/Amp.sol#2101-2110)
+	Event emitted after the call(s):
+	- Minted(_operator,_to,_value,_data) (../../sb/Amp.sol#2273)
+	- Transfer(address(0),_to,_value) (../../sb/Amp.sol#2274)
+Reentrancy in Amp._transferByPartition(bytes32,address,address,address,uint256,bytes,bytes) (../../sb/Amp.sol#1808-1866):
+	External calls:
+	- _callPreTransferHooks(_fromPartition,_operator,_from,_to,_value,_data,_operatorData) (../../sb/Amp.sol#1827-1835)
+		- IAmpTokensSender(senderImplementation).tokensToTransfer(msg.sig,_fromPartition,_operator,_from,_to,_value,_data,_operatorData) (../../sb/Amp.sol#2016-2025)
+		- IAmpPartitionStrategyValidator(fromPartitionValidatorImplementation).tokensFromPartitionToValidate(msg.sig,_fromPartition,_operator,_from,_to,_value,_data,_operatorData) (../../sb/Amp.sol#2038-2048)
+	Event emitted after the call(s):
+	- Transfer(_from,_to,_value) (../../sb/Amp.sol#1792)
+		- _transfer(_from,_to,_value) (../../sb/Amp.sol#1838)
+Reentrancy in Amp._transferByPartition(bytes32,address,address,address,uint256,bytes,bytes) (../../sb/Amp.sol#1808-1866):
+	External calls:
+	- _callPreTransferHooks(_fromPartition,_operator,_from,_to,_value,_data,_operatorData) (../../sb/Amp.sol#1827-1835)
+		- IAmpTokensSender(senderImplementation).tokensToTransfer(msg.sig,_fromPartition,_operator,_from,_to,_value,_data,_operatorData) (../../sb/Amp.sol#2016-2025)
+		- IAmpPartitionStrategyValidator(fromPartitionValidatorImplementation).tokensFromPartitionToValidate(msg.sig,_fromPartition,_operator,_from,_to,_value,_data,_operatorData) (../../sb/Amp.sol#2038-2048)
+	- _callPostTransferHooks(toPartition,_operator,_from,_to,_value,_data,_operatorData) (../../sb/Amp.sol#1841-1849)
+		- IAmpPartitionStrategyValidator(partitionManagerImplementation).tokensToPartitionToValidate(msg.sig,_toPartition,_operator,_from,_to,_value,_data,_operatorData) (../../sb/Amp.sol#2081-2091)
+		- IAmpTokensRecipient(recipientImplementation).tokensReceived(msg.sig,_toPartition,_operator,_from,_to,_value,_data,_operatorData) (../../sb/Amp.sol#2101-2110)
+	Event emitted after the call(s):
+	- ChangedPartition(_fromPartition,toPartition,_value) (../../sb/Amp.sol#1862)
+	- TransferByPartition(_fromPartition,_operator,_from,_to,_value,_data,_operatorData) (../../sb/Amp.sol#1851-1859)
+Reentrancy in Amp.setPartitionStrategy(bytes4,address) (../../sb/Amp.sol#1743-1757):
+	External calls:
+	- ERC1820Client.setInterfaceImplementation(iname,_implementation) (../../sb/Amp.sol#1752)
+		- ERC1820REGISTRY.setInterfaceImplementer(address(this),interfaceHash,_implementation) (../../sb/Amp.sol#404-408)
+	Event emitted after the call(s):
+	- PartitionStrategySet(_prefix,iname,_implementation) (../../sb/Amp.sol#1756)
+Reentrancy in Amp.swap(address) (../../sb/Amp.sol#1280-1289):
+	External calls:
+	- swapToken.transferFrom(_from,swapTokenGraveyard,amount) (../../sb/Amp.sol#1284)
+	- _mint(msg.sender,_from,amount,) (../../sb/Amp.sol#1286)
+		- IAmpPartitionStrategyValidator(partitionManagerImplementation).tokensToPartitionToValidate(msg.sig,_toPartition,_operator,_from,_to,_value,_data,_operatorData) (../../sb/Amp.sol#2081-2091)
+		- IAmpTokensRecipient(recipientImplementation).tokensReceived(msg.sig,_toPartition,_operator,_from,_to,_value,_data,_operatorData) (../../sb/Amp.sol#2101-2110)
+	Event emitted after the call(s):
+	- Minted(_operator,_to,_value,_data) (../../sb/Amp.sol#2273)
+		- _mint(msg.sender,_from,amount,) (../../sb/Amp.sol#1286)
+	- Swap(msg.sender,_from,amount) (../../sb/Amp.sol#1288)
+	- Transfer(address(0),_to,_value) (../../sb/Amp.sol#2274)
+		- _mint(msg.sender,_from,amount,) (../../sb/Amp.sol#1286)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+PartitionsBase._getDestinationPartition(bytes32,bytes) (../../sb/Amp.sol#595-614) uses assembly
+	- INLINE ASM (../../sb/Amp.sol#606-608)
+	- INLINE ASM (../../sb/Amp.sol#610-612)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Context._msgData() (../../sb/Amp.sol#231-234) is never used and should be removed
+ERC1820Client.delegateManagement(address) (../../sb/Amp.sol#420-422) is never used and should be removed
+PartitionsBase._splitPartition(bytes32) (../../sb/Amp.sol#632-645) is never used and should be removed
+SafeMath.div(uint256,uint256) (../../sb/Amp.sol#135-138) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/Amp.sol#190-193) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/Amp.sol#152-155) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/Amp.sol#210-213) is never used and should be removed
+SafeMath.mul(uint256,uint256) (../../sb/Amp.sol#116-121) is never used and should be removed
+SafeMath.sub(uint256,uint256,string) (../../sb/Amp.sol#170-173) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/Amp.sol#24-28) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/Amp.sol#60-63) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/Amp.sol#70-73) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/Amp.sol#45-53) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/Amp.sol#35-38) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.6.9 (../../sb/Amp.sol#1) is known to contain severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+solc-0.6.9 is known to contain severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Parameter ERC1820Client.setInterfaceImplementation(string,address)._interfaceLabel (../../sb/Amp.sol#400) is not in mixedCase
+Parameter ERC1820Client.setInterfaceImplementation(string,address)._implementation (../../sb/Amp.sol#401) is not in mixedCase
+Parameter ERC1820Client.interfaceAddr(address,string)._interfaceLabel (../../sb/Amp.sol#411) is not in mixedCase
+Parameter ERC1820Client.delegateManagement(address)._newManager (../../sb/Amp.sol#420) is not in mixedCase
+Parameter ERC1820Implementer.canImplementInterfaceForAddress(bytes32,address)._interfaceHash (../../sb/Amp.sol#451) is not in mixedCase
+Variable ErrorCodes.EC_50_TRANSFER_FAILURE (../../sb/Amp.sol#668) is not in mixedCase
+Variable ErrorCodes.EC_51_TRANSFER_SUCCESS (../../sb/Amp.sol#669) is not in mixedCase
+Variable ErrorCodes.EC_52_INSUFFICIENT_BALANCE (../../sb/Amp.sol#670) is not in mixedCase
+Variable ErrorCodes.EC_53_INSUFFICIENT_ALLOWANCE (../../sb/Amp.sol#671) is not in mixedCase
+Variable ErrorCodes.EC_56_INVALID_SENDER (../../sb/Amp.sol#673) is not in mixedCase
+Variable ErrorCodes.EC_57_INVALID_RECEIVER (../../sb/Amp.sol#674) is not in mixedCase
+Variable ErrorCodes.EC_58_INVALID_OPERATOR (../../sb/Amp.sol#675) is not in mixedCase
+Variable ErrorCodes.EC_59_INSUFFICIENT_RIGHTS (../../sb/Amp.sol#677) is not in mixedCase
+Variable ErrorCodes.EC_5A_INVALID_SWAP_TOKEN_ADDRESS (../../sb/Amp.sol#679) is not in mixedCase
+Variable ErrorCodes.EC_5B_INVALID_VALUE_0 (../../sb/Amp.sol#680) is not in mixedCase
+Variable ErrorCodes.EC_5C_ADDRESS_CONFLICT (../../sb/Amp.sol#681) is not in mixedCase
+Variable ErrorCodes.EC_5D_PARTITION_RESERVED (../../sb/Amp.sol#682) is not in mixedCase
+Variable ErrorCodes.EC_5E_PARTITION_PREFIX_CONFLICT (../../sb/Amp.sol#683) is not in mixedCase
+Variable ErrorCodes.EC_5F_INVALID_PARTITION_PREFIX_0 (../../sb/Amp.sol#684) is not in mixedCase
+Parameter Amp.balanceOf(address)._tokenHolder (../../sb/Amp.sol#1150) is not in mixedCase
+Parameter Amp.transfer(address,uint256)._to (../../sb/Amp.sol#1160) is not in mixedCase
+Parameter Amp.transfer(address,uint256)._value (../../sb/Amp.sol#1160) is not in mixedCase
+Parameter Amp.allowance(address,address)._owner (../../sb/Amp.sol#1172) is not in mixedCase
+Parameter Amp.allowance(address,address)._spender (../../sb/Amp.sol#1172) is not in mixedCase
+Parameter Amp.approve(address,uint256)._spender (../../sb/Amp.sol#1188) is not in mixedCase
+Parameter Amp.approve(address,uint256)._value (../../sb/Amp.sol#1188) is not in mixedCase
+Parameter Amp.increaseAllowance(address,uint256)._spender (../../sb/Amp.sol#1206) is not in mixedCase
+Parameter Amp.increaseAllowance(address,uint256)._addedValue (../../sb/Amp.sol#1206) is not in mixedCase
+Parameter Amp.decreaseAllowance(address,uint256)._spender (../../sb/Amp.sol#1229) is not in mixedCase
+Parameter Amp.decreaseAllowance(address,uint256)._subtractedValue (../../sb/Amp.sol#1229) is not in mixedCase
+Parameter Amp.transferFrom(address,address,uint256)._from (../../sb/Amp.sol#1249) is not in mixedCase
+Parameter Amp.transferFrom(address,address,uint256)._to (../../sb/Amp.sol#1250) is not in mixedCase
+Parameter Amp.transferFrom(address,address,uint256)._value (../../sb/Amp.sol#1251) is not in mixedCase
+Parameter Amp.swap(address)._from (../../sb/Amp.sol#1280) is not in mixedCase
+Parameter Amp.totalBalanceOf(address)._tokenHolder (../../sb/Amp.sol#1300) is not in mixedCase
+Parameter Amp.balanceOfByPartition(bytes32,address)._partition (../../sb/Amp.sol#1310) is not in mixedCase
+Parameter Amp.balanceOfByPartition(bytes32,address)._tokenHolder (../../sb/Amp.sol#1310) is not in mixedCase
+Parameter Amp.partitionsOf(address)._tokenHolder (../../sb/Amp.sol#1323) is not in mixedCase
+Parameter Amp.transferWithData(address,uint256,bytes)._to (../../sb/Amp.sol#1340) is not in mixedCase
+Parameter Amp.transferWithData(address,uint256,bytes)._value (../../sb/Amp.sol#1341) is not in mixedCase
+Parameter Amp.transferWithData(address,uint256,bytes)._data (../../sb/Amp.sol#1342) is not in mixedCase
+Parameter Amp.transferFromWithData(address,address,uint256,bytes)._from (../../sb/Amp.sol#1359) is not in mixedCase
+Parameter Amp.transferFromWithData(address,address,uint256,bytes)._to (../../sb/Amp.sol#1360) is not in mixedCase
+Parameter Amp.transferFromWithData(address,address,uint256,bytes)._value (../../sb/Amp.sol#1361) is not in mixedCase
+Parameter Amp.transferFromWithData(address,address,uint256,bytes)._data (../../sb/Amp.sol#1362) is not in mixedCase
+Parameter Amp.transferByPartition(bytes32,address,uint256,bytes)._partition (../../sb/Amp.sol#1381) is not in mixedCase
+Parameter Amp.transferByPartition(bytes32,address,uint256,bytes)._to (../../sb/Amp.sol#1382) is not in mixedCase
+Parameter Amp.transferByPartition(bytes32,address,uint256,bytes)._value (../../sb/Amp.sol#1383) is not in mixedCase
+Parameter Amp.transferByPartition(bytes32,address,uint256,bytes)._data (../../sb/Amp.sol#1384) is not in mixedCase
+Parameter Amp.operatorTransferByPartition(bytes32,address,address,uint256,bytes,bytes)._partition (../../sb/Amp.sol#1413) is not in mixedCase
+Parameter Amp.operatorTransferByPartition(bytes32,address,address,uint256,bytes,bytes)._from (../../sb/Amp.sol#1414) is not in mixedCase
+Parameter Amp.operatorTransferByPartition(bytes32,address,address,uint256,bytes,bytes)._to (../../sb/Amp.sol#1415) is not in mixedCase
+Parameter Amp.operatorTransferByPartition(bytes32,address,address,uint256,bytes,bytes)._value (../../sb/Amp.sol#1416) is not in mixedCase
+Parameter Amp.operatorTransferByPartition(bytes32,address,address,uint256,bytes,bytes)._data (../../sb/Amp.sol#1417) is not in mixedCase
+Parameter Amp.operatorTransferByPartition(bytes32,address,address,uint256,bytes,bytes)._operatorData (../../sb/Amp.sol#1418) is not in mixedCase
+Parameter Amp.authorizeOperator(address)._operator (../../sb/Amp.sol#1453) is not in mixedCase
+Parameter Amp.revokeOperator(address)._operator (../../sb/Amp.sol#1464) is not in mixedCase
+Parameter Amp.authorizeOperatorByPartition(bytes32,address)._partition (../../sb/Amp.sol#1475) is not in mixedCase
+Parameter Amp.authorizeOperatorByPartition(bytes32,address)._operator (../../sb/Amp.sol#1475) is not in mixedCase
+Parameter Amp.revokeOperatorByPartition(bytes32,address)._partition (../../sb/Amp.sol#1490) is not in mixedCase
+Parameter Amp.revokeOperatorByPartition(bytes32,address)._operator (../../sb/Amp.sol#1490) is not in mixedCase
+Parameter Amp.isOperator(address,address)._operator (../../sb/Amp.sol#1506) is not in mixedCase
+Parameter Amp.isOperator(address,address)._tokenHolder (../../sb/Amp.sol#1506) is not in mixedCase
+Parameter Amp.isOperatorForPartition(bytes32,address,address)._partition (../../sb/Amp.sol#1526) is not in mixedCase
+Parameter Amp.isOperatorForPartition(bytes32,address,address)._operator (../../sb/Amp.sol#1527) is not in mixedCase
+Parameter Amp.isOperatorForPartition(bytes32,address,address)._tokenHolder (../../sb/Amp.sol#1528) is not in mixedCase
+Parameter Amp.isOperatorForCollateralManager(bytes32,address,address)._partition (../../sb/Amp.sol#1547) is not in mixedCase
+Parameter Amp.isOperatorForCollateralManager(bytes32,address,address)._operator (../../sb/Amp.sol#1548) is not in mixedCase
+Parameter Amp.isOperatorForCollateralManager(bytes32,address,address)._collateralManager (../../sb/Amp.sol#1549) is not in mixedCase
+Parameter Amp.allowanceByPartition(bytes32,address,address)._partition (../../sb/Amp.sol#1621) is not in mixedCase
+Parameter Amp.allowanceByPartition(bytes32,address,address)._owner (../../sb/Amp.sol#1622) is not in mixedCase
+Parameter Amp.allowanceByPartition(bytes32,address,address)._spender (../../sb/Amp.sol#1623) is not in mixedCase
+Parameter Amp.approveByPartition(bytes32,address,uint256)._partition (../../sb/Amp.sol#1637) is not in mixedCase
+Parameter Amp.approveByPartition(bytes32,address,uint256)._spender (../../sb/Amp.sol#1638) is not in mixedCase
+Parameter Amp.approveByPartition(bytes32,address,uint256)._value (../../sb/Amp.sol#1639) is not in mixedCase
+Parameter Amp.increaseAllowanceByPartition(bytes32,address,uint256)._partition (../../sb/Amp.sol#1660) is not in mixedCase
+Parameter Amp.increaseAllowanceByPartition(bytes32,address,uint256)._spender (../../sb/Amp.sol#1661) is not in mixedCase
+Parameter Amp.increaseAllowanceByPartition(bytes32,address,uint256)._addedValue (../../sb/Amp.sol#1662) is not in mixedCase
+Parameter Amp.decreaseAllowanceByPartition(bytes32,address,uint256)._partition (../../sb/Amp.sol#1689) is not in mixedCase
+Parameter Amp.decreaseAllowanceByPartition(bytes32,address,uint256)._spender (../../sb/Amp.sol#1690) is not in mixedCase
+Parameter Amp.decreaseAllowanceByPartition(bytes32,address,uint256)._subtractedValue (../../sb/Amp.sol#1691) is not in mixedCase
+Parameter Amp.isCollateralManager(address)._collateralManager (../../sb/Amp.sol#1726) is not in mixedCase
+Parameter Amp.setPartitionStrategy(bytes4,address)._prefix (../../sb/Amp.sol#1743) is not in mixedCase
+Parameter Amp.setPartitionStrategy(bytes4,address)._implementation (../../sb/Amp.sol#1743) is not in mixedCase
+Parameter Amp.isPartitionStrategy(bytes4)._prefix (../../sb/Amp.sol#1765) is not in mixedCase
+Constant Amp._granularity (../../sb/Amp.sol#810) is not in UPPER_CASE_WITH_UNDERSCORES
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/Amp.sol#232)" inContext (../../sb/Amp.sol#226-235)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Variable Amp.isCollateralManager(address)._collateralManager (../../sb/Amp.sol#1726) is too similar to Amp.collateralManagers (../../sb/Amp.sol#901)
+Variable Amp.isOperatorForCollateralManager(bytes32,address,address)._collateralManager (../../sb/Amp.sol#1549) is too similar to Amp.collateralManagers (../../sb/Amp.sol#901)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+Amp.slitherConstructorConstantVariables() (../../sb/Amp.sol#746-2276) uses literals with too many digits:
+	- defaultPartition = 0x0000000000000000000000000000000000000000000000000000000000000000 (../../sb/Amp.sol#864)
+Amp.slitherConstructorConstantVariables() (../../sb/Amp.sol#746-2276) uses literals with too many digits:
+	- ZERO_PREFIX = 0x00000000 (../../sb/Amp.sol#870)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+ErrorCodes.EC_50_TRANSFER_FAILURE (../../sb/Amp.sol#668) is never used in Amp (../../sb/Amp.sol#746-2276)
+ErrorCodes.EC_51_TRANSFER_SUCCESS (../../sb/Amp.sol#669) is never used in Amp (../../sb/Amp.sol#746-2276)
+ErrorCodes.EC_59_INSUFFICIENT_RIGHTS (../../sb/Amp.sol#677) is never used in Amp (../../sb/Amp.sol#746-2276)
+ErrorCodes.EC_5B_INVALID_VALUE_0 (../../sb/Amp.sol#680) is never used in Amp (../../sb/Amp.sol#746-2276)
+Amp.ERC777_INTERFACE_NAME (../../sb/Amp.sol#771) is never used in Amp (../../sb/Amp.sol#746-2276)
+Amp.AMP_TOKENS_CHECKER (../../sb/Amp.sol#786) is never used in Amp (../../sb/Amp.sol#746-2276)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-state-variable
+
+ErrorCodes.EC_50_TRANSFER_FAILURE (../../sb/Amp.sol#668) should be constant 
+ErrorCodes.EC_51_TRANSFER_SUCCESS (../../sb/Amp.sol#669) should be constant 
+ErrorCodes.EC_52_INSUFFICIENT_BALANCE (../../sb/Amp.sol#670) should be constant 
+ErrorCodes.EC_53_INSUFFICIENT_ALLOWANCE (../../sb/Amp.sol#671) should be constant 
+ErrorCodes.EC_56_INVALID_SENDER (../../sb/Amp.sol#673) should be constant 
+ErrorCodes.EC_57_INVALID_RECEIVER (../../sb/Amp.sol#674) should be constant 
+ErrorCodes.EC_58_INVALID_OPERATOR (../../sb/Amp.sol#675) should be constant 
+ErrorCodes.EC_59_INSUFFICIENT_RIGHTS (../../sb/Amp.sol#677) should be constant 
+ErrorCodes.EC_5A_INVALID_SWAP_TOKEN_ADDRESS (../../sb/Amp.sol#679) should be constant 
+ErrorCodes.EC_5B_INVALID_VALUE_0 (../../sb/Amp.sol#680) should be constant 
+ErrorCodes.EC_5C_ADDRESS_CONFLICT (../../sb/Amp.sol#681) should be constant 
+ErrorCodes.EC_5D_PARTITION_RESERVED (../../sb/Amp.sol#682) should be constant 
+ErrorCodes.EC_5E_PARTITION_PREFIX_CONFLICT (../../sb/Amp.sol#683) should be constant 
+ErrorCodes.EC_5F_INVALID_PARTITION_PREFIX_0 (../../sb/Amp.sol#684) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+
+Amp.swapToken (../../sb/Amp.sol#926) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/Amp.sol analyzed (14 contracts with 93 detectors), 142 result(s) found

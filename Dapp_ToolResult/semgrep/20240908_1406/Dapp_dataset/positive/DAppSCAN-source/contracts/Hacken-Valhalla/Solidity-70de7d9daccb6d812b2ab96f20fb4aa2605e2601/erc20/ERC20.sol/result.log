@@ -1,0 +1,290 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 65 Code Findings │
+└──────────────────┘
+                  
+    /sb/ERC20.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          405┆ contract ERC20 is Context, IERC20, Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          615┆ for (uint i = 0; i < vestingsLock[_wallet].length - 1; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+          613┆ _vestingBalance += vestingsLock[_wallet][0].amount;
+            ⋮┆----------------------------------------
+          642┆ _treasuryBalance +=                                              
+  treasuryBalanceLock[indexTreasuryLock].amount;                                
+            ⋮┆----------------------------------------
+          651┆ _liquidityBalance +=                                             
+  liquidityBalanceLock[indexLiquidityLock].amount;                              
+            ⋮┆----------------------------------------
+          707┆ _treasuryBalance += _amount;
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+          434┆ bool private _isInitTreasure = false;
+            ⋮┆----------------------------------------
+          449┆ bool private _enableTransfer = false;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          454┆ constructor(address cOwner, address verifier) Ownable (cOwner) {
+          455┆     _name = "Valhalla Land Testnet Token";
+          456┆     _symbol = "tVALH";
+          457┆     _verifier = verifier;
+          458┆     _totalSupply = 100000000 * 10 ** _decimals;
+          459┆     _totalLiquidityBalance = 9000000 * 10 ** _decimals;
+          460┆     _liquidityBalance = 3000000 * 10 ** _decimals;
+          461┆     _totalTreasuryBalance = 36000000 * 10 ** _decimals;
+          462┆     _treasuryBalance = 0;
+          463┆ 
+             [hid 113 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          615┆ for (uint i = 0; i < vestingsLock[_wallet].length - 1; i++) {
+            ⋮┆----------------------------------------
+          616┆ vestingsLock[_wallet][i] = vestingsLock[_wallet][i+1];
+            ⋮┆----------------------------------------
+          616┆ vestingsLock[_wallet][i] = vestingsLock[_wallet][i+1];
+            ⋮┆----------------------------------------
+          633┆ treasuryBalanceLock.push(vst);
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          615┆ for (uint i = 0; i < vestingsLock[_wallet].length - 1; i++) {
+            ⋮┆----------------------------------------
+          628┆ for (uint256 i = 1; i <= 36; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          169┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          172┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          242┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          243┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          270┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          297┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          353┆ require(initialOwner != address(0), "Owner cannot be a zero      
+  address");                                                                    
+            ⋮┆----------------------------------------
+          368┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          388┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          579┆ require(_enableTransfer, 'Can not transfer');
+            ⋮┆----------------------------------------
+          588┆ require(_contract != address(0), "Zero address for NFT contract  
+  is not acceptable");                                                          
+            ⋮┆----------------------------------------
+          623┆ require(!_isInitTreasure, "Treasury initialized");
+            ⋮┆----------------------------------------
+          660┆ require(vestings[_msgSender()].amount > 0, "Insufficient token   
+  amount to claim");                                                            
+            ⋮┆----------------------------------------
+          670┆ require((_mode == 1 || _mode == 2), "Invalid mode. Use '1' for   
+  treasury claim and '2' for liquidity claim");                                 
+            ⋮┆----------------------------------------
+          674┆ require(signer ==_verifier, "Unauthorized transaction");
+            ⋮┆----------------------------------------
+          678┆ require(_treasuryBalance >= _amount, "Insufficient amount to     
+  claim");                                                                      
+            ⋮┆----------------------------------------
+          686┆ require(_liquidityBalance >= _amount, "Insufficient amount to    
+  claim");                                                                      
+            ⋮┆----------------------------------------
+          696┆ require(_amount > 0, "Token amount cannot be zero");
+            ⋮┆----------------------------------------
+          697┆ require(_balances[_msgSender()] >= _amount, "Insufficient token  
+  balance to buy item");                                                        
+            ⋮┆----------------------------------------
+          702┆ require(signer ==_verifier, "Unauthorized transaction");
+            ⋮┆----------------------------------------
+          814┆ require(currentAllowance >= amount, "ERC20: transfer amount      
+  exceeds allowance");                                                          
+            ⋮┆----------------------------------------
+          831┆ require(currentAllowance >= subtractedValue, "ERC20: decreased   
+  allowance below zero");                                                       
+            ⋮┆----------------------------------------
+          859┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          860┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          864┆ require(senderBalance >= amount, "ERC20: transfer amount exceeds 
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          880┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          881┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          611┆ if (vestingsLock[_wallet][0].deadline <= block.timestamp &&      
+  vestingsLock[_wallet][0].amount > 0) {                                        
+          612┆     vestings[_wallet].amount += vestingsLock[_wallet][0].amount;
+          613┆     _vestingBalance += vestingsLock[_wallet][0].amount;
+          614┆     emit Transfer(address(0), _wallet,                           
+  vestingsLock[_wallet][0].amount);                                             
+          615┆     for (uint i = 0; i < vestingsLock[_wallet].length - 1; i++) {
+          616┆         vestingsLock[_wallet][i] = vestingsLock[_wallet][i+1];
+          617┆     }
+          618┆     delete vestingsLock[_wallet][vestingsLock[_wallet].length -  
+  1];                                                                           
+          619┆ }
+            ⋮┆----------------------------------------
+          641┆ if (_isInitTreasure && indexTreasuryLock <                       
+  treasuryBalanceLock.length && block.timestamp >                               
+  treasuryBalanceLock[indexTreasuryLock].deadline) {                            
+          642┆     _treasuryBalance +=                                          
+  treasuryBalanceLock[indexTreasuryLock].amount;                                
+          643┆     _totalTreasuryBalance -=                                     
+  treasuryBalanceLock[indexTreasuryLock].amount;                                
+          644┆     treasuryBalanceLock[indexTreasuryLock].amount = 0;
+          645┆     indexTreasuryLock++;
+          646┆ }
+            ⋮┆----------------------------------------
+          650┆ if (indexLiquidityLock < liquidityBalanceLock.length &&          
+  block.timestamp > liquidityBalanceLock[indexLiquidityLock].deadline) {        
+          651┆     _liquidityBalance +=                                         
+  liquidityBalanceLock[indexLiquidityLock].amount;                              
+          652┆     _totalLiquidityBalance -=                                    
+  liquidityBalanceLock[indexLiquidityLock].amount;                              
+          653┆     liquidityBalanceLock[indexLiquidityLock].amount = 0;
+          654┆     indexLiquidityLock++;
+          655┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          615┆ for (uint i = 0; i < vestingsLock[_wallet].length - 1; i++) {
+            ⋮┆----------------------------------------
+          628┆ for (uint256 i = 1; i <= 36; i++) {
+            ⋮┆----------------------------------------
+          645┆ indexTreasuryLock++;
+            ⋮┆----------------------------------------
+          654┆ indexLiquidityLock++;
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          172┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          242┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          270┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          297┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          388┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          588┆ require(_contract != address(0), "Zero address for NFT contract  
+  is not acceptable");                                                          
+            ⋮┆----------------------------------------
+          660┆ require(vestings[_msgSender()].amount > 0, "Insufficient token   
+  amount to claim");                                                            
+            ⋮┆----------------------------------------
+          670┆ require((_mode == 1 || _mode == 2), "Invalid mode. Use '1' for   
+  treasury claim and '2' for liquidity claim");                                 
+            ⋮┆----------------------------------------
+          697┆ require(_balances[_msgSender()] >= _amount, "Insufficient token  
+  balance to buy item");                                                        
+            ⋮┆----------------------------------------
+          814┆ require(currentAllowance >= amount, "ERC20: transfer amount      
+  exceeds allowance");                                                          
+            ⋮┆----------------------------------------
+          831┆ require(currentAllowance >= subtractedValue, "ERC20: decreased   
+  allowance below zero");                                                       
+            ⋮┆----------------------------------------
+          859┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          860┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          864┆ require(senderBalance >= amount, "ERC20: transfer amount exceeds 
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          880┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          881┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 65 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

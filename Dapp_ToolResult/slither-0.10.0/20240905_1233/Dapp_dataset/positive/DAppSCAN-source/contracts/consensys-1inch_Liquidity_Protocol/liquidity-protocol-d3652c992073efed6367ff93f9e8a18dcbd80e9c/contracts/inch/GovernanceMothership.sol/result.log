@@ -1,0 +1,59 @@
+'solc --version' running
+'solc /sb/GovernanceMothership.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+GovernanceMothership.stake(uint256) (../../sb/GovernanceMothership.sol#714-720) ignores return value by inchToken.transferFrom(msg.sender,address(this),amount) (../../sb/GovernanceMothership.sol#717)
+GovernanceMothership.unstake(uint256) (../../sb/GovernanceMothership.sol#722-728) ignores return value by inchToken.transfer(msg.sender,amount) (../../sb/GovernanceMothership.sol#725)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+GovernanceMothership.batchNotifyFor(address[]) (../../sb/GovernanceMothership.sol#739-748) has external calls inside a loop: IGovernanceModule(_modules.at(i)).notifyStakesChanged(accounts,balances) (../../sb/GovernanceMothership.sol#746)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in GovernanceMothership.stake(uint256) (../../sb/GovernanceMothership.sol#714-720):
+	External calls:
+	- inchToken.transferFrom(msg.sender,address(this),amount) (../../sb/GovernanceMothership.sol#717)
+	State variables written after the call(s):
+	- _mint(msg.sender,amount) (../../sb/GovernanceMothership.sol#718)
+		- _balances[account] = _balances[account].add(amount) (../../sb/GovernanceMothership.sol#690)
+	- _mint(msg.sender,amount) (../../sb/GovernanceMothership.sol#718)
+		- _totalSupply = _totalSupply.add(amount) (../../sb/GovernanceMothership.sol#689)
+Reentrancy in GovernanceMothership.unstake(uint256) (../../sb/GovernanceMothership.sol#722-728):
+	External calls:
+	- inchToken.transfer(msg.sender,amount) (../../sb/GovernanceMothership.sol#725)
+	State variables written after the call(s):
+	- _burn(msg.sender,amount) (../../sb/GovernanceMothership.sol#726)
+		- _balances[account] = _balances[account].sub(amount,Burn amount exceeds balance) (../../sb/GovernanceMothership.sol#694)
+	- _burn(msg.sender,amount) (../../sb/GovernanceMothership.sol#726)
+		- _totalSupply = _totalSupply.sub(amount) (../../sb/GovernanceMothership.sol#695)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Context._msgData() (../../sb/GovernanceMothership.sol#20-23) is never used and should be removed
+EnumerableSet.add(EnumerableSet.Bytes32Set,bytes32) (../../sb/GovernanceMothership.sol#517-519) is never used and should be removed
+EnumerableSet.add(EnumerableSet.UintSet,uint256) (../../sb/GovernanceMothership.sol#626-628) is never used and should be removed
+EnumerableSet.at(EnumerableSet.Bytes32Set,uint256) (../../sb/GovernanceMothership.sol#555-557) is never used and should be removed
+EnumerableSet.at(EnumerableSet.UintSet,uint256) (../../sb/GovernanceMothership.sol#664-666) is never used and should be removed
+EnumerableSet.contains(EnumerableSet.AddressSet,address) (../../sb/GovernanceMothership.sol#588-590) is never used and should be removed
+EnumerableSet.contains(EnumerableSet.Bytes32Set,bytes32) (../../sb/GovernanceMothership.sol#534-536) is never used and should be removed
+EnumerableSet.contains(EnumerableSet.UintSet,uint256) (../../sb/GovernanceMothership.sol#643-645) is never used and should be removed
+EnumerableSet.length(EnumerableSet.Bytes32Set) (../../sb/GovernanceMothership.sol#541-543) is never used and should be removed
+EnumerableSet.length(EnumerableSet.UintSet) (../../sb/GovernanceMothership.sol#650-652) is never used and should be removed
+EnumerableSet.remove(EnumerableSet.Bytes32Set,bytes32) (../../sb/GovernanceMothership.sol#527-529) is never used and should be removed
+EnumerableSet.remove(EnumerableSet.UintSet,uint256) (../../sb/GovernanceMothership.sol#636-638) is never used and should be removed
+SafeMath.div(uint256,uint256) (../../sb/GovernanceMothership.sol#220-223) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/GovernanceMothership.sol#275-278) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/GovernanceMothership.sol#237-240) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/GovernanceMothership.sol#295-298) is never used and should be removed
+SafeMath.mul(uint256,uint256) (../../sb/GovernanceMothership.sol#201-206) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/GovernanceMothership.sol#109-113) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/GovernanceMothership.sol#145-148) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/GovernanceMothership.sol#155-158) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/GovernanceMothership.sol#130-138) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/GovernanceMothership.sol#120-123) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.6.0 (../../sb/GovernanceMothership.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Redundant expression "this (../../sb/GovernanceMothership.sol#21)" inContext (../../sb/GovernanceMothership.sol#15-24)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+/sb/GovernanceMothership.sol analyzed (8 contracts with 93 detectors), 30 result(s) found

@@ -1,0 +1,459 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 86 Code Findings │
+└──────────────────┘
+                 
+    /sb/SOAR.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          462┆ contract SOAR is Context, IERC20, Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          587┆ for (uint256 i = 0; i < _excluded.length; i++) {
+            ⋮┆----------------------------------------
+          589┆ _excluded[i] = _excluded[_excluded.length - 1];
+            ⋮┆----------------------------------------
+          764┆ for (uint256 i = 0; i < _excluded.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          418┆ constructor () internal {
+          419┆     address msgSender = _msgSender();
+          420┆     _owner = msgSender;
+          421┆     emit OwnershipTransferred(address(0), msgSender);
+          422┆ }
+            ⋮┆----------------------------------------
+          485┆ constructor () public {
+          486┆     _rOwned[_msgSender()] = _rTotal;
+          487┆     emit Transfer(address(0), _msgSender(), _tTotal);
+          488┆     startTime = now + (60 * 60); //60 Minutes Delay to Launch    
+  Time Function since Contract Deployment                                       
+          489┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          587┆ for (uint256 i = 0; i < _excluded.length; i++) {
+            ⋮┆----------------------------------------
+          588┆ if (_excluded[i] == account) {
+            ⋮┆----------------------------------------
+          589┆ _excluded[i] = _excluded[_excluded.length - 1];
+            ⋮┆----------------------------------------
+          589┆ _excluded[i] = _excluded[_excluded.length - 1];
+            ⋮┆----------------------------------------
+          589┆ _excluded[i] = _excluded[_excluded.length - 1];
+            ⋮┆----------------------------------------
+          590┆ _tOwned[account] = 0;
+            ⋮┆----------------------------------------
+          591┆ _isExcluded[account] = false;
+            ⋮┆----------------------------------------
+          592┆ _excluded.pop();
+            ⋮┆----------------------------------------
+          764┆ for (uint256 i = 0; i < _excluded.length; i++) {
+            ⋮┆----------------------------------------
+          765┆ if (_rOwned[_excluded[i]] > rSupply || _tOwned[_excluded[i]] >   
+  tSupply) return (_rTotal, _tTotal);                                           
+            ⋮┆----------------------------------------
+          765┆ if (_rOwned[_excluded[i]] > rSupply || _tOwned[_excluded[i]] >   
+  tSupply) return (_rTotal, _tTotal);                                           
+            ⋮┆----------------------------------------
+          765┆ if (_rOwned[_excluded[i]] > rSupply || _tOwned[_excluded[i]] >   
+  tSupply) return (_rTotal, _tTotal);                                           
+            ⋮┆----------------------------------------
+          765┆ if (_rOwned[_excluded[i]] > rSupply || _tOwned[_excluded[i]] >   
+  tSupply) return (_rTotal, _tTotal);                                           
+            ⋮┆----------------------------------------
+          765┆ if (_rOwned[_excluded[i]] > rSupply || _tOwned[_excluded[i]] >   
+  tSupply) return (_rTotal, _tTotal);                                           
+            ⋮┆----------------------------------------
+          766┆ rSupply = rSupply.sub(_rOwned[_excluded[i]]);
+            ⋮┆----------------------------------------
+          766┆ rSupply = rSupply.sub(_rOwned[_excluded[i]]);
+            ⋮┆----------------------------------------
+          767┆ tSupply = tSupply.sub(_tOwned[_excluded[i]]);
+            ⋮┆----------------------------------------
+          767┆ tSupply = tSupply.sub(_tOwned[_excluded[i]]);
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          587┆ for (uint256 i = 0; i < _excluded.length; i++) {
+            ⋮┆----------------------------------------
+          764┆ for (uint256 i = 0; i < _excluded.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          130┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          185┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          309┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          313┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          370┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          375┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          435┆ require(_owner == _msgSender(), "Ownable: caller is not the      
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          456┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          552┆ require(!_isExcluded[sender], "Excluded addresses cannot call    
+  this function");                                                              
+            ⋮┆----------------------------------------
+          560┆ require(tAmount <= _tTotal, "Amount must be less than supply");
+            ⋮┆----------------------------------------
+          571┆ require(rAmount <= _rTotal, "Amount must be less than total      
+  reflections");                                                                
+            ⋮┆----------------------------------------
+          577┆ require(!_isExcluded[account], "Account is already excluded");
+            ⋮┆----------------------------------------
+          586┆ require(_isExcluded[account], "Account is already excluded");
+            ⋮┆----------------------------------------
+          599┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          600┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          607┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          608┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          609┆ require(amount > 0, "Transfer amount must be greater than zero");
+            ⋮┆----------------------------------------
+          646┆ revert("ERC20: cannot transfer more than 50,000 tokens in first  
+  120 minutes");                                                                
+            ⋮┆----------------------------------------
+          662┆ revert("ERC20: cannot transfer more than 100,000 tokens in first 
+  240 minutes");                                                                
+            ⋮┆----------------------------------------
+          678┆ revert("ERC20: cannot transfer more than 150,000 tokens in first 
+  360 minutes");                                                                
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          621┆ if (_isExcluded[sender] && !_isExcluded[recipient]) {
+          622┆     _transferFromExcluded(sender, recipient, amount);
+          623┆ } else if (!_isExcluded[sender] && _isExcluded[recipient]) {
+          624┆     _transferToExcluded(sender, recipient, amount);
+          625┆ } else if (!_isExcluded[sender] && !_isExcluded[recipient]) {
+          626┆     _transferStandard(sender, recipient, amount);
+          627┆ } else if (_isExcluded[sender] && _isExcluded[recipient]) {
+          628┆     _transferBothExcluded(sender, recipient, amount);
+          629┆ } else {
+          630┆     _transferStandard(sender, recipient, amount);
+             [hid 1 additional lines, adjust with --max-lines-per-finding] 
+          623┆ } else if (!_isExcluded[sender] && _isExcluded[recipient]) {
+          624┆     _transferToExcluded(sender, recipient, amount);
+          625┆ } else if (!_isExcluded[sender] && !_isExcluded[recipient]) {
+          626┆     _transferStandard(sender, recipient, amount);
+          627┆ } else if (_isExcluded[sender] && _isExcluded[recipient]) {
+          628┆     _transferBothExcluded(sender, recipient, amount);
+          629┆ } else {
+          630┆     _transferStandard(sender, recipient, amount);
+          631┆ }
+            ⋮┆----------------------------------------
+          625┆ } else if (!_isExcluded[sender] && !_isExcluded[recipient]) {
+          626┆     _transferStandard(sender, recipient, amount);
+          627┆ } else if (_isExcluded[sender] && _isExcluded[recipient]) {
+          628┆     _transferBothExcluded(sender, recipient, amount);
+          629┆ } else {
+          630┆     _transferStandard(sender, recipient, amount);
+          631┆ }
+            ⋮┆----------------------------------------
+          627┆ } else if (_isExcluded[sender] && _isExcluded[recipient]) {
+          628┆     _transferBothExcluded(sender, recipient, amount);
+          629┆ } else {
+          630┆     _transferStandard(sender, recipient, amount);
+          631┆ }
+            ⋮┆----------------------------------------
+          632┆ } else if (now >= startTime && now <= relaseTime1) {
+          633┆     if (amount <= xLimit1) {
+          634┆         if (_isExcluded[sender] && !_isExcluded[recipient]) {
+          635┆             _transferFromExcluded(sender, recipient, amount);
+          636┆         } else if (!_isExcluded[sender] &&                       
+  _isExcluded[recipient]) {                                                     
+          637┆             _transferToExcluded(sender, recipient, amount);
+          638┆         } else if (!_isExcluded[sender] &&                       
+  !_isExcluded[recipient]) {                                                    
+          639┆             _transferStandard(sender, recipient, amount);
+          640┆         } else if (_isExcluded[sender] && _isExcluded[recipient])
+  {                                                                             
+          641┆             _transferBothExcluded(sender, recipient, amount);
+             [hid 51 additional lines, adjust with --max-lines-per-finding] 
+          634┆ if (_isExcluded[sender] && !_isExcluded[recipient]) {
+          635┆     _transferFromExcluded(sender, recipient, amount);
+          636┆ } else if (!_isExcluded[sender] && _isExcluded[recipient]) {
+          637┆     _transferToExcluded(sender, recipient, amount);
+          638┆ } else if (!_isExcluded[sender] && !_isExcluded[recipient]) {
+          639┆     _transferStandard(sender, recipient, amount);
+          640┆ } else if (_isExcluded[sender] && _isExcluded[recipient]) {
+          641┆     _transferBothExcluded(sender, recipient, amount);
+          642┆ } else {
+          643┆     _transferStandard(sender, recipient, amount);
+             [hid 1 additional lines, adjust with --max-lines-per-finding] 
+          636┆ } else if (!_isExcluded[sender] && _isExcluded[recipient]) {
+          637┆     _transferToExcluded(sender, recipient, amount);
+          638┆ } else if (!_isExcluded[sender] && !_isExcluded[recipient]) {
+          639┆     _transferStandard(sender, recipient, amount);
+          640┆ } else if (_isExcluded[sender] && _isExcluded[recipient]) {
+          641┆     _transferBothExcluded(sender, recipient, amount);
+          642┆ } else {
+          643┆     _transferStandard(sender, recipient, amount);
+          644┆ }
+            ⋮┆----------------------------------------
+          638┆ } else if (!_isExcluded[sender] && !_isExcluded[recipient]) {
+          639┆     _transferStandard(sender, recipient, amount);
+          640┆ } else if (_isExcluded[sender] && _isExcluded[recipient]) {
+          641┆     _transferBothExcluded(sender, recipient, amount);
+          642┆ } else {
+          643┆     _transferStandard(sender, recipient, amount);
+          644┆ }
+            ⋮┆----------------------------------------
+          640┆ } else if (_isExcluded[sender] && _isExcluded[recipient]) {
+          641┆     _transferBothExcluded(sender, recipient, amount);
+          642┆ } else {
+          643┆     _transferStandard(sender, recipient, amount);
+          644┆ }
+            ⋮┆----------------------------------------
+          648┆ } else if (now > relaseTime1 && now <= relaseTime2) {
+          649┆     if (amount <= xLimit2) {
+          650┆         if (_isExcluded[sender] && !_isExcluded[recipient]) {
+          651┆             _transferFromExcluded(sender, recipient, amount);
+          652┆         } else if (!_isExcluded[sender] &&                       
+  _isExcluded[recipient]) {                                                     
+          653┆             _transferToExcluded(sender, recipient, amount);
+          654┆         } else if (!_isExcluded[sender] &&                       
+  !_isExcluded[recipient]) {                                                    
+          655┆             _transferStandard(sender, recipient, amount);
+          656┆         } else if (_isExcluded[sender] && _isExcluded[recipient])
+  {                                                                             
+          657┆             _transferBothExcluded(sender, recipient, amount);
+             [hid 35 additional lines, adjust with --max-lines-per-finding] 
+          650┆ if (_isExcluded[sender] && !_isExcluded[recipient]) {
+          651┆     _transferFromExcluded(sender, recipient, amount);
+          652┆ } else if (!_isExcluded[sender] && _isExcluded[recipient]) {
+          653┆     _transferToExcluded(sender, recipient, amount);
+          654┆ } else if (!_isExcluded[sender] && !_isExcluded[recipient]) {
+          655┆     _transferStandard(sender, recipient, amount);
+          656┆ } else if (_isExcluded[sender] && _isExcluded[recipient]) {
+          657┆     _transferBothExcluded(sender, recipient, amount);
+          658┆ } else {
+          659┆     _transferStandard(sender, recipient, amount);
+             [hid 1 additional lines, adjust with --max-lines-per-finding] 
+          652┆ } else if (!_isExcluded[sender] && _isExcluded[recipient]) {
+          653┆     _transferToExcluded(sender, recipient, amount);
+          654┆ } else if (!_isExcluded[sender] && !_isExcluded[recipient]) {
+          655┆     _transferStandard(sender, recipient, amount);
+          656┆ } else if (_isExcluded[sender] && _isExcluded[recipient]) {
+          657┆     _transferBothExcluded(sender, recipient, amount);
+          658┆ } else {
+          659┆     _transferStandard(sender, recipient, amount);
+          660┆ }
+            ⋮┆----------------------------------------
+          654┆ } else if (!_isExcluded[sender] && !_isExcluded[recipient]) {
+          655┆     _transferStandard(sender, recipient, amount);
+          656┆ } else if (_isExcluded[sender] && _isExcluded[recipient]) {
+          657┆     _transferBothExcluded(sender, recipient, amount);
+          658┆ } else {
+          659┆     _transferStandard(sender, recipient, amount);
+          660┆ }
+            ⋮┆----------------------------------------
+          656┆ } else if (_isExcluded[sender] && _isExcluded[recipient]) {
+          657┆     _transferBothExcluded(sender, recipient, amount);
+          658┆ } else {
+          659┆     _transferStandard(sender, recipient, amount);
+          660┆ }
+            ⋮┆----------------------------------------
+          664┆ } else if (now > relaseTime2 && now <= relaseTime3) {
+          665┆     if (amount <= xLimit3) {
+          666┆         if (_isExcluded[sender] && !_isExcluded[recipient]) {
+          667┆             _transferFromExcluded(sender, recipient, amount);
+          668┆         } else if (!_isExcluded[sender] &&                       
+  _isExcluded[recipient]) {                                                     
+          669┆             _transferToExcluded(sender, recipient, amount);
+          670┆         } else if (!_isExcluded[sender] &&                       
+  !_isExcluded[recipient]) {                                                    
+          671┆             _transferStandard(sender, recipient, amount);
+          672┆         } else if (_isExcluded[sender] && _isExcluded[recipient])
+  {                                                                             
+          673┆             _transferBothExcluded(sender, recipient, amount);
+             [hid 19 additional lines, adjust with --max-lines-per-finding] 
+          666┆ if (_isExcluded[sender] && !_isExcluded[recipient]) {
+          667┆     _transferFromExcluded(sender, recipient, amount);
+          668┆ } else if (!_isExcluded[sender] && _isExcluded[recipient]) {
+          669┆     _transferToExcluded(sender, recipient, amount);
+          670┆ } else if (!_isExcluded[sender] && !_isExcluded[recipient]) {
+          671┆     _transferStandard(sender, recipient, amount);
+          672┆ } else if (_isExcluded[sender] && _isExcluded[recipient]) {
+          673┆     _transferBothExcluded(sender, recipient, amount);
+          674┆ } else {
+          675┆     _transferStandard(sender, recipient, amount);
+             [hid 1 additional lines, adjust with --max-lines-per-finding] 
+          668┆ } else if (!_isExcluded[sender] && _isExcluded[recipient]) {
+          669┆     _transferToExcluded(sender, recipient, amount);
+          670┆ } else if (!_isExcluded[sender] && !_isExcluded[recipient]) {
+          671┆     _transferStandard(sender, recipient, amount);
+          672┆ } else if (_isExcluded[sender] && _isExcluded[recipient]) {
+          673┆     _transferBothExcluded(sender, recipient, amount);
+          674┆ } else {
+          675┆     _transferStandard(sender, recipient, amount);
+          676┆ }
+            ⋮┆----------------------------------------
+          670┆ } else if (!_isExcluded[sender] && !_isExcluded[recipient]) {
+          671┆     _transferStandard(sender, recipient, amount);
+          672┆ } else if (_isExcluded[sender] && _isExcluded[recipient]) {
+          673┆     _transferBothExcluded(sender, recipient, amount);
+          674┆ } else {
+          675┆     _transferStandard(sender, recipient, amount);
+          676┆ }
+            ⋮┆----------------------------------------
+          672┆ } else if (_isExcluded[sender] && _isExcluded[recipient]) {
+          673┆     _transferBothExcluded(sender, recipient, amount);
+          674┆ } else {
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 86 findings.
+          675┆     _transferStandard(sender, recipient, amount);
+          676┆ }
+            ⋮┆----------------------------------------
+          681┆ if (_isExcluded[sender] && !_isExcluded[recipient]) {
+          682┆     _transferFromExcluded(sender, recipient, amount);
+          683┆ } else if (!_isExcluded[sender] && _isExcluded[recipient]) {
+          684┆     _transferToExcluded(sender, recipient, amount);
+          685┆ } else if (!_isExcluded[sender] && !_isExcluded[recipient]) {
+          686┆     _transferStandard(sender, recipient, amount);
+          687┆ } else if (_isExcluded[sender] && _isExcluded[recipient]) {
+          688┆     _transferBothExcluded(sender, recipient, amount);
+          689┆ } else {
+          690┆     _transferStandard(sender, recipient, amount);
+             [hid 1 additional lines, adjust with --max-lines-per-finding] 
+          683┆ } else if (!_isExcluded[sender] && _isExcluded[recipient]) {
+          684┆     _transferToExcluded(sender, recipient, amount);
+          685┆ } else if (!_isExcluded[sender] && !_isExcluded[recipient]) {
+          686┆     _transferStandard(sender, recipient, amount);
+          687┆ } else if (_isExcluded[sender] && _isExcluded[recipient]) {
+          688┆     _transferBothExcluded(sender, recipient, amount);
+          689┆ } else {
+          690┆     _transferStandard(sender, recipient, amount);
+          691┆ }
+            ⋮┆----------------------------------------
+          685┆ } else if (!_isExcluded[sender] && !_isExcluded[recipient]) {
+          686┆     _transferStandard(sender, recipient, amount);
+          687┆ } else if (_isExcluded[sender] && _isExcluded[recipient]) {
+          688┆     _transferBothExcluded(sender, recipient, amount);
+          689┆ } else {
+          690┆     _transferStandard(sender, recipient, amount);
+          691┆ }
+            ⋮┆----------------------------------------
+          687┆ } else if (_isExcluded[sender] && _isExcluded[recipient]) {
+          688┆     _transferBothExcluded(sender, recipient, amount);
+          689┆ } else {
+          690┆     _transferStandard(sender, recipient, amount);
+          691┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          587┆ for (uint256 i = 0; i < _excluded.length; i++) {
+            ⋮┆----------------------------------------
+          764┆ for (uint256 i = 0; i < _excluded.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          185┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          313┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          370┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          456┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          552┆ require(!_isExcluded[sender], "Excluded addresses cannot call    
+  this function");                                                              
+            ⋮┆----------------------------------------
+          571┆ require(rAmount <= _rTotal, "Amount must be less than total      
+  reflections");                                                                
+            ⋮┆----------------------------------------
+          599┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          600┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          607┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          608┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          609┆ require(amount > 0, "Transfer amount must be greater than zero");
+            ⋮┆----------------------------------------
+          646┆ revert("ERC20: cannot transfer more than 50,000 tokens in first  
+  120 minutes");                                                                
+            ⋮┆----------------------------------------
+          662┆ revert("ERC20: cannot transfer more than 100,000 tokens in first 
+  240 minutes");                                                                
+            ⋮┆----------------------------------------
+          678┆ revert("ERC20: cannot transfer more than 150,000 tokens in first 
+  360 minutes");                                                                
+
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

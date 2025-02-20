@@ -1,0 +1,215 @@
+'solc --version' running
+'solc /sb/ProfitSplitter.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+ProfitSplitter._payToBudget() (../../sb/ProfitSplitter.sol#1706-1744) sends eth to arbitrary user
+	Dangerous calls:
+	- budget.transfer(amount) (../../sb/ProfitSplitter.sol#1740)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#functions-that-send-ether-to-arbitrary-destinations
+
+Reentrancy in ProfitSplitter.changeIncoming(address,address) (../../sb/ProfitSplitter.sol#1642-1651):
+	External calls:
+	- transfer(_recipient,balance) (../../sb/ProfitSplitter.sol#1647)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/ProfitSplitter.sol#857)
+		- incoming.safeTransfer(_recipient,amount) (../../sb/ProfitSplitter.sol#1633)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/ProfitSplitter.sol#725)
+	External calls sending eth:
+	- transfer(_recipient,balance) (../../sb/ProfitSplitter.sol#1647)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/ProfitSplitter.sol#725)
+	State variables written after the call(s):
+	- incoming = ERC20(_incoming) (../../sb/ProfitSplitter.sol#1649)
+	ProfitSplitter.incoming (../../sb/ProfitSplitter.sol#1553) can be used in cross function reentrancies:
+	- ProfitSplitter._payToBudget() (../../sb/ProfitSplitter.sol#1706-1744)
+	- ProfitSplitter._payToRecipients() (../../sb/ProfitSplitter.sol#1750-1765)
+	- ProfitSplitter.changeIncoming(address,address) (../../sb/ProfitSplitter.sol#1642-1651)
+	- ProfitSplitter.constructor(address,address) (../../sb/ProfitSplitter.sol#1600-1603)
+	- ProfitSplitter.incoming (../../sb/ProfitSplitter.sol#1553)
+	- ProfitSplitter.split(uint256) (../../sb/ProfitSplitter.sol#1771-1778)
+	- ProfitSplitter.transfer(address,uint256) (../../sb/ProfitSplitter.sol#1630-1635)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities
+
+ProfitSplitter (../../sb/ProfitSplitter.sol#1543-1779) has incorrect ERC20 function interface:ProfitSplitter.transfer(address,uint256) (../../sb/ProfitSplitter.sol#1630-1635)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-erc20-interface
+
+ProfitSplitter._payToBudget() (../../sb/ProfitSplitter.sol#1706-1744) uses a dangerous strict equality:
+	- splitterIncomingBalance == 0 (../../sb/ProfitSplitter.sol#1708)
+ProfitSplitter._payToBudget() (../../sb/ProfitSplitter.sol#1706-1744) uses a dangerous strict equality:
+	- require(bool,string)(amountsIn.length == 2,ProfitSplitter::_payToBudget: invalid amounts in length) (../../sb/ProfitSplitter.sol#1723)
+ProfitSplitter._payToBudget() (../../sb/ProfitSplitter.sol#1706-1744) uses a dangerous strict equality:
+	- require(bool,string)(amountsOut.length == 2,ProfitSplitter::_payToBudget: invalid amounts out length) (../../sb/ProfitSplitter.sol#1730)
+ProfitSplitter._payToRecipients() (../../sb/ProfitSplitter.sol#1750-1765) uses a dangerous strict equality:
+	- splitterIncomingBalance == 0 (../../sb/ProfitSplitter.sol#1752)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+ProfitSplitter.addRecipient(address,uint256) (../../sb/ProfitSplitter.sol#1668-1675) ignores return value by recipientsIndex.add(recipient) (../../sb/ProfitSplitter.sol#1672)
+ProfitSplitter.removeRecipient(address) (../../sb/ProfitSplitter.sol#1681-1687) ignores return value by recipientsIndex.remove(recipient) (../../sb/ProfitSplitter.sol#1684)
+ProfitSplitter._payToBudget() (../../sb/ProfitSplitter.sol#1706-1744) ignores return value by uniswapRouter.swapTokensForExactETH(amountOut,amountsIn[0],path,address(this),block.timestamp) (../../sb/ProfitSplitter.sol#1727)
+ProfitSplitter._payToBudget() (../../sb/ProfitSplitter.sol#1706-1744) ignores return value by uniswapRouter.swapExactTokensForETH(splitterIncomingBalance,amountsOut[1],path,address(this),block.timestamp) (../../sb/ProfitSplitter.sol#1736)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+OwnablePausable.changePauser(address).newPauser (../../sb/ProfitSplitter.sol#1323) lacks a zero-check on :
+		- pauser = newPauser (../../sb/ProfitSplitter.sol#1324)
+ProfitSplitter.changeBudget(address,uint256)._budget (../../sb/ProfitSplitter.sol#1619) lacks a zero-check on :
+		- budget = _budget (../../sb/ProfitSplitter.sol#1620)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in ProfitSplitter._payToBudget() (../../sb/ProfitSplitter.sol#1706-1744):
+	External calls:
+	- incoming.safeApprove(address(uniswapRouter),amountsIn[0]) (../../sb/ProfitSplitter.sol#1726)
+	- uniswapRouter.swapTokensForExactETH(amountOut,amountsIn[0],path,address(this),block.timestamp) (../../sb/ProfitSplitter.sol#1727)
+	- incoming.safeApprove(address(uniswapRouter),splitterIncomingBalance) (../../sb/ProfitSplitter.sol#1735)
+	- uniswapRouter.swapExactTokensForETH(splitterIncomingBalance,amountsOut[1],path,address(this),block.timestamp) (../../sb/ProfitSplitter.sol#1736)
+	External calls sending eth:
+	- budget.transfer(amount) (../../sb/ProfitSplitter.sol#1740)
+	Event emitted after the call(s):
+	- PayToBudget(budget,amount) (../../sb/ProfitSplitter.sol#1741)
+Reentrancy in ProfitSplitter._payToRecipients() (../../sb/ProfitSplitter.sol#1750-1765):
+	External calls:
+	- incoming.safeTransfer(recipient,amount) (../../sb/ProfitSplitter.sol#1759)
+	Event emitted after the call(s):
+	- PayToRecipient(recipient,amount) (../../sb/ProfitSplitter.sol#1761)
+Reentrancy in ProfitSplitter.changeIncoming(address,address) (../../sb/ProfitSplitter.sol#1642-1651):
+	External calls:
+	- transfer(_recipient,balance) (../../sb/ProfitSplitter.sol#1647)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/ProfitSplitter.sol#857)
+		- incoming.safeTransfer(_recipient,amount) (../../sb/ProfitSplitter.sol#1633)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/ProfitSplitter.sol#725)
+	External calls sending eth:
+	- transfer(_recipient,balance) (../../sb/ProfitSplitter.sol#1647)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/ProfitSplitter.sol#725)
+	Event emitted after the call(s):
+	- IncomingChanged(_incoming) (../../sb/ProfitSplitter.sol#1650)
+Reentrancy in ProfitSplitter.split(uint256) (../../sb/ProfitSplitter.sol#1771-1778):
+	External calls:
+	- incoming.safeTransferFrom(msg.sender,address(this),amount) (../../sb/ProfitSplitter.sol#1773)
+	- _payToBudget() (../../sb/ProfitSplitter.sol#1776)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/ProfitSplitter.sol#857)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/ProfitSplitter.sol#725)
+		- incoming.safeApprove(address(uniswapRouter),amountsIn[0]) (../../sb/ProfitSplitter.sol#1726)
+		- uniswapRouter.swapTokensForExactETH(amountOut,amountsIn[0],path,address(this),block.timestamp) (../../sb/ProfitSplitter.sol#1727)
+		- incoming.safeApprove(address(uniswapRouter),splitterIncomingBalance) (../../sb/ProfitSplitter.sol#1735)
+		- uniswapRouter.swapExactTokensForETH(splitterIncomingBalance,amountsOut[1],path,address(this),block.timestamp) (../../sb/ProfitSplitter.sol#1736)
+	External calls sending eth:
+	- _payToBudget() (../../sb/ProfitSplitter.sol#1776)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/ProfitSplitter.sol#725)
+		- budget.transfer(amount) (../../sb/ProfitSplitter.sol#1740)
+	Event emitted after the call(s):
+	- PayToBudget(budget,amount) (../../sb/ProfitSplitter.sol#1741)
+		- _payToBudget() (../../sb/ProfitSplitter.sol#1776)
+Reentrancy in ProfitSplitter.split(uint256) (../../sb/ProfitSplitter.sol#1771-1778):
+	External calls:
+	- incoming.safeTransferFrom(msg.sender,address(this),amount) (../../sb/ProfitSplitter.sol#1773)
+	- _payToBudget() (../../sb/ProfitSplitter.sol#1776)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/ProfitSplitter.sol#857)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/ProfitSplitter.sol#725)
+		- incoming.safeApprove(address(uniswapRouter),amountsIn[0]) (../../sb/ProfitSplitter.sol#1726)
+		- uniswapRouter.swapTokensForExactETH(amountOut,amountsIn[0],path,address(this),block.timestamp) (../../sb/ProfitSplitter.sol#1727)
+		- incoming.safeApprove(address(uniswapRouter),splitterIncomingBalance) (../../sb/ProfitSplitter.sol#1735)
+		- uniswapRouter.swapExactTokensForETH(splitterIncomingBalance,amountsOut[1],path,address(this),block.timestamp) (../../sb/ProfitSplitter.sol#1736)
+	- _payToRecipients() (../../sb/ProfitSplitter.sol#1777)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/ProfitSplitter.sol#857)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/ProfitSplitter.sol#725)
+		- incoming.safeTransfer(recipient,amount) (../../sb/ProfitSplitter.sol#1759)
+	External calls sending eth:
+	- _payToBudget() (../../sb/ProfitSplitter.sol#1776)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/ProfitSplitter.sol#725)
+		- budget.transfer(amount) (../../sb/ProfitSplitter.sol#1740)
+	- _payToRecipients() (../../sb/ProfitSplitter.sol#1777)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/ProfitSplitter.sol#725)
+	Event emitted after the call(s):
+	- PayToRecipient(recipient,amount) (../../sb/ProfitSplitter.sol#1761)
+		- _payToRecipients() (../../sb/ProfitSplitter.sol#1777)
+Reentrancy in ProfitSplitter.transfer(address,uint256) (../../sb/ProfitSplitter.sol#1630-1635):
+	External calls:
+	- incoming.safeTransfer(_recipient,amount) (../../sb/ProfitSplitter.sol#1633)
+	Event emitted after the call(s):
+	- Transfer(_recipient,amount) (../../sb/ProfitSplitter.sol#1634)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Address.isContract(address) (../../sb/ProfitSplitter.sol#632-641) uses assembly
+	- INLINE ASM (../../sb/ProfitSplitter.sol#639)
+Address._verifyCallResult(bool,bytes,string) (../../sb/ProfitSplitter.sol#777-794) uses assembly
+	- INLINE ASM (../../sb/ProfitSplitter.sol#786-789)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.functionCall(address,bytes) (../../sb/ProfitSplitter.sol#685-687) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/ProfitSplitter.sol#710-712) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/ProfitSplitter.sol#759-761) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/ProfitSplitter.sol#769-775) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/ProfitSplitter.sol#735-737) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/ProfitSplitter.sol#745-751) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/ProfitSplitter.sol#659-665) is never used and should be removed
+Context._msgData() (../../sb/ProfitSplitter.sol#21-24) is never used and should be removed
+ERC20._burn(address,uint256) (../../sb/ProfitSplitter.sol#552-560) is never used and should be removed
+ERC20._mint(address,uint256) (../../sb/ProfitSplitter.sol#531-539) is never used and should be removed
+ERC20._setupDecimals(uint8) (../../sb/ProfitSplitter.sol#590-592) is never used and should be removed
+EnumerableSet.add(EnumerableSet.Bytes32Set,bytes32) (../../sb/ProfitSplitter.sol#1007-1009) is never used and should be removed
+EnumerableSet.add(EnumerableSet.UintSet,uint256) (../../sb/ProfitSplitter.sol#1116-1118) is never used and should be removed
+EnumerableSet.at(EnumerableSet.Bytes32Set,uint256) (../../sb/ProfitSplitter.sol#1045-1047) is never used and should be removed
+EnumerableSet.at(EnumerableSet.UintSet,uint256) (../../sb/ProfitSplitter.sol#1154-1156) is never used and should be removed
+EnumerableSet.contains(EnumerableSet.Bytes32Set,bytes32) (../../sb/ProfitSplitter.sol#1024-1026) is never used and should be removed
+EnumerableSet.contains(EnumerableSet.UintSet,uint256) (../../sb/ProfitSplitter.sol#1133-1135) is never used and should be removed
+EnumerableSet.length(EnumerableSet.Bytes32Set) (../../sb/ProfitSplitter.sol#1031-1033) is never used and should be removed
+EnumerableSet.length(EnumerableSet.UintSet) (../../sb/ProfitSplitter.sol#1140-1142) is never used and should be removed
+EnumerableSet.remove(EnumerableSet.Bytes32Set,bytes32) (../../sb/ProfitSplitter.sol#1017-1019) is never used and should be removed
+EnumerableSet.remove(EnumerableSet.UintSet,uint256) (../../sb/ProfitSplitter.sol#1126-1128) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/ProfitSplitter.sol#841-844) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/ProfitSplitter.sol#836-839) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/ProfitSplitter.sol#286-289) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/ProfitSplitter.sol#248-251) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/ProfitSplitter.sol#306-309) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/ProfitSplitter.sol#120-124) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/ProfitSplitter.sol#156-159) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/ProfitSplitter.sol#166-169) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/ProfitSplitter.sol#141-149) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/ProfitSplitter.sol#131-134) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.6.0 (../../sb/ProfitSplitter.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/ProfitSplitter.sol#659-665):
+	- (success) = recipient.call{value: amount}() (../../sb/ProfitSplitter.sol#663)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/ProfitSplitter.sol#720-727):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/ProfitSplitter.sol#725)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/ProfitSplitter.sol#745-751):
+	- (success,returndata) = target.staticcall(data) (../../sb/ProfitSplitter.sol#749)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/ProfitSplitter.sol#769-775):
+	- (success,returndata) = target.delegatecall(data) (../../sb/ProfitSplitter.sol#773)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Function IUniswapV2Router02.WETH() (../../sb/ProfitSplitter.sol#1348) is not in mixedCase
+Parameter ProfitSplitter.changeUniswapRouter(address)._uniswapRouter (../../sb/ProfitSplitter.sol#1609) is not in mixedCase
+Parameter ProfitSplitter.changeBudget(address,uint256)._budget (../../sb/ProfitSplitter.sol#1619) is not in mixedCase
+Parameter ProfitSplitter.changeBudget(address,uint256)._budgetBalance (../../sb/ProfitSplitter.sol#1619) is not in mixedCase
+Parameter ProfitSplitter.transfer(address,uint256)._recipient (../../sb/ProfitSplitter.sol#1630) is not in mixedCase
+Parameter ProfitSplitter.changeIncoming(address,address)._incoming (../../sb/ProfitSplitter.sol#1642) is not in mixedCase
+Parameter ProfitSplitter.changeIncoming(address,address)._recipient (../../sb/ProfitSplitter.sol#1642) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/ProfitSplitter.sol#22)" inContext (../../sb/ProfitSplitter.sol#16-25)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Reentrancy in ProfitSplitter._payToBudget() (../../sb/ProfitSplitter.sol#1706-1744):
+	External calls:
+	- budget.transfer(amount) (../../sb/ProfitSplitter.sol#1740)
+	Event emitted after the call(s):
+	- PayToBudget(budget,amount) (../../sb/ProfitSplitter.sol#1741)
+Reentrancy in ProfitSplitter.split(uint256) (../../sb/ProfitSplitter.sol#1771-1778):
+	External calls:
+	- _payToBudget() (../../sb/ProfitSplitter.sol#1776)
+		- budget.transfer(amount) (../../sb/ProfitSplitter.sol#1740)
+	External calls sending eth:
+	- _payToBudget() (../../sb/ProfitSplitter.sol#1776)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/ProfitSplitter.sol#725)
+		- budget.transfer(amount) (../../sb/ProfitSplitter.sol#1740)
+	- _payToRecipients() (../../sb/ProfitSplitter.sol#1777)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/ProfitSplitter.sol#725)
+	Event emitted after the call(s):
+	- PayToRecipient(recipient,amount) (../../sb/ProfitSplitter.sol#1761)
+		- _payToRecipients() (../../sb/ProfitSplitter.sol#1777)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-4
+
+Variable IUniswapV2Router02.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountADesired (../../sb/ProfitSplitter.sol#1353) is too similar to IUniswapV2Router02.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountBDesired (../../sb/ProfitSplitter.sol#1354)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+/sb/ProfitSplitter.sol analyzed (12 contracts with 93 detectors), 69 result(s) found

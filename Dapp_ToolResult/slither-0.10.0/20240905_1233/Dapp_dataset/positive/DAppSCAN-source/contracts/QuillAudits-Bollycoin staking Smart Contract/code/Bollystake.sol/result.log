@@ -1,0 +1,136 @@
+'solc --version' running
+'solc /sb/Bollystake.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/Bollystake.sol:
+Warning: SPDX license identifier not provided in source file. Before publishing, consider adding a comment containing "SPDX-License-Identifier: <SPDX-License>" to each source file. Use "SPDX-License-Identifier: UNLICENSED" for non-open-source code. Please see https://spdx.org for more information.
+--> /sb/Bollystake.sol
+
+Warning: Unused local variable.
+   --> /sb/Bollystake.sol:850:31:
+    |
+850 |         (bool _isStakeholder, uint256 s) = isStakeholder(msg.sender);
+    |                               ^^^^^^^^^
+
+
+
+Bollystake.distributeRewards(uint256) (../../sb/Bollystake.sol#866-882) uses arbitrary from in transferFrom: usdt.transferFrom(owner,address(this),amount) (../../sb/Bollystake.sol#871)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#arbitrary-from-in-transferfrom
+
+Bollystake.enter_stake(uint256) (../../sb/Bollystake.sol#835-848) ignores return value by BOLLY.transferFrom(msg.sender,address(this),_amount) (../../sb/Bollystake.sol#846)
+Bollystake.remove_stake(uint256) (../../sb/Bollystake.sol#858-864) ignores return value by BOLLY.transfer(msg.sender,_share) (../../sb/Bollystake.sol#863)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+IERC20usdt (../../sb/Bollystake.sol#714-718) has incorrect ERC20 function interface:IERC20usdt.transfer(address,uint256) (../../sb/Bollystake.sol#715)
+IERC20usdt (../../sb/Bollystake.sol#714-718) has incorrect ERC20 function interface:IERC20usdt.transferFrom(address,address,uint256) (../../sb/Bollystake.sol#716)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-erc20-interface
+
+Bollystake.enter_stake(uint256).allowance (../../sb/Bollystake.sol#837) shadows:
+	- ERC20.allowance(address,address) (../../sb/Bollystake.sol#476-478) (function)
+	- IERC20.allowance(address,address) (../../sb/Bollystake.sol#291) (function)
+Bollystake.distributeRewards(uint256).allowance (../../sb/Bollystake.sol#867) shadows:
+	- ERC20.allowance(address,address) (../../sb/Bollystake.sol#476-478) (function)
+	- IERC20.allowance(address,address) (../../sb/Bollystake.sol#291) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+Bollystake.constructor(IERC20usdt,IERC20,address)._owner (../../sb/Bollystake.sol#730) lacks a zero-check on :
+		- owner = _owner (../../sb/Bollystake.sol#733)
+Bollystake.set_owner(address)._owner (../../sb/Bollystake.sol#743) lacks a zero-check on :
+		- owner = _owner (../../sb/Bollystake.sol#745)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Bollystake.distributeRewards(uint256) (../../sb/Bollystake.sol#866-882) has external calls inside a loop: usdt.transfer(stakeholder,reward) (../../sb/Bollystake.sol#879)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in Bollystake.enter_stake(uint256) (../../sb/Bollystake.sol#835-848):
+	External calls:
+	- BOLLY.transferFrom(msg.sender,address(this),_amount) (../../sb/Bollystake.sol#846)
+	State variables written after the call(s):
+	- _mint(msg.sender,_amount) (../../sb/Bollystake.sol#847)
+		- _balances[account] += amount (../../sb/Bollystake.sol#613)
+	- _mint(msg.sender,_amount) (../../sb/Bollystake.sol#847)
+		- _totalSupply += amount (../../sb/Bollystake.sol#612)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in Bollystake.enter_stake(uint256) (../../sb/Bollystake.sol#835-848):
+	External calls:
+	- BOLLY.transferFrom(msg.sender,address(this),_amount) (../../sb/Bollystake.sol#846)
+	Event emitted after the call(s):
+	- Transfer(address(0),account,amount) (../../sb/Bollystake.sol#614)
+		- _mint(msg.sender,_amount) (../../sb/Bollystake.sol#847)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Bollystake.total_eligible_Stakes() (../../sb/Bollystake.sol#820-832) uses timestamp for comparisons
+	Dangerous comparisons:
+	- users[stakeholders[s]].expire > block.timestamp (../../sb/Bollystake.sol#827)
+Bollystake.remove_stake(uint256) (../../sb/Bollystake.sol#858-864) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)((users[msg.sender].expire < block.timestamp) && (_share <= users[msg.sender].locked_amount),Please wait 365 days until removing stake) (../../sb/Bollystake.sol#859)
+Bollystake.distributeRewards(uint256) (../../sb/Bollystake.sol#866-882) uses timestamp for comparisons
+	Dangerous comparisons:
+	- users[stakeholder].expire > block.timestamp (../../sb/Bollystake.sol#876)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Bollystake.relock_stake() (../../sb/Bollystake.sol#849-854) compares to a boolean constant:
+	-require(bool,string)(_isStakeholder == true,only current stakeholders can relock stake) (../../sb/Bollystake.sol#851)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#boolean-equality
+
+Different versions of Solidity are used:
+	- Version used: ['^0.8.0', '^0.8.7']
+	- ^0.8.0 (../../sb/Bollystake.sol#1)
+	- ^0.8.0 (../../sb/Bollystake.sol#2)
+	- ^0.8.0 (../../sb/Bollystake.sol#3)
+	- ^0.8.0 (../../sb/Bollystake.sol#4)
+	- ^0.8.0 (../../sb/Bollystake.sol#5)
+	- ^0.8.7 (../../sb/Bollystake.sol#6)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+
+Context._msgData() (../../sb/Bollystake.sol#254-256) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/Bollystake.sol#199-208) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/Bollystake.sol#159-161) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/Bollystake.sol#225-234) is never used and should be removed
+SafeMath.sub(uint256,uint256,string) (../../sb/Bollystake.sol#176-185) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/Bollystake.sol#30-36) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/Bollystake.sol#72-77) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/Bollystake.sol#84-89) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/Bollystake.sol#55-65) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/Bollystake.sol#43-48) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.8.0 (../../sb/Bollystake.sol#1) allows old versions
+Pragma version^0.8.0 (../../sb/Bollystake.sol#2) allows old versions
+Pragma version^0.8.0 (../../sb/Bollystake.sol#3) allows old versions
+Pragma version^0.8.0 (../../sb/Bollystake.sol#4) allows old versions
+Pragma version^0.8.0 (../../sb/Bollystake.sol#5) allows old versions
+Pragma version^0.8.7 (../../sb/Bollystake.sol#6) allows old versions
+solc-0.8.27 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Struct Bollystake.locked (../../sb/Bollystake.sol#738-741) is not in CapWords
+Function Bollystake.set_owner(address) (../../sb/Bollystake.sol#743-746) is not in mixedCase
+Parameter Bollystake.set_owner(address)._owner (../../sb/Bollystake.sol#743) is not in mixedCase
+Parameter Bollystake.isStakeholder(address)._address (../../sb/Bollystake.sol#754) is not in mixedCase
+Parameter Bollystake.addStakeholder(address)._stakeholder (../../sb/Bollystake.sol#769) is not in mixedCase
+Parameter Bollystake.removeStakeholder(address)._stakeholder (../../sb/Bollystake.sol#780) is not in mixedCase
+Parameter Bollystake.stakeOf(address)._stakeholder (../../sb/Bollystake.sol#796) is not in mixedCase
+Function Bollystake.total_eligible_Stakes() (../../sb/Bollystake.sol#820-832) is not in mixedCase
+Function Bollystake.enter_stake(uint256) (../../sb/Bollystake.sol#835-848) is not in mixedCase
+Parameter Bollystake.enter_stake(uint256)._amount (../../sb/Bollystake.sol#835) is not in mixedCase
+Function Bollystake.relock_stake() (../../sb/Bollystake.sol#849-854) is not in mixedCase
+Function Bollystake.remove_stake(uint256) (../../sb/Bollystake.sol#858-864) is not in mixedCase
+Parameter Bollystake.remove_stake(uint256)._share (../../sb/Bollystake.sol#858) is not in mixedCase
+Variable Bollystake.BOLLY (../../sb/Bollystake.sol#724) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Variable Bollystake.stakeOf(address)._stakeholder (../../sb/Bollystake.sol#796) is too similar to Bollystake.stakeholders (../../sb/Bollystake.sol#747)
+Variable Bollystake.removeStakeholder(address)._stakeholder (../../sb/Bollystake.sol#780) is too similar to Bollystake.stakeholders (../../sb/Bollystake.sol#747)
+Variable Bollystake.addStakeholder(address)._stakeholder (../../sb/Bollystake.sol#769) is too similar to Bollystake.stakeholders (../../sb/Bollystake.sol#747)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+Bollystake.enter_stake(uint256) (../../sb/Bollystake.sol#835-848) uses literals with too many digits:
+	- require(bool,string)(_amount >= 10000000000000000000000,minimum 10000 BOLLY needs to be staked) (../../sb/Bollystake.sol#838)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+Loop condition s < stakeholders.length (../../sb/Bollystake.sol#759) should use cached array length instead of referencing `length` member of the storage array.
+ Loop condition s < stakeholders.length (../../sb/Bollystake.sol#814) should use cached array length instead of referencing `length` member of the storage array.
+ Loop condition s < stakeholders.length (../../sb/Bollystake.sol#826) should use cached array length instead of referencing `length` member of the storage array.
+ Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cache-array-length
+/sb/Bollystake.sol analyzed (7 contracts with 93 detectors), 55 result(s) found

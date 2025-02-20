@@ -1,0 +1,269 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 74 Code Findings │
+└──────────────────┘
+                           
+    /sb/StakingRewards.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          518┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          522┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          540┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          545┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          550┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          878┆ for (uint256 i = 0; i < stakers.length; i++) {
+            ⋮┆----------------------------------------
+          997┆ for (uint256 i = 0; i < rewardTokens.length; i++) {
+            ⋮┆----------------------------------------
+         1065┆ for (uint256 i = 0; i < rewardTokens.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+          632┆ bool inited = false;
+            ⋮┆----------------------------------------
+          827┆ uint256 public periodFinish = 0;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          844┆ constructor(
+          845┆     address _rewardsDistribution,
+          846┆     address[] memory _rewardTokens,
+          847┆     address _stakingToken
+          848┆ ) public {
+          849┆     rewardTokens = _rewardTokens;
+          850┆     stakingToken = IERC20(_stakingToken);
+          851┆     rewardsDistribution = _rewardsDistribution;
+          852┆ 
+          853┆     _initializeEIP712("DualFarmsV1");
+             [hid 1 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          878┆ for (uint256 i = 0; i < stakers.length; i++) {
+            ⋮┆----------------------------------------
+          879┆ balances[i] = _balances[stakers[i]];
+            ⋮┆----------------------------------------
+          879┆ balances[i] = _balances[stakers[i]];
+            ⋮┆----------------------------------------
+          997┆ for (uint256 i = 0; i < rewardTokens.length; i++) {
+            ⋮┆----------------------------------------
+          998┆ uint256 reward = rewards[_msgSender()][rewardTokens[i]];
+            ⋮┆----------------------------------------
+          998┆ uint256 reward = rewards[_msgSender()][rewardTokens[i]];
+            ⋮┆----------------------------------------
+         1000┆ rewards[_msgSender()][rewardTokens[i]] = 0;
+            ⋮┆----------------------------------------
+         1000┆ rewards[_msgSender()][rewardTokens[i]] = 0;
+            ⋮┆----------------------------------------
+         1001┆ IERC20(rewardTokens[i]).safeTransfer(_msgSender(), reward);
+            ⋮┆----------------------------------------
+         1065┆ for (uint256 i = 0; i < rewardTokens.length; i++) {
+            ⋮┆----------------------------------------
+         1066┆ rewardsPerTokenMap[rewardTokens[i]] = rewardPerToken(
+            ⋮┆----------------------------------------
+         1066┆ rewardsPerTokenMap[rewardTokens[i]] = rewardPerToken(
+            ⋮┆----------------------------------------
+         1067┆ rewardTokens[i]
+            ⋮┆----------------------------------------
+         1069┆ rewardLastUpdatedTime[rewardTokens[i]] =                         
+  lastTimeRewardApplicable();                                                   
+            ⋮┆----------------------------------------
+         1069┆ rewardLastUpdatedTime[rewardTokens[i]] =                         
+  lastTimeRewardApplicable();                                                   
+            ⋮┆----------------------------------------
+         1071┆ rewards[account][rewardTokens[i]] = earned(
+            ⋮┆----------------------------------------
+         1071┆ rewards[account][rewardTokens[i]] = earned(
+            ⋮┆----------------------------------------
+         1073┆ rewardTokens[i]
+            ⋮┆----------------------------------------
+         1075┆ userRewardPerTokenPaid[account][
+            ⋮┆----------------------------------------
+         1076┆ rewardTokens[i]
+            ⋮┆----------------------------------------
+         1077┆ ] = rewardsPerTokenMap[rewardTokens[i]];
+            ⋮┆----------------------------------------
+         1077┆ ] = rewardsPerTokenMap[rewardTokens[i]];
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          878┆ for (uint256 i = 0; i < stakers.length; i++) {
+            ⋮┆----------------------------------------
+          997┆ for (uint256 i = 0; i < rewardTokens.length; i++) {
+            ⋮┆----------------------------------------
+         1065┆ for (uint256 i = 0; i < rewardTokens.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          115┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          130┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          147┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          164┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          181┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          367┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          371┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          428┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          429┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          453┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          477┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          537┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          538┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          539┆ );
+            ⋮┆----------------------------------------
+          567┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          618┆ require(_status != _ENTERED, "ReentrancyGuard: reentrant call");
+            ⋮┆----------------------------------------
+          635┆ require(!inited, 'already inited');
+            ⋮┆----------------------------------------
+          726┆ require(verify(userAddress, metaTx, sigR, sigS, sigV), 'Signer   
+  and signature do not match');                                                 
+            ⋮┆----------------------------------------
+          735┆ require(success, 'Function call not successful');
+            ⋮┆----------------------------------------
+          758┆ require(signer != address(0), 'NativeMetaTransaction:            
+  INVALID_SIGNER');                                                             
+            ⋮┆----------------------------------------
+          808┆ require(msg.sender == rewardsDistribution, 'Caller is not        
+  RewardsDistribution contract');                                               
+            ⋮┆----------------------------------------
+          943┆ require(amount > 0, "Cannot stake 0");
+            ⋮┆----------------------------------------
+          968┆ require(amount > 0, "Cannot stake 0");
+            ⋮┆----------------------------------------
+          984┆ require(amount > 0, "Cannot withdraw 0");
+            ⋮┆----------------------------------------
+         1037┆ require(
+         1038┆     rewardRate <= balance.div(periodFinish.sub(block.timestamp)),
+         1039┆     "Provided reward too high"
+         1040┆ );
+            ⋮┆----------------------------------------
+         1052┆ require(
+         1053┆     tokenAddress != address(stakingToken),
+         1054┆     "StakingRewards: rescue of staking token not allowed"
+         1055┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          878┆ for (uint256 i = 0; i < stakers.length; i++) {
+            ⋮┆----------------------------------------
+          997┆ for (uint256 i = 0; i < rewardTokens.length; i++) {
+            ⋮┆----------------------------------------
+         1065┆ for (uint256 i = 0; i < rewardTokens.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          147┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          371┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          428┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          453┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          477┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          537┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          538┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          539┆ );
+            ⋮┆----------------------------------------
+          567┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          726┆ require(verify(userAddress, metaTx, sigR, sigS, sigV), 'Signer   
+  and signature do not match');                                                 
+            ⋮┆----------------------------------------
+          758┆ require(signer != address(0), 'NativeMetaTransaction:            
+  INVALID_SIGNER');                                                             
+            ⋮┆----------------------------------------
+          808┆ require(msg.sender == rewardsDistribution, 'Caller is not        
+  RewardsDistribution contract');                                               
+            ⋮┆----------------------------------------
+         1052┆ require(
+         1053┆     tokenAddress != address(stakingToken),
+         1054┆     "StakingRewards: rescue of staking token not allowed"
+         1055┆ );
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 74 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

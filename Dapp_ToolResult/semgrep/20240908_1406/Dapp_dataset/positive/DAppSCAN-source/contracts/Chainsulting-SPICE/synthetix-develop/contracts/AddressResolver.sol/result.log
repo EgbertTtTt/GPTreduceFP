@@ -1,0 +1,151 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 36 Code Findings │
+└──────────────────┘
+                            
+    /sb/AddressResolver.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          269┆ for (uint i = 0; i < first.length; i++) {
+            ⋮┆----------------------------------------
+          273┆ for (uint j = 0; j < second.length; j++) {
+            ⋮┆----------------------------------------
+          274┆ combination[first.length + j] = second[j];
+            ⋮┆----------------------------------------
+          286┆ for (uint i = 0; i < requiredAddresses.length; i++) {
+            ⋮┆----------------------------------------
+          300┆ for (uint i = 0; i < requiredAddresses.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+            9┆ constructor(address _owner) public {
+           10┆     require(_owner != address(0), "Owner address cannot be 0");
+           11┆     owner = _owner;
+           12┆     emit OwnerChanged(address(0), _owner);
+           13┆ }
+            ⋮┆----------------------------------------
+          194┆ constructor(address _owner) public Owned(_owner) {}
+            ⋮┆----------------------------------------
+          256┆ constructor(address _resolver) internal {
+          257┆     resolver = AddressResolver(_resolver);
+          258┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          204┆ repository[name] = destination;
+            ⋮┆----------------------------------------
+          221┆ if (repository[names[i]] != destinations[i]) {
+            ⋮┆----------------------------------------
+          290┆ resolver.requireAndGetAddress(name,                              
+  string(abi.encodePacked("Resolver missing target: ", name)));                 
+            ⋮┆----------------------------------------
+          291┆ addressCache[name] = destination;
+            ⋮┆----------------------------------------
+          303┆ if (resolver.getAddress(name) != addressCache[name] ||           
+  addressCache[name] == address(0)) {                                           
+            ⋮┆----------------------------------------
+          303┆ if (resolver.getAddress(name) != addressCache[name] ||           
+  addressCache[name] == address(0)) {                                           
+            ⋮┆----------------------------------------
+          303┆ if (resolver.getAddress(name) != addressCache[name] ||           
+  addressCache[name] == address(0)) {                                           
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          201┆ for (uint i = 0; i < names.length; i++) {
+            ⋮┆----------------------------------------
+          212┆ for (uint i = 0; i < destinations.length; i++) {
+            ⋮┆----------------------------------------
+          220┆ for (uint i = 0; i < names.length; i++) {
+            ⋮┆----------------------------------------
+          269┆ for (uint i = 0; i < first.length; i++) {
+            ⋮┆----------------------------------------
+          273┆ for (uint j = 0; j < second.length; j++) {
+            ⋮┆----------------------------------------
+          286┆ for (uint i = 0; i < requiredAddresses.length; i++) {
+            ⋮┆----------------------------------------
+          300┆ for (uint i = 0; i < requiredAddresses.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           10┆ require(_owner != address(0), "Owner address cannot be 0");
+            ⋮┆----------------------------------------
+           21┆ require(msg.sender == nominatedOwner, "You must be nominated     
+  before you can accept ownership");                                            
+            ⋮┆----------------------------------------
+           33┆ require(msg.sender == owner, "Only the contract owner may perform
+  this action");                                                                
+            ⋮┆----------------------------------------
+          199┆ require(names.length == destinations.length, "Input lengths must 
+  match");                                                                      
+            ⋮┆----------------------------------------
+          240┆ require(address(issuer) != address(0), "Cannot find Issuer       
+  address");                                                                    
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          201┆ for (uint i = 0; i < names.length; i++) {
+            ⋮┆----------------------------------------
+          212┆ for (uint i = 0; i < destinations.length; i++) {
+            ⋮┆----------------------------------------
+          220┆ for (uint i = 0; i < names.length; i++) {
+            ⋮┆----------------------------------------
+          269┆ for (uint i = 0; i < first.length; i++) {
+            ⋮┆----------------------------------------
+          273┆ for (uint j = 0; j < second.length; j++) {
+            ⋮┆----------------------------------------
+          286┆ for (uint i = 0; i < requiredAddresses.length; i++) {
+            ⋮┆----------------------------------------
+          300┆ for (uint i = 0; i < requiredAddresses.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           21┆ require(msg.sender == nominatedOwner, "You must be nominated     
+  before you can accept ownership");                                            
+            ⋮┆----------------------------------------
+           33┆ require(msg.sender == owner, "Only the contract owner may perform
+  this action");                                                                
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 36 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

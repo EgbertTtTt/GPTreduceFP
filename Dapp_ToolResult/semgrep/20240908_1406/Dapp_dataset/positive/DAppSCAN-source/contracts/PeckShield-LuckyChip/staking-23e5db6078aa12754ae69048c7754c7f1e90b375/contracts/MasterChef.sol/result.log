@@ -1,0 +1,417 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                     
+                     
+┌───────────────────┐
+│ 109 Code Findings │
+└───────────────────┘
+                       
+    /sb/MasterChef.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          515┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          524┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          547┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          556┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          568┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          783┆ contract LCBEP20 is Context, IBEP20, Ownable {
+            ⋮┆----------------------------------------
+         1325┆ contract MasterChef is Ownable, ReentrancyGuard, IMasterChef {
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+         1499┆ for(uint256 i = 0; i < poolInfo.length; i ++){
+            ⋮┆----------------------------------------
+         1541┆ for(uint256 i = 0; i < bonusInfo.length; i ++) {
+            ⋮┆----------------------------------------
+         1581┆ for(uint256 i = 0; i < poolInfo.length; i ++){
+            ⋮┆----------------------------------------
+         1614┆ for(uint256 i = 0; i < bonusInfo.length; i ++) {
+            ⋮┆----------------------------------------
+         1643┆ for(uint256 i = 0; i < bonusInfo.length; i ++) {
+            ⋮┆----------------------------------------
+         1668┆ for(uint256 i = 0; i < bonusInfo.length; i ++) {
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+         1401┆ uint256 public totalAllocPoint = 0;
+            ⋮┆----------------------------------------
+         1403┆ uint256 public totalBonusPoint = 0;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          808┆ constructor(string memory name, string memory symbol) public {
+          809┆     _name = name;
+          810┆     _symbol = symbol;
+          811┆     _decimals = 18;
+          812┆ }
+            ⋮┆----------------------------------------
+         1420┆ constructor(
+         1421┆     LCToken _LC,
+         1422┆     address _dev0addr,
+         1423┆     address _dev1addr,
+         1424┆     address _dev2addr,
+         1425┆     address _safuaddr,
+         1426┆     address _treasuryaddr,
+         1427┆     uint256 _LCPerBlock,
+         1428┆     uint256 _startBlock,
+         1429┆     uint256 _stakingPercent,
+             [hid 20 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+         1242┆ Checkpoint memory cp = checkpoints[account][center];
+            ⋮┆----------------------------------------
+         1499┆ for(uint256 i = 0; i < poolInfo.length; i ++){
+            ⋮┆----------------------------------------
+         1500┆ PoolInfo storage pool = poolInfo[i];
+            ⋮┆----------------------------------------
+         1502┆ poolBonusPerShare[i].push(0);
+            ⋮┆----------------------------------------
+         1541┆ for(uint256 i = 0; i < bonusInfo.length; i ++) {
+            ⋮┆----------------------------------------
+         1542┆ values[i] =                                                      
+  user.amount.mul(poolBonusPerShare[_pid][i]).div(1e12).sub(userBonusDebt[i][_us
+  er]);                                                                         
+            ⋮┆----------------------------------------
+         1542┆ values[i] =                                                      
+  user.amount.mul(poolBonusPerShare[_pid][i]).div(1e12).sub(userBonusDebt[i][_us
+  er]);                                                                         
+            ⋮┆----------------------------------------
+         1581┆ for(uint256 i = 0; i < poolInfo.length; i ++){
+            ⋮┆----------------------------------------
+         1582┆ PoolInfo storage pool = poolInfo[i];
+            ⋮┆----------------------------------------
+         1588┆ poolBonusPerShare[i][_pid] =                                     
+  poolBonusPerShare[i][_pid].add(amount.mul(pool.bonusPoint).div(totalBonusPoint
+  ).mul(1e12).div(lpSupply));                                                   
+            ⋮┆----------------------------------------
+         1588┆ poolBonusPerShare[i][_pid] =                                     
+  poolBonusPerShare[i][_pid].add(amount.mul(pool.bonusPoint).div(totalBonusPoint
+  ).mul(1e12).div(lpSupply));                                                   
+            ⋮┆----------------------------------------
+         1588┆ poolBonusPerShare[i][_pid] =                                     
+  poolBonusPerShare[i][_pid].add(amount.mul(pool.bonusPoint).div(totalBonusPoint
+  ).mul(1e12).div(lpSupply));                                                   
+            ⋮┆----------------------------------------
+         1614┆ for(uint256 i = 0; i < bonusInfo.length; i ++) {
+            ⋮┆----------------------------------------
+         1615┆ uint256 pending =                                                
+  user.amount.mul(poolBonusPerShare[_pid][i]).div(1e12).sub(userBonusDebt[i][_us
+  er]);                                                                         
+            ⋮┆----------------------------------------
+         1615┆ uint256 pending =                                                
+  user.amount.mul(poolBonusPerShare[_pid][i]).div(1e12).sub(userBonusDebt[i][_us
+  er]);                                                                         
+            ⋮┆----------------------------------------
+         1617┆ BonusInfo storage bonusPool = bonusInfo[i];
+            ⋮┆----------------------------------------
+         1643┆ for(uint256 i = 0; i < bonusInfo.length; i ++) {
+            ⋮┆----------------------------------------
+         1644┆ userBonusDebt[i][msg.sender] =                                   
+  user.amount.mul(poolBonusPerShare[_pid][i]).div(1e12);                        
+            ⋮┆----------------------------------------
+         1644┆ userBonusDebt[i][msg.sender] =                                   
+  user.amount.mul(poolBonusPerShare[_pid][i]).div(1e12);                        
+            ⋮┆----------------------------------------
+         1668┆ for(uint256 i = 0; i < bonusInfo.length; i ++) {
+            ⋮┆----------------------------------------
+         1669┆ userBonusDebt[i][msg.sender] =                                   
+  user.amount.mul(poolBonusPerShare[_pid][i]).div(1e12);                        
+            ⋮┆----------------------------------------
+         1669┆ userBonusDebt[i][msg.sender] =                                   
+  user.amount.mul(poolBonusPerShare[_pid][i]).div(1e12);                        
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+         1499┆ for(uint256 i = 0; i < poolInfo.length; i ++){
+            ⋮┆----------------------------------------
+         1541┆ for(uint256 i = 0; i < bonusInfo.length; i ++) {
+            ⋮┆----------------------------------------
+         1551┆ for (uint256 pid = 0; pid < length; ++pid) {
+            ⋮┆----------------------------------------
+         1581┆ for(uint256 i = 0; i < poolInfo.length; i ++){
+            ⋮┆----------------------------------------
+         1614┆ for(uint256 i = 0; i < bonusInfo.length; i ++) {
+            ⋮┆----------------------------------------
+         1643┆ for(uint256 i = 0; i < bonusInfo.length; i ++) {
+            ⋮┆----------------------------------------
+         1668┆ for(uint256 i = 0; i < bonusInfo.length; i ++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           87┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          102┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          119┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          136┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          153┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          360┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          364┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          421┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          422┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          446┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          470┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          543┆ require(
+          544┆     (value == 0) || (token.allowance(address(this), spender) ==  
+  0),                                                                           
+          545┆     "SafeBEP20: approve from non-zero to non-zero allowance"
+          546┆ );
+            ⋮┆----------------------------------------
+          586┆ require(abi.decode(returndata, (bool)), "SafeBEP20: BEP20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          673┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          694┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          746┆ require(_status != _ENTERED, "ReentrancyGuard: reentrant call");
+            ⋮┆----------------------------------------
+          990┆ require(sender != address(0), "BEP20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          991┆ require(recipient != address(0), "BEP20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1008┆ require(account != address(0), "BEP20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1030┆ require(account != address(0), "BEP20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1055┆ require(owner != address(0), "BEP20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1056┆ require(spender != address(0), "BEP20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1189┆ require(signatory != address(0), "LC::delegateBySig: invalid     
+  signature");                                                                  
+            ⋮┆----------------------------------------
+         1190┆ require(nonce == nonces[signatory]++, "LC::delegateBySig: invalid
+  nonce");                                                                      
+            ⋮┆----------------------------------------
+         1191┆ require(now <= expiry, "LC::delegateBySig: signature expired");
+            ⋮┆----------------------------------------
+         1221┆ require(blockNumber < block.number, "LC::getPriorVotes: not yet  
+  determined");                                                                 
+            ⋮┆----------------------------------------
+         1464┆ require(lastBlockDevWithdraw < block.number, 'wait for new       
+  block');                                                                      
+            ⋮┆----------------------------------------
+         1576┆ require(_pid < bonusInfo.length, "_pid must be less than         
+  bonusInfo length");                                                           
+            ⋮┆----------------------------------------
+         1613┆ require(poolBonusPerShare[_pid].length == bonusInfo.length,      
+  "poolBonusPerShare.length must equal to bonusInof length");                   
+            ⋮┆----------------------------------------
+         1656┆ require(user.amount >= _amount, "withdraw: not good");
+            ⋮┆----------------------------------------
+         1710┆ require(newAmount <= 100 * 1e18, 'Max per block 100 LC');
+            ⋮┆----------------------------------------
+         1711┆ require(newAmount >= 1 * 1e15, 'Min per block 0.001 LC');
+            ⋮┆----------------------------------------
+         1716┆ require(_referralCommissionRate <=                               
+  MAXIMUM_REFERRAL_COMMISSION_RATE, "setReferralCommissionRate: invalid referral
+  commission rate basis points");                                               
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         1267┆ if (srcRep != dstRep && amount > 0) {
+         1268┆     if (srcRep != address(0)) {
+         1269┆         // decrease old representative
+         1270┆         uint32 srcRepNum = numCheckpoints[srcRep];
+         1271┆         uint256 srcRepOld = srcRepNum > 0 ?                      
+  checkpoints[srcRep][srcRepNum - 1].votes : 0;                                 
+         1272┆         uint256 srcRepNew = srcRepOld.sub(amount);
+         1273┆         _writeCheckpoint(srcRep, srcRepNum, srcRepOld,           
+  srcRepNew);                                                                   
+         1274┆     }
+         1275┆ 
+         1276┆     if (dstRep != address(0)) {
+             [hid 7 additional lines, adjust with --max-lines-per-finding] 
+         1296┆ if (nCheckpoints > 0 && checkpoints[delegatee][nCheckpoints -    
+  1].fromBlock == blockNumber) {                                                
+         1297┆     checkpoints[delegatee][nCheckpoints - 1].votes = newVotes;
+         1298┆ } else {
+         1299┆     checkpoints[delegatee][nCheckpoints] =                       
+  Checkpoint(blockNumber, newVotes);                                            
+         1300┆     numCheckpoints[delegatee] = nCheckpoints + 1;
+         1301┆ }
+            ⋮┆----------------------------------------
+         1527┆ if (block.number > pool.lastRewardBlock && lpSupply != 0) {
+         1528┆     uint256 multiplier = getMultiplier(pool.lastRewardBlock,     
+  block.number);                                                                
+         1529┆     uint256 LCReward =                                           
+  multiplier.mul(LCPerBlock).mul(pool.allocPoint).div(totalAllocPoint).mul(staki
+  ngPercent).div(percentDec);                                                   
+         1530┆     accLCPerShare =                                              
+  accLCPerShare.add(LCReward.mul(1e12).div(lpSupply));                          
+         1531┆ }
+            ⋮┆----------------------------------------
+         1630┆ if(_amount > 0 && address(luckychipReferral) != address(0) &&    
+  _referrer != address(0) && _referrer != msg.sender){                          
+         1631┆     luckychipReferral.recordReferral(msg.sender, _referrer);
+         1632┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+         1190┆ require(nonce == nonces[signatory]++, "LC::delegateBySig: invalid
+  nonce");                                                                      
+            ⋮┆----------------------------------------
+         1499┆ for(uint256 i = 0; i < poolInfo.length; i ++){
+            ⋮┆----------------------------------------
+         1541┆ for(uint256 i = 0; i < bonusInfo.length; i ++) {
+            ⋮┆----------------------------------------
+         1581┆ for(uint256 i = 0; i < poolInfo.length; i ++){
+            ⋮┆----------------------------------------
+         1614┆ for(uint256 i = 0; i < bonusInfo.length; i ++) {
+            ⋮┆----------------------------------------
+         1643┆ for(uint256 i = 0; i < bonusInfo.length; i ++) {
+            ⋮┆----------------------------------------
+         1668┆ for(uint256 i = 0; i < bonusInfo.length; i ++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          119┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          364┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          421┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          446┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          470┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          543┆ require(
+          544┆     (value == 0) || (token.allowance(address(this), spender) ==  
+  0),                                                                           
+          545┆     "SafeBEP20: approve from non-zero to non-zero allowance"
+          546┆ );
+            ⋮┆----------------------------------------
+          586┆ require(abi.decode(returndata, (bool)), "SafeBEP20: BEP20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          694┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          990┆ require(sender != address(0), "BEP20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          991┆ require(recipient != address(0), "BEP20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1030┆ require(account != address(0), "BEP20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1055┆ require(owner != address(0), "BEP20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1056┆ require(spender != address(0), "BEP20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1189┆ require(signatory != address(0), "LC::delegateBySig: invalid     
+  signature");                                                                  
+            ⋮┆----------------------------------------
+         1191┆ require(now <= expiry, "LC::delegateBySig: signature expired");
+            ⋮┆----------------------------------------
+         1221┆ require(blockNumber < block.number, "LC::getPriorVotes: not yet  
+  determined");                                                                 
+            ⋮┆----------------------------------------
+         1576┆ require(_pid < bonusInfo.length, "_pid must be less than         
+  bonusInfo length");                                                           
+            ⋮┆----------------------------------------
+         1613┆ require(poolBonusPerShare[_pid].length == bonusInfo.length,      
+  "poolBonusPerShare.length must equal to bonusInof length");                   
+            ⋮┆----------------------------------------
+         1716┆ require(_referralCommissionRate <=                               
+  MAXIMUM_REFERRAL_COMMISSION_RATE, "setReferralCommissionRate: invalid referral
+  commission rate basis points");                                               
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 109 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

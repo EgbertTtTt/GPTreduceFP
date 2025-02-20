@@ -1,0 +1,307 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 72 Code Findings │
+└──────────────────┘
+                           
+    /sb/BitBookStaking.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          537┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          546┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          569┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          578┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          590┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          761┆ contract Reserve is Ownable {
+            ⋮┆----------------------------------------
+          776┆ contract BitBookStaking is Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          895┆ withdrawFee[poolInfo.length - 1].push(withdrawFeeIntervals[i]);
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+          819┆ bool public initialized = false;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          831┆ constructor() public {
+          832┆     startBlock = 0;
+          833┆     rewardReserve = new Reserve();
+          834┆     WithdrawFeeInterval[] memory _withdrawFee = new              
+  WithdrawFeeInterval[](5);                                                     
+          835┆     _withdrawFee[0] = WithdrawFeeInterval(3 days, 50);
+          836┆     _withdrawFee[1] = WithdrawFeeInterval(10 days, 25);
+          837┆     _withdrawFee[2] = WithdrawFeeInterval(30 days, 15);
+          838┆     _withdrawFee[3] = WithdrawFeeInterval(90 days, 5);
+          839┆     add(108e6,                                                   
+  IBEP20(0xD48474E7444727bF500a32D5AbE01943f3A59A64),                           
+  IBEP20(0xD48474E7444727bF500a32D5AbE01943f3A59A64), 0, 0, 0, _withdrawFee);   
+          840┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          849┆ poolInfo[pid].lastRewardBlock = startBlock;
+            ⋮┆----------------------------------------
+          849┆ poolInfo[pid].lastRewardBlock = startBlock;
+            ⋮┆----------------------------------------
+          895┆ withdrawFee[poolInfo.length - 1].push(withdrawFeeIntervals[i]);
+            ⋮┆----------------------------------------
+          895┆ withdrawFee[poolInfo.length - 1].push(withdrawFeeIntervals[i]);
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          848┆ for (uint256 pid = 0; pid < length; ++pid) {
+            ⋮┆----------------------------------------
+          894┆ for (uint256 i = 0; i < length; i++) {
+            ⋮┆----------------------------------------
+         1052┆ for (uint256 i = 0; i < length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          202┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          217┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          234┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          251┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          268┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          381┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          385┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          442┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          443┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          467┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          491┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          565┆ require(
+          566┆     (value == 0) || (token.allowance(address(this), spender) ==  
+  0),                                                                           
+          567┆     "SafeBEP20: approve from non-zero to non-zero allowance"
+          568┆ );
+            ⋮┆----------------------------------------
+          608┆ require(abi.decode(returndata, (bool)), "SafeBEP20: BEP20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          673┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          694┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          747┆ require(_status != _ENTERED, "ReentrancyGuard: reentrant call");
+            ⋮┆----------------------------------------
+          843┆ require(!initialized, "BITBOOK_STAKING: Staking already          
+  started!");                                                                   
+            ⋮┆----------------------------------------
+          870┆ require(address(_stakedToken) != address(0), "BITBOOK_STAKING:   
+  Invalid Staked token address");                                               
+            ⋮┆----------------------------------------
+          871┆ require(address(_rewardToken) != address(0), "BITBOOK_STAKING:   
+  Invalid Reward token address");                                               
+            ⋮┆----------------------------------------
+          872┆ require(poolInfo.length <= 1000, "BITBOOK_STAKING: Pool Length   
+  Full!");                                                                      
+            ⋮┆----------------------------------------
+          873┆                                                                  
+  require(!poolExists[address(_stakedToken)][address(_rewardToken)],            
+  "BITBOOK_STAKING: Pool Already Exists!");                                     
+            ⋮┆----------------------------------------
+          874┆ require(_depositFeeBP <= 10000, "BITBOOK_STAKING: invalid deposit
+  fee basis points");                                                           
+            ⋮┆----------------------------------------
+          875┆ require(_harvestInterval <= MAXIMUM_HARVEST_INTERVAL,            
+  "BITBOOK_STAKING: invalid harvest interval");                                 
+            ⋮┆----------------------------------------
+          907┆ require(_depositFeeBP <= 10000, "BITBOOK_STAKING: invalid deposit
+  fee basis points");                                                           
+            ⋮┆----------------------------------------
+          908┆ require(_harvestInterval <= MAXIMUM_HARVEST_INTERVAL,            
+  "BITBOOK_STAKING: invalid harvest interval");                                 
+            ⋮┆----------------------------------------
+          976┆ require(!paused, "BITBOOK_STAKING: Paused!");
+            ⋮┆----------------------------------------
+          978┆ require(!pool.lockDeposit, "BITBOOK_STAKING: Deposit Locked!");
+            ⋮┆----------------------------------------
+          983┆ require(_amount >= poolInfo[_pid].minDeposit, "BITBOOK_STAKING:  
+  Not Enough Required Staking Tokens!");                                        
+            ⋮┆----------------------------------------
+         1006┆ require(user.amount >= _amount, "BITBOOK_STAKING: withdraw not   
+  good");                                                                       
+            ⋮┆----------------------------------------
+         1062┆ require(amount != 0, "BITBOOK_STAKING: Not enought staked        
+  tokens!");                                                                    
+            ⋮┆----------------------------------------
+         1071┆ require(balanceToWithdraw != 0, "BITBOOK_STAKING: Not enough     
+  balance to withdraw!");                                                       
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          926┆ if (
+          927┆     block.number > pool.lastRewardBlock &&
+          928┆     pool.stakedAmount != 0 &&
+          929┆     pool.rewardToken.balanceOf(address(this)) > 0
+          930┆ ) {
+          931┆     uint256 multiplier = getMultiplier(pool.lastRewardBlock,     
+  block.number);                                                                
+          932┆     uint256 tokenReward = multiplier.mul(pool.tokenPerBlock);
+          933┆     accTokenPerShare =                                           
+  accTokenPerShare.add(tokenReward.mul(1e12).div(pool.stakedAmount));           
+          934┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          894┆ for (uint256 i = 0; i < length; i++) {
+            ⋮┆----------------------------------------
+         1052┆ for (uint256 i = 0; i < length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          234┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          385┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          442┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          467┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          491┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          565┆ require(
+          566┆     (value == 0) || (token.allowance(address(this), spender) ==  
+  0),                                                                           
+          567┆     "SafeBEP20: approve from non-zero to non-zero allowance"
+          568┆ );
+            ⋮┆----------------------------------------
+          608┆ require(abi.decode(returndata, (bool)), "SafeBEP20: BEP20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          694┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          843┆ require(!initialized, "BITBOOK_STAKING: Staking already          
+  started!");                                                                   
+            ⋮┆----------------------------------------
+          870┆ require(address(_stakedToken) != address(0), "BITBOOK_STAKING:   
+  Invalid Staked token address");                                               
+            ⋮┆----------------------------------------
+          871┆ require(address(_rewardToken) != address(0), "BITBOOK_STAKING:   
+  Invalid Reward token address");                                               
+            ⋮┆----------------------------------------
+          872┆ require(poolInfo.length <= 1000, "BITBOOK_STAKING: Pool Length   
+  Full!");                                                                      
+            ⋮┆----------------------------------------
+          873┆                                                                  
+  require(!poolExists[address(_stakedToken)][address(_rewardToken)],            
+  "BITBOOK_STAKING: Pool Already Exists!");                                     
+            ⋮┆----------------------------------------
+          874┆ require(_depositFeeBP <= 10000, "BITBOOK_STAKING: invalid deposit
+  fee basis points");                                                           
+            ⋮┆----------------------------------------
+          875┆ require(_harvestInterval <= MAXIMUM_HARVEST_INTERVAL,            
+  "BITBOOK_STAKING: invalid harvest interval");                                 
+            ⋮┆----------------------------------------
+          907┆ require(_depositFeeBP <= 10000, "BITBOOK_STAKING: invalid deposit
+  fee basis points");                                                           
+            ⋮┆----------------------------------------
+          908┆ require(_harvestInterval <= MAXIMUM_HARVEST_INTERVAL,            
+  "BITBOOK_STAKING: invalid harvest interval");                                 
+            ⋮┆----------------------------------------
+          983┆ require(_amount >= poolInfo[_pid].minDeposit, "BITBOOK_STAKING:  
+  Not Enough Required Staking Tokens!");                                        
+            ⋮┆----------------------------------------
+         1006┆ require(user.amount >= _amount, "BITBOOK_STAKING: withdraw not   
+  good");                                                                       
+            ⋮┆----------------------------------------
+         1062┆ require(amount != 0, "BITBOOK_STAKING: Not enought staked        
+  tokens!");                                                                    
+            ⋮┆----------------------------------------
+         1071┆ require(balanceToWithdraw != 0, "BITBOOK_STAKING: Not enough     
+  balance to withdraw!");                                                       
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 72 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

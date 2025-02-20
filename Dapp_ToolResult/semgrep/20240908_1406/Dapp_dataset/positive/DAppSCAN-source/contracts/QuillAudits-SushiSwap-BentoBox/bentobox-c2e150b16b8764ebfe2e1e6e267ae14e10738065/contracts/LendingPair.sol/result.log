@@ -1,0 +1,250 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 55 Code Findings │
+└──────────────────┘
+                        
+    /sb/LendingPair.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          283┆ (bool success, bytes memory data) =                              
+  address(asset).staticcall(abi.encodeWithSelector(0x95d89b41));                
+            ⋮┆----------------------------------------
+          286┆ (success, data) =                                                
+  address(collateral).staticcall(abi.encodeWithSelector(0x95d89b41));           
+            ⋮┆----------------------------------------
+          293┆ (bool success, bytes memory data) =                              
+  address(asset).staticcall(abi.encodeWithSelector(0x06fdde03));                
+            ⋮┆----------------------------------------
+          296┆ (success, data) =                                                
+  address(collateral).staticcall(abi.encodeWithSelector(0x06fdde03));           
+            ⋮┆----------------------------------------
+          303┆ (bool success, bytes memory data) =                              
+  address(asset).staticcall(abi.encodeWithSelector(0x313ce567));                
+            ⋮┆----------------------------------------
+          786┆ (bool success, bytes memory data) =                              
+  address(token).call(abi.encodeWithSelector(0xa9059cbb, msg.sender,            
+  balanceAmount));                                                              
+            ⋮┆----------------------------------------
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          233┆ contract LendingPair is ERC20, Ownable, IMasterContract {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+           40┆ constructor () internal {
+           41┆     owner = msg.sender;
+           42┆     emit OwnershipTransferred(address(0), msg.sender);
+           43┆ }
+            ⋮┆----------------------------------------
+          319┆ constructor(IBentoBox bentoBox_) public {
+          320┆     bentoBox = bentoBox_;
+          321┆     masterContract = LendingPair(this);
+          322┆     dev = msg.sender;
+          323┆     feeTo = msg.sender;
+          324┆     emit LogDev(msg.sender);
+          325┆     emit LogFeeTo(msg.sender);
+          326┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          669┆ uint256 collateralAmount =                                       
+  borrowAmount.mul(LIQUIDATION_MULTIPLIER).mul(exchangeRate) / 1e23;            
+            ⋮┆----------------------------------------
+          672┆ userCollateralAmount[user] =                                     
+  userCollateralAmount[user].sub(collateralAmount);                             
+            ⋮┆----------------------------------------
+          672┆ userCollateralAmount[user] =                                     
+  userCollateralAmount[user].sub(collateralAmount);                             
+            ⋮┆----------------------------------------
+          674┆ userBorrowFraction[user] =                                       
+  userBorrowFraction[user].sub(borrowFraction);                                 
+            ⋮┆----------------------------------------
+          674┆ userBorrowFraction[user] =                                       
+  userBorrowFraction[user].sub(borrowFraction);                                 
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          661┆ for (uint256 i = 0; i < users.length; i++) {
+            ⋮┆----------------------------------------
+          731┆ for (uint256 i = 0; i < calls.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+            8┆ function add(uint256 a, uint256 b) internal pure returns (uint256
+  c) {require((c = a + b) >= b, "BoringMath: Add Overflow");}                   
+            ⋮┆----------------------------------------
+            9┆ function sub(uint256 a, uint256 b) internal pure returns (uint256
+  c) {require((c = a - b) <= a, "BoringMath: Underflow");}                      
+            ⋮┆----------------------------------------
+           10┆ function mul(uint256 a, uint256 b) internal pure returns (uint256
+  c) {require(b == 0 || (c = a * b)/b == a, "BoringMath: Mul Overflow");}       
+            ⋮┆----------------------------------------
+           12┆ require(a <= uint128(-1), "BoringMath: uint128 Overflow");
+            ⋮┆----------------------------------------
+           18┆ function add(uint128 a, uint128 b) internal pure returns (uint128
+  c) {require((c = a + b) >= b, "BoringMath: Add Overflow");}                   
+            ⋮┆----------------------------------------
+           19┆ function sub(uint128 a, uint128 b) internal pure returns (uint128
+  c) {require((c = a - b) <= a, "BoringMath: Underflow");}                      
+            ⋮┆----------------------------------------
+           55┆ require(newOwner != address(0), "Ownable: zero address");
+            ⋮┆----------------------------------------
+           61┆ require(msg.sender == pendingOwner, "Ownable: caller != pending  
+  owner");                                                                      
+            ⋮┆----------------------------------------
+           68┆ require(msg.sender == owner, "Ownable: caller is not the owner");
+            ⋮┆----------------------------------------
+           87┆ require(balanceOf[msg.sender] >= amount, "ERC20: balance too     
+  low");                                                                        
+            ⋮┆----------------------------------------
+           88┆ require(balanceOf[to] + amount >= balanceOf[to], "ERC20: overflow
+  detected");                                                                   
+            ⋮┆----------------------------------------
+           96┆ require(balanceOf[from] >= amount, "ERC20: balance too low");
+            ⋮┆----------------------------------------
+           97┆ require(allowance[from][msg.sender] >= amount, "ERC20: allowance 
+  too low");                                                                    
+            ⋮┆----------------------------------------
+           98┆ require(balanceOf[to] + amount >= balanceOf[to], "ERC20: overflow
+  detected");                                                                   
+            ⋮┆----------------------------------------
+          120┆ require(owner_ != address(0), "ERC20: Owner cannot be 0");
+            ⋮┆----------------------------------------
+          121┆ require(block.timestamp < deadline, "ERC20: Expired");
+            ⋮┆----------------------------------------
+          130┆ require(recoveredAddress == owner_, "ERC20: Invalid Signature");
+            ⋮┆----------------------------------------
+          348┆ require(address(collateral) == address(0), "LendingPair: already 
+  initialized");                                                                
+            ⋮┆----------------------------------------
+          556┆ require(isSolvent(msg.sender, false), "LendingPair: user         
+  insolvent");                                                                  
+            ⋮┆----------------------------------------
+          564┆ require(isSolvent(msg.sender, false), "LendingPair: user         
+  insolvent");                                                                  
+            ⋮┆----------------------------------------
+          590┆ require(isSolvent(msg.sender, false), "LendingPair: user         
+  insolvent");                                                                  
+            ⋮┆----------------------------------------
+          599┆ require(isSolvent(msg.sender, false), "LendingPair: user         
+  insolvent");                                                                  
+            ⋮┆----------------------------------------
+          619┆ require(masterContract.swappers(swapper), "LendingPair: Invalid  
+  swapper");                                                                    
+            ⋮┆----------------------------------------
+          628┆ require(returnedCollateralAmount >= minCollateralAmount,         
+  "LendingPair: not enough");                                                   
+            ⋮┆----------------------------------------
+          631┆ require(isSolvent(msg.sender, false), "LendingPair: user         
+  insolvent");                                                                  
+            ⋮┆----------------------------------------
+          636┆ require(masterContract.swappers(swapper), "LendingPair: Invalid  
+  swapper");                                                                    
+            ⋮┆----------------------------------------
+          645┆ require(returnedAssetAmount >= borrowAmount, "LendingPair: Not   
+  enough");                                                                     
+            ⋮┆----------------------------------------
+          649┆ require(isSolvent(msg.sender, false), "LendingPair: user         
+  insolvent");                                                                  
+            ⋮┆----------------------------------------
+          684┆ require(allBorrowAmount != 0, "LendingPair: all are solvent");
+            ⋮┆----------------------------------------
+          692┆ require(masterContract.swappers(swapper), "LendingPair: Invalid  
+  swapper");                                                                    
+            ⋮┆----------------------------------------
+          733┆ require(success || !revertOnFail, "LendingPair: Transaction      
+  failed");                                                                     
+            ⋮┆----------------------------------------
+          768┆ require(msg.sender == dev, "LendingPair: Not dev");
+            ⋮┆----------------------------------------
+          775┆ require(msg.sender == masterContract.owner(), "LendingPair:      
+  caller is not owner");                                                        
+            ⋮┆----------------------------------------
+          781┆ require(success, "LendingPair: ETH transfer failed");
+            ⋮┆----------------------------------------
+          787┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), "LendingPair: Transfer failed");                                    
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          787┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), "LendingPair: Transfer failed");                                    
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          783┆ } else if (address(token) != address(asset) && address(token) != 
+  address(collateral)) {                                                        
+          784┆     uint256 balanceAmount = token.balanceOf(address(this));
+          785┆     if (balanceAmount > 0) {
+          786┆         (bool success, bytes memory data) =                      
+  address(token).call(abi.encodeWithSelector(0xa9059cbb, msg.sender,            
+  balanceAmount));                                                              
+          787┆         require(success && (data.length == 0 || abi.decode(data, 
+  (bool))), "LendingPair: Transfer failed");                                    
+          788┆     }
+          789┆ } else {
+          790┆     uint256 excessAmount = bentoBox.balanceOf(token,             
+  address(this)).sub(token == asset ? totalAsset.amount :                       
+  totalCollateralAmount);                                                       
+          791┆     bentoBox.transfer(token, msg.sender, excessAmount);
+          792┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          661┆ for (uint256 i = 0; i < users.length; i++) {
+            ⋮┆----------------------------------------
+          731┆ for (uint256 i = 0; i < calls.length; i++) {
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 55 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

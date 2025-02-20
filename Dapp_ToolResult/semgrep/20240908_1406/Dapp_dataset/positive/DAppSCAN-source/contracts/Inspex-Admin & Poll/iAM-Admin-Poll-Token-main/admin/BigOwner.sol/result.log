@@ -1,0 +1,254 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 46 Code Findings │
+└──────────────────┘
+                     
+    /sb/BigOwner.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          172┆ for (uint32 i = 0; i < admin_.length; i++) {
+            ⋮┆----------------------------------------
+          204┆ for (uint256 i = 0; i < adminList.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          169┆ constructor(address[] memory admin_, uint256 deadline_) {
+          170┆   require(admin_.length >= 2, 'BigOwner: initial admin should    
+  more then 1 address.');                                                       
+          171┆ 
+          172┆   for (uint32 i = 0; i < admin_.length; i++) {
+          173┆     admin[admin_[i]] = true;
+          174┆     adminList.push(admin_[i]);
+          175┆   }
+          176┆ 
+          177┆   PANDING_BLOCK = deadline_;
+          178┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          173┆ admin[admin_[i]] = true;
+            ⋮┆----------------------------------------
+          174┆ adminList.push(admin_[i]);
+            ⋮┆----------------------------------------
+          204┆ for (uint256 i = 0; i < adminList.length; i++) {
+            ⋮┆----------------------------------------
+          205┆ if (adminList[i] == pendingRemoveAdmin_) {
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          172┆ for (uint32 i = 0; i < admin_.length; i++) {
+            ⋮┆----------------------------------------
+          204┆ for (uint256 i = 0; i < adminList.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           63┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+           84┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          165┆ require(admin[msg.sender] == true, 'BigOwner: caller is not the  
+  admin');                                                                      
+            ⋮┆----------------------------------------
+          170┆ require(admin_.length >= 2, 'BigOwner: initial admin should more 
+  then 1 address.');                                                            
+            ⋮┆----------------------------------------
+          192┆ require(txHash == pendingAdminHash, 'BigOwner::acceptAdmin:      
+  Argument not match pendingAdminHash.');                                       
+            ⋮┆----------------------------------------
+          193┆ require(msg.sender == pendingAdmin_, 'BigOwner::acceptAdmin: Call
+  must come from newAdmin.');                                                   
+            ⋮┆----------------------------------------
+          194┆ require(
+          195┆   pendingAdminHashSubmitBlock + PANDING_BLOCK >=                 
+  getBlockNumber(),                                                             
+          196┆   "BigOwner::acceptAdmin: PendingAdmin hasn't surpassed pending  
+  time."                                                                        
+          197┆ );
+            ⋮┆----------------------------------------
+          223┆ require(txHash == pendingAdminHash,                              
+  'BigOwner::approvePendingAdmin: Argument not match to pendingAdminHash.');    
+            ⋮┆----------------------------------------
+          224┆ require(
+          225┆   msg.sender != pendingAdminHashSubmitter,
+          226┆   'BigOwner::approvePendingAdmin: Call must not come from        
+  pendingAdminHashSubmitter.'                                                   
+          227┆ );
+            ⋮┆----------------------------------------
+          237┆ require(admin[pendingRemoveAdmin_] == true,                      
+  'BigOwner::setPendingAdmin: pendingRemoveAdmin should be admin.');            
+            ⋮┆----------------------------------------
+          238┆ require(admin[pendingAdmin_] == false,                           
+  'BigOwner::setPendingAdmin: pendingAdmin should not be admin.');              
+            ⋮┆----------------------------------------
+          272┆ require(
+          273┆   queuedTransactions[txHash].by != address(0),
+          274┆   "BigOwner::executeTransferOwnership: Transaction hasn't been   
+  queued."                                                                      
+          275┆ );
+            ⋮┆----------------------------------------
+          276┆ require(
+          277┆   getBlockNumber() <= queuedTransactions[txHash].submitedBlock + 
+  PANDING_BLOCK,                                                                
+          278┆   "BigOwner::executeTransferOwnership: Transaction hasn't        
+  surpassed pending time."                                                      
+          279┆ );
+            ⋮┆----------------------------------------
+          282┆ require(
+          283┆   queuedTransactions[txHash].by != msg.sender,
+          284┆   'BigOwner::executeTransferOwnership: can not execute by queue  
+  creator.'                                                                     
+          285┆ );
+            ⋮┆----------------------------------------
+          303┆ require(
+          304┆   queuedTransactions[txHash].by != address(0),
+          305┆   "BigOwner::executeAdminTransfer: Transaction hasn't been       
+  queued."                                                                      
+          306┆ );
+            ⋮┆----------------------------------------
+          307┆ require(
+          308┆   getBlockNumber() <= queuedTransactions[txHash].submitedBlock + 
+  PANDING_BLOCK,                                                                
+          309┆   "BigOwner::executeAdminTransfer: Transaction hasn't surpassed  
+  pending time."                                                                
+          310┆ );
+            ⋮┆----------------------------------------
+          313┆ require(
+          314┆   queuedTransactions[txHash].by != msg.sender,
+          315┆   'BigOwner::executeAdminTransfer: can not execute by queue      
+  creator.'                                                                     
+          316┆ );
+            ⋮┆----------------------------------------
+          321┆ require(success, 'BigOwner::executeAdminTransfer: Transaction    
+  execution reverted.');                                                        
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          172┆ for (uint32 i = 0; i < admin_.length; i++) {
+            ⋮┆----------------------------------------
+          204┆ for (uint256 i = 0; i < adminList.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           84┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          165┆ require(admin[msg.sender] == true, 'BigOwner: caller is not the  
+  admin');                                                                      
+            ⋮┆----------------------------------------
+          170┆ require(admin_.length >= 2, 'BigOwner: initial admin should more 
+  then 1 address.');                                                            
+            ⋮┆----------------------------------------
+          192┆ require(txHash == pendingAdminHash, 'BigOwner::acceptAdmin:      
+  Argument not match pendingAdminHash.');                                       
+            ⋮┆----------------------------------------
+          193┆ require(msg.sender == pendingAdmin_, 'BigOwner::acceptAdmin: Call
+  must come from newAdmin.');                                                   
+            ⋮┆----------------------------------------
+          194┆ require(
+          195┆   pendingAdminHashSubmitBlock + PANDING_BLOCK >=                 
+  getBlockNumber(),                                                             
+          196┆   "BigOwner::acceptAdmin: PendingAdmin hasn't surpassed pending  
+  time."                                                                        
+          197┆ );
+            ⋮┆----------------------------------------
+          223┆ require(txHash == pendingAdminHash,                              
+  'BigOwner::approvePendingAdmin: Argument not match to pendingAdminHash.');    
+            ⋮┆----------------------------------------
+          224┆ require(
+          225┆   msg.sender != pendingAdminHashSubmitter,
+          226┆   'BigOwner::approvePendingAdmin: Call must not come from        
+  pendingAdminHashSubmitter.'                                                   
+          227┆ );
+            ⋮┆----------------------------------------
+          237┆ require(admin[pendingRemoveAdmin_] == true,                      
+  'BigOwner::setPendingAdmin: pendingRemoveAdmin should be admin.');            
+            ⋮┆----------------------------------------
+          238┆ require(admin[pendingAdmin_] == false,                           
+  'BigOwner::setPendingAdmin: pendingAdmin should not be admin.');              
+            ⋮┆----------------------------------------
+          272┆ require(
+          273┆   queuedTransactions[txHash].by != address(0),
+          274┆   "BigOwner::executeTransferOwnership: Transaction hasn't been   
+  queued."                                                                      
+          275┆ );
+            ⋮┆----------------------------------------
+          276┆ require(
+          277┆   getBlockNumber() <= queuedTransactions[txHash].submitedBlock + 
+  PANDING_BLOCK,                                                                
+          278┆   "BigOwner::executeTransferOwnership: Transaction hasn't        
+  surpassed pending time."                                                      
+          279┆ );
+            ⋮┆----------------------------------------
+          282┆ require(
+          283┆   queuedTransactions[txHash].by != msg.sender,
+          284┆   'BigOwner::executeTransferOwnership: can not execute by queue  
+  creator.'                                                                     
+          285┆ );
+            ⋮┆----------------------------------------
+          303┆ require(
+          304┆   queuedTransactions[txHash].by != address(0),
+          305┆   "BigOwner::executeAdminTransfer: Transaction hasn't been       
+  queued."                                                                      
+          306┆ );
+            ⋮┆----------------------------------------
+          307┆ require(
+          308┆   getBlockNumber() <= queuedTransactions[txHash].submitedBlock + 
+  PANDING_BLOCK,                                                                
+          309┆   "BigOwner::executeAdminTransfer: Transaction hasn't surpassed  
+  pending time."                                                                
+          310┆ );
+            ⋮┆----------------------------------------
+          313┆ require(
+          314┆   queuedTransactions[txHash].by != msg.sender,
+          315┆   'BigOwner::executeAdminTransfer: can not execute by queue      
+  creator.'                                                                     
+          316┆ );
+            ⋮┆----------------------------------------
+          321┆ require(success, 'BigOwner::executeAdminTransfer: Transaction    
+  execution reverted.');                                                        
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 46 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

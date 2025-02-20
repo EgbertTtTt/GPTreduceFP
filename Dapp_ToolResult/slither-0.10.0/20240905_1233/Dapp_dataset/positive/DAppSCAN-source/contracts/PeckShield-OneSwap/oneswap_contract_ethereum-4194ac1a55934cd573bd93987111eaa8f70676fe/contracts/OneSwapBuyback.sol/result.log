@@ -1,0 +1,49 @@
+'solc --version' running
+'solc /sb/OneSwapBuyback.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+OneSwapBuyback._removeLiquidity(address) (../../sb/OneSwapBuyback.sol#232-249) ignores return value by IERC20(pair).approve(router,amt) (../../sb/OneSwapBuyback.sol#239)
+OneSwapBuyback._removeLiquidity(address) (../../sb/OneSwapBuyback.sol#232-249) ignores return value by IOneSwapRouter(router).removeLiquidity(pair,amt,0,0,address(this),_MAX_UINT256) (../../sb/OneSwapBuyback.sol#240-241)
+OneSwapBuyback._swapForMainToken(address) (../../sb/OneSwapBuyback.sol#257-281) ignores return value by IERC20(minorToken).approve(router,minorTokenAmt) (../../sb/OneSwapBuyback.sol#278)
+OneSwapBuyback._swapForMainToken(address) (../../sb/OneSwapBuyback.sol#257-281) ignores return value by IOneSwapRouter(router).swapToken(minorToken,minorTokenAmt,0,path,address(this),_MAX_UINT256) (../../sb/OneSwapBuyback.sol#279-280)
+OneSwapBuyback._swapForOnesAndBurn(address) (../../sb/OneSwapBuyback.sol#294-311) ignores return value by IERC20(token).approve(router,tokenAmt) (../../sb/OneSwapBuyback.sol#308)
+OneSwapBuyback._swapForOnesAndBurn(address) (../../sb/OneSwapBuyback.sol#294-311) ignores return value by IOneSwapRouter(router).swapToken(token,tokenAmt,0,path,address(this),_MAX_UINT256) (../../sb/OneSwapBuyback.sol#309-310)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+OneSwapBuyback.constructor(address,address,address,address)._weth (../../sb/OneSwapBuyback.sol#177) lacks a zero-check on :
+		- weth = _weth (../../sb/OneSwapBuyback.sol#178)
+OneSwapBuyback.constructor(address,address,address,address)._ones (../../sb/OneSwapBuyback.sol#177) lacks a zero-check on :
+		- ones = _ones (../../sb/OneSwapBuyback.sol#179)
+OneSwapBuyback.constructor(address,address,address,address)._router (../../sb/OneSwapBuyback.sol#177) lacks a zero-check on :
+		- router = _router (../../sb/OneSwapBuyback.sol#180)
+OneSwapBuyback.constructor(address,address,address,address)._factory (../../sb/OneSwapBuyback.sol#177) lacks a zero-check on :
+		- factory = _factory (../../sb/OneSwapBuyback.sol#181)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+OneSwapBuyback._removeLiquidity(address) (../../sb/OneSwapBuyback.sol#232-249) has external calls inside a loop: (a,b) = IOneSwapFactory(factory).getTokensFromPair(pair) (../../sb/OneSwapBuyback.sol#233)
+OneSwapBuyback._removeLiquidity(address) (../../sb/OneSwapBuyback.sol#232-249) has external calls inside a loop: amt = IERC20(pair).balanceOf(address(this)) (../../sb/OneSwapBuyback.sol#236)
+OneSwapBuyback._removeLiquidity(address) (../../sb/OneSwapBuyback.sol#232-249) has external calls inside a loop: IERC20(pair).approve(router,amt) (../../sb/OneSwapBuyback.sol#239)
+OneSwapBuyback._removeLiquidity(address) (../../sb/OneSwapBuyback.sol#232-249) has external calls inside a loop: IOneSwapRouter(router).removeLiquidity(pair,amt,0,0,address(this),_MAX_UINT256) (../../sb/OneSwapBuyback.sol#240-241)
+OneSwapBuyback._swapForMainToken(address) (../../sb/OneSwapBuyback.sol#257-281) has external calls inside a loop: (a,b) = IOneSwapFactory(factory).getTokensFromPair(pair) (../../sb/OneSwapBuyback.sol#258)
+OneSwapBuyback._swapForMainToken(address) (../../sb/OneSwapBuyback.sol#257-281) has external calls inside a loop: minorTokenAmt = IERC20(minorToken).balanceOf(address(this)) (../../sb/OneSwapBuyback.sol#271)
+OneSwapBuyback._swapForMainToken(address) (../../sb/OneSwapBuyback.sol#257-281) has external calls inside a loop: IERC20(minorToken).approve(router,minorTokenAmt) (../../sb/OneSwapBuyback.sol#278)
+OneSwapBuyback._swapForMainToken(address) (../../sb/OneSwapBuyback.sol#257-281) has external calls inside a loop: IOneSwapRouter(router).swapToken(minorToken,minorTokenAmt,0,path,address(this),_MAX_UINT256) (../../sb/OneSwapBuyback.sol#279-280)
+OneSwapBuyback._swapForOnesAndBurn(address) (../../sb/OneSwapBuyback.sol#294-311) has external calls inside a loop: (a,b) = IOneSwapFactory(factory).getTokensFromPair(pair) (../../sb/OneSwapBuyback.sol#295)
+OneSwapBuyback._swapForOnesAndBurn(address) (../../sb/OneSwapBuyback.sol#294-311) has external calls inside a loop: tokenAmt = IERC20(token).balanceOf(address(this)) (../../sb/OneSwapBuyback.sol#301)
+OneSwapBuyback._swapForOnesAndBurn(address) (../../sb/OneSwapBuyback.sol#294-311) has external calls inside a loop: IERC20(token).approve(router,tokenAmt) (../../sb/OneSwapBuyback.sol#308)
+OneSwapBuyback._swapForOnesAndBurn(address) (../../sb/OneSwapBuyback.sol#294-311) has external calls inside a loop: IOneSwapRouter(router).swapToken(token,tokenAmt,0,path,address(this),_MAX_UINT256) (../../sb/OneSwapBuyback.sol#309-310)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in OneSwapBuyback.swapForOnesAndBurn(address[]) (../../sb/OneSwapBuyback.sol#284-293):
+	External calls:
+	- _swapForOnesAndBurn(pairs[i]) (../../sb/OneSwapBuyback.sol#286)
+		- IERC20(token).approve(router,tokenAmt) (../../sb/OneSwapBuyback.sol#308)
+		- IOneSwapRouter(router).swapToken(token,tokenAmt,0,path,address(this),_MAX_UINT256) (../../sb/OneSwapBuyback.sol#309-310)
+	- IOneSwapToken(ones).burn(allOnes) (../../sb/OneSwapBuyback.sol#291)
+	Event emitted after the call(s):
+	- BurnOnes(allOnes) (../../sb/OneSwapBuyback.sol#292)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Pragma version^0.6.6 (../../sb/OneSwapBuyback.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+/sb/OneSwapBuyback.sol analyzed (7 contracts with 93 detectors), 25 result(s) found

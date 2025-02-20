@@ -1,0 +1,326 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 76 Code Findings │
+└──────────────────┘
+                             
+    /sb/OptimisticOracle.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          491┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          495┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          513┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          518┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          523┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+         2004┆ contract AddressWhitelist is Ownable, Lockable {
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+         2064┆ for (uint256 i = 0; i < whitelistIndices.length; i++) {
+            ⋮┆----------------------------------------
+         2073┆ for (uint256 i = 0; i < whitelistIndices.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+         1784┆ constructor() public {
+         1785┆     currentTime = now; // solhint-disable-line not-rely-on-time
+         1786┆ }
+            ⋮┆----------------------------------------
+         1863┆ constructor() internal {
+         1864┆     // Storing an initial non-zero value makes deployment a bit  
+  more                                                                          
+         1865┆     // expensive, but in exchange the refund on every call to    
+  nonReentrant                                                                  
+         1866┆     // will be lower in amount. Since refunds are capped to a    
+  percetange of                                                                 
+         1867┆     // the total transaction's gas, it is best to keep them low  
+  in cases                                                                      
+         1868┆     // like this one, to increase the likelihood of the full     
+  refund coming                                                                 
+         1869┆     // into effect.
+         1870┆     _notEntered = true;
+         1871┆ }
+            ⋮┆----------------------------------------
+         2188┆ constructor(
+         2189┆     uint256 _liveness,
+         2190┆     address _finderAddress,
+         2191┆     address _timerAddress
+         2192┆ ) public Testable(_timerAddress) {
+         2193┆     finder = FinderInterface(_finderAddress);
+         2194┆     _validateLiveness(_liveness);
+         2195┆     defaultLiveness = _liveness;
+         2196┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+         2064┆ for (uint256 i = 0; i < whitelistIndices.length; i++) {
+            ⋮┆----------------------------------------
+         2065┆ if (whitelist[whitelistIndices[i]] == Status.In) {
+            ⋮┆----------------------------------------
+         2065┆ if (whitelist[whitelistIndices[i]] == Status.In) {
+            ⋮┆----------------------------------------
+         2073┆ for (uint256 i = 0; i < whitelistIndices.length; i++) {
+            ⋮┆----------------------------------------
+         2074┆ address addr = whitelistIndices[i];
+            ⋮┆----------------------------------------
+         2075┆ if (whitelist[addr] == Status.In) {
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+         2064┆ for (uint256 i = 0; i < whitelistIndices.length; i++) {
+            ⋮┆----------------------------------------
+         2073┆ for (uint256 i = 0; i < whitelistIndices.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          162┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          177┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          194┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          211┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          228┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          340┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          344┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          401┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          402┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          426┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          450┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          510┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          511┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          512┆ );
+            ⋮┆----------------------------------------
+          540┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          570┆ require(!(a == -1 && b == _INT256_MIN), "SignedSafeMath:         
+  multiplication overflow");                                                    
+            ⋮┆----------------------------------------
+          573┆ require(c / a == b, "SignedSafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          591┆ require(b != 0, "SignedSafeMath: division by zero");
+            ⋮┆----------------------------------------
+          592┆ require(!(b == -1 && a == _INT256_MIN), "SignedSafeMath: division
+  overflow");                                                                   
+            ⋮┆----------------------------------------
+          611┆ require((b >= 0 && c <= a) || (b < 0 && c > a), "SignedSafeMath: 
+  subtraction overflow");                                                       
+            ⋮┆----------------------------------------
+          628┆ require((b >= 0 && c >= a) || (b < 0 && c < a), "SignedSafeMath: 
+  addition overflow");                                                          
+            ⋮┆----------------------------------------
+         1019┆ require(a.rawValue >= 0, "Negative value provided");
+            ⋮┆----------------------------------------
+         1024┆ require(a.rawValue <= uint256(type(int256).max), "Unsigned too   
+  large");                                                                      
+            ⋮┆----------------------------------------
+         1901┆ require(_notEntered, "ReentrancyGuard: reentrant call");
+            ⋮┆----------------------------------------
+         1974┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+         1995┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+         2217┆ require(getState(msg.sender, identifier, timestamp,              
+  ancillaryData) == State.Invalid, "requestPrice: Invalid");                    
+            ⋮┆----------------------------------------
+         2218┆                                                                  
+  require(_getIdentifierWhitelist().isIdentifierSupported(identifier),          
+  "Unsupported identifier");                                                    
+            ⋮┆----------------------------------------
+         2219┆                                                                  
+  require(_getCollateralWhitelist().isOnWhitelist(address(currency)),           
+  "Unsupported currency");                                                      
+            ⋮┆----------------------------------------
+         2262┆ require(getState(msg.sender, identifier, timestamp,              
+  ancillaryData) == State.Requested, "setBond: Requested");                     
+            ⋮┆----------------------------------------
+         2283┆ require(
+         2284┆     getState(msg.sender, identifier, timestamp, ancillaryData) ==
+  State.Requested,                                                              
+         2285┆     "setRefundOnDispute: Requested"
+         2286┆ );
+            ⋮┆----------------------------------------
+         2304┆ require(
+         2305┆     getState(msg.sender, identifier, timestamp, ancillaryData) ==
+  State.Requested,                                                              
+         2306┆     "setCustomLiveness: Requested"
+         2307┆ );
+            ⋮┆----------------------------------------
+         2332┆ require(
+         2333┆     getState(requester, identifier, timestamp, ancillaryData) == 
+  State.Requested,                                                              
+         2334┆     "proposePriceFor: Requested"
+         2335┆ );
+            ⋮┆----------------------------------------
+         2397┆ require(
+         2398┆     getState(requester, identifier, timestamp, ancillaryData) == 
+  State.Proposed,                                                               
+         2399┆     "disputePriceFor: Proposed"
+         2400┆ );
+            ⋮┆----------------------------------------
+         2614┆ revert("_settle: not settleable");
+            ⋮┆----------------------------------------
+         2646┆ require(_liveness < 5200 weeks, "Liveness too large");
+            ⋮┆----------------------------------------
+         2647┆ require(_liveness > 0, "Liveness cannot be 0");
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          570┆ require(!(a == -1 && b == _INT256_MIN), "SignedSafeMath:         
+  multiplication overflow");                                                    
+            ⋮┆----------------------------------------
+          592┆ require(!(b == -1 && a == _INT256_MIN), "SignedSafeMath: division
+  overflow");                                                                   
+            ⋮┆----------------------------------------
+          611┆ require((b >= 0 && c <= a) || (b < 0 && c > a), "SignedSafeMath: 
+  subtraction overflow");                                                       
+            ⋮┆----------------------------------------
+          628┆ require((b >= 0 && c >= a) || (b < 0 && c < a), "SignedSafeMath: 
+  addition overflow");                                                          
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         2420┆ if (request.reward > 0 && request.refundOnDispute) {
+         2421┆     refund = request.reward;
+         2422┆     request.reward = 0;
+         2423┆     request.currency.safeTransfer(requester, refund);
+         2424┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+         2064┆ for (uint256 i = 0; i < whitelistIndices.length; i++) {
+            ⋮┆----------------------------------------
+         2066┆ activeCount++;
+            ⋮┆----------------------------------------
+         2073┆ for (uint256 i = 0; i < whitelistIndices.length; i++) {
+            ⋮┆----------------------------------------
+         2077┆ activeCount++;
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          194┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          344┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          401┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          426┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          450┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          510┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          511┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          512┆ );
+            ⋮┆----------------------------------------
+          540┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          570┆ require(!(a == -1 && b == _INT256_MIN), "SignedSafeMath:         
+  multiplication overflow");                                                    
+            ⋮┆----------------------------------------
+          573┆ require(c / a == b, "SignedSafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          592┆ require(!(b == -1 && a == _INT256_MIN), "SignedSafeMath: division
+  overflow");                                                                   
+            ⋮┆----------------------------------------
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+          611┆ require((b >= 0 && c <= a) || (b < 0 && c > a), "SignedSafeMath: 
+  subtraction overflow");                                                       
+            ⋮┆----------------------------------------
+          628┆ require((b >= 0 && c >= a) || (b < 0 && c < a), "SignedSafeMath: 
+  addition overflow");                                                          
+            ⋮┆----------------------------------------
+         1995┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+
+
+Ran 48 rules on 1 file: 76 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

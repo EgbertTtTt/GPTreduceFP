@@ -1,0 +1,315 @@
+'solc --version' running
+'solc /sb/ThorusMaster.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/sb' running
+
+ThorusMaster.safeThorusTransfer(address,uint256) (../../sb/ThorusMaster.sol#708-715) ignores return value by thorus.transfer(_to,thorusBal) (../../sb/ThorusMaster.sol#711)
+ThorusMaster.safeThorusTransfer(address,uint256) (../../sb/ThorusMaster.sol#708-715) ignores return value by thorus.transfer(_to,_amount) (../../sb/ThorusMaster.sol#713)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+ThorusMaster.pendingThorus(uint256,address) (../../sb/ThorusMaster.sol#599-609) performs a multiplication on the result of a division:
+	- thorusReward = multiplier * thorusPerSecond * pool.allocPoint / totalAllocPoint (../../sb/ThorusMaster.sol#605)
+	- accThorusPerShare = accThorusPerShare + (thorusReward * 1e18 / pool.lpSupply) (../../sb/ThorusMaster.sol#606)
+ThorusMaster.updatePool(uint256) (../../sb/ThorusMaster.sol#618-632) performs a multiplication on the result of a division:
+	- thorusReward = multiplier * thorusPerSecond * pool.allocPoint / totalAllocPoint (../../sb/ThorusMaster.sol#628)
+	- pool.accThorusPerShare = pool.accThorusPerShare + (thorusReward * 1e18 / pool.lpSupply) (../../sb/ThorusMaster.sol#630)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+Reentrancy in ThorusMaster.add(uint256,IERC20) (../../sb/ThorusMaster.sol#574-590):
+	External calls:
+	- massUpdatePools() (../../sb/ThorusMaster.sol#575)
+		- thorus.mint(address(this),thorusReward) (../../sb/ThorusMaster.sol#629)
+	State variables written after the call(s):
+	- poolInfo.push(PoolInfo({lpToken:_lpToken,allocPoint:_allocPoint,lastRewardSecond:lastRewardSecond,accThorusPerShare:0,lpSupply:0})) (../../sb/ThorusMaster.sol#580-588)
+	ThorusMaster.poolInfo (../../sb/ThorusMaster.sol#543) can be used in cross function reentrancies:
+	- ThorusMaster.add(uint256,IERC20) (../../sb/ThorusMaster.sol#574-590)
+	- ThorusMaster.massUpdatePools() (../../sb/ThorusMaster.sol#611-616)
+	- ThorusMaster.pendingThorus(uint256,address) (../../sb/ThorusMaster.sol#599-609)
+	- ThorusMaster.poolInfo (../../sb/ThorusMaster.sol#543)
+	- ThorusMaster.poolLength() (../../sb/ThorusMaster.sol#566-568)
+	- ThorusMaster.set(uint256,uint256) (../../sb/ThorusMaster.sol#592-597)
+	- ThorusMaster.updatePool(uint256) (../../sb/ThorusMaster.sol#618-632)
+	- totalAllocPoint = totalAllocPoint + _allocPoint (../../sb/ThorusMaster.sol#579)
+	ThorusMaster.totalAllocPoint (../../sb/ThorusMaster.sol#545) can be used in cross function reentrancies:
+	- ThorusMaster.add(uint256,IERC20) (../../sb/ThorusMaster.sol#574-590)
+	- ThorusMaster.pendingThorus(uint256,address) (../../sb/ThorusMaster.sol#599-609)
+	- ThorusMaster.set(uint256,uint256) (../../sb/ThorusMaster.sol#592-597)
+	- ThorusMaster.totalAllocPoint (../../sb/ThorusMaster.sol#545)
+	- ThorusMaster.updatePool(uint256) (../../sb/ThorusMaster.sol#618-632)
+Reentrancy in ThorusMaster.claim(uint256) (../../sb/ThorusMaster.sol#694-706):
+	External calls:
+	- updatePool(_pid) (../../sb/ThorusMaster.sol#697)
+		- thorus.mint(address(this),thorusReward) (../../sb/ThorusMaster.sol#629)
+	State variables written after the call(s):
+	- user.pendingRewards = user.pendingRewards + pending (../../sb/ThorusMaster.sol#700)
+	ThorusMaster.userInfo (../../sb/ThorusMaster.sol#544) can be used in cross function reentrancies:
+	- ThorusMaster.pendingThorus(uint256,address) (../../sb/ThorusMaster.sol#599-609)
+	- ThorusMaster.userInfo (../../sb/ThorusMaster.sol#544)
+Reentrancy in ThorusMaster.claim(uint256) (../../sb/ThorusMaster.sol#694-706):
+	External calls:
+	- updatePool(_pid) (../../sb/ThorusMaster.sol#697)
+		- thorus.mint(address(this),thorusReward) (../../sb/ThorusMaster.sol#629)
+	- safeThorusTransfer(msg.sender,user.pendingRewards) (../../sb/ThorusMaster.sol#701)
+		- thorus.transfer(_to,thorusBal) (../../sb/ThorusMaster.sol#711)
+		- thorus.transfer(_to,_amount) (../../sb/ThorusMaster.sol#713)
+	State variables written after the call(s):
+	- user.pendingRewards = 0 (../../sb/ThorusMaster.sol#703)
+	ThorusMaster.userInfo (../../sb/ThorusMaster.sol#544) can be used in cross function reentrancies:
+	- ThorusMaster.pendingThorus(uint256,address) (../../sb/ThorusMaster.sol#599-609)
+	- ThorusMaster.userInfo (../../sb/ThorusMaster.sol#544)
+	- user.rewardDebt = user.amount * pool.accThorusPerShare / 1e18 (../../sb/ThorusMaster.sol#705)
+	ThorusMaster.userInfo (../../sb/ThorusMaster.sol#544) can be used in cross function reentrancies:
+	- ThorusMaster.pendingThorus(uint256,address) (../../sb/ThorusMaster.sol#599-609)
+	- ThorusMaster.userInfo (../../sb/ThorusMaster.sol#544)
+Reentrancy in ThorusMaster.deposit(uint256,uint256,bool) (../../sb/ThorusMaster.sol#634-658):
+	External calls:
+	- updatePool(_pid) (../../sb/ThorusMaster.sol#637)
+		- thorus.mint(address(this),thorusReward) (../../sb/ThorusMaster.sol#629)
+	State variables written after the call(s):
+	- user.pendingRewards = 0 (../../sb/ThorusMaster.sol#642)
+	ThorusMaster.userInfo (../../sb/ThorusMaster.sol#544) can be used in cross function reentrancies:
+	- ThorusMaster.pendingThorus(uint256,address) (../../sb/ThorusMaster.sol#599-609)
+	- ThorusMaster.userInfo (../../sb/ThorusMaster.sol#544)
+	- user.pendingRewards = totalPending (../../sb/ThorusMaster.sol#646)
+	ThorusMaster.userInfo (../../sb/ThorusMaster.sol#544) can be used in cross function reentrancies:
+	- ThorusMaster.pendingThorus(uint256,address) (../../sb/ThorusMaster.sol#599-609)
+	- ThorusMaster.userInfo (../../sb/ThorusMaster.sol#544)
+Reentrancy in ThorusMaster.deposit(uint256,uint256,bool) (../../sb/ThorusMaster.sol#634-658):
+	External calls:
+	- updatePool(_pid) (../../sb/ThorusMaster.sol#637)
+		- thorus.mint(address(this),thorusReward) (../../sb/ThorusMaster.sol#629)
+	- safeThorusTransfer(msg.sender,totalPending) (../../sb/ThorusMaster.sol#643)
+		- thorus.transfer(_to,thorusBal) (../../sb/ThorusMaster.sol#711)
+		- thorus.transfer(_to,_amount) (../../sb/ThorusMaster.sol#713)
+	- pool.lpToken.safeTransferFrom(msg.sender,address(this),_amount) (../../sb/ThorusMaster.sol#651)
+	State variables written after the call(s):
+	- pool.lpSupply = pool.lpSupply + _amount (../../sb/ThorusMaster.sol#654)
+	ThorusMaster.poolInfo (../../sb/ThorusMaster.sol#543) can be used in cross function reentrancies:
+	- ThorusMaster.add(uint256,IERC20) (../../sb/ThorusMaster.sol#574-590)
+	- ThorusMaster.massUpdatePools() (../../sb/ThorusMaster.sol#611-616)
+	- ThorusMaster.pendingThorus(uint256,address) (../../sb/ThorusMaster.sol#599-609)
+	- ThorusMaster.poolInfo (../../sb/ThorusMaster.sol#543)
+	- ThorusMaster.poolLength() (../../sb/ThorusMaster.sol#566-568)
+	- ThorusMaster.set(uint256,uint256) (../../sb/ThorusMaster.sol#592-597)
+	- ThorusMaster.updatePool(uint256) (../../sb/ThorusMaster.sol#618-632)
+	- user.amount = user.amount + _amount (../../sb/ThorusMaster.sol#653)
+	ThorusMaster.userInfo (../../sb/ThorusMaster.sol#544) can be used in cross function reentrancies:
+	- ThorusMaster.pendingThorus(uint256,address) (../../sb/ThorusMaster.sol#599-609)
+	- ThorusMaster.userInfo (../../sb/ThorusMaster.sol#544)
+	- user.rewardDebt = user.amount * pool.accThorusPerShare / 1e18 (../../sb/ThorusMaster.sol#656)
+	ThorusMaster.userInfo (../../sb/ThorusMaster.sol#544) can be used in cross function reentrancies:
+	- ThorusMaster.pendingThorus(uint256,address) (../../sb/ThorusMaster.sol#599-609)
+	- ThorusMaster.userInfo (../../sb/ThorusMaster.sol#544)
+Reentrancy in ThorusMaster.emergencyWithdraw(uint256) (../../sb/ThorusMaster.sol#683-692):
+	External calls:
+	- pool.lpToken.safeTransfer(msg.sender,user.amount) (../../sb/ThorusMaster.sol#686)
+	State variables written after the call(s):
+	- pool.lpSupply = pool.lpSupply - user.amount (../../sb/ThorusMaster.sol#687)
+	ThorusMaster.poolInfo (../../sb/ThorusMaster.sol#543) can be used in cross function reentrancies:
+	- ThorusMaster.add(uint256,IERC20) (../../sb/ThorusMaster.sol#574-590)
+	- ThorusMaster.massUpdatePools() (../../sb/ThorusMaster.sol#611-616)
+	- ThorusMaster.pendingThorus(uint256,address) (../../sb/ThorusMaster.sol#599-609)
+	- ThorusMaster.poolInfo (../../sb/ThorusMaster.sol#543)
+	- ThorusMaster.poolLength() (../../sb/ThorusMaster.sol#566-568)
+	- ThorusMaster.set(uint256,uint256) (../../sb/ThorusMaster.sol#592-597)
+	- ThorusMaster.updatePool(uint256) (../../sb/ThorusMaster.sol#618-632)
+	- user.amount = 0 (../../sb/ThorusMaster.sol#689)
+	ThorusMaster.userInfo (../../sb/ThorusMaster.sol#544) can be used in cross function reentrancies:
+	- ThorusMaster.pendingThorus(uint256,address) (../../sb/ThorusMaster.sol#599-609)
+	- ThorusMaster.userInfo (../../sb/ThorusMaster.sol#544)
+	- user.rewardDebt = 0 (../../sb/ThorusMaster.sol#690)
+	ThorusMaster.userInfo (../../sb/ThorusMaster.sol#544) can be used in cross function reentrancies:
+	- ThorusMaster.pendingThorus(uint256,address) (../../sb/ThorusMaster.sol#599-609)
+	- ThorusMaster.userInfo (../../sb/ThorusMaster.sol#544)
+	- user.pendingRewards = 0 (../../sb/ThorusMaster.sol#691)
+	ThorusMaster.userInfo (../../sb/ThorusMaster.sol#544) can be used in cross function reentrancies:
+	- ThorusMaster.pendingThorus(uint256,address) (../../sb/ThorusMaster.sol#599-609)
+	- ThorusMaster.userInfo (../../sb/ThorusMaster.sol#544)
+Reentrancy in ThorusMaster.set(uint256,uint256) (../../sb/ThorusMaster.sol#592-597):
+	External calls:
+	- massUpdatePools() (../../sb/ThorusMaster.sol#594)
+		- thorus.mint(address(this),thorusReward) (../../sb/ThorusMaster.sol#629)
+	State variables written after the call(s):
+	- poolInfo[_pid].allocPoint = _allocPoint (../../sb/ThorusMaster.sol#596)
+	ThorusMaster.poolInfo (../../sb/ThorusMaster.sol#543) can be used in cross function reentrancies:
+	- ThorusMaster.add(uint256,IERC20) (../../sb/ThorusMaster.sol#574-590)
+	- ThorusMaster.massUpdatePools() (../../sb/ThorusMaster.sol#611-616)
+	- ThorusMaster.pendingThorus(uint256,address) (../../sb/ThorusMaster.sol#599-609)
+	- ThorusMaster.poolInfo (../../sb/ThorusMaster.sol#543)
+	- ThorusMaster.poolLength() (../../sb/ThorusMaster.sol#566-568)
+	- ThorusMaster.set(uint256,uint256) (../../sb/ThorusMaster.sol#592-597)
+	- ThorusMaster.updatePool(uint256) (../../sb/ThorusMaster.sol#618-632)
+	- totalAllocPoint = totalAllocPoint - poolInfo[_pid].allocPoint + _allocPoint (../../sb/ThorusMaster.sol#595)
+	ThorusMaster.totalAllocPoint (../../sb/ThorusMaster.sol#545) can be used in cross function reentrancies:
+	- ThorusMaster.add(uint256,IERC20) (../../sb/ThorusMaster.sol#574-590)
+	- ThorusMaster.pendingThorus(uint256,address) (../../sb/ThorusMaster.sol#599-609)
+	- ThorusMaster.set(uint256,uint256) (../../sb/ThorusMaster.sol#592-597)
+	- ThorusMaster.totalAllocPoint (../../sb/ThorusMaster.sol#545)
+	- ThorusMaster.updatePool(uint256) (../../sb/ThorusMaster.sol#618-632)
+Reentrancy in ThorusMaster.setThorusPerSecond(uint256) (../../sb/ThorusMaster.sol#717-723):
+	External calls:
+	- massUpdatePools() (../../sb/ThorusMaster.sol#720)
+		- thorus.mint(address(this),thorusReward) (../../sb/ThorusMaster.sol#629)
+	State variables written after the call(s):
+	- thorusPerSecond = _thorusPerSecond (../../sb/ThorusMaster.sol#722)
+	ThorusMaster.thorusPerSecond (../../sb/ThorusMaster.sol#540) can be used in cross function reentrancies:
+	- ThorusMaster.constructor(IThorusToken,uint256,uint256) (../../sb/ThorusMaster.sol#556-564)
+	- ThorusMaster.pendingThorus(uint256,address) (../../sb/ThorusMaster.sol#599-609)
+	- ThorusMaster.setThorusPerSecond(uint256) (../../sb/ThorusMaster.sol#717-723)
+	- ThorusMaster.thorusPerSecond (../../sb/ThorusMaster.sol#540)
+	- ThorusMaster.updatePool(uint256) (../../sb/ThorusMaster.sol#618-632)
+Reentrancy in ThorusMaster.updatePool(uint256) (../../sb/ThorusMaster.sol#618-632):
+	External calls:
+	- thorus.mint(address(this),thorusReward) (../../sb/ThorusMaster.sol#629)
+	State variables written after the call(s):
+	- pool.accThorusPerShare = pool.accThorusPerShare + (thorusReward * 1e18 / pool.lpSupply) (../../sb/ThorusMaster.sol#630)
+	ThorusMaster.poolInfo (../../sb/ThorusMaster.sol#543) can be used in cross function reentrancies:
+	- ThorusMaster.add(uint256,IERC20) (../../sb/ThorusMaster.sol#574-590)
+	- ThorusMaster.massUpdatePools() (../../sb/ThorusMaster.sol#611-616)
+	- ThorusMaster.pendingThorus(uint256,address) (../../sb/ThorusMaster.sol#599-609)
+	- ThorusMaster.poolInfo (../../sb/ThorusMaster.sol#543)
+	- ThorusMaster.poolLength() (../../sb/ThorusMaster.sol#566-568)
+	- ThorusMaster.set(uint256,uint256) (../../sb/ThorusMaster.sol#592-597)
+	- ThorusMaster.updatePool(uint256) (../../sb/ThorusMaster.sol#618-632)
+	- pool.lastRewardSecond = block.timestamp (../../sb/ThorusMaster.sol#631)
+	ThorusMaster.poolInfo (../../sb/ThorusMaster.sol#543) can be used in cross function reentrancies:
+	- ThorusMaster.add(uint256,IERC20) (../../sb/ThorusMaster.sol#574-590)
+	- ThorusMaster.massUpdatePools() (../../sb/ThorusMaster.sol#611-616)
+	- ThorusMaster.pendingThorus(uint256,address) (../../sb/ThorusMaster.sol#599-609)
+	- ThorusMaster.poolInfo (../../sb/ThorusMaster.sol#543)
+	- ThorusMaster.poolLength() (../../sb/ThorusMaster.sol#566-568)
+	- ThorusMaster.set(uint256,uint256) (../../sb/ThorusMaster.sol#592-597)
+	- ThorusMaster.updatePool(uint256) (../../sb/ThorusMaster.sol#618-632)
+Reentrancy in ThorusMaster.withdraw(uint256,uint256,bool) (../../sb/ThorusMaster.sol#660-681):
+	External calls:
+	- updatePool(_pid) (../../sb/ThorusMaster.sol#664)
+		- thorus.mint(address(this),thorusReward) (../../sb/ThorusMaster.sol#629)
+	State variables written after the call(s):
+	- user.pendingRewards = 0 (../../sb/ThorusMaster.sol#668)
+	ThorusMaster.userInfo (../../sb/ThorusMaster.sol#544) can be used in cross function reentrancies:
+	- ThorusMaster.pendingThorus(uint256,address) (../../sb/ThorusMaster.sol#599-609)
+	- ThorusMaster.userInfo (../../sb/ThorusMaster.sol#544)
+	- user.pendingRewards = totalPending (../../sb/ThorusMaster.sol#672)
+	ThorusMaster.userInfo (../../sb/ThorusMaster.sol#544) can be used in cross function reentrancies:
+	- ThorusMaster.pendingThorus(uint256,address) (../../sb/ThorusMaster.sol#599-609)
+	- ThorusMaster.userInfo (../../sb/ThorusMaster.sol#544)
+Reentrancy in ThorusMaster.withdraw(uint256,uint256,bool) (../../sb/ThorusMaster.sol#660-681):
+	External calls:
+	- updatePool(_pid) (../../sb/ThorusMaster.sol#664)
+		- thorus.mint(address(this),thorusReward) (../../sb/ThorusMaster.sol#629)
+	- safeThorusTransfer(msg.sender,totalPending) (../../sb/ThorusMaster.sol#669)
+		- thorus.transfer(_to,thorusBal) (../../sb/ThorusMaster.sol#711)
+		- thorus.transfer(_to,_amount) (../../sb/ThorusMaster.sol#713)
+	State variables written after the call(s):
+	- pool.lpSupply = pool.lpSupply - _amount (../../sb/ThorusMaster.sol#676)
+	ThorusMaster.poolInfo (../../sb/ThorusMaster.sol#543) can be used in cross function reentrancies:
+	- ThorusMaster.add(uint256,IERC20) (../../sb/ThorusMaster.sol#574-590)
+	- ThorusMaster.massUpdatePools() (../../sb/ThorusMaster.sol#611-616)
+	- ThorusMaster.pendingThorus(uint256,address) (../../sb/ThorusMaster.sol#599-609)
+	- ThorusMaster.poolInfo (../../sb/ThorusMaster.sol#543)
+	- ThorusMaster.poolLength() (../../sb/ThorusMaster.sol#566-568)
+	- ThorusMaster.set(uint256,uint256) (../../sb/ThorusMaster.sol#592-597)
+	- ThorusMaster.updatePool(uint256) (../../sb/ThorusMaster.sol#618-632)
+	- user.amount = user.amount - _amount (../../sb/ThorusMaster.sol#675)
+	ThorusMaster.userInfo (../../sb/ThorusMaster.sol#544) can be used in cross function reentrancies:
+	- ThorusMaster.pendingThorus(uint256,address) (../../sb/ThorusMaster.sol#599-609)
+	- ThorusMaster.userInfo (../../sb/ThorusMaster.sol#544)
+Reentrancy in ThorusMaster.withdraw(uint256,uint256,bool) (../../sb/ThorusMaster.sol#660-681):
+	External calls:
+	- updatePool(_pid) (../../sb/ThorusMaster.sol#664)
+		- thorus.mint(address(this),thorusReward) (../../sb/ThorusMaster.sol#629)
+	- safeThorusTransfer(msg.sender,totalPending) (../../sb/ThorusMaster.sol#669)
+		- thorus.transfer(_to,thorusBal) (../../sb/ThorusMaster.sol#711)
+		- thorus.transfer(_to,_amount) (../../sb/ThorusMaster.sol#713)
+	- pool.lpToken.safeTransfer(msg.sender,_amount) (../../sb/ThorusMaster.sol#677)
+	State variables written after the call(s):
+	- user.rewardDebt = user.amount * pool.accThorusPerShare / 1e18 (../../sb/ThorusMaster.sol#679)
+	ThorusMaster.userInfo (../../sb/ThorusMaster.sol#544) can be used in cross function reentrancies:
+	- ThorusMaster.pendingThorus(uint256,address) (../../sb/ThorusMaster.sol#599-609)
+	- ThorusMaster.userInfo (../../sb/ThorusMaster.sol#544)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+ThorusMaster.updatePool(uint256) (../../sb/ThorusMaster.sol#618-632) has external calls inside a loop: thorus.mint(address(this),thorusReward) (../../sb/ThorusMaster.sol#629)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in ThorusMaster.add(uint256,IERC20) (../../sb/ThorusMaster.sol#574-590):
+	External calls:
+	- massUpdatePools() (../../sb/ThorusMaster.sol#575)
+		- thorus.mint(address(this),thorusReward) (../../sb/ThorusMaster.sol#629)
+	Event emitted after the call(s):
+	- Add(_allocPoint,_lpToken) (../../sb/ThorusMaster.sol#589)
+Reentrancy in ThorusMaster.setThorusPerSecond(uint256) (../../sb/ThorusMaster.sol#717-723):
+	External calls:
+	- massUpdatePools() (../../sb/ThorusMaster.sol#720)
+		- thorus.mint(address(this),thorusReward) (../../sb/ThorusMaster.sol#629)
+	Event emitted after the call(s):
+	- SetThorusPerSecond(thorusPerSecond,_thorusPerSecond) (../../sb/ThorusMaster.sol#721)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+ThorusMaster.add(uint256,IERC20) (../../sb/ThorusMaster.sol#574-590) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp > startSecond (../../sb/ThorusMaster.sol#576-578)
+ThorusMaster.pendingThorus(uint256,address) (../../sb/ThorusMaster.sol#599-609) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp > pool.lastRewardSecond && pool.lpSupply != 0 && totalAllocPoint > 0 (../../sb/ThorusMaster.sol#603)
+ThorusMaster.massUpdatePools() (../../sb/ThorusMaster.sol#611-616) uses timestamp for comparisons
+	Dangerous comparisons:
+	- pid < length (../../sb/ThorusMaster.sol#613)
+ThorusMaster.updatePool(uint256) (../../sb/ThorusMaster.sol#618-632) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp <= pool.lastRewardSecond (../../sb/ThorusMaster.sol#620)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/ThorusMaster.sol#181-191) uses assembly
+	- INLINE ASM (../../sb/ThorusMaster.sol#187-189)
+Address._verifyCallResult(bool,bytes,string) (../../sb/ThorusMaster.sol#344-364) uses assembly
+	- INLINE ASM (../../sb/ThorusMaster.sol#356-359)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.functionCall(address,bytes) (../../sb/ThorusMaster.sol#234-236) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/ThorusMaster.sol#263-269) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/ThorusMaster.sol#323-325) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/ThorusMaster.sol#333-342) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/ThorusMaster.sol#296-298) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/ThorusMaster.sol#306-315) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/ThorusMaster.sol#209-214) is never used and should be removed
+Context._msgData() (../../sb/ThorusMaster.sol#21-23) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/ThorusMaster.sol#403-416) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/ThorusMaster.sol#427-438) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/ThorusMaster.sol#418-425) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.8.10 (../../sb/ThorusMaster.sol#1) allows old versions
+solc-0.8.10 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/ThorusMaster.sol#209-214):
+	- (success) = recipient.call{value: amount}() (../../sb/ThorusMaster.sol#212)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/ThorusMaster.sol#277-288):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/ThorusMaster.sol#286)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/ThorusMaster.sol#306-315):
+	- (success,returndata) = target.staticcall(data) (../../sb/ThorusMaster.sol#313)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/ThorusMaster.sol#333-342):
+	- (success,returndata) = target.delegatecall(data) (../../sb/ThorusMaster.sol#340)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter ThorusMaster.getMultiplier(uint256,uint256)._from (../../sb/ThorusMaster.sol#570) is not in mixedCase
+Parameter ThorusMaster.getMultiplier(uint256,uint256)._to (../../sb/ThorusMaster.sol#570) is not in mixedCase
+Parameter ThorusMaster.add(uint256,IERC20)._allocPoint (../../sb/ThorusMaster.sol#574) is not in mixedCase
+Parameter ThorusMaster.add(uint256,IERC20)._lpToken (../../sb/ThorusMaster.sol#574) is not in mixedCase
+Parameter ThorusMaster.set(uint256,uint256)._pid (../../sb/ThorusMaster.sol#592) is not in mixedCase
+Parameter ThorusMaster.set(uint256,uint256)._allocPoint (../../sb/ThorusMaster.sol#592) is not in mixedCase
+Parameter ThorusMaster.pendingThorus(uint256,address)._pid (../../sb/ThorusMaster.sol#599) is not in mixedCase
+Parameter ThorusMaster.pendingThorus(uint256,address)._user (../../sb/ThorusMaster.sol#599) is not in mixedCase
+Parameter ThorusMaster.updatePool(uint256)._pid (../../sb/ThorusMaster.sol#618) is not in mixedCase
+Parameter ThorusMaster.deposit(uint256,uint256,bool)._pid (../../sb/ThorusMaster.sol#634) is not in mixedCase
+Parameter ThorusMaster.deposit(uint256,uint256,bool)._amount (../../sb/ThorusMaster.sol#634) is not in mixedCase
+Parameter ThorusMaster.deposit(uint256,uint256,bool)._withdrawRewards (../../sb/ThorusMaster.sol#634) is not in mixedCase
+Parameter ThorusMaster.withdraw(uint256,uint256,bool)._pid (../../sb/ThorusMaster.sol#660) is not in mixedCase
+Parameter ThorusMaster.withdraw(uint256,uint256,bool)._amount (../../sb/ThorusMaster.sol#660) is not in mixedCase
+Parameter ThorusMaster.withdraw(uint256,uint256,bool)._withdrawRewards (../../sb/ThorusMaster.sol#660) is not in mixedCase
+Parameter ThorusMaster.emergencyWithdraw(uint256)._pid (../../sb/ThorusMaster.sol#683) is not in mixedCase
+Parameter ThorusMaster.claim(uint256)._pid (../../sb/ThorusMaster.sol#694) is not in mixedCase
+Parameter ThorusMaster.safeThorusTransfer(address,uint256)._to (../../sb/ThorusMaster.sol#708) is not in mixedCase
+Parameter ThorusMaster.safeThorusTransfer(address,uint256)._amount (../../sb/ThorusMaster.sol#708) is not in mixedCase
+Parameter ThorusMaster.setThorusPerSecond(uint256)._thorusPerSecond (../../sb/ThorusMaster.sol#717) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+/sb/ThorusMaster.sol analyzed (8 contracts with 93 detectors), 62 result(s) found

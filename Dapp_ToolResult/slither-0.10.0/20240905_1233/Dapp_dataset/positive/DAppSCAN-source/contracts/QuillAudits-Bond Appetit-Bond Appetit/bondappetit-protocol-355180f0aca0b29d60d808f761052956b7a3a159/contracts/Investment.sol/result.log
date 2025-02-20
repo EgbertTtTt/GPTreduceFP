@@ -1,0 +1,133 @@
+'solc --version' running
+'solc /sb/Investment.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+GovernanceToken._writeCheckpoint(address,uint32,uint96,uint96) (../../sb/Investment.sol#1883-1899) uses a dangerous strict equality:
+	- nCheckpoints > 0 && checkpoints[delegatee][nCheckpoints - 1].fromBlock == blockNumber (../../sb/Investment.sol#1891)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Investment.invest(address,uint256) (../../sb/Investment.sol#2139-2158) ignores return value by uniswapRouter.swapExactTokensForTokens(amount,amountOut,_path(token),address(this),block.timestamp) (../../sb/Investment.sol#2151)
+Investment.invest(address,uint256) (../../sb/Investment.sol#2139-2158) ignores return value by governanceToken.transferLock(_msgSender(),reward,governanceTokenLockDate) (../../sb/Investment.sol#2154)
+Investment.investETH() (../../sb/Investment.sol#2163-2180) ignores return value by uniswapRouter.swapExactETHForTokens{value: msg.value}(amountOut,_path(token),address(this),block.timestamp) (../../sb/Investment.sol#2173)
+Investment.investETH() (../../sb/Investment.sol#2163-2180) ignores return value by governanceToken.transferLock(_msgSender(),reward,governanceTokenLockDate) (../../sb/Investment.sol#2176)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+OwnablePausable.changePauser(address).newPauser (../../sb/Investment.sol#1028) lacks a zero-check on :
+		- pauser = newPauser (../../sb/Investment.sol#1029)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in Investment.invest(address,uint256) (../../sb/Investment.sol#2139-2158):
+	External calls:
+	- ERC20(token).safeTransferFrom(_msgSender(),address(this),amount) (../../sb/Investment.sol#2143)
+	- ERC20(token).safeApprove(address(uniswapRouter),amount) (../../sb/Investment.sol#2150)
+	- uniswapRouter.swapExactTokensForTokens(amount,amountOut,_path(token),address(this),block.timestamp) (../../sb/Investment.sol#2151)
+	- governanceToken.transferLock(_msgSender(),reward,governanceTokenLockDate) (../../sb/Investment.sol#2154)
+	Event emitted after the call(s):
+	- Invested(_msgSender(),token,amount,reward) (../../sb/Investment.sol#2156)
+Reentrancy in Investment.investETH() (../../sb/Investment.sol#2163-2180):
+	External calls:
+	- uniswapRouter.swapExactETHForTokens{value: msg.value}(amountOut,_path(token),address(this),block.timestamp) (../../sb/Investment.sol#2173)
+	- governanceToken.transferLock(_msgSender(),reward,governanceTokenLockDate) (../../sb/Investment.sol#2176)
+	External calls sending eth:
+	- uniswapRouter.swapExactETHForTokens{value: msg.value}(amountOut,_path(token),address(this),block.timestamp) (../../sb/Investment.sol#2173)
+	Event emitted after the call(s):
+	- Invested(_msgSender(),token,msg.value,reward) (../../sb/Investment.sol#2178)
+Reentrancy in Investment.withdraw(address) (../../sb/Investment.sol#2186-2193):
+	External calls:
+	- cumulative.safeTransfer(recipient,balance) (../../sb/Investment.sol#2190)
+	Event emitted after the call(s):
+	- Withdrawal(recipient,address(cumulative),balance) (../../sb/Investment.sol#2192)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+GovernanceToken.delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32) (../../sb/Investment.sol#1764-1780) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(now <= expiry,GovernanceToken::delegateBySig: signature expired) (../../sb/Investment.sol#1778)
+GovernanceToken._transferTokens(address,address,uint96) (../../sb/Investment.sol#1843-1859) uses timestamp for comparisons
+	Dangerous comparisons:
+	- locking[src].date > block.timestamp && locking[src].amount > 0 && balances[src] < locking[src].amount (../../sb/Investment.sol#1852)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/Investment.sol#631-640) uses assembly
+	- INLINE ASM (../../sb/Investment.sol#638)
+Address._verifyCallResult(bool,bytes,string) (../../sb/Investment.sol#776-793) uses assembly
+	- INLINE ASM (../../sb/Investment.sol#785-788)
+GovernanceToken.getChainId() (../../sb/Investment.sol#1968-1975) uses assembly
+	- INLINE ASM (../../sb/Investment.sol#1971-1973)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.functionCall(address,bytes) (../../sb/Investment.sol#684-686) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/Investment.sol#709-711) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/Investment.sol#758-760) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/Investment.sol#768-774) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/Investment.sol#734-736) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/Investment.sol#744-750) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/Investment.sol#658-664) is never used and should be removed
+Context._msgData() (../../sb/Investment.sol#20-23) is never used and should be removed
+ERC20._burn(address,uint256) (../../sb/Investment.sol#551-559) is never used and should be removed
+ERC20._mint(address,uint256) (../../sb/Investment.sol#530-538) is never used and should be removed
+ERC20._setupDecimals(uint8) (../../sb/Investment.sol#589-591) is never used and should be removed
+EnumerableSet._at(EnumerableSet.Set,uint256) (../../sb/Investment.sol#1373-1376) is never used and should be removed
+EnumerableSet._length(EnumerableSet.Set) (../../sb/Investment.sol#1359-1361) is never used and should be removed
+EnumerableSet.add(EnumerableSet.Bytes32Set,bytes32) (../../sb/Investment.sol#1390-1392) is never used and should be removed
+EnumerableSet.add(EnumerableSet.UintSet,uint256) (../../sb/Investment.sol#1499-1501) is never used and should be removed
+EnumerableSet.at(EnumerableSet.AddressSet,uint256) (../../sb/Investment.sol#1482-1484) is never used and should be removed
+EnumerableSet.at(EnumerableSet.Bytes32Set,uint256) (../../sb/Investment.sol#1428-1430) is never used and should be removed
+EnumerableSet.at(EnumerableSet.UintSet,uint256) (../../sb/Investment.sol#1537-1539) is never used and should be removed
+EnumerableSet.contains(EnumerableSet.Bytes32Set,bytes32) (../../sb/Investment.sol#1407-1409) is never used and should be removed
+EnumerableSet.contains(EnumerableSet.UintSet,uint256) (../../sb/Investment.sol#1516-1518) is never used and should be removed
+EnumerableSet.length(EnumerableSet.AddressSet) (../../sb/Investment.sol#1468-1470) is never used and should be removed
+EnumerableSet.length(EnumerableSet.Bytes32Set) (../../sb/Investment.sol#1414-1416) is never used and should be removed
+EnumerableSet.length(EnumerableSet.UintSet) (../../sb/Investment.sol#1523-1525) is never used and should be removed
+EnumerableSet.remove(EnumerableSet.Bytes32Set,bytes32) (../../sb/Investment.sol#1400-1402) is never used and should be removed
+EnumerableSet.remove(EnumerableSet.UintSet,uint256) (../../sb/Investment.sol#1509-1511) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/Investment.sol#840-843) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/Investment.sol#835-838) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/Investment.sol#285-288) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/Investment.sol#247-250) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/Investment.sol#305-308) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/Investment.sol#119-123) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/Investment.sol#155-158) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/Investment.sol#165-168) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/Investment.sol#140-148) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/Investment.sol#130-133) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.6.0 (../../sb/Investment.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/Investment.sol#658-664):
+	- (success) = recipient.call{value: amount}() (../../sb/Investment.sol#662)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/Investment.sol#719-726):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/Investment.sol#724)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/Investment.sol#744-750):
+	- (success,returndata) = target.staticcall(data) (../../sb/Investment.sol#748)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/Investment.sol#768-774):
+	- (success,returndata) = target.delegatecall(data) (../../sb/Investment.sol#772)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Function IUniswapV2Router02.WETH() (../../sb/Investment.sol#1053) is not in mixedCase
+Parameter Investment.changeUniswapRouter(address)._uniswapRouter (../../sb/Investment.sol#2041) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/Investment.sol#21)" inContext (../../sb/Investment.sol#15-24)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Variable IUniswapV2Router02.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountADesired (../../sb/Investment.sol#1058) is too similar to IUniswapV2Router02.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountBDesired (../../sb/Investment.sol#1059)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+GovernanceToken.slitherConstructorVariables() (../../sb/Investment.sol#1542-1976) uses literals with too many digits:
+	- totalSupply = 100000000e18 (../../sb/Investment.sol#1556)
+Investment.slitherConstructorVariables() (../../sb/Investment.sol#1978-2194) uses literals with too many digits:
+	- governanceTokenPrice = 1000000 (../../sb/Investment.sol#1994)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+GovernanceToken.decimals (../../sb/Investment.sol#1553) should be constant 
+GovernanceToken.name (../../sb/Investment.sol#1547) should be constant 
+GovernanceToken.symbol (../../sb/Investment.sol#1550) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+
+Investment.cumulative (../../sb/Investment.sol#1983) should be immutable 
+Investment.governanceToken (../../sb/Investment.sol#1986) should be immutable 
+Investment.governanceTokenLockDate (../../sb/Investment.sol#1989) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/Investment.sol analyzed (13 contracts with 93 detectors), 67 result(s) found

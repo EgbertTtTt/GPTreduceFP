@@ -1,0 +1,235 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 35 Code Findings │
+└──────────────────┘
+                     
+    /sb/Governor.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          158┆ for (uint256 i = 0; i < proposal.targets.length; i++) {
+            ⋮┆----------------------------------------
+          215┆ for (uint256 i = 0; i < proposal.targets.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+           95┆ constructor(address timelock_, address guardian_) public {
+           96┆     timelock = ITimelock(timelock_);
+           97┆     guardian = guardian_;
+           98┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          216┆ timelock.executeTransaction.value(proposal.values[i])(
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          158┆ for (uint256 i = 0; i < proposal.targets.length; i++) {
+            ⋮┆----------------------------------------
+          215┆ for (uint256 i = 0; i < proposal.targets.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          108┆ require(
+          109┆     targets.length == values.length &&
+          110┆         targets.length == signatures.length &&
+          111┆         targets.length == calldatas.length,
+          112┆     "Governor::propose: proposal function information arity      
+  mismatch"                                                                     
+          113┆ );
+            ⋮┆----------------------------------------
+          114┆ require(targets.length != 0, "Governor::propose: must provide    
+  actions");                                                                    
+            ⋮┆----------------------------------------
+          115┆ require(
+          116┆     targets.length <= MAX_OPERATIONS,
+          117┆     "Governor::propose: too many actions"
+          118┆ );
+            ⋮┆----------------------------------------
+          147┆ require(
+          148┆     msg.sender == guardian,
+          149┆     "Governor::queue: sender must be gov guardian"
+          150┆ );
+            ⋮┆----------------------------------------
+          151┆ require(
+          152┆     state(proposalId) == ProposalState.Pending,
+          153┆     "Governor::queue: proposal can only be queued if it is       
+  pending"                                                                      
+          154┆ );
+            ⋮┆----------------------------------------
+          172┆ require(
+          173┆     proposalCount >= proposalId && proposalId > 0,
+          174┆     "Governor::state: invalid proposal id"
+          175┆ );
+            ⋮┆----------------------------------------
+          198┆ require(
+          199┆     !timelock.queuedTransactions(
+          200┆         keccak256(abi.encode(target, value, signature, data,     
+  eta))                                                                         
+          201┆     ),
+          202┆     "Governor::_queueOrRevert: proposal action already queued at 
+  eta"                                                                          
+          203┆ );
+            ⋮┆----------------------------------------
+          209┆ require(
+          210┆     state(proposalId) == ProposalState.Queued,
+          211┆     "Governor::execute: proposal can only be executed if it is   
+  queued"                                                                       
+          212┆ );
+            ⋮┆----------------------------------------
+          242┆ require(
+          243┆     msg.sender == guardian,
+          244┆     "Governor::__acceptAdmin: sender must be gov guardian"
+          245┆ );
+            ⋮┆----------------------------------------
+          254┆ require(
+          255┆     msg.sender == guardian,
+          256┆     "Governor::__queueSetTimelockPendingAdmin: sender must be gov
+  guardian"                                                                     
+          257┆ );
+            ⋮┆----------------------------------------
+          272┆ require(
+          273┆     msg.sender == guardian,
+          274┆     "Governor::__executeSetTimelockPendingAdmin: sender must be  
+  gov guardian"                                                                 
+          275┆ );
+            ⋮┆----------------------------------------
+          287┆ require(c >= a, "addition overflow");
+            ⋮┆----------------------------------------
+          292┆ require(b <= a, "subtraction underflow");
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          108┆ require(
+          109┆     targets.length == values.length &&
+          110┆         targets.length == signatures.length &&
+          111┆         targets.length == calldatas.length,
+          112┆     "Governor::propose: proposal function information arity      
+  mismatch"                                                                     
+          113┆ );
+            ⋮┆----------------------------------------
+          172┆ require(
+          173┆     proposalCount >= proposalId && proposalId > 0,
+          174┆     "Governor::state: invalid proposal id"
+          175┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          120┆ proposalCount++;
+            ⋮┆----------------------------------------
+          158┆ for (uint256 i = 0; i < proposal.targets.length; i++) {
+            ⋮┆----------------------------------------
+          215┆ for (uint256 i = 0; i < proposal.targets.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          108┆ require(
+          109┆     targets.length == values.length &&
+          110┆         targets.length == signatures.length &&
+          111┆         targets.length == calldatas.length,
+          112┆     "Governor::propose: proposal function information arity      
+  mismatch"                                                                     
+          113┆ );
+            ⋮┆----------------------------------------
+          114┆ require(targets.length != 0, "Governor::propose: must provide    
+  actions");                                                                    
+            ⋮┆----------------------------------------
+          115┆ require(
+          116┆     targets.length <= MAX_OPERATIONS,
+          117┆     "Governor::propose: too many actions"
+          118┆ );
+            ⋮┆----------------------------------------
+          147┆ require(
+          148┆     msg.sender == guardian,
+          149┆     "Governor::queue: sender must be gov guardian"
+          150┆ );
+            ⋮┆----------------------------------------
+          151┆ require(
+          152┆     state(proposalId) == ProposalState.Pending,
+          153┆     "Governor::queue: proposal can only be queued if it is       
+  pending"                                                                      
+          154┆ );
+            ⋮┆----------------------------------------
+          172┆ require(
+          173┆     proposalCount >= proposalId && proposalId > 0,
+          174┆     "Governor::state: invalid proposal id"
+          175┆ );
+            ⋮┆----------------------------------------
+          198┆ require(
+          199┆     !timelock.queuedTransactions(
+          200┆         keccak256(abi.encode(target, value, signature, data,     
+  eta))                                                                         
+          201┆     ),
+          202┆     "Governor::_queueOrRevert: proposal action already queued at 
+  eta"                                                                          
+          203┆ );
+            ⋮┆----------------------------------------
+          209┆ require(
+          210┆     state(proposalId) == ProposalState.Queued,
+          211┆     "Governor::execute: proposal can only be executed if it is   
+  queued"                                                                       
+          212┆ );
+            ⋮┆----------------------------------------
+          242┆ require(
+          243┆     msg.sender == guardian,
+          244┆     "Governor::__acceptAdmin: sender must be gov guardian"
+          245┆ );
+            ⋮┆----------------------------------------
+          254┆ require(
+          255┆     msg.sender == guardian,
+          256┆     "Governor::__queueSetTimelockPendingAdmin: sender must be gov
+  guardian"                                                                     
+          257┆ );
+            ⋮┆----------------------------------------
+          272┆ require(
+          273┆     msg.sender == guardian,
+          274┆     "Governor::__executeSetTimelockPendingAdmin: sender must be  
+  gov guardian"                                                                 
+          275┆ );
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 35 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

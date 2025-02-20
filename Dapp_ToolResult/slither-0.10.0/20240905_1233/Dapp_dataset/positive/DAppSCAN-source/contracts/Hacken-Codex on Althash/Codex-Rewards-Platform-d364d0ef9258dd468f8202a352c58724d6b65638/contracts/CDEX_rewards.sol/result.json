@@ -1,0 +1,144 @@
+{
+    "errors": [],
+    "fails": [],
+    "findings": [
+        {
+            "confidence": "Medium",
+            "contract": "CDEXStakingPool",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Hacken-Codex on Althash/Codex-Rewards-Platform-d364d0ef9258dd468f8202a352c58724d6b65638/contracts/CDEX_rewards.sol",
+            "function": "depositTokens",
+            "impact": "High",
+            "line": 489,
+            "line_end": 500,
+            "message": "CDEXStakingPool.depositTokens(uint256) (CDEX_rewards.sol#489-500) ignores return value by CDEXToken.transferFrom(owner,address(this),amount) (CDEX_rewards.sol#497)\n",
+            "name": "unchecked-transfer",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "CDEXStakingPool",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Hacken-Codex on Althash/Codex-Rewards-Platform-d364d0ef9258dd468f8202a352c58724d6b65638/contracts/CDEX_rewards.sol",
+            "function": "stake",
+            "impact": "High",
+            "line": 365,
+            "line_end": 393,
+            "message": "CDEXStakingPool.stake(uint256) (CDEX_rewards.sol#365-393) ignores return value by CDEXToken.transferFrom(msg.sender,address(this),amount) (CDEX_rewards.sol#390)\n",
+            "name": "unchecked-transfer",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "CDEXStakingPool",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Hacken-Codex on Althash/Codex-Rewards-Platform-d364d0ef9258dd468f8202a352c58724d6b65638/contracts/CDEX_rewards.sol",
+            "function": "stake",
+            "impact": "Medium",
+            "line": 365,
+            "line_end": 393,
+            "message": "Reentrancy in CDEXStakingPool.stake(uint256) (CDEX_rewards.sol#365-393):\n\tExternal calls:\n\t- CDEXRanking.insert(amount,msg.sender) (CDEX_rewards.sol#379)\n\t- CDEXRanking.remove(_balances[msg.sender],msg.sender) (CDEX_rewards.sol#382)\n\t- CDEXRanking.insert(_balances[msg.sender].add(amount),msg.sender) (CDEX_rewards.sol#384)\n\tState variables written after the call(s):\n\t- _balances[msg.sender] = _balances[msg.sender].add(amount) (CDEX_rewards.sol#387)\n\tCDEXStakingPool._balances (CDEX_rewards.sol#269) can be used in cross function reentrancies:\n\t- CDEXStakingPool.balanceOf(address) (CDEX_rewards.sol#298-300)\n\t- CDEXStakingPool.earned(address) (CDEX_rewards.sol#326-332)\n\t- CDEXStakingPool.exit() (CDEX_rewards.sol#461-464)\n\t- CDEXStakingPool.getReward() (CDEX_rewards.sol#426-458)\n\t- CDEXStakingPool.withdraw(uint256) (CDEX_rewards.sol#398-422)\n",
+            "name": "reentrancy-no-eth",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "CDEXStakingPool",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Hacken-Codex on Althash/Codex-Rewards-Platform-d364d0ef9258dd468f8202a352c58724d6b65638/contracts/CDEX_rewards.sol",
+            "function": "exit",
+            "impact": "Medium",
+            "line": 461,
+            "line_end": 464,
+            "message": "Reentrancy in CDEXStakingPool.exit() (CDEX_rewards.sol#461-464):\n\tExternal calls:\n\t- withdraw(_balances[msg.sender]) (CDEX_rewards.sol#462)\n\t\t- CDEXRanking.remove(_balances[msg.sender],msg.sender) (CDEX_rewards.sol#407)\n\t\t- CDEXRanking.insert(_balances[msg.sender],msg.sender) (CDEX_rewards.sol#415)\n\t\t- CDEXToken.transfer(msg.sender,amount) (CDEX_rewards.sol#419)\n\t- getReward() (CDEX_rewards.sol#463)\n\t\t- CDEXToken.transfer(msg.sender,reward.add(loyaltyBonus)) (CDEX_rewards.sol#450)\n\tState variables written after the call(s):\n\t- getReward() (CDEX_rewards.sol#463)\n\t\t- _status = _ENTERED (CDEX_rewards.sol#44)\n\t\t- _status = _NOT_ENTERED (CDEX_rewards.sol#50)\n\tReentrancyGuard._status (CDEX_rewards.sol#27) can be used in cross function reentrancies:\n\t- ReentrancyGuard.nonReentrant() (CDEX_rewards.sol#40-51)\n\t- getReward() (CDEX_rewards.sol#463)\n\t\t- lastUpdateTime = lastTimeRewardApplicable() (CDEX_rewards.sol#599)\n\tCDEXStakingPool.lastUpdateTime (CDEX_rewards.sol#249) can be used in cross function reentrancies:\n\t- CDEXStakingPool.lastUpdateTime (CDEX_rewards.sol#249)\n\t- CDEXStakingPool.notifyRewardAmount(uint256) (CDEX_rewards.sol#506-536)\n\t- CDEXStakingPool.rewardPerToken() (CDEX_rewards.sol#310-322)\n\t- CDEXStakingPool.updateReward(address) (CDEX_rewards.sol#597-605)\n\t- getReward() (CDEX_rewards.sol#463)\n\t\t- rewardPerTokenStored = rewardPerToken() (CDEX_rewards.sol#598)\n\tCDEXStakingPool.rewardPerTokenStored (CDEX_rewards.sol#250) can be used in cross function reentrancies:\n\t- CDEXStakingPool.rewardPerToken() (CDEX_rewards.sol#310-322)\n\t- CDEXStakingPool.rewardPerTokenStored (CDEX_rewards.sol#250)\n\t- CDEXStakingPool.updateReward(address) (CDEX_rewards.sol#597-605)\n\t- getReward() (CDEX_rewards.sol#463)\n\t\t- rewards[account] = earned(account) (CDEX_rewards.sol#601)\n\t\t- rewards[msg.sender] = 0 (CDEX_rewards.sol#436)\n\tCDEXStakingPool.rewards (CDEX_rewards.sol#265) can be used in cross function reentrancies:\n\t- CDEXStakingPool.earned(address) (CDEX_rewards.sol#326-332)\n\t- CDEXStakingPool.getReward() (CDEX_rewards.sol#426-458)\n\t- CDEXStakingPool.rewards (CDEX_rewards.sol#265)\n\t- CDEXStakingPool.updateReward(address) (CDEX_rewards.sol#597-605)\n\t- getReward() (CDEX_rewards.sol#463)\n\t\t- userRewardPerTokenPaid[account] = rewardPerTokenStored (CDEX_rewards.sol#602)\n\tCDEXStakingPool.userRewardPerTokenPaid (CDEX_rewards.sol#264) can be used in cross function reentrancies:\n\t- CDEXStakingPool.earned(address) (CDEX_rewards.sol#326-332)\n\t- CDEXStakingPool.updateReward(address) (CDEX_rewards.sol#597-605)\n\t- CDEXStakingPool.userRewardPerTokenPaid (CDEX_rewards.sol#264)\n",
+            "name": "reentrancy-no-eth",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "CDEXStakingPool",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Hacken-Codex on Althash/Codex-Rewards-Platform-d364d0ef9258dd468f8202a352c58724d6b65638/contracts/CDEX_rewards.sol",
+            "function": "withdraw",
+            "impact": "Medium",
+            "line": 398,
+            "line_end": 422,
+            "message": "Reentrancy in CDEXStakingPool.withdraw(uint256) (CDEX_rewards.sol#398-422):\n\tExternal calls:\n\t- CDEXRanking.remove(_balances[msg.sender],msg.sender) (CDEX_rewards.sol#407)\n\tState variables written after the call(s):\n\t- _balances[msg.sender] = _balances[msg.sender].sub(amount) (CDEX_rewards.sol#409)\n\tCDEXStakingPool._balances (CDEX_rewards.sol#269) can be used in cross function reentrancies:\n\t- CDEXStakingPool.balanceOf(address) (CDEX_rewards.sol#298-300)\n\t- CDEXStakingPool.earned(address) (CDEX_rewards.sol#326-332)\n\t- CDEXStakingPool.exit() (CDEX_rewards.sol#461-464)\n\t- CDEXStakingPool.getReward() (CDEX_rewards.sol#426-458)\n\t- CDEXStakingPool.withdraw(uint256) (CDEX_rewards.sol#398-422)\n",
+            "name": "reentrancy-no-eth",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "CDEXStakingPool",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Hacken-Codex on Althash/Codex-Rewards-Platform-d364d0ef9258dd468f8202a352c58724d6b65638/contracts/CDEX_rewards.sol",
+            "function": "withdraw",
+            "impact": "Low",
+            "line": 398,
+            "line_end": 422,
+            "message": "Reentrancy in CDEXStakingPool.withdraw(uint256) (CDEX_rewards.sol#398-422):\n\tExternal calls:\n\t- CDEXRanking.remove(_balances[msg.sender],msg.sender) (CDEX_rewards.sol#407)\n\tState variables written after the call(s):\n\t- totalMembers -= 1 (CDEX_rewards.sol#412)\n",
+            "name": "reentrancy-benign",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "CDEXStakingPool",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Hacken-Codex on Althash/Codex-Rewards-Platform-d364d0ef9258dd468f8202a352c58724d6b65638/contracts/CDEX_rewards.sol",
+            "function": "depositTokens",
+            "impact": "Low",
+            "line": 489,
+            "line_end": 500,
+            "message": "Reentrancy in CDEXStakingPool.depositTokens(uint256) (CDEX_rewards.sol#489-500):\n\tExternal calls:\n\t- CDEXToken.transferFrom(owner,address(this),amount) (CDEX_rewards.sol#497)\n\tEvent emitted after the call(s):\n\t- RewardsDeposited(owner,address(this),amount) (CDEX_rewards.sol#499)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "CDEXStakingPool",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Hacken-Codex on Althash/Codex-Rewards-Platform-d364d0ef9258dd468f8202a352c58724d6b65638/contracts/CDEX_rewards.sol",
+            "function": "exit",
+            "impact": "Low",
+            "line": 461,
+            "line_end": 464,
+            "message": "Reentrancy in CDEXStakingPool.exit() (CDEX_rewards.sol#461-464):\n\tExternal calls:\n\t- withdraw(_balances[msg.sender]) (CDEX_rewards.sol#462)\n\t\t- CDEXRanking.remove(_balances[msg.sender],msg.sender) (CDEX_rewards.sol#407)\n\t\t- CDEXRanking.insert(_balances[msg.sender],msg.sender) (CDEX_rewards.sol#415)\n\t\t- CDEXToken.transfer(msg.sender,amount) (CDEX_rewards.sol#419)\n\t- getReward() (CDEX_rewards.sol#463)\n\t\t- CDEXToken.transfer(msg.sender,reward.add(loyaltyBonus)) (CDEX_rewards.sol#450)\n\tEvent emitted after the call(s):\n\t- LoyaltyBonusPaid(msg.sender,loyaltyBonus) (CDEX_rewards.sol#455)\n\t\t- getReward() (CDEX_rewards.sol#463)\n\t- RewardPaid(msg.sender,reward) (CDEX_rewards.sol#452)\n\t\t- getReward() (CDEX_rewards.sol#463)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "CDEXStakingPool",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Hacken-Codex on Althash/Codex-Rewards-Platform-d364d0ef9258dd468f8202a352c58724d6b65638/contracts/CDEX_rewards.sol",
+            "function": "notifyRewardAmount",
+            "impact": "Low",
+            "line": 506,
+            "line_end": 536,
+            "message": "CDEXStakingPool.notifyRewardAmount(uint256) (CDEX_rewards.sol#506-536) uses timestamp for comparisons\n\tDangerous comparisons:\n\t- block.timestamp >= periodFinish (CDEX_rewards.sol#518)\n\t- require(bool)(rewardRate <= depositedRewardTokens.div(rewardsDuration)) (CDEX_rewards.sol#529)\n",
+            "name": "timestamp",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "CDEXStakingPool",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Hacken-Codex on Althash/Codex-Rewards-Platform-d364d0ef9258dd468f8202a352c58724d6b65638/contracts/CDEX_rewards.sol",
+            "function": "setRewardsDuration",
+            "impact": "Low",
+            "line": 541,
+            "line_end": 548,
+            "message": "CDEXStakingPool.setRewardsDuration(uint256) (CDEX_rewards.sol#541-548) uses timestamp for comparisons\n\tDangerous comparisons:\n\t- require(bool)(block.timestamp > periodFinish) (CDEX_rewards.sol#543)\n",
+            "name": "timestamp",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "CDEXStakingPool",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Hacken-Codex on Althash/Codex-Rewards-Platform-d364d0ef9258dd468f8202a352c58724d6b65638/contracts/CDEX_rewards.sol",
+            "function": "min",
+            "impact": "Low",
+            "line": 342,
+            "line_end": 344,
+            "message": "CDEXStakingPool.min(uint256,uint256) (CDEX_rewards.sol#342-344) uses timestamp for comparisons\n\tDangerous comparisons:\n\t- a < b (CDEX_rewards.sol#343)\n",
+            "name": "timestamp",
+            "check": "FP"
+        }
+    ],
+    "infos": [],
+    "parser": {
+        "id": "slither-0.10.0",
+        "mode": "solidity",
+        "version": "2024/04/30"
+    }
+}

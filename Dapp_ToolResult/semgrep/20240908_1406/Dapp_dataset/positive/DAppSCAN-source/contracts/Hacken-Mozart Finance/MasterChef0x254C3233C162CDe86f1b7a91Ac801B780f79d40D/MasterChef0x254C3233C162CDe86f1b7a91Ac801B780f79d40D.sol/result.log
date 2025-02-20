@@ -1,0 +1,390 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                     
+                     
+┌───────────────────┐
+│ 103 Code Findings │
+└───────────────────┘
+                                                                 
+    /sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          524┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          528┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          546┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          551┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          556┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          751┆ contract FixedBEP20 is Context, IBEP20, Ownable {
+            ⋮┆----------------------------------------
+         1277┆ contract MasterChef is Ownable, ReentrancyGuard {
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+         1418┆ for (uint256 i = 0; i < rewardInfo.length; i++) {
+            ⋮┆----------------------------------------
+         1666┆ for (uint256 i = 0; i < rewardInfo.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+         1329┆ uint256 public totalAllocPoint = 0;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          774┆ constructor(string memory name, string memory symbol, uint256    
+  totalSupply) public {                                                         
+          775┆     _name = name;
+          776┆     _symbol = symbol;
+          777┆     _totalSupply = totalSupply;
+          778┆     _decimals = 18;
+          779┆ }
+            ⋮┆----------------------------------------
+         1348┆ constructor(
+         1349┆     MelodyToken _melody,
+         1350┆     address _devaddr,
+         1351┆     address _feeAddress,
+         1352┆     uint256 _startBlock,
+         1353┆     uint256 _endBlock
+         1354┆ ) public {
+         1355┆     melody = _melody;
+         1356┆     devaddr = _devaddr;
+         1357┆     feeAddress = _feeAddress;
+             [hid 5 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+         1193┆ Checkpoint memory cp = checkpoints[account][center];
+            ⋮┆----------------------------------------
+         1418┆ for (uint256 i = 0; i < rewardInfo.length; i++) {
+            ⋮┆----------------------------------------
+         1419┆ BlockRewardInfo memory blockRewardInfo = rewardInfo[i];
+            ⋮┆----------------------------------------
+         1583┆ rewardInfo.push(BlockRewardInfo({
+            ⋮┆----------------------------------------
+         1584┆ firstBlock : prevBlock.add(blockCountPerDay.mul(i)),
+            ⋮┆----------------------------------------
+         1585┆ lastBlock : prevBlock.add(blockCountPerDay.mul(i + 1)),
+            ⋮┆----------------------------------------
+         1586┆ reward : rewardAmount.sub(blockRewardUnit.mul(i + 1))
+            ⋮┆----------------------------------------
+         1603┆ rewardInfo.push(BlockRewardInfo({
+            ⋮┆----------------------------------------
+         1604┆ firstBlock : prevBlock.add(blockCountPerDay.mul(i)),
+            ⋮┆----------------------------------------
+         1605┆ lastBlock : prevBlock.add(blockCountPerDay.mul(i + 1)),
+            ⋮┆----------------------------------------
+         1606┆ reward: rewardAmount.sub(blockRewardUnit.mul(i + 1).div(2))
+            ⋮┆----------------------------------------
+         1623┆ rewardInfo.push(BlockRewardInfo({
+            ⋮┆----------------------------------------
+         1624┆ firstBlock : prevBlock.add(blockCountPerDay.mul(i)),
+            ⋮┆----------------------------------------
+         1625┆ lastBlock : prevBlock.add(blockCountPerDay.mul(i + 1)),
+            ⋮┆----------------------------------------
+         1626┆ reward: rewardAmount.sub(blockRewardUnit.mul(i + 1).div(2))
+            ⋮┆----------------------------------------
+         1666┆ for (uint256 i = 0; i < rewardInfo.length; i++) {
+            ⋮┆----------------------------------------
+         1667┆ BlockRewardInfo memory info = rewardInfo[i];
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+         1418┆ for (uint256 i = 0; i < rewardInfo.length; i++) {
+            ⋮┆----------------------------------------
+         1455┆ for (uint256 pid = 0; pid < length; ++pid) {
+            ⋮┆----------------------------------------
+         1582┆ for (uint256 i = 0; i < 10; i++) {
+            ⋮┆----------------------------------------
+         1602┆ for (uint256 i = 0; i < 10; i++) {
+            ⋮┆----------------------------------------
+         1622┆ for (uint256 i = 0; i < 5; i++) {
+            ⋮┆----------------------------------------
+         1666┆ for (uint256 i = 0; i < rewardInfo.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          101┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          116┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          133┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          150┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          167┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          372┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          376┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          433┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          434┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          458┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          482┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          543┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          544┆     "SafeBEP20: approve from non-zero to non-zero allowance"
+          545┆ );
+            ⋮┆----------------------------------------
+          573┆ require(abi.decode(returndata, (bool)), "SafeBEP20: BEP20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          638┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          659┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          712┆ require(_status != _ENTERED, "ReentrancyGuard: reentrant call");
+            ⋮┆----------------------------------------
+          942┆ require(sender != address(0), 'FixedBEP20: transfer from the zero
+  address');                                                                    
+            ⋮┆----------------------------------------
+          943┆ require(recipient != address(0), 'FixedBEP20: transfer to the    
+  zero address');                                                               
+            ⋮┆----------------------------------------
+          960┆ require(account != address(0), 'MELODY: mint to the zero         
+  address');                                                                    
+            ⋮┆----------------------------------------
+          963┆ require(remainingAmount != 0, 'MELODY: mint zero amount');
+            ⋮┆----------------------------------------
+          989┆ require(account != address(0), 'FixedBEP20: burn from the zero   
+  address');                                                                    
+            ⋮┆----------------------------------------
+         1010┆ require(owner != address(0), 'FixedBEP20: approve from the zero  
+  address');                                                                    
+            ⋮┆----------------------------------------
+         1011┆ require(spender != address(0), 'FixedBEP20: approve to the zero  
+  address');                                                                    
+            ⋮┆----------------------------------------
+         1140┆ require(signatory != address(0), "MELODY::delegateBySig: invalid 
+  signature");                                                                  
+            ⋮┆----------------------------------------
+         1141┆ require(nonce == nonces[signatory]++, "MELODY::delegateBySig:    
+  invalid nonce");                                                              
+            ⋮┆----------------------------------------
+         1142┆ require(now <= expiry, "MELODY::delegateBySig: signature         
+  expired");                                                                    
+            ⋮┆----------------------------------------
+         1172┆ require(blockNumber < block.number, "MELODY::getPriorVotes: not  
+  yet determined");                                                             
+            ⋮┆----------------------------------------
+         1370┆ require(poolExistence[_lpToken] == false, "nonDuplicated:        
+  duplicated");                                                                 
+            ⋮┆----------------------------------------
+         1376┆ require(_depositFeeBP <= 10000, "add: invalid deposit fee basis  
+  points");                                                                     
+            ⋮┆----------------------------------------
+         1394┆ require(_depositFeeBP <= 10000, "set: invalid deposit fee basis  
+  points");                                                                     
+            ⋮┆----------------------------------------
+         1510┆ require(user.amount >= _amount, "withdraw: not good");
+            ⋮┆----------------------------------------
+         1544┆ require(transferSuccess, "safeMelodyTransfer: transfer failed");
+            ⋮┆----------------------------------------
+         1549┆ require(msg.sender == devaddr, "dev: wut?");
+            ⋮┆----------------------------------------
+         1555┆ require(msg.sender == feeAddress, "setFeeAddress: FORBIDDEN");
+            ⋮┆----------------------------------------
+         1562┆ require(_endBlock > _startBlock, "setRewardTable: Incorrect      
+  startBlock and endBlock");                                                    
+            ⋮┆----------------------------------------
+         1645┆ require(_endBlock > prevBlock, "setRewardTable, incorrect end    
+  block");                                                                      
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         1218┆ if (srcRep != dstRep && amount > 0) {
+         1219┆     if (srcRep != address(0)) {
+         1220┆         // decrease old representative
+         1221┆         uint32 srcRepNum = numCheckpoints[srcRep];
+         1222┆         uint256 srcRepOld = srcRepNum > 0 ?                      
+  checkpoints[srcRep][srcRepNum - 1].votes : 0;                                 
+         1223┆         uint256 srcRepNew = srcRepOld.sub(amount);
+         1224┆         _writeCheckpoint(srcRep, srcRepNum, srcRepOld,           
+  srcRepNew);                                                                   
+         1225┆     }
+         1226┆ 
+         1227┆     if (dstRep != address(0)) {
+             [hid 7 additional lines, adjust with --max-lines-per-finding] 
+         1247┆ if (nCheckpoints > 0 && checkpoints[delegatee][nCheckpoints -    
+  1].fromBlock == blockNumber) {                                                
+         1248┆     checkpoints[delegatee][nCheckpoints - 1].votes = newVotes;
+         1249┆ } else {
+         1250┆     checkpoints[delegatee][nCheckpoints] =                       
+  Checkpoint(blockNumber, newVotes);                                            
+         1251┆     numCheckpoints[delegatee] = nCheckpoints + 1;
+         1252┆ }
+            ⋮┆----------------------------------------
+         1443┆ if (block.number > pool.lastRewardBlock && lpSupply != 0) {
+         1444┆     uint256 poolReward =  getBlockReward(pool.lastRewardBlock,   
+  block.number);                                                                
+         1445┆     uint256 melodyReward =                                       
+  poolReward.mul(pool.allocPoint).div(totalAllocPoint);                         
+         1446┆     accMelodyPerShare =                                          
+  accMelodyPerShare.add(melodyReward.mul(1e12).div(lpSupply));                  
+         1447┆ }
+            ⋮┆----------------------------------------
+         1668┆ if (blockNumber >= info.firstBlock && blockNumber <              
+  info.lastBlock) {                                                             
+         1669┆     reward = info.reward;
+         1670┆     break;
+         1671┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+         1141┆ require(nonce == nonces[signatory]++, "MELODY::delegateBySig:    
+  invalid nonce");                                                              
+            ⋮┆----------------------------------------
+         1418┆ for (uint256 i = 0; i < rewardInfo.length; i++) {
+            ⋮┆----------------------------------------
+         1582┆ for (uint256 i = 0; i < 10; i++) {
+            ⋮┆----------------------------------------
+         1602┆ for (uint256 i = 0; i < 10; i++) {
+            ⋮┆----------------------------------------
+         1622┆ for (uint256 i = 0; i < 5; i++) {
+            ⋮┆----------------------------------------
+         1666┆ for (uint256 i = 0; i < rewardInfo.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 103 findings.
+          costs when the revert condition has been met.                         
+                                                                                
+          133┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          376┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          433┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          458┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          482┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          543┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          544┆     "SafeBEP20: approve from non-zero to non-zero allowance"
+          545┆ );
+            ⋮┆----------------------------------------
+          573┆ require(abi.decode(returndata, (bool)), "SafeBEP20: BEP20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          659┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          942┆ require(sender != address(0), 'FixedBEP20: transfer from the zero
+  address');                                                                    
+            ⋮┆----------------------------------------
+          943┆ require(recipient != address(0), 'FixedBEP20: transfer to the    
+  zero address');                                                               
+            ⋮┆----------------------------------------
+          989┆ require(account != address(0), 'FixedBEP20: burn from the zero   
+  address');                                                                    
+            ⋮┆----------------------------------------
+         1010┆ require(owner != address(0), 'FixedBEP20: approve from the zero  
+  address');                                                                    
+            ⋮┆----------------------------------------
+         1011┆ require(spender != address(0), 'FixedBEP20: approve to the zero  
+  address');                                                                    
+            ⋮┆----------------------------------------
+         1140┆ require(signatory != address(0), "MELODY::delegateBySig: invalid 
+  signature");                                                                  
+            ⋮┆----------------------------------------
+         1141┆ require(nonce == nonces[signatory]++, "MELODY::delegateBySig:    
+  invalid nonce");                                                              
+            ⋮┆----------------------------------------
+         1142┆ require(now <= expiry, "MELODY::delegateBySig: signature         
+  expired");                                                                    
+            ⋮┆----------------------------------------
+         1172┆ require(blockNumber < block.number, "MELODY::getPriorVotes: not  
+  yet determined");                                                             
+            ⋮┆----------------------------------------
+         1376┆ require(_depositFeeBP <= 10000, "add: invalid deposit fee basis  
+  points");                                                                     
+            ⋮┆----------------------------------------
+         1394┆ require(_depositFeeBP <= 10000, "set: invalid deposit fee basis  
+  points");                                                                     
+            ⋮┆----------------------------------------
+         1544┆ require(transferSuccess, "safeMelodyTransfer: transfer failed");
+            ⋮┆----------------------------------------
+         1562┆ require(_endBlock > _startBlock, "setRewardTable: Incorrect      
+  startBlock and endBlock");                                                    
+            ⋮┆----------------------------------------
+         1645┆ require(_endBlock > prevBlock, "setRewardTable, incorrect end    
+  block");                                                                      
+
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

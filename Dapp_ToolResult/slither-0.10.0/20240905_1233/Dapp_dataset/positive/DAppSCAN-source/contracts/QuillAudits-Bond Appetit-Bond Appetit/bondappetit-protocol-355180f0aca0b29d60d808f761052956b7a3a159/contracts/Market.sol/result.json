@@ -1,0 +1,96 @@
+{
+    "errors": [],
+    "fails": [],
+    "findings": [
+        {
+            "confidence": "Medium",
+            "contract": "Market",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/QuillAudits-Bond Appetit-Bond Appetit/bondappetit-protocol-355180f0aca0b29d60d808f761052956b7a3a159/contracts/Market.sol",
+            "function": "changeCumulativeToken",
+            "impact": "High",
+            "line": 1343,
+            "line_end": 1347,
+            "message": "Reentrancy in Market.changeCumulativeToken(address,address) (Market.sol#1343-1347):\n\tExternal calls:\n\t- withdraw(recipient) (Market.sol#1344)\n\t\t- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (Market.sol#856)\n\t\t- cumulative.safeTransfer(recipient,balance) (Market.sol#1539)\n\t\t- (success,returndata) = target.call{value: value}(data) (Market.sol#724)\n\tExternal calls sending eth:\n\t- withdraw(recipient) (Market.sol#1344)\n\t\t- (success,returndata) = target.call{value: value}(data) (Market.sol#724)\n\tState variables written after the call(s):\n\t- cumulative = ERC20(newToken) (Market.sol#1345)\n\tMarket.cumulative (Market.sol#1261) can be used in cross function reentrancies:\n\t- Market._path(address) (Market.sol#1445-1459)\n\t- Market.buy(address,uint256) (Market.sol#1479-1501)\n\t- Market.buyFromETH() (Market.sol#1507-1529)\n\t- Market.changeCumulativeToken(address,address) (Market.sol#1343-1347)\n\t- Market.constructor(address,address,address,address,address) (Market.sol#1306-1318)\n\t- Market.cumulative (Market.sol#1261)\n\t- Market.price(address,uint256) (Market.sol#1421-1439)\n\t- Market.withdraw(address) (Market.sol#1535-1542)\n",
+            "name": "reentrancy-eth",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "Market",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/QuillAudits-Bond Appetit-Bond Appetit/bondappetit-protocol-355180f0aca0b29d60d808f761052956b7a3a159/contracts/Market.sol",
+            "function": "buy",
+            "impact": "Medium",
+            "line": 1479,
+            "line_end": 1501,
+            "message": "Market.buy(address,uint256) (Market.sol#1479-1501) ignores return value by uniswapRouter.swapExactTokensForTokens(payment,amountOut,_path(currency),address(this),block.timestamp) (Market.sol#1491)\n",
+            "name": "unused-return",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "Market",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/QuillAudits-Bond Appetit-Bond Appetit/bondappetit-protocol-355180f0aca0b29d60d808f761052956b7a3a159/contracts/Market.sol",
+            "function": "buyFromETH",
+            "impact": "Medium",
+            "line": 1507,
+            "line_end": 1529,
+            "message": "Market.buyFromETH() (Market.sol#1507-1529) ignores return value by uniswapRouter.swapExactETHForTokens{value: payment}(amountOut,_path(currency),address(this),block.timestamp) (Market.sol#1519)\n",
+            "name": "unused-return",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "Market",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/QuillAudits-Bond Appetit-Bond Appetit/bondappetit-protocol-355180f0aca0b29d60d808f761052956b7a3a159/contracts/Market.sol",
+            "function": "buy",
+            "impact": "Low",
+            "line": 1479,
+            "line_end": 1501,
+            "message": "Reentrancy in Market.buy(address,uint256) (Market.sol#1479-1501):\n\tExternal calls:\n\t- ERC20(currency).safeTransferFrom(_msgSender(),address(this),payment) (Market.sol#1484)\n\t- ERC20(currency).safeApprove(address(uniswapRouter),payment) (Market.sol#1490)\n\t- uniswapRouter.swapExactTokensForTokens(payment,amountOut,_path(currency),address(this),block.timestamp) (Market.sol#1491)\n\t- productToken.safeTransfer(_msgSender(),product) (Market.sol#1494)\n\t- rewardToken.safeTransfer(_msgSender(),reward) (Market.sol#1496)\n\tEvent emitted after the call(s):\n\t- Buy(_msgSender(),currency,payment,product,reward) (Market.sol#1498)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "Market",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/QuillAudits-Bond Appetit-Bond Appetit/bondappetit-protocol-355180f0aca0b29d60d808f761052956b7a3a159/contracts/Market.sol",
+            "function": "buyFromETH",
+            "impact": "Low",
+            "line": 1507,
+            "line_end": 1529,
+            "message": "Reentrancy in Market.buyFromETH() (Market.sol#1507-1529):\n\tExternal calls:\n\t- uniswapRouter.swapExactETHForTokens{value: payment}(amountOut,_path(currency),address(this),block.timestamp) (Market.sol#1519)\n\t- productToken.safeTransfer(_msgSender(),product) (Market.sol#1522)\n\t- rewardToken.safeTransfer(_msgSender(),reward) (Market.sol#1524)\n\tExternal calls sending eth:\n\t- uniswapRouter.swapExactETHForTokens{value: payment}(amountOut,_path(currency),address(this),block.timestamp) (Market.sol#1519)\n\tEvent emitted after the call(s):\n\t- Buy(_msgSender(),currency,payment,product,reward) (Market.sol#1526)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "Market",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/QuillAudits-Bond Appetit-Bond Appetit/bondappetit-protocol-355180f0aca0b29d60d808f761052956b7a3a159/contracts/Market.sol",
+            "function": "changeCumulativeToken",
+            "impact": "Low",
+            "line": 1343,
+            "line_end": 1347,
+            "message": "Reentrancy in Market.changeCumulativeToken(address,address) (Market.sol#1343-1347):\n\tExternal calls:\n\t- withdraw(recipient) (Market.sol#1344)\n\t\t- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (Market.sol#856)\n\t\t- cumulative.safeTransfer(recipient,balance) (Market.sol#1539)\n\t\t- (success,returndata) = target.call{value: value}(data) (Market.sol#724)\n\tExternal calls sending eth:\n\t- withdraw(recipient) (Market.sol#1344)\n\t\t- (success,returndata) = target.call{value: value}(data) (Market.sol#724)\n\tEvent emitted after the call(s):\n\t- CumulativeChanged(newToken) (Market.sol#1346)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "Market",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/QuillAudits-Bond Appetit-Bond Appetit/bondappetit-protocol-355180f0aca0b29d60d808f761052956b7a3a159/contracts/Market.sol",
+            "function": "withdraw",
+            "impact": "Low",
+            "line": 1535,
+            "line_end": 1542,
+            "message": "Reentrancy in Market.withdraw(address) (Market.sol#1535-1542):\n\tExternal calls:\n\t- cumulative.safeTransfer(recipient,balance) (Market.sol#1539)\n\tEvent emitted after the call(s):\n\t- Withdrawal(recipient,address(cumulative),balance) (Market.sol#1541)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        }
+    ],
+    "infos": [],
+    "parser": {
+        "id": "slither-0.10.0",
+        "mode": "solidity",
+        "version": "2024/04/30"
+    }
+}

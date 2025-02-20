@@ -1,0 +1,205 @@
+'solc --version' running
+'solc /sb/DoxyFinance_V3.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/DoxyFinance_V3.sol:
+Warning: Contract code size is 31100 bytes and exceeds 24576 bytes (a limit introduced in Spurious Dragon). This contract may not be deployable on Mainnet. Consider enabling the optimizer (with a low "runs" value!), turning off revert strings, or using libraries.
+   --> /sb/DoxyFinance_V3.sol:774:1:
+    |
+774 | contract DoxyFinance_V3 is ERC20, Ownable {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+DoxyFinance_V3.rescueBEPTokenFromContract() (../../sb/DoxyFinance_V3.sol#1103-1107) ignores return value by ERC20Token.transfer(_owner,address(this).balance) (../../sb/DoxyFinance_V3.sol#1106)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+Reentrancy in DoxyFinance_V3.setRouterAddress(address) (../../sb/DoxyFinance_V3.sol#1038-1056):
+	External calls:
+	- pancakePair = IFactory(_newRouter.factory()).createPair(address(this),_newRouter.WETH()) (../../sb/DoxyFinance_V3.sol#1048-1051)
+	State variables written after the call(s):
+	- pancakeRouter = _newRouter (../../sb/DoxyFinance_V3.sol#1055)
+	ERC20.pancakeRouter (../../sb/DoxyFinance_V3.sol#281) can be used in cross function reentrancies:
+	- DoxyFinance_V3.constructor() (../../sb/DoxyFinance_V3.sol#780-823)
+	- ERC20.pancakeRouter (../../sb/DoxyFinance_V3.sol#281)
+	- DoxyFinance_V3.setRouterAddress(address) (../../sb/DoxyFinance_V3.sol#1038-1056)
+	- ERC20.swapTokensForBNB(uint256) (../../sb/DoxyFinance_V3.sol#622-644)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+DoxyFinance_V3.rescueBNBFromContract()._owner (../../sb/DoxyFinance_V3.sol#856) shadows:
+	- Ownable._owner (../../sb/DoxyFinance_V3.sol#735) (state variable)
+DoxyFinance_V3.airdrop(address[],uint256[])._balances (../../sb/DoxyFinance_V3.sol#1084) shadows:
+	- ERC20._balances (../../sb/DoxyFinance_V3.sol#238) (state variable)
+DoxyFinance_V3.preSale(address[],uint256[])._balances (../../sb/DoxyFinance_V3.sol#1094) shadows:
+	- ERC20._balances (../../sb/DoxyFinance_V3.sol#238) (state variable)
+DoxyFinance_V3.rescueBEPTokenFromContract()._owner (../../sb/DoxyFinance_V3.sol#1105) shadows:
+	- Ownable._owner (../../sb/DoxyFinance_V3.sol#735) (state variable)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+DoxyFinance_V3.rescueBNBFromContract()._owner (../../sb/DoxyFinance_V3.sol#856) lacks a zero-check on :
+		- _owner.transfer(address(this).balance) (../../sb/DoxyFinance_V3.sol#857)
+DoxyFinance_V3.setBurnWallet(address)._address (../../sb/DoxyFinance_V3.sol#886) lacks a zero-check on :
+		- burnWallet = _address (../../sb/DoxyFinance_V3.sol#891)
+DoxyFinance_V3.setMarketingWallet(address)._address (../../sb/DoxyFinance_V3.sol#903) lacks a zero-check on :
+		- marketingWallet = _address (../../sb/DoxyFinance_V3.sol#908)
+DoxyFinance_V3.setLiquidityWallet(address)._address (../../sb/DoxyFinance_V3.sol#913) lacks a zero-check on :
+		- liquidityWallet = _address (../../sb/DoxyFinance_V3.sol#918)
+DoxyFinance_V3.setAirdropWallet(address)._address (../../sb/DoxyFinance_V3.sol#923) lacks a zero-check on :
+		- communityAirdropWallet = _address (../../sb/DoxyFinance_V3.sol#928)
+DoxyFinance_V3.setPrivateSaleWallet(address)._address (../../sb/DoxyFinance_V3.sol#933) lacks a zero-check on :
+		- privateSaleWallet = _address (../../sb/DoxyFinance_V3.sol#938)
+DoxyFinance_V3.setStrategicSalesWallet(address)._address (../../sb/DoxyFinance_V3.sol#943) lacks a zero-check on :
+		- strategicSalesWallet = _address (../../sb/DoxyFinance_V3.sol#948)
+DoxyFinance_V3.setGameOperationsWallet(address)._address (../../sb/DoxyFinance_V3.sol#953) lacks a zero-check on :
+		- gameOperationsWallet = _address (../../sb/DoxyFinance_V3.sol#958)
+DoxyFinance_V3.setTeamWallet(address)._address (../../sb/DoxyFinance_V3.sol#963) lacks a zero-check on :
+		- teamWallet = _address (../../sb/DoxyFinance_V3.sol#968)
+DoxyFinance_V3.setStakeAddress(address)._address (../../sb/DoxyFinance_V3.sol#1007) lacks a zero-check on :
+		- stakeAddress = _address (../../sb/DoxyFinance_V3.sol#1008)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+ERC20._transfer(address,address,uint256) (../../sb/DoxyFinance_V3.sol#463-574) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp > timeLimit + 24 * 3600,maxSellPerDay Limit Exceeded) (../../sb/DoxyFinance_V3.sol#484-487)
+	- block.timestamp < _firstSell[sender] + 24 * 3600 (../../sb/DoxyFinance_V3.sol#491)
+	- block.timestamp < timeLimit + 24 * 3600 (../../sb/DoxyFinance_V3.sol#498)
+	- block.timestamp > timeLimit + 24 * 3600 (../../sb/DoxyFinance_V3.sol#500)
+	- block.timestamp < timeLimit + 24 * 3600 (../../sb/DoxyFinance_V3.sol#512)
+	- block.timestamp > timeLimit + 24 * 3600 (../../sb/DoxyFinance_V3.sol#514)
+	- block.timestamp < _firstBuy[recipient] + 24 * 3600 (../../sb/DoxyFinance_V3.sol#522)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+ERC20._transfer(address,address,uint256) (../../sb/DoxyFinance_V3.sol#463-574) compares to a boolean constant:
+	-require(bool,string)(LockList[_msgSender()] == false,ERC20: Caller Locked !) (../../sb/DoxyFinance_V3.sol#538)
+ERC20._transfer(address,address,uint256) (../../sb/DoxyFinance_V3.sol#463-574) compares to a boolean constant:
+	-require(bool,string)(LockList[recipient] == false,ERC20: Receipient Locked !) (../../sb/DoxyFinance_V3.sol#540)
+ERC20._transfer(address,address,uint256) (../../sb/DoxyFinance_V3.sol#463-574) compares to a boolean constant:
+	-require(bool,string)(LockList[sender] == false,ERC20: Sender Locked !) (../../sb/DoxyFinance_V3.sol#539)
+ERC20.burn(uint256) (../../sb/DoxyFinance_V3.sol#680-696) compares to a boolean constant:
+	-require(bool,string)(LockList[msg.sender] == false,ERC20: User Locked !) (../../sb/DoxyFinance_V3.sol#681)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#boolean-equality
+
+ERC20._transfer(address,address,uint256) (../../sb/DoxyFinance_V3.sol#463-574) has costly operations inside a loop:
+	- timeLimit = block.timestamp (../../sb/DoxyFinance_V3.sol#488)
+ERC20._transfer(address,address,uint256) (../../sb/DoxyFinance_V3.sol#463-574) has costly operations inside a loop:
+	- maxSellPerDayLimit = 1000000000 (../../sb/DoxyFinance_V3.sol#489)
+ERC20._transfer(address,address,uint256) (../../sb/DoxyFinance_V3.sol#463-574) has costly operations inside a loop:
+	- maxSellPerDayLimit += amount (../../sb/DoxyFinance_V3.sol#499)
+ERC20._transfeTokens(address,address,uint256,bool,bool) (../../sb/DoxyFinance_V3.sol#576-604) has costly operations inside a loop:
+	- appliedFees = buyFees (../../sb/DoxyFinance_V3.sol#590)
+ERC20._transfer(address,address,uint256) (../../sb/DoxyFinance_V3.sol#463-574) has costly operations inside a loop:
+	- maxSellPerDayLimit = 1000000000 (../../sb/DoxyFinance_V3.sol#501)
+ERC20._transfer(address,address,uint256) (../../sb/DoxyFinance_V3.sol#463-574) has costly operations inside a loop:
+	- timeLimit = block.timestamp (../../sb/DoxyFinance_V3.sol#502)
+ERC20._transfer(address,address,uint256) (../../sb/DoxyFinance_V3.sol#463-574) has costly operations inside a loop:
+	- maxSellPerDayLimit += amount (../../sb/DoxyFinance_V3.sol#513)
+ERC20._transfer(address,address,uint256) (../../sb/DoxyFinance_V3.sol#463-574) has costly operations inside a loop:
+	- maxSellPerDayLimit = 1000000000 (../../sb/DoxyFinance_V3.sol#515)
+ERC20._transfer(address,address,uint256) (../../sb/DoxyFinance_V3.sol#463-574) has costly operations inside a loop:
+	- timeLimit = block.timestamp (../../sb/DoxyFinance_V3.sol#516)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#costly-operations-inside-a-loop
+
+ERC20._transfer(address,address,uint256) (../../sb/DoxyFinance_V3.sol#463-574) has a high cyclomatic complexity (15).
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cyclomatic-complexity
+
+Context._msgData() (../../sb/DoxyFinance_V3.sol#227-229) is never used and should be removed
+SafeMath.add(uint256,uint256) (../../sb/DoxyFinance_V3.sol#83-85) is never used and should be removed
+SafeMath.div(uint256,uint256) (../../sb/DoxyFinance_V3.sol#95-97) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/DoxyFinance_V3.sol#114-123) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/DoxyFinance_V3.sol#99-101) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/DoxyFinance_V3.sol#125-134) is never used and should be removed
+SafeMath.mul(uint256,uint256) (../../sb/DoxyFinance_V3.sol#91-93) is never used and should be removed
+SafeMath.sub(uint256,uint256) (../../sb/DoxyFinance_V3.sol#87-89) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/DoxyFinance_V3.sol#22-32) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/DoxyFinance_V3.sol#61-70) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/DoxyFinance_V3.sol#72-81) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/DoxyFinance_V3.sol#45-59) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/DoxyFinance_V3.sol#34-43) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+ERC20.appliedFees (../../sb/DoxyFinance_V3.sol#329) is set pre-construction with a non-constant function or state variable:
+	- buyFees
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#function-initializing-state
+
+Pragma version^0.8.0 (../../sb/DoxyFinance_V3.sol#1) allows old versions
+solc-0.8.27 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/DoxyFinance_V3.sol#7-18):
+	- (success) = recipient.call{value: amount}() (../../sb/DoxyFinance_V3.sol#13)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Function IRouter.WETH() (../../sb/DoxyFinance_V3.sol#182) is not in mixedCase
+Struct ERC20.feeRatesStruct (../../sb/DoxyFinance_V3.sol#304-312) is not in CapWords
+Struct ERC20.antiwhale (../../sb/DoxyFinance_V3.sol#313-316) is not in CapWords
+Struct ERC20.valuesFromGetValues (../../sb/DoxyFinance_V3.sol#331-335) is not in CapWords
+Parameter ERC20.burn(uint256)._value (../../sb/DoxyFinance_V3.sol#680) is not in mixedCase
+Variable ERC20.LockList (../../sb/DoxyFinance_V3.sol#240) is not in mixedCase
+Variable ERC20.LockedTokens (../../sb/DoxyFinance_V3.sol#241) is not in mixedCase
+Variable ERC20.USDT (../../sb/DoxyFinance_V3.sol#285) is not in mixedCase
+Contract DoxyFinance_V3 (../../sb/DoxyFinance_V3.sol#774-1108) is not in CapWords
+Parameter DoxyFinance_V3.staking(uint256)._amount (../../sb/DoxyFinance_V3.sol#870) is not in mixedCase
+Parameter DoxyFinance_V3.setmaxTxAmount(uint256)._maxTxAmount (../../sb/DoxyFinance_V3.sol#882) is not in mixedCase
+Parameter DoxyFinance_V3.setBurnWallet(address)._address (../../sb/DoxyFinance_V3.sol#886) is not in mixedCase
+Parameter DoxyFinance_V3.whitelistWallet(address)._address (../../sb/DoxyFinance_V3.sol#898) is not in mixedCase
+Parameter DoxyFinance_V3.setMarketingWallet(address)._address (../../sb/DoxyFinance_V3.sol#903) is not in mixedCase
+Parameter DoxyFinance_V3.setLiquidityWallet(address)._address (../../sb/DoxyFinance_V3.sol#913) is not in mixedCase
+Parameter DoxyFinance_V3.setAirdropWallet(address)._address (../../sb/DoxyFinance_V3.sol#923) is not in mixedCase
+Parameter DoxyFinance_V3.setPrivateSaleWallet(address)._address (../../sb/DoxyFinance_V3.sol#933) is not in mixedCase
+Parameter DoxyFinance_V3.setStrategicSalesWallet(address)._address (../../sb/DoxyFinance_V3.sol#943) is not in mixedCase
+Parameter DoxyFinance_V3.setGameOperationsWallet(address)._address (../../sb/DoxyFinance_V3.sol#953) is not in mixedCase
+Parameter DoxyFinance_V3.setTeamWallet(address)._address (../../sb/DoxyFinance_V3.sol#963) is not in mixedCase
+Parameter DoxyFinance_V3.setBurnDifference(uint256)._burnDifference (../../sb/DoxyFinance_V3.sol#973) is not in mixedCase
+Parameter DoxyFinance_V3.setMaxBurnAmount(uint256)._maxBurnAmount (../../sb/DoxyFinance_V3.sol#977) is not in mixedCase
+Function DoxyFinance_V3.UserLock(address,bool) (../../sb/DoxyFinance_V3.sol#981-983) is not in mixedCase
+Parameter DoxyFinance_V3.UserLock(address,bool).Account (../../sb/DoxyFinance_V3.sol#981) is not in mixedCase
+Function DoxyFinance_V3.LockTokens(address,uint256) (../../sb/DoxyFinance_V3.sol#985-987) is not in mixedCase
+Parameter DoxyFinance_V3.LockTokens(address,uint256).Account (../../sb/DoxyFinance_V3.sol#985) is not in mixedCase
+Function DoxyFinance_V3.UnLockTokens(address) (../../sb/DoxyFinance_V3.sol#989-991) is not in mixedCase
+Parameter DoxyFinance_V3.UnLockTokens(address).Account (../../sb/DoxyFinance_V3.sol#989) is not in mixedCase
+Parameter DoxyFinance_V3.setStakeAddress(address)._address (../../sb/DoxyFinance_V3.sol#1007) is not in mixedCase
+Parameter DoxyFinance_V3.setTotalBuyFees(uint256)._totFees (../../sb/DoxyFinance_V3.sol#1058) is not in mixedCase
+Parameter DoxyFinance_V3.airdrop(address[],uint256[])._contributors (../../sb/DoxyFinance_V3.sol#1083) is not in mixedCase
+Parameter DoxyFinance_V3.airdrop(address[],uint256[])._balances (../../sb/DoxyFinance_V3.sol#1084) is not in mixedCase
+Parameter DoxyFinance_V3.preSale(address[],uint256[])._contributors (../../sb/DoxyFinance_V3.sol#1093) is not in mixedCase
+Parameter DoxyFinance_V3.preSale(address[],uint256[])._balances (../../sb/DoxyFinance_V3.sol#1094) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "i (../../sb/DoxyFinance_V3.sol#1087)" inDoxyFinance_V3 (../../sb/DoxyFinance_V3.sol#774-1108)
+Redundant expression "i (../../sb/DoxyFinance_V3.sol#1097)" inDoxyFinance_V3 (../../sb/DoxyFinance_V3.sol#774-1108)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+ERC20.constructor(string,string) (../../sb/DoxyFinance_V3.sol#339-344) uses literals with too many digits:
+	- maxSellPerDayLimit = 1000000000 (../../sb/DoxyFinance_V3.sol#340)
+ERC20._transfer(address,address,uint256) (../../sb/DoxyFinance_V3.sol#463-574) uses literals with too many digits:
+	- maxSellPerDayLimit = 1000000000 (../../sb/DoxyFinance_V3.sol#489)
+ERC20._transfer(address,address,uint256) (../../sb/DoxyFinance_V3.sol#463-574) uses literals with too many digits:
+	- maxSellPerDayLimit = 1000000000 (../../sb/DoxyFinance_V3.sol#501)
+ERC20._transfer(address,address,uint256) (../../sb/DoxyFinance_V3.sol#463-574) uses literals with too many digits:
+	- maxSellPerDayLimit = 1000000000 (../../sb/DoxyFinance_V3.sol#515)
+ERC20._getValues(uint256,bool) (../../sb/DoxyFinance_V3.sol#646-666) uses literals with too many digits:
+	- to_return.tFee = (_amount * appliedFees.totFees * appliedFees.taxFee) / 1000000 (../../sb/DoxyFinance_V3.sol#657-659)
+ERC20._getValues(uint256,bool) (../../sb/DoxyFinance_V3.sol#646-666) uses literals with too many digits:
+	- to_return.tSwap = (_amount * appliedFees.totFees * appliedFees.swapFee) / 1000000 (../../sb/DoxyFinance_V3.sol#660-662)
+DoxyFinance_V3.constructor() (../../sb/DoxyFinance_V3.sol#780-823) uses literals with too many digits:
+	- _mint(liquidityWallet,6362400000000000) (../../sb/DoxyFinance_V3.sol#781)
+DoxyFinance_V3.constructor() (../../sb/DoxyFinance_V3.sol#780-823) uses literals with too many digits:
+	- _mint(marketingWallet,2168100000000000) (../../sb/DoxyFinance_V3.sol#782)
+DoxyFinance_V3.constructor() (../../sb/DoxyFinance_V3.sol#780-823) uses literals with too many digits:
+	- _mint(strategicSalesWallet,592900000000000) (../../sb/DoxyFinance_V3.sol#783)
+DoxyFinance_V3.constructor() (../../sb/DoxyFinance_V3.sol#780-823) uses literals with too many digits:
+	- _mint(gameOperationsWallet,1238600000000000) (../../sb/DoxyFinance_V3.sol#784)
+DoxyFinance_V3.constructor() (../../sb/DoxyFinance_V3.sol#780-823) uses literals with too many digits:
+	- _mint(teamWallet,484000000000000) (../../sb/DoxyFinance_V3.sol#785)
+DoxyFinance_V3.constructor() (../../sb/DoxyFinance_V3.sol#780-823) uses literals with too many digits:
+	- _mint(communityAirdropWallet,154000000000000) (../../sb/DoxyFinance_V3.sol#786)
+DoxyFinance_V3.constructor() (../../sb/DoxyFinance_V3.sol#780-823) uses literals with too many digits:
+	- maxTxAmount = 110000000000000 (../../sb/DoxyFinance_V3.sol#822)
+DoxyFinance_V3.slitherConstructorVariables() (../../sb/DoxyFinance_V3.sol#774-1108) uses literals with too many digits:
+	- burnDifference = 11000000000000000 (../../sb/DoxyFinance_V3.sol#262)
+DoxyFinance_V3.slitherConstructorVariables() (../../sb/DoxyFinance_V3.sol#774-1108) uses literals with too many digits:
+	- maxBurnAmount = 502700000000000 (../../sb/DoxyFinance_V3.sol#263)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+ERC20.USDT (../../sb/DoxyFinance_V3.sol#285) should be constant 
+ERC20.pancakeSwapRouter (../../sb/DoxyFinance_V3.sol#283-284) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+/sb/DoxyFinance_V3.sol analyzed (10 contracts with 93 detectors), 101 result(s) found

@@ -1,0 +1,75 @@
+'solc --version' running
+'solc /sb/DProxy.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/sb' running
+
+TransparentUpgradeableProxy.admin() (../../sb/DProxy.sol#657-659) calls TransparentUpgradeableProxy.ifAdmin() (../../sb/DProxy.sol#640-646) which halt the execution return(uint256,uint256)(0,returndatasize()()) (../../sb/DProxy.sol#45)
+TransparentUpgradeableProxy.implementation() (../../sb/DProxy.sol#670-672) calls TransparentUpgradeableProxy.ifAdmin() (../../sb/DProxy.sol#640-646) which halt the execution return(uint256,uint256)(0,returndatasize()()) (../../sb/DProxy.sol#45)
+TransparentUpgradeableProxy.changeAdmin(address) (../../sb/DProxy.sol#681-683) calls TransparentUpgradeableProxy.ifAdmin() (../../sb/DProxy.sol#640-646) which halt the execution return(uint256,uint256)(0,returndatasize()()) (../../sb/DProxy.sol#45)
+TransparentUpgradeableProxy.upgradeTo(address) (../../sb/DProxy.sol#690-692) calls TransparentUpgradeableProxy.ifAdmin() (../../sb/DProxy.sol#640-646) which halt the execution return(uint256,uint256)(0,returndatasize()()) (../../sb/DProxy.sol#45)
+TransparentUpgradeableProxy.upgradeToAndCall(address,bytes) (../../sb/DProxy.sol#701-703) calls TransparentUpgradeableProxy.ifAdmin() (../../sb/DProxy.sol#640-646) which halt the execution return(uint256,uint256)(0,returndatasize()()) (../../sb/DProxy.sol#45)
+TransparentUpgradeableProxy.ifAdmin() (../../sb/DProxy.sol#640-646) calls Proxy._fallback() (../../sb/DProxy.sol#61-64) which halt the execution return(uint256,uint256)(0,returndatasize()()) (../../sb/DProxy.sol#45)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-assembly-return
+
+ERC1967Upgrade._upgradeToAndCall(address,bytes,bool) (../../sb/DProxy.sol#444-453) ignores return value by Address.functionDelegateCall(newImplementation,data) (../../sb/DProxy.sol#451)
+ERC1967Upgrade._upgradeToAndCallSecure(address,bytes,bool) (../../sb/DProxy.sol#460-488) ignores return value by Address.functionDelegateCall(newImplementation,data) (../../sb/DProxy.sol#470)
+ERC1967Upgrade._upgradeToAndCallSecure(address,bytes,bool) (../../sb/DProxy.sol#460-488) ignores return value by Address.functionDelegateCall(newImplementation,abi.encodeWithSignature(upgradeTo(address),oldImplementation)) (../../sb/DProxy.sol#478-481)
+ERC1967Upgrade._upgradeBeaconToAndCall(address,bytes,bool) (../../sb/DProxy.sol#563-573) ignores return value by Address.functionDelegateCall(IBeacon(newBeacon).implementation(),data) (../../sb/DProxy.sol#571)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+Modifier TransparentUpgradeableProxy.ifAdmin() (../../sb/DProxy.sol#640-646) does not always execute _; or revertReference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-modifier
+
+Reentrancy in ERC1967Upgrade._upgradeToAndCallSecure(address,bytes,bool) (../../sb/DProxy.sol#460-488):
+	External calls:
+	- Address.functionDelegateCall(newImplementation,data) (../../sb/DProxy.sol#470)
+	- Address.functionDelegateCall(newImplementation,abi.encodeWithSignature(upgradeTo(address),oldImplementation)) (../../sb/DProxy.sol#478-481)
+	Event emitted after the call(s):
+	- Upgraded(newImplementation) (../../sb/DProxy.sol#436)
+		- _upgradeTo(newImplementation) (../../sb/DProxy.sol#486)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Proxy._delegate(address) (../../sb/DProxy.sol#25-48) uses assembly
+	- INLINE ASM (../../sb/DProxy.sol#26-47)
+Address.isContract(address) (../../sb/DProxy.sol#124-134) uses assembly
+	- INLINE ASM (../../sb/DProxy.sol#130-132)
+Address._verifyCallResult(bool,bytes,string) (../../sb/DProxy.sol#287-307) uses assembly
+	- INLINE ASM (../../sb/DProxy.sol#299-302)
+StorageSlot.getAddressSlot(bytes32) (../../sb/DProxy.sol#356-360) uses assembly
+	- INLINE ASM (../../sb/DProxy.sol#357-359)
+StorageSlot.getBooleanSlot(bytes32) (../../sb/DProxy.sol#365-369) uses assembly
+	- INLINE ASM (../../sb/DProxy.sol#366-368)
+StorageSlot.getBytes32Slot(bytes32) (../../sb/DProxy.sol#374-378) uses assembly
+	- INLINE ASM (../../sb/DProxy.sol#375-377)
+StorageSlot.getUint256Slot(bytes32) (../../sb/DProxy.sol#383-387) uses assembly
+	- INLINE ASM (../../sb/DProxy.sol#384-386)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.functionCall(address,bytes) (../../sb/DProxy.sol#177-179) is never used and should be removed
+Address.functionCall(address,bytes,string) (../../sb/DProxy.sol#187-193) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/DProxy.sol#206-212) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/DProxy.sol#220-231) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/DProxy.sol#239-241) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/DProxy.sol#249-258) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/DProxy.sol#152-157) is never used and should be removed
+ERC1967Upgrade._getBeacon() (../../sb/DProxy.sol#541-543) is never used and should be removed
+ERC1967Upgrade._setBeacon(address) (../../sb/DProxy.sol#548-555) is never used and should be removed
+ERC1967Upgrade._upgradeBeaconToAndCall(address,bytes,bool) (../../sb/DProxy.sol#563-573) is never used and should be removed
+ERC1967Upgrade._upgradeToAndCallSecure(address,bytes,bool) (../../sb/DProxy.sol#460-488) is never used and should be removed
+StorageSlot.getBooleanSlot(bytes32) (../../sb/DProxy.sol#365-369) is never used and should be removed
+StorageSlot.getBytes32Slot(bytes32) (../../sb/DProxy.sol#374-378) is never used and should be removed
+StorageSlot.getUint256Slot(bytes32) (../../sb/DProxy.sol#383-387) is never used and should be removed
+TransparentUpgradeableProxy._admin() (../../sb/DProxy.sol#708-710) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.8.6 (../../sb/DProxy.sol#1) allows old versions
+solc-0.8.27 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/DProxy.sol#152-157):
+	- (success) = recipient.call{value: amount}() (../../sb/DProxy.sol#155)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/DProxy.sol#220-231):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/DProxy.sol#229)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/DProxy.sol#249-258):
+	- (success,returndata) = target.staticcall(data) (../../sb/DProxy.sol#256)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/DProxy.sol#276-285):
+	- (success,returndata) = target.delegatecall(data) (../../sb/DProxy.sol#283)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+/sb/DProxy.sol analyzed (8 contracts with 93 detectors), 40 result(s) found

@@ -1,0 +1,325 @@
+'solc --version' running
+'solc /sb/DynamicLiquidTokenConverter.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+LiquidTokenConverter.sell(uint256,address,address) (../../sb/DynamicLiquidTokenConverter.sol#1389-1422) sends eth to arbitrary user
+	Dangerous calls:
+	- _beneficiary.transfer(amount) (../../sb/DynamicLiquidTokenConverter.sol#1414)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#functions-that-send-ether-to-arbitrary-destinations
+
+Reentrancy in DynamicLiquidTokenConverter.reduceWeight(IERC20Token) (../../sb/DynamicLiquidTokenConverter.sol#1545-1577):
+	External calls:
+	- safeTransfer(_reserveToken,msg.sender,balance) (../../sb/DynamicLiquidTokenConverter.sol#1572)
+		- (success,data) = address(_token).call(abi.encodeWithSelector(TRANSFER_FUNC_SELECTOR,_to,_value)) (../../sb/DynamicLiquidTokenConverter.sol#463)
+	External calls sending eth:
+	- msg.sender.transfer(balance) (../../sb/DynamicLiquidTokenConverter.sol#1570)
+	State variables written after the call(s):
+	- syncReserveBalance(_reserveToken) (../../sb/DynamicLiquidTokenConverter.sol#1574)
+		- reserves[_reserveToken].balance = address(this).balance (../../sb/DynamicLiquidTokenConverter.sol#1048)
+		- reserves[_reserveToken].balance = _reserveToken.balanceOf(address(this)) (../../sb/DynamicLiquidTokenConverter.sol#1050)
+	ConverterBase.reserves (../../sb/DynamicLiquidTokenConverter.sol#588) can be used in cross function reentrancies:
+	- ConverterBase._validReserve(IERC20Token) (../../sb/DynamicLiquidTokenConverter.sol#698-700)
+	- ConverterBase.addReserve(IERC20Token,uint32) (../../sb/DynamicLiquidTokenConverter.sol#910-931)
+	- ConverterBase.connectors(IERC20Token) (../../sb/DynamicLiquidTokenConverter.sol#1112-1115)
+	- LiquidTokenConverter.doConvert(IERC20Token,IERC20Token,uint256,address,address) (../../sb/DynamicLiquidTokenConverter.sol#1248-1275)
+	- DynamicLiquidTokenConverter.getMarketCap(IERC20Token) (../../sb/DynamicLiquidTokenConverter.sol#1579-1586)
+	- ConverterBase.hasETHReserve() (../../sb/DynamicLiquidTokenConverter.sol#973-975)
+	- LiquidTokenConverter.purchaseTargetAmount(uint256) (../../sb/DynamicLiquidTokenConverter.sol#1285-1308)
+	- ConverterBase.receive() (../../sb/DynamicLiquidTokenConverter.sol#739-743)
+	- DynamicLiquidTokenConverter.reduceWeight(IERC20Token) (../../sb/DynamicLiquidTokenConverter.sol#1545-1577)
+	- ConverterBase.reserveBalance(IERC20Token) (../../sb/DynamicLiquidTokenConverter.sol#958-966)
+	- ConverterBase.reserveWeight(IERC20Token) (../../sb/DynamicLiquidTokenConverter.sol#941-948)
+	- ConverterBase.reserves (../../sb/DynamicLiquidTokenConverter.sol#588)
+	- LiquidTokenConverter.saleTargetAmount(uint256) (../../sb/DynamicLiquidTokenConverter.sol#1318-1342)
+	- LiquidTokenConverter.sell(uint256,address,address) (../../sb/DynamicLiquidTokenConverter.sol#1389-1422)
+	- ConverterBase.syncReserveBalance(IERC20Token) (../../sb/DynamicLiquidTokenConverter.sol#1046-1051)
+	- LiquidTokenConverter.targetAmountAndFee(IERC20Token,IERC20Token,uint256) (../../sb/DynamicLiquidTokenConverter.sol#1226-1234)
+	- ConverterBase.withdrawTokens(IERC20Token,address,uint256) (../../sb/DynamicLiquidTokenConverter.sol#858-875)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities
+
+Reentrancy in LiquidTokenConverter.sell(uint256,address,address) (../../sb/DynamicLiquidTokenConverter.sol#1389-1422):
+	External calls:
+	- IDSToken(address(anchor)).destroy(address(this),_amount) (../../sb/DynamicLiquidTokenConverter.sol#1407)
+	State variables written after the call(s):
+	- reserves[reserveToken].balance = reserves[reserveToken].balance.sub(amount) (../../sb/DynamicLiquidTokenConverter.sol#1410)
+	ConverterBase.reserves (../../sb/DynamicLiquidTokenConverter.sol#588) can be used in cross function reentrancies:
+	- ConverterBase._validReserve(IERC20Token) (../../sb/DynamicLiquidTokenConverter.sol#698-700)
+	- ConverterBase.addReserve(IERC20Token,uint32) (../../sb/DynamicLiquidTokenConverter.sol#910-931)
+	- ConverterBase.connectors(IERC20Token) (../../sb/DynamicLiquidTokenConverter.sol#1112-1115)
+	- LiquidTokenConverter.doConvert(IERC20Token,IERC20Token,uint256,address,address) (../../sb/DynamicLiquidTokenConverter.sol#1248-1275)
+	- ConverterBase.hasETHReserve() (../../sb/DynamicLiquidTokenConverter.sol#973-975)
+	- LiquidTokenConverter.purchaseTargetAmount(uint256) (../../sb/DynamicLiquidTokenConverter.sol#1285-1308)
+	- ConverterBase.receive() (../../sb/DynamicLiquidTokenConverter.sol#739-743)
+	- ConverterBase.reserveBalance(IERC20Token) (../../sb/DynamicLiquidTokenConverter.sol#958-966)
+	- ConverterBase.reserveWeight(IERC20Token) (../../sb/DynamicLiquidTokenConverter.sol#941-948)
+	- ConverterBase.reserves (../../sb/DynamicLiquidTokenConverter.sol#588)
+	- LiquidTokenConverter.saleTargetAmount(uint256) (../../sb/DynamicLiquidTokenConverter.sol#1318-1342)
+	- LiquidTokenConverter.sell(uint256,address,address) (../../sb/DynamicLiquidTokenConverter.sol#1389-1422)
+	- ConverterBase.syncReserveBalance(IERC20Token) (../../sb/DynamicLiquidTokenConverter.sol#1046-1051)
+	- LiquidTokenConverter.targetAmountAndFee(IERC20Token,IERC20Token,uint256) (../../sb/DynamicLiquidTokenConverter.sol#1226-1234)
+	- ConverterBase.withdrawTokens(IERC20Token,address,uint256) (../../sb/DynamicLiquidTokenConverter.sol#858-875)
+Reentrancy in ConverterBase.upgrade() (../../sb/DynamicLiquidTokenConverter.sol#882-891):
+	External calls:
+	- converterUpgrader.upgrade(version) (../../sb/DynamicLiquidTokenConverter.sol#889)
+	State variables written after the call(s):
+	- acceptOwnership() (../../sb/DynamicLiquidTokenConverter.sol#890)
+		- owner = newOwner (../../sb/DynamicLiquidTokenConverter.sol#192)
+	Owned.owner (../../sb/DynamicLiquidTokenConverter.sol#145) can be used in cross function reentrancies:
+	- Owned._ownerOnly() (../../sb/DynamicLiquidTokenConverter.sol#170-172)
+	- Owned.acceptOwnership() (../../sb/DynamicLiquidTokenConverter.sol#189-194)
+	- Owned.owner (../../sb/DynamicLiquidTokenConverter.sol#145)
+	- Owned.transferOwnership(address) (../../sb/DynamicLiquidTokenConverter.sol#181-184)
+	- ContractRegistryClient.updateRegistry() (../../sb/DynamicLiquidTokenConverter.sol#291-309)
+	- ConverterBase.withdrawETH(address) (../../sb/DynamicLiquidTokenConverter.sol#753-769)
+	- ConverterBase.withdrawTokens(IERC20Token,address,uint256) (../../sb/DynamicLiquidTokenConverter.sol#858-875)
+Reentrancy in ConverterBase.withdrawTokens(IERC20Token,address,uint256) (../../sb/DynamicLiquidTokenConverter.sol#858-875):
+	External calls:
+	- super.withdrawTokens(_token,_to,_amount) (../../sb/DynamicLiquidTokenConverter.sol#870)
+		- (success,data) = address(_token).call(abi.encodeWithSelector(TRANSFER_FUNC_SELECTOR,_to,_value)) (../../sb/DynamicLiquidTokenConverter.sol#463)
+	State variables written after the call(s):
+	- syncReserveBalance(_token) (../../sb/DynamicLiquidTokenConverter.sol#874)
+		- reserves[_reserveToken].balance = address(this).balance (../../sb/DynamicLiquidTokenConverter.sol#1048)
+		- reserves[_reserveToken].balance = _reserveToken.balanceOf(address(this)) (../../sb/DynamicLiquidTokenConverter.sol#1050)
+	ConverterBase.reserves (../../sb/DynamicLiquidTokenConverter.sol#588) can be used in cross function reentrancies:
+	- ConverterBase._validReserve(IERC20Token) (../../sb/DynamicLiquidTokenConverter.sol#698-700)
+	- ConverterBase.addReserve(IERC20Token,uint32) (../../sb/DynamicLiquidTokenConverter.sol#910-931)
+	- ConverterBase.connectors(IERC20Token) (../../sb/DynamicLiquidTokenConverter.sol#1112-1115)
+	- ConverterBase.hasETHReserve() (../../sb/DynamicLiquidTokenConverter.sol#973-975)
+	- ConverterBase.receive() (../../sb/DynamicLiquidTokenConverter.sol#739-743)
+	- ConverterBase.reserveBalance(IERC20Token) (../../sb/DynamicLiquidTokenConverter.sol#958-966)
+	- ConverterBase.reserveWeight(IERC20Token) (../../sb/DynamicLiquidTokenConverter.sol#941-948)
+	- ConverterBase.reserves (../../sb/DynamicLiquidTokenConverter.sol#588)
+	- ConverterBase.syncReserveBalance(IERC20Token) (../../sb/DynamicLiquidTokenConverter.sol#1046-1051)
+	- ConverterBase.withdrawTokens(IERC20Token,address,uint256) (../../sb/DynamicLiquidTokenConverter.sol#858-875)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+LiquidTokenConverter.doConvert(IERC20Token,IERC20Token,uint256,address,address).reserveToken (../../sb/DynamicLiquidTokenConverter.sol#1254) is a local variable never initialized
+LiquidTokenConverter.doConvert(IERC20Token,IERC20Token,uint256,address,address).targetAmount (../../sb/DynamicLiquidTokenConverter.sol#1253) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+LiquidTokenConverter.doConvert(IERC20Token,IERC20Token,uint256,address,address).reserveWeight (../../sb/DynamicLiquidTokenConverter.sol#1271) shadows:
+	- ConverterBase.reserveWeight(IERC20Token) (../../sb/DynamicLiquidTokenConverter.sol#941-948) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+ConverterBase.withdrawETH(address)._to (../../sb/DynamicLiquidTokenConverter.sol#753) lacks a zero-check on :
+		- _to.transfer(address(this).balance) (../../sb/DynamicLiquidTokenConverter.sol#765)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in ConverterBase.acceptAnchorOwnership() (../../sb/DynamicLiquidTokenConverter.sol#829-834):
+	External calls:
+	- anchor.acceptOwnership() (../../sb/DynamicLiquidTokenConverter.sol#832)
+	State variables written after the call(s):
+	- syncReserveBalances() (../../sb/DynamicLiquidTokenConverter.sol#833)
+		- reserves[_reserveToken].balance = address(this).balance (../../sb/DynamicLiquidTokenConverter.sol#1048)
+		- reserves[_reserveToken].balance = _reserveToken.balanceOf(address(this)) (../../sb/DynamicLiquidTokenConverter.sol#1050)
+Reentrancy in ConverterBase.upgrade() (../../sb/DynamicLiquidTokenConverter.sol#882-891):
+	External calls:
+	- converterUpgrader.upgrade(version) (../../sb/DynamicLiquidTokenConverter.sol#889)
+	State variables written after the call(s):
+	- acceptOwnership() (../../sb/DynamicLiquidTokenConverter.sol#890)
+		- newOwner = address(0) (../../sb/DynamicLiquidTokenConverter.sol#193)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in LiquidTokenConverter.acceptAnchorOwnership() (../../sb/DynamicLiquidTokenConverter.sol#1195-1199):
+	External calls:
+	- super.acceptAnchorOwnership() (../../sb/DynamicLiquidTokenConverter.sol#1196)
+		- anchor.acceptOwnership() (../../sb/DynamicLiquidTokenConverter.sol#832)
+	Event emitted after the call(s):
+	- Activation(converterType(),anchor,true) (../../sb/DynamicLiquidTokenConverter.sol#1198)
+Reentrancy in LiquidTokenConverter.buy(uint256,address,address) (../../sb/DynamicLiquidTokenConverter.sol#1353-1378):
+	External calls:
+	- IDSToken(address(anchor)).issue(_beneficiary,amount) (../../sb/DynamicLiquidTokenConverter.sol#1372)
+	Event emitted after the call(s):
+	- Conversion(_sourceToken,_targetToken,_trader,_amount,_returnAmount,int256(_feeAmount)) (../../sb/DynamicLiquidTokenConverter.sol#1085)
+		- dispatchConversionEvent(reserveToken,IDSToken(address(anchor)),_trader,_amount,amount,fee) (../../sb/DynamicLiquidTokenConverter.sol#1375)
+Reentrancy in LiquidTokenConverter.doConvert(IERC20Token,IERC20Token,uint256,address,address) (../../sb/DynamicLiquidTokenConverter.sol#1248-1275):
+	External calls:
+	- targetAmount = buy(_amount,_trader,_beneficiary) (../../sb/DynamicLiquidTokenConverter.sol#1258)
+		- IDSToken(address(anchor)).issue(_beneficiary,amount) (../../sb/DynamicLiquidTokenConverter.sol#1372)
+	- targetAmount = sell(_amount,_trader,_beneficiary) (../../sb/DynamicLiquidTokenConverter.sol#1262)
+		- (success,data) = address(_token).call(abi.encodeWithSelector(TRANSFER_FUNC_SELECTOR,_to,_value)) (../../sb/DynamicLiquidTokenConverter.sol#463)
+		- IDSToken(address(anchor)).destroy(address(this),_amount) (../../sb/DynamicLiquidTokenConverter.sol#1407)
+	External calls sending eth:
+	- targetAmount = sell(_amount,_trader,_beneficiary) (../../sb/DynamicLiquidTokenConverter.sol#1262)
+		- _beneficiary.transfer(amount) (../../sb/DynamicLiquidTokenConverter.sol#1414)
+	Event emitted after the call(s):
+	- TokenRateUpdate(IDSToken(address(anchor)),reserveToken,reserveBalance(reserveToken).mul(PPM_RESOLUTION),totalSupply.mul(reserveWeight)) (../../sb/DynamicLiquidTokenConverter.sol#1272)
+Reentrancy in DynamicLiquidTokenConverter.reduceWeight(IERC20Token) (../../sb/DynamicLiquidTokenConverter.sol#1545-1577):
+	External calls:
+	- safeTransfer(_reserveToken,msg.sender,balance) (../../sb/DynamicLiquidTokenConverter.sol#1572)
+		- (success,data) = address(_token).call(abi.encodeWithSelector(TRANSFER_FUNC_SELECTOR,_to,_value)) (../../sb/DynamicLiquidTokenConverter.sol#463)
+	External calls sending eth:
+	- msg.sender.transfer(balance) (../../sb/DynamicLiquidTokenConverter.sol#1570)
+	Event emitted after the call(s):
+	- ReserveTokenWeightUpdate(oldWeight,weight,percentage,reserve.balance) (../../sb/DynamicLiquidTokenConverter.sol#1576)
+Reentrancy in LiquidTokenConverter.sell(uint256,address,address) (../../sb/DynamicLiquidTokenConverter.sol#1389-1422):
+	External calls:
+	- IDSToken(address(anchor)).destroy(address(this),_amount) (../../sb/DynamicLiquidTokenConverter.sol#1407)
+	- safeTransfer(reserveToken,_beneficiary,amount) (../../sb/DynamicLiquidTokenConverter.sol#1416)
+		- (success,data) = address(_token).call(abi.encodeWithSelector(TRANSFER_FUNC_SELECTOR,_to,_value)) (../../sb/DynamicLiquidTokenConverter.sol#463)
+	External calls sending eth:
+	- _beneficiary.transfer(amount) (../../sb/DynamicLiquidTokenConverter.sol#1414)
+	Event emitted after the call(s):
+	- Conversion(_sourceToken,_targetToken,_trader,_amount,_returnAmount,int256(_feeAmount)) (../../sb/DynamicLiquidTokenConverter.sol#1085)
+		- dispatchConversionEvent(IDSToken(address(anchor)),reserveToken,_trader,_amount,amount,fee) (../../sb/DynamicLiquidTokenConverter.sol#1419)
+Reentrancy in ConverterBase.upgrade() (../../sb/DynamicLiquidTokenConverter.sol#882-891):
+	External calls:
+	- converterUpgrader.upgrade(version) (../../sb/DynamicLiquidTokenConverter.sol#889)
+	Event emitted after the call(s):
+	- OwnerUpdate(owner,newOwner) (../../sb/DynamicLiquidTokenConverter.sol#191)
+		- acceptOwnership() (../../sb/DynamicLiquidTokenConverter.sol#890)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+TokenHandler.safeApprove(IERC20Token,address,uint256) (../../sb/DynamicLiquidTokenConverter.sol#448-451) is never used and should be removed
+TokenHandler.safeTransferFrom(IERC20Token,address,address,uint256) (../../sb/DynamicLiquidTokenConverter.sol#477-480) is never used and should be removed
+Utils._greaterThanZero(uint256) (../../sb/DynamicLiquidTokenConverter.sol#208-210) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.6.12 (../../sb/DynamicLiquidTokenConverter.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in TokenHandler.safeApprove(IERC20Token,address,uint256) (../../sb/DynamicLiquidTokenConverter.sol#448-451):
+	- (success,data) = address(_token).call(abi.encodeWithSelector(APPROVE_FUNC_SELECTOR,_spender,_value)) (../../sb/DynamicLiquidTokenConverter.sol#449)
+Low level call in TokenHandler.safeTransfer(IERC20Token,address,uint256) (../../sb/DynamicLiquidTokenConverter.sol#462-465):
+	- (success,data) = address(_token).call(abi.encodeWithSelector(TRANSFER_FUNC_SELECTOR,_to,_value)) (../../sb/DynamicLiquidTokenConverter.sol#463)
+Low level call in TokenHandler.safeTransferFrom(IERC20Token,address,address,uint256) (../../sb/DynamicLiquidTokenConverter.sol#477-480):
+	- (success,data) = address(_token).call(abi.encodeWithSelector(TRANSFER_FROM_FUNC_SELECTOR,_from,_to,_value)) (../../sb/DynamicLiquidTokenConverter.sol#478)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter Owned.transferOwnership(address)._newOwner (../../sb/DynamicLiquidTokenConverter.sol#181) is not in mixedCase
+Parameter ContractRegistryClient.restrictRegistryUpdate(bool)._onlyOwnerCanUpdateRegistry (../../sb/DynamicLiquidTokenConverter.sol#324) is not in mixedCase
+Parameter ContractRegistryClient.addressOf(bytes32)._contractName (../../sb/DynamicLiquidTokenConverter.sol#336) is not in mixedCase
+Parameter SafeMath.add(uint256,uint256)._x (../../sb/DynamicLiquidTokenConverter.sol#382) is not in mixedCase
+Parameter SafeMath.add(uint256,uint256)._y (../../sb/DynamicLiquidTokenConverter.sol#382) is not in mixedCase
+Parameter SafeMath.sub(uint256,uint256)._x (../../sb/DynamicLiquidTokenConverter.sol#396) is not in mixedCase
+Parameter SafeMath.sub(uint256,uint256)._y (../../sb/DynamicLiquidTokenConverter.sol#396) is not in mixedCase
+Parameter SafeMath.mul(uint256,uint256)._x (../../sb/DynamicLiquidTokenConverter.sol#409) is not in mixedCase
+Parameter SafeMath.mul(uint256,uint256)._y (../../sb/DynamicLiquidTokenConverter.sol#409) is not in mixedCase
+Parameter SafeMath.div(uint256,uint256)._x (../../sb/DynamicLiquidTokenConverter.sol#427) is not in mixedCase
+Parameter SafeMath.div(uint256,uint256)._y (../../sb/DynamicLiquidTokenConverter.sol#427) is not in mixedCase
+Parameter TokenHandler.safeApprove(IERC20Token,address,uint256)._token (../../sb/DynamicLiquidTokenConverter.sol#448) is not in mixedCase
+Parameter TokenHandler.safeApprove(IERC20Token,address,uint256)._spender (../../sb/DynamicLiquidTokenConverter.sol#448) is not in mixedCase
+Parameter TokenHandler.safeApprove(IERC20Token,address,uint256)._value (../../sb/DynamicLiquidTokenConverter.sol#448) is not in mixedCase
+Parameter TokenHandler.safeTransfer(IERC20Token,address,uint256)._token (../../sb/DynamicLiquidTokenConverter.sol#462) is not in mixedCase
+Parameter TokenHandler.safeTransfer(IERC20Token,address,uint256)._to (../../sb/DynamicLiquidTokenConverter.sol#462) is not in mixedCase
+Parameter TokenHandler.safeTransfer(IERC20Token,address,uint256)._value (../../sb/DynamicLiquidTokenConverter.sol#462) is not in mixedCase
+Parameter TokenHandler.safeTransferFrom(IERC20Token,address,address,uint256)._token (../../sb/DynamicLiquidTokenConverter.sol#477) is not in mixedCase
+Parameter TokenHandler.safeTransferFrom(IERC20Token,address,address,uint256)._from (../../sb/DynamicLiquidTokenConverter.sol#477) is not in mixedCase
+Parameter TokenHandler.safeTransferFrom(IERC20Token,address,address,uint256)._to (../../sb/DynamicLiquidTokenConverter.sol#477) is not in mixedCase
+Parameter TokenHandler.safeTransferFrom(IERC20Token,address,address,uint256)._value (../../sb/DynamicLiquidTokenConverter.sol#477) is not in mixedCase
+Parameter TokenHolder.withdrawTokens(IERC20Token,address,uint256)._token (../../sb/DynamicLiquidTokenConverter.sol#510) is not in mixedCase
+Parameter TokenHolder.withdrawTokens(IERC20Token,address,uint256)._to (../../sb/DynamicLiquidTokenConverter.sol#510) is not in mixedCase
+Parameter TokenHolder.withdrawTokens(IERC20Token,address,uint256)._amount (../../sb/DynamicLiquidTokenConverter.sol#510) is not in mixedCase
+Parameter ConverterBase.withdrawETH(address)._to (../../sb/DynamicLiquidTokenConverter.sol#753) is not in mixedCase
+Parameter ConverterBase.setConversionWhitelist(IWhitelist)._whitelist (../../sb/DynamicLiquidTokenConverter.sol#787) is not in mixedCase
+Parameter ConverterBase.transferAnchorOwnership(address)._newOwner (../../sb/DynamicLiquidTokenConverter.sol#813) is not in mixedCase
+Parameter ConverterBase.setConversionFee(uint32)._conversionFee (../../sb/DynamicLiquidTokenConverter.sol#842) is not in mixedCase
+Parameter ConverterBase.withdrawTokens(IERC20Token,address,uint256)._token (../../sb/DynamicLiquidTokenConverter.sol#858) is not in mixedCase
+Parameter ConverterBase.withdrawTokens(IERC20Token,address,uint256)._to (../../sb/DynamicLiquidTokenConverter.sol#858) is not in mixedCase
+Parameter ConverterBase.withdrawTokens(IERC20Token,address,uint256)._amount (../../sb/DynamicLiquidTokenConverter.sol#858) is not in mixedCase
+Parameter ConverterBase.addReserve(IERC20Token,uint32)._token (../../sb/DynamicLiquidTokenConverter.sol#910) is not in mixedCase
+Parameter ConverterBase.addReserve(IERC20Token,uint32)._weight (../../sb/DynamicLiquidTokenConverter.sol#910) is not in mixedCase
+Parameter ConverterBase.reserveWeight(IERC20Token)._reserveToken (../../sb/DynamicLiquidTokenConverter.sol#941) is not in mixedCase
+Parameter ConverterBase.reserveBalance(IERC20Token)._reserveToken (../../sb/DynamicLiquidTokenConverter.sol#958) is not in mixedCase
+Parameter ConverterBase.convert(IERC20Token,IERC20Token,uint256,address,address)._sourceToken (../../sb/DynamicLiquidTokenConverter.sol#989) is not in mixedCase
+Parameter ConverterBase.convert(IERC20Token,IERC20Token,uint256,address,address)._targetToken (../../sb/DynamicLiquidTokenConverter.sol#989) is not in mixedCase
+Parameter ConverterBase.convert(IERC20Token,IERC20Token,uint256,address,address)._amount (../../sb/DynamicLiquidTokenConverter.sol#989) is not in mixedCase
+Parameter ConverterBase.convert(IERC20Token,IERC20Token,uint256,address,address)._trader (../../sb/DynamicLiquidTokenConverter.sol#989) is not in mixedCase
+Parameter ConverterBase.convert(IERC20Token,IERC20Token,uint256,address,address)._beneficiary (../../sb/DynamicLiquidTokenConverter.sol#989) is not in mixedCase
+Parameter ConverterBase.calculateFee(uint256)._targetAmount (../../sb/DynamicLiquidTokenConverter.sol#1037) is not in mixedCase
+Parameter ConverterBase.syncReserveBalance(IERC20Token)._reserveToken (../../sb/DynamicLiquidTokenConverter.sol#1046) is not in mixedCase
+Parameter ConverterBase.dispatchConversionEvent(IERC20Token,IERC20Token,address,uint256,uint256,uint256)._sourceToken (../../sb/DynamicLiquidTokenConverter.sol#1072) is not in mixedCase
+Parameter ConverterBase.dispatchConversionEvent(IERC20Token,IERC20Token,address,uint256,uint256,uint256)._targetToken (../../sb/DynamicLiquidTokenConverter.sol#1073) is not in mixedCase
+Parameter ConverterBase.dispatchConversionEvent(IERC20Token,IERC20Token,address,uint256,uint256,uint256)._trader (../../sb/DynamicLiquidTokenConverter.sol#1074) is not in mixedCase
+Parameter ConverterBase.dispatchConversionEvent(IERC20Token,IERC20Token,address,uint256,uint256,uint256)._amount (../../sb/DynamicLiquidTokenConverter.sol#1075) is not in mixedCase
+Parameter ConverterBase.dispatchConversionEvent(IERC20Token,IERC20Token,address,uint256,uint256,uint256)._returnAmount (../../sb/DynamicLiquidTokenConverter.sol#1076) is not in mixedCase
+Parameter ConverterBase.dispatchConversionEvent(IERC20Token,IERC20Token,address,uint256,uint256,uint256)._feeAmount (../../sb/DynamicLiquidTokenConverter.sol#1077) is not in mixedCase
+Parameter ConverterBase.transferTokenOwnership(address)._newOwner (../../sb/DynamicLiquidTokenConverter.sol#1098) is not in mixedCase
+Parameter ConverterBase.connectors(IERC20Token)._address (../../sb/DynamicLiquidTokenConverter.sol#1112) is not in mixedCase
+Parameter ConverterBase.connectorTokens(uint256)._index (../../sb/DynamicLiquidTokenConverter.sol#1120) is not in mixedCase
+Parameter ConverterBase.getConnectorBalance(IERC20Token)._connectorToken (../../sb/DynamicLiquidTokenConverter.sol#1134) is not in mixedCase
+Parameter ConverterBase.getReturn(IERC20Token,IERC20Token,uint256)._sourceToken (../../sb/DynamicLiquidTokenConverter.sol#1141) is not in mixedCase
+Parameter ConverterBase.getReturn(IERC20Token,IERC20Token,uint256)._targetToken (../../sb/DynamicLiquidTokenConverter.sol#1141) is not in mixedCase
+Parameter ConverterBase.getReturn(IERC20Token,IERC20Token,uint256)._amount (../../sb/DynamicLiquidTokenConverter.sol#1141) is not in mixedCase
+Parameter LiquidTokenConverter.addReserve(IERC20Token,uint32)._token (../../sb/DynamicLiquidTokenConverter.sol#1209) is not in mixedCase
+Parameter LiquidTokenConverter.addReserve(IERC20Token,uint32)._weight (../../sb/DynamicLiquidTokenConverter.sol#1209) is not in mixedCase
+Parameter LiquidTokenConverter.targetAmountAndFee(IERC20Token,IERC20Token,uint256)._sourceToken (../../sb/DynamicLiquidTokenConverter.sol#1226) is not in mixedCase
+Parameter LiquidTokenConverter.targetAmountAndFee(IERC20Token,IERC20Token,uint256)._targetToken (../../sb/DynamicLiquidTokenConverter.sol#1226) is not in mixedCase
+Parameter LiquidTokenConverter.targetAmountAndFee(IERC20Token,IERC20Token,uint256)._amount (../../sb/DynamicLiquidTokenConverter.sol#1226) is not in mixedCase
+Parameter LiquidTokenConverter.doConvert(IERC20Token,IERC20Token,uint256,address,address)._sourceToken (../../sb/DynamicLiquidTokenConverter.sol#1248) is not in mixedCase
+Parameter LiquidTokenConverter.doConvert(IERC20Token,IERC20Token,uint256,address,address)._targetToken (../../sb/DynamicLiquidTokenConverter.sol#1248) is not in mixedCase
+Parameter LiquidTokenConverter.doConvert(IERC20Token,IERC20Token,uint256,address,address)._amount (../../sb/DynamicLiquidTokenConverter.sol#1248) is not in mixedCase
+Parameter LiquidTokenConverter.doConvert(IERC20Token,IERC20Token,uint256,address,address)._trader (../../sb/DynamicLiquidTokenConverter.sol#1248) is not in mixedCase
+Parameter LiquidTokenConverter.doConvert(IERC20Token,IERC20Token,uint256,address,address)._beneficiary (../../sb/DynamicLiquidTokenConverter.sol#1248) is not in mixedCase
+Parameter LiquidTokenConverter.purchaseTargetAmount(uint256)._amount (../../sb/DynamicLiquidTokenConverter.sol#1285) is not in mixedCase
+Parameter LiquidTokenConverter.saleTargetAmount(uint256)._amount (../../sb/DynamicLiquidTokenConverter.sol#1318) is not in mixedCase
+Parameter LiquidTokenConverter.buy(uint256,address,address)._amount (../../sb/DynamicLiquidTokenConverter.sol#1353) is not in mixedCase
+Parameter LiquidTokenConverter.buy(uint256,address,address)._trader (../../sb/DynamicLiquidTokenConverter.sol#1353) is not in mixedCase
+Parameter LiquidTokenConverter.buy(uint256,address,address)._beneficiary (../../sb/DynamicLiquidTokenConverter.sol#1353) is not in mixedCase
+Parameter LiquidTokenConverter.sell(uint256,address,address)._amount (../../sb/DynamicLiquidTokenConverter.sol#1389) is not in mixedCase
+Parameter LiquidTokenConverter.sell(uint256,address,address)._trader (../../sb/DynamicLiquidTokenConverter.sol#1389) is not in mixedCase
+Parameter LiquidTokenConverter.sell(uint256,address,address)._beneficiary (../../sb/DynamicLiquidTokenConverter.sol#1389) is not in mixedCase
+Parameter DynamicLiquidTokenConverter.setMarketCapThreshold(uint256)._marketCapThreshold (../../sb/DynamicLiquidTokenConverter.sol#1480) is not in mixedCase
+Parameter DynamicLiquidTokenConverter.setMinimumWeight(uint32)._minimumWeight (../../sb/DynamicLiquidTokenConverter.sol#1495) is not in mixedCase
+Parameter DynamicLiquidTokenConverter.setStepWeight(uint32)._stepWeight (../../sb/DynamicLiquidTokenConverter.sol#1512) is not in mixedCase
+Parameter DynamicLiquidTokenConverter.setLastWeightAdjustmentMarketCap(uint256)._lastWeightAdjustmentMarketCap (../../sb/DynamicLiquidTokenConverter.sol#1528) is not in mixedCase
+Parameter DynamicLiquidTokenConverter.reduceWeight(IERC20Token)._reserveToken (../../sb/DynamicLiquidTokenConverter.sol#1545) is not in mixedCase
+Parameter DynamicLiquidTokenConverter.getMarketCap(IERC20Token)._reserveToken (../../sb/DynamicLiquidTokenConverter.sol#1579) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Reentrancy in LiquidTokenConverter.doConvert(IERC20Token,IERC20Token,uint256,address,address) (../../sb/DynamicLiquidTokenConverter.sol#1248-1275):
+	External calls:
+	- targetAmount = sell(_amount,_trader,_beneficiary) (../../sb/DynamicLiquidTokenConverter.sol#1262)
+		- _beneficiary.transfer(amount) (../../sb/DynamicLiquidTokenConverter.sol#1414)
+	Event emitted after the call(s):
+	- TokenRateUpdate(IDSToken(address(anchor)),reserveToken,reserveBalance(reserveToken).mul(PPM_RESOLUTION),totalSupply.mul(reserveWeight)) (../../sb/DynamicLiquidTokenConverter.sol#1272)
+Reentrancy in DynamicLiquidTokenConverter.reduceWeight(IERC20Token) (../../sb/DynamicLiquidTokenConverter.sol#1545-1577):
+	External calls:
+	- msg.sender.transfer(balance) (../../sb/DynamicLiquidTokenConverter.sol#1570)
+	State variables written after the call(s):
+	- syncReserveBalance(_reserveToken) (../../sb/DynamicLiquidTokenConverter.sol#1574)
+		- reserves[_reserveToken].balance = address(this).balance (../../sb/DynamicLiquidTokenConverter.sol#1048)
+		- reserves[_reserveToken].balance = _reserveToken.balanceOf(address(this)) (../../sb/DynamicLiquidTokenConverter.sol#1050)
+	Event emitted after the call(s):
+	- ReserveTokenWeightUpdate(oldWeight,weight,percentage,reserve.balance) (../../sb/DynamicLiquidTokenConverter.sol#1576)
+Reentrancy in LiquidTokenConverter.sell(uint256,address,address) (../../sb/DynamicLiquidTokenConverter.sol#1389-1422):
+	External calls:
+	- _beneficiary.transfer(amount) (../../sb/DynamicLiquidTokenConverter.sol#1414)
+	Event emitted after the call(s):
+	- Conversion(_sourceToken,_targetToken,_trader,_amount,_returnAmount,int256(_feeAmount)) (../../sb/DynamicLiquidTokenConverter.sol#1085)
+		- dispatchConversionEvent(IDSToken(address(anchor)),reserveToken,_trader,_amount,amount,fee) (../../sb/DynamicLiquidTokenConverter.sol#1419)
+Reentrancy in ConverterBase.withdrawETH(address) (../../sb/DynamicLiquidTokenConverter.sol#753-769):
+	External calls:
+	- _to.transfer(address(this).balance) (../../sb/DynamicLiquidTokenConverter.sol#765)
+	State variables written after the call(s):
+	- syncReserveBalance(ETH_RESERVE_ADDRESS) (../../sb/DynamicLiquidTokenConverter.sol#768)
+		- reserves[_reserveToken].balance = address(this).balance (../../sb/DynamicLiquidTokenConverter.sol#1048)
+		- reserves[_reserveToken].balance = _reserveToken.balanceOf(address(this)) (../../sb/DynamicLiquidTokenConverter.sol#1050)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-4
+
+Variable ConverterBase.syncReserveBalance(IERC20Token)._reserveToken (../../sb/DynamicLiquidTokenConverter.sol#1046) is too similar to ConverterBase.reserveTokens (../../sb/DynamicLiquidTokenConverter.sol#587)
+Variable ConverterBase.reserveWeight(IERC20Token)._reserveToken (../../sb/DynamicLiquidTokenConverter.sol#941) is too similar to ConverterBase.reserveTokens (../../sb/DynamicLiquidTokenConverter.sol#587)
+Variable IConverter.reserveBalance(IERC20Token)._reserveToken (../../sb/DynamicLiquidTokenConverter.sol#63) is too similar to ConverterBase.reserveTokens (../../sb/DynamicLiquidTokenConverter.sol#587)
+Variable ConverterBase.reserveBalance(IERC20Token)._reserveToken (../../sb/DynamicLiquidTokenConverter.sol#958) is too similar to ConverterBase.reserveTokens (../../sb/DynamicLiquidTokenConverter.sol#587)
+Variable DynamicLiquidTokenConverter.reduceWeight(IERC20Token)._reserveToken (../../sb/DynamicLiquidTokenConverter.sol#1545) is too similar to ConverterBase.reserveTokens (../../sb/DynamicLiquidTokenConverter.sol#587)
+Variable DynamicLiquidTokenConverter.getMarketCap(IERC20Token)._reserveToken (../../sb/DynamicLiquidTokenConverter.sol#1579) is too similar to ConverterBase.reserveTokens (../../sb/DynamicLiquidTokenConverter.sol#587)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+DynamicLiquidTokenConverter.slitherConstructorConstantVariables() (../../sb/DynamicLiquidTokenConverter.sol#1436-1587) uses literals with too many digits:
+	- PPM_RESOLUTION = 1000000 (../../sb/DynamicLiquidTokenConverter.sol#569)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+ContractRegistryClient.CONVERTER_FACTORY (../../sb/DynamicLiquidTokenConverter.sol#249) is never used in DynamicLiquidTokenConverter (../../sb/DynamicLiquidTokenConverter.sol#1436-1587)
+ContractRegistryClient.CONVERSION_PATH_FINDER (../../sb/DynamicLiquidTokenConverter.sol#250) is never used in DynamicLiquidTokenConverter (../../sb/DynamicLiquidTokenConverter.sol#1436-1587)
+ContractRegistryClient.CONVERTER_REGISTRY (../../sb/DynamicLiquidTokenConverter.sol#252) is never used in DynamicLiquidTokenConverter (../../sb/DynamicLiquidTokenConverter.sol#1436-1587)
+ContractRegistryClient.CONVERTER_REGISTRY_DATA (../../sb/DynamicLiquidTokenConverter.sol#253) is never used in DynamicLiquidTokenConverter (../../sb/DynamicLiquidTokenConverter.sol#1436-1587)
+ContractRegistryClient.BNT_TOKEN (../../sb/DynamicLiquidTokenConverter.sol#254) is never used in DynamicLiquidTokenConverter (../../sb/DynamicLiquidTokenConverter.sol#1436-1587)
+ContractRegistryClient.BANCOR_X (../../sb/DynamicLiquidTokenConverter.sol#255) is never used in DynamicLiquidTokenConverter (../../sb/DynamicLiquidTokenConverter.sol#1436-1587)
+ContractRegistryClient.BANCOR_X_UPGRADER (../../sb/DynamicLiquidTokenConverter.sol#256) is never used in DynamicLiquidTokenConverter (../../sb/DynamicLiquidTokenConverter.sol#1436-1587)
+ContractRegistryClient.CHAINLINK_ORACLE_WHITELIST (../../sb/DynamicLiquidTokenConverter.sol#257) is never used in DynamicLiquidTokenConverter (../../sb/DynamicLiquidTokenConverter.sol#1436-1587)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-state-variable
+
+ConverterBase.anchor (../../sb/DynamicLiquidTokenConverter.sol#585) should be immutable 
+ConverterBase.maxConversionFee (../../sb/DynamicLiquidTokenConverter.sol#590) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/DynamicLiquidTokenConverter.sol analyzed (22 contracts with 93 detectors), 125 result(s) found

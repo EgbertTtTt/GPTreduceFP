@@ -1,0 +1,221 @@
+'solc --version' running
+'solc /sb/ERC20.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/sb' running
+
+ERC20.allowance(address,address).owner (../../sb/ERC20.sol#795) shadows:
+	- Ownable.owner() (../../sb/ERC20.sol#360-362) (function)
+ERC20._approve(address,address,uint256).owner (../../sb/ERC20.sol#876) shadows:
+	- Ownable.owner() (../../sb/ERC20.sol#360-362) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+ERC20.constructor(address,address).verifier (../../sb/ERC20.sol#454) lacks a zero-check on :
+		- _verifier = verifier (../../sb/ERC20.sol#457)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in ERC20.buyItem(uint256,uint256,bool,string,uint256,bytes) (../../sb/ERC20.sol#695-717):
+	External calls:
+	- result = _mainContract.createFromERC20(_msgSender(),_category) (../../sb/ERC20.sol#710)
+	Event emitted after the call(s):
+	- ItemBought(_msgSender(),result,_amount,args) (../../sb/ERC20.sol#711)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+ERC20.releaseVesting(address) (../../sb/ERC20.sol#610-620) uses timestamp for comparisons
+	Dangerous comparisons:
+	- vestingsLock[_wallet][0].deadline <= block.timestamp && vestingsLock[_wallet][0].amount > 0 (../../sb/ERC20.sol#611)
+ERC20.releaseTreasure() (../../sb/ERC20.sol#640-647) uses timestamp for comparisons
+	Dangerous comparisons:
+	- _isInitTreasure && indexTreasuryLock < treasuryBalanceLock.length && block.timestamp > treasuryBalanceLock[indexTreasuryLock].deadline (../../sb/ERC20.sol#641)
+ERC20.releaseLiquidity() (../../sb/ERC20.sol#649-656) uses timestamp for comparisons
+	Dangerous comparisons:
+	- indexLiquidityLock < liquidityBalanceLock.length && block.timestamp > liquidityBalanceLock[indexLiquidityLock].deadline (../../sb/ERC20.sol#650)
+ERC20.claim(uint256,uint8,uint256,bytes) (../../sb/ERC20.sol#669-693) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(_liquidityBalance >= _amount,Insufficient amount to claim) (../../sb/ERC20.sol#686)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/ERC20.sol#140-150) uses assembly
+	- INLINE ASM (../../sb/ERC20.sol#146-148)
+Address.verifyCallResult(bool,bytes,string) (../../sb/ERC20.sol#309-329) uses assembly
+	- INLINE ASM (../../sb/ERC20.sol#321-324)
+ERC20.splitSignature(bytes) (../../sb/ERC20.sol#733-754) uses assembly
+	- INLINE ASM (../../sb/ERC20.sol#744-751)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.functionCall(address,bytes) (../../sb/ERC20.sol#193-195) is never used and should be removed
+Address.functionCall(address,bytes,string) (../../sb/ERC20.sol#203-209) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/ERC20.sol#222-228) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/ERC20.sol#236-247) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/ERC20.sol#282-284) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/ERC20.sol#292-301) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/ERC20.sol#255-257) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/ERC20.sol#265-274) is never used and should be removed
+Address.isContract(address) (../../sb/ERC20.sol#140-150) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/ERC20.sol#168-173) is never used and should be removed
+Address.verifyCallResult(bool,bytes,string) (../../sb/ERC20.sol#309-329) is never used and should be removed
+Context._msgData() (../../sb/ERC20.sol#114-116) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.8.0 (../../sb/ERC20.sol#1) allows old versions
+solc-0.8.27 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/ERC20.sol#168-173):
+	- (success) = recipient.call{value: amount}() (../../sb/ERC20.sol#171)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/ERC20.sol#236-247):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/ERC20.sol#245)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/ERC20.sol#265-274):
+	- (success,returndata) = target.staticcall(data) (../../sb/ERC20.sol#272)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/ERC20.sol#292-301):
+	- (success,returndata) = target.delegatecall(data) (../../sb/ERC20.sol#299)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter ERC20.setMainNFT(address)._contract (../../sb/ERC20.sol#587) is not in mixedCase
+Parameter ERC20.addLiquidityLock(uint256,uint256)._amount (../../sb/ERC20.sol#593) is not in mixedCase
+Parameter ERC20.addVestingLock(address,uint256,uint256)._wallet (../../sb/ERC20.sol#601) is not in mixedCase
+Parameter ERC20.addVestingLock(address,uint256,uint256)._ammount (../../sb/ERC20.sol#601) is not in mixedCase
+Parameter ERC20.addVestingLock(address,uint256,uint256)._deadline (../../sb/ERC20.sol#601) is not in mixedCase
+Parameter ERC20.releaseVesting(address)._wallet (../../sb/ERC20.sol#610) is not in mixedCase
+Parameter ERC20.claim(uint256,uint8,uint256,bytes)._amount (../../sb/ERC20.sol#669) is not in mixedCase
+Parameter ERC20.claim(uint256,uint8,uint256,bytes)._mode (../../sb/ERC20.sol#669) is not in mixedCase
+Parameter ERC20.buyItem(uint256,uint256,bool,string,uint256,bytes)._amount (../../sb/ERC20.sol#695) is not in mixedCase
+Parameter ERC20.buyItem(uint256,uint256,bool,string,uint256,bytes)._category (../../sb/ERC20.sol#695) is not in mixedCase
+Parameter ERC20.buyItem(uint256,uint256,bool,string,uint256,bytes)._mode (../../sb/ERC20.sol#695) is not in mixedCase
+Variable ERC20._totalTreasuryBalance (../../sb/ERC20.sol#431) is not in mixedCase
+Variable ERC20._totalLiquidityBalance (../../sb/ERC20.sol#436) is not in mixedCase
+Variable ERC20._marketingWallet (../../sb/ERC20.sol#440) is not in mixedCase
+Variable ERC20._teamWallet (../../sb/ERC20.sol#441) is not in mixedCase
+Variable ERC20._seedWallet (../../sb/ERC20.sol#442) is not in mixedCase
+Variable ERC20._privateWallet (../../sb/ERC20.sol#443) is not in mixedCase
+Variable ERC20._IDOAmount (../../sb/ERC20.sol#444) is not in mixedCase
+Variable ERC20._treasuryBalance (../../sb/ERC20.sol#445) is not in mixedCase
+Variable ERC20._liquidityBalance (../../sb/ERC20.sol#446) is not in mixedCase
+Variable ERC20._vestingBalance (../../sb/ERC20.sol#447) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- _totalSupply = 100000000 * 10 ** _decimals (../../sb/ERC20.sol#458)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- _totalLiquidityBalance = 9000000 * 10 ** _decimals (../../sb/ERC20.sol#459)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- _liquidityBalance = 3000000 * 10 ** _decimals (../../sb/ERC20.sol#460)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- _totalTreasuryBalance = 36000000 * 10 ** _decimals (../../sb/ERC20.sol#461)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- _balances[_privateWallet] = 3600000 * 10 ** _decimals (../../sb/ERC20.sol#467)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- _IDOAmount = 500000 * 10 ** _decimals (../../sb/ERC20.sol#471)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_marketingWallet,1000000 * 10 ** _decimals,block.timestamp + 4 * 2592000) (../../sb/ERC20.sol#514)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_marketingWallet,500000 * 10 ** _decimals,block.timestamp + 5 * 2592000) (../../sb/ERC20.sol#515)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_marketingWallet,500000 * 10 ** _decimals,block.timestamp + 6 * 2592000) (../../sb/ERC20.sol#516)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_marketingWallet,500000 * 10 ** _decimals,block.timestamp + 7 * 2592000) (../../sb/ERC20.sol#517)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_marketingWallet,500000 * 10 ** _decimals,block.timestamp + 8 * 2592000) (../../sb/ERC20.sol#518)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_marketingWallet,500000 * 10 ** _decimals,block.timestamp + 9 * 2592000) (../../sb/ERC20.sol#519)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_marketingWallet,500000 * 10 ** _decimals,block.timestamp + 10 * 2592000) (../../sb/ERC20.sol#520)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_marketingWallet,500000 * 10 ** _decimals,block.timestamp + 11 * 2592000) (../../sb/ERC20.sol#521)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_marketingWallet,500000 * 10 ** _decimals,block.timestamp + 12 * 2592000) (../../sb/ERC20.sol#522)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_marketingWallet,500000 * 10 ** _decimals,block.timestamp + 13 * 2592000) (../../sb/ERC20.sol#523)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_marketingWallet,500000 * 10 ** _decimals,block.timestamp + 14 * 2592000) (../../sb/ERC20.sol#524)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_marketingWallet,500000 * 10 ** _decimals,block.timestamp + 15 * 2592000) (../../sb/ERC20.sol#525)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_marketingWallet,500000 * 10 ** _decimals,block.timestamp + 16 * 2592000) (../../sb/ERC20.sol#526)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_marketingWallet,500000 * 10 ** _decimals,block.timestamp + 17 * 2592000) (../../sb/ERC20.sol#527)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_marketingWallet,500000 * 10 ** _decimals,block.timestamp + 18 * 2592000) (../../sb/ERC20.sol#528)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_marketingWallet,500000 * 10 ** _decimals,block.timestamp + 19 * 2592000) (../../sb/ERC20.sol#529)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_marketingWallet,500000 * 10 ** _decimals,block.timestamp + 20 * 2592000) (../../sb/ERC20.sol#530)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_marketingWallet,500000 * 10 ** _decimals,block.timestamp + 21 * 2592000) (../../sb/ERC20.sol#531)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_marketingWallet,500000 * 10 ** _decimals,block.timestamp + 22 * 2592000) (../../sb/ERC20.sol#532)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_teamWallet,1200000 * 10 ** _decimals,block.timestamp + 12 * 2592000) (../../sb/ERC20.sol#534)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_teamWallet,600000 * 10 ** _decimals,block.timestamp + 15 * 2592000) (../../sb/ERC20.sol#535)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_teamWallet,600000 * 10 ** _decimals,block.timestamp + 18 * 2592000) (../../sb/ERC20.sol#536)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_teamWallet,600000 * 10 ** _decimals,block.timestamp + 21 * 2592000) (../../sb/ERC20.sol#537)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_teamWallet,600000 * 10 ** _decimals,block.timestamp + 24 * 2592000) (../../sb/ERC20.sol#538)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_teamWallet,600000 * 10 ** _decimals,block.timestamp + 27 * 2592000) (../../sb/ERC20.sol#539)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_teamWallet,600000 * 10 ** _decimals,block.timestamp + 30 * 2592000) (../../sb/ERC20.sol#540)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_teamWallet,600000 * 10 ** _decimals,block.timestamp + 33 * 2592000) (../../sb/ERC20.sol#541)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_teamWallet,600000 * 10 ** _decimals,block.timestamp + 36 * 2592000) (../../sb/ERC20.sol#542)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_seedWallet,500000 * 10 ** _decimals,block.timestamp + 21 * 2592000) (../../sb/ERC20.sol#550)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_privateWallet,3600000 * 10 ** _decimals,block.timestamp + 3 * 2592000) (../../sb/ERC20.sol#552)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_privateWallet,3600000 * 10 ** _decimals,block.timestamp + 6 * 2592000) (../../sb/ERC20.sol#553)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_privateWallet,3600000 * 10 ** _decimals,block.timestamp + 9 * 2592000) (../../sb/ERC20.sol#554)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_privateWallet,3600000 * 10 ** _decimals,block.timestamp + 12 * 2592000) (../../sb/ERC20.sol#555)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_privateWallet,3600000 * 10 ** _decimals,block.timestamp + 15 * 2592000) (../../sb/ERC20.sol#556)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addVestingLock(_privateWallet,2400000 * 10 ** _decimals,block.timestamp + 18 * 2592000) (../../sb/ERC20.sol#557)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addLiquidityLock(600000 * 10 ** _decimals,block.timestamp + 1 * 2592000) (../../sb/ERC20.sol#559)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addLiquidityLock(600000 * 10 ** _decimals,block.timestamp + 2 * 2592000) (../../sb/ERC20.sol#560)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addLiquidityLock(600000 * 10 ** _decimals,block.timestamp + 3 * 2592000) (../../sb/ERC20.sol#561)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addLiquidityLock(600000 * 10 ** _decimals,block.timestamp + 4 * 2592000) (../../sb/ERC20.sol#562)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addLiquidityLock(600000 * 10 ** _decimals,block.timestamp + 5 * 2592000) (../../sb/ERC20.sol#563)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addLiquidityLock(600000 * 10 ** _decimals,block.timestamp + 6 * 2592000) (../../sb/ERC20.sol#564)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addLiquidityLock(600000 * 10 ** _decimals,block.timestamp + 7 * 2592000) (../../sb/ERC20.sol#565)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addLiquidityLock(600000 * 10 ** _decimals,block.timestamp + 8 * 2592000) (../../sb/ERC20.sol#566)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addLiquidityLock(600000 * 10 ** _decimals,block.timestamp + 9 * 2592000) (../../sb/ERC20.sol#567)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addLiquidityLock(600000 * 10 ** _decimals,block.timestamp + 10 * 2592000) (../../sb/ERC20.sol#568)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addLiquidityLock(600000 * 10 ** _decimals,block.timestamp + 11 * 2592000) (../../sb/ERC20.sol#569)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addLiquidityLock(600000 * 10 ** _decimals,block.timestamp + 12 * 2592000) (../../sb/ERC20.sol#570)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addLiquidityLock(600000 * 10 ** _decimals,block.timestamp + 13 * 2592000) (../../sb/ERC20.sol#571)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addLiquidityLock(600000 * 10 ** _decimals,block.timestamp + 14 * 2592000) (../../sb/ERC20.sol#572)
+ERC20.constructor(address,address) (../../sb/ERC20.sol#454-576) uses literals with too many digits:
+	- addLiquidityLock(600000 * 10 ** _decimals,block.timestamp + 15 * 2592000) (../../sb/ERC20.sol#573)
+ERC20.initTreasure() (../../sb/ERC20.sol#622-638) uses literals with too many digits:
+	- partAmmount = 1000000 * 10 ** _decimals (../../sb/ERC20.sol#626)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+ERC20._decimals (../../sb/ERC20.sol#423) should be constant 
+ERC20._marketingWallet (../../sb/ERC20.sol#440) should be constant 
+ERC20._privateWallet (../../sb/ERC20.sol#443) should be constant 
+ERC20._seedWallet (../../sb/ERC20.sol#442) should be constant 
+ERC20._teamWallet (../../sb/ERC20.sol#441) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+
+ERC20._IDOAmount (../../sb/ERC20.sol#444) should be immutable 
+ERC20._totalSupply (../../sb/ERC20.sol#422) should be immutable 
+ERC20._verifier (../../sb/ERC20.sol#429) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/ERC20.sol analyzed (6 contracts with 93 detectors), 115 result(s) found

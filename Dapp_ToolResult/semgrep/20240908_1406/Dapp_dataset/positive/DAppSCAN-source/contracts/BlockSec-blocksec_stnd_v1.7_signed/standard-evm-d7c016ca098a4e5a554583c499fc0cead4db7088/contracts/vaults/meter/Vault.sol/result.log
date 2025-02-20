@@ -1,0 +1,180 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 31 Code Findings │
+└──────────────────┘
+                  
+    /sb/Vault.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+           15┆ (bool success, bytes memory data) =                              
+  token.call(abi.encodeWithSelector(0x095ea7b3, to, value));                    
+            ⋮┆----------------------------------------
+           21┆ (bool success, bytes memory data) =                              
+  token.call(abi.encodeWithSelector(0xa9059cbb, to, value));                    
+            ⋮┆----------------------------------------
+           27┆ (bool success, bytes memory data) =                              
+  token.call(abi.encodeWithSelector(0x23b872dd, from, to, value));              
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          187┆ constructor() public {
+          188┆   factory = msg.sender;
+          189┆   createdAt = block.timestamp;
+          190┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           16┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), "AF");                                                              
+            ⋮┆----------------------------------------
+           22┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), "TF");                                                              
+            ⋮┆----------------------------------------
+           28┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), "TFF");                                                             
+            ⋮┆----------------------------------------
+           33┆ require(success, "ETF");
+            ⋮┆----------------------------------------
+          193┆ require(
+          194┆   IERC721Minimal(v1).ownerOf(vaultId) == msg.sender,
+          195┆   "Vault: Vault is not owned by you"
+          196┆ );
+            ⋮┆----------------------------------------
+          211┆ require(msg.sender == factory, "Vault: FORBIDDEN"); // sufficient
+  check                                                                         
+            ⋮┆----------------------------------------
+          242┆ require(
+          243┆   !IVaultManager(manager).isValidCDP(
+          244┆     collateral,
+          245┆     debt,
+          246┆     IERC20Minimal(collateral).balanceOf(address(this)),
+          247┆     IERC20Minimal(debt).balanceOf(address(this))
+          248┆   ),
+          249┆   "Vault: Position is still safe"
+          250┆ );
+            ⋮┆----------------------------------------
+          256┆ require(pair != address(0), "Vault: Liquidating pair not         
+  supported");                                                                  
+            ⋮┆----------------------------------------
+          272┆ require(collateral == WETH, "Vault: collateral is not a native   
+  asset");                                                                      
+            ⋮┆----------------------------------------
+          295┆ require(collateral == WETH, "Vault: collateral is not a native   
+  asset");                                                                      
+            ⋮┆----------------------------------------
+          297┆ require(
+          298┆   IVaultManager(manager).isValidCDP(
+          299┆     collateral,
+          300┆     debt,
+          301┆     IERC20Minimal(collateral).balanceOf(address(this)) - amount_,
+          302┆     borrow
+          303┆   ),
+          304┆   "Vault: below MCR"
+          305┆ );
+            ⋮┆----------------------------------------
+          319┆ require(
+          320┆   IERC20Minimal(collateral).balanceOf(address(this)) >= amount_,
+          321┆   "Vault: Not enough collateral"
+          322┆ );
+            ⋮┆----------------------------------------
+          325┆ require(
+          326┆   IVaultManager(manager).isValidCDP(collateral,debt,test,borrow) 
+  == true,                                                                      
+          327┆   "Vault: below MCR"
+          328┆ );
+            ⋮┆----------------------------------------
+          342┆ require(IVaultManager(manager).isValidCDP(collateral, debt,      
+  cAmount_+ deposits, dAmount_), "IP"); // Invalid Position                     
+            ⋮┆----------------------------------------
+          344┆ require(IVaultManager(manager).isValidSupply(dAmount_), "RB"); //
+  Rebase limited mtr borrow                                                     
+            ⋮┆----------------------------------------
+          357┆ require(IVaultManager(manager).isValidCDP(collateral, debt,      
+  msg.value + deposits, dAmount_), "IP"); // Invalid Position                   
+            ⋮┆----------------------------------------
+          359┆ require(IVaultManager(manager).isValidSupply(dAmount_), "RB"); //
+  Rebase limited mtr borrow                                                     
+            ⋮┆----------------------------------------
+          369┆ require(amount_ != 0, "Vault: amount is zero");
+            ⋮┆----------------------------------------
+          381┆ require(fee + borrow == amount_, "Vault: not enough balance to   
+  payback");                                                                    
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+           16┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), "AF");                                                              
+            ⋮┆----------------------------------------
+           22┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), "TF");                                                              
+            ⋮┆----------------------------------------
+           28┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), "TFF");                                                             
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          435┆ } else if (dividendOn && treasuryOn) {
+          436┆   uint256 third = fee_ / 3;
+          437┆   TransferHelper.safeTransfer(asset_, dividend, third);
+          438┆   TransferHelper.safeTransfer(asset_, feeTo, third);
+          439┆   TransferHelper.safeTransfer(asset_, treasury, third);
+          440┆ } else {
+          441┆   TransferHelper.safeTransfer(asset_, feeTo, fee_);
+          442┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          256┆ require(pair != address(0), "Vault: Liquidating pair not         
+  supported");                                                                  
+            ⋮┆----------------------------------------
+          272┆ require(collateral == WETH, "Vault: collateral is not a native   
+  asset");                                                                      
+            ⋮┆----------------------------------------
+          295┆ require(collateral == WETH, "Vault: collateral is not a native   
+  asset");                                                                      
+            ⋮┆----------------------------------------
+          381┆ require(fee + borrow == amount_, "Vault: not enough balance to   
+  payback");                                                                    
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 31 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

@@ -1,0 +1,106 @@
+'solc --version' running
+'solc /sb/wHakka.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+Reentrancy in wHakka.stake(address,uint256,uint256) (../../sb/wHakka.sol#558-575):
+	External calls:
+	- wAmount = getStakingRate(time).mul(amount).div(1e18) (../../sb/wHakka.sol#560)
+		- currentModel.stakingRate(time) (../../sb/wHakka.sol#550)
+	State variables written after the call(s):
+	- vaultCount[to] ++ (../../sb/wHakka.sol#569)
+	wHakka.vaultCount (../../sb/wHakka.sol#537) can be used in cross function reentrancies:
+	- wHakka.stake(address,uint256,uint256) (../../sb/wHakka.sol#558-575)
+	- wHakka.vaultCount (../../sb/wHakka.sol#537)
+	- v.hakkaAmount = amount (../../sb/wHakka.sol#563)
+	wHakka.vaults (../../sb/wHakka.sol#536) can be used in cross function reentrancies:
+	- wHakka.stake(address,uint256,uint256) (../../sb/wHakka.sol#558-575)
+	- wHakka.unstake(address,uint256,uint256) (../../sb/wHakka.sol#578-595)
+	- wHakka.vaults (../../sb/wHakka.sol#536)
+	- v.wAmount = wAmount (../../sb/wHakka.sol#564)
+	wHakka.vaults (../../sb/wHakka.sol#536) can be used in cross function reentrancies:
+	- wHakka.stake(address,uint256,uint256) (../../sb/wHakka.sol#558-575)
+	- wHakka.unstake(address,uint256,uint256) (../../sb/wHakka.sol#578-595)
+	- wHakka.vaults (../../sb/wHakka.sol#536)
+	- v.unlockTime = block.timestamp.add(time) (../../sb/wHakka.sol#565)
+	wHakka.vaults (../../sb/wHakka.sol#536) can be used in cross function reentrancies:
+	- wHakka.stake(address,uint256,uint256) (../../sb/wHakka.sol#558-575)
+	- wHakka.unstake(address,uint256,uint256) (../../sb/wHakka.sol#578-595)
+	- wHakka.vaults (../../sb/wHakka.sol#536)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+Reentrancy in wHakka.stake(address,uint256,uint256) (../../sb/wHakka.sol#558-575):
+	External calls:
+	- wAmount = getStakingRate(time).mul(amount).div(1e18) (../../sb/wHakka.sol#560)
+		- currentModel.stakingRate(time) (../../sb/wHakka.sol#550)
+	State variables written after the call(s):
+	- _mint(to,wAmount) (../../sb/wHakka.sol#571)
+		- _balances[to] = _balances[to].add(amount) (../../sb/wHakka.sol#477)
+	- _mint(to,wAmount) (../../sb/wHakka.sol#571)
+		- _totalSupply = _totalSupply.add(amount) (../../sb/wHakka.sol#478)
+	- stakedHakka[to] = stakedHakka[to].add(amount) (../../sb/wHakka.sol#567)
+	- votingPower[to] = votingPower[to].add(wAmount) (../../sb/wHakka.sol#568)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in wHakka.stake(address,uint256,uint256) (../../sb/wHakka.sol#558-575):
+	External calls:
+	- wAmount = getStakingRate(time).mul(amount).div(1e18) (../../sb/wHakka.sol#560)
+		- currentModel.stakingRate(time) (../../sb/wHakka.sol#550)
+	Event emitted after the call(s):
+	- Transfer(address(0),to,amount) (../../sb/wHakka.sol#479)
+		- _mint(to,wAmount) (../../sb/wHakka.sol#571)
+Reentrancy in wHakka.stake(address,uint256,uint256) (../../sb/wHakka.sol#558-575):
+	External calls:
+	- wAmount = getStakingRate(time).mul(amount).div(1e18) (../../sb/wHakka.sol#560)
+		- currentModel.stakingRate(time) (../../sb/wHakka.sol#550)
+	- Hakka.safeTransferFrom(msg.sender,address(this),amount) (../../sb/wHakka.sol#572)
+	Event emitted after the call(s):
+	- Stake(to,msg.sender,amount,wAmount,time) (../../sb/wHakka.sol#574)
+Reentrancy in wHakka.unstake(address,uint256,uint256) (../../sb/wHakka.sol#578-595):
+	External calls:
+	- Hakka.safeTransfer(to,amount) (../../sb/wHakka.sol#592)
+	Event emitted after the call(s):
+	- Unstake(msg.sender,to,amount,wAmount) (../../sb/wHakka.sol#594)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+stakingRateModel.stakingRateMax() (../../sb/wHakka.sol#507-516) uses timestamp for comparisons
+	Dangerous comparisons:
+	- timeElapsed > 0 (../../sb/wHakka.sol#510)
+wHakka.unstake(address,uint256,uint256) (../../sb/wHakka.sol#578-595) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp >= v.unlockTime,locked) (../../sb/wHakka.sol#581)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/wHakka.sol#310-323) uses assembly
+	- INLINE ASM (../../sb/wHakka.sol#321)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.sendValue(address,uint256) (../../sb/wHakka.sol#353-359) is never used and should be removed
+Address.toPayable(address) (../../sb/wHakka.sol#331-333) is never used and should be removed
+Context._msgData() (../../sb/wHakka.sol#156-159) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/wHakka.sol#374-383) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/wHakka.sol#390-393) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/wHakka.sol#385-388) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/wHakka.sol#123-125) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/wHakka.sol#140-143) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.5.17 (../../sb/wHakka.sol#1) allows old versions
+solc-0.5.17 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/wHakka.sol#353-359):
+	- (success) = recipient.call.value(amount)() (../../sb/wHakka.sol#357)
+Low level call in SafeERC20.callOptionalReturn(IERC20,bytes) (../../sb/wHakka.sol#401-420):
+	- (success,returndata) = address(token).call(data) (../../sb/wHakka.sol#413)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Contract stakingRateModel (../../sb/wHakka.sol#489-518) is not in CapWords
+Constant stakingRateModel.ratePerSecond (../../sb/wHakka.sol#494) is not in UPPER_CASE_WITH_UNDERSCORES
+Contract wHakka (../../sb/wHakka.sol#520-602) is not in CapWords
+Struct wHakka.vault (../../sb/wHakka.sol#524-528) is not in CapWords
+Parameter wHakka.inCaseTokenGetsStuckPartial(IERC20,uint256)._TokenAddress (../../sb/wHakka.sol#597) is not in mixedCase
+Parameter wHakka.inCaseTokenGetsStuckPartial(IERC20,uint256)._amount (../../sb/wHakka.sol#597) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/wHakka.sol#157)" inContext (../../sb/wHakka.sol#146-160)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+/sb/wHakka.sol analyzed (10 contracts with 93 detectors), 27 result(s) found

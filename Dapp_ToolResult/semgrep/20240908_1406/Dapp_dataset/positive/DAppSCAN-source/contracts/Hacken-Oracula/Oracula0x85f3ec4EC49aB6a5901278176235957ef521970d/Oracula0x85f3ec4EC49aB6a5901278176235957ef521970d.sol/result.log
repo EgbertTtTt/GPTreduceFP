@@ -1,0 +1,187 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 40 Code Findings │
+└──────────────────┘
+                                                              
+    /sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          809┆ contract Oracula is Context, IBEP20, Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          872┆ constructor(
+          873┆ 
+          874┆     address _devAddress,
+          875┆ 
+          876┆     address _rewardAddress,
+          877┆ 
+          878┆     uint256 _burnFee,
+          879┆ 
+          880┆     uint256 _devFee,
+          881┆ 
+             [hid 39 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           43┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+           47┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+           79┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+           81┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          101┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          123┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          191┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          215┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1036┆ require(currentAllowance >= amount, "BEP20: transfer amount      
+  exceeds allowance");                                                          
+            ⋮┆----------------------------------------
+         1066┆ require(currentAllowance >= subtractedValue, "BEP20: decreased   
+  allowance below zero");                                                       
+            ⋮┆----------------------------------------
+         1086┆ require(_from != address(0), "BEP20: transfer from the zero      
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1088┆ require(_to != address(0), "BEP20: transfer to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1094┆ require(senderBalance >= _amount, "BEP20: transfer amount exceeds
+  balance");                                                                    
+            ⋮┆----------------------------------------
+         1164┆ require(owner != address(0), "BEP20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1166┆ require(spender != address(0), "BEP20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1226┆ require(newAddress != address(pancakeRouter), "MemeKing: The     
+  router already has that address");                                            
+            ⋮┆----------------------------------------
+         1252┆ require(_burnFee + _devFee + _rewardFee <= maximumFee, "Maximum  
+  fee would be exceeded");                                                      
+            ⋮┆----------------------------------------
+         1254┆ require(_burnFee <= maxBurnFee, "Burn fee exceeds 2%");
+            ⋮┆----------------------------------------
+         1256┆ require(_devFee <= maxDevFee, "Dev fee exceeds 2%");
+            ⋮┆----------------------------------------
+         1258┆ require(_rewardFee <= maxRewardFee, "Reward fee exceeds 2%");
+            ⋮┆----------------------------------------
+         1314┆ require(exchangePairs[pair] != value, "MemeKing: Automated market
+  maker pair is already set to that value");                                    
+            ⋮┆----------------------------------------
+         1332┆ revert("Sending BNB to the contract is not smart");
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         1114┆ if (block.timestamp >= nextBurn && _balances[address(this)] > 0) 
+  {                                                                             
+         1115┆ 
+         1116┆     uint256 burnAmount = _balances[address(this)];
+         1117┆ 
+         1118┆     _balances[address(this)] = 0;
+         1119┆ 
+         1120┆     _balances[burnAddress] += burnAmount;
+         1121┆ 
+         1122┆     emit Transfer(address(this), burnAddress, burnAmount);
+         1123┆ 
+             [hid 3 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           47┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+           79┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          101┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          123┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          215┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1036┆ require(currentAllowance >= amount, "BEP20: transfer amount      
+  exceeds allowance");                                                          
+            ⋮┆----------------------------------------
+         1066┆ require(currentAllowance >= subtractedValue, "BEP20: decreased   
+  allowance below zero");                                                       
+            ⋮┆----------------------------------------
+         1086┆ require(_from != address(0), "BEP20: transfer from the zero      
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1088┆ require(_to != address(0), "BEP20: transfer to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1094┆ require(senderBalance >= _amount, "BEP20: transfer amount exceeds
+  balance");                                                                    
+            ⋮┆----------------------------------------
+         1164┆ require(owner != address(0), "BEP20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1166┆ require(spender != address(0), "BEP20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1226┆ require(newAddress != address(pancakeRouter), "MemeKing: The     
+  router already has that address");                                            
+            ⋮┆----------------------------------------
+         1314┆ require(exchangePairs[pair] != value, "MemeKing: Automated market
+  maker pair is already set to that value");                                    
+            ⋮┆----------------------------------------
+         1332┆ revert("Sending BNB to the contract is not smart");
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 40 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

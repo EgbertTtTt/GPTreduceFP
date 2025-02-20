@@ -1,0 +1,78 @@
+'solc --version' running
+'solc /sb/Governor.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/Governor.sol:
+/sb/Governor.sol:2:1: Warning: Experimental features are turned on. Do not use experimental features on live deployments.
+pragma experimental ABIEncoderV2;
+^-------------------------------^
+
+
+Governor.execute(uint256) (../../sb/Governor.sol#208-225) sends eth to arbitrary user
+	Dangerous calls:
+	- timelock.executeTransaction.value(proposal.values[i])(proposal.targets[i],proposal.values[i],proposal.signatures[i],proposal.calldatas[i],proposal.eta) (../../sb/Governor.sol#216-222)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#functions-that-send-ether-to-arbitrary-destinations
+
+Governor._queueOrRevert(address,uint256,string,bytes,uint256) (../../sb/Governor.sol#191-205) ignores return value by timelock.queueTransaction(target,value,signature,data,eta) (../../sb/Governor.sol#204)
+Governor.execute(uint256) (../../sb/Governor.sol#208-225) ignores return value by timelock.executeTransaction.value(proposal.values[i])(proposal.targets[i],proposal.values[i],proposal.signatures[i],proposal.calldatas[i],proposal.eta) (../../sb/Governor.sol#216-222)
+Governor.__queueSetTimelockPendingAdmin(address,uint256) (../../sb/Governor.sol#250-265) ignores return value by timelock.queueTransaction(address(timelock),0,setPendingAdmin(address),abi.encode(newPendingAdmin),eta) (../../sb/Governor.sol#258-264)
+Governor.__executeSetTimelockPendingAdmin(address,uint256) (../../sb/Governor.sol#268-283) ignores return value by timelock.executeTransaction(address(timelock),0,setPendingAdmin(address),abi.encode(newPendingAdmin),eta) (../../sb/Governor.sol#276-282)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+Governor.constructor(address,address).guardian_ (../../sb/Governor.sol#95) lacks a zero-check on :
+		- guardian = guardian_ (../../sb/Governor.sol#97)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Governor._queueOrRevert(address,uint256,string,bytes,uint256) (../../sb/Governor.sol#191-205) has external calls inside a loop: require(bool,string)(! timelock.queuedTransactions(keccak256(bytes)(abi.encode(target,value,signature,data,eta))),Governor::_queueOrRevert: proposal action already queued at eta) (../../sb/Governor.sol#198-203)
+Governor._queueOrRevert(address,uint256,string,bytes,uint256) (../../sb/Governor.sol#191-205) has external calls inside a loop: timelock.queueTransaction(target,value,signature,data,eta) (../../sb/Governor.sol#204)
+Governor.execute(uint256) (../../sb/Governor.sol#208-225) has external calls inside a loop: timelock.executeTransaction.value(proposal.values[i])(proposal.targets[i],proposal.values[i],proposal.signatures[i],proposal.calldatas[i],proposal.eta) (../../sb/Governor.sol#216-222)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in Governor.execute(uint256) (../../sb/Governor.sol#208-225):
+	External calls:
+	- timelock.executeTransaction.value(proposal.values[i])(proposal.targets[i],proposal.values[i],proposal.signatures[i],proposal.calldatas[i],proposal.eta) (../../sb/Governor.sol#216-222)
+	Event emitted after the call(s):
+	- ProposalExecuted(proposalId) (../../sb/Governor.sol#224)
+Reentrancy in Governor.queue(uint256) (../../sb/Governor.sol#146-169):
+	External calls:
+	- _queueOrRevert(proposal.targets[i],proposal.values[i],proposal.signatures[i],proposal.calldatas[i],proposal.eta) (../../sb/Governor.sol#159-165)
+		- timelock.queueTransaction(target,value,signature,data,eta) (../../sb/Governor.sol#204)
+	Event emitted after the call(s):
+	- ProposalQueued(proposal.id,proposal.eta) (../../sb/Governor.sol#168)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Governor.queue(uint256) (../../sb/Governor.sol#146-169) uses timestamp for comparisons
+	Dangerous comparisons:
+	- i < proposal.targets.length (../../sb/Governor.sol#158)
+Governor.state(uint256) (../../sb/Governor.sol#171-188) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp >= add256(proposal.eta,timelock.GRACE_PERIOD()) (../../sb/Governor.sol#182)
+Governor._queueOrRevert(address,uint256,string,bytes,uint256) (../../sb/Governor.sol#191-205) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(! timelock.queuedTransactions(keccak256(bytes)(abi.encode(target,value,signature,data,eta))),Governor::_queueOrRevert: proposal action already queued at eta) (../../sb/Governor.sol#198-203)
+Governor.add256(uint256,uint256) (../../sb/Governor.sol#285-289) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(c >= a,addition overflow) (../../sb/Governor.sol#287)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Governor.sub256(uint256,uint256) (../../sb/Governor.sol#291-294) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.5.11 (../../sb/Governor.sol#1) allows old versions
+solc-0.5.17 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Function ITimelock.GRACE_PERIOD() (../../sb/Governor.sol#8) is not in mixedCase
+Function Governor.__acceptAdmin() (../../sb/Governor.sol#241-247) is not in mixedCase
+Function Governor.__queueSetTimelockPendingAdmin(address,uint256) (../../sb/Governor.sol#250-265) is not in mixedCase
+Function Governor.__executeSetTimelockPendingAdmin(address,uint256) (../../sb/Governor.sol#268-283) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+propose(address[],uint256[],string[],bytes[],string) should be declared external:
+	- Governor.propose(address[],uint256[],string[],bytes[],string) (../../sb/Governor.sol#100-144)
+Moreover, the following function parameters should change its data location:
+targets location should be calldata
+values location should be calldata
+signatures location should be calldata
+calldatas location should be calldata
+description location should be calldata
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#public-function-that-could-be-declared-external
+/sb/Governor.sol analyzed (2 contracts with 93 detectors), 23 result(s) found

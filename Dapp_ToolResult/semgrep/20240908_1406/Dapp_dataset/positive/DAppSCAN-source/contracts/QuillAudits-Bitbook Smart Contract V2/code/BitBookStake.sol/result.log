@@ -1,0 +1,161 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 24 Code Findings │
+└──────────────────┘
+                         
+    /sb/BitBookStake.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          133┆ contract BitBookStake is Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+          137┆ uint256 stakeID = 0;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+           37┆ constructor ()  { }
+            ⋮┆----------------------------------------
+          107┆ constructor ()  {
+          108┆   address msgSender = _msgSender();
+          109┆   _owner = msgSender;
+          110┆   emit OwnershipTransferred(address(0), msgSender);
+          111┆ }
+            ⋮┆----------------------------------------
+          163┆ constructor(IBEP20 _bitBookToken) {
+          164┆     bitBookToken = _bitBookToken;
+          165┆ 
+          166┆     //set fee percentage initially
+          167┆     getPercentage[1][3] = 5e8;
+          168┆     getPercentage[3][10] = 25e7;
+          169┆     getPercentage[10][30] = 15e7;
+          170┆     getPercentage[30][90] = 5e7;
+          171┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           53┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+           76┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          118┆ require(_owner == _msgSender(), "Ownable: caller is not the      
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          127┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          174┆ require(_amount > 0,"BitBook Stake: amount must greater than zero
+  ");                                                                           
+            ⋮┆----------------------------------------
+          199┆ require((_from == 1 && _to == 3) || (_from == 3 && _to == 10) || 
+  (_from == 10 && _to == 30) || (_from == 30 && _to == 90) ,"BitBook stake ::   
+  give correct days p ... [0m                                                   
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+          206┆ require((_from == 1 && _to == 3) || (_from == 3 && _to == 10) || 
+  (_from == 10 && _to == 30) || (_from == 30 && _to == 90) ,"BitBook stake ::   
+  give correct days p ... [0m                                                   
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+          229┆ require(!userDetails[msg.sender][_stakerID].claim,"BitBook ::    
+  User already claimed");                                                       
+            ⋮┆----------------------------------------
+          230┆ require(userDetails[msg.sender][_stakerID].depositTime !=        
+  0,"BitBook :: User not found");                                               
+            ⋮┆----------------------------------------
+          261┆ require(_to != address(0) && _amount != 0,"BitBook :: failsafe   
+  params error");                                                               
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          199┆ require((_from == 1 && _to == 3) || (_from == 3 && _to == 10) || 
+  (_from == 10 && _to == 30) || (_from == 30 && _to == 90) ,"BitBook stake ::   
+  give correct days p ... [0m                                                   
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+          206┆ require((_from == 1 && _to == 3) || (_from == 3 && _to == 10) || 
+  (_from == 10 && _to == 30) || (_from == 30 && _to == 90) ,"BitBook stake ::   
+  give correct days p ... [0m                                                   
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+          261┆ require(_to != address(0) && _amount != 0,"BitBook :: failsafe   
+  params error");                                                               
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          184┆ stakeID++;
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           76┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          127┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          174┆ require(_amount > 0,"BitBook Stake: amount must greater than zero
+  ");                                                                           
+            ⋮┆----------------------------------------
+          199┆ require((_from == 1 && _to == 3) || (_from == 3 && _to == 10) || 
+  (_from == 10 && _to == 30) || (_from == 30 && _to == 90) ,"BitBook stake ::   
+  give correct days p ... [0m                                                   
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+          206┆ require((_from == 1 && _to == 3) || (_from == 3 && _to == 10) || 
+  (_from == 10 && _to == 30) || (_from == 30 && _to == 90) ,"BitBook stake ::   
+  give correct days p ... [0m                                                   
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 24 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

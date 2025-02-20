@@ -1,0 +1,301 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 65 Code Findings │
+└──────────────────┘
+                    
+    /sb/CFVault.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          129┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          133┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          140┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          145┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          150┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          649┆ contract CFVaultV2 is Ownable, ReentrancyGuard {
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          201┆ for (uint i = 0; i< self.length;i++){
+            ⋮┆----------------------------------------
+          210┆ for (uint i = 0; i< self.length;i++){
+            ⋮┆----------------------------------------
+          600┆ for(uint i = 0; i < transferListeners.length; i++){
+            ⋮┆----------------------------------------
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+          106┆ _guardCounter += 1;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+           12┆ constructor () internal {
+           13┆     address msgSender = msg.sender;
+           14┆     _contract_owner = msgSender;
+           15┆     emit OwnershipTransferred(address(0), msgSender);
+           16┆ }
+            ⋮┆----------------------------------------
+          101┆ constructor () internal {
+          102┆     _guardCounter = 1;
+          103┆ }
+            ⋮┆----------------------------------------
+          312┆ constructor(
+          313┆     ERC20Base _parentToken,
+          314┆     uint _parentSnapShotBlock,
+          315┆     string memory _tokenName,
+          316┆     uint8 _decimalUnits,
+          317┆     string memory _tokenSymbol,
+          318┆     bool _transfersEnabled
+          319┆ )  public
+          320┆ {
+          321┆     name = _tokenName;                                 // Set the
+  name                                                                          
+             [hid 7 additional lines, adjust with --max-lines-per-finding] 
+          666┆ constructor(address _target_token, address _lp_token, address    
+  _controller) public {                                                         
+          667┆   require(_controller != address(0x0), "invalid controller");
+          668┆   target_token = _target_token;
+          669┆   controller = CFControllerInterface(_controller);
+          670┆   ratio_base = 10000;
+          671┆   lp_token = _lp_token;
+          672┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          600┆ for(uint i = 0; i < transferListeners.length; i++){
+            ⋮┆----------------------------------------
+          601┆ TransferEventCallBack t =                                        
+  TransferEventCallBack(transferListeners[i]);                                  
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          201┆ for (uint i = 0; i< self.length;i++){
+            ⋮┆----------------------------------------
+          210┆ for (uint i = 0; i< self.length;i++){
+            ⋮┆----------------------------------------
+          600┆ for(uint i = 0; i < transferListeners.length; i++){
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           29┆ require(_contract_owner == msg.sender, "Ownable: caller is not   
+  the owner");                                                                  
+            ⋮┆----------------------------------------
+           45┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+           54┆ require(c >= a, "add");
+            ⋮┆----------------------------------------
+           61┆ require(b <= a, "sub");
+            ⋮┆----------------------------------------
+           66┆ require(a == 0 || c / a == b, "mul");
+            ⋮┆----------------------------------------
+           69┆ require(b > 0, "div");
+            ⋮┆----------------------------------------
+           90┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+           94┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          109┆ require(localCounter == _guardCounter, "ReentrancyGuard:         
+  reentrant call");                                                             
+            ⋮┆----------------------------------------
+          137┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          138┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          139┆ );
+            ⋮┆----------------------------------------
+          153┆ require(address(token).isContract(), "SafeERC20: call to         
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          157┆ require(success, "SafeERC20: low-level call failed");
+            ⋮┆----------------------------------------
+          161┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          176┆ require(status, "TransferableToken, transfer eth failed");
+            ⋮┆----------------------------------------
+          215┆ require(false, "AddressArray:index_of, not exist");
+            ⋮┆----------------------------------------
+          667┆ require(_controller != address(0x0), "invalid controller");
+            ⋮┆----------------------------------------
+          693┆ require(controller != CFControllerInterface(0x0) &&              
+  controller.get_current_pool() != ICurvePool(0x0), "paused");                  
+            ⋮┆----------------------------------------
+          695┆ require(_amount == msg.value, "inconsist amount");
+            ⋮┆----------------------------------------
+          697┆ require(IERC20(target_token).allowance(msg.sender, address(this))
+  >= _amount, "CFVault: not enough allowance");                                 
+            ⋮┆----------------------------------------
+          700┆ require(_amount <= max_amount, "too large amount");
+            ⋮┆----------------------------------------
+          701┆ require(slip != 0, "Slippage not set");
+            ⋮┆----------------------------------------
+          702┆ require(_amount != 0, "too small amount");
+            ⋮┆----------------------------------------
+          712┆ require(tt_after.safeSub(tt_before) == _amount, "token           
+  inflation");                                                                  
+            ⋮┆----------------------------------------
+          727┆ require(lp_amount >= min_amount, "Slippage");
+            ⋮┆----------------------------------------
+          731┆ require(d <= 18, "invalid decimal");
+            ⋮┆----------------------------------------
+          748┆ require(controller != CFControllerInterface(0x0) &&              
+  controller.get_current_pool() != ICurvePool(0x0), "paused");                  
+            ⋮┆----------------------------------------
+          749┆ require(slip != 0, "Slippage not set");
+            ⋮┆----------------------------------------
+          751┆ require(amount >= _amount, "no enough LP tokens");
+            ⋮┆----------------------------------------
+          764┆ require(target_amount >= min_amount, "Slippage");
+            ⋮┆----------------------------------------
+          783┆ require(_fee < ratio_base, "invalid fee");
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          372┆ require((_to != address(0)) && (_to != address(this)));
+            ⋮┆----------------------------------------
+          693┆ require(controller != CFControllerInterface(0x0) &&              
+  controller.get_current_pool() != ICurvePool(0x0), "paused");                  
+            ⋮┆----------------------------------------
+          748┆ require(controller != CFControllerInterface(0x0) &&              
+  controller.get_current_pool() != ICurvePool(0x0), "paused");                  
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          767┆ if(withdraw_fee_ratio != 0 && fee_pool != address(0x0)){
+          768┆   uint256 f =                                                    
+  target_amount.safeMul(withdraw_fee_ratio).safeDiv(ratio_base);                
+          769┆   uint256 r = target_amount.safeSub(f);
+          770┆   TransferableToken.transfer(target_token, msg.sender, r);
+          771┆   TransferableToken.transfer(target_token, fee_pool, f);
+          772┆   TokenInterfaceERC20(lp_token).destroyTokens(msg.sender,        
+  _amount);                                                                     
+          773┆   emit CFFWithdraw(msg.sender, r, _amount, f,                    
+  get_virtual_price());                                                         
+          774┆ }else{
+          775┆   TransferableToken.transfer(target_token, msg.sender,           
+  target_amount);                                                               
+          776┆   TokenInterfaceERC20(lp_token).destroyTokens(msg.sender,        
+  _amount);                                                                     
+             [hid 2 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-prefix-decrement-not-postfix                    
+          Consider using the prefix decrement expression whenever the return    
+  value is not needed. The                                                      
+          prefix decrement expression is cheaper in terms of gas.               
+                                                                                
+          223┆ self.length--;
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          201┆ for (uint i = 0; i< self.length;i++){
+            ⋮┆----------------------------------------
+          210┆ for (uint i = 0; i< self.length;i++){
+            ⋮┆----------------------------------------
+          600┆ for(uint i = 0; i < transferListeners.length; i++){
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           45┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+           94┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          137┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          138┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          139┆ );
+            ⋮┆----------------------------------------
+          161┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          176┆ require(status, "TransferableToken, transfer eth failed");
+            ⋮┆----------------------------------------
+       solidity.security.curve-readonly-reentrancy                              
+          controller.get_current_pool().get_virtual_price() call on a Curve pool
+  is not protected from                                                         
+          the read-only reentrancy.                                             
+                                                                                
+          718┆ uint vir = controller.get_current_pool().get_virtual_price();
+            ⋮┆----------------------------------------
+          756┆ uint vir = controller.get_current_pool().get_virtual_price();
+            ⋮┆----------------------------------------
+       solidity.security.curve-readonly-reentrancy                              
+          cp.get_virtual_price() call on a Curve pool is not protected from the 
+  read-only reentrancy.                                                         
+                                                                                
+          810┆ return v1.safeMul(cp.get_virtual_price()).safeDiv(v2);
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+Some files were skipped or only partially analyzed.
+  Partially scanned: 1 files only partially analyzed due to parsing or internal Semgrep errors
+
+Ran 48 rules on 1 file: 65 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

@@ -1,0 +1,147 @@
+'solc --version' running
+'solc /sb/DODODrops.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/DODODrops.sol:
+Warning: Contract code size exceeds 24576 bytes (a limit introduced in Spurious Dragon). This contract may not be deployable on mainnet. Consider enabling the optimizer (with a low "runs" value!), turning off revert strings, or using libraries.
+   --> /sb/DODODrops.sol:589:1:
+    |
+589 | contract DODODrops is InitializableMintableERC20, ReentrancyGuard {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+InitializableOwnable.initOwner(address).newOwner (../../sb/DODODrops.sol#463) lacks a zero-check on :
+		- _OWNER_ = newOwner (../../sb/DODODrops.sol#465)
+InitializableOwnable.transferOwnership(address).newOwner (../../sb/DODODrops.sol#468) lacks a zero-check on :
+		- _NEW_OWNER_ = newOwner (../../sb/DODODrops.sol#470)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+DODODrops._redeemSinglePrize(address,uint256,address) (../../sb/DODODrops.sol#708-743) has external calls inside a loop: IDropsNft(_NFT_TOKEN_).mint(to,tokenId,1,) (../../sb/DODODrops.sol#733)
+DODODrops._redeemSinglePrize(address,uint256,address) (../../sb/DODODrops.sol#708-743) has external calls inside a loop: IDropsNft(_NFT_TOKEN_).mint(to,tokenId) (../../sb/DODODrops.sol#740)
+DODODrops._redeemSinglePrize(address,uint256,address) (../../sb/DODODrops.sol#708-743) has external calls inside a loop: random = IRandomGenerator(_RNG_).random(gasleft()() + block.number) % range (../../sb/DODODrops.sol#721)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in DODODrops.buyTickets(address,uint256) (../../sb/DODODrops.sol#677-695):
+	External calls:
+	- IERC20(_BUY_TOKEN_).universalTransfer(_MAINTAINER_,feeAmount) (../../sb/DODODrops.sol#692)
+	State variables written after the call(s):
+	- _mint(ticketTo,ticketAmount) (../../sb/DODODrops.sol#693)
+		- balances[user] = balances[user].add(value) (../../sb/DODODrops.sol#562)
+	- _mint(ticketTo,ticketAmount) (../../sb/DODODrops.sol#693)
+		- totalSupply = totalSupply.add(value) (../../sb/DODODrops.sol#563)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in DODODrops._redeemSinglePrize(address,uint256,address) (../../sb/DODODrops.sol#708-743):
+	External calls:
+	- IDropsNft(_NFT_TOKEN_).mint(to,tokenId,1,) (../../sb/DODODrops.sol#733)
+	- IDropsNft(_NFT_TOKEN_).mint(to,tokenId) (../../sb/DODODrops.sol#740)
+	Event emitted after the call(s):
+	- RedeemPrize(to,tokenId,referer) (../../sb/DODODrops.sol#742)
+Reentrancy in DODODrops.buyTickets(address,uint256) (../../sb/DODODrops.sol#677-695):
+	External calls:
+	- IERC20(_BUY_TOKEN_).universalTransfer(_MAINTAINER_,feeAmount) (../../sb/DODODrops.sol#692)
+	Event emitted after the call(s):
+	- BuyTicket(ticketTo,payAmount,feeAmount,ticketAmount) (../../sb/DODODrops.sol#694)
+	- Mint(user,value) (../../sb/DODODrops.sol#564)
+		- _mint(ticketTo,ticketAmount) (../../sb/DODODrops.sol#693)
+	- Transfer(address(0),user,value) (../../sb/DODODrops.sol#565)
+		- _mint(ticketTo,ticketAmount) (../../sb/DODODrops.sol#693)
+Reentrancy in DODODrops.withdraw() (../../sb/DODODrops.sol#784-788):
+	External calls:
+	- IERC20(_BUY_TOKEN_).universalTransfer(msg.sender,amount) (../../sb/DODODrops.sol#786)
+	Event emitted after the call(s):
+	- Withdraw(msg.sender,amount) (../../sb/DODODrops.sol#787)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+DODODrops._redeemSinglePrize(address,uint256,address) (../../sb/DODODrops.sol#708-743) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp >= _REDEEM_ALLOWED_TIME_ && _REDEEM_ALLOWED_TIME_ != 0,REDEEM_CLOSE) (../../sb/DODODrops.sol#709)
+DODODrops.updateRedeemTime(uint256) (../../sb/DODODrops.sol#834-838) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(newRedeemTime > block.timestamp || newRedeemTime == 0,PARAM_NOT_INVALID) (../../sb/DODODrops.sol#835)
+DODODrops.getSellingInfo() (../../sb/DODODrops.sol#846-859) uses timestamp for comparisons
+	Dangerous comparisons:
+	- curBlockTime >= _SELLING_TIME_INTERVAL_[0] && _SELLING_TIME_INTERVAL_[0] != 0 (../../sb/DODODrops.sol#848)
+	- curBlockTime <= _SELLING_TIME_INTERVAL_[i] (../../sb/DODODrops.sol#851)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/DODODrops.sol#256-265) uses assembly
+	- INLINE ASM (../../sb/DODODrops.sol#263)
+Address._verifyCallResult(bool,bytes,string) (../../sb/DODODrops.sol#401-418) uses assembly
+	- INLINE ASM (../../sb/DODODrops.sol#410-413)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+DODODrops._redeemSinglePrize(address,uint256,address) (../../sb/DODODrops.sol#708-743) has costly operations inside a loop:
+	- _TOKEN_ID_LIST_.pop() (../../sb/DODODrops.sol#739)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#costly-operations-inside-a-loop
+
+Address._verifyCallResult(bool,bytes,string) (../../sb/DODODrops.sol#401-418) is never used and should be removed
+Address.functionCall(address,bytes) (../../sb/DODODrops.sol#309-311) is never used and should be removed
+Address.functionCall(address,bytes,string) (../../sb/DODODrops.sol#319-321) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/DODODrops.sol#334-336) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/DODODrops.sol#344-351) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/DODODrops.sol#383-385) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/DODODrops.sol#393-399) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/DODODrops.sol#359-361) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/DODODrops.sol#369-375) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/DODODrops.sol#283-289) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/DODODrops.sol#143-157) is never used and should be removed
+SafeERC20.safeTransferFrom(IERC20,address,address,uint256) (../../sb/DODODrops.sol#131-141) is never used and should be removed
+SafeMath.div(uint256,uint256) (../../sb/DODODrops.sol#84-87) is never used and should be removed
+SafeMath.divCeil(uint256,uint256) (../../sb/DODODrops.sol#89-97) is never used and should be removed
+SafeMath.mul(uint256,uint256) (../../sb/DODODrops.sol#73-82) is never used and should be removed
+SafeMath.sqrt(uint256) (../../sb/DODODrops.sol#110-117) is never used and should be removed
+UniversalERC20.tokenBalanceOf(IERC20,address) (../../sb/DODODrops.sol#229-231) is never used and should be removed
+UniversalERC20.universalApproveMax(IERC20,address,uint256) (../../sb/DODODrops.sol#207-219) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.6.9 (../../sb/DODODrops.sol#1) is known to contain severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+solc-0.6.9 is known to contain severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in SafeERC20._callOptionalReturn(IERC20,bytes) (../../sb/DODODrops.sol#165-184):
+	- (success,returndata) = address(token).call(data) (../../sb/DODODrops.sol#176)
+Low level call in Address.sendValue(address,uint256) (../../sb/DODODrops.sol#283-289):
+	- (success) = recipient.call{value: amount}() (../../sb/DODODrops.sol#287)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/DODODrops.sol#344-351):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/DODODrops.sol#349)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/DODODrops.sol#369-375):
+	- (success,returndata) = target.staticcall(data) (../../sb/DODODrops.sol#373)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/DODODrops.sol#393-399):
+	- (success,returndata) = target.delegatecall(data) (../../sb/DODODrops.sol#397)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Variable ReentrancyGuard._ENTERED_ (../../sb/DODODrops.sol#424) is not in mixedCase
+Variable InitializableOwnable._OWNER_ (../../sb/DODODrops.sol#439) is not in mixedCase
+Variable InitializableOwnable._NEW_OWNER_ (../../sb/DODODrops.sol#440) is not in mixedCase
+Variable InitializableOwnable._INITIALIZED_ (../../sb/DODODrops.sol#441) is not in mixedCase
+Parameter InitializableMintableERC20.init(address,uint256,string,string,uint8)._creator (../../sb/DODODrops.sol#498) is not in mixedCase
+Parameter InitializableMintableERC20.init(address,uint256,string,string,uint8)._initSupply (../../sb/DODODrops.sol#499) is not in mixedCase
+Parameter InitializableMintableERC20.init(address,uint256,string,string,uint8)._name (../../sb/DODODrops.sol#500) is not in mixedCase
+Parameter InitializableMintableERC20.init(address,uint256,string,string,uint8)._symbol (../../sb/DODODrops.sol#501) is not in mixedCase
+Parameter InitializableMintableERC20.init(address,uint256,string,string,uint8)._decimals (../../sb/DODODrops.sol#502) is not in mixedCase
+Parameter DODODrops.addressToShortString(address)._addr (../../sb/DODODrops.sol#861) is not in mixedCase
+Variable DODODrops._BUY_TOKEN_ (../../sb/DODODrops.sol#597) is not in mixedCase
+Variable DODODrops._BUY_TOKEN_RESERVE_ (../../sb/DODODrops.sol#598) is not in mixedCase
+Variable DODODrops._FEE_MODEL_ (../../sb/DODODrops.sol#599) is not in mixedCase
+Variable DODODrops._MAINTAINER_ (../../sb/DODODrops.sol#600) is not in mixedCase
+Variable DODODrops._NFT_TOKEN_ (../../sb/DODODrops.sol#601) is not in mixedCase
+Variable DODODrops._TICKET_UNIT_ (../../sb/DODODrops.sol#603) is not in mixedCase
+Variable DODODrops._SELLING_TIME_INTERVAL_ (../../sb/DODODrops.sol#605) is not in mixedCase
+Variable DODODrops._SELLING_PRICE_SET_ (../../sb/DODODrops.sol#606) is not in mixedCase
+Variable DODODrops._SELLING_AMOUNT_SET_ (../../sb/DODODrops.sol#607) is not in mixedCase
+Variable DODODrops._REDEEM_ALLOWED_TIME_ (../../sb/DODODrops.sol#608) is not in mixedCase
+Variable DODODrops._PROB_INTERVAL_ (../../sb/DODODrops.sol#610) is not in mixedCase
+Variable DODODrops._TOKEN_ID_MAP_ (../../sb/DODODrops.sol#611) is not in mixedCase
+Variable DODODrops._TOKEN_ID_LIST_ (../../sb/DODODrops.sol#613) is not in mixedCase
+Variable DODODrops._IS_PROB_MODE_ (../../sb/DODODrops.sol#615) is not in mixedCase
+Variable DODODrops._IS_REVEAL_MODE_ (../../sb/DODODrops.sol#616) is not in mixedCase
+Variable DODODrops._REVEAL_RN_ (../../sb/DODODrops.sol#617) is not in mixedCase
+Variable DODODrops._RNG_ (../../sb/DODODrops.sol#618) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+DODODrops._BASE_COIN_ (../../sb/DODODrops.sol#595) is never used in DODODrops (../../sb/DODODrops.sol#589-872)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-state-variable
+
+Loop condition i < _PROB_INTERVAL_.length (../../sb/DODODrops.sol#726) should use cached array length instead of referencing `length` member of the storage array.
+ Loop condition i < _SELLING_TIME_INTERVAL_.length (../../sb/DODODrops.sol#850) should use cached array length instead of referencing `length` member of the storage array.
+ Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cache-array-length
+/sb/DODODrops.sol analyzed (12 contracts with 93 detectors), 70 result(s) found

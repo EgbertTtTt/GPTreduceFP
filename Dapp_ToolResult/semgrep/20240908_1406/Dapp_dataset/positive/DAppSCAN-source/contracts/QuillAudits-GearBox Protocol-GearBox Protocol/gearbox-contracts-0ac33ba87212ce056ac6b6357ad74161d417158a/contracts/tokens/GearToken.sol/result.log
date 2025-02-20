@@ -1,0 +1,199 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 30 Code Findings │
+└──────────────────┘
+                      
+    /sb/GearToken.sol 
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          301┆ constructor(address account) {
+          302┆     balances[account] = uint96(totalSupply);
+          303┆     emit Transfer(address(0), account, totalSupply);
+          304┆     manager = msg.sender;
+          305┆     // SWC-135-Code With No Effects: L108
+          306┆     transfersAllowed = false;
+          307┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          587┆ Checkpoint memory cp = checkpoints[account][center];
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           74┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+           89┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          106┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          123┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          140┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          293┆ require(msg.sender == manager, "Gear::caller is not the          
+  manager");                                                                    
+            ⋮┆----------------------------------------
+          313┆ require(newManager != address(0), "Zero address is not allowed");
+  // T:[GT-5]                                                                   
+            ⋮┆----------------------------------------
+          418┆ require(signatory != address(0), "Gear::permit: invalid          
+  signature");                                                                  
+            ⋮┆----------------------------------------
+          419┆ require(signatory == owner, "Gear::permit: unauthorized");
+            ⋮┆----------------------------------------
+          420┆ require(block.timestamp <= deadline, "Gear::permit: signature    
+  expired");                                                                    
+            ⋮┆----------------------------------------
+          525┆ require(
+          526┆     signatory != address(0),
+          527┆     "Gear::delegateBySig: invalid signature"
+          528┆ );
+            ⋮┆----------------------------------------
+          529┆ require(
+          530┆     nonce == nonces[signatory]++,
+          531┆     "Gear::delegateBySig: invalid nonce"
+          532┆ );
+            ⋮┆----------------------------------------
+          533┆ require(
+          534┆     block.timestamp <= expiry,
+          535┆     "Gear::delegateBySig: signature expired"
+          536┆ );
+            ⋮┆----------------------------------------
+          563┆ require(
+          564┆     blockNumber < block.number,
+          565┆     "Gear::getPriorVotes: not yet determined"
+          566┆ );
+            ⋮┆----------------------------------------
+          614┆ require(
+          615┆     transfersAllowed || msg.sender == manager || msg.sender ==   
+  miner,                                                                        
+          616┆     "Gear::transfers are forbidden"
+          617┆ );
+            ⋮┆----------------------------------------
+          618┆ require(
+          619┆     src != address(0),
+          620┆     "Gear::_transferTokens: cannot transfer from the zero        
+  address"                                                                      
+          621┆ );
+            ⋮┆----------------------------------------
+          622┆ require(
+          623┆     dst != address(0),
+          624┆     "Gear::_transferTokens: cannot transfer to the zero address"
+          625┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          470┆ if (spender != src && spenderAllowance != uint96(-1)) {
+          471┆     uint96 newAllowance = sub96(
+          472┆         spenderAllowance,
+          473┆         amount,
+          474┆         "Gear::transferFrom: transfer amount exceeds spender     
+  allowance"                                                                    
+          475┆     );
+          476┆     allowances[src][spender] = newAllowance;
+          477┆ 
+          478┆     emit Approval(src, spender, newAllowance);
+          479┆ }
+            ⋮┆----------------------------------------
+          647┆ if (srcRep != dstRep && amount > 0) {
+          648┆     if (srcRep != address(0)) {
+          649┆         uint32 srcRepNum = numCheckpoints[srcRep];
+          650┆         uint96 srcRepOld = srcRepNum > 0
+          651┆             ? checkpoints[srcRep][srcRepNum - 1].votes
+          652┆             : 0;
+          653┆         uint96 srcRepNew = sub96(
+          654┆             srcRepOld,
+          655┆             amount,
+          656┆             "Gear::_moveVotes: vote amount underflows"
+             [hid 17 additional lines, adjust with --max-lines-per-finding] 
+          687┆ if (
+          688┆     nCheckpoints > 0 &&
+          689┆     checkpoints[delegatee][nCheckpoints - 1].fromBlock ==        
+  blockNumber                                                                   
+          690┆ ) {
+          691┆     checkpoints[delegatee][nCheckpoints - 1].votes = newVotes;
+          692┆ } else {
+          693┆     checkpoints[delegatee][nCheckpoints] = Checkpoint(
+          694┆         blockNumber,
+          695┆         newVotes
+          696┆     );
+             [hid 2 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          530┆ nonce == nonces[signatory]++,
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          106┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          525┆ require(
+          526┆     signatory != address(0),
+          527┆     "Gear::delegateBySig: invalid signature"
+          528┆ );
+            ⋮┆----------------------------------------
+          529┆ require(
+          530┆     nonce == nonces[signatory]++,
+          531┆     "Gear::delegateBySig: invalid nonce"
+          532┆ );
+            ⋮┆----------------------------------------
+          533┆ require(
+          534┆     block.timestamp <= expiry,
+          535┆     "Gear::delegateBySig: signature expired"
+          536┆ );
+            ⋮┆----------------------------------------
+          563┆ require(
+          564┆     blockNumber < block.number,
+          565┆     "Gear::getPriorVotes: not yet determined"
+          566┆ );
+            ⋮┆----------------------------------------
+          618┆ require(
+          619┆     src != address(0),
+          620┆     "Gear::_transferTokens: cannot transfer from the zero        
+  address"                                                                      
+          621┆ );
+            ⋮┆----------------------------------------
+          622┆ require(
+          623┆     dst != address(0),
+          624┆     "Gear::_transferTokens: cannot transfer to the zero address"
+          625┆ );
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 30 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

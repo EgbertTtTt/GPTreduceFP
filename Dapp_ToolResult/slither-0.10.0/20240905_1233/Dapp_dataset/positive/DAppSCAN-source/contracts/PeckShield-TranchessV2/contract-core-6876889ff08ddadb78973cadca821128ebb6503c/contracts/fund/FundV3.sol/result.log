@@ -1,0 +1,300 @@
+'solc --version' running
+'solc /sb/FundV3.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/FundV3.sol:
+Warning: Contract code size exceeds 24576 bytes (a limit introduced in Spurious Dragon). This contract may not be deployable on mainnet. Consider enabling the optimizer (with a low "runs" value!), turning off revert strings, or using libraries.
+    --> /sb/FundV3.sol:1377:1:
+     |
+1377 | contract FundV3 is IFundV3, Ownable, ReentrancyGuard, FundRolesV2, CoreUtility {
+     | ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+FundV3.transferFromStrategy(uint256) (../../sb/FundV3.sol#2195-2199) uses arbitrary from in transferFrom: IERC20(tokenUnderlying).safeTransferFrom(_strategy,address(this),amount) (../../sb/FundV3.sol#2197)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#arbitrary-from-in-transferfrom
+
+Reentrancy in FundV3.settle() (../../sb/FundV3.sol#2143-2188):
+	External calls:
+	- IPrimaryMarketV3(_primaryMarket).settle(day) (../../sb/FundV3.sol#2152)
+	- _payFeeDebt() (../../sb/FundV3.sol#2154)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/FundV3.sol#537)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/FundV3.sol#405)
+		- (success) = feeCollector.call(abi.encodeWithSignature(checkpoint())) (../../sb/FundV3.sol#2347)
+		- IERC20(tokenUnderlying).safeTransfer(feeCollector,amount) (../../sb/FundV3.sol#2351)
+	- interestRate = _updateInterestRate(day) (../../sb/FundV3.sol#2175-2178)
+		- baseInterestRate = MAX_INTEREST_RATE.min(aprOracle.capture()) (../../sb/FundV3.sol#2449)
+	External calls sending eth:
+	- _payFeeDebt() (../../sb/FundV3.sol#2154)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/FundV3.sol#405)
+	State variables written after the call(s):
+	- _historicalNavB[day] = navB (../../sb/FundV3.sol#2183)
+	FundV3._historicalNavB (../../sb/FundV3.sol#1472) can be used in cross function reentrancies:
+	- FundV3._extrapolateNav(uint256,uint256,uint256,uint256,uint256) (../../sb/FundV3.sol#1726-1753)
+	- FundV3.historicalNavs(uint256) (../../sb/FundV3.sol#1686-1693)
+	- FundV3.initialize(uint256,uint256,uint256) (../../sb/FundV3.sol#1547-1567)
+	- _historicalNavR[day] = navR (../../sb/FundV3.sol#2184)
+	FundV3._historicalNavR (../../sb/FundV3.sol#1475) can be used in cross function reentrancies:
+	- FundV3._extrapolateNav(uint256,uint256,uint256,uint256,uint256) (../../sb/FundV3.sol#1726-1753)
+	- FundV3.historicalNavs(uint256) (../../sb/FundV3.sol#1686-1693)
+	- FundV3.initialize(uint256,uint256,uint256) (../../sb/FundV3.sol#1547-1567)
+	- currentDay = day + 86400 (../../sb/FundV3.sol#2185)
+	FundV3.currentDay (../../sb/FundV3.sol#1433) can be used in cross function reentrancies:
+	- FundV3.currentDay (../../sb/FundV3.sol#1433)
+	- FundV3.extrapolateNav(uint256) (../../sb/FundV3.sol#1705-1724)
+	- FundV3.initialize(uint256,uint256,uint256) (../../sb/FundV3.sol#1547-1567)
+	- historicalInterestRate[day] = interestRate (../../sb/FundV3.sol#2179)
+	FundV3.historicalInterestRate (../../sb/FundV3.sol#1493) can be used in cross function reentrancies:
+	- FundV3._extrapolateNav(uint256,uint256,uint256,uint256,uint256) (../../sb/FundV3.sol#1726-1753)
+	- FundV3.historicalInterestRate (../../sb/FundV3.sol#1493)
+	- FundV3.initialize(uint256,uint256,uint256) (../../sb/FundV3.sol#1547-1567)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities
+
+CoreUtility._endOfWeek(uint256) (../../sb/FundV3.sol#820-822) performs a multiplication on the result of a division:
+	- ((timestamp.add(604800) - SETTLEMENT_TIME) / 604800) * 604800 + SETTLEMENT_TIME (../../sb/FundV3.sol#821)
+FundV3.endOfDay(uint256) (../../sb/FundV3.sol#1580-1582) performs a multiplication on the result of a division:
+	- ((timestamp.add(86400) - SETTLEMENT_TIME) / 86400) * 86400 + SETTLEMENT_TIME (../../sb/FundV3.sol#1581)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+FundV3._payFeeDebt() (../../sb/FundV3.sol#2331-2354) uses a dangerous strict equality:
+	- total == 0 (../../sb/FundV3.sol#2333)
+FundV3._payFeeDebt() (../../sb/FundV3.sol#2331-2354) uses a dangerous strict equality:
+	- hot == 0 (../../sb/FundV3.sol#2337)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+FundV3.refreshAllowance(address,address,uint256).owner (../../sb/FundV3.sol#1842) shadows:
+	- Ownable.owner() (../../sb/FundV3.sol#623-625) (function)
+FundV3.trancheAllowance(uint256,address,address).owner (../../sb/FundV3.sol#1914) shadows:
+	- Ownable.owner() (../../sb/FundV3.sol#623-625) (function)
+FundV3.trancheAllowanceVersion(address,address).owner (../../sb/FundV3.sol#1948) shadows:
+	- Ownable.owner() (../../sb/FundV3.sol#623-625) (function)
+FundV3.shareApprove(address,address,uint256).owner (../../sb/FundV3.sol#2052) shadows:
+	- Ownable.owner() (../../sb/FundV3.sol#623-625) (function)
+FundV3._approve(uint256,address,address,uint256).owner (../../sb/FundV3.sol#2126) shadows:
+	- Ownable.owner() (../../sb/FundV3.sol#623-625) (function)
+FundV3._refreshAllowance(address,address,uint256).owner (../../sb/FundV3.sol#2498) shadows:
+	- Ownable.owner() (../../sb/FundV3.sol#623-625) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+FundV3.transferToStrategy(uint256) (../../sb/FundV3.sol#2190-2193) should emit an event for: 
+	- _strategyUnderlying = _strategyUnderlying.add(amount) (../../sb/FundV3.sol#2191) 
+FundV3.transferFromStrategy(uint256) (../../sb/FundV3.sol#2195-2199) should emit an event for: 
+	- _strategyUnderlying = _strategyUnderlying.sub(amount) (../../sb/FundV3.sol#2196) 
+FundV3.primaryMarketTransferUnderlying(address,uint256,uint256) (../../sb/FundV3.sol#2201-2209) should emit an event for: 
+	- feeDebt = feeDebt.add(fee) (../../sb/FundV3.sol#2207) 
+	- _totalDebt = _totalDebt.add(fee) (../../sb/FundV3.sol#2208) 
+FundV3.primaryMarketAddDebt(uint256,uint256) (../../sb/FundV3.sol#2211-2215) should emit an event for: 
+	- feeDebt = feeDebt.add(fee) (../../sb/FundV3.sol#2213) 
+	- _totalDebt = _totalDebt.add(amount).add(fee) (../../sb/FundV3.sol#2214) 
+FundV3.primaryMarketPayDebt(uint256) (../../sb/FundV3.sol#2217-2221) should emit an event for: 
+	- _totalDebt = _totalDebt.sub(amount) (../../sb/FundV3.sol#2219) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+FundRolesV2.constructor(address,address,address,address,address).tokenQ_ (../../sb/FundV3.sol#1279) lacks a zero-check on :
+		- _tokenQ = tokenQ_ (../../sb/FundV3.sol#1285)
+FundRolesV2.constructor(address,address,address,address,address).tokenB_ (../../sb/FundV3.sol#1280) lacks a zero-check on :
+		- _tokenB = tokenB_ (../../sb/FundV3.sol#1286)
+FundRolesV2.constructor(address,address,address,address,address).tokenR_ (../../sb/FundV3.sol#1281) lacks a zero-check on :
+		- _tokenR = tokenR_ (../../sb/FundV3.sol#1287)
+FundRolesV2.constructor(address,address,address,address,address).primaryMarket_ (../../sb/FundV3.sol#1282) lacks a zero-check on :
+		- _primaryMarket = primaryMarket_ (../../sb/FundV3.sol#1288)
+FundRolesV2.constructor(address,address,address,address,address).strategy_ (../../sb/FundV3.sol#1283) lacks a zero-check on :
+		- _strategy = strategy_ (../../sb/FundV3.sol#1289)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in FundV3.initialize(uint256,uint256,uint256) (../../sb/FundV3.sol#1547-1567):
+	External calls:
+	- historicalInterestRate[lastDay] = MAX_INTEREST_RATE.min(aprOracle.capture()) (../../sb/FundV3.sol#1565)
+	State variables written after the call(s):
+	- fundActivityStartTime = lastDay (../../sb/FundV3.sol#1566)
+Reentrancy in FundV3.primaryMarketTransferUnderlying(address,uint256,uint256) (../../sb/FundV3.sol#2201-2209):
+	External calls:
+	- IERC20(tokenUnderlying).safeTransfer(recipient,amount) (../../sb/FundV3.sol#2206)
+	State variables written after the call(s):
+	- _totalDebt = _totalDebt.add(fee) (../../sb/FundV3.sol#2208)
+	- feeDebt = feeDebt.add(fee) (../../sb/FundV3.sol#2207)
+Reentrancy in FundV3.settle() (../../sb/FundV3.sol#2143-2188):
+	External calls:
+	- IPrimaryMarketV3(_primaryMarket).settle(day) (../../sb/FundV3.sol#2152)
+	- _payFeeDebt() (../../sb/FundV3.sol#2154)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/FundV3.sol#537)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/FundV3.sol#405)
+		- (success) = feeCollector.call(abi.encodeWithSignature(checkpoint())) (../../sb/FundV3.sol#2347)
+		- IERC20(tokenUnderlying).safeTransfer(feeCollector,amount) (../../sb/FundV3.sol#2351)
+	External calls sending eth:
+	- _payFeeDebt() (../../sb/FundV3.sol#2154)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/FundV3.sol#405)
+	State variables written after the call(s):
+	- _triggerRebalance(day,navSum,navB,navR,newSplitRatio) (../../sb/FundV3.sol#2164)
+		- _balanceVersions[account] = targetVersion (../../sb/FundV3.sol#2475)
+	- _triggerRebalance(day,navSum,navB,navR,newSplitRatio) (../../sb/FundV3.sol#2164)
+		- _rebalanceSize = oldSize + 1 (../../sb/FundV3.sol#2384)
+	- _triggerRebalance(day,navSum,navB,navR,newSplitRatio) (../../sb/FundV3.sol#2164)
+		- _rebalances[oldSize] = rebalance (../../sb/FundV3.sol#2383)
+	- _triggerRebalance(day,navSum,navB,navR,newSplitRatio) (../../sb/FundV3.sol#2164)
+		- (_totalSupplies[TRANCHE_Q],_totalSupplies[TRANCHE_B],_totalSupplies[TRANCHE_R]) = doRebalance(_totalSupplies[TRANCHE_Q],_totalSupplies[TRANCHE_B],_totalSupplies[TRANCHE_R],oldSize) (../../sb/FundV3.sol#2396-2405)
+	- fundActivityStartTime = day + activityDelayTimeAfterRebalance (../../sb/FundV3.sol#2170)
+	- fundActivityStartTime = day (../../sb/FundV3.sol#2172)
+	- splitRatio = newSplitRatio (../../sb/FundV3.sol#2165)
+Reentrancy in FundV3.settle() (../../sb/FundV3.sol#2143-2188):
+	External calls:
+	- IPrimaryMarketV3(_primaryMarket).settle(day) (../../sb/FundV3.sol#2152)
+	- _payFeeDebt() (../../sb/FundV3.sol#2154)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/FundV3.sol#537)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/FundV3.sol#405)
+		- (success) = feeCollector.call(abi.encodeWithSignature(checkpoint())) (../../sb/FundV3.sol#2347)
+		- IERC20(tokenUnderlying).safeTransfer(feeCollector,amount) (../../sb/FundV3.sol#2351)
+	- interestRate = _updateInterestRate(day) (../../sb/FundV3.sol#2175-2178)
+		- baseInterestRate = MAX_INTEREST_RATE.min(aprOracle.capture()) (../../sb/FundV3.sol#2449)
+	External calls sending eth:
+	- _payFeeDebt() (../../sb/FundV3.sol#2154)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/FundV3.sol#405)
+	State variables written after the call(s):
+	- historicalEquivalentTotalB[day] = equivalentTotalB (../../sb/FundV3.sol#2181)
+	- historicalUnderlying[day] = underlying (../../sb/FundV3.sol#2182)
+Reentrancy in FundV3.shareTransferFrom(address,address,address,uint256) (../../sb/FundV3.sol#2035-2049):
+	External calls:
+	- shareTransfer(sender,recipient,amount) (../../sb/FundV3.sol#2042)
+		- IShareV2(_getShare(tranche)).fundEmitTransfer(sender,recipient,amount) (../../sb/FundV3.sol#2096)
+	State variables written after the call(s):
+	- _refreshAllowance(sender,spender,_rebalanceSize) (../../sb/FundV3.sol#2043)
+		- _allowanceVersions[owner][spender] = targetVersion (../../sb/FundV3.sol#2514)
+Reentrancy in FundV3.trancheTransferFrom(uint256,address,address,uint256,uint256) (../../sb/FundV3.sol#1968-1985):
+	External calls:
+	- _approve(tranche,sender,msg.sender,newAllowance) (../../sb/FundV3.sol#1981)
+		- IShareV2(_getShare(tranche)).fundEmitApproval(owner,spender,amount) (../../sb/FundV3.sol#2133)
+	State variables written after the call(s):
+	- _refreshBalance(sender,version) (../../sb/FundV3.sol#1982)
+		- _balanceVersions[account] = targetVersion (../../sb/FundV3.sol#2475)
+	- _refreshBalance(recipient,version) (../../sb/FundV3.sol#1983)
+		- _balanceVersions[account] = targetVersion (../../sb/FundV3.sol#2475)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in FundV3._payFeeDebt() (../../sb/FundV3.sol#2331-2354):
+	External calls:
+	- (success) = feeCollector.call(abi.encodeWithSignature(checkpoint())) (../../sb/FundV3.sol#2347)
+	- IERC20(tokenUnderlying).safeTransfer(feeCollector,amount) (../../sb/FundV3.sol#2351)
+	Event emitted after the call(s):
+	- FeeDebtPaid(amount) (../../sb/FundV3.sol#2352)
+Reentrancy in FundV3.shareTransferFrom(address,address,address,uint256) (../../sb/FundV3.sol#2035-2049):
+	External calls:
+	- shareTransfer(sender,recipient,amount) (../../sb/FundV3.sol#2042)
+		- IShareV2(_getShare(tranche)).fundEmitTransfer(sender,recipient,amount) (../../sb/FundV3.sol#2096)
+	Event emitted after the call(s):
+	- AllowancesRebalanced(owner,spender,targetVersion,allowanceQ,allowanceB,allowanceR) (../../sb/FundV3.sol#2533-2540)
+		- _refreshAllowance(sender,spender,_rebalanceSize) (../../sb/FundV3.sol#2043)
+Reentrancy in FundV3.trancheTransferFrom(uint256,address,address,uint256,uint256) (../../sb/FundV3.sol#1968-1985):
+	External calls:
+	- _approve(tranche,sender,msg.sender,newAllowance) (../../sb/FundV3.sol#1981)
+		- IShareV2(_getShare(tranche)).fundEmitApproval(owner,spender,amount) (../../sb/FundV3.sol#2133)
+	Event emitted after the call(s):
+	- BalancesRebalanced(account,targetVersion,balanceQ,balanceB,balanceR) (../../sb/FundV3.sol#2489)
+		- _refreshBalance(recipient,version) (../../sb/FundV3.sol#1983)
+	- BalancesRebalanced(account,targetVersion,balanceQ,balanceB,balanceR) (../../sb/FundV3.sol#2489)
+		- _refreshBalance(sender,version) (../../sb/FundV3.sol#1982)
+Reentrancy in FundV3.transferFromStrategy(uint256) (../../sb/FundV3.sol#2195-2199):
+	External calls:
+	- IERC20(tokenUnderlying).safeTransferFrom(_strategy,address(this),amount) (../../sb/FundV3.sol#2197)
+	- _payFeeDebt() (../../sb/FundV3.sol#2198)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/FundV3.sol#537)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/FundV3.sol#405)
+		- (success) = feeCollector.call(abi.encodeWithSignature(checkpoint())) (../../sb/FundV3.sol#2347)
+		- IERC20(tokenUnderlying).safeTransfer(feeCollector,amount) (../../sb/FundV3.sol#2351)
+	External calls sending eth:
+	- _payFeeDebt() (../../sb/FundV3.sol#2198)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/FundV3.sol#405)
+	Event emitted after the call(s):
+	- FeeDebtPaid(amount) (../../sb/FundV3.sol#2352)
+		- _payFeeDebt() (../../sb/FundV3.sol#2198)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+FundRolesV2._applyPrimaryMarketUpdate(address) (../../sb/FundV3.sol#1334-1345) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp >= _proposedPrimaryMarketTimestamp + ROLE_UPDATE_MIN_DELAY && block.timestamp < _proposedPrimaryMarketTimestamp + ROLE_UPDATE_MAX_DELAY,Not ready to update) (../../sb/FundV3.sol#1336-1340)
+FundRolesV2._applyStrategyUpdate(address) (../../sb/FundV3.sol#1363-1374) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp >= _proposedStrategyTimestamp + ROLE_UPDATE_MIN_DELAY && block.timestamp < _proposedStrategyTimestamp + ROLE_UPDATE_MAX_DELAY,Not ready to update) (../../sb/FundV3.sol#1365-1369)
+FundV3.initialize(uint256,uint256,uint256) (../../sb/FundV3.sol#1547-1567) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(splitRatio == 0 && currentDay == 0,Already initialized) (../../sb/FundV3.sol#1552)
+	- require(bool,string)(lastDayPrice != 0,Price not available) (../../sb/FundV3.sol#1562)
+FundV3.isFundActive(uint256) (../../sb/FundV3.sol#1629-1631) uses timestamp for comparisons
+	Dangerous comparisons:
+	- timestamp >= fundActivityStartTime (../../sb/FundV3.sol#1630)
+FundV3._extrapolateNav(uint256,uint256,uint256,uint256,uint256) (../../sb/FundV3.sol#1726-1753) uses timestamp for comparisons
+	Dangerous comparisons:
+	- navSum >= navB (../../sb/FundV3.sol#1747)
+FundV3.shareTransfer(address,address,uint256) (../../sb/FundV3.sol#2021-2033) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(isFundActive(block.timestamp),Transfer is inactive) (../../sb/FundV3.sol#2028)
+FundV3.settle() (../../sb/FundV3.sol#2143-2188) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp >= day,The current trading day does not end yet) (../../sb/FundV3.sol#2146)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/FundV3.sol#312-321) uses assembly
+	- INLINE ASM (../../sb/FundV3.sol#319)
+Address._verifyCallResult(bool,bytes,string) (../../sb/FundV3.sol#457-474) uses assembly
+	- INLINE ASM (../../sb/FundV3.sol#466-469)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.functionCall(address,bytes) (../../sb/FundV3.sol#365-367) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/FundV3.sol#390-392) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/FundV3.sol#439-441) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/FundV3.sol#449-455) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/FundV3.sol#415-417) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/FundV3.sol#425-431) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/FundV3.sol#339-345) is never used and should be removed
+Context._msgData() (../../sb/FundV3.sol#588-591) is never used and should be removed
+Math.average(uint256,uint256) (../../sb/FundV3.sol#567-570) is never used and should be removed
+Math.max(uint256,uint256) (../../sb/FundV3.sol#552-554) is never used and should be removed
+SafeDecimalMath.decimalToPreciseDecimal(uint256) (../../sb/FundV3.sol#773-775) is never used and should be removed
+SafeDecimalMath.divideDecimalPrecise(uint256,uint256) (../../sb/FundV3.sol#765-768) is never used and should be removed
+SafeDecimalMath.multiplyDecimalPrecise(uint256,uint256) (../../sb/FundV3.sol#746-749) is never used and should be removed
+SafeDecimalMath.preciseDecimalToDecimal(uint256) (../../sb/FundV3.sol#780-788) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/FundV3.sol#505-514) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/FundV3.sol#521-524) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/FundV3.sol#516-519) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/FundV3.sol#265-268) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/FundV3.sol#227-230) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/FundV3.sol#285-288) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/FundV3.sol#99-103) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/FundV3.sol#135-138) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/FundV3.sol#145-148) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/FundV3.sol#120-128) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/FundV3.sol#110-113) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version>=0.6.10<0.8.0 (../../sb/FundV3.sol#1) is too complex
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/FundV3.sol#339-345):
+	- (success) = recipient.call{value: amount}() (../../sb/FundV3.sol#343)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/FundV3.sol#400-407):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/FundV3.sol#405)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/FundV3.sol#425-431):
+	- (success,returndata) = target.staticcall(data) (../../sb/FundV3.sol#429)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/FundV3.sol#449-455):
+	- (success,returndata) = target.delegatecall(data) (../../sb/FundV3.sol#453)
+Low level call in FundV3._payFeeDebt() (../../sb/FundV3.sol#2331-2354):
+	- (success) = feeCollector.call(abi.encodeWithSignature(checkpoint())) (../../sb/FundV3.sol#2347)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Constant SafeDecimalMath.highPrecisionDecimals (../../sb/FundV3.sol#722) is not in UPPER_CASE_WITH_UNDERSCORES
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/FundV3.sol#589)" inContext (../../sb/FundV3.sol#583-592)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Variable FundRolesV2.ROLE_UPDATE_MAX_DELAY (../../sb/FundV3.sol#1264) is too similar to FundRolesV2.ROLE_UPDATE_MIN_DELAY (../../sb/FundV3.sol#1263)
+Variable FundRolesV2._primaryMarket (../../sb/FundV3.sol#1270) is too similar to FundRolesV2.constructor(address,address,address,address,address).primaryMarket_ (../../sb/FundV3.sol#1282)
+Variable FundV3.STRATEGY_UPDATE_MAX_DELAY (../../sb/FundV3.sol#1401) is too similar to FundV3.STRATEGY_UPDATE_MIN_DELAY (../../sb/FundV3.sol#1400)
+Variable FundV3._historicalNavB (../../sb/FundV3.sol#1472) is too similar to FundV3._historicalNavR (../../sb/FundV3.sol#1475)
+Variable FundV3._rebalanceAllowance(uint256,uint256,uint256,uint256).newAllowanceB (../../sb/FundV3.sol#2553) is too similar to FundV3._rebalanceAllowance(uint256,uint256,uint256,uint256).newAllowanceR (../../sb/FundV3.sol#2554)
+Variable FundV3._rebalanceAllowance(uint256,uint256,uint256,uint256).newAllowanceB (../../sb/FundV3.sol#2553) is too similar to FundV3._rebalanceAllowance(uint256,uint256,uint256,uint256).newAllowanceQ (../../sb/FundV3.sol#2552)
+Variable FundV3._rebalanceAllowance(uint256,uint256,uint256,uint256).newAllowanceQ (../../sb/FundV3.sol#2552) is too similar to FundV3._rebalanceAllowance(uint256,uint256,uint256,uint256).newAllowanceR (../../sb/FundV3.sol#2554)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+FundV3.STRATEGY_UPDATE_MIN_DELAY (../../sb/FundV3.sol#1400) is never used in FundV3 (../../sb/FundV3.sol#1377-2569)
+FundV3.STRATEGY_UPDATE_MAX_DELAY (../../sb/FundV3.sol#1401) is never used in FundV3 (../../sb/FundV3.sol#1377-2569)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-state-variable
+/sb/FundV3.sol analyzed (21 contracts with 93 detectors), 84 result(s) found

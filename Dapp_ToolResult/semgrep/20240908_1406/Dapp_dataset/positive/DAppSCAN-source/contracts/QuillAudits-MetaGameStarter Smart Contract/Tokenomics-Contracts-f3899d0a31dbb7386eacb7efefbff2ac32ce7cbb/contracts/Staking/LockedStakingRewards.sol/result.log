@@ -1,0 +1,123 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 20 Code Findings │
+└──────────────────┘
+                                 
+    /sb/LockedStakingRewards.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          166┆ contract LockedStakingRewards is Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          186┆ for (uint256 i = 0; i < _initialPools.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          185┆ constructor(Pool[] memory _initialPools) {
+          186┆     for (uint256 i = 0; i < _initialPools.length; i++) {
+          187┆         createPool(i, _initialPools[i]);
+          188┆     }
+          189┆                                                                  
+  transferOwnership(0x2a9Da28bCbF97A8C008Fd211f5127b860613922D);                
+          190┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          186┆ for (uint256 i = 0; i < _initialPools.length; i++) {
+            ⋮┆----------------------------------------
+          300┆ for(uint i = 0; i < 5; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           63┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+           84┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          206┆ require(isTransferPhase(_pool), "pool is locked currently");
+            ⋮┆----------------------------------------
+          214┆ require(isTransferPhase(_pool), "pool is locked currently");
+            ⋮┆----------------------------------------
+          215┆ require(_sharesAmount <= _shares[msg.sender][_pool], "cannot     
+  withdraw more than balance");                                                 
+            ⋮┆----------------------------------------
+          224┆ require(block.timestamp > pool[_pool].startOfDeposit +           
+  depositDuration, "can only update after depositDuration");                    
+            ⋮┆----------------------------------------
+          225┆ require(!pool[_pool].isTerminated, "can not terminated pools");
+            ⋮┆----------------------------------------
+          235┆ require(isTransferPhase(_pool), "pool only updateable during     
+  transfer phase");                                                             
+            ⋮┆----------------------------------------
+          245┆ require(pool[_pool].cycleDuration == 0, "cannot override an      
+  existing pool");                                                              
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          186┆ for (uint256 i = 0; i < _initialPools.length; i++) {
+            ⋮┆----------------------------------------
+          300┆ for(uint i = 0; i < 5; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           84┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          215┆ require(_sharesAmount <= _shares[msg.sender][_pool], "cannot     
+  withdraw more than balance");                                                 
+            ⋮┆----------------------------------------
+          224┆ require(block.timestamp > pool[_pool].startOfDeposit +           
+  depositDuration, "can only update after depositDuration");                    
+            ⋮┆----------------------------------------
+          235┆ require(isTransferPhase(_pool), "pool only updateable during     
+  transfer phase");                                                             
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 20 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

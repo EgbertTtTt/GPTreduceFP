@@ -1,0 +1,204 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 48 Code Findings │
+└──────────────────┘
+                        
+    /sb/StratAlpaca.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          673┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          677┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          695┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          700┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          705┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+         1247┆ bool public wantIsWBNB = false;
+            ⋮┆----------------------------------------
+         1258┆ uint256 public lastHarvestBlock = 0;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+         1072┆ constructor () internal {
+         1073┆     _status = _NOT_ENTERED;
+         1074┆ }
+            ⋮┆----------------------------------------
+         1126┆ constructor () internal {
+         1127┆     assert(_OWNER_SLOT ==                                        
+  bytes32(uint256(keccak256("eip1967.proxy.owner")) - 1));                      
+         1128┆     _setOwner(msg.sender);
+         1129┆     emit OwnershipTransferred(address(0), msg.sender);
+         1130┆ }
+            ⋮┆----------------------------------------
+         1270┆ constructor() public {}
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+         1454┆ keepers[_keepers[i]] = _states[i];
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+         1453┆ for(uint256 i = 0; i < n; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           34┆ require(_status != _ENTERED, "ReentrancyGuard: reentrant call");
+            ⋮┆----------------------------------------
+           94┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          115┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          156┆ require(!paused(), "Pausable: paused");
+            ⋮┆----------------------------------------
+          168┆ require(paused(), "Pausable: not paused");
+            ⋮┆----------------------------------------
+          353┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          368┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          385┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          402┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          419┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          531┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          535┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          592┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          593┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          617┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          641┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          692┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          693┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          694┆ );
+            ⋮┆----------------------------------------
+          722┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          743┆ require(_initializing || _isConstructor() || !_initialized,      
+  "Initializable: contract is already initialized");                            
+            ⋮┆----------------------------------------
+         1085┆ require(_status != _ENTERED_OR_PAUSED, "ReentrancyGuard:         
+  reentrant call or paused");                                                   
+            ⋮┆----------------------------------------
+         1155┆ require(owner() == msg.sender, "Ownable: caller is not the       
+  owner");                                                                      
+            ⋮┆----------------------------------------
+         1176┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1320┆ require (msg.sender == vault, "Must from vault");
+            ⋮┆----------------------------------------
+         1325┆ require (msg.sender == vault || keepers[msg.sender], "Must from  
+  vault/keeper");                                                               
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+         1453┆ for(uint256 i = 0; i < n; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          115┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          385┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          535┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          592┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          617┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          641┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          692┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          693┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          694┆ );
+            ⋮┆----------------------------------------
+          722┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          743┆ require(_initializing || _isConstructor() || !_initialized,      
+  "Initializable: contract is already initialized");                            
+            ⋮┆----------------------------------------
+         1085┆ require(_status != _ENTERED_OR_PAUSED, "ReentrancyGuard:         
+  reentrant call or paused");                                                   
+            ⋮┆----------------------------------------
+         1176┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 48 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

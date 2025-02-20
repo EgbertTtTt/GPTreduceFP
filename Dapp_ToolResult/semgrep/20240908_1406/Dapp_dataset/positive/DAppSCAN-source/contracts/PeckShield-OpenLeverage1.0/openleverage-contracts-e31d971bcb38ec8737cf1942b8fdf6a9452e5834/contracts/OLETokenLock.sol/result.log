@@ -1,0 +1,131 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 18 Code Findings │
+└──────────────────┘
+                         
+    /sb/OLETokenLock.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          236┆ for (uint i = 0; i < beneficiaries.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          231┆ constructor(IOLEToken token_, address[] memory beneficiaries,    
+  uint256[] memory amounts, uint128[] memory startTimes, uint128[] memory       
+  endTimes, address delegate ... [0m                                            
+          232┆     require(beneficiaries.length == amounts.length
+          233┆     && beneficiaries.length == startTimes.length
+          234┆         && beneficiaries.length == endTimes.length, "array length
+  must be same");                                                               
+          235┆     token = token_;
+          236┆     for (uint i = 0; i < beneficiaries.length; i++) {
+          237┆         address beneficiary = beneficiaries[i];
+          238┆         releaseVars[beneficiary] = ReleaseVar(beneficiary, 0,    
+  amounts[i], startTimes[i], endTimes[i]);                                      
+          239┆     }
+          240┆ }
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          238┆ releaseVars[beneficiary] = ReleaseVar(beneficiary, 0, amounts[i],
+  startTimes[i], endTimes[i]);                                                  
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          236┆ for (uint i = 0; i < beneficiaries.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           87┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          102┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          119┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          136┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          153┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          232┆ require(beneficiaries.length == amounts.length
+          233┆ && beneficiaries.length == startTimes.length
+          234┆     && beneficiaries.length == endTimes.length, "array length    
+  must be same");                                                               
+            ⋮┆----------------------------------------
+          244┆ require(beneficiary != address(0), "beneficiary address cannot be
+  0");                                                                          
+            ⋮┆----------------------------------------
+          247┆ require(amount > 0, "no amount available");
+            ⋮┆----------------------------------------
+          249┆ require(amount >= currentTransfer, "transfer out limit exceeds   
+  ");                                                                           
+            ⋮┆----------------------------------------
+          256┆ require(block.timestamp >= releaseVars[beneficiary].startTime,   
+  "not time to unlock");                                                        
+            ⋮┆----------------------------------------
+          257┆ require(releaseVars[beneficiary].amount > 0, "beneficiary does   
+  not exist");                                                                  
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          232┆ require(beneficiaries.length == amounts.length
+          233┆ && beneficiaries.length == startTimes.length
+          234┆     && beneficiaries.length == endTimes.length, "array length    
+  must be same");                                                               
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          236┆ for (uint i = 0; i < beneficiaries.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          119┆ require(c / a == b, "SafeMath: multiplication overflow");
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 18 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

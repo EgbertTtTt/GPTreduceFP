@@ -1,0 +1,548 @@
+'solc --version' running
+'solc /sb/PerpetualPositionManager.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/PerpetualPositionManager.sol:
+Warning: Contract code size exceeds 24576 bytes (a limit introduced in Spurious Dragon). This contract may not be deployable on mainnet. Consider enabling the optimizer (with a low "runs" value!), turning off revert strings, or using libraries.
+    --> /sb/PerpetualPositionManager.sol:3541:1:
+     |
+3541 | contract PerpetualPositionManager is FundingRateApplier {
+     | ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+FeePayer._payFinalFees(address,FixedPoint.Unsigned) (../../sb/PerpetualPositionManager.sol#1859-1883) uses arbitrary from in transferFrom: collateralCurrency.safeTransferFrom(payer,address(this),amount.rawValue) (../../sb/PerpetualPositionManager.sol#1866)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#arbitrary-from-in-transferfrom
+
+Reentrancy in FundingRateApplier._applyEffectiveFundingRate() (../../sb/PerpetualPositionManager.sol#3465-3493):
+	External calls:
+	- _latestFundingRatePerSecond = _getLatestFundingRate() (../../sb/PerpetualPositionManager.sol#3474)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/PerpetualPositionManager.sol#537)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+		- price = optimisticOracle.getPrice(identifier,proposalTime,ancillaryData) (../../sb/PerpetualPositionManager.sol#3422-3455)
+		- collateralCurrency.safeTransfer(request.proposer,reward.rawValue) (../../sb/PerpetualPositionManager.sol#3440)
+	- (fundingRate.cumulativeMultiplier,periodRate) = _calculateEffectiveFundingRate(paymentPeriod,_getLatestFundingRate(),fundingRate.cumulativeMultiplier) (../../sb/PerpetualPositionManager.sol#3477-3481)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/PerpetualPositionManager.sol#537)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+		- price = optimisticOracle.getPrice(identifier,proposalTime,ancillaryData) (../../sb/PerpetualPositionManager.sol#3422-3455)
+		- collateralCurrency.safeTransfer(request.proposer,reward.rawValue) (../../sb/PerpetualPositionManager.sol#3440)
+	External calls sending eth:
+	- _latestFundingRatePerSecond = _getLatestFundingRate() (../../sb/PerpetualPositionManager.sol#3474)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+	- (fundingRate.cumulativeMultiplier,periodRate) = _calculateEffectiveFundingRate(paymentPeriod,_getLatestFundingRate(),fundingRate.cumulativeMultiplier) (../../sb/PerpetualPositionManager.sol#3477-3481)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+	State variables written after the call(s):
+	- (fundingRate.cumulativeMultiplier,periodRate) = _calculateEffectiveFundingRate(paymentPeriod,_getLatestFundingRate(),fundingRate.cumulativeMultiplier) (../../sb/PerpetualPositionManager.sol#3477-3481)
+		- cumulativeFeeMultiplier = cumulativeFeeMultiplier.mul(FixedPoint.fromUnscaledUint(1).sub(effectiveFee)) (../../sb/PerpetualPositionManager.sol#1954)
+	FeePayer.cumulativeFeeMultiplier (../../sb/PerpetualPositionManager.sol#1739) can be used in cross function reentrancies:
+	- FeePayer.constructor(address,address,address) (../../sb/PerpetualPositionManager.sol#1765-1774)
+	- FeePayer.constructor(address,address,address) (../../sb/PerpetualPositionManager.sol#1765-1774)
+	- FeePayer.cumulativeFeeMultiplier (../../sb/PerpetualPositionManager.sol#1739)
+	- (fundingRate.cumulativeMultiplier,periodRate) = _calculateEffectiveFundingRate(paymentPeriod,_getLatestFundingRate(),fundingRate.cumulativeMultiplier) (../../sb/PerpetualPositionManager.sol#3477-3481)
+		- fundingRate.rate = FixedPoint.Signed(price) (../../sb/PerpetualPositionManager.sol#3431)
+		- fundingRate.updateTime = proposalTime (../../sb/PerpetualPositionManager.sol#3432)
+		- fundingRate.proposalTime = 0 (../../sb/PerpetualPositionManager.sol#3446)
+		- fundingRate.proposalTime = 0 (../../sb/PerpetualPositionManager.sol#3453)
+	FundingRateApplier.fundingRate (../../sb/PerpetualPositionManager.sol#3257) can be used in cross function reentrancies:
+	- FundingRateApplier.constructor(bytes32,address,address,address,FixedPoint.Unsigned,address) (../../sb/PerpetualPositionManager.sol#3303-3322)
+	- FundingRateApplier.fundingRate (../../sb/PerpetualPositionManager.sol#3257)
+	- fundingRate.applicationTime = currentTime (../../sb/PerpetualPositionManager.sol#3492)
+	FundingRateApplier.fundingRate (../../sb/PerpetualPositionManager.sol#3257) can be used in cross function reentrancies:
+	- FundingRateApplier.constructor(bytes32,address,address,address,FixedPoint.Unsigned,address) (../../sb/PerpetualPositionManager.sol#3303-3322)
+	- FundingRateApplier.fundingRate (../../sb/PerpetualPositionManager.sol#3257)
+Reentrancy in FundingRateApplier.applyFundingRate() (../../sb/PerpetualPositionManager.sol#3334-3336):
+	External calls:
+	- _applyEffectiveFundingRate() (../../sb/PerpetualPositionManager.sol#3335)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/PerpetualPositionManager.sol#537)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+		- price = optimisticOracle.getPrice(identifier,proposalTime,ancillaryData) (../../sb/PerpetualPositionManager.sol#3422-3455)
+		- collateralCurrency.safeTransfer(request.proposer,reward.rawValue) (../../sb/PerpetualPositionManager.sol#3440)
+	- regularFees() (../../sb/PerpetualPositionManager.sol#3334)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/PerpetualPositionManager.sol#537)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+		- collateralCurrency.safeIncreaseAllowance(address(store),regularFee.rawValue) (../../sb/PerpetualPositionManager.sol#1832)
+		- store.payOracleFeesErc20(address(collateralCurrency),regularFee) (../../sb/PerpetualPositionManager.sol#1833)
+		- collateralCurrency.safeTransfer(msg.sender,latePenalty.rawValue) (../../sb/PerpetualPositionManager.sol#1837)
+	External calls sending eth:
+	- _applyEffectiveFundingRate() (../../sb/PerpetualPositionManager.sol#3335)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+	- regularFees() (../../sb/PerpetualPositionManager.sol#3334)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+	State variables written after the call(s):
+	- _applyEffectiveFundingRate() (../../sb/PerpetualPositionManager.sol#3335)
+		- cumulativeFeeMultiplier = cumulativeFeeMultiplier.mul(FixedPoint.fromUnscaledUint(1).sub(effectiveFee)) (../../sb/PerpetualPositionManager.sol#1954)
+	FeePayer.cumulativeFeeMultiplier (../../sb/PerpetualPositionManager.sol#1739) can be used in cross function reentrancies:
+	- FeePayer.constructor(address,address,address) (../../sb/PerpetualPositionManager.sol#1765-1774)
+	- FeePayer.constructor(address,address,address) (../../sb/PerpetualPositionManager.sol#1765-1774)
+	- FeePayer.cumulativeFeeMultiplier (../../sb/PerpetualPositionManager.sol#1739)
+Reentrancy in FundingRateApplier.applyFundingRate() (../../sb/PerpetualPositionManager.sol#3334-3336):
+	External calls:
+	- regularFees() (../../sb/PerpetualPositionManager.sol#3334)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/PerpetualPositionManager.sol#537)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+		- collateralCurrency.safeIncreaseAllowance(address(store),regularFee.rawValue) (../../sb/PerpetualPositionManager.sol#1832)
+		- store.payOracleFeesErc20(address(collateralCurrency),regularFee) (../../sb/PerpetualPositionManager.sol#1833)
+		- collateralCurrency.safeTransfer(msg.sender,latePenalty.rawValue) (../../sb/PerpetualPositionManager.sol#1837)
+	External calls sending eth:
+	- regularFees() (../../sb/PerpetualPositionManager.sol#3334)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+	State variables written after the call(s):
+	- nonReentrant() (../../sb/PerpetualPositionManager.sol#3334)
+		- _notEntered = false (../../sb/PerpetualPositionManager.sol#1537)
+		- _notEntered = true (../../sb/PerpetualPositionManager.sol#1543)
+	Lockable._notEntered (../../sb/PerpetualPositionManager.sol#1492) can be used in cross function reentrancies:
+	- Lockable._preEntranceCheck() (../../sb/PerpetualPositionManager.sol#1530-1533)
+Reentrancy in PerpetualPositionManager.create(FixedPoint.Unsigned,FixedPoint.Unsigned) (../../sb/PerpetualPositionManager.sol#3846-3884):
+	External calls:
+	- fees() (../../sb/PerpetualPositionManager.sol#3849)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/PerpetualPositionManager.sol#537)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+		- price = optimisticOracle.getPrice(identifier,proposalTime,ancillaryData) (../../sb/PerpetualPositionManager.sol#3422-3455)
+		- collateralCurrency.safeTransfer(request.proposer,reward.rawValue) (../../sb/PerpetualPositionManager.sol#3440)
+		- collateralCurrency.safeIncreaseAllowance(address(store),regularFee.rawValue) (../../sb/PerpetualPositionManager.sol#1832)
+		- store.payOracleFeesErc20(address(collateralCurrency),regularFee) (../../sb/PerpetualPositionManager.sol#1833)
+		- collateralCurrency.safeTransfer(msg.sender,latePenalty.rawValue) (../../sb/PerpetualPositionManager.sol#1837)
+	External calls sending eth:
+	- fees() (../../sb/PerpetualPositionManager.sol#3849)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+	State variables written after the call(s):
+	- nonReentrant() (../../sb/PerpetualPositionManager.sol#3850)
+		- _notEntered = false (../../sb/PerpetualPositionManager.sol#1537)
+		- _notEntered = true (../../sb/PerpetualPositionManager.sol#1543)
+	Lockable._notEntered (../../sb/PerpetualPositionManager.sol#1492) can be used in cross function reentrancies:
+	- Lockable._postEntranceReset() (../../sb/PerpetualPositionManager.sol#1540-1544)
+	- Lockable._preEntranceCheck() (../../sb/PerpetualPositionManager.sol#1530-1533)
+	- Lockable._preEntranceSet() (../../sb/PerpetualPositionManager.sol#1535-1538)
+Reentrancy in PerpetualPositionManager.depositTo(address,FixedPoint.Unsigned) (../../sb/PerpetualPositionManager.sol#3696-3713):
+	External calls:
+	- fees() (../../sb/PerpetualPositionManager.sol#3700)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/PerpetualPositionManager.sol#537)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+		- price = optimisticOracle.getPrice(identifier,proposalTime,ancillaryData) (../../sb/PerpetualPositionManager.sol#3422-3455)
+		- collateralCurrency.safeTransfer(request.proposer,reward.rawValue) (../../sb/PerpetualPositionManager.sol#3440)
+		- collateralCurrency.safeIncreaseAllowance(address(store),regularFee.rawValue) (../../sb/PerpetualPositionManager.sol#1832)
+		- store.payOracleFeesErc20(address(collateralCurrency),regularFee) (../../sb/PerpetualPositionManager.sol#1833)
+		- collateralCurrency.safeTransfer(msg.sender,latePenalty.rawValue) (../../sb/PerpetualPositionManager.sol#1837)
+	External calls sending eth:
+	- fees() (../../sb/PerpetualPositionManager.sol#3700)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+	State variables written after the call(s):
+	- nonReentrant() (../../sb/PerpetualPositionManager.sol#3701)
+		- _notEntered = false (../../sb/PerpetualPositionManager.sol#1537)
+		- _notEntered = true (../../sb/PerpetualPositionManager.sol#1543)
+	Lockable._notEntered (../../sb/PerpetualPositionManager.sol#1492) can be used in cross function reentrancies:
+	- Lockable._postEntranceReset() (../../sb/PerpetualPositionManager.sol#1540-1544)
+	- Lockable._preEntranceCheck() (../../sb/PerpetualPositionManager.sol#1530-1533)
+	- Lockable._preEntranceSet() (../../sb/PerpetualPositionManager.sol#1535-1538)
+Reentrancy in PerpetualPositionManager.emergencyShutdown() (../../sb/PerpetualPositionManager.sol#4025-4033):
+	External calls:
+	- fees() (../../sb/PerpetualPositionManager.sol#4025)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/PerpetualPositionManager.sol#537)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+		- price = optimisticOracle.getPrice(identifier,proposalTime,ancillaryData) (../../sb/PerpetualPositionManager.sol#3422-3455)
+		- collateralCurrency.safeTransfer(request.proposer,reward.rawValue) (../../sb/PerpetualPositionManager.sol#3440)
+		- collateralCurrency.safeIncreaseAllowance(address(store),regularFee.rawValue) (../../sb/PerpetualPositionManager.sol#1832)
+		- store.payOracleFeesErc20(address(collateralCurrency),regularFee) (../../sb/PerpetualPositionManager.sol#1833)
+		- collateralCurrency.safeTransfer(msg.sender,latePenalty.rawValue) (../../sb/PerpetualPositionManager.sol#1837)
+	External calls sending eth:
+	- fees() (../../sb/PerpetualPositionManager.sol#4025)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+	State variables written after the call(s):
+	- nonReentrant() (../../sb/PerpetualPositionManager.sol#4025)
+		- _notEntered = false (../../sb/PerpetualPositionManager.sol#1537)
+		- _notEntered = true (../../sb/PerpetualPositionManager.sol#1543)
+	Lockable._notEntered (../../sb/PerpetualPositionManager.sol#1492) can be used in cross function reentrancies:
+	- Lockable._postEntranceReset() (../../sb/PerpetualPositionManager.sol#1540-1544)
+	- Lockable._preEntranceCheck() (../../sb/PerpetualPositionManager.sol#1530-1533)
+	- Lockable._preEntranceSet() (../../sb/PerpetualPositionManager.sol#1535-1538)
+	- emergencyShutdownTimestamp = getCurrentTime() (../../sb/PerpetualPositionManager.sol#4029)
+	FundingRateApplier.emergencyShutdownTimestamp (../../sb/PerpetualPositionManager.sol#3260) can be used in cross function reentrancies:
+	- FundingRateApplier._applyEffectiveFundingRate() (../../sb/PerpetualPositionManager.sol#3465-3493)
+	- PerpetualPositionManager._notEmergencyShutdown() (../../sb/PerpetualPositionManager.sol#4242-4245)
+	- FundingRateApplier.constructor(bytes32,address,address,address,FixedPoint.Unsigned,address) (../../sb/PerpetualPositionManager.sol#3303-3322)
+	- FundingRateApplier.constructor(bytes32,address,address,address,FixedPoint.Unsigned,address) (../../sb/PerpetualPositionManager.sol#3303-3322)
+	- FundingRateApplier.emergencyShutdownTimestamp (../../sb/PerpetualPositionManager.sol#3260)
+Reentrancy in FundingRateApplier.proposeNewRate(FixedPoint.Signed,uint256) (../../sb/PerpetualPositionManager.sol#3343-3392):
+	External calls:
+	- fees() (../../sb/PerpetualPositionManager.sol#3345)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/PerpetualPositionManager.sol#537)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+		- price = optimisticOracle.getPrice(identifier,proposalTime,ancillaryData) (../../sb/PerpetualPositionManager.sol#3422-3455)
+		- collateralCurrency.safeTransfer(request.proposer,reward.rawValue) (../../sb/PerpetualPositionManager.sol#3440)
+		- collateralCurrency.safeIncreaseAllowance(address(store),regularFee.rawValue) (../../sb/PerpetualPositionManager.sol#1832)
+		- store.payOracleFeesErc20(address(collateralCurrency),regularFee) (../../sb/PerpetualPositionManager.sol#1833)
+		- collateralCurrency.safeTransfer(msg.sender,latePenalty.rawValue) (../../sb/PerpetualPositionManager.sol#1837)
+	External calls sending eth:
+	- fees() (../../sb/PerpetualPositionManager.sol#3345)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+	State variables written after the call(s):
+	- nonReentrant() (../../sb/PerpetualPositionManager.sol#3346)
+		- _notEntered = false (../../sb/PerpetualPositionManager.sol#1537)
+		- _notEntered = true (../../sb/PerpetualPositionManager.sol#1543)
+	Lockable._notEntered (../../sb/PerpetualPositionManager.sol#1492) can be used in cross function reentrancies:
+	- Lockable._preEntranceCheck() (../../sb/PerpetualPositionManager.sol#1530-1533)
+	- fundingRate.proposalTime = timestamp (../../sb/PerpetualPositionManager.sol#3361)
+	FundingRateApplier.fundingRate (../../sb/PerpetualPositionManager.sol#3257) can be used in cross function reentrancies:
+	- FundingRateApplier.constructor(bytes32,address,address,address,FixedPoint.Unsigned,address) (../../sb/PerpetualPositionManager.sol#3303-3322)
+	- FundingRateApplier.fundingRate (../../sb/PerpetualPositionManager.sol#3257)
+Reentrancy in PerpetualPositionManager.redeem(FixedPoint.Unsigned) (../../sb/PerpetualPositionManager.sol#3895-3932):
+	External calls:
+	- fees() (../../sb/PerpetualPositionManager.sol#3899)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/PerpetualPositionManager.sol#537)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+		- price = optimisticOracle.getPrice(identifier,proposalTime,ancillaryData) (../../sb/PerpetualPositionManager.sol#3422-3455)
+		- collateralCurrency.safeTransfer(request.proposer,reward.rawValue) (../../sb/PerpetualPositionManager.sol#3440)
+		- collateralCurrency.safeIncreaseAllowance(address(store),regularFee.rawValue) (../../sb/PerpetualPositionManager.sol#1832)
+		- store.payOracleFeesErc20(address(collateralCurrency),regularFee) (../../sb/PerpetualPositionManager.sol#1833)
+		- collateralCurrency.safeTransfer(msg.sender,latePenalty.rawValue) (../../sb/PerpetualPositionManager.sol#1837)
+	External calls sending eth:
+	- fees() (../../sb/PerpetualPositionManager.sol#3899)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+	State variables written after the call(s):
+	- nonReentrant() (../../sb/PerpetualPositionManager.sol#3900)
+		- _notEntered = false (../../sb/PerpetualPositionManager.sol#1537)
+		- _notEntered = true (../../sb/PerpetualPositionManager.sol#1543)
+	Lockable._notEntered (../../sb/PerpetualPositionManager.sol#1492) can be used in cross function reentrancies:
+	- Lockable._postEntranceReset() (../../sb/PerpetualPositionManager.sol#1540-1544)
+	- Lockable._preEntranceCheck() (../../sb/PerpetualPositionManager.sol#1530-1533)
+	- Lockable._preEntranceSet() (../../sb/PerpetualPositionManager.sol#1535-1538)
+	- amountWithdrawn = _deleteSponsorPosition(msg.sender) (../../sb/PerpetualPositionManager.sol#3912)
+		- delete positions[sponsor] (../../sb/PerpetualPositionManager.sol#4138)
+	PerpetualPositionManager.positions (../../sb/PerpetualPositionManager.sol#3564) can be used in cross function reentrancies:
+	- PerpetualPositionManager._deleteSponsorPosition(address) (../../sb/PerpetualPositionManager.sol#4128-4144)
+	- PerpetualPositionManager._getPositionData(address) (../../sb/PerpetualPositionManager.sol#4150-4157)
+	- PerpetualPositionManager._onlyCollateralizedPosition(address) (../../sb/PerpetualPositionManager.sol#4235-4240)
+	- PerpetualPositionManager.getCollateral(address) (../../sb/PerpetualPositionManager.sol#4055-4063)
+	- PerpetualPositionManager.positions (../../sb/PerpetualPositionManager.sol#3564)
+	- amountWithdrawn = _deleteSponsorPosition(msg.sender) (../../sb/PerpetualPositionManager.sol#3912)
+		- rawTotalPositionCollateral = rawTotalPositionCollateral.sub(positionToLiquidate.rawCollateral) (../../sb/PerpetualPositionManager.sol#4134)
+	PerpetualPositionManager.rawTotalPositionCollateral (../../sb/PerpetualPositionManager.sol#3572) can be used in cross function reentrancies:
+	- PerpetualPositionManager._decrementCollateralBalances(PerpetualPositionManager.PositionData,FixedPoint.Unsigned) (../../sb/PerpetualPositionManager.sol#4212-4218)
+	- PerpetualPositionManager._deleteSponsorPosition(address) (../../sb/PerpetualPositionManager.sol#4128-4144)
+	- PerpetualPositionManager._incrementCollateralBalances(PerpetualPositionManager.PositionData,FixedPoint.Unsigned) (../../sb/PerpetualPositionManager.sol#4200-4206)
+	- PerpetualPositionManager._pfc() (../../sb/PerpetualPositionManager.sol#4146-4148)
+	- PerpetualPositionManager.rawTotalPositionCollateral (../../sb/PerpetualPositionManager.sol#3572)
+	- PerpetualPositionManager.totalPositionCollateral() (../../sb/PerpetualPositionManager.sol#4069-4076)
+Reentrancy in PerpetualPositionManager.settleEmergencyShutdown() (../../sb/PerpetualPositionManager.sol#3956-4012):
+	External calls:
+	- fees() (../../sb/PerpetualPositionManager.sol#3959)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/PerpetualPositionManager.sol#537)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+		- price = optimisticOracle.getPrice(identifier,proposalTime,ancillaryData) (../../sb/PerpetualPositionManager.sol#3422-3455)
+		- collateralCurrency.safeTransfer(request.proposer,reward.rawValue) (../../sb/PerpetualPositionManager.sol#3440)
+		- collateralCurrency.safeIncreaseAllowance(address(store),regularFee.rawValue) (../../sb/PerpetualPositionManager.sol#1832)
+		- store.payOracleFeesErc20(address(collateralCurrency),regularFee) (../../sb/PerpetualPositionManager.sol#1833)
+		- collateralCurrency.safeTransfer(msg.sender,latePenalty.rawValue) (../../sb/PerpetualPositionManager.sol#1837)
+	External calls sending eth:
+	- fees() (../../sb/PerpetualPositionManager.sol#3959)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+	State variables written after the call(s):
+	- nonReentrant() (../../sb/PerpetualPositionManager.sol#3960)
+		- _notEntered = false (../../sb/PerpetualPositionManager.sol#1537)
+		- _notEntered = true (../../sb/PerpetualPositionManager.sol#1543)
+	Lockable._notEntered (../../sb/PerpetualPositionManager.sol#1492) can be used in cross function reentrancies:
+	- Lockable._postEntranceReset() (../../sb/PerpetualPositionManager.sol#1540-1544)
+	- Lockable._preEntranceCheck() (../../sb/PerpetualPositionManager.sol#1530-1533)
+	- Lockable._preEntranceSet() (../../sb/PerpetualPositionManager.sol#1535-1538)
+Reentrancy in PerpetualPositionManager.withdraw(FixedPoint.Unsigned) (../../sb/PerpetualPositionManager.sol#3733-3755):
+	External calls:
+	- fees() (../../sb/PerpetualPositionManager.sol#3737)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/PerpetualPositionManager.sol#537)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+		- price = optimisticOracle.getPrice(identifier,proposalTime,ancillaryData) (../../sb/PerpetualPositionManager.sol#3422-3455)
+		- collateralCurrency.safeTransfer(request.proposer,reward.rawValue) (../../sb/PerpetualPositionManager.sol#3440)
+		- collateralCurrency.safeIncreaseAllowance(address(store),regularFee.rawValue) (../../sb/PerpetualPositionManager.sol#1832)
+		- store.payOracleFeesErc20(address(collateralCurrency),regularFee) (../../sb/PerpetualPositionManager.sol#1833)
+		- collateralCurrency.safeTransfer(msg.sender,latePenalty.rawValue) (../../sb/PerpetualPositionManager.sol#1837)
+	External calls sending eth:
+	- fees() (../../sb/PerpetualPositionManager.sol#3737)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+	State variables written after the call(s):
+	- nonReentrant() (../../sb/PerpetualPositionManager.sol#3738)
+		- _notEntered = false (../../sb/PerpetualPositionManager.sol#1537)
+		- _notEntered = true (../../sb/PerpetualPositionManager.sol#1543)
+	Lockable._notEntered (../../sb/PerpetualPositionManager.sol#1492) can be used in cross function reentrancies:
+	- Lockable._postEntranceReset() (../../sb/PerpetualPositionManager.sol#1540-1544)
+	- Lockable._preEntranceCheck() (../../sb/PerpetualPositionManager.sol#1530-1533)
+	- Lockable._preEntranceSet() (../../sb/PerpetualPositionManager.sol#1535-1538)
+Reentrancy in PerpetualPositionManager.withdrawPassedRequest() (../../sb/PerpetualPositionManager.sol#3789-3820):
+	External calls:
+	- fees() (../../sb/PerpetualPositionManager.sol#3792)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/PerpetualPositionManager.sol#537)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+		- price = optimisticOracle.getPrice(identifier,proposalTime,ancillaryData) (../../sb/PerpetualPositionManager.sol#3422-3455)
+		- collateralCurrency.safeTransfer(request.proposer,reward.rawValue) (../../sb/PerpetualPositionManager.sol#3440)
+		- collateralCurrency.safeIncreaseAllowance(address(store),regularFee.rawValue) (../../sb/PerpetualPositionManager.sol#1832)
+		- store.payOracleFeesErc20(address(collateralCurrency),regularFee) (../../sb/PerpetualPositionManager.sol#1833)
+		- collateralCurrency.safeTransfer(msg.sender,latePenalty.rawValue) (../../sb/PerpetualPositionManager.sol#1837)
+	External calls sending eth:
+	- fees() (../../sb/PerpetualPositionManager.sol#3792)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+	State variables written after the call(s):
+	- nonReentrant() (../../sb/PerpetualPositionManager.sol#3793)
+		- _notEntered = false (../../sb/PerpetualPositionManager.sol#1537)
+		- _notEntered = true (../../sb/PerpetualPositionManager.sol#1543)
+	Lockable._notEntered (../../sb/PerpetualPositionManager.sol#1492) can be used in cross function reentrancies:
+	- Lockable._postEntranceReset() (../../sb/PerpetualPositionManager.sol#1540-1544)
+	- Lockable._preEntranceCheck() (../../sb/PerpetualPositionManager.sol#1530-1533)
+	- Lockable._preEntranceSet() (../../sb/PerpetualPositionManager.sol#1535-1538)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities
+
+PerpetualPositionManager.redeem(FixedPoint.Unsigned) (../../sb/PerpetualPositionManager.sol#3895-3932) performs a multiplication on the result of a division:
+	- fractionRedeemed = numTokens.div(positionData.tokensOutstanding) (../../sb/PerpetualPositionManager.sol#3906)
+	- collateralRedeemed = fractionRedeemed.mul(_getFeeAdjustedCollateral(positionData.rawCollateral)) (../../sb/PerpetualPositionManager.sol#3907-3908)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+FeePayer.payRegularFees() (../../sb/PerpetualPositionManager.sol#1789-1840) uses a dangerous strict equality:
+	- lastPaymentTime == time (../../sb/PerpetualPositionManager.sol#1803)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Reentrancy in FundingRateApplier._getLatestFundingRate() (../../sb/PerpetualPositionManager.sol#3413-3458):
+	External calls:
+	- price = optimisticOracle.getPrice(identifier,proposalTime,ancillaryData) (../../sb/PerpetualPositionManager.sol#3422-3455)
+	State variables written after the call(s):
+	- fundingRate.rate = FixedPoint.Signed(price) (../../sb/PerpetualPositionManager.sol#3431)
+	FundingRateApplier.fundingRate (../../sb/PerpetualPositionManager.sol#3257) can be used in cross function reentrancies:
+	- FundingRateApplier.constructor(bytes32,address,address,address,FixedPoint.Unsigned,address) (../../sb/PerpetualPositionManager.sol#3303-3322)
+	- FundingRateApplier.fundingRate (../../sb/PerpetualPositionManager.sol#3257)
+	- fundingRate.updateTime = proposalTime (../../sb/PerpetualPositionManager.sol#3432)
+	FundingRateApplier.fundingRate (../../sb/PerpetualPositionManager.sol#3257) can be used in cross function reentrancies:
+	- FundingRateApplier.constructor(bytes32,address,address,address,FixedPoint.Unsigned,address) (../../sb/PerpetualPositionManager.sol#3303-3322)
+	- FundingRateApplier.fundingRate (../../sb/PerpetualPositionManager.sol#3257)
+	- fundingRate.proposalTime = 0 (../../sb/PerpetualPositionManager.sol#3453)
+	FundingRateApplier.fundingRate (../../sb/PerpetualPositionManager.sol#3257) can be used in cross function reentrancies:
+	- FundingRateApplier.constructor(bytes32,address,address,address,FixedPoint.Unsigned,address) (../../sb/PerpetualPositionManager.sol#3303-3322)
+	- FundingRateApplier.fundingRate (../../sb/PerpetualPositionManager.sol#3257)
+Reentrancy in FundingRateApplier._getLatestFundingRate() (../../sb/PerpetualPositionManager.sol#3413-3458):
+	External calls:
+	- price = optimisticOracle.getPrice(identifier,proposalTime,ancillaryData) (../../sb/PerpetualPositionManager.sol#3422-3455)
+	- collateralCurrency.safeTransfer(request.proposer,reward.rawValue) (../../sb/PerpetualPositionManager.sol#3440)
+	State variables written after the call(s):
+	- fundingRate.proposalTime = 0 (../../sb/PerpetualPositionManager.sol#3446)
+	FundingRateApplier.fundingRate (../../sb/PerpetualPositionManager.sol#3257) can be used in cross function reentrancies:
+	- FundingRateApplier.constructor(bytes32,address,address,address,FixedPoint.Unsigned,address) (../../sb/PerpetualPositionManager.sol#3303-3322)
+	- FundingRateApplier.fundingRate (../../sb/PerpetualPositionManager.sol#3257)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+FundingRateApplier.proposeNewRate(FixedPoint.Signed,uint256) (../../sb/PerpetualPositionManager.sol#3343-3392) ignores return value by optimisticOracle.requestPrice(identifier,timestamp,ancillaryData,collateralCurrency,0) (../../sb/PerpetualPositionManager.sol#3368)
+FundingRateApplier.proposeNewRate(FixedPoint.Signed,uint256) (../../sb/PerpetualPositionManager.sol#3343-3392) ignores return value by optimisticOracle.proposePriceFor(msg.sender,address(this),identifier,timestamp,ancillaryData,rate.rawValue) (../../sb/PerpetualPositionManager.sol#3384-3391)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+Reentrancy in FundingRateApplier._getLatestFundingRate() (../../sb/PerpetualPositionManager.sol#3413-3458):
+	External calls:
+	- price = optimisticOracle.getPrice(identifier,proposalTime,ancillaryData) (../../sb/PerpetualPositionManager.sol#3422-3455)
+	State variables written after the call(s):
+	- _adjustCumulativeFeeMultiplier(reward,_pfc()) (../../sb/PerpetualPositionManager.sol#3439)
+		- cumulativeFeeMultiplier = cumulativeFeeMultiplier.mul(FixedPoint.fromUnscaledUint(1).sub(effectiveFee)) (../../sb/PerpetualPositionManager.sol#1954)
+Reentrancy in PerpetualPositionManager.create(FixedPoint.Unsigned,FixedPoint.Unsigned) (../../sb/PerpetualPositionManager.sol#3846-3884):
+	External calls:
+	- fees() (../../sb/PerpetualPositionManager.sol#3849)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/PerpetualPositionManager.sol#537)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+		- price = optimisticOracle.getPrice(identifier,proposalTime,ancillaryData) (../../sb/PerpetualPositionManager.sol#3422-3455)
+		- collateralCurrency.safeTransfer(request.proposer,reward.rawValue) (../../sb/PerpetualPositionManager.sol#3440)
+		- collateralCurrency.safeIncreaseAllowance(address(store),regularFee.rawValue) (../../sb/PerpetualPositionManager.sol#1832)
+		- store.payOracleFeesErc20(address(collateralCurrency),regularFee) (../../sb/PerpetualPositionManager.sol#1833)
+		- collateralCurrency.safeTransfer(msg.sender,latePenalty.rawValue) (../../sb/PerpetualPositionManager.sol#1837)
+	External calls sending eth:
+	- fees() (../../sb/PerpetualPositionManager.sol#3849)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+	State variables written after the call(s):
+	- positionData.tokensOutstanding = positionData.tokensOutstanding.add(numTokens) (../../sb/PerpetualPositionManager.sol#3873)
+	- totalTokensOutstanding = totalTokensOutstanding.add(numTokens) (../../sb/PerpetualPositionManager.sol#3875)
+Reentrancy in PerpetualPositionManager.redeem(FixedPoint.Unsigned) (../../sb/PerpetualPositionManager.sol#3895-3932):
+	External calls:
+	- fees() (../../sb/PerpetualPositionManager.sol#3899)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/PerpetualPositionManager.sol#537)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+		- price = optimisticOracle.getPrice(identifier,proposalTime,ancillaryData) (../../sb/PerpetualPositionManager.sol#3422-3455)
+		- collateralCurrency.safeTransfer(request.proposer,reward.rawValue) (../../sb/PerpetualPositionManager.sol#3440)
+		- collateralCurrency.safeIncreaseAllowance(address(store),regularFee.rawValue) (../../sb/PerpetualPositionManager.sol#1832)
+		- store.payOracleFeesErc20(address(collateralCurrency),regularFee) (../../sb/PerpetualPositionManager.sol#1833)
+		- collateralCurrency.safeTransfer(msg.sender,latePenalty.rawValue) (../../sb/PerpetualPositionManager.sol#1837)
+	External calls sending eth:
+	- fees() (../../sb/PerpetualPositionManager.sol#3899)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+	State variables written after the call(s):
+	- amountWithdrawn = _deleteSponsorPosition(msg.sender) (../../sb/PerpetualPositionManager.sol#3912)
+		- totalTokensOutstanding = totalTokensOutstanding.sub(positionToLiquidate.tokensOutstanding) (../../sb/PerpetualPositionManager.sol#4135)
+	- totalTokensOutstanding = totalTokensOutstanding.sub(numTokens) (../../sb/PerpetualPositionManager.sol#3923)
+Reentrancy in PerpetualPositionManager.settleEmergencyShutdown() (../../sb/PerpetualPositionManager.sol#3956-4012):
+	External calls:
+	- fees() (../../sb/PerpetualPositionManager.sol#3959)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/PerpetualPositionManager.sol#537)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+		- price = optimisticOracle.getPrice(identifier,proposalTime,ancillaryData) (../../sb/PerpetualPositionManager.sol#3422-3455)
+		- collateralCurrency.safeTransfer(request.proposer,reward.rawValue) (../../sb/PerpetualPositionManager.sol#3440)
+		- collateralCurrency.safeIncreaseAllowance(address(store),regularFee.rawValue) (../../sb/PerpetualPositionManager.sol#1832)
+		- store.payOracleFeesErc20(address(collateralCurrency),regularFee) (../../sb/PerpetualPositionManager.sol#1833)
+		- collateralCurrency.safeTransfer(msg.sender,latePenalty.rawValue) (../../sb/PerpetualPositionManager.sol#1837)
+	External calls sending eth:
+	- fees() (../../sb/PerpetualPositionManager.sol#3959)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+	State variables written after the call(s):
+	- emergencyShutdownPrice = _getOracleEmergencyShutdownPrice() (../../sb/PerpetualPositionManager.sol#3965)
+	- delete positions[msg.sender] (../../sb/PerpetualPositionManager.sol#3993)
+	- totalTokensOutstanding = totalTokensOutstanding.sub(tokensToRedeem) (../../sb/PerpetualPositionManager.sol#4004)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in FeePayer._payFinalFees(address,FixedPoint.Unsigned) (../../sb/PerpetualPositionManager.sol#1859-1883):
+	External calls:
+	- collateralCurrency.safeTransferFrom(payer,address(this),amount.rawValue) (../../sb/PerpetualPositionManager.sol#1866)
+	Event emitted after the call(s):
+	- FinalFeesPaid(amount.rawValue) (../../sb/PerpetualPositionManager.sol#1878)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+FeePayer.payRegularFees() (../../sb/PerpetualPositionManager.sol#1789-1840) uses timestamp for comparisons
+	Dangerous comparisons:
+	- lastPaymentTime == time (../../sb/PerpetualPositionManager.sol#1803)
+OptimisticOracle.getState(address,bytes32,uint256,bytes) (../../sb/PerpetualPositionManager.sol#3052-3080) uses timestamp for comparisons
+	Dangerous comparisons:
+	- request.expirationTime <= getCurrentTime() (../../sb/PerpetualPositionManager.sol#3073)
+FundingRateApplier.proposeNewRate(FixedPoint.Signed,uint256) (../../sb/PerpetualPositionManager.sol#3343-3392) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(fundingRate.proposalTime == 0,Proposal in progress) (../../sb/PerpetualPositionManager.sol#3349)
+	- require(bool,string)(timestamp > updateTime && timestamp >= currentTime.sub(1800) && timestamp <= currentTime.add(90),Invalid proposal time) (../../sb/PerpetualPositionManager.sol#3355-3358)
+FundingRateApplier._getLatestFundingRate() (../../sb/PerpetualPositionManager.sol#3413-3458) uses timestamp for comparisons
+	Dangerous comparisons:
+	- proposalTime != 0 (../../sb/PerpetualPositionManager.sol#3415)
+	- proposalTime >= lastUpdateTime (../../sb/PerpetualPositionManager.sol#3429)
+	- request.disputer == address(0) (../../sb/PerpetualPositionManager.sol#3435)
+	- optimisticOracle.getRequest(address(this),identifier,proposalTime,ancillaryData).disputer != address(0) (../../sb/PerpetualPositionManager.sol#3450-3451)
+PerpetualPositionManager.requestWithdrawal(FixedPoint.Unsigned) (../../sb/PerpetualPositionManager.sol#3762-3780) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(collateralAmount.isGreaterThan(0) && collateralAmount.isLessThanOrEqual(_getFeeAdjustedCollateral(positionData.rawCollateral)),Invalid collateral amount) (../../sb/PerpetualPositionManager.sol#3769-3773)
+PerpetualPositionManager.withdrawPassedRequest() (../../sb/PerpetualPositionManager.sol#3789-3820) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(positionData.withdrawalRequestPassTimestamp != 0 && positionData.withdrawalRequestPassTimestamp <= getCurrentTime(),Invalid withdraw request) (../../sb/PerpetualPositionManager.sol#3797-3801)
+PerpetualPositionManager.create(FixedPoint.Unsigned,FixedPoint.Unsigned) (../../sb/PerpetualPositionManager.sol#3846-3884) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)((_checkCollateralization(_getFeeAdjustedCollateral(positionData.rawCollateral).add(collateralAmount),positionData.tokensOutstanding.add(numTokens)) || _checkCollateralization(collateralAmount,numTokens)),Insufficient collateral) (../../sb/PerpetualPositionManager.sol#3855-3861)
+PerpetualPositionManager._reduceSponsorPosition(address,FixedPoint.Unsigned,FixedPoint.Unsigned,FixedPoint.Unsigned) (../../sb/PerpetualPositionManager.sol#4093-4125) uses timestamp for comparisons
+	Dangerous comparisons:
+	- tokensToRemove.isEqual(positionData.tokensOutstanding) && _getFeeAdjustedCollateral(positionData.rawCollateral).isEqual(collateralToRemove) (../../sb/PerpetualPositionManager.sol#4103-4104)
+PerpetualPositionManager._notEmergencyShutdown() (../../sb/PerpetualPositionManager.sol#4242-4245) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool)(emergencyShutdownTimestamp == 0) (../../sb/PerpetualPositionManager.sol#4244)
+PerpetualPositionManager._isEmergencyShutdown() (../../sb/PerpetualPositionManager.sol#4247-4250) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool)(emergencyShutdownTimestamp != 0) (../../sb/PerpetualPositionManager.sol#4249)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/PerpetualPositionManager.sol#312-321) uses assembly
+	- INLINE ASM (../../sb/PerpetualPositionManager.sol#319)
+Address._verifyCallResult(bool,bytes,string) (../../sb/PerpetualPositionManager.sol#457-474) uses assembly
+	- INLINE ASM (../../sb/PerpetualPositionManager.sol#466-469)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.functionCall(address,bytes) (../../sb/PerpetualPositionManager.sol#365-367) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/PerpetualPositionManager.sol#390-392) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/PerpetualPositionManager.sol#439-441) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/PerpetualPositionManager.sol#449-455) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/PerpetualPositionManager.sol#415-417) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/PerpetualPositionManager.sol#425-431) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/PerpetualPositionManager.sol#339-345) is never used and should be removed
+Context._msgData() (../../sb/PerpetualPositionManager.sol#2466-2469) is never used and should be removed
+FeePayer._computeFinalFees() (../../sb/PerpetualPositionManager.sol#1891-1894) is never used and should be removed
+FeePayer._payFinalFees(address,FixedPoint.Unsigned) (../../sb/PerpetualPositionManager.sol#1859-1883) is never used and should be removed
+FixedPoint.add(FixedPoint.Signed,int256) (../../sb/PerpetualPositionManager.sol#1213-1215) is never used and should be removed
+FixedPoint.add(FixedPoint.Unsigned,uint256) (../../sb/PerpetualPositionManager.sol#836-838) is never used and should be removed
+FixedPoint.div(FixedPoint.Signed,FixedPoint.Signed) (../../sb/PerpetualPositionManager.sol#1313-1320) is never used and should be removed
+FixedPoint.div(FixedPoint.Signed,int256) (../../sb/PerpetualPositionManager.sol#1329-1331) is never used and should be removed
+FixedPoint.div(FixedPoint.Unsigned,uint256) (../../sb/PerpetualPositionManager.sol#949-951) is never used and should be removed
+FixedPoint.div(int256,FixedPoint.Signed) (../../sb/PerpetualPositionManager.sol#1340-1342) is never used and should be removed
+FixedPoint.div(uint256,FixedPoint.Unsigned) (../../sb/PerpetualPositionManager.sol#960-962) is never used and should be removed
+FixedPoint.divAwayFromZero(FixedPoint.Signed,FixedPoint.Signed) (../../sb/PerpetualPositionManager.sol#1350-1362) is never used and should be removed
+FixedPoint.divAwayFromZero(FixedPoint.Signed,int256) (../../sb/PerpetualPositionManager.sol#1370-1375) is never used and should be removed
+FixedPoint.divCeil(FixedPoint.Unsigned,uint256) (../../sb/PerpetualPositionManager.sol#987-992) is never used and should be removed
+FixedPoint.fromUnsigned(FixedPoint.Unsigned) (../../sb/PerpetualPositionManager.sol#1023-1026) is never used and should be removed
+FixedPoint.isEqual(FixedPoint.Signed,FixedPoint.Signed) (../../sb/PerpetualPositionManager.sol#1053-1055) is never used and should be removed
+FixedPoint.isEqual(FixedPoint.Signed,int256) (../../sb/PerpetualPositionManager.sol#1043-1045) is never used and should be removed
+FixedPoint.isGreaterThan(FixedPoint.Signed,FixedPoint.Signed) (../../sb/PerpetualPositionManager.sol#1063-1065) is never used and should be removed
+FixedPoint.isGreaterThan(FixedPoint.Signed,int256) (../../sb/PerpetualPositionManager.sol#1073-1075) is never used and should be removed
+FixedPoint.isGreaterThan(int256,FixedPoint.Signed) (../../sb/PerpetualPositionManager.sol#1083-1085) is never used and should be removed
+FixedPoint.isGreaterThan(uint256,FixedPoint.Unsigned) (../../sb/PerpetualPositionManager.sol#706-708) is never used and should be removed
+FixedPoint.isGreaterThanOrEqual(FixedPoint.Signed,FixedPoint.Signed) (../../sb/PerpetualPositionManager.sol#1093-1095) is never used and should be removed
+FixedPoint.isGreaterThanOrEqual(FixedPoint.Signed,int256) (../../sb/PerpetualPositionManager.sol#1103-1105) is never used and should be removed
+FixedPoint.isGreaterThanOrEqual(FixedPoint.Unsigned,uint256) (../../sb/PerpetualPositionManager.sol#726-728) is never used and should be removed
+FixedPoint.isGreaterThanOrEqual(int256,FixedPoint.Signed) (../../sb/PerpetualPositionManager.sol#1113-1115) is never used and should be removed
+FixedPoint.isGreaterThanOrEqual(uint256,FixedPoint.Unsigned) (../../sb/PerpetualPositionManager.sol#736-738) is never used and should be removed
+FixedPoint.isLessThan(FixedPoint.Signed,FixedPoint.Signed) (../../sb/PerpetualPositionManager.sol#1123-1125) is never used and should be removed
+FixedPoint.isLessThan(FixedPoint.Signed,int256) (../../sb/PerpetualPositionManager.sol#1133-1135) is never used and should be removed
+FixedPoint.isLessThan(FixedPoint.Unsigned,uint256) (../../sb/PerpetualPositionManager.sol#756-758) is never used and should be removed
+FixedPoint.isLessThan(int256,FixedPoint.Signed) (../../sb/PerpetualPositionManager.sol#1143-1145) is never used and should be removed
+FixedPoint.isLessThan(uint256,FixedPoint.Unsigned) (../../sb/PerpetualPositionManager.sol#766-768) is never used and should be removed
+FixedPoint.isLessThanOrEqual(FixedPoint.Signed,FixedPoint.Signed) (../../sb/PerpetualPositionManager.sol#1153-1155) is never used and should be removed
+FixedPoint.isLessThanOrEqual(FixedPoint.Signed,int256) (../../sb/PerpetualPositionManager.sol#1163-1165) is never used and should be removed
+FixedPoint.isLessThanOrEqual(int256,FixedPoint.Signed) (../../sb/PerpetualPositionManager.sol#1173-1175) is never used and should be removed
+FixedPoint.isLessThanOrEqual(uint256,FixedPoint.Unsigned) (../../sb/PerpetualPositionManager.sol#796-798) is never used and should be removed
+FixedPoint.max(FixedPoint.Unsigned,FixedPoint.Unsigned) (../../sb/PerpetualPositionManager.sol#816-818) is never used and should be removed
+FixedPoint.min(FixedPoint.Signed,FixedPoint.Signed) (../../sb/PerpetualPositionManager.sol#1183-1185) is never used and should be removed
+FixedPoint.mul(FixedPoint.Signed,FixedPoint.Signed) (../../sb/PerpetualPositionManager.sol#1254-1262) is never used and should be removed
+FixedPoint.mulAwayFromZero(FixedPoint.Signed,FixedPoint.Signed) (../../sb/PerpetualPositionManager.sol#1281-1293) is never used and should be removed
+FixedPoint.mulAwayFromZero(FixedPoint.Signed,int256) (../../sb/PerpetualPositionManager.sol#1301-1304) is never used and should be removed
+FixedPoint.mulCeil(FixedPoint.Unsigned,FixedPoint.Unsigned) (../../sb/PerpetualPositionManager.sol#904-913) is never used and should be removed
+FixedPoint.mulCeil(FixedPoint.Unsigned,uint256) (../../sb/PerpetualPositionManager.sol#921-924) is never used and should be removed
+FixedPoint.pow(FixedPoint.Signed,uint256) (../../sb/PerpetualPositionManager.sol#1384-1389) is never used and should be removed
+FixedPoint.pow(FixedPoint.Unsigned,uint256) (../../sb/PerpetualPositionManager.sol#1001-1006) is never used and should be removed
+FixedPoint.sub(FixedPoint.Signed,FixedPoint.Signed) (../../sb/PerpetualPositionManager.sol#1223-1225) is never used and should be removed
+FixedPoint.sub(FixedPoint.Signed,int256) (../../sb/PerpetualPositionManager.sol#1233-1235) is never used and should be removed
+FixedPoint.sub(FixedPoint.Unsigned,uint256) (../../sb/PerpetualPositionManager.sol#856-858) is never used and should be removed
+FixedPoint.sub(int256,FixedPoint.Signed) (../../sb/PerpetualPositionManager.sol#1243-1245) is never used and should be removed
+FixedPoint.sub(uint256,FixedPoint.Unsigned) (../../sb/PerpetualPositionManager.sol#866-868) is never used and should be removed
+PerpetualPositionManager._reduceSponsorPosition(address,FixedPoint.Unsigned,FixedPoint.Unsigned,FixedPoint.Unsigned) (../../sb/PerpetualPositionManager.sol#4093-4125) is never used and should be removed
+SafeCast.toInt128(int256) (../../sb/PerpetualPositionManager.sol#2075-2078) is never used and should be removed
+SafeCast.toInt16(int256) (../../sb/PerpetualPositionManager.sol#2129-2132) is never used and should be removed
+SafeCast.toInt32(int256) (../../sb/PerpetualPositionManager.sol#2111-2114) is never used and should be removed
+SafeCast.toInt64(int256) (../../sb/PerpetualPositionManager.sol#2093-2096) is never used and should be removed
+SafeCast.toInt8(int256) (../../sb/PerpetualPositionManager.sol#2147-2150) is never used and should be removed
+SafeCast.toUint128(uint256) (../../sb/PerpetualPositionManager.sol#1985-1988) is never used and should be removed
+SafeCast.toUint16(uint256) (../../sb/PerpetualPositionManager.sol#2030-2033) is never used and should be removed
+SafeCast.toUint256(int256) (../../sb/PerpetualPositionManager.sol#2057-2060) is never used and should be removed
+SafeCast.toUint32(uint256) (../../sb/PerpetualPositionManager.sol#2015-2018) is never used and should be removed
+SafeCast.toUint64(uint256) (../../sb/PerpetualPositionManager.sol#2000-2003) is never used and should be removed
+SafeCast.toUint8(uint256) (../../sb/PerpetualPositionManager.sol#2045-2048) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/PerpetualPositionManager.sol#505-514) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/PerpetualPositionManager.sol#521-524) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/PerpetualPositionManager.sol#191-194) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/PerpetualPositionManager.sol#211-214) is never used and should be removed
+SafeMath.sub(uint256,uint256,string) (../../sb/PerpetualPositionManager.sol#171-174) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/PerpetualPositionManager.sol#25-29) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/PerpetualPositionManager.sol#61-64) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/PerpetualPositionManager.sol#71-74) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/PerpetualPositionManager.sol#46-54) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/PerpetualPositionManager.sol#36-39) is never used and should be removed
+SignedSafeMath.div(int256,int256) (../../sb/PerpetualPositionManager.sol#590-597) is never used and should be removed
+SignedSafeMath.sub(int256,int256) (../../sb/PerpetualPositionManager.sol#609-614) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.6.0 (../../sb/PerpetualPositionManager.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/PerpetualPositionManager.sol#339-345):
+	- (success) = recipient.call{value: amount}() (../../sb/PerpetualPositionManager.sol#343)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/PerpetualPositionManager.sol#400-407):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/PerpetualPositionManager.sol#405)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/PerpetualPositionManager.sol#425-431):
+	- (success,returndata) = target.staticcall(data) (../../sb/PerpetualPositionManager.sol#429)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/PerpetualPositionManager.sol#449-455):
+	- (success,returndata) = target.delegatecall(data) (../../sb/PerpetualPositionManager.sol#453)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Redundant expression "this (../../sb/PerpetualPositionManager.sol#2467)" inContext (../../sb/PerpetualPositionManager.sol#2461-2470)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Loop condition i < whitelistIndices.length (../../sb/PerpetualPositionManager.sol#2599) should use cached array length instead of referencing `length` member of the storage array.
+ Loop condition i_scope_0 < whitelistIndices.length (../../sb/PerpetualPositionManager.sol#2608) should use cached array length instead of referencing `length` member of the storage array.
+ Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cache-array-length
+
+FeePayer.collateralCurrency (../../sb/PerpetualPositionManager.sol#1724) should be immutable 
+FeePayer.finder (../../sb/PerpetualPositionManager.sol#1727) should be immutable 
+FundingRateApplier.configStore (../../sb/PerpetualPositionManager.sol#3263) should be immutable 
+OptimisticOracle.defaultLiveness (../../sb/PerpetualPositionManager.sol#2715) should be immutable 
+OptimisticOracle.finder (../../sb/PerpetualPositionManager.sol#2712) should be immutable 
+PerpetualPositionManager.priceIdentifier (../../sb/PerpetualPositionManager.sol#3578) should be immutable 
+PerpetualPositionManager.tokenCurrency (../../sb/PerpetualPositionManager.sol#3575) should be immutable 
+PerpetualPositionManager.withdrawalLiveness (../../sb/PerpetualPositionManager.sol#3585) should be immutable 
+Testable.timerAddress (../../sb/PerpetualPositionManager.sol#1582) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/PerpetualPositionManager.sol analyzed (28 contracts with 93 detectors), 132 result(s) found

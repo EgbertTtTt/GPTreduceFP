@@ -1,0 +1,484 @@
+'solc --version' running
+'solc /sb/CoinMama.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/CoinMama.sol:
+Warning: SPDX license identifier not provided in source file. Before publishing, consider adding a comment containing "SPDX-License-Identifier: <SPDX-License>" to each source file. Use "SPDX-License-Identifier: UNLICENSED" for non-open-source code. Please see https://spdx.org for more information.
+--> /sb/CoinMama.sol
+
+Warning: Contract code size exceeds 24576 bytes (a limit introduced in Spurious Dragon). This contract may not be deployable on mainnet. Consider enabling the optimizer (with a low "runs" value!), turning off revert strings, or using libraries.
+   --> /sb/CoinMama.sol:877:1:
+    |
+877 | contract CoinMama is ERC20, Ownable {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+CoinMama.addLiquidity(uint256,uint256) (../../sb/CoinMama.sol#1343-1358) sends eth to arbitrary user
+	Dangerous calls:
+	- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,deadWallet,block.timestamp) (../../sb/CoinMama.sol#1349-1356)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#functions-that-send-ether-to-arbitrary-destinations
+
+Reentrancy in CoinMama._transfer(address,address,uint256) (../../sb/CoinMama.sol#1150-1259):
+	External calls:
+	- swapAndSendToFee(operationalallet,marketingTokens) (../../sb/CoinMama.sol#1210)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/CoinMama.sol#1333-1339)
+	External calls sending eth:
+	- swapAndSendToFee(operationalallet,marketingTokens) (../../sb/CoinMama.sol#1210)
+		- wallet.transfer(newBalance) (../../sb/CoinMama.sol#1273)
+	State variables written after the call(s):
+	- lastSwap = block.timestamp (../../sb/CoinMama.sol#1211)
+	CoinMama.lastSwap (../../sb/CoinMama.sol#900) can be used in cross function reentrancies:
+	- CoinMama._transfer(address,address,uint256) (../../sb/CoinMama.sol#1150-1259)
+Reentrancy in CoinMama._transfer(address,address,uint256) (../../sb/CoinMama.sol#1150-1259):
+	External calls:
+	- swapAndSendToFee(operationalallet,marketingTokens) (../../sb/CoinMama.sol#1210)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/CoinMama.sol#1333-1339)
+	- swapAndLiquify(swapTokens) (../../sb/CoinMama.sol#1215)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,deadWallet,block.timestamp) (../../sb/CoinMama.sol#1349-1356)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/CoinMama.sol#1333-1339)
+	- swapAndSendDividends(sellTokens) (../../sb/CoinMama.sol#1218)
+		- (success) = address(dividendTracker).call{value: dividends}() (../../sb/CoinMama.sol#1363)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/CoinMama.sol#1333-1339)
+	External calls sending eth:
+	- swapAndSendToFee(operationalallet,marketingTokens) (../../sb/CoinMama.sol#1210)
+		- wallet.transfer(newBalance) (../../sb/CoinMama.sol#1273)
+	- swapAndLiquify(swapTokens) (../../sb/CoinMama.sol#1215)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,deadWallet,block.timestamp) (../../sb/CoinMama.sol#1349-1356)
+	- swapAndSendDividends(sellTokens) (../../sb/CoinMama.sol#1218)
+		- (success) = address(dividendTracker).call{value: dividends}() (../../sb/CoinMama.sol#1363)
+	State variables written after the call(s):
+	- super._transfer(from,address(this),fees) (../../sb/CoinMama.sol#1240)
+		- _balances[sender] = _balances[sender].sub(amount,ERC20: transfer amount exceeds balance) (../../sb/CoinMama.sol#563)
+		- _balances[recipient] = _balances[recipient].add(amount) (../../sb/CoinMama.sol#564)
+	ERC20._balances (../../sb/CoinMama.sol#379) can be used in cross function reentrancies:
+	- ERC20._mint(address,uint256) (../../sb/CoinMama.sol#577-585)
+	- ERC20._transfer(address,address,uint256) (../../sb/CoinMama.sol#553-566)
+	- ERC20.balanceOf(address) (../../sb/CoinMama.sol#444-446)
+	- super._transfer(from,deadWallet,burnAmt) (../../sb/CoinMama.sol#1241)
+		- _balances[sender] = _balances[sender].sub(amount,ERC20: transfer amount exceeds balance) (../../sb/CoinMama.sol#563)
+		- _balances[recipient] = _balances[recipient].add(amount) (../../sb/CoinMama.sol#564)
+	ERC20._balances (../../sb/CoinMama.sol#379) can be used in cross function reentrancies:
+	- ERC20._mint(address,uint256) (../../sb/CoinMama.sol#577-585)
+	- ERC20._transfer(address,address,uint256) (../../sb/CoinMama.sol#553-566)
+	- ERC20.balanceOf(address) (../../sb/CoinMama.sol#444-446)
+	- super._transfer(from,to,amount) (../../sb/CoinMama.sol#1244)
+		- _balances[sender] = _balances[sender].sub(amount,ERC20: transfer amount exceeds balance) (../../sb/CoinMama.sol#563)
+		- _balances[recipient] = _balances[recipient].add(amount) (../../sb/CoinMama.sol#564)
+	ERC20._balances (../../sb/CoinMama.sol#379) can be used in cross function reentrancies:
+	- ERC20._mint(address,uint256) (../../sb/CoinMama.sol#577-585)
+	- ERC20._transfer(address,address,uint256) (../../sb/CoinMama.sol#553-566)
+	- ERC20.balanceOf(address) (../../sb/CoinMama.sol#444-446)
+	- swapping = false (../../sb/CoinMama.sol#1220)
+	CoinMama.swapping (../../sb/CoinMama.sol#886) can be used in cross function reentrancies:
+	- CoinMama._transfer(address,address,uint256) (../../sb/CoinMama.sol#1150-1259)
+Reentrancy in DividendPayingToken._withdrawDividendOfUser(address) (../../sb/CoinMama.sol#778-794):
+	External calls:
+	- (success) = user.call{gas: 3000,value: _withdrawableDividend}() (../../sb/CoinMama.sol#783)
+	State variables written after the call(s):
+	- withdrawnDividends[user] = withdrawnDividends[user].sub(_withdrawableDividend) (../../sb/CoinMama.sol#786)
+	DividendPayingToken.withdrawnDividends (../../sb/CoinMama.sol#731) can be used in cross function reentrancies:
+	- DividendPayingToken._withdrawDividendOfUser(address) (../../sb/CoinMama.sol#778-794)
+	- DividendPayingToken.withdrawableDividendOf(address) (../../sb/CoinMama.sol#807-809)
+	- DividendPayingToken.withdrawnDividendOf(address) (../../sb/CoinMama.sol#814-816)
+Reentrancy in CoinMamaDividendTracker.process(uint256) (../../sb/CoinMama.sol#1520-1565):
+	External calls:
+	- processAccount(address(account),true) (../../sb/CoinMama.sol#1546)
+		- (success) = user.call{gas: 3000,value: _withdrawableDividend}() (../../sb/CoinMama.sol#783)
+	State variables written after the call(s):
+	- lastProcessedIndex = _lastProcessedIndex (../../sb/CoinMama.sol#1562)
+	CoinMamaDividendTracker.lastProcessedIndex (../../sb/CoinMama.sol#1377) can be used in cross function reentrancies:
+	- CoinMamaDividendTracker.getAccount(address) (../../sb/CoinMama.sol#1431-1474)
+	- CoinMamaDividendTracker.getLastProcessedIndex() (../../sb/CoinMama.sol#1421-1423)
+	- CoinMamaDividendTracker.lastProcessedIndex (../../sb/CoinMama.sol#1377)
+	- CoinMamaDividendTracker.process(uint256) (../../sb/CoinMama.sol#1520-1565)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities
+
+Reentrancy in CoinMama.updateDividendTracker(address) (../../sb/CoinMama.sol#995-1011):
+	External calls:
+	- newDividendTracker.excludeFromDividends(address(newDividendTracker)) (../../sb/CoinMama.sol#1002)
+	- newDividendTracker.excludeFromDividends(address(this)) (../../sb/CoinMama.sol#1003)
+	- newDividendTracker.excludeFromDividends(owner()) (../../sb/CoinMama.sol#1004)
+	- newDividendTracker.excludeFromDividends(address(0)) (../../sb/CoinMama.sol#1005)
+	- newDividendTracker.excludeFromDividends(address(uniswapV2Router)) (../../sb/CoinMama.sol#1006)
+	State variables written after the call(s):
+	- dividendTracker = newDividendTracker (../../sb/CoinMama.sol#1010)
+	CoinMama.dividendTracker (../../sb/CoinMama.sol#889) can be used in cross function reentrancies:
+	- CoinMama._setAutomatedMarketMakerPair(address,bool) (../../sb/CoinMama.sol#1051-1060)
+	- CoinMama._transfer(address,address,uint256) (../../sb/CoinMama.sol#1150-1259)
+	- CoinMama.claim() (../../sb/CoinMama.sol#1125-1127)
+	- CoinMama.constructor() (../../sb/CoinMama.sol#951-989)
+	- CoinMama.dividendTokenBalanceOf(address) (../../sb/CoinMama.sol#1090-1092)
+	- CoinMama.dividendTracker (../../sb/CoinMama.sol#889)
+	- CoinMama.excludeFromDividends(address) (../../sb/CoinMama.sol#1276-1278)
+	- CoinMama.getAccountDividendsInfo(address) (../../sb/CoinMama.sol#1094-1105)
+	- CoinMama.getAccountDividendsInfoAtIndex(uint256) (../../sb/CoinMama.sol#1107-1118)
+	- CoinMama.getClaimWait() (../../sb/CoinMama.sol#1074-1076)
+	- CoinMama.getLastProcessedIndex() (../../sb/CoinMama.sol#1129-1131)
+	- CoinMama.getNumberOfDividendTokenHolders() (../../sb/CoinMama.sol#1141-1143)
+	- CoinMama.getTotalDividendsDistributed() (../../sb/CoinMama.sol#1078-1080)
+	- CoinMama.processDividendTracker(uint256) (../../sb/CoinMama.sol#1120-1123)
+	- CoinMama.swapAndSendDividends(uint256) (../../sb/CoinMama.sol#1360-1368)
+	- CoinMama.updateClaimWait(uint256) (../../sb/CoinMama.sol#1070-1072)
+	- CoinMama.updateDividendTracker(address) (../../sb/CoinMama.sol#995-1011)
+	- CoinMama.withdrawableDividendOf(address) (../../sb/CoinMama.sol#1086-1088)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+CoinMama.getAccountDividendsInfo(address) (../../sb/CoinMama.sol#1094-1105) ignores return value by dividendTracker.getAccount(account) (../../sb/CoinMama.sol#1104)
+CoinMama.getAccountDividendsInfoAtIndex(uint256) (../../sb/CoinMama.sol#1107-1118) ignores return value by dividendTracker.getAccountAtIndex(index) (../../sb/CoinMama.sol#1117)
+CoinMama.claim() (../../sb/CoinMama.sol#1125-1127) ignores return value by dividendTracker.processAccount(msg.sender,false) (../../sb/CoinMama.sol#1126)
+CoinMama.addLiquidity(uint256,uint256) (../../sb/CoinMama.sol#1343-1358) ignores return value by uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,deadWallet,block.timestamp) (../../sb/CoinMama.sol#1349-1356)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+DividendPayingToken.constructor(string,string)._name (../../sb/CoinMama.sol#735) shadows:
+	- ERC20._name (../../sb/CoinMama.sol#385) (state variable)
+DividendPayingToken.constructor(string,string)._symbol (../../sb/CoinMama.sol#735) shadows:
+	- ERC20._symbol (../../sb/CoinMama.sol#386) (state variable)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+CoinMama.setSwapTokensAtAmt(uint256) (../../sb/CoinMama.sol#1133-1135) should emit an event for: 
+	- swapTokensAtAmount = amount (../../sb/CoinMama.sol#1134) 
+CoinMama.setBNBRewardsfee(uint256) (../../sb/CoinMama.sol#1261-1264) should emit an event for: 
+	- BNBRewardsFee = value (../../sb/CoinMama.sol#1262) 
+	- totalFees = BNBRewardsFee.add(liquidityFee).add(marketingAndBuybackFee) (../../sb/CoinMama.sol#1263) 
+CoinMama.setLiquidityFee(uint256) (../../sb/CoinMama.sol#1280-1283) should emit an event for: 
+	- liquidityFee = value (../../sb/CoinMama.sol#1281) 
+	- totalFees = BNBRewardsFee.add(liquidityFee).add(marketingAndBuybackFee) (../../sb/CoinMama.sol#1282) 
+CoinMama.setMarketingFee(uint256) (../../sb/CoinMama.sol#1286-1289) should emit an event for: 
+	- marketingAndBuybackFee = value (../../sb/CoinMama.sol#1287) 
+	- totalFees = BNBRewardsFee.add(liquidityFee).add(marketingAndBuybackFee) (../../sb/CoinMama.sol#1288) 
+CoinMama.setBurnFee(uint256) (../../sb/CoinMama.sol#1295-1297) should emit an event for: 
+	- burnFee = value (../../sb/CoinMama.sol#1296) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+CoinMama.setoperationalallet(address).newwallet (../../sb/CoinMama.sol#1291) lacks a zero-check on :
+		- operationalallet = newwallet (../../sb/CoinMama.sol#1292)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+DividendPayingToken._withdrawDividendOfUser(address) (../../sb/CoinMama.sol#778-794) has external calls inside a loop: (success) = user.call{gas: 3000,value: _withdrawableDividend}() (../../sb/CoinMama.sol#783)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in CoinMama._transfer(address,address,uint256) (../../sb/CoinMama.sol#1150-1259):
+	External calls:
+	- swapAndSendToFee(operationalallet,marketingTokens) (../../sb/CoinMama.sol#1210)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/CoinMama.sol#1333-1339)
+	- swapAndLiquify(swapTokens) (../../sb/CoinMama.sol#1215)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,deadWallet,block.timestamp) (../../sb/CoinMama.sol#1349-1356)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/CoinMama.sol#1333-1339)
+	External calls sending eth:
+	- swapAndSendToFee(operationalallet,marketingTokens) (../../sb/CoinMama.sol#1210)
+		- wallet.transfer(newBalance) (../../sb/CoinMama.sol#1273)
+	- swapAndLiquify(swapTokens) (../../sb/CoinMama.sol#1215)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,deadWallet,block.timestamp) (../../sb/CoinMama.sol#1349-1356)
+	State variables written after the call(s):
+	- swapAndLiquify(swapTokens) (../../sb/CoinMama.sol#1215)
+		- _allowances[owner][spender] = amount (../../sb/CoinMama.sol#629)
+Reentrancy in CoinMama._transfer(address,address,uint256) (../../sb/CoinMama.sol#1150-1259):
+	External calls:
+	- swapAndSendToFee(operationalallet,marketingTokens) (../../sb/CoinMama.sol#1210)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/CoinMama.sol#1333-1339)
+	- swapAndLiquify(swapTokens) (../../sb/CoinMama.sol#1215)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,deadWallet,block.timestamp) (../../sb/CoinMama.sol#1349-1356)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/CoinMama.sol#1333-1339)
+	- swapAndSendDividends(sellTokens) (../../sb/CoinMama.sol#1218)
+		- (success) = address(dividendTracker).call{value: dividends}() (../../sb/CoinMama.sol#1363)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/CoinMama.sol#1333-1339)
+	External calls sending eth:
+	- swapAndSendToFee(operationalallet,marketingTokens) (../../sb/CoinMama.sol#1210)
+		- wallet.transfer(newBalance) (../../sb/CoinMama.sol#1273)
+	- swapAndLiquify(swapTokens) (../../sb/CoinMama.sol#1215)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,deadWallet,block.timestamp) (../../sb/CoinMama.sol#1349-1356)
+	- swapAndSendDividends(sellTokens) (../../sb/CoinMama.sol#1218)
+		- (success) = address(dividendTracker).call{value: dividends}() (../../sb/CoinMama.sol#1363)
+	State variables written after the call(s):
+	- swapAndSendDividends(sellTokens) (../../sb/CoinMama.sol#1218)
+		- _allowances[owner][spender] = amount (../../sb/CoinMama.sol#629)
+Reentrancy in CoinMamaDividendTracker.processAccount(address,bool) (../../sb/CoinMama.sol#1567-1577):
+	External calls:
+	- amount = _withdrawDividendOfUser(account) (../../sb/CoinMama.sol#1568)
+		- (success) = user.call{gas: 3000,value: _withdrawableDividend}() (../../sb/CoinMama.sol#783)
+	State variables written after the call(s):
+	- lastClaimTimes[account] = block.timestamp (../../sb/CoinMama.sol#1571)
+Reentrancy in CoinMama.swapAndLiquify(uint256) (../../sb/CoinMama.sol#1299-1320):
+	External calls:
+	- swapTokensForEth(half) (../../sb/CoinMama.sol#1311)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/CoinMama.sol#1333-1339)
+	- addLiquidity(otherHalf,newBalance) (../../sb/CoinMama.sol#1317)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,deadWallet,block.timestamp) (../../sb/CoinMama.sol#1349-1356)
+	External calls sending eth:
+	- addLiquidity(otherHalf,newBalance) (../../sb/CoinMama.sol#1317)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,deadWallet,block.timestamp) (../../sb/CoinMama.sol#1349-1356)
+	State variables written after the call(s):
+	- addLiquidity(otherHalf,newBalance) (../../sb/CoinMama.sol#1317)
+		- _allowances[owner][spender] = amount (../../sb/CoinMama.sol#629)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in CoinMama._setAutomatedMarketMakerPair(address,bool) (../../sb/CoinMama.sol#1051-1060):
+	External calls:
+	- dividendTracker.excludeFromDividends(pair) (../../sb/CoinMama.sol#1056)
+	Event emitted after the call(s):
+	- SetAutomatedMarketMakerPair(pair,value) (../../sb/CoinMama.sol#1059)
+Reentrancy in CoinMama._transfer(address,address,uint256) (../../sb/CoinMama.sol#1150-1259):
+	External calls:
+	- swapAndSendToFee(operationalallet,marketingTokens) (../../sb/CoinMama.sol#1210)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/CoinMama.sol#1333-1339)
+	- swapAndLiquify(swapTokens) (../../sb/CoinMama.sol#1215)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,deadWallet,block.timestamp) (../../sb/CoinMama.sol#1349-1356)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/CoinMama.sol#1333-1339)
+	External calls sending eth:
+	- swapAndSendToFee(operationalallet,marketingTokens) (../../sb/CoinMama.sol#1210)
+		- wallet.transfer(newBalance) (../../sb/CoinMama.sol#1273)
+	- swapAndLiquify(swapTokens) (../../sb/CoinMama.sol#1215)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,deadWallet,block.timestamp) (../../sb/CoinMama.sol#1349-1356)
+	Event emitted after the call(s):
+	- Approval(owner,spender,amount) (../../sb/CoinMama.sol#630)
+		- swapAndLiquify(swapTokens) (../../sb/CoinMama.sol#1215)
+	- SwapAndLiquify(half,newBalance,otherHalf) (../../sb/CoinMama.sol#1319)
+		- swapAndLiquify(swapTokens) (../../sb/CoinMama.sol#1215)
+Reentrancy in CoinMama._transfer(address,address,uint256) (../../sb/CoinMama.sol#1150-1259):
+	External calls:
+	- swapAndSendToFee(operationalallet,marketingTokens) (../../sb/CoinMama.sol#1210)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/CoinMama.sol#1333-1339)
+	- swapAndLiquify(swapTokens) (../../sb/CoinMama.sol#1215)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,deadWallet,block.timestamp) (../../sb/CoinMama.sol#1349-1356)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/CoinMama.sol#1333-1339)
+	- swapAndSendDividends(sellTokens) (../../sb/CoinMama.sol#1218)
+		- (success) = address(dividendTracker).call{value: dividends}() (../../sb/CoinMama.sol#1363)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/CoinMama.sol#1333-1339)
+	External calls sending eth:
+	- swapAndSendToFee(operationalallet,marketingTokens) (../../sb/CoinMama.sol#1210)
+		- wallet.transfer(newBalance) (../../sb/CoinMama.sol#1273)
+	- swapAndLiquify(swapTokens) (../../sb/CoinMama.sol#1215)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,deadWallet,block.timestamp) (../../sb/CoinMama.sol#1349-1356)
+	- swapAndSendDividends(sellTokens) (../../sb/CoinMama.sol#1218)
+		- (success) = address(dividendTracker).call{value: dividends}() (../../sb/CoinMama.sol#1363)
+	Event emitted after the call(s):
+	- Approval(owner,spender,amount) (../../sb/CoinMama.sol#630)
+		- swapAndSendDividends(sellTokens) (../../sb/CoinMama.sol#1218)
+	- SendDividends(tokens,dividends) (../../sb/CoinMama.sol#1366)
+		- swapAndSendDividends(sellTokens) (../../sb/CoinMama.sol#1218)
+	- Transfer(sender,recipient,amount) (../../sb/CoinMama.sol#565)
+		- super._transfer(from,address(this),fees) (../../sb/CoinMama.sol#1240)
+	- Transfer(sender,recipient,amount) (../../sb/CoinMama.sol#565)
+		- super._transfer(from,to,amount) (../../sb/CoinMama.sol#1244)
+	- Transfer(sender,recipient,amount) (../../sb/CoinMama.sol#565)
+		- super._transfer(from,deadWallet,burnAmt) (../../sb/CoinMama.sol#1241)
+Reentrancy in CoinMama._transfer(address,address,uint256) (../../sb/CoinMama.sol#1150-1259):
+	External calls:
+	- swapAndSendToFee(operationalallet,marketingTokens) (../../sb/CoinMama.sol#1210)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/CoinMama.sol#1333-1339)
+	- swapAndLiquify(swapTokens) (../../sb/CoinMama.sol#1215)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,deadWallet,block.timestamp) (../../sb/CoinMama.sol#1349-1356)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/CoinMama.sol#1333-1339)
+	- swapAndSendDividends(sellTokens) (../../sb/CoinMama.sol#1218)
+		- (success) = address(dividendTracker).call{value: dividends}() (../../sb/CoinMama.sol#1363)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/CoinMama.sol#1333-1339)
+	- dividendTracker.setBalance(address(from),balanceOf(from)) (../../sb/CoinMama.sol#1246)
+	- dividendTracker.setBalance(address(to),balanceOf(to)) (../../sb/CoinMama.sol#1247)
+	- (iterations,claims,lastProcessedIndex) = dividendTracker.process(gas) (../../sb/CoinMama.sol#1252-1257)
+	External calls sending eth:
+	- swapAndSendToFee(operationalallet,marketingTokens) (../../sb/CoinMama.sol#1210)
+		- wallet.transfer(newBalance) (../../sb/CoinMama.sol#1273)
+	- swapAndLiquify(swapTokens) (../../sb/CoinMama.sol#1215)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,deadWallet,block.timestamp) (../../sb/CoinMama.sol#1349-1356)
+	- swapAndSendDividends(sellTokens) (../../sb/CoinMama.sol#1218)
+		- (success) = address(dividendTracker).call{value: dividends}() (../../sb/CoinMama.sol#1363)
+	Event emitted after the call(s):
+	- ProcessedDividendTracker(iterations,claims,lastProcessedIndex,true,gas,tx.origin) (../../sb/CoinMama.sol#1253)
+Reentrancy in CoinMamaDividendTracker.processAccount(address,bool) (../../sb/CoinMama.sol#1567-1577):
+	External calls:
+	- amount = _withdrawDividendOfUser(account) (../../sb/CoinMama.sol#1568)
+		- (success) = user.call{gas: 3000,value: _withdrawableDividend}() (../../sb/CoinMama.sol#783)
+	Event emitted after the call(s):
+	- Claim(account,amount,automatic) (../../sb/CoinMama.sol#1572)
+Reentrancy in CoinMama.processDividendTracker(uint256) (../../sb/CoinMama.sol#1120-1123):
+	External calls:
+	- (iterations,claims,lastProcessedIndex) = dividendTracker.process(gas) (../../sb/CoinMama.sol#1121)
+	Event emitted after the call(s):
+	- ProcessedDividendTracker(iterations,claims,lastProcessedIndex,false,gas,tx.origin) (../../sb/CoinMama.sol#1122)
+Reentrancy in CoinMama.swapAndLiquify(uint256) (../../sb/CoinMama.sol#1299-1320):
+	External calls:
+	- swapTokensForEth(half) (../../sb/CoinMama.sol#1311)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/CoinMama.sol#1333-1339)
+	- addLiquidity(otherHalf,newBalance) (../../sb/CoinMama.sol#1317)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,deadWallet,block.timestamp) (../../sb/CoinMama.sol#1349-1356)
+	External calls sending eth:
+	- addLiquidity(otherHalf,newBalance) (../../sb/CoinMama.sol#1317)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,deadWallet,block.timestamp) (../../sb/CoinMama.sol#1349-1356)
+	Event emitted after the call(s):
+	- Approval(owner,spender,amount) (../../sb/CoinMama.sol#630)
+		- addLiquidity(otherHalf,newBalance) (../../sb/CoinMama.sol#1317)
+	- SwapAndLiquify(half,newBalance,otherHalf) (../../sb/CoinMama.sol#1319)
+Reentrancy in CoinMama.swapAndSendDividends(uint256) (../../sb/CoinMama.sol#1360-1368):
+	External calls:
+	- swapTokensForEth(tokens) (../../sb/CoinMama.sol#1361)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/CoinMama.sol#1333-1339)
+	- (success) = address(dividendTracker).call{value: dividends}() (../../sb/CoinMama.sol#1363)
+	External calls sending eth:
+	- (success) = address(dividendTracker).call{value: dividends}() (../../sb/CoinMama.sol#1363)
+	Event emitted after the call(s):
+	- SendDividends(tokens,dividends) (../../sb/CoinMama.sol#1366)
+Reentrancy in CoinMama.updateDividendTracker(address) (../../sb/CoinMama.sol#995-1011):
+	External calls:
+	- newDividendTracker.excludeFromDividends(address(newDividendTracker)) (../../sb/CoinMama.sol#1002)
+	- newDividendTracker.excludeFromDividends(address(this)) (../../sb/CoinMama.sol#1003)
+	- newDividendTracker.excludeFromDividends(owner()) (../../sb/CoinMama.sol#1004)
+	- newDividendTracker.excludeFromDividends(address(0)) (../../sb/CoinMama.sol#1005)
+	- newDividendTracker.excludeFromDividends(address(uniswapV2Router)) (../../sb/CoinMama.sol#1006)
+	Event emitted after the call(s):
+	- UpdateDividendTracker(newAddress,address(dividendTracker)) (../../sb/CoinMama.sol#1008)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+DividendPayingToken._withdrawDividendOfUser(address) (../../sb/CoinMama.sol#778-794) tries to limit the gas of an external call that controls implicit decoding
+	(success) = user.call{gas: 3000,value: _withdrawableDividend}() (../../sb/CoinMama.sol#783)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#return-bomb
+
+CoinMama._transfer(address,address,uint256) (../../sb/CoinMama.sol#1150-1259) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp >= userCanSellTime[from],You are punished) (../../sb/CoinMama.sol#1158)
+	- timePassed >= 60 * 60 (../../sb/CoinMama.sol#1208)
+CoinMamaDividendTracker.getAccount(address) (../../sb/CoinMama.sol#1431-1474) uses timestamp for comparisons
+	Dangerous comparisons:
+	- nextClaimTime > block.timestamp (../../sb/CoinMama.sol#1471-1473)
+CoinMamaDividendTracker.canAutoClaim(uint256) (../../sb/CoinMama.sol#1495-1501) uses timestamp for comparisons
+	Dangerous comparisons:
+	- lastClaimTime > block.timestamp (../../sb/CoinMama.sol#1496)
+	- block.timestamp.sub(lastClaimTime) >= claimWait (../../sb/CoinMama.sol#1500)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Different versions of Solidity are used:
+	- Version used: ['>=0.6.2', '^0.6.2']
+	- >=0.6.2 (../../sb/CoinMama.sol#2)
+	- ^0.6.2 (../../sb/CoinMama.sol#1)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+
+CoinMama._transfer(address,address,uint256) (../../sb/CoinMama.sol#1150-1259) has a high cyclomatic complexity (20).
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cyclomatic-complexity
+
+Context._msgData() (../../sb/CoinMama.sol#11-14) is never used and should be removed
+DividendPayingToken._transfer(address,address,uint256) (../../sb/CoinMama.sol#834-840) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/CoinMama.sol#1701-1703) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/CoinMama.sol#1717-1720) is never used and should be removed
+SafeMathInt.abs(int256) (../../sb/CoinMama.sol#1771-1774) is never used and should be removed
+SafeMathInt.div(int256,int256) (../../sb/CoinMama.sol#1742-1748) is never used and should be removed
+SafeMathInt.mul(int256,int256) (../../sb/CoinMama.sol#1730-1737) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+CoinMama.totalFees (../../sb/CoinMama.sol#897) is set pre-construction with a non-constant function or state variable:
+	- BNBRewardsFee.add(liquidityFee).add(marketingAndBuybackFee)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#function-initializing-state
+
+Pragma version^0.6.2 (../../sb/CoinMama.sol#1) allows old versions
+Pragma version>=0.6.2 (../../sb/CoinMama.sol#2) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in DividendPayingToken._withdrawDividendOfUser(address) (../../sb/CoinMama.sol#778-794):
+	- (success) = user.call{gas: 3000,value: _withdrawableDividend}() (../../sb/CoinMama.sol#783)
+Low level call in CoinMama.swapAndSendDividends(uint256) (../../sb/CoinMama.sol#1360-1368):
+	- (success) = address(dividendTracker).call{value: dividends}() (../../sb/CoinMama.sol#1363)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Function IUniswapV2Pair.DOMAIN_SEPARATOR() (../../sb/CoinMama.sol#96) is not in mixedCase
+Function IUniswapV2Pair.PERMIT_TYPEHASH() (../../sb/CoinMama.sol#97) is not in mixedCase
+Function IUniswapV2Pair.MINIMUM_LIQUIDITY() (../../sb/CoinMama.sol#114) is not in mixedCase
+Function IUniswapV2Router01.WETH() (../../sb/CoinMama.sol#150) is not in mixedCase
+Parameter DividendPayingToken.dividendOf(address)._owner (../../sb/CoinMama.sol#800) is not in mixedCase
+Parameter DividendPayingToken.withdrawableDividendOf(address)._owner (../../sb/CoinMama.sol#807) is not in mixedCase
+Parameter DividendPayingToken.withdrawnDividendOf(address)._owner (../../sb/CoinMama.sol#814) is not in mixedCase
+Parameter DividendPayingToken.accumulativeDividendOf(address)._owner (../../sb/CoinMama.sol#824) is not in mixedCase
+Constant DividendPayingToken.magnitude (../../sb/CoinMama.sol#715) is not in UPPER_CASE_WITH_UNDERSCORES
+Parameter CoinMama.setTrigger(bool)._bool (../../sb/CoinMama.sol#1041) is not in mixedCase
+Variable CoinMama.BNBRewardsFee (../../sb/CoinMama.sol#893) is not in mixedCase
+Parameter CoinMamaDividendTracker.getAccount(address)._account (../../sb/CoinMama.sol#1431) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/CoinMama.sol#12)" inContext (../../sb/CoinMama.sol#6-15)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Reentrancy in CoinMama._transfer(address,address,uint256) (../../sb/CoinMama.sol#1150-1259):
+	External calls:
+	- swapAndSendToFee(operationalallet,marketingTokens) (../../sb/CoinMama.sol#1210)
+		- wallet.transfer(newBalance) (../../sb/CoinMama.sol#1273)
+	State variables written after the call(s):
+	- lastSwap = block.timestamp (../../sb/CoinMama.sol#1211)
+Reentrancy in CoinMama._transfer(address,address,uint256) (../../sb/CoinMama.sol#1150-1259):
+	External calls:
+	- swapAndSendToFee(operationalallet,marketingTokens) (../../sb/CoinMama.sol#1210)
+		- wallet.transfer(newBalance) (../../sb/CoinMama.sol#1273)
+	External calls sending eth:
+	- swapAndSendToFee(operationalallet,marketingTokens) (../../sb/CoinMama.sol#1210)
+		- wallet.transfer(newBalance) (../../sb/CoinMama.sol#1273)
+	- swapAndLiquify(swapTokens) (../../sb/CoinMama.sol#1215)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,deadWallet,block.timestamp) (../../sb/CoinMama.sol#1349-1356)
+	State variables written after the call(s):
+	- swapAndLiquify(swapTokens) (../../sb/CoinMama.sol#1215)
+		- _allowances[owner][spender] = amount (../../sb/CoinMama.sol#629)
+	Event emitted after the call(s):
+	- Approval(owner,spender,amount) (../../sb/CoinMama.sol#630)
+		- swapAndLiquify(swapTokens) (../../sb/CoinMama.sol#1215)
+	- SwapAndLiquify(half,newBalance,otherHalf) (../../sb/CoinMama.sol#1319)
+		- swapAndLiquify(swapTokens) (../../sb/CoinMama.sol#1215)
+Reentrancy in CoinMama._transfer(address,address,uint256) (../../sb/CoinMama.sol#1150-1259):
+	External calls:
+	- swapAndSendToFee(operationalallet,marketingTokens) (../../sb/CoinMama.sol#1210)
+		- wallet.transfer(newBalance) (../../sb/CoinMama.sol#1273)
+	External calls sending eth:
+	- swapAndSendToFee(operationalallet,marketingTokens) (../../sb/CoinMama.sol#1210)
+		- wallet.transfer(newBalance) (../../sb/CoinMama.sol#1273)
+	- swapAndLiquify(swapTokens) (../../sb/CoinMama.sol#1215)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,deadWallet,block.timestamp) (../../sb/CoinMama.sol#1349-1356)
+	- swapAndSendDividends(sellTokens) (../../sb/CoinMama.sol#1218)
+		- (success) = address(dividendTracker).call{value: dividends}() (../../sb/CoinMama.sol#1363)
+	State variables written after the call(s):
+	- swapAndSendDividends(sellTokens) (../../sb/CoinMama.sol#1218)
+		- _allowances[owner][spender] = amount (../../sb/CoinMama.sol#629)
+	- super._transfer(from,address(this),fees) (../../sb/CoinMama.sol#1240)
+		- _balances[sender] = _balances[sender].sub(amount,ERC20: transfer amount exceeds balance) (../../sb/CoinMama.sol#563)
+		- _balances[recipient] = _balances[recipient].add(amount) (../../sb/CoinMama.sol#564)
+	- super._transfer(from,deadWallet,burnAmt) (../../sb/CoinMama.sol#1241)
+		- _balances[sender] = _balances[sender].sub(amount,ERC20: transfer amount exceeds balance) (../../sb/CoinMama.sol#563)
+		- _balances[recipient] = _balances[recipient].add(amount) (../../sb/CoinMama.sol#564)
+	- super._transfer(from,to,amount) (../../sb/CoinMama.sol#1244)
+		- _balances[sender] = _balances[sender].sub(amount,ERC20: transfer amount exceeds balance) (../../sb/CoinMama.sol#563)
+		- _balances[recipient] = _balances[recipient].add(amount) (../../sb/CoinMama.sol#564)
+	- swapping = false (../../sb/CoinMama.sol#1220)
+	Event emitted after the call(s):
+	- Approval(owner,spender,amount) (../../sb/CoinMama.sol#630)
+		- swapAndSendDividends(sellTokens) (../../sb/CoinMama.sol#1218)
+	- ProcessedDividendTracker(iterations,claims,lastProcessedIndex,true,gas,tx.origin) (../../sb/CoinMama.sol#1253)
+	- SendDividends(tokens,dividends) (../../sb/CoinMama.sol#1366)
+		- swapAndSendDividends(sellTokens) (../../sb/CoinMama.sol#1218)
+	- Transfer(sender,recipient,amount) (../../sb/CoinMama.sol#565)
+		- super._transfer(from,address(this),fees) (../../sb/CoinMama.sol#1240)
+	- Transfer(sender,recipient,amount) (../../sb/CoinMama.sol#565)
+		- super._transfer(from,to,amount) (../../sb/CoinMama.sol#1244)
+	- Transfer(sender,recipient,amount) (../../sb/CoinMama.sol#565)
+		- super._transfer(from,deadWallet,burnAmt) (../../sb/CoinMama.sol#1241)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-4
+
+Variable IUniswapV2Router01.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountADesired (../../sb/CoinMama.sol#155) is too similar to IUniswapV2Router01.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountBDesired (../../sb/CoinMama.sol#156)
+Variable DividendPayingToken._withdrawDividendOfUser(address)._withdrawableDividend (../../sb/CoinMama.sol#779) is too similar to CoinMamaDividendTracker.getAccount(address).withdrawableDividends (../../sb/CoinMama.sol#1436)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+CoinMama.constructor() (../../sb/CoinMama.sol#951-989) uses literals with too many digits:
+	- _mint(owner(),1000000000 * (10 ** 18)) (../../sb/CoinMama.sol#988)
+CoinMama.updateGasForProcessing(uint256) (../../sb/CoinMama.sol#1063-1068) uses literals with too many digits:
+	- require(bool,string)(newValue >= 200000 && newValue <= 500000,CoinMama: gasForProcessing must be between 200,000 and 500,000) (../../sb/CoinMama.sol#1064)
+CoinMama._transfer(address,address,uint256) (../../sb/CoinMama.sol#1150-1259) uses literals with too many digits:
+	- amount = amount.sub(amount.mul(10).div(100000)) (../../sb/CoinMama.sol#1184)
+CoinMama.slitherConstructorVariables() (../../sb/CoinMama.sol#877-1369) uses literals with too many digits:
+	- swapTokensAtAmount = 20000000000 * (10 ** 18) (../../sb/CoinMama.sol#891)
+CoinMama.slitherConstructorVariables() (../../sb/CoinMama.sol#877-1369) uses literals with too many digits:
+	- maxSoldAmount = 10000000000000000000000000 (../../sb/CoinMama.sol#898)
+CoinMama.slitherConstructorVariables() (../../sb/CoinMama.sol#877-1369) uses literals with too many digits:
+	- gasForProcessing = 300000 (../../sb/CoinMama.sol#903)
+CoinMamaDividendTracker.constructor() (../../sb/CoinMama.sol#1391-1394) uses literals with too many digits:
+	- minimumTokenBalanceForDividends = 300000 * (10 ** 18) (../../sb/CoinMama.sol#1393)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+SafeMathInt.MAX_INT256 (../../sb/CoinMama.sol#1725) is never used in SafeMathInt (../../sb/CoinMama.sol#1723-1781)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-state-variable
+
+CoinMama.deadWallet (../../sb/CoinMama.sol#884) should be constant 
+CoinMama.maxSoldAmount (../../sb/CoinMama.sol#898) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+/sb/CoinMama.sol analyzed (18 contracts with 93 detectors), 79 result(s) found

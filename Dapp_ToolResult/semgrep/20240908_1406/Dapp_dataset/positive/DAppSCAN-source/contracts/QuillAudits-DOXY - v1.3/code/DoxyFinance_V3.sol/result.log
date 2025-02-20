@@ -1,0 +1,337 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 63 Code Findings │
+└──────────────────┘
+                           
+    /sb/DoxyFinance_V3.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          774┆ contract DoxyFinance_V3 is ERC20, Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+          499┆ maxSellPerDayLimit += amount;
+            ⋮┆----------------------------------------
+          513┆ maxSellPerDayLimit += amount;
+            ⋮┆----------------------------------------
+          675┆ _totalSupply += amount;
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+          778┆ bool takeStakeFees = false;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          339┆ constructor(string memory name_, string memory symbol_) {
+          340┆     maxSellPerDayLimit = 1000000000;
+          341┆     timeLimit = block.timestamp;
+          342┆     _name = name_;
+          343┆     _symbol = symbol_;
+          344┆ }
+            ⋮┆----------------------------------------
+          780┆ constructor() ERC20("Doxy Finance", "DOXY_V3") {
+          781┆     _mint(liquidityWallet, 6362400000000000);
+          782┆     _mint(marketingWallet, 2168100000000000);
+          783┆     _mint(strategicSalesWallet, 592900000000000);
+          784┆     _mint(gameOperationsWallet, 1238600000000000);
+          785┆     _mint(teamWallet, 484000000000000);
+          786┆     _mint(communityAirdropWallet, 154000000000000);
+          787┆ 
+          788┆     _isExcludedFromFee[owner()] = true;
+          789┆     _isExcludedFromFee[liquidityWallet] = true;
+             [hid 34 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+            8┆ require(
+            9┆     address(this).balance >= amount,
+           10┆     "Address: insufficient balance"
+           11┆ );
+            ⋮┆----------------------------------------
+           14┆ require(
+           15┆     success,
+           16┆     "Address: unable to send value, recipient may have reverted"
+           17┆ );
+            ⋮┆----------------------------------------
+          406┆ require(
+          407┆     unapprovbal >= LockedTokens[msg.sender],
+          408┆     "ERC20: Approval amount exceeds locked amount "
+          409┆ );
+            ⋮┆----------------------------------------
+          422┆ require(
+          423┆     currentAllowance >= amount,
+          424┆     "ERC20: transfer amount exceeds allowance"
+          425┆ );
+            ⋮┆----------------------------------------
+          452┆ require(
+          453┆     currentAllowance >= subtractedValue,
+          454┆     "ERC20: decreased allowance below zero"
+          455┆ );
+            ⋮┆----------------------------------------
+          468┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          469┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          470┆ require(
+          471┆     !_isBadActor[sender] && !_isBadActor[recipient],
+          472┆     "Bots are not allowed"
+          473┆ );
+            ⋮┆----------------------------------------
+          476┆ require(amount <= maxTxAmount, "you are exceeding maxTxAmount");
+            ⋮┆----------------------------------------
+          480┆ require(_includeInSell[sender], "ERC20:Not allowed to sell");
+            ⋮┆----------------------------------------
+          484┆ require(
+          485┆     block.timestamp > timeLimit + 24 * 1 hours,
+          486┆     "maxSellPerDay Limit Exceeded"
+          487┆ );
+            ⋮┆----------------------------------------
+          492┆ require(
+          493┆     _totSells[sender] + amount <= sellLimit,
+          494┆     "You can't sell more than sellLimit"
+          495┆ );
+            ⋮┆----------------------------------------
+          505┆ require(
+          506┆     amount <= sellLimit,
+          507┆     "You can't sell more than sellLimit"
+          508┆ );
+            ⋮┆----------------------------------------
+          523┆ require(
+          524┆     _totBuy[recipient] + amount <= buyLimit,
+          525┆     "You can't sell more than buyLimit"
+          526┆ );
+            ⋮┆----------------------------------------
+          529┆ require(
+          530┆     amount <= buyLimit,
+          531┆     "You can't sell more than buyLimit"
+          532┆ );
+            ⋮┆----------------------------------------
+          538┆ require(LockList[_msgSender()] == false, "ERC20: Caller Locked   
+  !");                                                                          
+            ⋮┆----------------------------------------
+          539┆ require(LockList[sender] == false, "ERC20: Sender Locked !");
+            ⋮┆----------------------------------------
+          540┆ require(LockList[recipient] == false, "ERC20: Receipient Locked  
+  !");                                                                          
+            ⋮┆----------------------------------------
+          544┆ require(
+          545┆     senderBalance >= amount,
+          546┆     "ERC20: transfer amount exceeds balance"
+          547┆ );
+            ⋮┆----------------------------------------
+          553┆ require(
+          554┆     stage >= LockedTokens[sender],
+          555┆     "ERC20: transfer amount exceeds Senders Locked Amount"
+          556┆ );
+            ⋮┆----------------------------------------
+          673┆ require(account != address(0), "ERC20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+          681┆ require(LockList[msg.sender] == false, "ERC20: User Locked !");
+            ⋮┆----------------------------------------
+          688┆ require(
+          689┆     stage >= LockedTokens[msg.sender],
+          690┆     "ERC20: transfer amount exceeds  Locked Amount"
+          691┆ );
+            ⋮┆----------------------------------------
+          699┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          702┆ require(accountBalance >= amount, "ERC20: burn amount exceeds    
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          718┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          719┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          751┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          760┆ require(
+          761┆     newOwner != address(0),
+          762┆     "Ownable: new owner is the zero address"
+          763┆ );
+            ⋮┆----------------------------------------
+          872┆ require(_amount <= balanceOf(_msgSender()), "Insufficent         
+  Balance");                                                                    
+            ⋮┆----------------------------------------
+         1032┆ require(
+         1033┆     buyFees.swapFee + buyFees.taxFee == 10000,
+         1034┆     "sum of all percentages should be 10000"
+         1035┆ );
+            ⋮┆----------------------------------------
+         1039┆ require(address(pancakeRouter) != newRouter, "Router already     
+  set");                                                                        
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          470┆ require(
+          471┆     !_isBadActor[sender] && !_isBadActor[recipient],
+          472┆     "Bots are not allowed"
+          473┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          475┆ if (!_isExcludedFromFee[sender] &&                               
+  !_isExcludedFromFee[recipient]) {                                             
+          476┆     require(amount <= maxTxAmount, "you are exceeding            
+  maxTxAmount");                                                                
+          477┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+         1087┆ for (i; i < _contributors.length; i++) {
+            ⋮┆----------------------------------------
+         1097┆ for (i; i < _contributors.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           14┆ require(
+           15┆     success,
+           16┆     "Address: unable to send value, recipient may have reverted"
+           17┆ );
+            ⋮┆----------------------------------------
+          406┆ require(
+          407┆     unapprovbal >= LockedTokens[msg.sender],
+          408┆     "ERC20: Approval amount exceeds locked amount "
+          409┆ );
+            ⋮┆----------------------------------------
+          422┆ require(
+          423┆     currentAllowance >= amount,
+          424┆     "ERC20: transfer amount exceeds allowance"
+          425┆ );
+            ⋮┆----------------------------------------
+          452┆ require(
+          453┆     currentAllowance >= subtractedValue,
+          454┆     "ERC20: decreased allowance below zero"
+          455┆ );
+            ⋮┆----------------------------------------
+          468┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          469┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          492┆ require(
+          493┆     _totSells[sender] + amount <= sellLimit,
+          494┆     "You can't sell more than sellLimit"
+          495┆ );
+            ⋮┆----------------------------------------
+          505┆ require(
+          506┆     amount <= sellLimit,
+          507┆     "You can't sell more than sellLimit"
+          508┆ );
+            ⋮┆----------------------------------------
+          523┆ require(
+          524┆     _totBuy[recipient] + amount <= buyLimit,
+          525┆     "You can't sell more than buyLimit"
+          526┆ );
+            ⋮┆----------------------------------------
+          529┆ require(
+          530┆     amount <= buyLimit,
+          531┆     "You can't sell more than buyLimit"
+          532┆ );
+            ⋮┆----------------------------------------
+          544┆ require(
+          545┆     senderBalance >= amount,
+          546┆     "ERC20: transfer amount exceeds balance"
+          547┆ );
+            ⋮┆----------------------------------------
+          553┆ require(
+          554┆     stage >= LockedTokens[sender],
+          555┆     "ERC20: transfer amount exceeds Senders Locked Amount"
+          556┆ );
+            ⋮┆----------------------------------------
+          688┆ require(
+          689┆     stage >= LockedTokens[msg.sender],
+          690┆     "ERC20: transfer amount exceeds  Locked Amount"
+          691┆ );
+            ⋮┆----------------------------------------
+          699┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          702┆ require(accountBalance >= amount, "ERC20: burn amount exceeds    
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          718┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          719┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          760┆ require(
+          761┆     newOwner != address(0),
+          762┆     "Ownable: new owner is the zero address"
+          763┆ );
+            ⋮┆----------------------------------------
+         1032┆ require(
+         1033┆     buyFees.swapFee + buyFees.taxFee == 10000,
+         1034┆     "sum of all percentages should be 10000"
+         1035┆ );
+            ⋮┆----------------------------------------
+       solidity.security.no-slippage-check          
+          No slippage check in a Uniswap v2/v3 trade
+                                                    
+          637┆ pancakeRouter.swapExactTokensForETHSupportingFeeOnTransferTokens(
+          638┆     tokenAmount,
+          639┆     0, // accept any amount of BNB
+          640┆     path,
+          641┆     address(this),
+          642┆     block.timestamp
+          643┆ );
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 63 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

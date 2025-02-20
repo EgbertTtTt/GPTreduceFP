@@ -1,0 +1,127 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 23 Code Findings │
+└──────────────────┘
+                                
+    /sb/TokenTranchePricing.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          105┆ contract TokenTranchePricing is Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          142┆ for (uint i = 0; i < init_tranches.length / tranche_size; i++) {
+            ⋮┆----------------------------------------
+          164┆ for (uint i = 0; i < tranches.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          150┆ require(i == 0 || (end >= tranches[i - 1].end && amount >        
+  tranches[i - 1].amount) ||                                                    
+            ⋮┆----------------------------------------
+          150┆ require(i == 0 || (end >= tranches[i - 1].end && amount >        
+  tranches[i - 1].amount) ||                                                    
+            ⋮┆----------------------------------------
+          151┆ (end > tranches[i - 1].end && amount >= tranches[i - 1].amount));
+            ⋮┆----------------------------------------
+          151┆ (end > tranches[i - 1].end && amount >= tranches[i - 1].amount));
+            ⋮┆----------------------------------------
+          153┆ tranches[i].amount = amount;
+            ⋮┆----------------------------------------
+          154┆ tranches[i].price = init_tranches[i * tranche_size +             
+  price_offset];                                                                
+            ⋮┆----------------------------------------
+          155┆ tranches[i].start = start;
+            ⋮┆----------------------------------------
+          156┆ tranches[i].end = end;
+            ⋮┆----------------------------------------
+          164┆ for (uint i = 0; i < tranches.length; i++) {
+            ⋮┆----------------------------------------
+          165┆ if (tranches[i].start <= block.number && block.number <          
+  tranches[i].end && tokensSold < tranches[i].amount) {                         
+            ⋮┆----------------------------------------
+          165┆ if (tranches[i].start <= block.number && block.number <          
+  tranches[i].end && tokensSold < tranches[i].amount) {                         
+            ⋮┆----------------------------------------
+          165┆ if (tranches[i].start <= block.number && block.number <          
+  tranches[i].end && tokensSold < tranches[i].amount) {                         
+            ⋮┆----------------------------------------
+          166┆ return tranches[i];
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          142┆ for (uint i = 0; i < init_tranches.length / tranche_size; i++) {
+            ⋮┆----------------------------------------
+          164┆ for (uint i = 0; i < tranches.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          147┆ require(block.number < start && start < end);
+            ⋮┆----------------------------------------
+          150┆ require(i == 0 || (end >= tranches[i - 1].end && amount >        
+  tranches[i - 1].amount) ||                                                    
+          151┆         (end > tranches[i - 1].end && amount >= tranches[i -     
+  1].amount));                                                                  
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          165┆ if (tranches[i].start <= block.number && block.number <          
+  tranches[i].end && tokensSold < tranches[i].amount) {                         
+          166┆   return tranches[i];
+          167┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          142┆ for (uint i = 0; i < init_tranches.length / tranche_size; i++) {
+            ⋮┆----------------------------------------
+          164┆ for (uint i = 0; i < tranches.length; i++) {
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 23 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

@@ -1,0 +1,198 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 33 Code Findings │
+└──────────────────┘
+                      
+    /sb/LUSDToken.sol 
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+         2264┆ constructor
+         2265┆ (
+         2266┆     address _troveManagerAddress,
+         2267┆     address _stabilityPoolAddress,
+         2268┆     address _borrowerOperationsAddress
+         2269┆ )
+         2270┆     public
+         2271┆ {
+         2272┆     troveManagerAddress = _troveManagerAddress;
+         2273┆     emit TroveManagerAddressChanged(_troveManagerAddress);
+             [hid 7 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          190┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          244┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+         2369┆ require(deadline == 0 || deadline >= now, 'LUSD: Signature has   
+  expired');                                                                    
+            ⋮┆----------------------------------------
+         2375┆ require(recoveredAddress != address(0) &&
+         2376┆         recoveredAddress == owner, 'LUSD: Recovered address from 
+  the sig is not the owner');                                                   
+            ⋮┆----------------------------------------
+         2393┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+         2394┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+         2402┆ require(account != address(0), "ERC20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+         2410┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+         2418┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         2419┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         2428┆ require(
+         2429┆     _recipient != address(0) &&
+         2430┆     _recipient != address(this),
+         2431┆     "LUSD: Cannot transfer tokens directly to the LUSD token     
+  contract or the zero address"                                                 
+         2432┆ );
+            ⋮┆----------------------------------------
+         2433┆ require(
+         2434┆     _recipient != stabilityPoolAddress &&
+         2435┆     _recipient != troveManagerAddress &&
+         2436┆     _recipient != borrowerOperationsAddress,
+         2437┆     "LUSD: Cannot transfer tokens directly to the StabilityPool, 
+  TroveManager or BorrowerOps"                                                  
+         2438┆ );
+            ⋮┆----------------------------------------
+         2442┆ require(msg.sender == borrowerOperationsAddress, "LUSDToken:     
+  Caller is not BorrowerOperations");                                           
+            ⋮┆----------------------------------------
+         2446┆ require(
+         2447┆     msg.sender == borrowerOperationsAddress ||
+         2448┆     msg.sender == troveManagerAddress ||
+         2449┆     msg.sender == stabilityPoolAddress,
+         2450┆     "LUSD: Caller is neither BorrowerOperations nor TroveManager 
+  nor StabilityPool"                                                            
+         2451┆ );
+            ⋮┆----------------------------------------
+         2455┆ require(msg.sender == stabilityPoolAddress, "LUSD: Caller is not 
+  the StabilityPool");                                                          
+            ⋮┆----------------------------------------
+         2459┆ require(
+         2460┆     msg.sender == troveManagerAddress || msg.sender ==           
+  stabilityPoolAddress,                                                         
+         2461┆     "LUSD: Caller is neither TroveManager nor StabilityPool");
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+         2375┆ require(recoveredAddress != address(0) &&
+         2376┆         recoveredAddress == owner, 'LUSD: Recovered address from 
+  the sig is not the owner');                                                   
+            ⋮┆----------------------------------------
+         2428┆ require(
+         2429┆     _recipient != address(0) &&
+         2430┆     _recipient != address(this),
+         2431┆     "LUSD: Cannot transfer tokens directly to the LUSD token     
+  contract or the zero address"                                                 
+         2432┆ );
+            ⋮┆----------------------------------------
+         2433┆ require(
+         2434┆     _recipient != stabilityPoolAddress &&
+         2435┆     _recipient != troveManagerAddress &&
+         2436┆     _recipient != borrowerOperationsAddress,
+         2437┆     "LUSD: Cannot transfer tokens directly to the StabilityPool, 
+  TroveManager or BorrowerOps"                                                  
+         2438┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          244┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+         2375┆ require(recoveredAddress != address(0) &&
+         2376┆         recoveredAddress == owner, 'LUSD: Recovered address from 
+  the sig is not the owner');                                                   
+            ⋮┆----------------------------------------
+         2393┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+         2394┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+         2410┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+         2418┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         2419┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         2428┆ require(
+         2429┆     _recipient != address(0) &&
+         2430┆     _recipient != address(this),
+         2431┆     "LUSD: Cannot transfer tokens directly to the LUSD token     
+  contract or the zero address"                                                 
+         2432┆ );
+            ⋮┆----------------------------------------
+         2433┆ require(
+         2434┆     _recipient != stabilityPoolAddress &&
+         2435┆     _recipient != troveManagerAddress &&
+         2436┆     _recipient != borrowerOperationsAddress,
+         2437┆     "LUSD: Cannot transfer tokens directly to the StabilityPool, 
+  TroveManager or BorrowerOps"                                                  
+         2438┆ );
+            ⋮┆----------------------------------------
+         2442┆ require(msg.sender == borrowerOperationsAddress, "LUSDToken:     
+  Caller is not BorrowerOperations");                                           
+            ⋮┆----------------------------------------
+         2446┆ require(
+         2447┆     msg.sender == borrowerOperationsAddress ||
+         2448┆     msg.sender == troveManagerAddress ||
+         2449┆     msg.sender == stabilityPoolAddress,
+         2450┆     "LUSD: Caller is neither BorrowerOperations nor TroveManager 
+  nor StabilityPool"                                                            
+         2451┆ );
+            ⋮┆----------------------------------------
+         2455┆ require(msg.sender == stabilityPoolAddress, "LUSD: Caller is not 
+  the StabilityPool");                                                          
+            ⋮┆----------------------------------------
+         2459┆ require(
+         2460┆     msg.sender == troveManagerAddress || msg.sender ==           
+  stabilityPoolAddress,                                                         
+         2461┆     "LUSD: Caller is neither TroveManager nor StabilityPool");
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 33 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

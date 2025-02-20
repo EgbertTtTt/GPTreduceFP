@@ -1,0 +1,194 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 42 Code Findings │
+└──────────────────┘
+                          
+    /sb/SkyRewardPool.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          490┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          494┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          512┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          517┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          522┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+          577┆ uint256 public totalAllocPoint = 0;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          594┆ constructor(
+          595┆     address _sky,
+          596┆     uint256 _poolStartTime
+          597┆ ) public {
+          598┆     require(block.timestamp < _poolStartTime, "late");
+          599┆     if (_sky != address(0)) sky = IERC20(_sky);
+          600┆     poolStartTime = _poolStartTime;
+          601┆     poolEndTime = poolStartTime + runningTime;
+          602┆     operator = msg.sender;
+          603┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          613┆ require(poolInfo[pid].token != _token, "SkyRewardPool: existing  
+  pool?");                                                                      
+            ⋮┆----------------------------------------
+          778┆ if (userInfo[pid][msg.sender].amount > 0) {
+            ⋮┆----------------------------------------
+          817┆ PoolInfo storage pool = poolInfo[pid];
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          612┆ for (uint256 pid = 0; pid < length; ++pid) {
+            ⋮┆----------------------------------------
+          701┆ for (uint256 pid = 0; pid < length; ++pid) {
+            ⋮┆----------------------------------------
+          777┆ for (uint256 pid = 0; pid < length; ++pid) {
+            ⋮┆----------------------------------------
+          816┆ for (uint256 pid = 0; pid < length; ++pid) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          161┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          176┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          193┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          210┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          227┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          339┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          343┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          400┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          401┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          425┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          449┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          509┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          510┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          511┆ );
+            ⋮┆----------------------------------------
+          539┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          598┆ require(block.timestamp < _poolStartTime, "late");
+            ⋮┆----------------------------------------
+          606┆ require(operator == msg.sender, "SkyRewardPool: caller is not the
+  operator");                                                                   
+            ⋮┆----------------------------------------
+          613┆ require(poolInfo[pid].token != _token, "SkyRewardPool: existing  
+  pool?");                                                                      
+            ⋮┆----------------------------------------
+          756┆ require(user.amount >= _amount, "withdraw: not good");
+            ⋮┆----------------------------------------
+          814┆ require(_token != sky, "sky");
+            ⋮┆----------------------------------------
+          818┆ require(_token != pool.token, "pool.token");
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          690┆ if (block.timestamp > pool.lastRewardTime && tokenSupply != 0) {
+          691┆     uint256 _generatedReward =                                   
+  getGeneratedReward(pool.lastRewardTime, block.timestamp);                     
+          692┆     uint256 _skyReward =                                         
+  _generatedReward.mul(pool.allocPoint).div(totalAllocPoint);                   
+          693┆     accSkyPerShare =                                             
+  accSkyPerShare.add(_skyReward.mul(1e18).div(tokenSupply));                    
+          694┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          193┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          343┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          400┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          425┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          449┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          509┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          510┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          511┆ );
+            ⋮┆----------------------------------------
+          539┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          606┆ require(operator == msg.sender, "SkyRewardPool: caller is not the
+  operator");                                                                   
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 42 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

@@ -1,0 +1,116 @@
+'solc --version' running
+'solc /sb/Controller.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+Reentrancy in Controller.repayDai(bytes32,uint256,address,address,uint256) (../../sb/Controller.sol#944-954):
+	External calls:
+	- _treasury.pushDai(from,toRepay) (../../sb/Controller.sol#952)
+	State variables written after the call(s):
+	- _repay(collateral,maturity,to,inYDai(collateral,maturity,toRepay)) (../../sb/Controller.sol#953)
+		- debtYDai[collateral][maturity][user] = debtYDai[collateral][maturity][user].sub(yDaiAmount) (../../sb/Controller.sol#969)
+	Controller.debtYDai (../../sb/Controller.sol#593) can be used in cross function reentrancies:
+	- Controller._repay(bytes32,uint256,address,uint256) (../../sb/Controller.sol#968-972)
+	- Controller.borrow(bytes32,uint256,address,address,uint256) (../../sb/Controller.sol#879-897)
+	- Controller.debtDai(bytes32,uint256,address) (../../sb/Controller.sol#747-749)
+	- Controller.debtYDai (../../sb/Controller.sol#593)
+	- Controller.erase(bytes32,address) (../../sb/Controller.sol#979-997)
+	- Controller.repayYDai(bytes32,uint256,address,address,uint256) (../../sb/Controller.sol#915-925)
+	- Controller.totalDebtDai(bytes32,address) (../../sb/Controller.sol#757-766)
+Reentrancy in Controller.repayYDai(bytes32,uint256,address,address,uint256) (../../sb/Controller.sol#915-925):
+	External calls:
+	- series[maturity].burn(from,toRepay) (../../sb/Controller.sol#923)
+	State variables written after the call(s):
+	- _repay(collateral,maturity,to,toRepay) (../../sb/Controller.sol#924)
+		- debtYDai[collateral][maturity][user] = debtYDai[collateral][maturity][user].sub(yDaiAmount) (../../sb/Controller.sol#969)
+	Controller.debtYDai (../../sb/Controller.sol#593) can be used in cross function reentrancies:
+	- Controller._repay(bytes32,uint256,address,uint256) (../../sb/Controller.sol#968-972)
+	- Controller.borrow(bytes32,uint256,address,address,uint256) (../../sb/Controller.sol#879-897)
+	- Controller.debtDai(bytes32,uint256,address) (../../sb/Controller.sol#747-749)
+	- Controller.debtYDai (../../sb/Controller.sol#593)
+	- Controller.erase(bytes32,address) (../../sb/Controller.sol#979-997)
+	- Controller.repayYDai(bytes32,uint256,address,address,uint256) (../../sb/Controller.sol#915-925)
+	- Controller.totalDebtDai(bytes32,address) (../../sb/Controller.sol#757-766)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+Controller.totalDebtDai(bytes32,address).totalDebt (../../sb/Controller.sol#758) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+Controller.powerOf(bytes32,address) (../../sb/Controller.sol#775-785) ignores return value by (spot) = _vat.ilks(WETH) (../../sb/Controller.sol#778)
+Controller.locked(bytes32,address) (../../sb/Controller.sol#790-801) ignores return value by (spot) = _vat.ilks(WETH) (../../sb/Controller.sol#796)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+Controller.inDai(bytes32,uint256,uint256) (../../sb/Controller.sol#696-711) has external calls inside a loop: yDai.isMature() (../../sb/Controller.sol#702)
+Controller.inDai(bytes32,uint256,uint256) (../../sb/Controller.sol#696-711) has external calls inside a loop: muld(yDaiAmount,yDai.rateGrowth()) (../../sb/Controller.sol#704)
+Controller.inDai(bytes32,uint256,uint256) (../../sb/Controller.sol#696-711) has external calls inside a loop: muld(yDaiAmount,yDai.chiGrowth()) (../../sb/Controller.sol#706)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in Controller.borrow(bytes32,uint256,address,address,uint256) (../../sb/Controller.sol#879-897):
+	External calls:
+	- yDai.mint(to,yDaiAmount) (../../sb/Controller.sol#895)
+	Event emitted after the call(s):
+	- Borrowed(collateral,maturity,from,toInt256(yDaiAmount)) (../../sb/Controller.sol#896)
+Reentrancy in Controller.post(bytes32,address,address,uint256) (../../sb/Controller.sol#811-830):
+	External calls:
+	- _treasury.pushWeth(from,amount) (../../sb/Controller.sol#824)
+	- _treasury.pushChai(from,amount) (../../sb/Controller.sol#826)
+	Event emitted after the call(s):
+	- Posted(collateral,to,toInt256(amount)) (../../sb/Controller.sol#829)
+Reentrancy in Controller.repayDai(bytes32,uint256,address,address,uint256) (../../sb/Controller.sol#944-954):
+	External calls:
+	- _treasury.pushDai(from,toRepay) (../../sb/Controller.sol#952)
+	Event emitted after the call(s):
+	- Borrowed(collateral,maturity,user,- toInt256(yDaiAmount)) (../../sb/Controller.sol#971)
+		- _repay(collateral,maturity,to,inYDai(collateral,maturity,toRepay)) (../../sb/Controller.sol#953)
+Reentrancy in Controller.repayYDai(bytes32,uint256,address,address,uint256) (../../sb/Controller.sol#915-925):
+	External calls:
+	- series[maturity].burn(from,toRepay) (../../sb/Controller.sol#923)
+	Event emitted after the call(s):
+	- Borrowed(collateral,maturity,user,- toInt256(yDaiAmount)) (../../sb/Controller.sol#971)
+		- _repay(collateral,maturity,to,toRepay) (../../sb/Controller.sol#924)
+Reentrancy in Controller.withdraw(bytes32,address,address,uint256) (../../sb/Controller.sol#840-864):
+	External calls:
+	- _treasury.pullWeth(to,amount) (../../sb/Controller.sol#858)
+	- _treasury.pullChai(to,amount) (../../sb/Controller.sol#860)
+	Event emitted after the call(s):
+	- Posted(collateral,from,- toInt256(amount)) (../../sb/Controller.sol#863)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Controller.shutdown() (../../sb/Controller.sol#642-648) compares to a boolean constant:
+	-require(bool,string)(_treasury.live() == false,Controller: Treasury is live) (../../sb/Controller.sol#643-646)
+Controller.onlyLive() (../../sb/Controller.sol#609-612) compares to a boolean constant:
+	-require(bool,string)(live == true,Controller: Not available during unwind) (../../sb/Controller.sol#610)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#boolean-equality
+
+Context._msgData() (../../sb/Controller.sol#465-468) is never used and should be removed
+Math.average(uint256,uint256) (../../sb/Controller.sol#27-30) is never used and should be removed
+Math.max(uint256,uint256) (../../sb/Controller.sol#12-14) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/Controller.sol#218-221) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/Controller.sol#180-183) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/Controller.sol#238-241) is never used and should be removed
+SafeMath.sub(uint256,uint256,string) (../../sb/Controller.sol#198-201) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/Controller.sol#52-56) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/Controller.sol#88-91) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/Controller.sol#98-101) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/Controller.sol#73-81) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/Controller.sol#63-66) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.6.10 (../../sb/Controller.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Redundant expression "this (../../sb/Controller.sol#466)" inContext (../../sb/Controller.sol#460-469)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+DecimalMath.divdrup(uint256,uint256) (../../sb/Controller.sol#441-447) uses literals with too many digits:
+	- z = x.mul(10000000000000000000000000000).div(y) (../../sb/Controller.sol#444)
+Controller.slitherConstructorConstantVariables() (../../sb/Controller.sol#574-998) uses literals with too many digits:
+	- UNIT = 1000000000000000000000000000 (../../sb/Controller.sol#427)
+Controller.slitherConstructorConstantVariables() (../../sb/Controller.sol#574-998) uses literals with too many digits:
+	- DUST = 50000000000000000 (../../sb/Controller.sol#582)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+Controller._pot (../../sb/Controller.sol#586) should be immutable 
+Controller._treasury (../../sb/Controller.sol#587) should be immutable 
+Controller._vat (../../sb/Controller.sol#585) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/Controller.sol analyzed (14 contracts with 93 detectors), 36 result(s) found

@@ -1,0 +1,224 @@
+'solc --version' running
+'solc /sb/MasterChef.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+MasterChef.safeRewardTokenTransfer(address,uint256) (../../sb/MasterChef.sol#1236-1247) ignores return value by rewardToken.transfer(_to,rewardTokenBal) (../../sb/MasterChef.sol#1242)
+MasterChef.safeRewardTokenTransfer(address,uint256) (../../sb/MasterChef.sol#1236-1247) ignores return value by rewardToken.transfer(_to,_amount) (../../sb/MasterChef.sol#1244)
+MasterChef.depositRewardTokens(uint256) (../../sb/MasterChef.sol#1261-1263) ignores return value by rewardToken.transferFrom(msg.sender,address(this),_amount) (../../sb/MasterChef.sol#1262)
+MasterChef.withdrawRewardTokens(uint256) (../../sb/MasterChef.sol#1265-1267) ignores return value by rewardToken.transfer(msg.sender,_amount) (../../sb/MasterChef.sol#1266)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+MasterChef.pendingRewardToken(uint256,address) (../../sb/MasterChef.sol#1119-1143) performs a multiplication on the result of a division:
+	- rewardTokenReward = multiplier.mul(rewardTokenPerBlock).mul(pool.allocPoint).div(totalAllocPoint) (../../sb/MasterChef.sol#1131-1134)
+	- accRewardTokenPerShare = accRewardTokenPerShare.add(rewardTokenReward.mul(1e12).div(lpSupply)) (../../sb/MasterChef.sol#1135-1137)
+MasterChef.updatePool(uint256) (../../sb/MasterChef.sol#1154-1175) performs a multiplication on the result of a division:
+	- rewardTokenReward = multiplier.mul(rewardTokenPerBlock).mul(pool.allocPoint).div(totalAllocPoint) (../../sb/MasterChef.sol#1165-1168)
+	- pool.accRewardTokenPerShare = pool.accRewardTokenPerShare.add(rewardTokenReward.mul(1e12).div(lpSupply)) (../../sb/MasterChef.sol#1171-1173)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+MasterChef.updatePool(uint256) (../../sb/MasterChef.sol#1154-1175) uses a dangerous strict equality:
+	- lpSupply == 0 (../../sb/MasterChef.sol#1160)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Reentrancy in MasterChef.deposit(uint256,uint256) (../../sb/MasterChef.sol#1178-1201):
+	External calls:
+	- safeRewardTokenTransfer(msg.sender,pending) (../../sb/MasterChef.sol#1188)
+		- rewardToken.transfer(_to,rewardTokenBal) (../../sb/MasterChef.sol#1242)
+		- rewardToken.transfer(_to,_amount) (../../sb/MasterChef.sol#1244)
+	- pool.lpToken.safeTransferFrom(address(msg.sender),address(this),_amount) (../../sb/MasterChef.sol#1190-1194)
+	State variables written after the call(s):
+	- user.unstakeTime = now + unstakeFrozenTime (../../sb/MasterChef.sol#1195)
+	MasterChef.userInfo (../../sb/MasterChef.sol#979) can be used in cross function reentrancies:
+	- MasterChef.deposit(uint256,uint256) (../../sb/MasterChef.sol#1178-1201)
+	- MasterChef.emergencyWithdraw(uint256) (../../sb/MasterChef.sol#1226-1233)
+	- MasterChef.pendingRewardToken(uint256,address) (../../sb/MasterChef.sol#1119-1143)
+	- MasterChef.userInfo (../../sb/MasterChef.sol#979)
+	- MasterChef.withdraw(uint256,uint256) (../../sb/MasterChef.sol#1204-1223)
+	- user.amount = user.amount.add(_amount) (../../sb/MasterChef.sol#1196)
+	MasterChef.userInfo (../../sb/MasterChef.sol#979) can be used in cross function reentrancies:
+	- MasterChef.deposit(uint256,uint256) (../../sb/MasterChef.sol#1178-1201)
+	- MasterChef.emergencyWithdraw(uint256) (../../sb/MasterChef.sol#1226-1233)
+	- MasterChef.pendingRewardToken(uint256,address) (../../sb/MasterChef.sol#1119-1143)
+	- MasterChef.userInfo (../../sb/MasterChef.sol#979)
+	- MasterChef.withdraw(uint256,uint256) (../../sb/MasterChef.sol#1204-1223)
+	- user.rewardDebt = user.amount.mul(pool.accRewardTokenPerShare).div(1e12) (../../sb/MasterChef.sol#1197-1199)
+	MasterChef.userInfo (../../sb/MasterChef.sol#979) can be used in cross function reentrancies:
+	- MasterChef.deposit(uint256,uint256) (../../sb/MasterChef.sol#1178-1201)
+	- MasterChef.emergencyWithdraw(uint256) (../../sb/MasterChef.sol#1226-1233)
+	- MasterChef.pendingRewardToken(uint256,address) (../../sb/MasterChef.sol#1119-1143)
+	- MasterChef.userInfo (../../sb/MasterChef.sol#979)
+	- MasterChef.withdraw(uint256,uint256) (../../sb/MasterChef.sol#1204-1223)
+Reentrancy in MasterChef.emergencyWithdraw(uint256) (../../sb/MasterChef.sol#1226-1233):
+	External calls:
+	- pool.lpToken.safeTransfer(address(msg.sender),user.amount) (../../sb/MasterChef.sol#1229)
+	State variables written after the call(s):
+	- user.amount = 0 (../../sb/MasterChef.sol#1231)
+	MasterChef.userInfo (../../sb/MasterChef.sol#979) can be used in cross function reentrancies:
+	- MasterChef.deposit(uint256,uint256) (../../sb/MasterChef.sol#1178-1201)
+	- MasterChef.emergencyWithdraw(uint256) (../../sb/MasterChef.sol#1226-1233)
+	- MasterChef.pendingRewardToken(uint256,address) (../../sb/MasterChef.sol#1119-1143)
+	- MasterChef.userInfo (../../sb/MasterChef.sol#979)
+	- MasterChef.withdraw(uint256,uint256) (../../sb/MasterChef.sol#1204-1223)
+	- user.rewardDebt = 0 (../../sb/MasterChef.sol#1232)
+	MasterChef.userInfo (../../sb/MasterChef.sol#979) can be used in cross function reentrancies:
+	- MasterChef.deposit(uint256,uint256) (../../sb/MasterChef.sol#1178-1201)
+	- MasterChef.emergencyWithdraw(uint256) (../../sb/MasterChef.sol#1226-1233)
+	- MasterChef.pendingRewardToken(uint256,address) (../../sb/MasterChef.sol#1119-1143)
+	- MasterChef.userInfo (../../sb/MasterChef.sol#979)
+	- MasterChef.withdraw(uint256,uint256) (../../sb/MasterChef.sol#1204-1223)
+Reentrancy in MasterChef.withdraw(uint256,uint256) (../../sb/MasterChef.sol#1204-1223):
+	External calls:
+	- safeRewardTokenTransfer(msg.sender,pending) (../../sb/MasterChef.sol#1215)
+		- rewardToken.transfer(_to,rewardTokenBal) (../../sb/MasterChef.sol#1242)
+		- rewardToken.transfer(_to,_amount) (../../sb/MasterChef.sol#1244)
+	State variables written after the call(s):
+	- user.amount = user.amount.sub(_amount) (../../sb/MasterChef.sol#1216)
+	MasterChef.userInfo (../../sb/MasterChef.sol#979) can be used in cross function reentrancies:
+	- MasterChef.deposit(uint256,uint256) (../../sb/MasterChef.sol#1178-1201)
+	- MasterChef.emergencyWithdraw(uint256) (../../sb/MasterChef.sol#1226-1233)
+	- MasterChef.pendingRewardToken(uint256,address) (../../sb/MasterChef.sol#1119-1143)
+	- MasterChef.userInfo (../../sb/MasterChef.sol#979)
+	- MasterChef.withdraw(uint256,uint256) (../../sb/MasterChef.sol#1204-1223)
+	- user.rewardDebt = user.amount.mul(pool.accRewardTokenPerShare).div(1e12) (../../sb/MasterChef.sol#1217-1219)
+	MasterChef.userInfo (../../sb/MasterChef.sol#979) can be used in cross function reentrancies:
+	- MasterChef.deposit(uint256,uint256) (../../sb/MasterChef.sol#1178-1201)
+	- MasterChef.emergencyWithdraw(uint256) (../../sb/MasterChef.sol#1226-1233)
+	- MasterChef.pendingRewardToken(uint256,address) (../../sb/MasterChef.sol#1119-1143)
+	- MasterChef.userInfo (../../sb/MasterChef.sol#979)
+	- MasterChef.withdraw(uint256,uint256) (../../sb/MasterChef.sol#1204-1223)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+MasterChef.setAll(IERC20,uint256,uint256,uint256,uint256,uint256) (../../sb/MasterChef.sol#1015-1029) should emit an event for: 
+	- rewardTokenPerBlock = _rewardTokenPerBlock (../../sb/MasterChef.sol#1024) 
+	- startRewardBlock = _startRewardBlock (../../sb/MasterChef.sol#1025) 
+	- endRewardBlock = _endRewardBlock (../../sb/MasterChef.sol#1026) 
+	- bonusEndBlock = _bonusEndBlock (../../sb/MasterChef.sol#1027) 
+MasterChef.setRewardTokenPerBlock(uint256) (../../sb/MasterChef.sol#1039-1044) should emit an event for: 
+	- rewardTokenPerBlock = _rewardTokenPerBlock (../../sb/MasterChef.sol#1043) 
+MasterChef.setStartRewardBlock(uint256) (../../sb/MasterChef.sol#1046-1048) should emit an event for: 
+	- startRewardBlock = _startRewardBlock (../../sb/MasterChef.sol#1047) 
+MasterChef.setEndRewardBlock(uint256) (../../sb/MasterChef.sol#1050-1052) should emit an event for: 
+	- endRewardBlock = _endRewardBlock (../../sb/MasterChef.sol#1051) 
+MasterChef.setBonusEndBlock(uint256) (../../sb/MasterChef.sol#1054-1056) should emit an event for: 
+	- bonusEndBlock = _bonusEndBlock (../../sb/MasterChef.sol#1055) 
+MasterChef.add(uint256,IERC20,bool) (../../sb/MasterChef.sol#1064-1083) should emit an event for: 
+	- totalAllocPoint = totalAllocPoint.add(_allocPoint) (../../sb/MasterChef.sol#1074) 
+MasterChef.set(uint256,uint256,bool) (../../sb/MasterChef.sol#1086-1098) should emit an event for: 
+	- totalAllocPoint = totalAllocPoint.sub(poolInfo[_pid].allocPoint).add(_allocPoint) (../../sb/MasterChef.sol#1094-1096) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+MasterChef.updatePool(uint256) (../../sb/MasterChef.sol#1154-1175) has external calls inside a loop: lpSupply = pool.lpToken.balanceOf(address(this)) (../../sb/MasterChef.sol#1159)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in MasterChef.deposit(uint256,uint256) (../../sb/MasterChef.sol#1178-1201):
+	External calls:
+	- safeRewardTokenTransfer(msg.sender,pending) (../../sb/MasterChef.sol#1188)
+		- rewardToken.transfer(_to,rewardTokenBal) (../../sb/MasterChef.sol#1242)
+		- rewardToken.transfer(_to,_amount) (../../sb/MasterChef.sol#1244)
+	- pool.lpToken.safeTransferFrom(address(msg.sender),address(this),_amount) (../../sb/MasterChef.sol#1190-1194)
+	Event emitted after the call(s):
+	- Deposit(msg.sender,_pid,_amount) (../../sb/MasterChef.sol#1200)
+Reentrancy in MasterChef.emergencyWithdraw(uint256) (../../sb/MasterChef.sol#1226-1233):
+	External calls:
+	- pool.lpToken.safeTransfer(address(msg.sender),user.amount) (../../sb/MasterChef.sol#1229)
+	Event emitted after the call(s):
+	- EmergencyWithdraw(msg.sender,_pid,user.amount) (../../sb/MasterChef.sol#1230)
+Reentrancy in MasterChef.withdraw(uint256,uint256) (../../sb/MasterChef.sol#1204-1223):
+	External calls:
+	- safeRewardTokenTransfer(msg.sender,pending) (../../sb/MasterChef.sol#1215)
+		- rewardToken.transfer(_to,rewardTokenBal) (../../sb/MasterChef.sol#1242)
+		- rewardToken.transfer(_to,_amount) (../../sb/MasterChef.sol#1244)
+	- pool.lpToken.safeTransfer(address(msg.sender),_amount) (../../sb/MasterChef.sol#1220)
+	Event emitted after the call(s):
+	- Withdraw(msg.sender,_pid,_amount) (../../sb/MasterChef.sol#1221)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+MasterChef.deposit(uint256,uint256) (../../sb/MasterChef.sol#1178-1201) uses timestamp for comparisons
+	Dangerous comparisons:
+	- now > user.unstakeTime (../../sb/MasterChef.sol#1187)
+MasterChef.withdraw(uint256,uint256) (../../sb/MasterChef.sol#1204-1223) uses timestamp for comparisons
+	Dangerous comparisons:
+	- now > user.unstakeTime (../../sb/MasterChef.sol#1209)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/MasterChef.sol#311-320) uses assembly
+	- INLINE ASM (../../sb/MasterChef.sol#318)
+Address._verifyCallResult(bool,bytes,string) (../../sb/MasterChef.sol#456-473) uses assembly
+	- INLINE ASM (../../sb/MasterChef.sol#465-468)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.functionCall(address,bytes) (../../sb/MasterChef.sol#364-366) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/MasterChef.sol#389-391) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/MasterChef.sol#438-440) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/MasterChef.sol#448-454) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/MasterChef.sol#414-416) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/MasterChef.sol#424-430) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/MasterChef.sol#338-344) is never used and should be removed
+Context._msgData() (../../sb/MasterChef.sol#559-562) is never used and should be removed
+ERC20._burn(address,uint256) (../../sb/MasterChef.sol#805-813) is never used and should be removed
+ERC20._mint(address,uint256) (../../sb/MasterChef.sol#784-792) is never used and should be removed
+ERC20._setupDecimals(uint8) (../../sb/MasterChef.sol#843-845) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/MasterChef.sol#504-513) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/MasterChef.sol#520-523) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/MasterChef.sol#515-518) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/MasterChef.sol#190-193) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/MasterChef.sol#152-155) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/MasterChef.sol#210-213) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/MasterChef.sol#24-28) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/MasterChef.sol#60-63) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/MasterChef.sol#70-73) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/MasterChef.sol#45-53) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/MasterChef.sol#35-38) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.6.12 (../../sb/MasterChef.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/MasterChef.sol#338-344):
+	- (success) = recipient.call{value: amount}() (../../sb/MasterChef.sol#342)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/MasterChef.sol#399-406):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/MasterChef.sol#404)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/MasterChef.sol#424-430):
+	- (success,returndata) = target.staticcall(data) (../../sb/MasterChef.sol#428)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/MasterChef.sol#448-454):
+	- (success,returndata) = target.delegatecall(data) (../../sb/MasterChef.sol#452)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter MasterChef.setAll(IERC20,uint256,uint256,uint256,uint256,uint256)._rewardToken (../../sb/MasterChef.sol#1016) is not in mixedCase
+Parameter MasterChef.setAll(IERC20,uint256,uint256,uint256,uint256,uint256)._rewardTokenPerBlock (../../sb/MasterChef.sol#1017) is not in mixedCase
+Parameter MasterChef.setAll(IERC20,uint256,uint256,uint256,uint256,uint256)._startRewardBlock (../../sb/MasterChef.sol#1018) is not in mixedCase
+Parameter MasterChef.setAll(IERC20,uint256,uint256,uint256,uint256,uint256)._endRewardBlock (../../sb/MasterChef.sol#1019) is not in mixedCase
+Parameter MasterChef.setAll(IERC20,uint256,uint256,uint256,uint256,uint256)._bonusEndBlock (../../sb/MasterChef.sol#1020) is not in mixedCase
+Parameter MasterChef.setAll(IERC20,uint256,uint256,uint256,uint256,uint256)._unstakeFrozenTime (../../sb/MasterChef.sol#1021) is not in mixedCase
+Parameter MasterChef.setRewardToken(IERC20)._rewardToken (../../sb/MasterChef.sol#1031) is not in mixedCase
+Parameter MasterChef.setUnstakeFrozenTime(uint256)._unstakeFrozenTime (../../sb/MasterChef.sol#1035) is not in mixedCase
+Parameter MasterChef.setRewardTokenPerBlock(uint256)._rewardTokenPerBlock (../../sb/MasterChef.sol#1039) is not in mixedCase
+Parameter MasterChef.setStartRewardBlock(uint256)._startRewardBlock (../../sb/MasterChef.sol#1046) is not in mixedCase
+Parameter MasterChef.setEndRewardBlock(uint256)._endRewardBlock (../../sb/MasterChef.sol#1050) is not in mixedCase
+Parameter MasterChef.setBonusEndBlock(uint256)._bonusEndBlock (../../sb/MasterChef.sol#1054) is not in mixedCase
+Parameter MasterChef.add(uint256,IERC20,bool)._allocPoint (../../sb/MasterChef.sol#1065) is not in mixedCase
+Parameter MasterChef.add(uint256,IERC20,bool)._lpToken (../../sb/MasterChef.sol#1066) is not in mixedCase
+Parameter MasterChef.add(uint256,IERC20,bool)._withUpdate (../../sb/MasterChef.sol#1067) is not in mixedCase
+Parameter MasterChef.set(uint256,uint256,bool)._pid (../../sb/MasterChef.sol#1087) is not in mixedCase
+Parameter MasterChef.set(uint256,uint256,bool)._allocPoint (../../sb/MasterChef.sol#1088) is not in mixedCase
+Parameter MasterChef.set(uint256,uint256,bool)._withUpdate (../../sb/MasterChef.sol#1089) is not in mixedCase
+Parameter MasterChef.getMultiplier(uint256,uint256)._from (../../sb/MasterChef.sol#1101) is not in mixedCase
+Parameter MasterChef.getMultiplier(uint256,uint256)._to (../../sb/MasterChef.sol#1101) is not in mixedCase
+Parameter MasterChef.pendingRewardToken(uint256,address)._pid (../../sb/MasterChef.sol#1119) is not in mixedCase
+Parameter MasterChef.pendingRewardToken(uint256,address)._user (../../sb/MasterChef.sol#1119) is not in mixedCase
+Parameter MasterChef.updatePool(uint256)._pid (../../sb/MasterChef.sol#1154) is not in mixedCase
+Parameter MasterChef.deposit(uint256,uint256)._pid (../../sb/MasterChef.sol#1178) is not in mixedCase
+Parameter MasterChef.deposit(uint256,uint256)._amount (../../sb/MasterChef.sol#1178) is not in mixedCase
+Parameter MasterChef.withdraw(uint256,uint256)._pid (../../sb/MasterChef.sol#1204) is not in mixedCase
+Parameter MasterChef.withdraw(uint256,uint256)._amount (../../sb/MasterChef.sol#1204) is not in mixedCase
+Parameter MasterChef.emergencyWithdraw(uint256)._pid (../../sb/MasterChef.sol#1226) is not in mixedCase
+Parameter MasterChef.safeRewardTokenTransfer(address,uint256)._to (../../sb/MasterChef.sol#1236) is not in mixedCase
+Parameter MasterChef.safeRewardTokenTransfer(address,uint256)._amount (../../sb/MasterChef.sol#1236) is not in mixedCase
+Parameter MasterChef.setMigrator(IMigratorChef)._migrator (../../sb/MasterChef.sol#1257) is not in mixedCase
+Parameter MasterChef.depositRewardTokens(uint256)._amount (../../sb/MasterChef.sol#1261) is not in mixedCase
+Parameter MasterChef.withdrawRewardTokens(uint256)._amount (../../sb/MasterChef.sol#1265) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/MasterChef.sol#560)" inContext (../../sb/MasterChef.sol#554-563)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+/sb/MasterChef.sol analyzed (9 contracts with 93 detectors), 87 result(s) found

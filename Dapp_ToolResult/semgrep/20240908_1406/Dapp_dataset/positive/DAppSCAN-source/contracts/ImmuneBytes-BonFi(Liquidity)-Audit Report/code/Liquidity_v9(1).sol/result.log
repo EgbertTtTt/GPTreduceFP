@@ -1,0 +1,184 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 41 Code Findings │
+└──────────────────┘
+                            
+    /sb/Liquidity_v9(1).sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          162┆ contract Liquidity_v8 is Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          102┆ constructor() internal {}
+            ⋮┆----------------------------------------
+          125┆ constructor() internal {
+          126┆     _owner = _msgSender();
+          127┆     emit OwnershipTransferred(address(0), _owner);
+          128┆ }
+            ⋮┆----------------------------------------
+          229┆ constructor(
+          230┆     string memory name_,
+          231┆     address tokenAddress_,
+          232┆     address rewardTokenAddress_,
+          233┆     uint64 rate_,
+          234┆     uint256 lockDuration_
+          235┆ ) public Ownable() {
+          236┆     name = name_;
+          237┆     require(tokenAddress_ != address(0), "Token address: 0       
+  address");                                                                    
+          238┆     tokenAddress = tokenAddress_;
+             [hid 10 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          453┆ for (uint64 i = userIndex; i < index; i++) {
+            ⋮┆----------------------------------------
+          455┆ if (endTime < rates[i + 1].timeStamp) {
+            ⋮┆----------------------------------------
+          459┆ time = rates[i + 1].timeStamp.sub(depositTime);
+            ⋮┆----------------------------------------
+          460┆ interest = amount.mul(rates[i].newInterestRate).mul(time).div(
+            ⋮┆----------------------------------------
+          464┆ depositTime = rates[i + 1].timeStamp;
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          453┆ for (uint64 i = userIndex; i < index; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           62┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+           68┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+           80┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+           87┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+           95┆ require(b != 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          135┆ require(isOwner(), "Ownable: caller is not the owner");
+            ⋮┆----------------------------------------
+          153┆ require(
+          154┆     newOwner != address(0),
+          155┆     "Ownable: new owner is the zero address"
+          156┆ );
+            ⋮┆----------------------------------------
+          237┆ require(tokenAddress_ != address(0), "Token address: 0 address");
+            ⋮┆----------------------------------------
+          239┆ require(
+          240┆     rewardTokenAddress_ != address(0),
+          241┆     "Reward token address: 0 address"
+          242┆ );
+            ⋮┆----------------------------------------
+          244┆ require(rate_ != 0, "Zero interest rate");
+            ⋮┆----------------------------------------
+          254┆ require(rate_ != 0, "Zero interest rate");
+            ⋮┆----------------------------------------
+          278┆ require(rewardAmount > 0, "Reward must be positive");
+            ⋮┆----------------------------------------
+          325┆ require(amount > 0, "Can't stake 0 amount");
+            ⋮┆----------------------------------------
+          327┆ require(hasStaked[from] == false, "Already staked");
+            ⋮┆----------------------------------------
+          356┆ require(hasStaked[from] == true, "No stakes found for user");
+            ⋮┆----------------------------------------
+          357┆ require(
+          358┆     block.timestamp >= deposits[from].endTime,
+          359┆     "Requesting before lock time"
+          360┆ );
+            ⋮┆----------------------------------------
+          361┆ require(deposits[from].paid == false, "Already paid out");
+            ⋮┆----------------------------------------
+          370┆ require(reward <= rewardBalance, "Not enough rewards");
+            ⋮┆----------------------------------------
+          379┆ require(principalPaid && rewardPaid, "Error paying");
+            ⋮┆----------------------------------------
+          403┆ require(hasStaked[from] == true, "No stakes found for user");
+            ⋮┆----------------------------------------
+          404┆ require(
+          405┆     block.timestamp >= deposits[from].endTime,
+          406┆     "Requesting before lock time"
+          407┆ );
+            ⋮┆----------------------------------------
+          408┆ require(deposits[from].paid == false, "Already paid out");
+            ⋮┆----------------------------------------
+          420┆ require(principalPaid, "Error paying");
+            ⋮┆----------------------------------------
+          522┆ require(amount <= ourAllowance, "Make sure to add enough         
+  allowance");                                                                  
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          379┆ require(principalPaid && rewardPaid, "Error paying");
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          255┆ index++;
+            ⋮┆----------------------------------------
+          453┆ for (uint64 i = userIndex; i < index; i++) {
+            ⋮┆----------------------------------------
+          465┆ userIndex++;
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           80┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          153┆ require(
+          154┆     newOwner != address(0),
+          155┆     "Ownable: new owner is the zero address"
+          156┆ );
+            ⋮┆----------------------------------------
+          522┆ require(amount <= ourAllowance, "Make sure to add enough         
+  allowance");                                                                  
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 41 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

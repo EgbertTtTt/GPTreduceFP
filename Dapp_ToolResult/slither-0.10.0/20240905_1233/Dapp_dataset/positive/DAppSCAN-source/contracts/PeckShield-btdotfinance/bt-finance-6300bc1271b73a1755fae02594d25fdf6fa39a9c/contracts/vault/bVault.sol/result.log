@@ -1,0 +1,113 @@
+'solc --version' running
+'solc /sb/bVault.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+bVault.withdraw(uint256) (../../sb/bVault.sol#383-407) performs a multiplication on the result of a division:
+	- r = (balance().mul(_shares)).div(totalSupply()) (../../sb/bVault.sol#386)
+	- fee = r.mul(feeRatio).div(feeMax) (../../sb/bVault.sol#402)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+bVault.deposit(uint256) (../../sb/bVault.sol#356-374) uses a dangerous strict equality:
+	- totalSupply() == 0 (../../sb/bVault.sol#364)
+bVault.getPricePerFullShare() (../../sb/bVault.sol#421-426) uses a dangerous strict equality:
+	- totalSupply() == 0 (../../sb/bVault.sol#422)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+ERC20Detailed.constructor(string,string,uint8).name (../../sb/bVault.sol#143) shadows:
+	- ERC20Detailed.name() (../../sb/bVault.sol#148-150) (function)
+ERC20Detailed.constructor(string,string,uint8).symbol (../../sb/bVault.sol#143) shadows:
+	- ERC20Detailed.symbol() (../../sb/bVault.sol#151-153) (function)
+ERC20Detailed.constructor(string,string,uint8).decimals (../../sb/bVault.sol#143) shadows:
+	- ERC20Detailed.decimals() (../../sb/bVault.sol#154-156) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+bVault.setMin(uint256) (../../sb/bVault.sol#321-324) should emit an event for: 
+	- min = _min (../../sb/bVault.sol#323) 
+bVault.setFeeRatio(uint256[3]) (../../sb/bVault.sol#428-435) should emit an event for: 
+	- fee1 = fees[0] (../../sb/bVault.sol#432) 
+	- fee2 = fees[1] (../../sb/bVault.sol#433) 
+	- fee3 = fees[2] (../../sb/bVault.sol#434) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+bVault.setGovernance(address)._governance (../../sb/bVault.sol#326) lacks a zero-check on :
+		- governance = _governance (../../sb/bVault.sol#328)
+bVault.setController(address)._controller (../../sb/bVault.sol#331) lacks a zero-check on :
+		- controller = _controller (../../sb/bVault.sol#333)
+bVault.setFeeAddress(address).fadd (../../sb/bVault.sol#437) lacks a zero-check on :
+		- feeAddress = fadd (../../sb/bVault.sol#440)
+bVault.setTimeLock(address)._timelock (../../sb/bVault.sol#443) lacks a zero-check on :
+		- timelock = _timelock (../../sb/bVault.sol#446)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in bVault.deposit(uint256) (../../sb/bVault.sol#356-374):
+	External calls:
+	- token.safeTransferFrom(msg.sender,address(this),_amount) (../../sb/bVault.sol#360)
+	State variables written after the call(s):
+	- _mint(msg.sender,shares) (../../sb/bVault.sol#369)
+		- _balances[account] = _balances[account].add(amount) (../../sb/bVault.sol#115)
+	- _mint(msg.sender,shares) (../../sb/bVault.sol#369)
+		- _totalSupply = _totalSupply.add(amount) (../../sb/bVault.sol#114)
+	- userDepoistTime[msg.sender] = now (../../sb/bVault.sol#370)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in bVault.deposit(uint256) (../../sb/bVault.sol#356-374):
+	External calls:
+	- token.safeTransferFrom(msg.sender,address(this),_amount) (../../sb/bVault.sol#360)
+	Event emitted after the call(s):
+	- Transfer(address(0),account,amount) (../../sb/bVault.sol#116)
+		- _mint(msg.sender,shares) (../../sb/bVault.sol#369)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+bVault.getFeeRatio() (../../sb/bVault.sol#409-419) uses timestamp for comparisons
+	Dangerous comparisons:
+	- t > 604800 (../../sb/bVault.sol#412)
+	- t > 86400 (../../sb/bVault.sol#415)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/bVault.sol#205-211) uses assembly
+	- INLINE ASM (../../sb/bVault.sol#209)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.sendValue(address,uint256) (../../sb/bVault.sol#215-221) is never used and should be removed
+Address.toPayable(address) (../../sb/bVault.sol#212-214) is never used and should be removed
+Context._msgData() (../../sb/bVault.sol#27-30) is never used and should be removed
+ERC20._burnFrom(address,uint256) (../../sb/bVault.sol#132-135) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/bVault.sol#236-241) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/bVault.sol#248-251) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/bVault.sol#243-246) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/bVault.sol#195-197) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/bVault.sol#198-201) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.5.16 (../../sb/bVault.sol#1) allows old versions
+solc-0.5.17 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/bVault.sol#215-221):
+	- (success) = recipient.call.value(amount)() (../../sb/bVault.sol#219)
+Low level call in SafeERC20.callOptionalReturn(IERC20,bytes) (../../sb/bVault.sol#252-263):
+	- (success,returndata) = address(token).call(data) (../../sb/bVault.sol#256)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Contract bVault (../../sb/bVault.sol#272-453) is not in CapWords
+Parameter bVault.setMin(uint256)._min (../../sb/bVault.sol#321) is not in mixedCase
+Parameter bVault.setGovernance(address)._governance (../../sb/bVault.sol#326) is not in mixedCase
+Parameter bVault.setController(address)._controller (../../sb/bVault.sol#331) is not in mixedCase
+Parameter bVault.setEarnLowerlimit(uint256)._earnLowerlimit (../../sb/bVault.sol#335) is not in mixedCase
+Parameter bVault.deposit(uint256)._amount (../../sb/bVault.sol#356) is not in mixedCase
+Parameter bVault.withdraw(uint256)._shares (../../sb/bVault.sol#383) is not in mixedCase
+Parameter bVault.setTimeLock(address)._timelock (../../sb/bVault.sol#443) is not in mixedCase
+Variable bVault.RestrictContractCall (../../sb/bVault.sol#295) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/bVault.sol#28)" inContext (../../sb/bVault.sol#19-31)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+bVault.feeMax (../../sb/bVault.sol#289) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+
+setFeeRatio(uint256[3]) should be declared external:
+	- bVault.setFeeRatio(uint256[3]) (../../sb/bVault.sol#428-435)
+Moreover, the following function parameters should change its data location:
+fees location should be calldata
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#public-function-that-could-be-declared-external
+/sb/bVault.sol analyzed (10 contracts with 93 detectors), 41 result(s) found

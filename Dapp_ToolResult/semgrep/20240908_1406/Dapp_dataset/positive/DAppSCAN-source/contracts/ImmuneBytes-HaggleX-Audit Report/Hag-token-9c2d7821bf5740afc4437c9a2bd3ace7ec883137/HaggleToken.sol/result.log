@@ -1,0 +1,404 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 86 Code Findings │
+└──────────────────┘
+                        
+    /sb/HaggleToken.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          780┆ for (uint i = 0; i < _staking[_msgSender()].length; i++){
+            ⋮┆----------------------------------------
+          792┆ for (uint i = 0; i < _staking[_msgSender()].length; i++){
+            ⋮┆----------------------------------------
+          874┆ for(uint i = 0; i < _addresses.length; i++){
+            ⋮┆----------------------------------------
+         1095┆ for (uint i = _index; i<_array.length-1; i++){
+            ⋮┆----------------------------------------
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+         1059┆ stakedSupply += amount_;
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+          677┆ uint private stakedSupply = 0;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          339┆ constructor (string memory name_, string memory symbol_, uint8   
+  decimals_) public {                                                           
+          340┆     _name = name_;
+          341┆     _symbol = symbol_;
+          342┆     _decimals = decimals_;
+          343┆ 
+          344┆ 
+          345┆     _paused = false;
+          346┆ }
+            ⋮┆----------------------------------------
+          717┆ constructor () public  ERC20("HaggleX Token", "HAG", 18){
+          718┆ 
+          719┆ 
+          720┆     //Test Staking
+          721┆     _stakingOptions[9].rewardPercent = 100;
+          722┆     _stakingOptions[9].lockedTime = 20 minutes;
+          723┆     _stakingOptions[9].totalStaked = 0;
+          724┆ 
+          725┆ 
+          726┆     _stakingOptions[8].rewardPercent = 50;
+             [hid 32 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          780┆ for (uint i = 0; i < _staking[_msgSender()].length; i++){
+            ⋮┆----------------------------------------
+          792┆ for (uint i = 0; i < _staking[_msgSender()].length; i++){
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          780┆ for (uint i = 0; i < _staking[_msgSender()].length; i++){
+            ⋮┆----------------------------------------
+          792┆ for (uint i = 0; i < _staking[_msgSender()].length; i++){
+            ⋮┆----------------------------------------
+          874┆ for(uint i = 0; i < _addresses.length; i++){
+            ⋮┆----------------------------------------
+         1095┆ for (uint i = _index; i<_array.length-1; i++){
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           52┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          107┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          269┆ require(_msgSender() == _owner, "HaggleX Token: Only Owner can   
+  perform this task");                                                          
+            ⋮┆----------------------------------------
+          278┆ require(_msgSender() == _newOwner, "HaggleX Token: Token Contract
+  Ownership has not been set for the address");                                 
+            ⋮┆----------------------------------------
+          506┆ require(_paused == false, "HaggleX Token: token transfer is      
+  unavailable");                                                                
+            ⋮┆----------------------------------------
+          514┆ require(_paused == true, "HaggleX Token: token transfer is       
+  available");                                                                  
+            ⋮┆----------------------------------------
+          522┆ require(_blacklists[_address] == false, "HaggleX Token: account  
+  already blacklisted");                                                        
+            ⋮┆----------------------------------------
+          530┆ require(_blacklists[_address] == true, "HaggleX Token: account   
+  already whitelisted");                                                        
+            ⋮┆----------------------------------------
+          552┆ require(sender != address(0), "HaggleX Token: transfer from the  
+  zero address");                                                               
+            ⋮┆----------------------------------------
+          553┆ require(recipient != address(0), "HaggleX Token: transfer to the 
+  zero address");                                                               
+            ⋮┆----------------------------------------
+          554┆ require(_paused == false, "HaggleX Token: token contract is not  
+  available");                                                                  
+            ⋮┆----------------------------------------
+          555┆ require(_blacklists[sender] == false,"HaggleX Token: sender      
+  account already blacklisted");                                                
+            ⋮┆----------------------------------------
+          556┆ require(_blacklists[recipient] == false,"HaggleX Token: sender   
+  account already blacklisted");                                                
+            ⋮┆----------------------------------------
+          576┆ require(account != address(0), "HaggleX Token: mint to the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          577┆ require(_paused == false, "HaggleX Token: token contract is not  
+  available");                                                                  
+            ⋮┆----------------------------------------
+          578┆ require(_blacklists[account] == false,"HaggleX Token: account to 
+  mint to already blacklisted");                                                
+            ⋮┆----------------------------------------
+          601┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          602┆ require(_paused == false, "HaggleX Token: token contract is not  
+  available");                                                                  
+            ⋮┆----------------------------------------
+          603┆ require(_blacklists[account] == false,"HaggleX Token: account to 
+  burn from already blacklisted");                                              
+            ⋮┆----------------------------------------
+          629┆ require(owner != address(0), "HaggleX Token: approve from the    
+  zero address");                                                               
+            ⋮┆----------------------------------------
+          630┆ require(spender != address(0), "HaggleX Token: approve to the    
+  zero address");                                                               
+            ⋮┆----------------------------------------
+          631┆ require(_paused == false, "HaggleX Token: token contract approve 
+  is not available");                                                           
+            ⋮┆----------------------------------------
+          632┆ require(_blacklists[owner] == false,"HaggleX Token: owner account
+  already blacklisted");                                                        
+            ⋮┆----------------------------------------
+          633┆ require(_blacklists[spender] == false,"HaggleX Token: spender    
+  account already blacklisted");                                                
+            ⋮┆----------------------------------------
+          866┆ require(_msgSender() == _minter || _msgSender() == _owner,       
+  "HaggleX Token: Only minter and owner can mint tokens!");                     
+            ⋮┆----------------------------------------
+         1021┆ require(isStakeLocked(stake_) == true, "Withdrawal no longer     
+  available, you can only Unstake now!");                                       
+            ⋮┆----------------------------------------
+         1022┆ require(block.timestamp >=                                       
+  _staking[_msgSender()][stake_].lastWithdrawTime + 10 minutes, "Not yet time to
+  withdraw reward");                                                            
+            ⋮┆----------------------------------------
+         1031┆ require(block.timestamp >= lastWithdrawTime + 10 minutes, "Not   
+  yet time to withdraw Leadership Board reward");                               
+            ⋮┆----------------------------------------
+         1039┆ require(block.timestamp >= lastWithdrawTime + 10 minutes, "Not   
+  yet time to withdraw Leadership Board reward");                               
+            ⋮┆----------------------------------------
+         1047┆ require(block.timestamp >= lastWithdrawTime + 10 minutes, "Not   
+  yet time to withdraw Leadership Board reward");                               
+            ⋮┆----------------------------------------
+         1079┆ require(isStakeLocked(stake_) != true, "HaggleX Token:Stake still
+  locked!");                                                                    
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          964┆ if (getTotalSupply() >= 1000000 ether && getTotalSupply() <=     
+  1116800 ether) {//halvening 1                                                 
+          965┆    reward =  80 ether;
+          966┆ }
+          967┆ else if (getTotalSupply() > 1116800 ether && getTotalSupply() <= 
+  1175200 ether) {//halvening 2                                                 
+          968┆ 
+          969┆    reward =  40 ether;
+          970┆ }
+          971┆ else if (getTotalSupply() > 1175200 ether && getTotalSupply() <= 
+  1204400 ether) { //halvening 3                                                
+          972┆ 
+          973┆    reward =  20 ether;
+             [hid 25 additional lines, adjust with --max-lines-per-finding] 
+          967┆ else if (getTotalSupply() > 1116800 ether && getTotalSupply() <= 
+  1175200 ether) {//halvening 2                                                 
+          968┆ 
+          969┆    reward =  40 ether;
+          970┆ }
+          971┆ else if (getTotalSupply() > 1175200 ether && getTotalSupply() <= 
+  1204400 ether) { //halvening 3                                                
+          972┆ 
+          973┆    reward =  20 ether;
+          974┆ }
+          975┆ else if (getTotalSupply() > 1204400 ether && getTotalSupply() <= 
+  1219000 ether) { //halvening 4                                                
+          976┆ 
+             [hid 22 additional lines, adjust with --max-lines-per-finding] 
+          971┆ else if (getTotalSupply() > 1175200 ether && getTotalSupply() <= 
+  1204400 ether) { //halvening 3                                                
+          972┆ 
+          973┆    reward =  20 ether;
+          974┆ }
+          975┆ else if (getTotalSupply() > 1204400 ether && getTotalSupply() <= 
+  1219000 ether) { //halvening 4                                                
+          976┆ 
+          977┆    reward =  10 ether;
+          978┆ }
+          979┆ else if (getTotalSupply() > 1219000 ether && getTotalSupply() <= 
+  1226300 ether) { //halvening 5                                                
+          980┆ 
+             [hid 18 additional lines, adjust with --max-lines-per-finding] 
+          975┆ else if (getTotalSupply() > 1204400 ether && getTotalSupply() <= 
+  1219000 ether) { //halvening 4                                                
+          976┆ 
+          977┆    reward =  10 ether;
+          978┆ }
+          979┆ else if (getTotalSupply() > 1219000 ether && getTotalSupply() <= 
+  1226300 ether) { //halvening 5                                                
+          980┆ 
+          981┆    reward =  5 ether;
+          982┆ }
+          983┆ else if (getTotalSupply() > 1226300 ether && getTotalSupply() <= 
+  1229950 ether) { //halvening 6                                                
+          984┆ 
+             [hid 14 additional lines, adjust with --max-lines-per-finding] 
+          979┆ else if (getTotalSupply() > 1219000 ether && getTotalSupply() <= 
+  1226300 ether) { //halvening 5                                                
+          980┆ 
+          981┆    reward =  5 ether;
+          982┆ }
+          983┆ else if (getTotalSupply() > 1226300 ether && getTotalSupply() <= 
+  1229950 ether) { //halvening 6                                                
+          984┆ 
+          985┆    reward =  2.5 ether;
+          986┆ }
+          987┆ else if (getTotalSupply() > 1229950 ether && getTotalSupply() <= 
+  1231775 ether) { //halvening 7                                                
+          988┆ 
+             [hid 10 additional lines, adjust with --max-lines-per-finding] 
+          983┆ else if (getTotalSupply() > 1226300 ether && getTotalSupply() <= 
+  1229950 ether) { //halvening 6                                                
+          984┆ 
+          985┆    reward =  2.5 ether;
+          986┆ }
+          987┆ else if (getTotalSupply() > 1229950 ether && getTotalSupply() <= 
+  1231775 ether) { //halvening 7                                                
+          988┆ 
+          989┆    reward =  1.25 ether;
+          990┆ }
+          991┆ else if (getTotalSupply() > 1231775 ether) { //halvening 8
+          992┆ 
+             [hid 6 additional lines, adjust with --max-lines-per-finding] 
+          987┆ else if (getTotalSupply() > 1229950 ether && getTotalSupply() <= 
+  1231775 ether) { //halvening 7                                                
+          988┆ 
+          989┆    reward =  1.25 ether;
+          990┆ }
+          991┆ else if (getTotalSupply() > 1231775 ether) { //halvening 8
+          992┆ 
+          993┆    reward =  0.625 ether;
+          994┆ }
+          995┆ else {
+          996┆ 
+             [hid 2 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          780┆ for (uint i = 0; i < _staking[_msgSender()].length; i++){
+            ⋮┆----------------------------------------
+          792┆ for (uint i = 0; i < _staking[_msgSender()].length; i++){
+            ⋮┆----------------------------------------
+          874┆ for(uint i = 0; i < _addresses.length; i++){
+            ⋮┆----------------------------------------
+         1023┆ _staking[_msgSender()][stake_].noOfWithdrawals++;
+            ⋮┆----------------------------------------
+         1095┆ for (uint i = _index; i<_array.length-1; i++){
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          107┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          269┆ require(_msgSender() == _owner, "HaggleX Token: Only Owner can   
+  perform this task");                                                          
+            ⋮┆----------------------------------------
+          278┆ require(_msgSender() == _newOwner, "HaggleX Token: Token Contract
+  Ownership has not been set for the address");                                 
+            ⋮┆----------------------------------------
+          506┆ require(_paused == false, "HaggleX Token: token transfer is      
+  unavailable");                                                                
+            ⋮┆----------------------------------------
+          514┆ require(_paused == true, "HaggleX Token: token transfer is       
+  available");                                                                  
+            ⋮┆----------------------------------------
+          522┆ require(_blacklists[_address] == false, "HaggleX Token: account  
+  already blacklisted");                                                        
+            ⋮┆----------------------------------------
+          530┆ require(_blacklists[_address] == true, "HaggleX Token: account   
+  already whitelisted");                                                        
+            ⋮┆----------------------------------------
+          552┆ require(sender != address(0), "HaggleX Token: transfer from the  
+  zero address");                                                               
+            ⋮┆----------------------------------------
+          553┆ require(recipient != address(0), "HaggleX Token: transfer to the 
+  zero address");                                                               
+            ⋮┆----------------------------------------
+          554┆ require(_paused == false, "HaggleX Token: token contract is not  
+  available");                                                                  
+            ⋮┆----------------------------------------
+          555┆ require(_blacklists[sender] == false,"HaggleX Token: sender      
+  account already blacklisted");                                                
+            ⋮┆----------------------------------------
+          556┆ require(_blacklists[recipient] == false,"HaggleX Token: sender   
+  account already blacklisted");                                                
+            ⋮┆----------------------------------------
+          576┆ require(account != address(0), "HaggleX Token: mint to the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          577┆ require(_paused == false, "HaggleX Token: token contract is not  
+  available");                                                                  
+            ⋮┆----------------------------------------
+          578┆ require(_blacklists[account] == false,"HaggleX Token: account to 
+  mint to already blacklisted");                                                
+            ⋮┆----------------------------------------
+          601┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          602┆ require(_paused == false, "HaggleX Token: token contract is not  
+  available");                                                                  
+            ⋮┆----------------------------------------
+          603┆ require(_blacklists[account] == false,"HaggleX Token: account to 
+  burn from already blacklisted");                                              
+            ⋮┆----------------------------------------
+          629┆ require(owner != address(0), "HaggleX Token: approve from the    
+  zero address");                                                               
+            ⋮┆----------------------------------------
+          630┆ require(spender != address(0), "HaggleX Token: approve to the    
+  zero address");                                                               
+            ⋮┆----------------------------------------
+          631┆ require(_paused == false, "HaggleX Token: token contract approve 
+  is not available");                                                           
+            ⋮┆----------------------------------------
+          632┆ require(_blacklists[owner] == false,"HaggleX Token: owner account
+  already blacklisted");                                                        
+            ⋮┆----------------------------------------
+          633┆ require(_blacklists[spender] == false,"HaggleX Token: spender    
+  account already blacklisted");                                                
+            ⋮┆----------------------------------------
+          866┆ require(_msgSender() == _minter || _msgSender() == _owner,       
+  "HaggleX Token: Only minter and owner can mint tokens!");                     
+            ⋮┆----------------------------------------
+         1021┆ require(isStakeLocked(stake_) == true, "Withdrawal no longer     
+  available, you can only Unstake now!");                                       
+            ⋮┆----------------------------------------
+         1031┆ require(block.timestamp >= lastWithdrawTime + 10 minutes, "Not   
+  yet time to withdraw Leadership Board reward");                               
+            ⋮┆----------------------------------------
+         1039┆ require(block.timestamp >= lastWithdrawTime + 10 minutes, "Not   
+  yet time to withdraw Leadership Board reward");                               
+            ⋮┆----------------------------------------
+         1047┆ require(block.timestamp >= lastWithdrawTime + 10 minutes, "Not   
+  yet time to withdraw Leadership Board reward");                               
+            ⋮┆----------------------------------------
+         1079┆ require(isStakeLocked(stake_) != true, "HaggleX Token:Stake still
+  locked!");                                                                    
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 86 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

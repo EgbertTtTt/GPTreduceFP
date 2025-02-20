@@ -1,0 +1,111 @@
+'solc --version' running
+'solc /sb/LiquidityStaking.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+Reentrancy in LiquidityStaking._claimRewards(address) (../../sb/LiquidityStaking.sol#492-496):
+	External calls:
+	- require(bool,string)(IERC20(rewardToken).transfer(account,rewards),Reward transfer failed) (../../sb/LiquidityStaking.sol#494)
+	State variables written after the call(s):
+	- delete claimableRewards[account] (../../sb/LiquidityStaking.sol#495)
+	LiquidityStaking.claimableRewards (../../sb/LiquidityStaking.sol#425) can be used in cross function reentrancies:
+	- LiquidityStaking._claimRewards(address) (../../sb/LiquidityStaking.sol#492-496)
+	- LiquidityStaking._rewardCheckpoint(address) (../../sb/LiquidityStaking.sol#520-528)
+	- LiquidityStaking.claimableRewards (../../sb/LiquidityStaking.sol#425)
+Reentrancy in LiquidityStaking.deposit(uint256) (../../sb/LiquidityStaking.sol#459-468):
+	External calls:
+	- require(bool,string)(IERC20(stakedToken).transferFrom(msg.sender,address(this),amount),Staked transferFrom failed) (../../sb/LiquidityStaking.sol#462-465)
+	State variables written after the call(s):
+	- stakes[msg.sender] = stakes[msg.sender].add(amount) (../../sb/LiquidityStaking.sol#467)
+	LiquidityStaking.stakes (../../sb/LiquidityStaking.sol#424) can be used in cross function reentrancies:
+	- LiquidityStaking._rewardCheckpoint(address) (../../sb/LiquidityStaking.sol#520-528)
+	- LiquidityStaking._withdraw(address,uint256) (../../sb/LiquidityStaking.sol#486-490)
+	- LiquidityStaking.deposit(uint256) (../../sb/LiquidityStaking.sol#459-468)
+	- LiquidityStaking.exit() (../../sb/LiquidityStaking.sol#480-484)
+	- LiquidityStaking.stakes (../../sb/LiquidityStaking.sol#424)
+	- totalStakes = totalStakes.add(amount) (../../sb/LiquidityStaking.sol#466)
+	LiquidityStaking.totalStakes (../../sb/LiquidityStaking.sol#422) can be used in cross function reentrancies:
+	- LiquidityStaking._checkpoint() (../../sb/LiquidityStaking.sol#498-518)
+	- LiquidityStaking._withdraw(address,uint256) (../../sb/LiquidityStaking.sol#486-490)
+	- LiquidityStaking.deposit(uint256) (../../sb/LiquidityStaking.sol#459-468)
+	- LiquidityStaking.totalStakes (../../sb/LiquidityStaking.sol#422)
+Reentrancy in LiquidityStaking.exit() (../../sb/LiquidityStaking.sol#480-484):
+	External calls:
+	- _withdraw(msg.sender,stakes[msg.sender]) (../../sb/LiquidityStaking.sol#482)
+		- require(bool,string)(IERC20(stakedToken).transfer(account,amount),Staked transfer failed) (../../sb/LiquidityStaking.sol#487)
+	- rewards = _claimRewards(msg.sender) (../../sb/LiquidityStaking.sol#483)
+		- require(bool,string)(IERC20(rewardToken).transfer(account,rewards),Reward transfer failed) (../../sb/LiquidityStaking.sol#494)
+	State variables written after the call(s):
+	- rewards = _claimRewards(msg.sender) (../../sb/LiquidityStaking.sol#483)
+		- delete claimableRewards[account] (../../sb/LiquidityStaking.sol#495)
+	LiquidityStaking.claimableRewards (../../sb/LiquidityStaking.sol#425) can be used in cross function reentrancies:
+	- LiquidityStaking._claimRewards(address) (../../sb/LiquidityStaking.sol#492-496)
+	- LiquidityStaking._rewardCheckpoint(address) (../../sb/LiquidityStaking.sol#520-528)
+	- LiquidityStaking.claimableRewards (../../sb/LiquidityStaking.sol#425)
+Reentrancy in LiquidityStaking.initialize(uint256) (../../sb/LiquidityStaking.sol#441-452):
+	External calls:
+	- require(bool,string)(IERC20(rewardToken).transferFrom(msg.sender,address(this),amount),Reward transferFrom failed) (../../sb/LiquidityStaking.sol#446-449)
+	State variables written after the call(s):
+	- rate = rate_ (../../sb/LiquidityStaking.sol#451)
+	LiquidityStaking.rate (../../sb/LiquidityStaking.sol#418) can be used in cross function reentrancies:
+	- LiquidityStaking._checkpoint() (../../sb/LiquidityStaking.sol#498-518)
+	- LiquidityStaking.initialize(uint256) (../../sb/LiquidityStaking.sol#441-452)
+	- LiquidityStaking.rate (../../sb/LiquidityStaking.sol#418)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+LiquidityStaking.deposit(uint256) (../../sb/LiquidityStaking.sol#459-468) should emit an event for: 
+	- totalStakes = totalStakes.add(amount) (../../sb/LiquidityStaking.sol#466) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+LiquidityStaking.constructor(address,address,uint256,uint256).rewardToken_ (../../sb/LiquidityStaking.sol#428) lacks a zero-check on :
+		- rewardToken = rewardToken_ (../../sb/LiquidityStaking.sol#434)
+LiquidityStaking.constructor(address,address,uint256,uint256).stakedToken_ (../../sb/LiquidityStaking.sol#429) lacks a zero-check on :
+		- stakedToken = stakedToken_ (../../sb/LiquidityStaking.sol#435)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in LiquidityStaking._withdraw(address,uint256) (../../sb/LiquidityStaking.sol#486-490):
+	External calls:
+	- require(bool,string)(IERC20(stakedToken).transfer(account,amount),Staked transfer failed) (../../sb/LiquidityStaking.sol#487)
+	State variables written after the call(s):
+	- stakes[account] = stakes[account].sub(amount,Exceed staked balances) (../../sb/LiquidityStaking.sol#489)
+	- totalStakes = totalStakes.sub(amount,Exceed staked balances) (../../sb/LiquidityStaking.sol#488)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+LiquidityStaking.constructor(address,address,uint256,uint256) (../../sb/LiquidityStaking.sol#427-439) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(startTimestamp_ >= block.timestamp,Start cannot be in the past) (../../sb/LiquidityStaking.sol#433)
+LiquidityStaking.initialize(uint256) (../../sb/LiquidityStaking.sol#441-452) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(startTimestamp >= block.timestamp,Start cannot be in the past) (../../sb/LiquidityStaking.sol#443)
+LiquidityStaking._claimRewards(address) (../../sb/LiquidityStaking.sol#492-496) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(IERC20(rewardToken).transfer(account,rewards),Reward transfer failed) (../../sb/LiquidityStaking.sol#494)
+LiquidityStaking._checkpoint() (../../sb/LiquidityStaking.sol#498-518) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp < startTimestamp (../../sb/LiquidityStaking.sol#500)
+	- timeLapse != 0 (../../sb/LiquidityStaking.sol#506)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Math.average(uint256,uint256) (../../sb/LiquidityStaking.sol#27-30) is never used and should be removed
+Math.max(uint256,uint256) (../../sb/LiquidityStaking.sol#12-14) is never used and should be removed
+SafeDecimalMath.decimalToPreciseDecimal(uint256) (../../sb/LiquidityStaking.sol#374-376) is never used and should be removed
+SafeDecimalMath.divideDecimal(uint256,uint256) (../../sb/LiquidityStaking.sol#361-364) is never used and should be removed
+SafeDecimalMath.multiplyDecimal(uint256,uint256) (../../sb/LiquidityStaking.sol#342-345) is never used and should be removed
+SafeDecimalMath.preciseDecimalToDecimal(uint256) (../../sb/LiquidityStaking.sol#381-389) is never used and should be removed
+SafeDecimalMath.saturatingMul(uint256,uint256) (../../sb/LiquidityStaking.sol#395-401) is never used and should be removed
+SafeDecimalMath.saturatingMultiplyDecimal(uint256,uint256) (../../sb/LiquidityStaking.sol#403-406) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/LiquidityStaking.sol#218-221) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/LiquidityStaking.sol#180-183) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/LiquidityStaking.sol#238-241) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/LiquidityStaking.sol#52-56) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/LiquidityStaking.sol#88-91) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/LiquidityStaking.sol#98-101) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/LiquidityStaking.sol#73-81) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/LiquidityStaking.sol#63-66) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version>=0.6.10<0.8.0 (../../sb/LiquidityStaking.sol#1) is too complex
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Constant SafeDecimalMath.highPrecisionDecimals (../../sb/LiquidityStaking.sol#323) is not in UPPER_CASE_WITH_UNDERSCORES
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+/sb/LiquidityStaking.sol analyzed (5 contracts with 93 detectors), 31 result(s) found

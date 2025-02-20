@@ -1,0 +1,357 @@
+'solc --version' running
+'solc /sb/PrimitiveEngine.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/PrimitiveEngine.sol:
+Warning: Contract code size exceeds 24576 bytes (a limit introduced in Spurious Dragon). This contract may not be deployable on mainnet. Consider enabling the optimizer (with a low "runs" value!), turning off revert strings, or using libraries.
+    --> /sb/PrimitiveEngine.sol:1705:1:
+     |
+1705 | contract PrimitiveEngine is IPrimitiveEngine {
+     | ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+ABDKMath64x64.divuu(uint256,uint256) (../../sb/PrimitiveEngine.sol#694-749) performs a multiplication on the result of a division:
+	- result = (x << (255 - msb)) / (((y - 1) >> (msb - 191)) + 1) (../../sb/PrimitiveEngine.sol#726)
+	- hi = result * (y >> 128) (../../sb/PrimitiveEngine.sol#729)
+ABDKMath64x64.divuu(uint256,uint256) (../../sb/PrimitiveEngine.sol#694-749) performs a multiplication on the result of a division:
+	- result = (x << (255 - msb)) / (((y - 1) >> (msb - 191)) + 1) (../../sb/PrimitiveEngine.sol#726)
+	- lo = result * (y & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF) (../../sb/PrimitiveEngine.sol#730)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+PrimitiveEngine.deposit(address,uint256,uint256,bytes).balStable (../../sb/PrimitiveEngine.sol#1894) is a local variable never initialized
+PrimitiveEngine.deposit(address,uint256,uint256,bytes).balRisky (../../sb/PrimitiveEngine.sol#1893) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+PrimitiveEngine.withdraw(address,uint256,uint256) (../../sb/PrimitiveEngine.sol#1904-1914) ignores return value by margins.withdraw(delRisky,delStable) (../../sb/PrimitiveEngine.sol#1910)
+PrimitiveEngine.allocate(bytes32,address,uint256,uint256,bool,bytes) (../../sb/PrimitiveEngine.sol#1919-1951) ignores return value by margins.withdraw(delRisky,delStable) (../../sb/PrimitiveEngine.sol#1942)
+PrimitiveEngine.swap(address,bytes32,bool,uint256,bool,bool,bytes) (../../sb/PrimitiveEngine.sol#1983-2079) ignores return value by margins.withdraw(deltaIn,0) (../../sb/PrimitiveEngine.sol#2056)
+PrimitiveEngine.swap(address,bytes32,bool,uint256,bool,bool,bytes) (../../sb/PrimitiveEngine.sol#1983-2079) ignores return value by margins.withdraw(0,deltaIn) (../../sb/PrimitiveEngine.sol#2070)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+IPrimitiveEngineView.reserves(bytes32).liquidity (../../sb/PrimitiveEngine.sol#1544) shadows:
+	- IPrimitiveEngineView.liquidity(address,bytes32) (../../sb/PrimitiveEngine.sol#1572) (function)
+IPrimitiveEngineView.liquidity(address,bytes32).liquidity (../../sb/PrimitiveEngine.sol#1572) shadows:
+	- IPrimitiveEngineView.liquidity(address,bytes32) (../../sb/PrimitiveEngine.sol#1572) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+Reentrancy in PrimitiveEngine.allocate(bytes32,address,uint256,uint256,bool,bytes) (../../sb/PrimitiveEngine.sol#1919-1951):
+	External calls:
+	- IPrimitiveLiquidityCallback(msg.sender).allocateCallback(delRisky,delStable,data) (../../sb/PrimitiveEngine.sol#1945)
+	Event emitted after the call(s):
+	- Allocate(msg.sender,recipient,poolId,delRisky,delStable) (../../sb/PrimitiveEngine.sol#1950)
+Reentrancy in PrimitiveEngine.create(uint256,uint64,uint32,uint256,uint256,bytes) (../../sb/PrimitiveEngine.sol#1829-1879):
+	External calls:
+	- IPrimitiveCreateCallback(msg.sender).createCallback(delRisky,delStable,data) (../../sb/PrimitiveEngine.sol#1874)
+	Event emitted after the call(s):
+	- Create(msg.sender,cal.strike,cal.sigma,cal.maturity) (../../sb/PrimitiveEngine.sol#1878)
+Reentrancy in PrimitiveEngine.deposit(address,uint256,uint256,bytes) (../../sb/PrimitiveEngine.sol#1884-1901):
+	External calls:
+	- IPrimitiveDepositCallback(msg.sender).depositCallback(delRisky,delStable,data) (../../sb/PrimitiveEngine.sol#1897)
+	Event emitted after the call(s):
+	- Deposit(msg.sender,recipient,delRisky,delStable) (../../sb/PrimitiveEngine.sol#1900)
+Reentrancy in PrimitiveEngine.swap(address,bytes32,bool,uint256,bool,bool,bytes) (../../sb/PrimitiveEngine.sol#1983-2079):
+	External calls:
+	- IERC20(stable).safeTransfer(details.recipient,deltaOut) (../../sb/PrimitiveEngine.sol#2052)
+	- IPrimitiveSwapCallback(msg.sender).swapCallback(details.deltaIn,0,data) (../../sb/PrimitiveEngine.sol#2059)
+	- IERC20(risky).safeTransfer(details.recipient,deltaOut) (../../sb/PrimitiveEngine.sol#2066)
+	- IPrimitiveSwapCallback(msg.sender).swapCallback(0,details.deltaIn,data) (../../sb/PrimitiveEngine.sol#2073)
+	Event emitted after the call(s):
+	- Swap(msg.sender,details.recipient,details.poolId,details.riskyForStable,details.deltaIn,deltaOut) (../../sb/PrimitiveEngine.sol#2078)
+Reentrancy in PrimitiveEngine.withdraw(address,uint256,uint256) (../../sb/PrimitiveEngine.sol#1904-1914):
+	External calls:
+	- IERC20(risky).safeTransfer(recipient,delRisky) (../../sb/PrimitiveEngine.sol#1911)
+	- IERC20(stable).safeTransfer(recipient,delStable) (../../sb/PrimitiveEngine.sol#1912)
+	Event emitted after the call(s):
+	- Withdraw(msg.sender,recipient,delRisky,delStable) (../../sb/PrimitiveEngine.sol#1913)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+ABDKMath64x64.pow(int128,uint256) (../../sb/PrimitiveEngine.sol#413-504) has a high cyclomatic complexity (19).
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) has a high cyclomatic complexity (65).
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cyclomatic-complexity
+
+ABDKMath64x64.avg(int128,int128) (../../sb/PrimitiveEngine.sol#382-386) is never used and should be removed
+ABDKMath64x64.divi(int256,int256) (../../sb/PrimitiveEngine.sol#292-314) is never used and should be removed
+ABDKMath64x64.from128x128(int256) (../../sb/PrimitiveEngine.sol#138-144) is never used and should be removed
+ABDKMath64x64.fromInt(int256) (../../sb/PrimitiveEngine.sol#83-88) is never used and should be removed
+ABDKMath64x64.fromUInt(uint256) (../../sb/PrimitiveEngine.sol#110-115) is never used and should be removed
+ABDKMath64x64.gavg(int128,int128) (../../sb/PrimitiveEngine.sol#396-403) is never used and should be removed
+ABDKMath64x64.inv(int128) (../../sb/PrimitiveEngine.sol#366-373) is never used and should be removed
+ABDKMath64x64.muli(int128,int256) (../../sb/PrimitiveEngine.sol#212-240) is never used and should be removed
+ABDKMath64x64.pow(int128,uint256) (../../sb/PrimitiveEngine.sol#413-504) is never used and should be removed
+ABDKMath64x64.to128x128(int128) (../../sb/PrimitiveEngine.sol#153-157) is never used and should be removed
+ABDKMath64x64.toInt(int128) (../../sb/PrimitiveEngine.sol#97-101) is never used and should be removed
+ABDKMath64x64.toUInt(int128) (../../sb/PrimitiveEngine.sol#124-129) is never used and should be removed
+Units.percentage(int128) (../../sb/PrimitiveEngine.sol#967-969) is never used and should be removed
+Units.scaleDown(uint256,uint256) (../../sb/PrimitiveEngine.sol#934-936) is never used and should be removed
+Units.scaleUp(uint256,uint256) (../../sb/PrimitiveEngine.sol#926-928) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.8.6 (../../sb/PrimitiveEngine.sol#1) allows old versions
+solc-0.8.6 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Transfers.safeTransfer(IERC20,address,uint256) (../../sb/PrimitiveEngine.sol#1238-1247):
+	- (success,returnData) = address(token).call(abi.encodeWithSelector(token.transfer.selector,to,value)) (../../sb/PrimitiveEngine.sol#1243-1245)
+Low level call in PrimitiveEngine.balanceRisky() (../../sb/PrimitiveEngine.sol#1774-1780):
+	- (success,data) = risky.staticcall(abi.encodeWithSelector(IERC20.balanceOf.selector,address(this))) (../../sb/PrimitiveEngine.sol#1775-1777)
+Low level call in PrimitiveEngine.balanceStable() (../../sb/PrimitiveEngine.sol#1783-1789):
+	- (success,data) = stable.staticcall(abi.encodeWithSelector(IERC20.balanceOf.selector,address(this))) (../../sb/PrimitiveEngine.sol#1784-1786)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Function ABDKMath64x64.log_2(int128) (../../sb/PrimitiveEngine.sol#525-568) is not in mixedCase
+Function ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) is not in mixedCase
+Constant ABDKMath64x64.MIN_64x64 (../../sb/PrimitiveEngine.sol#69) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant ABDKMath64x64.MAX_64x64 (../../sb/PrimitiveEngine.sol#74) is not in UPPER_CASE_WITH_UNDERSCORES
+Function IPrimitiveEngineView.PRECISION() (../../sb/PrimitiveEngine.sol#1499) is not in mixedCase
+Function IPrimitiveEngineView.GAMMA() (../../sb/PrimitiveEngine.sol#1502) is not in mixedCase
+Function IPrimitiveEngineView.BUFFER() (../../sb/PrimitiveEngine.sol#1505) is not in mixedCase
+Function IPrimitiveEngineView.MIN_LIQUIDITY() (../../sb/PrimitiveEngine.sol#1510) is not in mixedCase
+Function IPrimitiveFactory.MIN_LIQUIDITY_FACTOR() (../../sb/PrimitiveEngine.sol#1670) is not in mixedCase
+Variable PrimitiveEngine.MIN_LIQUIDITY (../../sb/PrimitiveEngine.sol#1736) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+ABDKMath64x64.fromInt(int256) (../../sb/PrimitiveEngine.sol#83-88) uses literals with too many digits:
+	- require(bool)(x >= - 0x8000000000000000 && x <= 0x7FFFFFFFFFFFFFFF) (../../sb/PrimitiveEngine.sol#85)
+ABDKMath64x64.muli(int128,int256) (../../sb/PrimitiveEngine.sol#212-240) uses literals with too many digits:
+	- require(bool)(y >= - 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF && y <= 0x1000000000000000000000000000000000000000000000000) (../../sb/PrimitiveEngine.sol#215-218)
+ABDKMath64x64.muli(int128,int256) (../../sb/PrimitiveEngine.sol#212-240) uses literals with too many digits:
+	- require(bool)(absoluteResult <= 0x8000000000000000000000000000000000000000000000000000000000000000) (../../sb/PrimitiveEngine.sol#232)
+ABDKMath64x64.divi(int256,int256) (../../sb/PrimitiveEngine.sol#292-314) uses literals with too many digits:
+	- require(bool)(absoluteResult <= 0x80000000000000000000000000000000) (../../sb/PrimitiveEngine.sol#307)
+ABDKMath64x64.inv(int128) (../../sb/PrimitiveEngine.sol#366-373) uses literals with too many digits:
+	- result = int256(0x100000000000000000000000000000000) / x (../../sb/PrimitiveEngine.sol#369)
+ABDKMath64x64.gavg(int128,int128) (../../sb/PrimitiveEngine.sol#396-403) uses literals with too many digits:
+	- require(bool)(m < 0x4000000000000000000000000000000000000000000000000000000000000000) (../../sb/PrimitiveEngine.sol#400)
+ABDKMath64x64.pow(int128,uint256) (../../sb/PrimitiveEngine.sol#413-504) uses literals with too many digits:
+	- absResult = 0x100000000000000000000000000000000 (../../sb/PrimitiveEngine.sol#419)
+ABDKMath64x64.pow(int128,uint256) (../../sb/PrimitiveEngine.sol#413-504) uses literals with too many digits:
+	- absX <= 0x10000000000000000 (../../sb/PrimitiveEngine.sol#421)
+ABDKMath64x64.pow(int128,uint256) (../../sb/PrimitiveEngine.sol#413-504) uses literals with too many digits:
+	- absX < 0x1000000000000000000000000 (../../sb/PrimitiveEngine.sol#450)
+ABDKMath64x64.pow(int128,uint256) (../../sb/PrimitiveEngine.sol#413-504) uses literals with too many digits:
+	- absX < 0x10000000000000000000000000000 (../../sb/PrimitiveEngine.sol#454)
+ABDKMath64x64.pow(int128,uint256) (../../sb/PrimitiveEngine.sol#413-504) uses literals with too many digits:
+	- absX < 0x1000000000000000000000000000000 (../../sb/PrimitiveEngine.sol#458)
+ABDKMath64x64.pow(int128,uint256) (../../sb/PrimitiveEngine.sol#413-504) uses literals with too many digits:
+	- absX < 0x10000000000000000000000000000000 (../../sb/PrimitiveEngine.sol#462)
+ABDKMath64x64.pow(int128,uint256) (../../sb/PrimitiveEngine.sol#413-504) uses literals with too many digits:
+	- absX < 0x40000000000000000000000000000000 (../../sb/PrimitiveEngine.sol#466)
+ABDKMath64x64.pow(int128,uint256) (../../sb/PrimitiveEngine.sol#413-504) uses literals with too many digits:
+	- absX < 0x80000000000000000000000000000000 (../../sb/PrimitiveEngine.sol#470)
+ABDKMath64x64.pow(int128,uint256) (../../sb/PrimitiveEngine.sol#413-504) uses literals with too many digits:
+	- absResult > 0x100000000000000000000000000000000 (../../sb/PrimitiveEngine.sol#482)
+ABDKMath64x64.pow(int128,uint256) (../../sb/PrimitiveEngine.sol#413-504) uses literals with too many digits:
+	- absX >= 0x100000000000000000000000000000000 (../../sb/PrimitiveEngine.sol#489)
+ABDKMath64x64.log_2(int128) (../../sb/PrimitiveEngine.sol#525-568) uses literals with too many digits:
+	- xc >= 0x10000000000000000 (../../sb/PrimitiveEngine.sol#531)
+ABDKMath64x64.log_2(int128) (../../sb/PrimitiveEngine.sol#525-568) uses literals with too many digits:
+	- xc >= 0x100000000 (../../sb/PrimitiveEngine.sol#535)
+ABDKMath64x64.log_2(int128) (../../sb/PrimitiveEngine.sol#525-568) uses literals with too many digits:
+	- bit = 0x8000000000000000 (../../sb/PrimitiveEngine.sol#559)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- require(bool)(x < 0x400000000000000000) (../../sb/PrimitiveEngine.sol#592)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x < - 0x400000000000000000 (../../sb/PrimitiveEngine.sol#594)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = 0x80000000000000000000000000000000 (../../sb/PrimitiveEngine.sol#596)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x8000000000000000 > 0 (../../sb/PrimitiveEngine.sol#598)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x4000000000000000 > 0 (../../sb/PrimitiveEngine.sol#599)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x2000000000000000 > 0 (../../sb/PrimitiveEngine.sol#600)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x1000000000000000 > 0 (../../sb/PrimitiveEngine.sol#601)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x800000000000000 > 0 (../../sb/PrimitiveEngine.sol#602)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x400000000000000 > 0 (../../sb/PrimitiveEngine.sol#603)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x200000000000000 > 0 (../../sb/PrimitiveEngine.sol#604)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x100000000000000 > 0 (../../sb/PrimitiveEngine.sol#605)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x80000000000000 > 0 (../../sb/PrimitiveEngine.sol#606)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x40000000000000 > 0 (../../sb/PrimitiveEngine.sol#607)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x20000000000000 > 0 (../../sb/PrimitiveEngine.sol#608)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x10000000000000 > 0 (../../sb/PrimitiveEngine.sol#609)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x8000000000000 > 0 (../../sb/PrimitiveEngine.sol#610)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x4000000000000 > 0 (../../sb/PrimitiveEngine.sol#611)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x2000000000000 > 0 (../../sb/PrimitiveEngine.sol#612)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x1000000000000 > 0 (../../sb/PrimitiveEngine.sol#613)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x800000000000 > 0 (../../sb/PrimitiveEngine.sol#614)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x400000000000 > 0 (../../sb/PrimitiveEngine.sol#615)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x200000000000 > 0 (../../sb/PrimitiveEngine.sol#616)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x100000000000 > 0 (../../sb/PrimitiveEngine.sol#617)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x100000B1721BCFC99D9F890EA06911763) >> 128 (../../sb/PrimitiveEngine.sol#617)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x80000000000 > 0 (../../sb/PrimitiveEngine.sol#618)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x10000058B90CF1E6D97F9CA14DBCC1628) >> 128 (../../sb/PrimitiveEngine.sol#618)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x40000000000 > 0 (../../sb/PrimitiveEngine.sol#619)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x1000002C5C863B73F016468F6BAC5CA2B) >> 128 (../../sb/PrimitiveEngine.sol#619)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x20000000000 > 0 (../../sb/PrimitiveEngine.sol#620)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x100000162E430E5A18F6119E3C02282A5) >> 128 (../../sb/PrimitiveEngine.sol#620)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x10000000000 > 0 (../../sb/PrimitiveEngine.sol#621)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x1000000B1721835514B86E6D96EFD1BFE) >> 128 (../../sb/PrimitiveEngine.sol#621)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x8000000000 > 0 (../../sb/PrimitiveEngine.sol#622)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x100000058B90C0B48C6BE5DF846C5B2EF) >> 128 (../../sb/PrimitiveEngine.sol#622)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x4000000000 > 0 (../../sb/PrimitiveEngine.sol#623)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x10000002C5C8601CC6B9E94213C72737A) >> 128 (../../sb/PrimitiveEngine.sol#623)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x2000000000 > 0 (../../sb/PrimitiveEngine.sol#624)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x1000000162E42FFF037DF38AA2B219F06) >> 128 (../../sb/PrimitiveEngine.sol#624)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x1000000000 > 0 (../../sb/PrimitiveEngine.sol#625)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x10000000B17217FBA9C739AA5819F44F9) >> 128 (../../sb/PrimitiveEngine.sol#625)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x800000000 > 0 (../../sb/PrimitiveEngine.sol#626)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x1000000058B90BFCDEE5ACD3C1CEDC823) >> 128 (../../sb/PrimitiveEngine.sol#626)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x400000000 > 0 (../../sb/PrimitiveEngine.sol#627)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x100000002C5C85FE31F35A6A30DA1BE50) >> 128 (../../sb/PrimitiveEngine.sol#627)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x200000000 > 0 (../../sb/PrimitiveEngine.sol#628)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x10000000162E42FF0999CE3541B9FFFCF) >> 128 (../../sb/PrimitiveEngine.sol#628)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x100000000 > 0 (../../sb/PrimitiveEngine.sol#629)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x100000000B17217F80F4EF5AADDA45554) >> 128 (../../sb/PrimitiveEngine.sol#629)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x80000000 > 0 (../../sb/PrimitiveEngine.sol#630)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x10000000058B90BFBF8479BD5A81B51AD) >> 128 (../../sb/PrimitiveEngine.sol#630)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x40000000 > 0 (../../sb/PrimitiveEngine.sol#631)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x1000000002C5C85FDF84BD62AE30A74CC) >> 128 (../../sb/PrimitiveEngine.sol#631)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x20000000 > 0 (../../sb/PrimitiveEngine.sol#632)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x100000000162E42FEFB2FED257559BDAA) >> 128 (../../sb/PrimitiveEngine.sol#632)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x10000000 > 0 (../../sb/PrimitiveEngine.sol#633)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x1000000000B17217F7D5A7716BBA4A9AE) >> 128 (../../sb/PrimitiveEngine.sol#633)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x8000000 > 0 (../../sb/PrimitiveEngine.sol#634)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x100000000058B90BFBE9DDBAC5E109CCE) >> 128 (../../sb/PrimitiveEngine.sol#634)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x4000000 > 0 (../../sb/PrimitiveEngine.sol#635)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x10000000002C5C85FDF4B15DE6F17EB0D) >> 128 (../../sb/PrimitiveEngine.sol#635)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x2000000 > 0 (../../sb/PrimitiveEngine.sol#636)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x1000000000162E42FEFA494F1478FDE05) >> 128 (../../sb/PrimitiveEngine.sol#636)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x1000000 > 0 (../../sb/PrimitiveEngine.sol#637)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x10000000000B17217F7D20CF927C8E94C) >> 128 (../../sb/PrimitiveEngine.sol#637)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x800000 > 0 (../../sb/PrimitiveEngine.sol#638)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x1000000000058B90BFBE8F71CB4E4B33D) >> 128 (../../sb/PrimitiveEngine.sol#638)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x400000 > 0 (../../sb/PrimitiveEngine.sol#639)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x100000000002C5C85FDF477B662B26945) >> 128 (../../sb/PrimitiveEngine.sol#639)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x200000 > 0 (../../sb/PrimitiveEngine.sol#640)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x10000000000162E42FEFA3AE53369388C) >> 128 (../../sb/PrimitiveEngine.sol#640)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- x & 0x100000 > 0 (../../sb/PrimitiveEngine.sol#641)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x100000000000B17217F7D1D351A389D40) >> 128 (../../sb/PrimitiveEngine.sol#641)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x10000000000058B90BFBE8E8B2D3D4EDE) >> 128 (../../sb/PrimitiveEngine.sol#642)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x1000000000002C5C85FDF4741BEA6E77E) >> 128 (../../sb/PrimitiveEngine.sol#643)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x100000000000162E42FEFA39FE95583C2) >> 128 (../../sb/PrimitiveEngine.sol#644)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x1000000000000B17217F7D1CFB72B45E1) >> 128 (../../sb/PrimitiveEngine.sol#645)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x100000000000058B90BFBE8E7CC35C3F0) >> 128 (../../sb/PrimitiveEngine.sol#646)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x10000000000002C5C85FDF473E242EA38) >> 128 (../../sb/PrimitiveEngine.sol#647)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x1000000000000162E42FEFA39F02B772C) >> 128 (../../sb/PrimitiveEngine.sol#648)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x10000000000000B17217F7D1CF7D83C1A) >> 128 (../../sb/PrimitiveEngine.sol#649)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x1000000000000058B90BFBE8E7BDCBE2E) >> 128 (../../sb/PrimitiveEngine.sol#650)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x100000000000002C5C85FDF473DEA871F) >> 128 (../../sb/PrimitiveEngine.sol#651)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x10000000000000162E42FEFA39EF44D91) >> 128 (../../sb/PrimitiveEngine.sol#652)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x100000000000000B17217F7D1CF79E949) >> 128 (../../sb/PrimitiveEngine.sol#653)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x10000000000000058B90BFBE8E7BCE544) >> 128 (../../sb/PrimitiveEngine.sol#654)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x1000000000000002C5C85FDF473DE6ECA) >> 128 (../../sb/PrimitiveEngine.sol#655)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x100000000000000162E42FEFA39EF366F) >> 128 (../../sb/PrimitiveEngine.sol#656)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x1000000000000000B17217F7D1CF79AFA) >> 128 (../../sb/PrimitiveEngine.sol#657)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x100000000000000058B90BFBE8E7BCD6D) >> 128 (../../sb/PrimitiveEngine.sol#658)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x10000000000000002C5C85FDF473DE6B2) >> 128 (../../sb/PrimitiveEngine.sol#659)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x1000000000000000162E42FEFA39EF358) >> 128 (../../sb/PrimitiveEngine.sol#660)
+ABDKMath64x64.exp_2(int128) (../../sb/PrimitiveEngine.sol#590-668) uses literals with too many digits:
+	- result = (result * 0x10000000000000000B17217F7D1CF79AB) >> 128 (../../sb/PrimitiveEngine.sol#661)
+ABDKMath64x64.exp(int128) (../../sb/PrimitiveEngine.sol#676-684) uses literals with too many digits:
+	- require(bool)(x < 0x400000000000000000) (../../sb/PrimitiveEngine.sol#678)
+ABDKMath64x64.exp(int128) (../../sb/PrimitiveEngine.sol#676-684) uses literals with too many digits:
+	- x < - 0x400000000000000000 (../../sb/PrimitiveEngine.sol#680)
+ABDKMath64x64.divuu(uint256,uint256) (../../sb/PrimitiveEngine.sol#694-749) uses literals with too many digits:
+	- xc >= 0x100000000 (../../sb/PrimitiveEngine.sol#704)
+ABDKMath64x64.sqrtu(uint256) (../../sb/PrimitiveEngine.sol#758-802) uses literals with too many digits:
+	- xx >= 0x100000000000000000000000000000000 (../../sb/PrimitiveEngine.sol#764)
+ABDKMath64x64.sqrtu(uint256) (../../sb/PrimitiveEngine.sol#758-802) uses literals with too many digits:
+	- xx >= 0x10000000000000000 (../../sb/PrimitiveEngine.sol#768)
+ABDKMath64x64.sqrtu(uint256) (../../sb/PrimitiveEngine.sol#758-802) uses literals with too many digits:
+	- xx >= 0x100000000 (../../sb/PrimitiveEngine.sol#772)
+ABDKMath64x64.slitherConstructorConstantVariables() (../../sb/PrimitiveEngine.sol#65-803) uses literals with too many digits:
+	- MIN_64x64 = - 0x80000000000000000000000000000000 (../../sb/PrimitiveEngine.sol#69)
+CumulativeNormalDistribution.slitherConstructorConstantVariables() (../../sb/PrimitiveEngine.sol#807-907) uses literals with too many digits:
+	- ONE_INT = 0x10000000000000000 (../../sb/PrimitiveEngine.sol#814)
+CumulativeNormalDistribution.slitherConstructorConstantVariables() (../../sb/PrimitiveEngine.sol#807-907) uses literals with too many digits:
+	- TWO_INT = 0x20000000000000000 (../../sb/PrimitiveEngine.sol#815)
+CumulativeNormalDistribution.slitherConstructorConstantVariables() (../../sb/PrimitiveEngine.sol#807-907) uses literals with too many digits:
+	- HALF_INT = 0x8000000000000000 (../../sb/PrimitiveEngine.sol#849)
+ReplicationMath.slitherConstructorConstantVariables() (../../sb/PrimitiveEngine.sol#984-1089) uses literals with too many digits:
+	- ONE_INT = 0x10000000000000000 (../../sb/PrimitiveEngine.sol#991)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+/sb/PrimitiveEngine.sol analyzed (20 contracts with 93 detectors), 169 result(s) found

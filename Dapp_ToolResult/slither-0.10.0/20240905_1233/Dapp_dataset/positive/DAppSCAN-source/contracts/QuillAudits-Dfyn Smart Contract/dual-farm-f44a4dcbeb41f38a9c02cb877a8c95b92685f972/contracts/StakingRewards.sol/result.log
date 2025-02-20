@@ -1,0 +1,158 @@
+'solc --version' running
+'solc /sb/StakingRewards.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+Reentrancy in StakingRewards.exit() (../../sb/StakingRewards.sol#1007-1010):
+	External calls:
+	- withdraw(_balances[_msgSender()]) (../../sb/StakingRewards.sol#1008)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/StakingRewards.sol#564)
+		- stakingToken.safeTransfer(_msgSender(),amount) (../../sb/StakingRewards.sol#987)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/StakingRewards.sol#432)
+	- getReward() (../../sb/StakingRewards.sol#1009)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/StakingRewards.sol#564)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/StakingRewards.sol#432)
+		- IERC20(rewardTokens[i]).safeTransfer(_msgSender(),reward) (../../sb/StakingRewards.sol#1001)
+	External calls sending eth:
+	- withdraw(_balances[_msgSender()]) (../../sb/StakingRewards.sol#1008)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/StakingRewards.sol#432)
+	- getReward() (../../sb/StakingRewards.sol#1009)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/StakingRewards.sol#432)
+	State variables written after the call(s):
+	- getReward() (../../sb/StakingRewards.sol#1009)
+		- _status = _ENTERED (../../sb/StakingRewards.sol#621)
+		- _status = _NOT_ENTERED (../../sb/StakingRewards.sol#627)
+	ReentrancyGuard._status (../../sb/StakingRewards.sol#603) can be used in cross function reentrancies:
+	- ReentrancyGuard.nonReentrant() (../../sb/StakingRewards.sol#616-628)
+	- getReward() (../../sb/StakingRewards.sol#1009)
+		- rewardLastUpdatedTime[rewardTokens[i]] = lastTimeRewardApplicable() (../../sb/StakingRewards.sol#1069)
+	StakingRewards.rewardLastUpdatedTime (../../sb/StakingRewards.sol#837) can be used in cross function reentrancies:
+	- StakingRewards.notifyRewardAmount(address,uint256) (../../sb/StakingRewards.sol#1014-1046)
+	- StakingRewards.rewardLastUpdatedTime (../../sb/StakingRewards.sol#837)
+	- StakingRewards.rewardPerToken(address) (../../sb/StakingRewards.sol#889-906)
+	- StakingRewards.updateReward(address) (../../sb/StakingRewards.sol#1064-1081)
+	- getReward() (../../sb/StakingRewards.sol#1009)
+		- rewards[_msgSender()][rewardTokens[i]] = 0 (../../sb/StakingRewards.sol#1000)
+		- rewards[account][rewardTokens[i]] = earned(account,rewardTokens[i]) (../../sb/StakingRewards.sol#1071-1074)
+	StakingRewards.rewards (../../sb/StakingRewards.sol#840) can be used in cross function reentrancies:
+	- StakingRewards.earned(address,address) (../../sb/StakingRewards.sol#908-923)
+	- StakingRewards.getReward() (../../sb/StakingRewards.sol#991-1005)
+	- StakingRewards.rewards (../../sb/StakingRewards.sol#840)
+	- StakingRewards.updateReward(address) (../../sb/StakingRewards.sol#1064-1081)
+	- getReward() (../../sb/StakingRewards.sol#1009)
+		- rewardsPerTokenMap[rewardTokens[i]] = rewardPerToken(rewardTokens[i]) (../../sb/StakingRewards.sol#1066-1068)
+	StakingRewards.rewardsPerTokenMap (../../sb/StakingRewards.sol#834) can be used in cross function reentrancies:
+	- StakingRewards.rewardPerToken(address) (../../sb/StakingRewards.sol#889-906)
+	- StakingRewards.rewardsPerTokenMap (../../sb/StakingRewards.sol#834)
+	- StakingRewards.updateReward(address) (../../sb/StakingRewards.sol#1064-1081)
+	- getReward() (../../sb/StakingRewards.sol#1009)
+		- userRewardPerTokenPaid[account][rewardTokens[i]] = rewardsPerTokenMap[rewardTokens[i]] (../../sb/StakingRewards.sol#1075-1077)
+	StakingRewards.userRewardPerTokenPaid (../../sb/StakingRewards.sol#838-839) can be used in cross function reentrancies:
+	- StakingRewards.earned(address,address) (../../sb/StakingRewards.sol#908-923)
+	- StakingRewards.updateReward(address) (../../sb/StakingRewards.sol#1064-1081)
+	- StakingRewards.userRewardPerTokenPaid (../../sb/StakingRewards.sol#838-839)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities
+
+StakingRewards.rescueFunds(address,address) (../../sb/StakingRewards.sol#1048-1060) ignores return value by IERC20(tokenAddress).transfer(receiver,IERC20(tokenAddress).balanceOf(address(this))) (../../sb/StakingRewards.sol#1056-1059)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+Reentrancy in StakingRewards.getReward() (../../sb/StakingRewards.sol#991-1005):
+	External calls:
+	- IERC20(rewardTokens[i]).safeTransfer(_msgSender(),reward) (../../sb/StakingRewards.sol#1001)
+	State variables written after the call(s):
+	- rewards[_msgSender()][rewardTokens[i]] = 0 (../../sb/StakingRewards.sol#1000)
+	StakingRewards.rewards (../../sb/StakingRewards.sol#840) can be used in cross function reentrancies:
+	- StakingRewards.earned(address,address) (../../sb/StakingRewards.sol#908-923)
+	- StakingRewards.getReward() (../../sb/StakingRewards.sol#991-1005)
+	- StakingRewards.rewards (../../sb/StakingRewards.sol#840)
+	- StakingRewards.updateReward(address) (../../sb/StakingRewards.sol#1064-1081)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+StakingRewards.constructor(address,address[],address)._rewardsDistribution (../../sb/StakingRewards.sol#845) lacks a zero-check on :
+		- rewardsDistribution = _rewardsDistribution (../../sb/StakingRewards.sol#851)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in StakingRewards.exit() (../../sb/StakingRewards.sol#1007-1010):
+	External calls:
+	- withdraw(_balances[_msgSender()]) (../../sb/StakingRewards.sol#1008)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/StakingRewards.sol#564)
+		- stakingToken.safeTransfer(_msgSender(),amount) (../../sb/StakingRewards.sol#987)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/StakingRewards.sol#432)
+	- getReward() (../../sb/StakingRewards.sol#1009)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/StakingRewards.sol#564)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/StakingRewards.sol#432)
+		- IERC20(rewardTokens[i]).safeTransfer(_msgSender(),reward) (../../sb/StakingRewards.sol#1001)
+	External calls sending eth:
+	- withdraw(_balances[_msgSender()]) (../../sb/StakingRewards.sol#1008)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/StakingRewards.sol#432)
+	- getReward() (../../sb/StakingRewards.sol#1009)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/StakingRewards.sol#432)
+	Event emitted after the call(s):
+	- RewardPaid(_msgSender(),reward) (../../sb/StakingRewards.sol#1002)
+		- getReward() (../../sb/StakingRewards.sol#1009)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+StakingRewards.notifyRewardAmount(address,uint256) (../../sb/StakingRewards.sol#1014-1046) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp >= periodFinish (../../sb/StakingRewards.sol#1022)
+	- require(bool,string)(rewardRate <= balance.div(periodFinish.sub(block.timestamp)),Provided reward too high) (../../sb/StakingRewards.sol#1037-1040)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/StakingRewards.sol#339-348) uses assembly
+	- INLINE ASM (../../sb/StakingRewards.sol#346)
+Address._verifyCallResult(bool,bytes,string) (../../sb/StakingRewards.sol#484-501) uses assembly
+	- INLINE ASM (../../sb/StakingRewards.sol#493-496)
+EIP712Base.getChainId() (../../sb/StakingRewards.sol#678-684) uses assembly
+	- INLINE ASM (../../sb/StakingRewards.sol#680-682)
+NativeMetaTransaction._msgSender() (../../sb/StakingRewards.sol#762-774) uses assembly
+	- INLINE ASM (../../sb/StakingRewards.sol#766-769)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.functionCall(address,bytes) (../../sb/StakingRewards.sol#392-394) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/StakingRewards.sol#417-419) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/StakingRewards.sol#466-468) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/StakingRewards.sol#476-482) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/StakingRewards.sol#442-444) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/StakingRewards.sol#452-458) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/StakingRewards.sol#366-372) is never used and should be removed
+Math.average(uint256,uint256) (../../sb/StakingRewards.sol#27-30) is never used and should be removed
+Math.max(uint256,uint256) (../../sb/StakingRewards.sol#12-14) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/StakingRewards.sol#532-541) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/StakingRewards.sol#548-551) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/StakingRewards.sol#543-546) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/StakingRewards.sol#218-221) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/StakingRewards.sol#180-183) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/StakingRewards.sol#238-241) is never used and should be removed
+SafeMath.sub(uint256,uint256,string) (../../sb/StakingRewards.sol#198-201) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/StakingRewards.sol#52-56) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/StakingRewards.sol#88-91) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/StakingRewards.sol#98-101) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/StakingRewards.sol#73-81) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/StakingRewards.sol#63-66) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version>=0.6.11 (../../sb/StakingRewards.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/StakingRewards.sol#366-372):
+	- (success) = recipient.call{value: amount}() (../../sb/StakingRewards.sol#370)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/StakingRewards.sol#427-434):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/StakingRewards.sol#432)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/StakingRewards.sol#452-458):
+	- (success,returndata) = target.staticcall(data) (../../sb/StakingRewards.sol#456)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/StakingRewards.sol#476-482):
+	- (success,returndata) = target.delegatecall(data) (../../sb/StakingRewards.sol#480)
+Low level call in NativeMetaTransaction.executeMetaTransaction(address,bytes,bytes32,bytes32,uint8) (../../sb/StakingRewards.sol#716-738):
+	- (success,returnData) = address(this).call(abi.encodePacked(functionSignature,userAddress)) (../../sb/StakingRewards.sol#734)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Loop condition i < stakers.length (../../sb/StakingRewards.sol#878) should use cached array length instead of referencing `length` member of the storage array.
+ Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cache-array-length
+
+StakingRewards.rewardPerTokenStored (../../sb/StakingRewards.sol#829) should be constant 
+StakingRewards.rewardsDuration (../../sb/StakingRewards.sol#828) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+
+RewardsDistributionRecipient.rewardsDistribution (../../sb/StakingRewards.sol#803) should be immutable 
+StakingRewards.stakingToken (../../sb/StakingRewards.sol#826) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/StakingRewards.sol analyzed (13 contracts with 93 detectors), 43 result(s) found

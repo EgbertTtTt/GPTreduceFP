@@ -1,0 +1,437 @@
+'solc --version' running
+'solc /sb/MasterChef.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/MasterChef.sol:
+Warning: Documentation tag on non-public state variables will be disallowed in 0.7.0. You will need to use the @dev tag explicitly.
+    --> /sb/MasterChef.sol:1093:5:
+     |
+1093 |     /// @notice A record of each accounts delegate
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+Reentrancy in MasterChef.deposit(uint256,uint256,address) (../../sb/MasterChef.sol#1626-1649):
+	External calls:
+	- updatePool(_pid) (../../sb/MasterChef.sol#1629)
+		- LC.mint(address(this),LCReward) (../../sb/MasterChef.sol#1569)
+	- luckychipReferral.recordReferral(msg.sender,_referrer) (../../sb/MasterChef.sol#1631)
+	- payPendingLC(_pid,msg.sender) (../../sb/MasterChef.sol#1633)
+		- LC.transfer(_to,LCBal) (../../sb/MasterChef.sol#1692)
+		- LC.transfer(_to,_amount) (../../sb/MasterChef.sol#1694)
+		- LC.mint(referrer,commissionAmount) (../../sb/MasterChef.sol#1729)
+		- luckychipReferral.recordReferralCommission(referrer,commissionAmount) (../../sb/MasterChef.sol#1730)
+		- LC.mint(treasuryaddr,commissionAmount) (../../sb/MasterChef.sol#1733)
+		- luckychipReferral.recordReferralCommission(treasuryaddr,commissionAmount) (../../sb/MasterChef.sol#1734)
+		- LC.mint(treasuryaddr,commissionAmount_scope_0) (../../sb/MasterChef.sol#1741)
+	- payPendingBonus(_pid,msg.sender) (../../sb/MasterChef.sol#1635)
+		- returndata = address(token).functionCall(data,SafeBEP20: low-level call failed) (../../sb/MasterChef.sol#582)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/MasterChef.sol#425)
+		- bonusPool.bonusToken.safeTransfer(address(_user),pending) (../../sb/MasterChef.sol#1619)
+	- pool.lpToken.safeTransferFrom(address(msg.sender),address(this),_amount) (../../sb/MasterChef.sol#1638)
+	External calls sending eth:
+	- payPendingBonus(_pid,msg.sender) (../../sb/MasterChef.sol#1635)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/MasterChef.sol#425)
+	State variables written after the call(s):
+	- userBonusDebt[i][msg.sender] = user.amount.mul(poolBonusPerShare[_pid][i]).div(1e12) (../../sb/MasterChef.sol#1644)
+	MasterChef.userBonusDebt (../../sb/MasterChef.sol#1397) can be used in cross function reentrancies:
+	- MasterChef.pendingBonus(uint256,address) (../../sb/MasterChef.sol#1536-1546)
+	- MasterChef.userBonusDebt (../../sb/MasterChef.sol#1397)
+	- user.amount = user.amount.add(_amount) (../../sb/MasterChef.sol#1639)
+	MasterChef.userInfo (../../sb/MasterChef.sol#1399) can be used in cross function reentrancies:
+	- MasterChef.pendingBonus(uint256,address) (../../sb/MasterChef.sol#1536-1546)
+	- MasterChef.pendingLC(uint256,address) (../../sb/MasterChef.sol#1522-1533)
+	- MasterChef.userInfo (../../sb/MasterChef.sol#1399)
+	- user.rewardDebt = user.amount.mul(pool.accLCPerShare).div(1e12) (../../sb/MasterChef.sol#1641)
+	MasterChef.userInfo (../../sb/MasterChef.sol#1399) can be used in cross function reentrancies:
+	- MasterChef.pendingBonus(uint256,address) (../../sb/MasterChef.sol#1536-1546)
+	- MasterChef.pendingLC(uint256,address) (../../sb/MasterChef.sol#1522-1533)
+	- MasterChef.userInfo (../../sb/MasterChef.sol#1399)
+Reentrancy in MasterChef.withdraw(uint256,uint256) (../../sb/MasterChef.sol#1652-1673):
+	External calls:
+	- updatePool(_pid) (../../sb/MasterChef.sol#1657)
+		- LC.mint(address(this),LCReward) (../../sb/MasterChef.sol#1569)
+	- payPendingLC(_pid,msg.sender) (../../sb/MasterChef.sol#1658)
+		- LC.transfer(_to,LCBal) (../../sb/MasterChef.sol#1692)
+		- LC.transfer(_to,_amount) (../../sb/MasterChef.sol#1694)
+		- LC.mint(referrer,commissionAmount) (../../sb/MasterChef.sol#1729)
+		- luckychipReferral.recordReferralCommission(referrer,commissionAmount) (../../sb/MasterChef.sol#1730)
+		- LC.mint(treasuryaddr,commissionAmount) (../../sb/MasterChef.sol#1733)
+		- luckychipReferral.recordReferralCommission(treasuryaddr,commissionAmount) (../../sb/MasterChef.sol#1734)
+		- LC.mint(treasuryaddr,commissionAmount_scope_0) (../../sb/MasterChef.sol#1741)
+	- payPendingBonus(_pid,msg.sender) (../../sb/MasterChef.sol#1660)
+		- returndata = address(token).functionCall(data,SafeBEP20: low-level call failed) (../../sb/MasterChef.sol#582)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/MasterChef.sol#425)
+		- bonusPool.bonusToken.safeTransfer(address(_user),pending) (../../sb/MasterChef.sol#1619)
+	External calls sending eth:
+	- payPendingBonus(_pid,msg.sender) (../../sb/MasterChef.sol#1660)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/MasterChef.sol#425)
+	State variables written after the call(s):
+	- user.amount = user.amount.sub(_amount) (../../sb/MasterChef.sol#1663)
+	MasterChef.userInfo (../../sb/MasterChef.sol#1399) can be used in cross function reentrancies:
+	- MasterChef.pendingBonus(uint256,address) (../../sb/MasterChef.sol#1536-1546)
+	- MasterChef.pendingLC(uint256,address) (../../sb/MasterChef.sol#1522-1533)
+	- MasterChef.userInfo (../../sb/MasterChef.sol#1399)
+Reentrancy in MasterChef.withdraw(uint256,uint256) (../../sb/MasterChef.sol#1652-1673):
+	External calls:
+	- updatePool(_pid) (../../sb/MasterChef.sol#1657)
+		- LC.mint(address(this),LCReward) (../../sb/MasterChef.sol#1569)
+	- payPendingLC(_pid,msg.sender) (../../sb/MasterChef.sol#1658)
+		- LC.transfer(_to,LCBal) (../../sb/MasterChef.sol#1692)
+		- LC.transfer(_to,_amount) (../../sb/MasterChef.sol#1694)
+		- LC.mint(referrer,commissionAmount) (../../sb/MasterChef.sol#1729)
+		- luckychipReferral.recordReferralCommission(referrer,commissionAmount) (../../sb/MasterChef.sol#1730)
+		- LC.mint(treasuryaddr,commissionAmount) (../../sb/MasterChef.sol#1733)
+		- luckychipReferral.recordReferralCommission(treasuryaddr,commissionAmount) (../../sb/MasterChef.sol#1734)
+		- LC.mint(treasuryaddr,commissionAmount_scope_0) (../../sb/MasterChef.sol#1741)
+	- payPendingBonus(_pid,msg.sender) (../../sb/MasterChef.sol#1660)
+		- returndata = address(token).functionCall(data,SafeBEP20: low-level call failed) (../../sb/MasterChef.sol#582)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/MasterChef.sol#425)
+		- bonusPool.bonusToken.safeTransfer(address(_user),pending) (../../sb/MasterChef.sol#1619)
+	- pool.lpToken.safeTransfer(address(msg.sender),_amount) (../../sb/MasterChef.sol#1664)
+	External calls sending eth:
+	- payPendingBonus(_pid,msg.sender) (../../sb/MasterChef.sol#1660)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/MasterChef.sol#425)
+	State variables written after the call(s):
+	- userBonusDebt[i][msg.sender] = user.amount.mul(poolBonusPerShare[_pid][i]).div(1e12) (../../sb/MasterChef.sol#1669)
+	MasterChef.userBonusDebt (../../sb/MasterChef.sol#1397) can be used in cross function reentrancies:
+	- MasterChef.pendingBonus(uint256,address) (../../sb/MasterChef.sol#1536-1546)
+	- MasterChef.userBonusDebt (../../sb/MasterChef.sol#1397)
+	- user.rewardDebt = user.amount.mul(pool.accLCPerShare).div(1e12) (../../sb/MasterChef.sol#1666)
+	MasterChef.userInfo (../../sb/MasterChef.sol#1399) can be used in cross function reentrancies:
+	- MasterChef.pendingBonus(uint256,address) (../../sb/MasterChef.sol#1536-1546)
+	- MasterChef.pendingLC(uint256,address) (../../sb/MasterChef.sol#1522-1533)
+	- MasterChef.userInfo (../../sb/MasterChef.sol#1399)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities
+
+MasterChef.safeLCTransfer(address,uint256) (../../sb/MasterChef.sol#1689-1696) ignores return value by LC.transfer(_to,LCBal) (../../sb/MasterChef.sol#1692)
+MasterChef.safeLCTransfer(address,uint256) (../../sb/MasterChef.sol#1689-1696) ignores return value by LC.transfer(_to,_amount) (../../sb/MasterChef.sol#1694)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+MasterChef.luckychipReferral (../../sb/MasterChef.sol#1408) is never initialized. It is used in:
+	- MasterChef.deposit(uint256,uint256,address) (../../sb/MasterChef.sol#1626-1649)
+	- MasterChef.payReferralCommission(address,uint256) (../../sb/MasterChef.sol#1721-1746)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-state-variables
+
+MasterChef.pendingLC(uint256,address) (../../sb/MasterChef.sol#1522-1533) performs a multiplication on the result of a division:
+	- LCReward = multiplier.mul(LCPerBlock).mul(pool.allocPoint).div(totalAllocPoint).mul(stakingPercent).div(percentDec) (../../sb/MasterChef.sol#1529)
+MasterChef.pendingLC(uint256,address) (../../sb/MasterChef.sol#1522-1533) performs a multiplication on the result of a division:
+	- LCReward = multiplier.mul(LCPerBlock).mul(pool.allocPoint).div(totalAllocPoint).mul(stakingPercent).div(percentDec) (../../sb/MasterChef.sol#1529)
+	- accLCPerShare = accLCPerShare.add(LCReward.mul(1e12).div(lpSupply)) (../../sb/MasterChef.sol#1530)
+MasterChef.updatePool(uint256) (../../sb/MasterChef.sol#1557-1572) performs a multiplication on the result of a division:
+	- LCReward = multiplier.mul(LCPerBlock).mul(pool.allocPoint).div(totalAllocPoint).mul(stakingPercent).div(percentDec) (../../sb/MasterChef.sol#1568)
+MasterChef.updatePool(uint256) (../../sb/MasterChef.sol#1557-1572) performs a multiplication on the result of a division:
+	- LCReward = multiplier.mul(LCPerBlock).mul(pool.allocPoint).div(totalAllocPoint).mul(stakingPercent).div(percentDec) (../../sb/MasterChef.sol#1568)
+	- pool.accLCPerShare = pool.accLCPerShare.add(LCReward.mul(1e12).div(lpSupply)) (../../sb/MasterChef.sol#1570)
+MasterChef.updateBonus(uint256) (../../sb/MasterChef.sol#1575-1594) performs a multiplication on the result of a division:
+	- poolBonusPerShare[i][_pid] = poolBonusPerShare[i][_pid].add(amount.mul(pool.bonusPoint).div(totalBonusPoint).mul(1e12).div(lpSupply)) (../../sb/MasterChef.sol#1588)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+LCToken._writeCheckpoint(address,uint32,uint256,uint256) (../../sb/MasterChef.sol#1286-1304) uses a dangerous strict equality:
+	- nCheckpoints > 0 && checkpoints[delegatee][nCheckpoints - 1].fromBlock == blockNumber (../../sb/MasterChef.sol#1296)
+MasterChef.payPendingBonus(uint256,address) (../../sb/MasterChef.sol#1609-1623) uses a dangerous strict equality:
+	- require(bool,string)(poolBonusPerShare[_pid].length == bonusInfo.length,poolBonusPerShare.length must equal to bonusInof length) (../../sb/MasterChef.sol#1613)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Reentrancy in MasterChef.add(uint256,uint256,IBEP20,bool) (../../sb/MasterChef.sol#1477-1494):
+	External calls:
+	- massUpdatePools() (../../sb/MasterChef.sol#1479)
+		- LC.mint(address(this),LCReward) (../../sb/MasterChef.sol#1569)
+	State variables written after the call(s):
+	- poolInfo.push(PoolInfo({lpToken:_lpToken,allocPoint:_allocPoint,bonusPoint:_bonusPoint,lastRewardBlock:lastRewardBlock,accLCPerShare:0})) (../../sb/MasterChef.sol#1485-1493)
+	MasterChef.poolInfo (../../sb/MasterChef.sol#1391) can be used in cross function reentrancies:
+	- MasterChef.add(uint256,uint256,IBEP20,bool) (../../sb/MasterChef.sol#1477-1494)
+	- MasterChef.addBonus(IBEP20) (../../sb/MasterChef.sol#1496-1505)
+	- MasterChef.massUpdatePools() (../../sb/MasterChef.sol#1549-1554)
+	- MasterChef.pendingBonus(uint256,address) (../../sb/MasterChef.sol#1536-1546)
+	- MasterChef.pendingLC(uint256,address) (../../sb/MasterChef.sol#1522-1533)
+	- MasterChef.poolInfo (../../sb/MasterChef.sol#1391)
+	- MasterChef.poolLength() (../../sb/MasterChef.sol#1455-1457)
+	- MasterChef.set(uint256,uint256,bool) (../../sb/MasterChef.sol#1508-1514)
+	- MasterChef.updateBonus(uint256) (../../sb/MasterChef.sol#1575-1594)
+	- MasterChef.updatePool(uint256) (../../sb/MasterChef.sol#1557-1572)
+	- totalAllocPoint = totalAllocPoint.add(_allocPoint) (../../sb/MasterChef.sol#1482)
+	MasterChef.totalAllocPoint (../../sb/MasterChef.sol#1401) can be used in cross function reentrancies:
+	- MasterChef.add(uint256,uint256,IBEP20,bool) (../../sb/MasterChef.sol#1477-1494)
+	- MasterChef.pendingLC(uint256,address) (../../sb/MasterChef.sol#1522-1533)
+	- MasterChef.set(uint256,uint256,bool) (../../sb/MasterChef.sol#1508-1514)
+	- MasterChef.totalAllocPoint (../../sb/MasterChef.sol#1401)
+	- MasterChef.updatePool(uint256) (../../sb/MasterChef.sol#1557-1572)
+Reentrancy in MasterChef.emergencyWithdraw(uint256) (../../sb/MasterChef.sol#1676-1686):
+	External calls:
+	- pool.lpToken.safeTransfer(address(msg.sender),user.amount) (../../sb/MasterChef.sol#1679)
+	State variables written after the call(s):
+	- user.amount = 0 (../../sb/MasterChef.sol#1681)
+	MasterChef.userInfo (../../sb/MasterChef.sol#1399) can be used in cross function reentrancies:
+	- MasterChef.pendingBonus(uint256,address) (../../sb/MasterChef.sol#1536-1546)
+	- MasterChef.pendingLC(uint256,address) (../../sb/MasterChef.sol#1522-1533)
+	- MasterChef.userInfo (../../sb/MasterChef.sol#1399)
+	- user.rewardDebt = 0 (../../sb/MasterChef.sol#1682)
+	MasterChef.userInfo (../../sb/MasterChef.sol#1399) can be used in cross function reentrancies:
+	- MasterChef.pendingBonus(uint256,address) (../../sb/MasterChef.sol#1536-1546)
+	- MasterChef.pendingLC(uint256,address) (../../sb/MasterChef.sol#1522-1533)
+	- MasterChef.userInfo (../../sb/MasterChef.sol#1399)
+Reentrancy in MasterChef.payPendingBonus(uint256,address) (../../sb/MasterChef.sol#1609-1623):
+	External calls:
+	- bonusPool.bonusToken.safeTransfer(address(_user),pending) (../../sb/MasterChef.sol#1619)
+	State variables written after the call(s):
+	- bonusPool.lastBalance = bonusPool.lastBalance.sub(pending) (../../sb/MasterChef.sol#1618)
+	MasterChef.bonusInfo (../../sb/MasterChef.sol#1393) can be used in cross function reentrancies:
+	- MasterChef.addBonus(IBEP20) (../../sb/MasterChef.sol#1496-1505)
+	- MasterChef.bonusInfo (../../sb/MasterChef.sol#1393)
+	- MasterChef.bonusLength() (../../sb/MasterChef.sol#1459-1461)
+	- MasterChef.pendingBonus(uint256,address) (../../sb/MasterChef.sol#1536-1546)
+	- MasterChef.updateBonus(uint256) (../../sb/MasterChef.sol#1575-1594)
+Reentrancy in MasterChef.set(uint256,uint256,bool) (../../sb/MasterChef.sol#1508-1514):
+	External calls:
+	- massUpdatePools() (../../sb/MasterChef.sol#1510)
+		- LC.mint(address(this),LCReward) (../../sb/MasterChef.sol#1569)
+	State variables written after the call(s):
+	- poolInfo[_pid].allocPoint = _allocPoint (../../sb/MasterChef.sol#1513)
+	MasterChef.poolInfo (../../sb/MasterChef.sol#1391) can be used in cross function reentrancies:
+	- MasterChef.add(uint256,uint256,IBEP20,bool) (../../sb/MasterChef.sol#1477-1494)
+	- MasterChef.addBonus(IBEP20) (../../sb/MasterChef.sol#1496-1505)
+	- MasterChef.massUpdatePools() (../../sb/MasterChef.sol#1549-1554)
+	- MasterChef.pendingBonus(uint256,address) (../../sb/MasterChef.sol#1536-1546)
+	- MasterChef.pendingLC(uint256,address) (../../sb/MasterChef.sol#1522-1533)
+	- MasterChef.poolInfo (../../sb/MasterChef.sol#1391)
+	- MasterChef.poolLength() (../../sb/MasterChef.sol#1455-1457)
+	- MasterChef.set(uint256,uint256,bool) (../../sb/MasterChef.sol#1508-1514)
+	- MasterChef.updateBonus(uint256) (../../sb/MasterChef.sol#1575-1594)
+	- MasterChef.updatePool(uint256) (../../sb/MasterChef.sol#1557-1572)
+	- totalAllocPoint = totalAllocPoint.sub(poolInfo[_pid].allocPoint).add(_allocPoint) (../../sb/MasterChef.sol#1512)
+	MasterChef.totalAllocPoint (../../sb/MasterChef.sol#1401) can be used in cross function reentrancies:
+	- MasterChef.add(uint256,uint256,IBEP20,bool) (../../sb/MasterChef.sol#1477-1494)
+	- MasterChef.pendingLC(uint256,address) (../../sb/MasterChef.sol#1522-1533)
+	- MasterChef.set(uint256,uint256,bool) (../../sb/MasterChef.sol#1508-1514)
+	- MasterChef.totalAllocPoint (../../sb/MasterChef.sol#1401)
+	- MasterChef.updatePool(uint256) (../../sb/MasterChef.sol#1557-1572)
+Reentrancy in MasterChef.updatePool(uint256) (../../sb/MasterChef.sol#1557-1572):
+	External calls:
+	- LC.mint(address(this),LCReward) (../../sb/MasterChef.sol#1569)
+	State variables written after the call(s):
+	- pool.accLCPerShare = pool.accLCPerShare.add(LCReward.mul(1e12).div(lpSupply)) (../../sb/MasterChef.sol#1570)
+	MasterChef.poolInfo (../../sb/MasterChef.sol#1391) can be used in cross function reentrancies:
+	- MasterChef.add(uint256,uint256,IBEP20,bool) (../../sb/MasterChef.sol#1477-1494)
+	- MasterChef.addBonus(IBEP20) (../../sb/MasterChef.sol#1496-1505)
+	- MasterChef.massUpdatePools() (../../sb/MasterChef.sol#1549-1554)
+	- MasterChef.pendingBonus(uint256,address) (../../sb/MasterChef.sol#1536-1546)
+	- MasterChef.pendingLC(uint256,address) (../../sb/MasterChef.sol#1522-1533)
+	- MasterChef.poolInfo (../../sb/MasterChef.sol#1391)
+	- MasterChef.poolLength() (../../sb/MasterChef.sol#1455-1457)
+	- MasterChef.set(uint256,uint256,bool) (../../sb/MasterChef.sol#1508-1514)
+	- MasterChef.updateBonus(uint256) (../../sb/MasterChef.sol#1575-1594)
+	- MasterChef.updatePool(uint256) (../../sb/MasterChef.sol#1557-1572)
+	- pool.lastRewardBlock = block.number (../../sb/MasterChef.sol#1571)
+	MasterChef.poolInfo (../../sb/MasterChef.sol#1391) can be used in cross function reentrancies:
+	- MasterChef.add(uint256,uint256,IBEP20,bool) (../../sb/MasterChef.sol#1477-1494)
+	- MasterChef.addBonus(IBEP20) (../../sb/MasterChef.sol#1496-1505)
+	- MasterChef.massUpdatePools() (../../sb/MasterChef.sol#1549-1554)
+	- MasterChef.pendingBonus(uint256,address) (../../sb/MasterChef.sol#1536-1546)
+	- MasterChef.pendingLC(uint256,address) (../../sb/MasterChef.sol#1522-1533)
+	- MasterChef.poolInfo (../../sb/MasterChef.sol#1391)
+	- MasterChef.poolLength() (../../sb/MasterChef.sol#1455-1457)
+	- MasterChef.set(uint256,uint256,bool) (../../sb/MasterChef.sol#1508-1514)
+	- MasterChef.updateBonus(uint256) (../../sb/MasterChef.sol#1575-1594)
+	- MasterChef.updatePool(uint256) (../../sb/MasterChef.sol#1557-1572)
+Reentrancy in MasterChef.withdrawDevFee() (../../sb/MasterChef.sol#1463-1472):
+	External calls:
+	- LC.mint(dev0addr,LCReward.mul(dev0Percent).div(percentDec)) (../../sb/MasterChef.sol#1467)
+	- LC.mint(dev1addr,LCReward.mul(dev1Percent).div(percentDec)) (../../sb/MasterChef.sol#1468)
+	- LC.mint(dev2addr,LCReward.mul(dev2Percent).div(percentDec)) (../../sb/MasterChef.sol#1469)
+	- LC.mint(safuaddr,LCReward.mul(safuPercent).div(percentDec)) (../../sb/MasterChef.sol#1470)
+	State variables written after the call(s):
+	- lastBlockDevWithdraw = block.number (../../sb/MasterChef.sol#1471)
+	MasterChef.lastBlockDevWithdraw (../../sb/MasterChef.sol#1385) can be used in cross function reentrancies:
+	- MasterChef.constructor(LCToken,address,address,address,address,address,uint256,uint256,uint256,uint256,uint256,uint256,uint256) (../../sb/MasterChef.sol#1420-1449)
+	- MasterChef.lastBlockDevWithdraw (../../sb/MasterChef.sol#1385)
+	- MasterChef.withdrawDevFee() (../../sb/MasterChef.sol#1463-1472)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+LCBEP20.constructor(string,string).name (../../sb/MasterChef.sol#808) shadows:
+	- LCBEP20.name() (../../sb/MasterChef.sol#824-826) (function)
+	- IBEP20.name() (../../sb/MasterChef.sol#235) (function)
+LCBEP20.constructor(string,string).symbol (../../sb/MasterChef.sol#808) shadows:
+	- LCBEP20.symbol() (../../sb/MasterChef.sol#838-840) (function)
+	- IBEP20.symbol() (../../sb/MasterChef.sol#230) (function)
+LCBEP20.allowance(address,address).owner (../../sb/MasterChef.sol#876) shadows:
+	- Ownable.owner() (../../sb/MasterChef.sol#665-667) (function)
+LCBEP20._approve(address,address,uint256).owner (../../sb/MasterChef.sol#1051) shadows:
+	- Ownable.owner() (../../sb/MasterChef.sol#665-667) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+MasterChef.updateMultiplier(uint256) (../../sb/MasterChef.sol#1451-1453) should emit an event for: 
+	- BONUS_MULTIPLIER = multiplierNumber (../../sb/MasterChef.sol#1452) 
+MasterChef.add(uint256,uint256,IBEP20,bool) (../../sb/MasterChef.sol#1477-1494) should emit an event for: 
+	- totalAllocPoint = totalAllocPoint.add(_allocPoint) (../../sb/MasterChef.sol#1482) 
+	- totalBonusPoint = totalBonusPoint.add(_bonusPoint) (../../sb/MasterChef.sol#1483) 
+MasterChef.set(uint256,uint256,bool) (../../sb/MasterChef.sol#1508-1514) should emit an event for: 
+	- totalAllocPoint = totalAllocPoint.sub(poolInfo[_pid].allocPoint).add(_allocPoint) (../../sb/MasterChef.sol#1512) 
+MasterChef.updateLcPerBlock(uint256) (../../sb/MasterChef.sol#1709-1713) should emit an event for: 
+	- LCPerBlock = newAmount (../../sb/MasterChef.sol#1712) 
+MasterChef.setReferralCommissionRate(uint16) (../../sb/MasterChef.sol#1715-1718) should emit an event for: 
+	- referralCommissionRate = _referralCommissionRate (../../sb/MasterChef.sol#1717) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+MasterChef.constructor(LCToken,address,address,address,address,address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)._dev0addr (../../sb/MasterChef.sol#1422) lacks a zero-check on :
+		- dev0addr = _dev0addr (../../sb/MasterChef.sol#1436)
+MasterChef.constructor(LCToken,address,address,address,address,address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)._dev1addr (../../sb/MasterChef.sol#1423) lacks a zero-check on :
+		- dev1addr = _dev1addr (../../sb/MasterChef.sol#1437)
+MasterChef.constructor(LCToken,address,address,address,address,address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)._dev2addr (../../sb/MasterChef.sol#1424) lacks a zero-check on :
+		- dev2addr = _dev2addr (../../sb/MasterChef.sol#1438)
+MasterChef.constructor(LCToken,address,address,address,address,address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)._safuaddr (../../sb/MasterChef.sol#1425) lacks a zero-check on :
+		- safuaddr = _safuaddr (../../sb/MasterChef.sol#1439)
+MasterChef.constructor(LCToken,address,address,address,address,address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)._treasuryaddr (../../sb/MasterChef.sol#1426) lacks a zero-check on :
+		- treasuryaddr = _treasuryaddr (../../sb/MasterChef.sol#1440)
+MasterChef.setDevAddress(address,address,address)._dev0addr (../../sb/MasterChef.sol#1698) lacks a zero-check on :
+		- dev0addr = _dev0addr (../../sb/MasterChef.sol#1699)
+MasterChef.setDevAddress(address,address,address)._dev1addr (../../sb/MasterChef.sol#1698) lacks a zero-check on :
+		- dev1addr = _dev1addr (../../sb/MasterChef.sol#1700)
+MasterChef.setDevAddress(address,address,address)._dev2addr (../../sb/MasterChef.sol#1698) lacks a zero-check on :
+		- dev2addr = _dev2addr (../../sb/MasterChef.sol#1701)
+MasterChef.setSafuAddress(address)._safuaddr (../../sb/MasterChef.sol#1703) lacks a zero-check on :
+		- safuaddr = _safuaddr (../../sb/MasterChef.sol#1704)
+MasterChef.setTreasuryAddress(address)._treasuryaddr (../../sb/MasterChef.sol#1706) lacks a zero-check on :
+		- treasuryaddr = _treasuryaddr (../../sb/MasterChef.sol#1707)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+MasterChef.updatePool(uint256) (../../sb/MasterChef.sol#1557-1572) has external calls inside a loop: lpSupply = pool.lpToken.balanceOf(address(this)) (../../sb/MasterChef.sol#1562)
+MasterChef.updatePool(uint256) (../../sb/MasterChef.sol#1557-1572) has external calls inside a loop: LC.mint(address(this),LCReward) (../../sb/MasterChef.sol#1569)
+MasterChef.updateBonus(uint256) (../../sb/MasterChef.sol#1575-1594) has external calls inside a loop: lpSupply = pool.lpToken.balanceOf(address(this)) (../../sb/MasterChef.sol#1583)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in MasterChef.add(uint256,uint256,IBEP20,bool) (../../sb/MasterChef.sol#1477-1494):
+	External calls:
+	- massUpdatePools() (../../sb/MasterChef.sol#1479)
+		- LC.mint(address(this),LCReward) (../../sb/MasterChef.sol#1569)
+	State variables written after the call(s):
+	- totalBonusPoint = totalBonusPoint.add(_bonusPoint) (../../sb/MasterChef.sol#1483)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+LCToken.delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32) (../../sb/MasterChef.sol#1152-1193) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(now <= expiry,LC::delegateBySig: signature expired) (../../sb/MasterChef.sol#1191)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/MasterChef.sol#332-341) uses assembly
+	- INLINE ASM (../../sb/MasterChef.sol#339)
+Address._verifyCallResult(bool,bytes,string) (../../sb/MasterChef.sol#477-494) uses assembly
+	- INLINE ASM (../../sb/MasterChef.sol#486-489)
+LCToken.getChainId() (../../sb/MasterChef.sol#1311-1315) uses assembly
+	- INLINE ASM (../../sb/MasterChef.sol#1313)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.functionCall(address,bytes) (../../sb/MasterChef.sol#385-387) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/MasterChef.sol#410-412) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/MasterChef.sol#459-461) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/MasterChef.sol#469-475) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/MasterChef.sol#435-437) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/MasterChef.sol#445-451) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/MasterChef.sol#359-365) is never used and should be removed
+Context._msgData() (../../sb/MasterChef.sol#630-633) is never used and should be removed
+LCBEP20._burn(address,uint256) (../../sb/MasterChef.sol#1029-1035) is never used and should be removed
+LCBEP20._burnFrom(address,uint256) (../../sb/MasterChef.sol#1068-1075) is never used and should be removed
+SafeBEP20.safeApprove(IBEP20,address,uint256) (../../sb/MasterChef.sol#534-548) is never used and should be removed
+SafeBEP20.safeDecreaseAllowance(IBEP20,address,uint256) (../../sb/MasterChef.sol#559-569) is never used and should be removed
+SafeBEP20.safeIncreaseAllowance(IBEP20,address,uint256) (../../sb/MasterChef.sol#550-557) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/MasterChef.sol#190-193) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/MasterChef.sol#152-155) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/MasterChef.sol#210-213) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/MasterChef.sol#24-28) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/MasterChef.sol#60-63) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/MasterChef.sol#70-73) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/MasterChef.sol#45-53) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/MasterChef.sol#35-38) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.6.12 (../../sb/MasterChef.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/MasterChef.sol#359-365):
+	- (success) = recipient.call{value: amount}() (../../sb/MasterChef.sol#363)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/MasterChef.sol#420-427):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/MasterChef.sol#425)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/MasterChef.sol#445-451):
+	- (success,returndata) = target.staticcall(data) (../../sb/MasterChef.sol#449)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/MasterChef.sol#469-475):
+	- (success,returndata) = target.delegatecall(data) (../../sb/MasterChef.sol#473)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Constant LCBEP20._maxSupply (../../sb/MasterChef.sol#784) is not in UPPER_CASE_WITH_UNDERSCORES
+Parameter LCToken.mint(address,uint256)._to (../../sb/MasterChef.sol#1082) is not in mixedCase
+Parameter LCToken.mint(address,uint256)._amount (../../sb/MasterChef.sol#1082) is not in mixedCase
+Parameter MasterChef.add(uint256,uint256,IBEP20,bool)._allocPoint (../../sb/MasterChef.sol#1477) is not in mixedCase
+Parameter MasterChef.add(uint256,uint256,IBEP20,bool)._bonusPoint (../../sb/MasterChef.sol#1477) is not in mixedCase
+Parameter MasterChef.add(uint256,uint256,IBEP20,bool)._lpToken (../../sb/MasterChef.sol#1477) is not in mixedCase
+Parameter MasterChef.add(uint256,uint256,IBEP20,bool)._withUpdate (../../sb/MasterChef.sol#1477) is not in mixedCase
+Parameter MasterChef.addBonus(IBEP20)._bonusToken (../../sb/MasterChef.sol#1496) is not in mixedCase
+Parameter MasterChef.set(uint256,uint256,bool)._pid (../../sb/MasterChef.sol#1508) is not in mixedCase
+Parameter MasterChef.set(uint256,uint256,bool)._allocPoint (../../sb/MasterChef.sol#1508) is not in mixedCase
+Parameter MasterChef.set(uint256,uint256,bool)._withUpdate (../../sb/MasterChef.sol#1508) is not in mixedCase
+Parameter MasterChef.getMultiplier(uint256,uint256)._from (../../sb/MasterChef.sol#1517) is not in mixedCase
+Parameter MasterChef.getMultiplier(uint256,uint256)._to (../../sb/MasterChef.sol#1517) is not in mixedCase
+Parameter MasterChef.pendingLC(uint256,address)._pid (../../sb/MasterChef.sol#1522) is not in mixedCase
+Parameter MasterChef.pendingLC(uint256,address)._user (../../sb/MasterChef.sol#1522) is not in mixedCase
+Parameter MasterChef.pendingBonus(uint256,address)._pid (../../sb/MasterChef.sol#1536) is not in mixedCase
+Parameter MasterChef.pendingBonus(uint256,address)._user (../../sb/MasterChef.sol#1536) is not in mixedCase
+Parameter MasterChef.updatePool(uint256)._pid (../../sb/MasterChef.sol#1557) is not in mixedCase
+Parameter MasterChef.updateBonus(uint256)._pid (../../sb/MasterChef.sol#1575) is not in mixedCase
+Parameter MasterChef.payPendingLC(uint256,address)._pid (../../sb/MasterChef.sol#1597) is not in mixedCase
+Parameter MasterChef.payPendingLC(uint256,address)._user (../../sb/MasterChef.sol#1597) is not in mixedCase
+Parameter MasterChef.payPendingBonus(uint256,address)._pid (../../sb/MasterChef.sol#1609) is not in mixedCase
+Parameter MasterChef.payPendingBonus(uint256,address)._user (../../sb/MasterChef.sol#1609) is not in mixedCase
+Parameter MasterChef.deposit(uint256,uint256,address)._pid (../../sb/MasterChef.sol#1626) is not in mixedCase
+Parameter MasterChef.deposit(uint256,uint256,address)._amount (../../sb/MasterChef.sol#1626) is not in mixedCase
+Parameter MasterChef.deposit(uint256,uint256,address)._referrer (../../sb/MasterChef.sol#1626) is not in mixedCase
+Parameter MasterChef.withdraw(uint256,uint256)._pid (../../sb/MasterChef.sol#1652) is not in mixedCase
+Parameter MasterChef.withdraw(uint256,uint256)._amount (../../sb/MasterChef.sol#1652) is not in mixedCase
+Parameter MasterChef.emergencyWithdraw(uint256)._pid (../../sb/MasterChef.sol#1676) is not in mixedCase
+Parameter MasterChef.safeLCTransfer(address,uint256)._to (../../sb/MasterChef.sol#1689) is not in mixedCase
+Parameter MasterChef.safeLCTransfer(address,uint256)._amount (../../sb/MasterChef.sol#1689) is not in mixedCase
+Parameter MasterChef.setDevAddress(address,address,address)._dev0addr (../../sb/MasterChef.sol#1698) is not in mixedCase
+Parameter MasterChef.setDevAddress(address,address,address)._dev1addr (../../sb/MasterChef.sol#1698) is not in mixedCase
+Parameter MasterChef.setDevAddress(address,address,address)._dev2addr (../../sb/MasterChef.sol#1698) is not in mixedCase
+Parameter MasterChef.setSafuAddress(address)._safuaddr (../../sb/MasterChef.sol#1703) is not in mixedCase
+Parameter MasterChef.setTreasuryAddress(address)._treasuryaddr (../../sb/MasterChef.sol#1706) is not in mixedCase
+Parameter MasterChef.setReferralCommissionRate(uint16)._referralCommissionRate (../../sb/MasterChef.sol#1715) is not in mixedCase
+Parameter MasterChef.payReferralCommission(address,uint256)._user (../../sb/MasterChef.sol#1721) is not in mixedCase
+Parameter MasterChef.payReferralCommission(address,uint256)._pending (../../sb/MasterChef.sol#1721) is not in mixedCase
+Variable MasterChef.LC (../../sb/MasterChef.sol#1361) is not in mixedCase
+Variable MasterChef.LCPerBlock (../../sb/MasterChef.sol#1387) is not in mixedCase
+Variable MasterChef.BONUS_MULTIPLIER (../../sb/MasterChef.sol#1389) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/MasterChef.sol#631)" inContext (../../sb/MasterChef.sol#625-634)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Variable MasterChef.constructor(LCToken,address,address,address,address,address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)._dev0Percent (../../sb/MasterChef.sol#1430) is too similar to MasterChef.constructor(LCToken,address,address,address,address,address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)._dev1Percent (../../sb/MasterChef.sol#1431)
+Variable MasterChef.constructor(LCToken,address,address,address,address,address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)._dev0Percent (../../sb/MasterChef.sol#1430) is too similar to MasterChef.constructor(LCToken,address,address,address,address,address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)._dev2Percent (../../sb/MasterChef.sol#1432)
+Variable MasterChef.constructor(LCToken,address,address,address,address,address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)._dev1Percent (../../sb/MasterChef.sol#1431) is too similar to MasterChef.constructor(LCToken,address,address,address,address,address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)._dev2Percent (../../sb/MasterChef.sol#1432)
+Variable MasterChef.dev0Percent (../../sb/MasterChef.sol#1367) is too similar to MasterChef.dev1Percent (../../sb/MasterChef.sol#1369)
+Variable MasterChef.dev0Percent (../../sb/MasterChef.sol#1367) is too similar to MasterChef.dev2Percent (../../sb/MasterChef.sol#1371)
+Variable MasterChef.dev1Percent (../../sb/MasterChef.sol#1369) is too similar to MasterChef.dev2Percent (../../sb/MasterChef.sol#1371)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+MasterChef.slitherConstructorVariables() (../../sb/MasterChef.sol#1325-1747) uses literals with too many digits:
+	- percentDec = 1000000 (../../sb/MasterChef.sol#1363)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+Loop condition i < poolInfo.length (../../sb/MasterChef.sol#1499) should use cached array length instead of referencing `length` member of the storage array.
+ Loop condition i < bonusInfo.length (../../sb/MasterChef.sol#1541) should use cached array length instead of referencing `length` member of the storage array.
+ Loop condition i < poolInfo.length (../../sb/MasterChef.sol#1581) should use cached array length instead of referencing `length` member of the storage array.
+ Loop condition i < bonusInfo.length (../../sb/MasterChef.sol#1643) should use cached array length instead of referencing `length` member of the storage array.
+ Loop condition i < bonusInfo.length (../../sb/MasterChef.sol#1668) should use cached array length instead of referencing `length` member of the storage array.
+ Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cache-array-length
+
+MasterChef.luckychipReferral (../../sb/MasterChef.sol#1408) should be constant 
+MasterChef.percentDec (../../sb/MasterChef.sol#1363) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+
+MasterChef.LC (../../sb/MasterChef.sol#1361) should be immutable 
+MasterChef.dev0Percent (../../sb/MasterChef.sol#1367) should be immutable 
+MasterChef.dev1Percent (../../sb/MasterChef.sol#1369) should be immutable 
+MasterChef.dev2Percent (../../sb/MasterChef.sol#1371) should be immutable 
+MasterChef.safuPercent (../../sb/MasterChef.sol#1373) should be immutable 
+MasterChef.stakingPercent (../../sb/MasterChef.sol#1365) should be immutable 
+MasterChef.startBlock (../../sb/MasterChef.sol#1405) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/MasterChef.sol analyzed (12 contracts with 93 detectors), 137 result(s) found

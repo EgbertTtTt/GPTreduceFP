@@ -1,0 +1,268 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 61 Code Findings │
+└──────────────────┘
+                        
+    /sb/MasterShiba.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          462┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          471┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          494┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          503┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          515┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          647┆ contract ShibaBonusAggregator is Ownable, IBonusAggregator {
+            ⋮┆----------------------------------------
+          696┆ contract ShibaBEP20 is Context, IBEP20, Ownable {
+            ⋮┆----------------------------------------
+          985┆ contract MasterShiba is Ownable, IMasterBonus {
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+         1036┆ uint256 public totalAllocPoint = 0;
+            ⋮┆----------------------------------------
+         1049┆ uint256 public lastReductionPeriodIndex = 0;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          551┆ constructor() internal {}
+            ⋮┆----------------------------------------
+          583┆ constructor() internal {
+          584┆     address msgSender = _msgSender();
+          585┆     _owner = msgSender;
+          586┆     emit OwnershipTransferred(address(0), msgSender);
+          587┆ }
+            ⋮┆----------------------------------------
+          722┆ constructor(string memory name, string memory symbol) public {
+          723┆     _name = name;
+          724┆     _symbol = symbol;
+          725┆     _decimals = 18;
+          726┆ }
+            ⋮┆----------------------------------------
+         1056┆ constructor(
+         1057┆     ShibaBEP20 _Nova,
+         1058┆     ShibaBEP20 _sNova,
+         1059┆     ShibaBonusAggregator _bonusAggregator,
+         1060┆     address _devaddr,
+         1061┆     address _feeAddress,
+         1062┆     uint256 _NovaPerBlock,
+         1063┆     uint256 _startBlock
+         1064┆ ) public {
+         1065┆     Nova = _Nova;
+             [hid 20 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+         1178┆ for (uint256 index = lastReductionPeriodIndex; index <           
+  currentIndex; ++index) {                                                      
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+         1178┆ for (uint256 index = lastReductionPeriodIndex; index <           
+  currentIndex; ++index) {                                                      
+            ⋮┆----------------------------------------
+         1196┆ for (uint256 pid = 0; pid < length; ++pid) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           31┆ require(c >= a, 'SafeMath: addition overflow');
+            ⋮┆----------------------------------------
+           90┆ require(c / a == b, 'SafeMath: multiplication overflow');
+            ⋮┆----------------------------------------
+          337┆ require(address(this).balance >= amount, 'Address: insufficient  
+  balance');                                                                    
+            ⋮┆----------------------------------------
+          341┆ require(success, 'Address: unable to send value, recipient may   
+  have reverted');                                                              
+            ⋮┆----------------------------------------
+          411┆ require(address(this).balance >= value, 'Address: insufficient   
+  balance for call');                                                           
+            ⋮┆----------------------------------------
+          421┆ require(isContract(target), 'Address: call to non-contract');
+            ⋮┆----------------------------------------
+          490┆ require(
+          491┆     (value == 0) || (token.allowance(address(this), spender) ==  
+  0),                                                                           
+          492┆     'SafeBEP20: approve from non-zero to non-zero allowance'
+          493┆ );
+            ⋮┆----------------------------------------
+          533┆ require(abi.decode(returndata, (bool)), 'SafeBEP20: BEP20        
+  operation did not succeed');                                                  
+            ⋮┆----------------------------------------
+          600┆ require(_owner == _msgSender(), 'Ownable: caller is not the      
+  owner');                                                                      
+            ⋮┆----------------------------------------
+          628┆ require(newOwner != address(0), 'Ownable: new owner is the zero  
+  address');                                                                    
+            ⋮┆----------------------------------------
+          662┆ require(contractBonusSource[msg.sender], "caller is not in       
+  contract list");                                                              
+            ⋮┆----------------------------------------
+          676┆ require(userBonusOnFarms[_pid][_user] < 10000, "Invalid          
+  percent");                                                                    
+            ⋮┆----------------------------------------
+          894┆ require(sender != address(0), "BEP20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          895┆ require(recipient != address(0), "BEP20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          915┆ require(account != address(0), "BEP20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+          934┆ require(account != BURN_ADDRESS, "BEP20: burn from the zero      
+  address");                                                                    
+            ⋮┆----------------------------------------
+          960┆ require(owner != address(0), "BEP20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          961┆ require(spender != address(0), "BEP20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1088┆ require(_pid < poolInfo.length, "validatePool: pool exists?");
+            ⋮┆----------------------------------------
+         1093┆ require(msg.sender == address(bonusAggregator), "Ownable: caller 
+  is not the owner");                                                           
+            ⋮┆----------------------------------------
+         1112┆ require(_depositFeeBP <= 400, "add: invalid deposit fee basis    
+  points");                                                                     
+            ⋮┆----------------------------------------
+         1131┆ require(_depositFeeBP <= 400, "set: invalid deposit fee basis    
+  points");                                                                     
+            ⋮┆----------------------------------------
+         1294┆ require(user.amount >= _amount, "withdraw: not good");
+            ⋮┆----------------------------------------
+         1353┆ require(transferSuccess, "safeNovaTransfer: Transfer failed");
+            ⋮┆----------------------------------------
+         1365┆ require(transferSuccess, "safeSNovaTransfer: Transfer failed");
+            ⋮┆----------------------------------------
+         1370┆ require(msg.sender == devaddr, "dev: wut?");
+            ⋮┆----------------------------------------
+         1379┆ require(minimumEmissionRate > _minimumEmissionRate, "must be     
+  lower");                                                                      
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         1150┆ if (block.number > pool.lastRewardBlock && lpSupply != 0) {
+         1151┆     uint256 multiplier = getMultiplier(pool.lastRewardBlock,     
+  block.number);                                                                
+         1152┆     uint256 NovaReward =                                         
+  multiplier.mul(NovaPerBlock).mul(pool.allocPoint).div(totalAllocPoint);       
+         1153┆     accNovaPerShare =                                            
+  accNovaPerShare.add(NovaReward.mul(1e12).div(lpSupply));                      
+         1154┆ }
+            ⋮┆----------------------------------------
+         1165┆ if(startBlock > 0 && block.number <= startBlock){
+         1166┆     return;
+         1167┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           90┆ require(c / a == b, 'SafeMath: multiplication overflow');
+            ⋮┆----------------------------------------
+          341┆ require(success, 'Address: unable to send value, recipient may   
+  have reverted');                                                              
+            ⋮┆----------------------------------------
+          411┆ require(address(this).balance >= value, 'Address: insufficient   
+  balance for call');                                                           
+            ⋮┆----------------------------------------
+          490┆ require(
+          491┆     (value == 0) || (token.allowance(address(this), spender) ==  
+  0),                                                                           
+          492┆     'SafeBEP20: approve from non-zero to non-zero allowance'
+          493┆ );
+            ⋮┆----------------------------------------
+          533┆ require(abi.decode(returndata, (bool)), 'SafeBEP20: BEP20        
+  operation did not succeed');                                                  
+            ⋮┆----------------------------------------
+          628┆ require(newOwner != address(0), 'Ownable: new owner is the zero  
+  address');                                                                    
+            ⋮┆----------------------------------------
+          894┆ require(sender != address(0), "BEP20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          895┆ require(recipient != address(0), "BEP20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          934┆ require(account != BURN_ADDRESS, "BEP20: burn from the zero      
+  address");                                                                    
+            ⋮┆----------------------------------------
+          960┆ require(owner != address(0), "BEP20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          961┆ require(spender != address(0), "BEP20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1112┆ require(_depositFeeBP <= 400, "add: invalid deposit fee basis    
+  points");                                                                     
+            ⋮┆----------------------------------------
+         1131┆ require(_depositFeeBP <= 400, "set: invalid deposit fee basis    
+  points");                                                                     
+            ⋮┆----------------------------------------
+         1353┆ require(transferSuccess, "safeNovaTransfer: Transfer failed");
+            ⋮┆----------------------------------------
+         1365┆ require(transferSuccess, "safeSNovaTransfer: Transfer failed");
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 61 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

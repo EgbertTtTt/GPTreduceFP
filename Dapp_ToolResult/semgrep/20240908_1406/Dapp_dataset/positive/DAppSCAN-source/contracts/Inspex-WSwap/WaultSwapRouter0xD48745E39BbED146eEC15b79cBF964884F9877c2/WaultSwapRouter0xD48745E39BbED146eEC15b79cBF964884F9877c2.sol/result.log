@@ -1,0 +1,342 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 83 Code Findings │
+└──────────────────┘
+                                                                      
+    /sb/WaultSwapRouter0xD48745E39BbED146eEC15b79cBF964884F9877c2.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+           43┆ (bool success, bytes memory data) =                              
+  token.call(abi.encodeWithSelector(0x095ea7b3, to, value));                    
+            ⋮┆----------------------------------------
+           55┆ (bool success, bytes memory data) =                              
+  token.call(abi.encodeWithSelector(0xa9059cbb, to, value));                    
+            ⋮┆----------------------------------------
+           67┆ (bool success, bytes memory data) =                              
+  token.call(abi.encodeWithSelector(0x23b872dd, from, to, value));              
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          598┆ for (uint i; i < path.length - 1; i++) {
+            ⋮┆----------------------------------------
+          620┆ for (uint i = path.length - 1; i > 0; i--) {
+            ⋮┆----------------------------------------
+         1074┆ for (uint i; i < path.length - 1; i++) {
+            ⋮┆----------------------------------------
+         1084┆ address to = i < path.length - 2 ?                               
+  WaultSwapLibrary.pairFor(factory, output, path[i + 2]) : _to;                 
+            ⋮┆----------------------------------------
+         1292┆ for (uint i; i < path.length - 1; i++) {
+            ⋮┆----------------------------------------
+         1318┆ address to = i < path.length - 2 ?                               
+  WaultSwapLibrary.pairFor(factory, output, path[i + 2]) : _to;                 
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          694┆ constructor(address _factory, address _WETH) public {
+          695┆ 
+          696┆     factory = _factory;
+          697┆ 
+          698┆     WETH = _WETH;
+          699┆ 
+          700┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          598┆ for (uint i; i < path.length - 1; i++) {
+            ⋮┆----------------------------------------
+         1074┆ for (uint i; i < path.length - 1; i++) {
+            ⋮┆----------------------------------------
+         1292┆ for (uint i; i < path.length - 1; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           45┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'TransferHelper: APPROVE_FAILED');                                  
+            ⋮┆----------------------------------------
+           57┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'TransferHelper: TRANSFER_FAILED');                                 
+            ⋮┆----------------------------------------
+           69┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'TransferHelper: TRANSFER_FROM_FAILED');                            
+            ⋮┆----------------------------------------
+           79┆ require(success, 'TransferHelper: ETH_TRANSFER_FAILED');
+            ⋮┆----------------------------------------
+          456┆ require((z = x + y) >= x, 'ds-math-add-overflow');
+            ⋮┆----------------------------------------
+          464┆ require((z = x - y) <= x, 'ds-math-sub-underflow');
+            ⋮┆----------------------------------------
+          472┆ require(y == 0 || (z = x * y) / y == x, 'ds-math-mul-overflow');
+            ⋮┆----------------------------------------
+          488┆ require(tokenA != tokenB, 'WaultSwapLibrary:                     
+  IDENTICAL_ADDRESSES');                                                        
+            ⋮┆----------------------------------------
+          492┆ require(token0 != address(0), 'WaultSwapLibrary: ZERO_ADDRESS');
+            ⋮┆----------------------------------------
+          540┆ require(amountA > 0, 'WaultSwapLibrary: INSUFFICIENT_AMOUNT');
+            ⋮┆----------------------------------------
+          542┆ require(reserveA > 0 && reserveB > 0, 'WaultSwapLibrary:         
+  INSUFFICIENT_LIQUIDITY');                                                     
+            ⋮┆----------------------------------------
+          554┆ require(amountIn > 0, 'WaultSwapLibrary:                         
+  INSUFFICIENT_INPUT_AMOUNT');                                                  
+            ⋮┆----------------------------------------
+          556┆ require(reserveIn > 0 && reserveOut > 0, 'WaultSwapLibrary:      
+  INSUFFICIENT_LIQUIDITY');                                                     
+            ⋮┆----------------------------------------
+          574┆ require(amountOut > 0, 'WaultSwapLibrary:                        
+  INSUFFICIENT_OUTPUT_AMOUNT');                                                 
+            ⋮┆----------------------------------------
+          576┆ require(reserveIn > 0 && reserveOut > 0, 'WaultSwapLibrary:      
+  INSUFFICIENT_LIQUIDITY');                                                     
+            ⋮┆----------------------------------------
+          592┆ require(path.length >= 2, 'WaultSwapLibrary: INVALID_PATH');
+            ⋮┆----------------------------------------
+          614┆ require(path.length >= 2, 'WaultSwapLibrary: INVALID_PATH');
+            ⋮┆----------------------------------------
+          686┆ require(deadline >= block.timestamp, 'WaultSwapRouter: EXPIRED');
+            ⋮┆----------------------------------------
+          750┆ require(amountBOptimal >= amountBMin, 'WaultSwapRouter:          
+  INSUFFICIENT_B_AMOUNT');                                                      
+            ⋮┆----------------------------------------
+          760┆ require(amountAOptimal >= amountAMin, 'WaultSwapRouter:          
+  INSUFFICIENT_A_AMOUNT');                                                      
+            ⋮┆----------------------------------------
+          882┆ require(amountA >= amountAMin, 'WaultSwapRouter:                 
+  INSUFFICIENT_A_AMOUNT');                                                      
+            ⋮┆----------------------------------------
+          884┆ require(amountB >= amountBMin, 'WaultSwapRouter:                 
+  INSUFFICIENT_B_AMOUNT');                                                      
+            ⋮┆----------------------------------------
+         1112┆ require(amounts[amounts.length - 1] >= amountOutMin,             
+  'WaultSwapRouter: INSUFFICIENT_OUTPUT_AMOUNT');                               
+            ⋮┆----------------------------------------
+         1140┆ require(amounts[0] <= amountInMax, 'WaultSwapRouter:             
+  EXCESSIVE_INPUT_AMOUNT');                                                     
+            ⋮┆----------------------------------------
+         1168┆ require(path[0] == WETH, 'WaultSwapRouter: INVALID_PATH');
+            ⋮┆----------------------------------------
+         1172┆ require(amounts[amounts.length - 1] >= amountOutMin,             
+  'WaultSwapRouter: INSUFFICIENT_OUTPUT_AMOUNT');                               
+            ⋮┆----------------------------------------
+         1196┆ require(path[path.length - 1] == WETH, 'WaultSwapRouter:         
+  INVALID_PATH');                                                               
+            ⋮┆----------------------------------------
+         1200┆ require(amounts[0] <= amountInMax, 'WaultSwapRouter:             
+  EXCESSIVE_INPUT_AMOUNT');                                                     
+            ⋮┆----------------------------------------
+         1230┆ require(path[path.length - 1] == WETH, 'WaultSwapRouter:         
+  INVALID_PATH');                                                               
+            ⋮┆----------------------------------------
+         1234┆ require(amounts[amounts.length - 1] >= amountOutMin,             
+  'WaultSwapRouter: INSUFFICIENT_OUTPUT_AMOUNT');                               
+            ⋮┆----------------------------------------
+         1266┆ require(path[0] == WETH, 'WaultSwapRouter: INVALID_PATH');
+            ⋮┆----------------------------------------
+         1270┆ require(amounts[0] <= msg.value, 'WaultSwapRouter:               
+  EXCESSIVE_INPUT_AMOUNT');                                                     
+            ⋮┆----------------------------------------
+         1350┆ require(
+         1351┆ 
+         1352┆     IERC20(path[path.length -                                    
+  1]).balanceOf(to).sub(balanceBefore) >= amountOutMin,                         
+         1353┆ 
+         1354┆     'WaultSwapRouter: INSUFFICIENT_OUTPUT_AMOUNT'
+         1355┆ 
+         1356┆ );
+            ⋮┆----------------------------------------
+         1384┆ require(path[0] == WETH, 'WaultSwapRouter: INVALID_PATH');
+            ⋮┆----------------------------------------
+         1396┆ require(
+         1397┆ 
+         1398┆     IERC20(path[path.length -                                    
+  1]).balanceOf(to).sub(balanceBefore) >= amountOutMin,                         
+         1399┆ 
+         1400┆     'WaultSwapRouter: INSUFFICIENT_OUTPUT_AMOUNT'
+         1401┆ 
+         1402┆ );
+            ⋮┆----------------------------------------
+         1430┆ require(path[path.length - 1] == WETH, 'WaultSwapRouter:         
+  INVALID_PATH');                                                               
+            ⋮┆----------------------------------------
+         1442┆ require(amountOut >= amountOutMin, 'WaultSwapRouter:             
+  INSUFFICIENT_OUTPUT_AMOUNT');                                                 
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+           45┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'TransferHelper: APPROVE_FAILED');                                  
+            ⋮┆----------------------------------------
+           57┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'TransferHelper: TRANSFER_FAILED');                                 
+            ⋮┆----------------------------------------
+           69┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'TransferHelper: TRANSFER_FROM_FAILED');                            
+            ⋮┆----------------------------------------
+          542┆ require(reserveA > 0 && reserveB > 0, 'WaultSwapLibrary:         
+  INSUFFICIENT_LIQUIDITY');                                                     
+            ⋮┆----------------------------------------
+          556┆ require(reserveIn > 0 && reserveOut > 0, 'WaultSwapLibrary:      
+  INSUFFICIENT_LIQUIDITY');                                                     
+            ⋮┆----------------------------------------
+          576┆ require(reserveIn > 0 && reserveOut > 0, 'WaultSwapLibrary:      
+  INSUFFICIENT_LIQUIDITY');                                                     
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          740┆ if (reserveA == 0 && reserveB == 0) {
+          741┆ 
+          742┆     (amountA, amountB) = (amountADesired, amountBDesired);
+          743┆ 
+          744┆ } else {
+          745┆ 
+          746┆     uint amountBOptimal = WaultSwapLibrary.quote(amountADesired, 
+  reserveA, reserveB);                                                          
+          747┆ 
+          748┆     if (amountBOptimal <= amountBDesired) {
+          749┆ 
+             [hid 17 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-prefix-decrement-not-postfix                    
+          Consider using the prefix decrement expression whenever the return    
+  value is not needed. The                                                      
+          prefix decrement expression is cheaper in terms of gas.               
+                                                                                
+          620┆ for (uint i = path.length - 1; i > 0; i--) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          598┆ for (uint i; i < path.length - 1; i++) {
+            ⋮┆----------------------------------------
+         1074┆ for (uint i; i < path.length - 1; i++) {
+            ⋮┆----------------------------------------
+         1292┆ for (uint i; i < path.length - 1; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           69┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'TransferHelper: TRANSFER_FROM_FAILED');                            
+            ⋮┆----------------------------------------
+           79┆ require(success, 'TransferHelper: ETH_TRANSFER_FAILED');
+            ⋮┆----------------------------------------
+          488┆ require(tokenA != tokenB, 'WaultSwapLibrary:                     
+  IDENTICAL_ADDRESSES');                                                        
+            ⋮┆----------------------------------------
+          540┆ require(amountA > 0, 'WaultSwapLibrary: INSUFFICIENT_AMOUNT');
+            ⋮┆----------------------------------------
+          542┆ require(reserveA > 0 && reserveB > 0, 'WaultSwapLibrary:         
+  INSUFFICIENT_LIQUIDITY');                                                     
+            ⋮┆----------------------------------------
+          554┆ require(amountIn > 0, 'WaultSwapLibrary:                         
+  INSUFFICIENT_INPUT_AMOUNT');                                                  
+            ⋮┆----------------------------------------
+          556┆ require(reserveIn > 0 && reserveOut > 0, 'WaultSwapLibrary:      
+  INSUFFICIENT_LIQUIDITY');                                                     
+            ⋮┆----------------------------------------
+          574┆ require(amountOut > 0, 'WaultSwapLibrary:                        
+  INSUFFICIENT_OUTPUT_AMOUNT');                                                 
+            ⋮┆----------------------------------------
+          576┆ require(reserveIn > 0 && reserveOut > 0, 'WaultSwapLibrary:      
+  INSUFFICIENT_LIQUIDITY');                                                     
+            ⋮┆----------------------------------------
+          750┆ require(amountBOptimal >= amountBMin, 'WaultSwapRouter:          
+  INSUFFICIENT_B_AMOUNT');                                                      
+            ⋮┆----------------------------------------
+          760┆ require(amountAOptimal >= amountAMin, 'WaultSwapRouter:          
+  INSUFFICIENT_A_AMOUNT');                                                      
+            ⋮┆----------------------------------------
+          882┆ require(amountA >= amountAMin, 'WaultSwapRouter:                 
+  INSUFFICIENT_A_AMOUNT');                                                      
+            ⋮┆----------------------------------------
+          884┆ require(amountB >= amountBMin, 'WaultSwapRouter:                 
+  INSUFFICIENT_B_AMOUNT');                                                      
+            ⋮┆----------------------------------------
+         1112┆ require(amounts[amounts.length - 1] >= amountOutMin,             
+  'WaultSwapRouter: INSUFFICIENT_OUTPUT_AMOUNT');                               
+            ⋮┆----------------------------------------
+         1140┆ require(amounts[0] <= amountInMax, 'WaultSwapRouter:             
+  EXCESSIVE_INPUT_AMOUNT');                                                     
+            ⋮┆----------------------------------------
+         1172┆ require(amounts[amounts.length - 1] >= amountOutMin,             
+  'WaultSwapRouter: INSUFFICIENT_OUTPUT_AMOUNT');                               
+            ⋮┆----------------------------------------
+         1200┆ require(amounts[0] <= amountInMax, 'WaultSwapRouter:             
+  EXCESSIVE_INPUT_AMOUNT');                                                     
+            ⋮┆----------------------------------------
+         1234┆ require(amounts[amounts.length - 1] >= amountOutMin,             
+  'WaultSwapRouter: INSUFFICIENT_OUTPUT_AMOUNT');                               
+            ⋮┆----------------------------------------
+         1270┆ require(amounts[0] <= msg.value, 'WaultSwapRouter:               
+  EXCESSIVE_INPUT_AMOUNT');                                                     
+            ⋮┆----------------------------------------
+         1350┆ require(
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 83 findings.
+         1351┆ 
+         1352┆     IERC20(path[path.length -                                    
+  1]).balanceOf(to).sub(balanceBefore) >= amountOutMin,                         
+         1353┆ 
+         1354┆     'WaultSwapRouter: INSUFFICIENT_OUTPUT_AMOUNT'
+         1355┆ 
+         1356┆ );
+            ⋮┆----------------------------------------
+         1396┆ require(
+         1397┆ 
+         1398┆     IERC20(path[path.length -                                    
+  1]).balanceOf(to).sub(balanceBefore) >= amountOutMin,                         
+         1399┆ 
+         1400┆     'WaultSwapRouter: INSUFFICIENT_OUTPUT_AMOUNT'
+         1401┆ 
+         1402┆ );
+            ⋮┆----------------------------------------
+         1442┆ require(amountOut >= amountOutMin, 'WaultSwapRouter:             
+  INSUFFICIENT_OUTPUT_AMOUNT');                                                 
+
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

@@ -1,0 +1,304 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 87 Code Findings │
+└──────────────────┘
+                      
+    /sb/DODODrops.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          128┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          137┆ _callOptionalReturn(
+          138┆     token,
+          139┆     abi.encodeWithSelector(token.transferFrom.selector, from, to,
+  value)                                                                        
+          140┆ );
+            ⋮┆----------------------------------------
+          156┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          726┆ for (i = 0; i < _PROB_INTERVAL_.length; i++) {
+            ⋮┆----------------------------------------
+          749┆ for (uint256 i = 0; i < sellingTimeIntervals.length - 1; i++) {
+            ⋮┆----------------------------------------
+          766┆ for (uint256 i = 1; i < probIntervals.length; i++) {
+            ⋮┆----------------------------------------
+          768┆ require(tokenIdMap[i].length > 0, "INVALID");
+            ⋮┆----------------------------------------
+          809┆ for (uint256 i = 0; i < addTokenIdList.length; i++) {
+            ⋮┆----------------------------------------
+          850┆ for (i = 1; i < _SELLING_TIME_INTERVAL_.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+          617┆ uint256 public _REVEAL_RN_ = 0;
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          726┆ for (i = 0; i < _PROB_INTERVAL_.length; i++) {
+            ⋮┆----------------------------------------
+          727┆ if (random <= _PROB_INTERVAL_[i]) {
+            ⋮┆----------------------------------------
+          810┆ _TOKEN_ID_LIST_.push(addTokenIdList[i]);
+            ⋮┆----------------------------------------
+          850┆ for (i = 1; i < _SELLING_TIME_INTERVAL_.length; i++) {
+            ⋮┆----------------------------------------
+          851┆ if (curBlockTime <= _SELLING_TIME_INTERVAL_[i]) {
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          701┆ for (uint256 i = 0; i < ticketNum; i++) {
+            ⋮┆----------------------------------------
+          749┆ for (uint256 i = 0; i < sellingTimeIntervals.length - 1; i++) {
+            ⋮┆----------------------------------------
+          766┆ for (uint256 i = 1; i < probIntervals.length; i++) {
+            ⋮┆----------------------------------------
+          809┆ for (uint256 i = 0; i < addTokenIdList.length; i++) {
+            ⋮┆----------------------------------------
+          866┆ for (uint256 i = 0; i < 4; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           79┆ require(c / a == b, "MUL_ERROR");
+            ⋮┆----------------------------------------
+           85┆ require(b > 0, "DIVIDING_ERROR");
+            ⋮┆----------------------------------------
+          100┆ require(b <= a, "SUB_ERROR");
+            ⋮┆----------------------------------------
+          106┆ require(c >= a, "ADD_ERROR");
+            ⋮┆----------------------------------------
+          152┆ require(
+          153┆     (value == 0) || (token.allowance(address(this), spender) ==  
+  0),                                                                           
+          154┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          155┆ );
+            ⋮┆----------------------------------------
+          177┆ require(success, "SafeERC20: low-level call failed");
+            ⋮┆----------------------------------------
+          182┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          284┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          288┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          345┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          346┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          370┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          394┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          427┆ require(!_ENTERED_, "REENTRANT");
+            ⋮┆----------------------------------------
+          452┆ require(!_INITIALIZED_, "DODO_INITIALIZED");
+            ⋮┆----------------------------------------
+          457┆ require(msg.sender == _OWNER_, "NOT_OWNER");
+            ⋮┆----------------------------------------
+          474┆ require(msg.sender == _NEW_OWNER_, "INVALID_CLAIM");
+            ⋮┆----------------------------------------
+          514┆ require(to != address(0), "TO_ADDRESS_IS_EMPTY");
+            ⋮┆----------------------------------------
+          515┆ require(amount <= balances[msg.sender], "BALANCE_NOT_ENOUGH");
+            ⋮┆----------------------------------------
+          532┆ require(to != address(0), "TO_ADDRESS_IS_EMPTY");
+            ⋮┆----------------------------------------
+          533┆ require(amount <= balances[from], "BALANCE_NOT_ENOUGH");
+            ⋮┆----------------------------------------
+          534┆ require(amount <= allowed[from][msg.sender],                     
+  "ALLOWANCE_NOT_ENOUGH");                                                      
+            ⋮┆----------------------------------------
+          627┆ require(block.timestamp < _SELLING_TIME_INTERVAL_[0] ||          
+  _SELLING_TIME_INTERVAL_[0]  == 0, "ALREADY_START");                           
+            ⋮┆----------------------------------------
+          679┆ require(curPrice > 0 && sellAmount > 0, "CAN_NOT_BUY");
+            ⋮┆----------------------------------------
+          680┆ require(ticketAmount <= sellAmount, "TICKETS_NOT_ENOUGH");
+            ⋮┆----------------------------------------
+          682┆ require(payAmount > 0, "UnQualified");
+            ⋮┆----------------------------------------
+          687┆ require(payAmount <= buyInput, "PAY_AMOUNT_NOT_ENOUGH");
+            ⋮┆----------------------------------------
+          698┆ require(!address(msg.sender).isContract(), "ONLY_ALLOW_EOA");
+            ⋮┆----------------------------------------
+          699┆ require(ticketNum >= 1 && ticketNum <= balanceOf(msg.sender),    
+  "TICKET_NUM_INVALID");                                                        
+            ⋮┆----------------------------------------
+          709┆ require(block.timestamp >= _REDEEM_ALLOWED_TIME_ &&              
+  _REDEEM_ALLOWED_TIME_ != 0, "REDEEM_CLOSE");                                  
+            ⋮┆----------------------------------------
+          718┆ require(_REVEAL_RN_ != 0, "REVEAL_NOT_SET");
+            ⋮┆----------------------------------------
+          731┆ require(_TOKEN_ID_MAP_[i].length > 0, "EMPTY_TOKEN_ID_MAP");
+            ⋮┆----------------------------------------
+          747┆ require(sellingTimeIntervals.length > 0, "PARAM_NOT_INVALID");
+            ⋮┆----------------------------------------
+          748┆ require(sellingTimeIntervals.length == sellingPrice.length &&    
+  sellingPrice.length == sellingAmount.length, "PARAM_NOT_INVALID");            
+            ⋮┆----------------------------------------
+          750┆ require(sellingTimeIntervals[i] < sellingTimeIntervals[i + 1],   
+  "INTERVAL_INVALID");                                                          
+            ⋮┆----------------------------------------
+          751┆ require(sellingPrice[i] != 0, "PRICE_INVALID");
+            ⋮┆----------------------------------------
+          761┆ require(_IS_PROB_MODE_, "ONLY_ALLOW_PROB_MODE");
+            ⋮┆----------------------------------------
+          762┆ require(probIntervals.length > 0, "PARAM_NOT_INVALID");
+            ⋮┆----------------------------------------
+          763┆ require(tokenIdMap.length == probIntervals.length,               
+  "PARAM_NOT_INVALID");                                                         
+            ⋮┆----------------------------------------
+          765┆ require(tokenIdMap[0].length > 0, "INVALID");
+            ⋮┆----------------------------------------
+          767┆ require(probIntervals[i] > probIntervals[i - 1],                 
+  "INTERVAL_INVALID");                                                          
+            ⋮┆----------------------------------------
+          768┆ require(tokenIdMap[i].length > 0, "INVALID");
+            ⋮┆----------------------------------------
+          776┆ require(!_IS_PROB_MODE_, "ONLY_ALLOW_FIXED_AMOUNT_MODE");
+            ⋮┆----------------------------------------
+          777┆ require(tokenIdList.length > 0, "PARAM_NOT_INVALID");
+            ⋮┆----------------------------------------
+          791┆ require(_REVEAL_RN_ == 0, "ALREADY_SET");
+            ⋮┆----------------------------------------
+          816┆ require(_IS_PROB_MODE_, "ONLY_ALLOW_PROB_MODE");
+            ⋮┆----------------------------------------
+          817┆ require(tokenIds.length > 0 && index <                           
+  _TOKEN_ID_MAP_.length,"PARAM_NOT_INVALID");                                   
+            ⋮┆----------------------------------------
+          835┆ require(newRedeemTime > block.timestamp || newRedeemTime == 0,   
+  "PARAM_NOT_INVALID");                                                         
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          679┆ require(curPrice > 0 && sellAmount > 0, "CAN_NOT_BUY");
+            ⋮┆----------------------------------------
+          699┆ require(ticketNum >= 1 && ticketNum <= balanceOf(msg.sender),    
+  "TICKET_NUM_INVALID");                                                        
+            ⋮┆----------------------------------------
+          709┆ require(block.timestamp >= _REDEEM_ALLOWED_TIME_ &&              
+  _REDEEM_ALLOWED_TIME_ != 0, "REDEEM_CLOSE");                                  
+            ⋮┆----------------------------------------
+          748┆ require(sellingTimeIntervals.length == sellingPrice.length &&    
+  sellingPrice.length == sellingAmount.length, "PARAM_NOT_INVALID");            
+            ⋮┆----------------------------------------
+          817┆ require(tokenIds.length > 0 && index <                           
+  _TOKEN_ID_MAP_.length,"PARAM_NOT_INVALID");                                   
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          848┆ if(curBlockTime >= _SELLING_TIME_INTERVAL_[0] &&                 
+  _SELLING_TIME_INTERVAL_[0] != 0) {                                            
+          849┆     uint256 i;
+          850┆     for (i = 1; i < _SELLING_TIME_INTERVAL_.length; i++) {
+          851┆         if (curBlockTime <= _SELLING_TIME_INTERVAL_[i]) {
+          852┆             break;
+          853┆         }
+          854┆     }
+          855┆     curPrice = _SELLING_PRICE_SET_[i-1];
+          856┆     sellAmount = _SELLING_AMOUNT_SET_[i-1];
+          857┆     index = i - 1;
+             [hid 1 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          701┆ for (uint256 i = 0; i < ticketNum; i++) {
+            ⋮┆----------------------------------------
+          726┆ for (i = 0; i < _PROB_INTERVAL_.length; i++) {
+            ⋮┆----------------------------------------
+          749┆ for (uint256 i = 0; i < sellingTimeIntervals.length - 1; i++) {
+            ⋮┆----------------------------------------
+          766┆ for (uint256 i = 1; i < probIntervals.length; i++) {
+            ⋮┆----------------------------------------
+          809┆ for (uint256 i = 0; i < addTokenIdList.length; i++) {
+            ⋮┆----------------------------------------
+          850┆ for (i = 1; i < _SELLING_TIME_INTERVAL_.length; i++) {
+            ⋮┆----------------------------------------
+          866┆ for (uint256 i = 0; i < 4; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          152┆ require(
+          153┆     (value == 0) || (token.allowance(address(this), spender) ==  
+  0),                                                                           
+          154┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          155┆ );
+            ⋮┆----------------------------------------
+          182┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          288┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          345┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          370┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          394┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 87 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

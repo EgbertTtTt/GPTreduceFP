@@ -1,0 +1,137 @@
+'solc --version' running
+'solc /sb/Liquidity_v9(1).sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+Liquidity_v8.emergencyWithdraw() (../../sb/Liquidity_v9(1).sol#401-411) uses a dangerous strict equality:
+	- require(bool,string)(deposits[from].paid == false,Already paid out) (../../sb/Liquidity_v9(1).sol#408)
+Liquidity_v8.withdraw() (../../sb/Liquidity_v9(1).sol#354-364) uses a dangerous strict equality:
+	- require(bool,string)(deposits[from].paid == false,Already paid out) (../../sb/Liquidity_v9(1).sol#361)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Reentrancy in Liquidity_v8._withdraw(address) (../../sb/Liquidity_v9(1).sol#366-383):
+	External calls:
+	- principalPaid = _payDirect(from,amount,tokenAddress) (../../sb/Liquidity_v9(1).sol#377)
+		- ERC20Interface.transfer(to,amount) (../../sb/Liquidity_v9(1).sol#511)
+	- rewardPaid = _payDirect(from,reward,rewardTokenAddress) (../../sb/Liquidity_v9(1).sol#378)
+		- ERC20Interface.transfer(to,amount) (../../sb/Liquidity_v9(1).sol#511)
+	State variables written after the call(s):
+	- rewardPaid = _payDirect(from,reward,rewardTokenAddress) (../../sb/Liquidity_v9(1).sol#378)
+		- ERC20Interface = IERC20(token) (../../sb/Liquidity_v9(1).sol#510)
+	Liquidity_v8.ERC20Interface (../../sb/Liquidity_v9(1).sol#199) can be used in cross function reentrancies:
+	- Liquidity_v8.ERC20Interface (../../sb/Liquidity_v9(1).sol#199)
+	- Liquidity_v8._hasAllowance(address,uint256,address) (../../sb/Liquidity_v9(1).sol#514-524)
+	- Liquidity_v8._payDirect(address,uint256,address) (../../sb/Liquidity_v9(1).sol#505-512)
+	- Liquidity_v8._payTo(address,address,uint256,address) (../../sb/Liquidity_v9(1).sol#492-503)
+	- Liquidity_v8.getPeggedValue() (../../sb/Liquidity_v9(1).sol#388-399)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+Liquidity_v8._calculate(address).interest (../../sb/Liquidity_v9(1).sol#451) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+Liquidity_v8.getPeggedValue() (../../sb/Liquidity_v9(1).sol#388-399) ignores return value by (getReserves,None,None) = ERC20Interface.getReserves() (../../sb/Liquidity_v9(1).sol#392)
+Liquidity_v8.getPeggedValue() (../../sb/Liquidity_v9(1).sol#388-399) ignores return value by (None,getReserves,None) = ERC20Interface.getReserves() (../../sb/Liquidity_v9(1).sol#394)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+Liquidity_v8.changeLockDuration(uint256) (../../sb/Liquidity_v9(1).sol#265-267) should emit an event for: 
+	- lockDuration = lockduration_ (../../sb/Liquidity_v9(1).sol#266) 
+Liquidity_v8.addReward(uint256) (../../sb/Liquidity_v9(1).sol#273-286) should emit an event for: 
+	- rewardBalance = rewardBalance.add(rewardAmount) (../../sb/Liquidity_v9(1).sol#284) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+Reentrancy in Liquidity_v8._stake(address,uint256) (../../sb/Liquidity_v9(1).sol#331-349):
+	External calls:
+	- ! _payMe(staker,amount,tokenAddress) (../../sb/Liquidity_v9(1).sol#332)
+		- ERC20Interface.transferFrom(allower,receiver,amount) (../../sb/Liquidity_v9(1).sol#502)
+	State variables written after the call(s):
+	- deposits[staker] = Deposits(amount,block.timestamp,block.timestamp.add((lockDuration.mul(86400))),index,false) (../../sb/Liquidity_v9(1).sol#336-342)
+	- hasStaked[staker] = true (../../sb/Liquidity_v9(1).sol#335)
+	- stakedBalance = stakedBalance.add(amount) (../../sb/Liquidity_v9(1).sol#346)
+	- stakedTotal = stakedTotal.add(amount) (../../sb/Liquidity_v9(1).sol#347)
+Reentrancy in Liquidity_v8.addReward(uint256) (../../sb/Liquidity_v9(1).sol#273-286):
+	External calls:
+	- ! _payMe(from,rewardAmount,rewardTokenAddress) (../../sb/Liquidity_v9(1).sol#280)
+		- ERC20Interface.transferFrom(allower,receiver,amount) (../../sb/Liquidity_v9(1).sol#502)
+	State variables written after the call(s):
+	- rewardBalance = rewardBalance.add(rewardAmount) (../../sb/Liquidity_v9(1).sol#284)
+	- totalReward = totalReward.add(rewardAmount) (../../sb/Liquidity_v9(1).sol#283)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in Liquidity_v8._emergencyWithdraw(address) (../../sb/Liquidity_v9(1).sol#413-424):
+	External calls:
+	- principalPaid = _payDirect(from,amount,tokenAddress) (../../sb/Liquidity_v9(1).sol#419)
+		- ERC20Interface.transfer(to,amount) (../../sb/Liquidity_v9(1).sol#511)
+	Event emitted after the call(s):
+	- PaidOut(tokenAddress,address(0),from,amount,0) (../../sb/Liquidity_v9(1).sol#421)
+Reentrancy in Liquidity_v8._stake(address,uint256) (../../sb/Liquidity_v9(1).sol#331-349):
+	External calls:
+	- ! _payMe(staker,amount,tokenAddress) (../../sb/Liquidity_v9(1).sol#332)
+		- ERC20Interface.transferFrom(allower,receiver,amount) (../../sb/Liquidity_v9(1).sol#502)
+	Event emitted after the call(s):
+	- Staked(tokenAddress,staker,amount) (../../sb/Liquidity_v9(1).sol#343)
+Reentrancy in Liquidity_v8._withdraw(address) (../../sb/Liquidity_v9(1).sol#366-383):
+	External calls:
+	- principalPaid = _payDirect(from,amount,tokenAddress) (../../sb/Liquidity_v9(1).sol#377)
+		- ERC20Interface.transfer(to,amount) (../../sb/Liquidity_v9(1).sol#511)
+	- rewardPaid = _payDirect(from,reward,rewardTokenAddress) (../../sb/Liquidity_v9(1).sol#378)
+		- ERC20Interface.transfer(to,amount) (../../sb/Liquidity_v9(1).sol#511)
+	Event emitted after the call(s):
+	- PaidOut(tokenAddress,rewardTokenAddress,from,amount,reward) (../../sb/Liquidity_v9(1).sol#380)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Liquidity_v8.withdraw() (../../sb/Liquidity_v9(1).sol#354-364) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp >= deposits[from].endTime,Requesting before lock time) (../../sb/Liquidity_v9(1).sol#357-360)
+	- require(bool,string)(deposits[from].paid == false,Already paid out) (../../sb/Liquidity_v9(1).sol#361)
+Liquidity_v8._withdraw(address) (../../sb/Liquidity_v9(1).sol#366-383) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(reward <= rewardBalance,Not enough rewards) (../../sb/Liquidity_v9(1).sol#370)
+	- require(bool,string)(principalPaid && rewardPaid,Error paying) (../../sb/Liquidity_v9(1).sol#379)
+Liquidity_v8.emergencyWithdraw() (../../sb/Liquidity_v9(1).sol#401-411) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp >= deposits[from].endTime,Requesting before lock time) (../../sb/Liquidity_v9(1).sol#404-407)
+	- require(bool,string)(deposits[from].paid == false,Already paid out) (../../sb/Liquidity_v9(1).sol#408)
+Liquidity_v8._emergencyWithdraw(address) (../../sb/Liquidity_v9(1).sol#413-424) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(principalPaid,Error paying) (../../sb/Liquidity_v9(1).sol#420)
+Liquidity_v8._calculate(address) (../../sb/Liquidity_v9(1).sol#435-482) uses timestamp for comparisons
+	Dangerous comparisons:
+	- i < index (../../sb/Liquidity_v9(1).sol#453)
+	- endTime < rates[i + 1].timeStamp (../../sb/Liquidity_v9(1).sol#455)
+	- depositTime < endTime (../../sb/Liquidity_v9(1).sol#469)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Liquidity_v8.stake(uint256) (../../sb/Liquidity_v9(1).sol#320-329) compares to a boolean constant:
+	-require(bool,string)(hasStaked[from] == false,Already staked) (../../sb/Liquidity_v9(1).sol#327)
+Liquidity_v8.withdraw() (../../sb/Liquidity_v9(1).sol#354-364) compares to a boolean constant:
+	-require(bool,string)(hasStaked[from] == true,No stakes found for user) (../../sb/Liquidity_v9(1).sol#356)
+Liquidity_v8.withdraw() (../../sb/Liquidity_v9(1).sol#354-364) compares to a boolean constant:
+	-require(bool,string)(deposits[from].paid == false,Already paid out) (../../sb/Liquidity_v9(1).sol#361)
+Liquidity_v8.emergencyWithdraw() (../../sb/Liquidity_v9(1).sol#401-411) compares to a boolean constant:
+	-require(bool,string)(hasStaked[from] == true,No stakes found for user) (../../sb/Liquidity_v9(1).sol#403)
+Liquidity_v8.emergencyWithdraw() (../../sb/Liquidity_v9(1).sol#401-411) compares to a boolean constant:
+	-require(bool,string)(deposits[from].paid == false,Already paid out) (../../sb/Liquidity_v9(1).sol#408)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#boolean-equality
+
+Context._msgData() (../../sb/Liquidity_v9(1).sol#110-113) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/Liquidity_v9(1).sol#94-97) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.5.0 (../../sb/Liquidity_v9(1).sol#1) allows old versions
+Pragma version^0.5.0 (../../sb/Liquidity_v9(1).sol#2) allows old versions
+Pragma version^0.5.0 (../../sb/Liquidity_v9(1).sol#3) allows old versions
+Pragma version^0.5.0 (../../sb/Liquidity_v9(1).sol#4) allows old versions
+Pragma version^0.5.0 (../../sb/Liquidity_v9(1).sol#5) allows old versions
+solc-0.5.17 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Contract Liquidity_v8 (../../sb/Liquidity_v9(1).sol#162-525) is not in CapWords
+Variable Liquidity_v8.ERC20Interface (../../sb/Liquidity_v9(1).sol#199) is not in mixedCase
+Modifier Liquidity_v8._hasAllowance(address,uint256,address) (../../sb/Liquidity_v9(1).sol#514-524) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/Liquidity_v9(1).sol#111)" inContext (../../sb/Liquidity_v9(1).sol#101-114)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Variable Liquidity_v8._calculate(address)._lockduration (../../sb/Liquidity_v9(1).sol#452) is too similar to Liquidity_v8.constructor(string,address,address,uint64,uint256).lockDuration_ (../../sb/Liquidity_v9(1).sol#234)
+Variable Liquidity_v8._calculate(address)._lockduration (../../sb/Liquidity_v9(1).sol#452) is too similar to Liquidity_v8.changeLockDuration(uint256).lockduration_ (../../sb/Liquidity_v9(1).sol#265)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+/sb/Liquidity_v9(1).sol analyzed (5 contracts with 93 detectors), 37 result(s) found

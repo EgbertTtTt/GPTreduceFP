@@ -1,0 +1,254 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 50 Code Findings │
+└──────────────────┘
+                         
+    /sb/WadzPayToken.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          449┆ contract WadzPayToken is Context, IERC20, IERC20Metadata, Ownable
+  {                                                                             
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          922┆ for (uint256 i = 0; i < _tgeWhitelistRounds.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+          746┆ _totalSupply += amount;
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+          477┆ uint256 private transferDelay = 0;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          488┆ constructor() {
+          489┆     _name = "WadzPay Token";
+          490┆     _symbol = "WTK";
+          491┆     _mint(msg.sender, 250000000 * (10**uint256(decimals())));
+          492┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          870┆ WhitelistRound storage wlRound = _tgeWhitelistRounds[i];
+            ⋮┆----------------------------------------
+          898┆ _tgeWhitelistRounds[index].addresses[addresses[i]] = enabled;
+            ⋮┆----------------------------------------
+          922┆ for (uint256 i = 0; i < _tgeWhitelistRounds.length; i++) {
+            ⋮┆----------------------------------------
+          924┆ WhitelistRound storage wlRound = _tgeWhitelistRounds[i];
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          869┆ for (uint256 i = 0; i < durations.length; i++) {
+            ⋮┆----------------------------------------
+          897┆ for (uint256 i = 0; i < addresses.length; i++) {
+            ⋮┆----------------------------------------
+          922┆ for (uint256 i = 0; i < _tgeWhitelistRounds.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          176┆ require(owner() == msg.sender, "Ownable: caller is not the       
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          197┆ require(
+          198┆     newOwner != address(0),
+          199┆     "Ownable: new owner is the zero address"
+          200┆ );
+            ⋮┆----------------------------------------
+          615┆ require(
+          616┆     currentAllowance >= amount,
+          617┆     "ERC20: transfer amount exceeds allowance"
+          618┆ );
+            ⋮┆----------------------------------------
+          669┆ require(
+          670┆     currentAllowance >= subtractedValue,
+          671┆     "ERC20: decreased allowance below zero"
+          672┆ );
+            ⋮┆----------------------------------------
+          705┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          706┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          709┆ require(
+          710┆     amount <= (totalSupply() * maxTxPercent) / 1000,
+          711┆     "Overflow max transfer amount"
+          712┆ );
+            ⋮┆----------------------------------------
+          714┆ require(!blackList[sender], "Blacklisted seller");
+            ⋮┆----------------------------------------
+          722┆ require(
+          723┆     senderBalance >= amount,
+          724┆     "ERC20: transfer amount exceeds balance"
+          725┆ );
+            ⋮┆----------------------------------------
+          742┆ require(account != address(0), "ERC20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+          763┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          768┆ require(accountBalance >= amount, "ERC20: burn amount exceeds    
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          793┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          794┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          837┆ require(blackList[_blackListedUser], "This user is not a member  
+  of blacklist");                                                               
+            ⋮┆----------------------------------------
+          861┆ require(durations.length == amountsMax.length, "Invalid          
+  whitelist(s)");                                                               
+            ⋮┆----------------------------------------
+          888┆ require(index < _tgeWhitelistRounds.length, "Invalid index");
+            ⋮┆----------------------------------------
+          889┆ require(amountMax > 0, "Invalid amountMax");
+            ⋮┆----------------------------------------
+          958┆ require(wlRound.addresses[recipient], "TGE - Buyer is not        
+  whitelisted");                                                                
+            ⋮┆----------------------------------------
+          965┆ require(amount <= amountRemaining, "TGE - Amount exceeds         
+  whitelist maximum");                                                          
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          708┆ if (sender != owner() && recipient != owner()) {
+          709┆     require(
+          710┆         amount <= (totalSupply() * maxTxPercent) / 1000,
+          711┆         "Overflow max transfer amount"
+          712┆     );
+          713┆ }
+            ⋮┆----------------------------------------
+          946┆ if(_tgeTimestamp == 0 && sender != _tgePairAddress && recipient  
+  == _tgePairAddress && amount > 0)                                             
+          947┆     _tgeTimestamp = block.timestamp;
+            ⋮┆----------------------------------------
+          949┆ if(sender == _tgePairAddress && recipient != _tgePairAddress) {
+          950┆     //buying
+          951┆ 
+          952┆     (uint256 wlRoundNumber,,,,,) = getTGEWhitelistRound();
+          953┆ 
+          954┆     if(wlRoundNumber > 0) {
+          955┆ 
+          956┆         WhitelistRound storage wlRound =                         
+  _tgeWhitelistRounds[wlRoundNumber.sub(1)];                                    
+          957┆ 
+          958┆         require(wlRound.addresses[recipient], "TGE - Buyer is not
+  whitelisted");                                                                
+             [hid 12 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          869┆ for (uint256 i = 0; i < durations.length; i++) {
+            ⋮┆----------------------------------------
+          897┆ for (uint256 i = 0; i < addresses.length; i++) {
+            ⋮┆----------------------------------------
+          922┆ for (uint256 i = 0; i < _tgeWhitelistRounds.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          197┆ require(
+          198┆     newOwner != address(0),
+          199┆     "Ownable: new owner is the zero address"
+          200┆ );
+            ⋮┆----------------------------------------
+          615┆ require(
+          616┆     currentAllowance >= amount,
+          617┆     "ERC20: transfer amount exceeds allowance"
+          618┆ );
+            ⋮┆----------------------------------------
+          669┆ require(
+          670┆     currentAllowance >= subtractedValue,
+          671┆     "ERC20: decreased allowance below zero"
+          672┆ );
+            ⋮┆----------------------------------------
+          705┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          706┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          722┆ require(
+          723┆     senderBalance >= amount,
+          724┆     "ERC20: transfer amount exceeds balance"
+          725┆ );
+            ⋮┆----------------------------------------
+          763┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          768┆ require(accountBalance >= amount, "ERC20: burn amount exceeds    
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          793┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          794┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          837┆ require(blackList[_blackListedUser], "This user is not a member  
+  of blacklist");                                                               
+            ⋮┆----------------------------------------
+          965┆ require(amount <= amountRemaining, "TGE - Amount exceeds         
+  whitelist maximum");                                                          
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 50 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

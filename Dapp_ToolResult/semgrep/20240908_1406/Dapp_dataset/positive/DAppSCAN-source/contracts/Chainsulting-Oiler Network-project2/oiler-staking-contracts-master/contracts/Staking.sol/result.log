@@ -1,0 +1,179 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 40 Code Findings │
+└──────────────────┘
+                    
+    /sb/Staking.sol 
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+          243┆ totalRewardPoints += expectedStakingRewardPoints;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          179┆ constructor(address oilerToken_, uint256                         
+  stakingDurationInBlocks_, address stakingFundAddress_, uint256                
+  stakingFundAmount_, uint256 vestingDuration_, address ow ... [0m              
+          180┆     require(owner_ != address(0x0), "Owner address cannot be     
+  zero");                                                                       
+          181┆     owner = owner_;
+          182┆ 
+          183┆     require(oilerToken_ != address(0x0), "oilerToken address     
+  cannot be zero");                                                             
+          184┆     oilerToken = IERC20(oilerToken_);
+          185┆ 
+          186┆     stakingProgramEndsBlock = block.number +                     
+  stakingDurationInBlocks_;                                                     
+          187┆     vestingDuration = vestingDuration_;
+          188┆     require(stakingFundAddress_ != address(0x0), "StakingFund    
+  address cannot be zero");                                                     
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+             [hid 8 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          156┆ require(address(poolToken) != address(0x0), "poolToken not set");
+            ⋮┆----------------------------------------
+          165┆ require(msg.sender == owner, "Can only be called by owner");
+            ⋮┆----------------------------------------
+          180┆ require(owner_ != address(0x0), "Owner address cannot be zero");
+            ⋮┆----------------------------------------
+          183┆ require(oilerToken_ != address(0x0), "oilerToken address cannot  
+  be zero");                                                                    
+            ⋮┆----------------------------------------
+          188┆ require(stakingFundAddress_ != address(0x0), "StakingFund address
+  cannot be zero");                                                             
+            ⋮┆----------------------------------------
+          191┆ require(IERC20(oilerToken_).balanceOf(stakingFundAddress_) >=    
+  stakingFundAmount_, "StakingFund doesn't have enough OIL balance");           
+            ⋮┆----------------------------------------
+          192┆ require(IERC20(oilerToken_).allowance(stakingFundAddress_,       
+  address(this)) >= stakingFundAmount_, "StakingFund doesn't have enough        
+  allowance");                                                                  
+            ⋮┆----------------------------------------
+          193┆ require(IERC20(oilerToken_).transferFrom(stakingFundAddress_,    
+  address(this), stakingFundAmount_), "TransferFrom of OIL from StakingFund     
+  failed");                                                                     
+            ⋮┆----------------------------------------
+          200┆ require(address(poolToken) == address(0x0), "poolToken was       
+  already set");                                                                
+            ⋮┆----------------------------------------
+          201┆ require(poolToken_ != address(0x0), "poolToken address cannot be 
+  zero");                                                                       
+            ⋮┆----------------------------------------
+          219┆ require(stakingRewardPoints > 0, "Neither tokenAmount nor        
+  lockingPeriod couldn't be 0");                                                
+            ⋮┆----------------------------------------
+          232┆ require(block.number <= stakingProgramEndsBlock -                
+  lockingPeriodInBlocks_, "Your lock period exceeds Staking Program duration"); 
+            ⋮┆----------------------------------------
+          233┆ require(stakes[msg.sender].tokenAmount == 0, "Already staking");
+            ⋮┆----------------------------------------
+          248┆ require(poolToken.transferFrom(msg.sender, address(this),        
+  tokenAmount_), "TransferFrom of poolTokens failed");                          
+            ⋮┆----------------------------------------
+          262┆ require(stakeAmount != 0, "You don't have a stake to unlock");
+            ⋮┆----------------------------------------
+          264┆ require(block.number > stake.startBlock, "You can't withdraw the 
+  stake in the same block it was locked");                                      
+            ⋮┆----------------------------------------
+          272┆ require(poolToken.transfer(msg.sender, stakeAmount), "Pool token 
+  transfer failed");                                                            
+            ⋮┆----------------------------------------
+          295┆ require(block.number > stakingProgramEndsBlock, "You can only get
+  Rewards after Staking Program ends");                                         
+            ⋮┆----------------------------------------
+          296┆ require(stakes[msg.sender].tokenAmount == 0, "You still have a   
+  stake locked - please unlock first, don't leave free money here");            
+            ⋮┆----------------------------------------
+          297┆ require(rewardPointsEarned[msg.sender] > 0, "You don't have any  
+  rewardPoints");                                                               
+            ⋮┆----------------------------------------
+          326┆ require(amountEarned_ > 0, "You didn't earn any integer amount of
+  wei");                                                                        
+            ⋮┆----------------------------------------
+          327┆ require(recipient_ != address(0), "TokenVesting: beneficiary is  
+  the zero address");                                                           
+            ⋮┆----------------------------------------
+          335┆ require(releasable > 0, "Vesting release: no tokens are due");
+            ⋮┆----------------------------------------
+          338┆ require(oilerToken.transfer(msg.sender, releasable), "Reward     
+  oilers transfer failed");                                                     
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          183┆ require(oilerToken_ != address(0x0), "oilerToken address cannot  
+  be zero");                                                                    
+            ⋮┆----------------------------------------
+          188┆ require(stakingFundAddress_ != address(0x0), "StakingFund address
+  cannot be zero");                                                             
+            ⋮┆----------------------------------------
+          191┆ require(IERC20(oilerToken_).balanceOf(stakingFundAddress_) >=    
+  stakingFundAmount_, "StakingFund doesn't have enough OIL balance");           
+            ⋮┆----------------------------------------
+          192┆ require(IERC20(oilerToken_).allowance(stakingFundAddress_,       
+  address(this)) >= stakingFundAmount_, "StakingFund doesn't have enough        
+  allowance");                                                                  
+            ⋮┆----------------------------------------
+          193┆ require(IERC20(oilerToken_).transferFrom(stakingFundAddress_,    
+  address(this), stakingFundAmount_), "TransferFrom of OIL from StakingFund     
+  failed");                                                                     
+            ⋮┆----------------------------------------
+          219┆ require(stakingRewardPoints > 0, "Neither tokenAmount nor        
+  lockingPeriod couldn't be 0");                                                
+            ⋮┆----------------------------------------
+          232┆ require(block.number <= stakingProgramEndsBlock -                
+  lockingPeriodInBlocks_, "Your lock period exceeds Staking Program duration"); 
+            ⋮┆----------------------------------------
+          248┆ require(poolToken.transferFrom(msg.sender, address(this),        
+  tokenAmount_), "TransferFrom of poolTokens failed");                          
+            ⋮┆----------------------------------------
+          264┆ require(block.number > stake.startBlock, "You can't withdraw the 
+  stake in the same block it was locked");                                      
+            ⋮┆----------------------------------------
+          295┆ require(block.number > stakingProgramEndsBlock, "You can only get
+  Rewards after Staking Program ends");                                         
+            ⋮┆----------------------------------------
+          296┆ require(stakes[msg.sender].tokenAmount == 0, "You still have a   
+  stake locked - please unlock first, don't leave free money here");            
+            ⋮┆----------------------------------------
+          326┆ require(amountEarned_ > 0, "You didn't earn any integer amount of
+  wei");                                                                        
+            ⋮┆----------------------------------------
+          327┆ require(recipient_ != address(0), "TokenVesting: beneficiary is  
+  the zero address");                                                           
+            ⋮┆----------------------------------------
+          335┆ require(releasable > 0, "Vesting release: no tokens are due");
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 40 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

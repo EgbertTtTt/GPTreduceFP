@@ -1,0 +1,210 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 50 Code Findings │
+└──────────────────┘
+                      
+    /sb/Gifto_TGE.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          251┆ for (uint i = 0; i < newInvestorList.length; i++){
+            ⋮┆----------------------------------------
+          261┆ for (uint i = 0; i < investorList.length; i++){
+            ⋮┆----------------------------------------
+          605┆ for (uint i=0; i<owners.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+          633┆ transactionCount += 1;
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+           42┆ bool public _selling = false;//initial not selling
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          252┆ approvedInvestorList[newInvestorList[i]] = true;
+            ⋮┆----------------------------------------
+          262┆ approvedInvestorList[investorList[i]] = false;
+            ⋮┆----------------------------------------
+          276┆ if(approvedInvestorList[buyers[i]]){
+            ⋮┆----------------------------------------
+          276┆ if(approvedInvestorList[buyers[i]]){
+            ⋮┆----------------------------------------
+          278┆ uint256 requestedUnits = (deposit[buyers[i]] * _originalBuyPrice)
+  / 10**18;                                                                     
+            ⋮┆----------------------------------------
+          278┆ uint256 requestedUnits = (deposit[buyers[i]] * _originalBuyPrice)
+  / 10**18;                                                                     
+            ⋮┆----------------------------------------
+          278┆ uint256 requestedUnits = (deposit[buyers[i]] * _originalBuyPrice)
+  / 10**18;                                                                     
+            ⋮┆----------------------------------------
+          281┆ if(requestedUnits <= _icoSupply && requestedUnits > 0 ){
+            ⋮┆----------------------------------------
+          283┆ balances[owner] -= requestedUnits;
+            ⋮┆----------------------------------------
+          283┆ balances[owner] -= requestedUnits;
+            ⋮┆----------------------------------------
+          284┆ balances[buyers[i]] += requestedUnits;
+            ⋮┆----------------------------------------
+          284┆ balances[buyers[i]] += requestedUnits;
+            ⋮┆----------------------------------------
+          285┆ _icoSupply -= requestedUnits;
+            ⋮┆----------------------------------------
+          288┆ Transfer(owner, buyers[i], requestedUnits);
+            ⋮┆----------------------------------------
+          288┆ Transfer(owner, buyers[i], requestedUnits);
+            ⋮┆----------------------------------------
+          291┆ deposit[buyers[i]] = 0;
+            ⋮┆----------------------------------------
+          291┆ deposit[buyers[i]] = 0;
+            ⋮┆----------------------------------------
+          605┆ for (uint i=0; i<owners.length; i++) {
+            ⋮┆----------------------------------------
+          606┆ if (confirmations[transactionId][owners[i]])
+            ⋮┆----------------------------------------
+          606┆ if (confirmations[transactionId][owners[i]])
+            ⋮┆----------------------------------------
+          608┆ if (count == required)
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          251┆ for (uint i = 0; i < newInvestorList.length; i++){
+            ⋮┆----------------------------------------
+          261┆ for (uint i = 0; i < investorList.length; i++){
+            ⋮┆----------------------------------------
+          275┆ for (uint i = a; i <= b; i++){
+            ⋮┆----------------------------------------
+          605┆ for (uint i=0; i<owners.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+           98┆ require(_selling && (_icoSupply > 0) );
+            ⋮┆----------------------------------------
+          118┆ require ( (msg.value >= _minimumBuy) &&
+          119┆         ( (deposit[msg.sender] + msg.value) <= _maximumBuy) );
+            ⋮┆----------------------------------------
+          127┆ require ( (a>=0 && a<=b) &&
+          128┆           (b<buyers.length) );
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          281┆ if(requestedUnits <= _icoSupply && requestedUnits > 0 ){
+          282┆     // prepare transfer data
+          283┆     balances[owner] -= requestedUnits;
+          284┆     balances[buyers[i]] += requestedUnits;
+          285┆     _icoSupply -= requestedUnits;
+          286┆ 
+          287┆     // submit transfer
+          288┆     Transfer(owner, buyers[i], requestedUnits);
+          289┆ 
+          290┆     // reset deposit of buyer
+             [hid 2 additional lines, adjust with --max-lines-per-finding] 
+          307┆ if ( (balances[msg.sender] >= _amount) &&
+          308┆      (_amount >= 0) &&
+          309┆      (balances[_to] + _amount > balances[_to]) ) {
+          310┆ 
+          311┆     balances[msg.sender] -= _amount;
+          312┆     balances[_to] += _amount;
+          313┆     Transfer(msg.sender, _to, _amount);
+          314┆     return true;
+          315┆ } else {
+          316┆     return false;
+             [hid 1 additional lines, adjust with --max-lines-per-finding] 
+          333┆ if (balances[_from] >= _amount
+          334┆     && allowed[_from][msg.sender] >= _amount
+          335┆     && _amount > 0
+          336┆     && balances[_to] + _amount > balances[_to]) {
+          337┆     balances[_from] -= _amount;
+          338┆     allowed[_from][msg.sender] -= _amount;
+          339┆     balances[_to] += _amount;
+          340┆     Transfer(_from, _to, _amount);
+          341┆     return true;
+          342┆ } else {
+             [hid 2 additional lines, adjust with --max-lines-per-finding] 
+          663┆ if (   pending && !transactions[i].executed
+          664┆     || executed && transactions[i].executed)
+          665┆     count += 1;
+            ⋮┆----------------------------------------
+          714┆ if (   pending && !transactions[i].executed
+          715┆     || executed && transactions[i].executed)
+          716┆ {
+          717┆     transactionIdsTemp[count] = i;
+          718┆     count += 1;
+          719┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          251┆ for (uint i = 0; i < newInvestorList.length; i++){
+            ⋮┆----------------------------------------
+          261┆ for (uint i = 0; i < investorList.length; i++){
+            ⋮┆----------------------------------------
+          275┆ for (uint i = a; i <= b; i++){
+            ⋮┆----------------------------------------
+          498┆ for (uint i=0; i<owners.length - 1; i++)
+            ⋮┆----------------------------------------
+          518┆ for (uint i=0; i<owners.length; i++)
+            ⋮┆----------------------------------------
+          605┆ for (uint i=0; i<owners.length; i++) {
+            ⋮┆----------------------------------------
+          648┆ for (uint i=0; i<owners.length; i++)
+            ⋮┆----------------------------------------
+          662┆ for (uint i=0; i<transactionCount; i++)
+            ⋮┆----------------------------------------
+          689┆ for (i=0; i<owners.length; i++)
+            ⋮┆----------------------------------------
+          695┆ for (i=0; i<count; i++)
+            ⋮┆----------------------------------------
+          713┆ for (i=0; i<transactionCount; i++)
+            ⋮┆----------------------------------------
+          721┆ for (i=from; i<to; i++)
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+Some files were skipped or only partially analyzed.
+  Partially scanned: 1 files only partially analyzed due to parsing or internal Semgrep errors
+
+Ran 48 rules on 1 file: 50 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

@@ -1,0 +1,224 @@
+'solc --version' running
+'solc /sb/Exchange.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/Exchange.sol:
+/sb/Exchange.sol:2:1: Warning: Experimental features are turned on. Do not use experimental features on live deployments.
+pragma experimental ABIEncoderV2;
+^-------------------------------^
+
+
+LibMathSigned.wln(int256) (../../sb/Exchange.sol#154-214) performs a multiplication on the result of a division:
+	- m = (longer_fixed_1 * (x - a1_5)) / (x + a1_5) (../../sb/Exchange.sol#201)
+	- r = r + 2 * m (../../sb/Exchange.sol#202)
+LibMathSigned.wln(int256) (../../sb/Exchange.sol#154-214) performs a multiplication on the result of a division:
+	- m = (longer_fixed_1 * (x - a1_5)) / (x + a1_5) (../../sb/Exchange.sol#201)
+	- m2 = (m * m) / longer_fixed_1 (../../sb/Exchange.sol#203)
+LibMathSigned.wln(int256) (../../sb/Exchange.sol#154-214) performs a multiplication on the result of a division:
+	- m = (longer_fixed_1 * (x - a1_5)) / (x + a1_5) (../../sb/Exchange.sol#201)
+	- m2 = (m * m) / longer_fixed_1 (../../sb/Exchange.sol#203)
+	- m = (m * m2) / longer_fixed_1 (../../sb/Exchange.sol#206)
+LibMathSigned.wln(int256) (../../sb/Exchange.sol#154-214) performs a multiplication on the result of a division:
+	- m = (m * m2) / longer_fixed_1 (../../sb/Exchange.sol#206)
+	- r = r + (2 * m) / int256(i) (../../sb/Exchange.sol#207)
+LibMathSigned.wln(int256) (../../sb/Exchange.sol#154-214) performs a multiplication on the result of a division:
+	- x = x * 10 (../../sb/Exchange.sol#162)
+	- x = x / 10 (../../sb/Exchange.sol#166)
+LibMathSigned.ceil(int256,int256) (../../sb/Exchange.sol#221-225) performs a multiplication on the result of a division:
+	- (sub(add(x,m),1) / m) * m (../../sb/Exchange.sol#224)
+LibMathUnsigned.ceil(uint256,uint256) (../../sb/Exchange.sol#303-306) performs a multiplication on the result of a division:
+	- (sub(add(x,m),1) / m) * m (../../sb/Exchange.sol#305)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+Reentrancy in Exchange.matchOrderWithAMM(LibOrder.OrderParam,address,uint256) (../../sb/Exchange.sol#888-916):
+	External calls:
+	- takerOpened = amm.sellFromWhitelisted(takerOrderParam.trader,amount,price,takerOrderParam.getExpiredAt()) (../../sb/Exchange.sol#904-909)
+	- takerOpened = amm.buyFromWhitelisted(takerOrderParam.trader,amount,price,takerOrderParam.getExpiredAt()) (../../sb/Exchange.sol#911)
+	State variables written after the call(s):
+	- filled[takerOrderHash] = filled[takerOrderHash].add(amount) (../../sb/Exchange.sol#913)
+	Exchange.filled (../../sb/Exchange.sol#797) can be used in cross function reentrancies:
+	- Exchange.filled (../../sb/Exchange.sol#797)
+	- Exchange.matchOrderWithAMM(LibOrder.OrderParam,address,uint256) (../../sb/Exchange.sol#888-916)
+	- Exchange.matchOrders(LibOrder.OrderParam,LibOrder.OrderParam[],address,uint256[]) (../../sb/Exchange.sol#809-856)
+	- Exchange.validateOrderParam(IPerpetual,LibOrder.OrderParam) (../../sb/Exchange.sol#930-945)
+Reentrancy in Exchange.matchOrders(LibOrder.OrderParam,LibOrder.OrderParam[],address,uint256[]) (../../sb/Exchange.sol#809-856):
+	External calls:
+	- opened = fillOrder(perpetual,takerOrderParam,makerOrderParams[i],amounts[i]) (../../sb/Exchange.sol#840)
+		- takerOpened = perpetual.tradePosition(takerOrderParam.trader,takerOrderParam.side(),price,amount) (../../sb/Exchange.sol#865)
+		- perpetual.transferCashBalance(trader,msg.sender,fee.toUint256()) (../../sb/Exchange.sol#949)
+		- makerOpened = perpetual.tradePosition(makerOrderParam.trader,makerOrderParam.side(),price,amount) (../../sb/Exchange.sol#866)
+		- perpetual.transferCashBalance(msg.sender,trader,fee.neg().toUint256()) (../../sb/Exchange.sol#951)
+		- available = perpetual.availableMargin(guy) (../../sb/Exchange.sol#980)
+		- require(bool,string)(perpetual.isIMSafe(makerOrderParam.trader),maker margin) (../../sb/Exchange.sol#878)
+		- perpetual.transferCashBalance(guy,devAddress,fee.toUint256()) (../../sb/Exchange.sol#983)
+		- require(bool,string)(perpetual.isSafe(makerOrderParam.trader),maker unsafe) (../../sb/Exchange.sol#880)
+		- perpetual.transferCashBalance(devAddress,guy,fee.neg().toUint256()) (../../sb/Exchange.sol#985)
+		- require(bool,string)(perpetual.isSafe(devAddress),dev unsafe) (../../sb/Exchange.sol#986)
+	State variables written after the call(s):
+	- filled[makerOrderHash] = makerFilledAmount.add(amounts[i]) (../../sb/Exchange.sol#843)
+	Exchange.filled (../../sb/Exchange.sol#797) can be used in cross function reentrancies:
+	- Exchange.filled (../../sb/Exchange.sol#797)
+	- Exchange.matchOrderWithAMM(LibOrder.OrderParam,address,uint256) (../../sb/Exchange.sol#888-916)
+	- Exchange.matchOrders(LibOrder.OrderParam,LibOrder.OrderParam[],address,uint256[]) (../../sb/Exchange.sol#809-856)
+	- Exchange.validateOrderParam(IPerpetual,LibOrder.OrderParam) (../../sb/Exchange.sol#930-945)
+Reentrancy in Exchange.matchOrders(LibOrder.OrderParam,LibOrder.OrderParam[],address,uint256[]) (../../sb/Exchange.sol#809-856):
+	External calls:
+	- opened = fillOrder(perpetual,takerOrderParam,makerOrderParams[i],amounts[i]) (../../sb/Exchange.sol#840)
+		- takerOpened = perpetual.tradePosition(takerOrderParam.trader,takerOrderParam.side(),price,amount) (../../sb/Exchange.sol#865)
+		- perpetual.transferCashBalance(trader,msg.sender,fee.toUint256()) (../../sb/Exchange.sol#949)
+		- makerOpened = perpetual.tradePosition(makerOrderParam.trader,makerOrderParam.side(),price,amount) (../../sb/Exchange.sol#866)
+		- perpetual.transferCashBalance(msg.sender,trader,fee.neg().toUint256()) (../../sb/Exchange.sol#951)
+		- available = perpetual.availableMargin(guy) (../../sb/Exchange.sol#980)
+		- require(bool,string)(perpetual.isIMSafe(makerOrderParam.trader),maker margin) (../../sb/Exchange.sol#878)
+		- perpetual.transferCashBalance(guy,devAddress,fee.toUint256()) (../../sb/Exchange.sol#983)
+		- require(bool,string)(perpetual.isSafe(makerOrderParam.trader),maker unsafe) (../../sb/Exchange.sol#880)
+		- perpetual.transferCashBalance(devAddress,guy,fee.neg().toUint256()) (../../sb/Exchange.sol#985)
+		- require(bool,string)(perpetual.isSafe(devAddress),dev unsafe) (../../sb/Exchange.sol#986)
+	- require(bool,string)(perpetual.isIMSafe(takerOrderParam.trader),taker margin) (../../sb/Exchange.sol#849)
+	- require(bool,string)(perpetual.isSafe(takerOrderParam.trader),maker unsafe) (../../sb/Exchange.sol#851)
+	- require(bool,string)(perpetual.isSafe(msg.sender),broker unsafe) (../../sb/Exchange.sol#853)
+	State variables written after the call(s):
+	- filled[takerOrderHash] = takerFilledAmount (../../sb/Exchange.sol#855)
+	Exchange.filled (../../sb/Exchange.sol#797) can be used in cross function reentrancies:
+	- Exchange.filled (../../sb/Exchange.sol#797)
+	- Exchange.matchOrderWithAMM(LibOrder.OrderParam,address,uint256) (../../sb/Exchange.sol#888-916)
+	- Exchange.matchOrders(LibOrder.OrderParam,LibOrder.OrderParam[],address,uint256[]) (../../sb/Exchange.sol#809-856)
+	- Exchange.validateOrderParam(IPerpetual,LibOrder.OrderParam) (../../sb/Exchange.sol#930-945)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+LibSignature.isValidSignature(LibSignature.OrderSignature,bytes32,address).recovered (../../sb/Exchange.sol#365) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+Exchange.validateOrderParam(IPerpetual,LibOrder.OrderParam) (../../sb/Exchange.sol#930-945) has external calls inside a loop: broker = perpetual.currentBroker(orderParam.trader) (../../sb/Exchange.sol#935)
+Exchange.fillOrder(IPerpetual,LibOrder.OrderParam,LibOrder.OrderParam,uint256) (../../sb/Exchange.sol#858-886) has external calls inside a loop: takerOpened = perpetual.tradePosition(takerOrderParam.trader,takerOrderParam.side(),price,amount) (../../sb/Exchange.sol#865)
+Exchange.fillOrder(IPerpetual,LibOrder.OrderParam,LibOrder.OrderParam,uint256) (../../sb/Exchange.sol#858-886) has external calls inside a loop: makerOpened = perpetual.tradePosition(makerOrderParam.trader,makerOrderParam.side(),price,amount) (../../sb/Exchange.sol#866)
+Exchange.claimTradingFee(IPerpetual,address,int256) (../../sb/Exchange.sol#947-953) has external calls inside a loop: perpetual.transferCashBalance(trader,msg.sender,fee.toUint256()) (../../sb/Exchange.sol#949)
+Exchange.claimTradingFee(IPerpetual,address,int256) (../../sb/Exchange.sol#947-953) has external calls inside a loop: perpetual.transferCashBalance(msg.sender,trader,fee.neg().toUint256()) (../../sb/Exchange.sol#951)
+Exchange.claimTakerDevFee(IPerpetual,address,uint256,uint256,uint256) (../../sb/Exchange.sol#990-999) has external calls inside a loop: rate = perpetual.getGovernance().takerDevFeeRate (../../sb/Exchange.sol#997)
+Exchange.claimDevFee(IPerpetual,address,uint256,uint256,uint256,int256) (../../sb/Exchange.sol#964-988) has external calls inside a loop: devAddress = perpetual.devAddress() (../../sb/Exchange.sol#978)
+Exchange.claimDevFee(IPerpetual,address,uint256,uint256,uint256,int256) (../../sb/Exchange.sol#964-988) has external calls inside a loop: available = perpetual.availableMargin(guy) (../../sb/Exchange.sol#980)
+Exchange.claimDevFee(IPerpetual,address,uint256,uint256,uint256,int256) (../../sb/Exchange.sol#964-988) has external calls inside a loop: perpetual.transferCashBalance(guy,devAddress,fee.toUint256()) (../../sb/Exchange.sol#983)
+Exchange.claimDevFee(IPerpetual,address,uint256,uint256,uint256,int256) (../../sb/Exchange.sol#964-988) has external calls inside a loop: perpetual.transferCashBalance(devAddress,guy,fee.neg().toUint256()) (../../sb/Exchange.sol#985)
+Exchange.claimDevFee(IPerpetual,address,uint256,uint256,uint256,int256) (../../sb/Exchange.sol#964-988) has external calls inside a loop: require(bool,string)(perpetual.isSafe(devAddress),dev unsafe) (../../sb/Exchange.sol#986)
+Exchange.claimMakerDevFee(IPerpetual,address,uint256,uint256,uint256) (../../sb/Exchange.sol#1001-1010) has external calls inside a loop: rate = perpetual.getGovernance().makerDevFeeRate (../../sb/Exchange.sol#1008)
+Exchange.fillOrder(IPerpetual,LibOrder.OrderParam,LibOrder.OrderParam,uint256) (../../sb/Exchange.sol#858-886) has external calls inside a loop: require(bool,string)(perpetual.isIMSafe(makerOrderParam.trader),maker margin) (../../sb/Exchange.sol#878)
+Exchange.fillOrder(IPerpetual,LibOrder.OrderParam,LibOrder.OrderParam,uint256) (../../sb/Exchange.sol#858-886) has external calls inside a loop: require(bool,string)(perpetual.isSafe(makerOrderParam.trader),maker unsafe) (../../sb/Exchange.sol#880)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in Exchange.fillOrder(IPerpetual,LibOrder.OrderParam,LibOrder.OrderParam,uint256) (../../sb/Exchange.sol#858-886):
+	External calls:
+	- takerOpened = perpetual.tradePosition(takerOrderParam.trader,takerOrderParam.side(),price,amount) (../../sb/Exchange.sol#865)
+	- makerOpened = perpetual.tradePosition(makerOrderParam.trader,makerOrderParam.side(),price,amount) (../../sb/Exchange.sol#866)
+	- claimTradingFee(perpetual,takerOrderParam.trader,takerTradingFee) (../../sb/Exchange.sol#870)
+		- perpetual.transferCashBalance(trader,msg.sender,fee.toUint256()) (../../sb/Exchange.sol#949)
+		- perpetual.transferCashBalance(msg.sender,trader,fee.neg().toUint256()) (../../sb/Exchange.sol#951)
+	- claimTradingFee(perpetual,makerOrderParam.trader,makerTradingFee) (../../sb/Exchange.sol#872)
+		- perpetual.transferCashBalance(trader,msg.sender,fee.toUint256()) (../../sb/Exchange.sol#949)
+		- perpetual.transferCashBalance(msg.sender,trader,fee.neg().toUint256()) (../../sb/Exchange.sol#951)
+	- claimTakerDevFee(perpetual,takerOrderParam.trader,price,takerOpened,amount.sub(takerOpened)) (../../sb/Exchange.sol#875)
+		- available = perpetual.availableMargin(guy) (../../sb/Exchange.sol#980)
+		- perpetual.transferCashBalance(guy,devAddress,fee.toUint256()) (../../sb/Exchange.sol#983)
+		- perpetual.transferCashBalance(devAddress,guy,fee.neg().toUint256()) (../../sb/Exchange.sol#985)
+		- require(bool,string)(perpetual.isSafe(devAddress),dev unsafe) (../../sb/Exchange.sol#986)
+	- claimMakerDevFee(perpetual,makerOrderParam.trader,price,makerOpened,amount.sub(makerOpened)) (../../sb/Exchange.sol#876)
+		- available = perpetual.availableMargin(guy) (../../sb/Exchange.sol#980)
+		- perpetual.transferCashBalance(guy,devAddress,fee.toUint256()) (../../sb/Exchange.sol#983)
+		- perpetual.transferCashBalance(devAddress,guy,fee.neg().toUint256()) (../../sb/Exchange.sol#985)
+		- require(bool,string)(perpetual.isSafe(devAddress),dev unsafe) (../../sb/Exchange.sol#986)
+	- require(bool,string)(perpetual.isIMSafe(makerOrderParam.trader),maker margin) (../../sb/Exchange.sol#878)
+	- require(bool,string)(perpetual.isSafe(makerOrderParam.trader),maker unsafe) (../../sb/Exchange.sol#880)
+	Event emitted after the call(s):
+	- MatchWithOrders(address(perpetual),takerOrderParam,makerOrderParam,amount) (../../sb/Exchange.sol#883)
+Reentrancy in Exchange.matchOrderWithAMM(LibOrder.OrderParam,address,uint256) (../../sb/Exchange.sol#888-916):
+	External calls:
+	- takerOpened = amm.sellFromWhitelisted(takerOrderParam.trader,amount,price,takerOrderParam.getExpiredAt()) (../../sb/Exchange.sol#904-909)
+	- takerOpened = amm.buyFromWhitelisted(takerOrderParam.trader,amount,price,takerOrderParam.getExpiredAt()) (../../sb/Exchange.sol#911)
+	Event emitted after the call(s):
+	- MatchWithAMM(_perpetual,takerOrderParam,amount) (../../sb/Exchange.sol#915)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Exchange.validateOrderParam(IPerpetual,LibOrder.OrderParam) (../../sb/Exchange.sol#930-945) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(orderParam.getExpiredAt() >= block.timestamp,order expired) (../../sb/Exchange.sol#938)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+LibOrder.hashOrder(LibOrder.Order) (../../sb/Exchange.sol#462-473) uses assembly
+	- INLINE ASM (../../sb/Exchange.sol#465-471)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+LibMathSigned.ceil(int256,int256) (../../sb/Exchange.sol#221-225) is never used and should be removed
+LibMathSigned.logBase(int256,int256) (../../sb/Exchange.sol#217-219) is never used and should be removed
+LibMathSigned.max(int256,int256) (../../sb/Exchange.sol#95-97) is never used and should be removed
+LibMathSigned.wdiv(int256,int256) (../../sb/Exchange.sol#73-79) is never used and should be removed
+LibMathSigned.wfrac(int256,int256,int256) (../../sb/Exchange.sol#82-89) is never used and should be removed
+LibMathSigned.wln(int256) (../../sb/Exchange.sol#154-214) is never used and should be removed
+LibMathSigned.wpowi(int256,int256) (../../sb/Exchange.sol#107-117) is never used and should be removed
+LibMathUnsigned.WAD() (../../sb/Exchange.sol#232-234) is never used and should be removed
+LibMathUnsigned.ceil(uint256,uint256) (../../sb/Exchange.sol#303-306) is never used and should be removed
+LibMathUnsigned.div(uint256,uint256) (../../sb/Exchange.sol#264-271) is never used and should be removed
+LibMathUnsigned.max(uint256,uint256) (../../sb/Exchange.sol#289-291) is never used and should be removed
+LibMathUnsigned.min(uint256,uint256) (../../sb/Exchange.sol#285-287) is never used and should be removed
+LibMathUnsigned.wfrac(uint256,uint256,uint256) (../../sb/Exchange.sol#281-283) is never used and should be removed
+LibOrder.isMarketBuy(LibOrder.OrderParam) (../../sb/Exchange.sol#496-498) is never used and should be removed
+LibTypes.counterSide(LibTypes.Side) (../../sb/Exchange.sol#527-534) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.5.2 (../../sb/Exchange.sol#1) allows old versions
+solc-0.5.17 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Function LibMathSigned.WAD() (../../sb/Exchange.sol#9-11) is not in mixedCase
+Constant LibMathSigned.fixed_digits (../../sb/Exchange.sol#119) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant LibMathSigned.fixed_1 (../../sb/Exchange.sol#120) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant LibMathSigned.fixed_e (../../sb/Exchange.sol#121) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant LibMathSigned.longer_digits (../../sb/Exchange.sol#122) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant LibMathSigned.longer_fixed_log_e_1_5 (../../sb/Exchange.sol#123) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant LibMathSigned.longer_fixed_1 (../../sb/Exchange.sol#124) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant LibMathSigned.longer_fixed_log_e_10 (../../sb/Exchange.sol#125) is not in UPPER_CASE_WITH_UNDERSCORES
+Function LibMathUnsigned.WAD() (../../sb/Exchange.sol#232-234) is not in mixedCase
+Parameter Exchange.matchOrders(LibOrder.OrderParam,LibOrder.OrderParam[],address,uint256[])._perpetual (../../sb/Exchange.sol#812) is not in mixedCase
+Parameter Exchange.matchOrderWithAMM(LibOrder.OrderParam,address,uint256)._perpetual (../../sb/Exchange.sol#888) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Variable Exchange.matchOrders(LibOrder.OrderParam,LibOrder.OrderParam[],address,uint256[]).makerFilledAmount (../../sb/Exchange.sol#834) is too similar to Exchange.matchOrderWithAMM(LibOrder.OrderParam,address,uint256).takerFilledAmount (../../sb/Exchange.sol#897)
+Variable Exchange.matchOrders(LibOrder.OrderParam,LibOrder.OrderParam[],address,uint256[]).makerFilledAmount (../../sb/Exchange.sol#834) is too similar to Exchange.matchOrders(LibOrder.OrderParam,LibOrder.OrderParam[],address,uint256[]).takerFilledAmount (../../sb/Exchange.sol#822)
+Variable Exchange.fillOrder(IPerpetual,LibOrder.OrderParam,LibOrder.OrderParam,uint256).makerOpened (../../sb/Exchange.sol#866) is too similar to Exchange.matchOrders(LibOrder.OrderParam,LibOrder.OrderParam[],address,uint256[]).takerOpened (../../sb/Exchange.sol#823)
+Variable Exchange.fillOrder(IPerpetual,LibOrder.OrderParam,LibOrder.OrderParam,uint256).makerOpened (../../sb/Exchange.sol#866) is too similar to Exchange.matchOrderWithAMM(LibOrder.OrderParam,address,uint256).takerOpened (../../sb/Exchange.sol#901)
+Variable Exchange.fillOrder(IPerpetual,LibOrder.OrderParam,LibOrder.OrderParam,uint256).makerOpened (../../sb/Exchange.sol#866) is too similar to Exchange.fillOrder(IPerpetual,LibOrder.OrderParam,LibOrder.OrderParam,uint256).takerOpened (../../sb/Exchange.sol#865)
+Variable Exchange.matchOrders(LibOrder.OrderParam,LibOrder.OrderParam[],address,uint256[]).makerOrderHash (../../sb/Exchange.sol#833) is too similar to Exchange.matchOrderWithAMM(LibOrder.OrderParam,address,uint256).takerOrderHash (../../sb/Exchange.sol#896)
+Variable Exchange.matchOrders(LibOrder.OrderParam,LibOrder.OrderParam[],address,uint256[]).makerOrderHash (../../sb/Exchange.sol#833) is too similar to Exchange.matchOrders(LibOrder.OrderParam,LibOrder.OrderParam[],address,uint256[]).takerOrderHash (../../sb/Exchange.sol#821)
+Variable Exchange.fillOrder(IPerpetual,LibOrder.OrderParam,LibOrder.OrderParam,uint256).makerOrderParam (../../sb/Exchange.sol#861) is too similar to Exchange.matchOrderWithAMM(LibOrder.OrderParam,address,uint256).takerOrderParam (../../sb/Exchange.sol#888)
+Variable Exchange.fillOrder(IPerpetual,LibOrder.OrderParam,LibOrder.OrderParam,uint256).makerOrderParam (../../sb/Exchange.sol#861) is too similar to Exchange.fillOrder(IPerpetual,LibOrder.OrderParam,LibOrder.OrderParam,uint256).takerOrderParam (../../sb/Exchange.sol#860)
+Variable Exchange.validatePrice(LibOrder.OrderParam,LibOrder.OrderParam).makerOrderParam (../../sb/Exchange.sol#918) is too similar to Exchange.matchOrders(LibOrder.OrderParam,LibOrder.OrderParam[],address,uint256[]).takerOrderParam (../../sb/Exchange.sol#810)
+Variable Exchange.validatePrice(LibOrder.OrderParam,LibOrder.OrderParam).makerOrderParam (../../sb/Exchange.sol#918) is too similar to Exchange.validatePrice(LibOrder.OrderParam,LibOrder.OrderParam).takerOrderParam (../../sb/Exchange.sol#918)
+Variable Exchange.validatePrice(LibOrder.OrderParam,LibOrder.OrderParam).makerOrderParam (../../sb/Exchange.sol#918) is too similar to Exchange.matchOrderWithAMM(LibOrder.OrderParam,address,uint256).takerOrderParam (../../sb/Exchange.sol#888)
+Variable Exchange.validatePrice(LibOrder.OrderParam,LibOrder.OrderParam).makerOrderParam (../../sb/Exchange.sol#918) is too similar to Exchange.fillOrder(IPerpetual,LibOrder.OrderParam,LibOrder.OrderParam,uint256).takerOrderParam (../../sb/Exchange.sol#860)
+Variable Exchange.fillOrder(IPerpetual,LibOrder.OrderParam,LibOrder.OrderParam,uint256).makerOrderParam (../../sb/Exchange.sol#861) is too similar to Exchange.matchOrders(LibOrder.OrderParam,LibOrder.OrderParam[],address,uint256[]).takerOrderParam (../../sb/Exchange.sol#810)
+Variable Exchange.fillOrder(IPerpetual,LibOrder.OrderParam,LibOrder.OrderParam,uint256).makerOrderParam (../../sb/Exchange.sol#861) is too similar to Exchange.validatePrice(LibOrder.OrderParam,LibOrder.OrderParam).takerOrderParam (../../sb/Exchange.sol#918)
+Variable Exchange.fillOrder(IPerpetual,LibOrder.OrderParam,LibOrder.OrderParam,uint256).makerTradingFee (../../sb/Exchange.sol#871) is too similar to Exchange.fillOrder(IPerpetual,LibOrder.OrderParam,LibOrder.OrderParam,uint256).takerTradingFee (../../sb/Exchange.sol#869)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+LibMathSigned.wln(int256) (../../sb/Exchange.sol#154-214) uses literals with too many digits:
+	- require(bool,string)(x <= 10000000000000000000000000000000000000000,logE only accepts v <= 1e22 * 1e18) (../../sb/Exchange.sol#156)
+LibMathSigned.slitherConstructorConstantVariables() (../../sb/Exchange.sol#5-226) uses literals with too many digits:
+	- fixed_1 = 1000000000000000000 (../../sb/Exchange.sol#120)
+LibMathSigned.slitherConstructorConstantVariables() (../../sb/Exchange.sol#5-226) uses literals with too many digits:
+	- longer_fixed_1 = 1000000000000000000000000000000000000 (../../sb/Exchange.sol#124)
+LibOrder.slitherConstructorConstantVariables() (../../sb/Exchange.sol#386-519) uses literals with too many digits:
+	- FEE_RATE_BASE = 100000 (../../sb/Exchange.sol#396)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+matchOrders(LibOrder.OrderParam,LibOrder.OrderParam[],address,uint256[]) should be declared external:
+	- Exchange.matchOrders(LibOrder.OrderParam,LibOrder.OrderParam[],address,uint256[]) (../../sb/Exchange.sol#809-856)
+Moreover, the following function parameters should change its data location:
+takerOrderParam location should be calldata
+makerOrderParams location should be calldata
+amounts location should be calldata
+matchOrderWithAMM(LibOrder.OrderParam,address,uint256) should be declared external:
+	- Exchange.matchOrderWithAMM(LibOrder.OrderParam,address,uint256) (../../sb/Exchange.sol#888-916)
+Moreover, the following function parameters should change its data location:
+takerOrderParam location should be calldata
+cancelOrder(LibOrder.Order) should be declared external:
+	- Exchange.cancelOrder(LibOrder.Order) (../../sb/Exchange.sol#955-962)
+Moreover, the following function parameters should change its data location:
+order location should be calldata
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#public-function-that-could-be-declared-external
+/sb/Exchange.sol analyzed (10 contracts with 93 detectors), 80 result(s) found

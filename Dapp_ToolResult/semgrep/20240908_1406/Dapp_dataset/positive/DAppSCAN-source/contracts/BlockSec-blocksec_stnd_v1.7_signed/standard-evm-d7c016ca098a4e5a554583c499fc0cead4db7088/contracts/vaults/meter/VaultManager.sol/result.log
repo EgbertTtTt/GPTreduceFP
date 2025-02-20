@@ -1,0 +1,294 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 67 Code Findings │
+└──────────────────┘
+                         
+    /sb/VaultManager.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          760┆ (bool success, bytes memory data) =                              
+  token.call(abi.encodeWithSelector(0x095ea7b3, to, value));                    
+            ⋮┆----------------------------------------
+          766┆ (bool success, bytes memory data) =                              
+  token.call(abi.encodeWithSelector(0xa9059cbb, to, value));                    
+            ⋮┆----------------------------------------
+          772┆ (bool success, bytes memory data) =                              
+  token.call(abi.encodeWithSelector(0x23b872dd, from, to, value));              
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          726┆ constructor() {
+          727┆     _setupRole(ORACLE_OPERATOR_ROLE, _msgSender());
+          728┆ }
+            ⋮┆----------------------------------------
+          932┆ constructor() public {
+          933┆   factory = msg.sender;
+          934┆   createdAt = block.timestamp;
+          935┆ }
+            ⋮┆----------------------------------------
+         1249┆ constructor() {
+         1250┆     _setupRole(ORACLE_OPERATOR_ROLE, _msgSender());
+         1251┆     _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
+         1252┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          135┆ require(set._values.length > index, "EnumerableSet: index out of 
+  bounds");                                                                     
+            ⋮┆----------------------------------------
+          352┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          356┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          413┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          414┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          438┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          462┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          637┆ require(hasRole(_roles[role].adminRole, _msgSender()),           
+  "AccessControl: sender must be an admin to grant");                           
+            ⋮┆----------------------------------------
+          652┆ require(hasRole(_roles[role].adminRole, _msgSender()),           
+  "AccessControl: sender must be an admin to revoke");                          
+            ⋮┆----------------------------------------
+          672┆ require(account == _msgSender(), "AccessControl: can only        
+  renounce roles for self");                                                    
+            ⋮┆----------------------------------------
+          732┆ require(
+          733┆     aggregator != address(0x0),
+          734┆     "VAULT: Asset not registered"
+          735┆ );
+            ⋮┆----------------------------------------
+          741┆ require(
+          742┆     hasRole(ORACLE_OPERATOR_ROLE, msg.sender),
+          743┆     "Meter: Caller is not an Oracle Operator"
+          744┆ );
+            ⋮┆----------------------------------------
+          761┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), "AF");                                                              
+            ⋮┆----------------------------------------
+          767┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), "TF");                                                              
+            ⋮┆----------------------------------------
+          773┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), "TFF");                                                             
+            ⋮┆----------------------------------------
+          778┆ require(success, "ETF");
+            ⋮┆----------------------------------------
+          938┆ require(
+          939┆   IERC721Minimal(v1).ownerOf(vaultId) == msg.sender,
+          940┆   "Vault: Vault is not owned by you"
+          941┆ );
+            ⋮┆----------------------------------------
+          956┆ require(msg.sender == factory, "Vault: FORBIDDEN"); // sufficient
+  check                                                                         
+            ⋮┆----------------------------------------
+          987┆ require(
+          988┆   !IVaultManager(manager).isValidCDP(
+          989┆     collateral,
+          990┆     debt,
+          991┆     IERC20Minimal(collateral).balanceOf(address(this)),
+          992┆     IERC20Minimal(debt).balanceOf(address(this))
+          993┆   ),
+          994┆   "Vault: Position is still safe"
+          995┆ );
+            ⋮┆----------------------------------------
+         1001┆ require(pair != address(0), "Vault: Liquidating pair not         
+  supported");                                                                  
+            ⋮┆----------------------------------------
+         1017┆ require(collateral == WETH, "Vault: collateral is not a native   
+  asset");                                                                      
+            ⋮┆----------------------------------------
+         1040┆ require(collateral == WETH, "Vault: collateral is not a native   
+  asset");                                                                      
+            ⋮┆----------------------------------------
+         1042┆ require(
+         1043┆   IVaultManager(manager).isValidCDP(
+         1044┆     collateral,
+         1045┆     debt,
+         1046┆     IERC20Minimal(collateral).balanceOf(address(this)) - amount_,
+         1047┆     borrow
+         1048┆   ),
+         1049┆   "Vault: below MCR"
+         1050┆ );
+            ⋮┆----------------------------------------
+         1064┆ require(
+         1065┆   IERC20Minimal(collateral).balanceOf(address(this)) >= amount_,
+         1066┆   "Vault: Not enough collateral"
+         1067┆ );
+            ⋮┆----------------------------------------
+         1070┆ require(
+         1071┆   IVaultManager(manager).isValidCDP(collateral,debt,test,borrow) 
+  == true,                                                                      
+         1072┆   "Vault: below MCR"
+         1073┆ );
+            ⋮┆----------------------------------------
+         1087┆ require(IVaultManager(manager).isValidCDP(collateral, debt,      
+  cAmount_+ deposits, dAmount_), "IP"); // Invalid Position                     
+            ⋮┆----------------------------------------
+         1089┆ require(IVaultManager(manager).isValidSupply(dAmount_), "RB"); //
+  Rebase limited mtr borrow                                                     
+            ⋮┆----------------------------------------
+         1102┆ require(IVaultManager(manager).isValidCDP(collateral, debt,      
+  msg.value + deposits, dAmount_), "IP"); // Invalid Position                   
+            ⋮┆----------------------------------------
+         1104┆ require(IVaultManager(manager).isValidSupply(dAmount_), "RB"); //
+  Rebase limited mtr borrow                                                     
+            ⋮┆----------------------------------------
+         1114┆ require(amount_ != 0, "Vault: amount is zero");
+            ⋮┆----------------------------------------
+         1126┆ require(fee + borrow == amount_, "Vault: not enough balance to   
+  payback");                                                                    
+            ⋮┆----------------------------------------
+         1255┆ require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "IA"); //     
+  Invalid Access                                                                
+            ⋮┆----------------------------------------
+         1265┆ require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "IA"); //     
+  Invalid Access                                                                
+            ⋮┆----------------------------------------
+         1271┆ require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "IA"); //     
+  Invalid Access                                                                
+            ⋮┆----------------------------------------
+         1279┆ require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "IA"); //     
+  Invalid Access                                                                
+            ⋮┆----------------------------------------
+         1287┆ require(IsOpen[collateral_], "VAULTMANAGER: NOT OPEN");
+            ⋮┆----------------------------------------
+         1289┆ require(isValidCDP(collateral_, stablecoin, cAmount_, dAmount_)
+         1290┆ , "IP"); // Invalid Position
+            ⋮┆----------------------------------------
+         1292┆ require(isValidSupply(dAmount_), "RB"); // Rebase limited mtr    
+  borrow                                                                        
+            ⋮┆----------------------------------------
+         1295┆ require(vlt != address(0), "VAULTMANAGER: FE"); // Factory error
+            ⋮┆----------------------------------------
+         1307┆ require(IsOpen[WETH], "VAULTMANAGER: NOT OPEN");
+            ⋮┆----------------------------------------
+         1309┆ require(isValidCDP(WETH, stablecoin, msg.value, dAmount_)
+         1310┆ , "IP"); // Invalid Position
+            ⋮┆----------------------------------------
+         1312┆ require(isValidSupply(dAmount_), "RB"); // Rebase limited mtr    
+  borrow                                                                        
+            ⋮┆----------------------------------------
+         1315┆ require(vlt != address(0), "VAULTMANAGER: FE"); // Factory error
+            ⋮┆----------------------------------------
+         1396┆ require(
+         1397┆     aggregator != address(0x0),
+         1398┆     "VAULT: Asset not registered"
+         1399┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          761┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), "AF");                                                              
+            ⋮┆----------------------------------------
+          767┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), "TF");                                                              
+            ⋮┆----------------------------------------
+          773┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), "TFF");                                                             
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         1180┆ } else if (dividendOn && treasuryOn) {
+         1181┆   uint256 third = fee_ / 3;
+         1182┆   TransferHelper.safeTransfer(asset_, dividend, third);
+         1183┆   TransferHelper.safeTransfer(asset_, feeTo, third);
+         1184┆   TransferHelper.safeTransfer(asset_, treasury, third);
+         1185┆ } else {
+         1186┆   TransferHelper.safeTransfer(asset_, feeTo, fee_);
+         1187┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          135┆ require(set._values.length > index, "EnumerableSet: index out of 
+  bounds");                                                                     
+            ⋮┆----------------------------------------
+          356┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          413┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          438┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          462┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          637┆ require(hasRole(_roles[role].adminRole, _msgSender()),           
+  "AccessControl: sender must be an admin to grant");                           
+            ⋮┆----------------------------------------
+          652┆ require(hasRole(_roles[role].adminRole, _msgSender()),           
+  "AccessControl: sender must be an admin to revoke");                          
+            ⋮┆----------------------------------------
+          672┆ require(account == _msgSender(), "AccessControl: can only        
+  renounce roles for self");                                                    
+            ⋮┆----------------------------------------
+          741┆ require(
+          742┆     hasRole(ORACLE_OPERATOR_ROLE, msg.sender),
+          743┆     "Meter: Caller is not an Oracle Operator"
+          744┆ );
+            ⋮┆----------------------------------------
+         1001┆ require(pair != address(0), "Vault: Liquidating pair not         
+  supported");                                                                  
+            ⋮┆----------------------------------------
+         1017┆ require(collateral == WETH, "Vault: collateral is not a native   
+  asset");                                                                      
+            ⋮┆----------------------------------------
+         1040┆ require(collateral == WETH, "Vault: collateral is not a native   
+  asset");                                                                      
+            ⋮┆----------------------------------------
+         1126┆ require(fee + borrow == amount_, "Vault: not enough balance to   
+  payback");                                                                    
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 67 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

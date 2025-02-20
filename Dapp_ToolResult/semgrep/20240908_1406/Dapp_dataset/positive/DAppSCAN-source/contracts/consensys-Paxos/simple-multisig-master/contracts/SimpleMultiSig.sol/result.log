@@ -1,0 +1,96 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 12 Code Findings │
+└──────────────────┘
+                           
+    /sb/SimpleMultiSig.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+           34┆ for (uint i = 0; i < owners_.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+           30┆ constructor(uint threshold_, address[] owners_, uint chainId)    
+  public {                                                                      
+           31┆   require(owners_.length <= 10 && threshold_ <= owners_.length &&
+  threshold_ > 0);                                                              
+           32┆ 
+           33┆   address lastAdd = address(0);
+           34┆   for (uint i = 0; i < owners_.length; i++) {
+           35┆     require(owners_[i] > lastAdd);
+           36┆     isOwner[owners_[i]] = true;
+           37┆     lastAdd = owners_[i];
+           38┆   }
+           39┆   ownersArr = owners_;
+             [hid 9 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+           36┆ isOwner[owners_[i]] = true;
+            ⋮┆----------------------------------------
+           61┆ for (uint i = 0; i < threshold; i++) {
+            ⋮┆----------------------------------------
+           63┆ require(recovered > lastAdd && isOwner[recovered]);
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+           34┆ for (uint i = 0; i < owners_.length; i++) {
+            ⋮┆----------------------------------------
+           61┆ for (uint i = 0; i < threshold; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+           31┆ require(owners_.length <= 10 && threshold_ <= owners_.length &&  
+  threshold_ > 0);                                                              
+            ⋮┆----------------------------------------
+           53┆ require(sigR.length == sigS.length && sigR.length ==             
+  sigV.length);                                                                 
+            ⋮┆----------------------------------------
+           63┆ require(recovered > lastAdd && isOwner[recovered]);
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+           34┆ for (uint i = 0; i < owners_.length; i++) {
+            ⋮┆----------------------------------------
+           61┆ for (uint i = 0; i < threshold; i++) {
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 12 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

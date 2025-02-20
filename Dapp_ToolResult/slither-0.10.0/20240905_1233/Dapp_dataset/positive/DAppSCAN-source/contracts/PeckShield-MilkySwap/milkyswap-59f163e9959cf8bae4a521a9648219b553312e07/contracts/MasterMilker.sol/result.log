@@ -1,0 +1,321 @@
+'solc --version' running
+'solc /sb/MasterMilker.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/MasterMilker.sol:
+Warning: Documentation tag on non-public state variables will be disallowed in 0.7.0. You will need to use the @dev tag explicitly.
+    --> /sb/MasterMilker.sol:1238:5:
+     |
+1238 |     /// @notice A record of each accounts delegate
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+MasterMilker.pendingMilky(uint256,address) (../../sb/MasterMilker.sol#1592-1613) performs a multiplication on the result of a division:
+	- milkyReward = multiplier.mul(milkyPerBlock).mul(pool.allocPoint).div(totalAllocPoint) (../../sb/MasterMilker.sol#1604-1607)
+	- accMilkyPerShare = accMilkyPerShare.add(milkyReward.mul(1e12).div(lpSupply)) (../../sb/MasterMilker.sol#1608-1610)
+MasterMilker.updatePool(uint256) (../../sb/MasterMilker.sol#1624-1645) performs a multiplication on the result of a division:
+	- milkyReward = multiplier.mul(milkyPerBlock).mul(pool.allocPoint).div(totalAllocPoint) (../../sb/MasterMilker.sol#1635-1638)
+	- pool.accMilkyPerShare = pool.accMilkyPerShare.add(milkyReward.mul(1e12).div(lpSupply)) (../../sb/MasterMilker.sol#1641-1643)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+MilkyToken._writeCheckpoint(address,uint32,uint256,uint256) (../../sb/MasterMilker.sol#1431-1449) uses a dangerous strict equality:
+	- nCheckpoints > 0 && checkpoints[delegatee][nCheckpoints - 1].fromBlock == blockNumber (../../sb/MasterMilker.sol#1441)
+MasterMilker.updatePool(uint256) (../../sb/MasterMilker.sol#1624-1645) uses a dangerous strict equality:
+	- lpSupply == 0 (../../sb/MasterMilker.sol#1630)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Reentrancy in MasterMilker.add(uint256,IERC20) (../../sb/MasterMilker.sol#1543-1559):
+	External calls:
+	- massUpdatePools() (../../sb/MasterMilker.sol#1547)
+		- milky.mint(devaddr,milkyReward.div(10)) (../../sb/MasterMilker.sol#1639)
+		- milky.mint(address(this),milkyReward) (../../sb/MasterMilker.sol#1640)
+	State variables written after the call(s):
+	- poolInfo.push(PoolInfo({lpToken:_lpToken,allocPoint:_allocPoint,lastRewardBlock:lastRewardBlock,accMilkyPerShare:0})) (../../sb/MasterMilker.sol#1551-1558)
+	MasterMilker.poolInfo (../../sb/MasterMilker.sol#1507) can be used in cross function reentrancies:
+	- MasterMilker.add(uint256,IERC20) (../../sb/MasterMilker.sol#1543-1559)
+	- MasterMilker.deposit(uint256,uint256) (../../sb/MasterMilker.sol#1648-1667)
+	- MasterMilker.emergencyWithdraw(uint256) (../../sb/MasterMilker.sol#1688-1695)
+	- MasterMilker.massUpdatePools() (../../sb/MasterMilker.sol#1616-1621)
+	- MasterMilker.pendingMilky(uint256,address) (../../sb/MasterMilker.sol#1592-1613)
+	- MasterMilker.poolInfo (../../sb/MasterMilker.sol#1507)
+	- MasterMilker.poolLength() (../../sb/MasterMilker.sol#1537-1539)
+	- MasterMilker.set(uint256,uint256) (../../sb/MasterMilker.sol#1562-1571)
+	- MasterMilker.updatePool(uint256) (../../sb/MasterMilker.sol#1624-1645)
+	- MasterMilker.withdraw(uint256,uint256) (../../sb/MasterMilker.sol#1670-1684)
+	- totalAllocPoint = totalAllocPoint.add(_allocPoint) (../../sb/MasterMilker.sol#1550)
+	MasterMilker.totalAllocPoint (../../sb/MasterMilker.sol#1511) can be used in cross function reentrancies:
+	- MasterMilker.add(uint256,IERC20) (../../sb/MasterMilker.sol#1543-1559)
+	- MasterMilker.pendingMilky(uint256,address) (../../sb/MasterMilker.sol#1592-1613)
+	- MasterMilker.set(uint256,uint256) (../../sb/MasterMilker.sol#1562-1571)
+	- MasterMilker.totalAllocPoint (../../sb/MasterMilker.sol#1511)
+	- MasterMilker.updatePool(uint256) (../../sb/MasterMilker.sol#1624-1645)
+Reentrancy in MasterMilker.deposit(uint256,uint256) (../../sb/MasterMilker.sol#1648-1667):
+	External calls:
+	- updatePool(_pid) (../../sb/MasterMilker.sol#1651)
+		- milky.mint(devaddr,milkyReward.div(10)) (../../sb/MasterMilker.sol#1639)
+		- milky.mint(address(this),milkyReward) (../../sb/MasterMilker.sol#1640)
+	- safeMilkyTransfer(msg.sender,pending) (../../sb/MasterMilker.sol#1657)
+		- assert(bool)(milky.transfer(_to,milkyBal)) (../../sb/MasterMilker.sol#1701)
+		- assert(bool)(milky.transfer(_to,_amount)) (../../sb/MasterMilker.sol#1703)
+	- pool.lpToken.safeTransferFrom(address(msg.sender),address(this),_amount) (../../sb/MasterMilker.sol#1659-1663)
+	State variables written after the call(s):
+	- user.amount = user.amount.add(_amount) (../../sb/MasterMilker.sol#1664)
+	MasterMilker.userInfo (../../sb/MasterMilker.sol#1509) can be used in cross function reentrancies:
+	- MasterMilker.deposit(uint256,uint256) (../../sb/MasterMilker.sol#1648-1667)
+	- MasterMilker.emergencyWithdraw(uint256) (../../sb/MasterMilker.sol#1688-1695)
+	- MasterMilker.pendingMilky(uint256,address) (../../sb/MasterMilker.sol#1592-1613)
+	- MasterMilker.userInfo (../../sb/MasterMilker.sol#1509)
+	- MasterMilker.withdraw(uint256,uint256) (../../sb/MasterMilker.sol#1670-1684)
+	- user.rewardDebt = user.amount.mul(pool.accMilkyPerShare).div(1e12) (../../sb/MasterMilker.sol#1665)
+	MasterMilker.userInfo (../../sb/MasterMilker.sol#1509) can be used in cross function reentrancies:
+	- MasterMilker.deposit(uint256,uint256) (../../sb/MasterMilker.sol#1648-1667)
+	- MasterMilker.emergencyWithdraw(uint256) (../../sb/MasterMilker.sol#1688-1695)
+	- MasterMilker.pendingMilky(uint256,address) (../../sb/MasterMilker.sol#1592-1613)
+	- MasterMilker.userInfo (../../sb/MasterMilker.sol#1509)
+	- MasterMilker.withdraw(uint256,uint256) (../../sb/MasterMilker.sol#1670-1684)
+Reentrancy in MasterMilker.emergencyWithdraw(uint256) (../../sb/MasterMilker.sol#1688-1695):
+	External calls:
+	- pool.lpToken.safeTransfer(address(msg.sender),user.amount) (../../sb/MasterMilker.sol#1692)
+	State variables written after the call(s):
+	- user.amount = 0 (../../sb/MasterMilker.sol#1693)
+	MasterMilker.userInfo (../../sb/MasterMilker.sol#1509) can be used in cross function reentrancies:
+	- MasterMilker.deposit(uint256,uint256) (../../sb/MasterMilker.sol#1648-1667)
+	- MasterMilker.emergencyWithdraw(uint256) (../../sb/MasterMilker.sol#1688-1695)
+	- MasterMilker.pendingMilky(uint256,address) (../../sb/MasterMilker.sol#1592-1613)
+	- MasterMilker.userInfo (../../sb/MasterMilker.sol#1509)
+	- MasterMilker.withdraw(uint256,uint256) (../../sb/MasterMilker.sol#1670-1684)
+	- user.rewardDebt = 0 (../../sb/MasterMilker.sol#1694)
+	MasterMilker.userInfo (../../sb/MasterMilker.sol#1509) can be used in cross function reentrancies:
+	- MasterMilker.deposit(uint256,uint256) (../../sb/MasterMilker.sol#1648-1667)
+	- MasterMilker.emergencyWithdraw(uint256) (../../sb/MasterMilker.sol#1688-1695)
+	- MasterMilker.pendingMilky(uint256,address) (../../sb/MasterMilker.sol#1592-1613)
+	- MasterMilker.userInfo (../../sb/MasterMilker.sol#1509)
+	- MasterMilker.withdraw(uint256,uint256) (../../sb/MasterMilker.sol#1670-1684)
+Reentrancy in MasterMilker.set(uint256,uint256) (../../sb/MasterMilker.sol#1562-1571):
+	External calls:
+	- massUpdatePools() (../../sb/MasterMilker.sol#1566)
+		- milky.mint(devaddr,milkyReward.div(10)) (../../sb/MasterMilker.sol#1639)
+		- milky.mint(address(this),milkyReward) (../../sb/MasterMilker.sol#1640)
+	State variables written after the call(s):
+	- poolInfo[_pid].allocPoint = _allocPoint (../../sb/MasterMilker.sol#1570)
+	MasterMilker.poolInfo (../../sb/MasterMilker.sol#1507) can be used in cross function reentrancies:
+	- MasterMilker.add(uint256,IERC20) (../../sb/MasterMilker.sol#1543-1559)
+	- MasterMilker.deposit(uint256,uint256) (../../sb/MasterMilker.sol#1648-1667)
+	- MasterMilker.emergencyWithdraw(uint256) (../../sb/MasterMilker.sol#1688-1695)
+	- MasterMilker.massUpdatePools() (../../sb/MasterMilker.sol#1616-1621)
+	- MasterMilker.pendingMilky(uint256,address) (../../sb/MasterMilker.sol#1592-1613)
+	- MasterMilker.poolInfo (../../sb/MasterMilker.sol#1507)
+	- MasterMilker.poolLength() (../../sb/MasterMilker.sol#1537-1539)
+	- MasterMilker.set(uint256,uint256) (../../sb/MasterMilker.sol#1562-1571)
+	- MasterMilker.updatePool(uint256) (../../sb/MasterMilker.sol#1624-1645)
+	- MasterMilker.withdraw(uint256,uint256) (../../sb/MasterMilker.sol#1670-1684)
+	- totalAllocPoint = totalAllocPoint.sub(poolInfo[_pid].allocPoint).add(_allocPoint) (../../sb/MasterMilker.sol#1567-1569)
+	MasterMilker.totalAllocPoint (../../sb/MasterMilker.sol#1511) can be used in cross function reentrancies:
+	- MasterMilker.add(uint256,IERC20) (../../sb/MasterMilker.sol#1543-1559)
+	- MasterMilker.pendingMilky(uint256,address) (../../sb/MasterMilker.sol#1592-1613)
+	- MasterMilker.set(uint256,uint256) (../../sb/MasterMilker.sol#1562-1571)
+	- MasterMilker.totalAllocPoint (../../sb/MasterMilker.sol#1511)
+	- MasterMilker.updatePool(uint256) (../../sb/MasterMilker.sol#1624-1645)
+Reentrancy in MasterMilker.updateEmissionRate(uint256) (../../sb/MasterMilker.sol#1715-1718):
+	External calls:
+	- massUpdatePools() (../../sb/MasterMilker.sol#1716)
+		- milky.mint(devaddr,milkyReward.div(10)) (../../sb/MasterMilker.sol#1639)
+		- milky.mint(address(this),milkyReward) (../../sb/MasterMilker.sol#1640)
+	State variables written after the call(s):
+	- milkyPerBlock = _milkyPerBlock (../../sb/MasterMilker.sol#1717)
+	MasterMilker.milkyPerBlock (../../sb/MasterMilker.sol#1503) can be used in cross function reentrancies:
+	- MasterMilker.constructor(MilkyToken,address,uint256,uint256,uint256) (../../sb/MasterMilker.sol#1522-1535)
+	- MasterMilker.milkyPerBlock (../../sb/MasterMilker.sol#1503)
+	- MasterMilker.pendingMilky(uint256,address) (../../sb/MasterMilker.sol#1592-1613)
+	- MasterMilker.updateEmissionRate(uint256) (../../sb/MasterMilker.sol#1715-1718)
+	- MasterMilker.updatePool(uint256) (../../sb/MasterMilker.sol#1624-1645)
+Reentrancy in MasterMilker.updatePool(uint256) (../../sb/MasterMilker.sol#1624-1645):
+	External calls:
+	- milky.mint(devaddr,milkyReward.div(10)) (../../sb/MasterMilker.sol#1639)
+	- milky.mint(address(this),milkyReward) (../../sb/MasterMilker.sol#1640)
+	State variables written after the call(s):
+	- pool.accMilkyPerShare = pool.accMilkyPerShare.add(milkyReward.mul(1e12).div(lpSupply)) (../../sb/MasterMilker.sol#1641-1643)
+	MasterMilker.poolInfo (../../sb/MasterMilker.sol#1507) can be used in cross function reentrancies:
+	- MasterMilker.add(uint256,IERC20) (../../sb/MasterMilker.sol#1543-1559)
+	- MasterMilker.deposit(uint256,uint256) (../../sb/MasterMilker.sol#1648-1667)
+	- MasterMilker.emergencyWithdraw(uint256) (../../sb/MasterMilker.sol#1688-1695)
+	- MasterMilker.massUpdatePools() (../../sb/MasterMilker.sol#1616-1621)
+	- MasterMilker.pendingMilky(uint256,address) (../../sb/MasterMilker.sol#1592-1613)
+	- MasterMilker.poolInfo (../../sb/MasterMilker.sol#1507)
+	- MasterMilker.poolLength() (../../sb/MasterMilker.sol#1537-1539)
+	- MasterMilker.set(uint256,uint256) (../../sb/MasterMilker.sol#1562-1571)
+	- MasterMilker.updatePool(uint256) (../../sb/MasterMilker.sol#1624-1645)
+	- MasterMilker.withdraw(uint256,uint256) (../../sb/MasterMilker.sol#1670-1684)
+	- pool.lastRewardBlock = block.number (../../sb/MasterMilker.sol#1644)
+	MasterMilker.poolInfo (../../sb/MasterMilker.sol#1507) can be used in cross function reentrancies:
+	- MasterMilker.add(uint256,IERC20) (../../sb/MasterMilker.sol#1543-1559)
+	- MasterMilker.deposit(uint256,uint256) (../../sb/MasterMilker.sol#1648-1667)
+	- MasterMilker.emergencyWithdraw(uint256) (../../sb/MasterMilker.sol#1688-1695)
+	- MasterMilker.massUpdatePools() (../../sb/MasterMilker.sol#1616-1621)
+	- MasterMilker.pendingMilky(uint256,address) (../../sb/MasterMilker.sol#1592-1613)
+	- MasterMilker.poolInfo (../../sb/MasterMilker.sol#1507)
+	- MasterMilker.poolLength() (../../sb/MasterMilker.sol#1537-1539)
+	- MasterMilker.set(uint256,uint256) (../../sb/MasterMilker.sol#1562-1571)
+	- MasterMilker.updatePool(uint256) (../../sb/MasterMilker.sol#1624-1645)
+	- MasterMilker.withdraw(uint256,uint256) (../../sb/MasterMilker.sol#1670-1684)
+Reentrancy in MasterMilker.withdraw(uint256,uint256) (../../sb/MasterMilker.sol#1670-1684):
+	External calls:
+	- updatePool(_pid) (../../sb/MasterMilker.sol#1674)
+		- milky.mint(devaddr,milkyReward.div(10)) (../../sb/MasterMilker.sol#1639)
+		- milky.mint(address(this),milkyReward) (../../sb/MasterMilker.sol#1640)
+	- safeMilkyTransfer(msg.sender,pending) (../../sb/MasterMilker.sol#1679)
+		- assert(bool)(milky.transfer(_to,milkyBal)) (../../sb/MasterMilker.sol#1701)
+		- assert(bool)(milky.transfer(_to,_amount)) (../../sb/MasterMilker.sol#1703)
+	State variables written after the call(s):
+	- user.amount = user.amount.sub(_amount) (../../sb/MasterMilker.sol#1680)
+	MasterMilker.userInfo (../../sb/MasterMilker.sol#1509) can be used in cross function reentrancies:
+	- MasterMilker.deposit(uint256,uint256) (../../sb/MasterMilker.sol#1648-1667)
+	- MasterMilker.emergencyWithdraw(uint256) (../../sb/MasterMilker.sol#1688-1695)
+	- MasterMilker.pendingMilky(uint256,address) (../../sb/MasterMilker.sol#1592-1613)
+	- MasterMilker.userInfo (../../sb/MasterMilker.sol#1509)
+	- MasterMilker.withdraw(uint256,uint256) (../../sb/MasterMilker.sol#1670-1684)
+	- user.rewardDebt = user.amount.mul(pool.accMilkyPerShare).div(1e12) (../../sb/MasterMilker.sol#1681)
+	MasterMilker.userInfo (../../sb/MasterMilker.sol#1509) can be used in cross function reentrancies:
+	- MasterMilker.deposit(uint256,uint256) (../../sb/MasterMilker.sol#1648-1667)
+	- MasterMilker.emergencyWithdraw(uint256) (../../sb/MasterMilker.sol#1688-1695)
+	- MasterMilker.pendingMilky(uint256,address) (../../sb/MasterMilker.sol#1592-1613)
+	- MasterMilker.userInfo (../../sb/MasterMilker.sol#1509)
+	- MasterMilker.withdraw(uint256,uint256) (../../sb/MasterMilker.sol#1670-1684)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+MasterMilker.add(uint256,IERC20) (../../sb/MasterMilker.sol#1543-1559) should emit an event for: 
+	- totalAllocPoint = totalAllocPoint.add(_allocPoint) (../../sb/MasterMilker.sol#1550) 
+MasterMilker.set(uint256,uint256) (../../sb/MasterMilker.sol#1562-1571) should emit an event for: 
+	- totalAllocPoint = totalAllocPoint.sub(poolInfo[_pid].allocPoint).add(_allocPoint) (../../sb/MasterMilker.sol#1567-1569) 
+MasterMilker.updateEmissionRate(uint256) (../../sb/MasterMilker.sol#1715-1718) should emit an event for: 
+	- milkyPerBlock = _milkyPerBlock (../../sb/MasterMilker.sol#1717) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+MasterMilker.updatePool(uint256) (../../sb/MasterMilker.sol#1624-1645) has external calls inside a loop: lpSupply = pool.lpToken.balanceOf(address(this)) (../../sb/MasterMilker.sol#1629)
+MasterMilker.updatePool(uint256) (../../sb/MasterMilker.sol#1624-1645) has external calls inside a loop: milky.mint(devaddr,milkyReward.div(10)) (../../sb/MasterMilker.sol#1639)
+MasterMilker.updatePool(uint256) (../../sb/MasterMilker.sol#1624-1645) has external calls inside a loop: milky.mint(address(this),milkyReward) (../../sb/MasterMilker.sol#1640)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in MasterMilker.deposit(uint256,uint256) (../../sb/MasterMilker.sol#1648-1667):
+	External calls:
+	- updatePool(_pid) (../../sb/MasterMilker.sol#1651)
+		- milky.mint(devaddr,milkyReward.div(10)) (../../sb/MasterMilker.sol#1639)
+		- milky.mint(address(this),milkyReward) (../../sb/MasterMilker.sol#1640)
+	- safeMilkyTransfer(msg.sender,pending) (../../sb/MasterMilker.sol#1657)
+		- assert(bool)(milky.transfer(_to,milkyBal)) (../../sb/MasterMilker.sol#1701)
+		- assert(bool)(milky.transfer(_to,_amount)) (../../sb/MasterMilker.sol#1703)
+	- pool.lpToken.safeTransferFrom(address(msg.sender),address(this),_amount) (../../sb/MasterMilker.sol#1659-1663)
+	Event emitted after the call(s):
+	- Deposit(msg.sender,_pid,_amount) (../../sb/MasterMilker.sol#1666)
+Reentrancy in MasterMilker.withdraw(uint256,uint256) (../../sb/MasterMilker.sol#1670-1684):
+	External calls:
+	- updatePool(_pid) (../../sb/MasterMilker.sol#1674)
+		- milky.mint(devaddr,milkyReward.div(10)) (../../sb/MasterMilker.sol#1639)
+		- milky.mint(address(this),milkyReward) (../../sb/MasterMilker.sol#1640)
+	- safeMilkyTransfer(msg.sender,pending) (../../sb/MasterMilker.sol#1679)
+		- assert(bool)(milky.transfer(_to,milkyBal)) (../../sb/MasterMilker.sol#1701)
+		- assert(bool)(milky.transfer(_to,_amount)) (../../sb/MasterMilker.sol#1703)
+	- pool.lpToken.safeTransfer(address(msg.sender),_amount) (../../sb/MasterMilker.sol#1682)
+	Event emitted after the call(s):
+	- Withdraw(msg.sender,_pid,_amount) (../../sb/MasterMilker.sol#1683)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+MilkyToken.delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32) (../../sb/MasterMilker.sol#1297-1338) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(now <= expiry,MILKY::delegateBySig: signature expired) (../../sb/MasterMilker.sol#1336)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/MasterMilker.sol#311-320) uses assembly
+	- INLINE ASM (../../sb/MasterMilker.sol#318)
+Address._verifyCallResult(bool,bytes,string) (../../sb/MasterMilker.sol#456-473) uses assembly
+	- INLINE ASM (../../sb/MasterMilker.sol#465-468)
+MilkyToken.getChainId() (../../sb/MasterMilker.sol#1456-1460) uses assembly
+	- INLINE ASM (../../sb/MasterMilker.sol#1458)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.functionCall(address,bytes) (../../sb/MasterMilker.sol#364-366) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/MasterMilker.sol#389-391) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/MasterMilker.sol#438-440) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/MasterMilker.sol#448-454) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/MasterMilker.sol#414-416) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/MasterMilker.sol#424-430) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/MasterMilker.sol#338-344) is never used and should be removed
+Context._msgData() (../../sb/MasterMilker.sol#853-856) is never used and should be removed
+ERC20._burn(address,uint256) (../../sb/MasterMilker.sol#1163-1171) is never used and should be removed
+ERC20._setupDecimals(uint8) (../../sb/MasterMilker.sol#1201-1203) is never used and should be removed
+EnumerableSet._add(EnumerableSet.Set,bytes32) (../../sb/MasterMilker.sol#593-603) is never used and should be removed
+EnumerableSet._at(EnumerableSet.Set,uint256) (../../sb/MasterMilker.sol#669-672) is never used and should be removed
+EnumerableSet._contains(EnumerableSet.Set,bytes32) (../../sb/MasterMilker.sol#648-650) is never used and should be removed
+EnumerableSet._length(EnumerableSet.Set) (../../sb/MasterMilker.sol#655-657) is never used and should be removed
+EnumerableSet._remove(EnumerableSet.Set,bytes32) (../../sb/MasterMilker.sol#611-643) is never used and should be removed
+EnumerableSet.add(EnumerableSet.AddressSet,address) (../../sb/MasterMilker.sol#740-742) is never used and should be removed
+EnumerableSet.add(EnumerableSet.Bytes32Set,bytes32) (../../sb/MasterMilker.sol#686-688) is never used and should be removed
+EnumerableSet.add(EnumerableSet.UintSet,uint256) (../../sb/MasterMilker.sol#795-797) is never used and should be removed
+EnumerableSet.at(EnumerableSet.AddressSet,uint256) (../../sb/MasterMilker.sol#778-780) is never used and should be removed
+EnumerableSet.at(EnumerableSet.Bytes32Set,uint256) (../../sb/MasterMilker.sol#724-726) is never used and should be removed
+EnumerableSet.at(EnumerableSet.UintSet,uint256) (../../sb/MasterMilker.sol#833-835) is never used and should be removed
+EnumerableSet.contains(EnumerableSet.AddressSet,address) (../../sb/MasterMilker.sol#757-759) is never used and should be removed
+EnumerableSet.contains(EnumerableSet.Bytes32Set,bytes32) (../../sb/MasterMilker.sol#703-705) is never used and should be removed
+EnumerableSet.contains(EnumerableSet.UintSet,uint256) (../../sb/MasterMilker.sol#812-814) is never used and should be removed
+EnumerableSet.length(EnumerableSet.AddressSet) (../../sb/MasterMilker.sol#764-766) is never used and should be removed
+EnumerableSet.length(EnumerableSet.Bytes32Set) (../../sb/MasterMilker.sol#710-712) is never used and should be removed
+EnumerableSet.length(EnumerableSet.UintSet) (../../sb/MasterMilker.sol#819-821) is never used and should be removed
+EnumerableSet.remove(EnumerableSet.AddressSet,address) (../../sb/MasterMilker.sol#750-752) is never used and should be removed
+EnumerableSet.remove(EnumerableSet.Bytes32Set,bytes32) (../../sb/MasterMilker.sol#696-698) is never used and should be removed
+EnumerableSet.remove(EnumerableSet.UintSet,uint256) (../../sb/MasterMilker.sol#805-807) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/MasterMilker.sol#504-513) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/MasterMilker.sol#520-523) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/MasterMilker.sol#515-518) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/MasterMilker.sol#264-267) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/MasterMilker.sol#226-229) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/MasterMilker.sol#284-287) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/MasterMilker.sol#98-102) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/MasterMilker.sol#134-137) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/MasterMilker.sol#144-147) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/MasterMilker.sol#119-127) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/MasterMilker.sol#109-112) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.6.12 (../../sb/MasterMilker.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/MasterMilker.sol#338-344):
+	- (success) = recipient.call{value: amount}() (../../sb/MasterMilker.sol#342)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/MasterMilker.sol#399-406):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/MasterMilker.sol#404)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/MasterMilker.sol#424-430):
+	- (success,returndata) = target.staticcall(data) (../../sb/MasterMilker.sol#428)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/MasterMilker.sol#448-454):
+	- (success,returndata) = target.delegatecall(data) (../../sb/MasterMilker.sol#452)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter MilkyToken.mint(address,uint256)._to (../../sb/MasterMilker.sol#1227) is not in mixedCase
+Parameter MilkyToken.mint(address,uint256)._amount (../../sb/MasterMilker.sol#1227) is not in mixedCase
+Parameter MasterMilker.add(uint256,IERC20)._allocPoint (../../sb/MasterMilker.sol#1544) is not in mixedCase
+Parameter MasterMilker.add(uint256,IERC20)._lpToken (../../sb/MasterMilker.sol#1545) is not in mixedCase
+Parameter MasterMilker.set(uint256,uint256)._pid (../../sb/MasterMilker.sol#1563) is not in mixedCase
+Parameter MasterMilker.set(uint256,uint256)._allocPoint (../../sb/MasterMilker.sol#1564) is not in mixedCase
+Parameter MasterMilker.getMultiplier(uint256,uint256)._from (../../sb/MasterMilker.sol#1574) is not in mixedCase
+Parameter MasterMilker.getMultiplier(uint256,uint256)._to (../../sb/MasterMilker.sol#1574) is not in mixedCase
+Parameter MasterMilker.pendingMilky(uint256,address)._pid (../../sb/MasterMilker.sol#1592) is not in mixedCase
+Parameter MasterMilker.pendingMilky(uint256,address)._user (../../sb/MasterMilker.sol#1592) is not in mixedCase
+Parameter MasterMilker.updatePool(uint256)._pid (../../sb/MasterMilker.sol#1624) is not in mixedCase
+Parameter MasterMilker.deposit(uint256,uint256)._pid (../../sb/MasterMilker.sol#1648) is not in mixedCase
+Parameter MasterMilker.deposit(uint256,uint256)._amount (../../sb/MasterMilker.sol#1648) is not in mixedCase
+Parameter MasterMilker.withdraw(uint256,uint256)._pid (../../sb/MasterMilker.sol#1670) is not in mixedCase
+Parameter MasterMilker.withdraw(uint256,uint256)._amount (../../sb/MasterMilker.sol#1670) is not in mixedCase
+Parameter MasterMilker.emergencyWithdraw(uint256)._pid (../../sb/MasterMilker.sol#1688) is not in mixedCase
+Parameter MasterMilker.safeMilkyTransfer(address,uint256)._to (../../sb/MasterMilker.sol#1698) is not in mixedCase
+Parameter MasterMilker.safeMilkyTransfer(address,uint256)._amount (../../sb/MasterMilker.sol#1698) is not in mixedCase
+Parameter MasterMilker.dev(address)._devaddr (../../sb/MasterMilker.sol#1708) is not in mixedCase
+Parameter MasterMilker.updateEmissionRate(uint256)._milkyPerBlock (../../sb/MasterMilker.sol#1715) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/MasterMilker.sol#854)" inContext (../../sb/MasterMilker.sol#848-857)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+MasterMilker.bonusEndBlock (../../sb/MasterMilker.sol#1501) should be immutable 
+MasterMilker.milky (../../sb/MasterMilker.sol#1497) should be immutable 
+MasterMilker.startBlock (../../sb/MasterMilker.sol#1513) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/MasterMilker.sol analyzed (10 contracts with 93 detectors), 94 result(s) found

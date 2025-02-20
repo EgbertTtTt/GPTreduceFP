@@ -1,0 +1,183 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 38 Code Findings │
+└──────────────────┘
+                                  
+    /sb/RocketMinipoolManager.sol 
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+          317┆ bool internal useLatestDelegate = false;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          353┆ constructor(RocketStorageInterface _rocketStorageAddress, address
+  _nodeAddress, MinipoolDeposit _depositType) {                                 
+          354┆     // Initialise RocketStorage
+          355┆     require(address(_rocketStorageAddress) != address(0x0),      
+  "Invalid storage address");                                                   
+          356┆     rocketStorage =                                              
+  RocketStorageInterface(_rocketStorageAddress);                                
+          357┆     // Set storage state to uninitialised
+          358┆     storageState = StorageState.Uninitialised;
+          359┆     // Set the current delegate
+          360┆     rocketMinipoolDelegate =                                     
+  getContractAddress("rocketMinipoolDelegate");                                 
+          361┆     // Set local copy of penalty contract
+          362┆     rocketMinipoolPenalty =                                      
+  getContractAddress("rocketMinipoolPenalty");                                  
+             [hid 4 additional lines, adjust with --max-lines-per-finding] 
+          771┆ constructor(RocketStorageInterface _rocketStorageAddress)        
+  RocketBase(_rocketStorageAddress) {                                           
+          772┆     version = 1;
+          773┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          811┆ for (uint256 i = offset; i < max; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           87┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          102┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          119┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          136┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          153┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          348┆ require(msg.sender == nodeAddress || msg.sender ==               
+  withdrawalAddress, "Only the node operator can access this method");          
+            ⋮┆----------------------------------------
+          355┆ require(address(_rocketStorageAddress) != address(0x0), "Invalid 
+  storage address");                                                            
+            ⋮┆----------------------------------------
+          381┆ require(rocketMinipoolDelegate != rocketMinipoolDelegatePrev,    
+  "New delegate is the same as the existing one");                              
+            ⋮┆----------------------------------------
+          389┆ require(rocketMinipoolDelegatePrev != address(0x0), "Previous    
+  delegate contract is not set");                                               
+            ⋮┆----------------------------------------
+          437┆ require(contractAddress != address(0x0), "Contract not found");
+            ⋮┆----------------------------------------
+          472┆ require(getBool(keccak256(abi.encodePacked("contract.exists",    
+  msg.sender))), "Invalid or outdated network contract");                       
+            ⋮┆----------------------------------------
+          480┆ require(_contractAddress ==                                      
+  getAddress(keccak256(abi.encodePacked("contract.address", _contractName))),   
+  "Invalid or outdated contract");                                              
+            ⋮┆----------------------------------------
+          488┆ require(getBool(keccak256(abi.encodePacked("node.exists",        
+  _nodeAddress))), "Invalid node");                                             
+            ⋮┆----------------------------------------
+          496┆ require(getBool(keccak256(abi.encodePacked("dao.trustednodes.",  
+  "member", _nodeAddress))), "Invalid trusted node");                           
+            ⋮┆----------------------------------------
+          504┆ require(getBool(keccak256(abi.encodePacked("minipool.exists",    
+  _minipoolAddress))), "Invalid minipool");                                     
+            ⋮┆----------------------------------------
+          513┆ require(msg.sender == rocketStorage.getGuardian(), "Account is   
+  not a temporary guardian");                                                   
+            ⋮┆----------------------------------------
+          534┆ require(contractAddress != address(0x0), "Contract not found");
+            ⋮┆----------------------------------------
+          554┆ require(bytes(contractName).length > 0, "Contract not found");
+            ⋮┆----------------------------------------
+          940┆ require(
+          941┆     getNodeActiveMinipoolCount(_nodeAddress) <                   
+  rocketNodeStaking.getNodeMinipoolLimit(_nodeAddress),                         
+          942┆     "Minipool count after deposit exceeds limit based on node RPL
+  stake"                                                                        
+          943┆ );
+            ⋮┆----------------------------------------
+          948┆ require(totalMinipoolCount.add(1) <=                             
+  rocketDAOProtocolSettingsMinipool.getMaximumCount(), "Global minipool limit   
+  reached");                                                                    
+            ⋮┆----------------------------------------
+          997┆ require(rocketNetworkPrices.inConsensus(), "Network is not in    
+  consensus");                                                                  
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          811┆ for (uint256 i = offset; i < max; i++) {
+            ⋮┆----------------------------------------
+          817┆ initializedCount++;
+            ⋮┆----------------------------------------
+          820┆ prelaunchCount++;
+            ⋮┆----------------------------------------
+          823┆ stakingCount++;
+            ⋮┆----------------------------------------
+          826┆ withdrawableCount++;
+            ⋮┆----------------------------------------
+          829┆ dissolvedCount++;
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          119┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          348┆ require(msg.sender == nodeAddress || msg.sender ==               
+  withdrawalAddress, "Only the node operator can access this method");          
+            ⋮┆----------------------------------------
+          381┆ require(rocketMinipoolDelegate != rocketMinipoolDelegatePrev,    
+  "New delegate is the same as the existing one");                              
+            ⋮┆----------------------------------------
+          389┆ require(rocketMinipoolDelegatePrev != address(0x0), "Previous    
+  delegate contract is not set");                                               
+            ⋮┆----------------------------------------
+          472┆ require(getBool(keccak256(abi.encodePacked("contract.exists",    
+  msg.sender))), "Invalid or outdated network contract");                       
+            ⋮┆----------------------------------------
+          513┆ require(msg.sender == rocketStorage.getGuardian(), "Account is   
+  not a temporary guardian");                                                   
+            ⋮┆----------------------------------------
+          940┆ require(
+          941┆     getNodeActiveMinipoolCount(_nodeAddress) <                   
+  rocketNodeStaking.getNodeMinipoolLimit(_nodeAddress),                         
+          942┆     "Minipool count after deposit exceeds limit based on node RPL
+  stake"                                                                        
+          943┆ );
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+Some files were skipped or only partially analyzed.
+  Partially scanned: 1 files only partially analyzed due to parsing or internal Semgrep errors
+
+Ran 48 rules on 1 file: 38 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

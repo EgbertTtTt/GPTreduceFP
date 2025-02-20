@@ -1,0 +1,217 @@
+{
+    "errors": [],
+    "fails": [],
+    "findings": [
+        {
+            "confidence": "Medium",
+            "contract": "SAFECOVID",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Wildfire Token Security Audit/Wildfirebeb20-main/wildfire.sol",
+            "function": "_transfer",
+            "impact": "High",
+            "line": 954,
+            "line_end": 1003,
+            "message": "Reentrancy in SAFECOVID._transfer(address,address,uint256) (wildfire.sol#954-1003):\n\tExternal calls:\n\t- swapAndLiquify(contractTokenBalance) (wildfire.sol#990)\n\t\t- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (wildfire.sol#1051-1058)\n\t\t- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (wildfire.sol#1037-1043)\n\tExternal calls sending eth:\n\t- swapAndLiquify(contractTokenBalance) (wildfire.sol#990)\n\t\t- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (wildfire.sol#1051-1058)\n\tState variables written after the call(s):\n\t- _tokenTransfer(from,to,amount,takeFee) (wildfire.sol#1002)\n\t\t- _rOwned[address(this)] = _rOwned[address(this)].add(rLiquidity) (wildfire.sol#910)\n\t\t- _rOwned[sender] = _rOwned[sender].sub(rAmount) (wildfire.sol#1093)\n\t\t- _rOwned[sender] = _rOwned[sender].sub(rAmount) (wildfire.sol#1084)\n\t\t- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (wildfire.sol#1085)\n\t\t- _rOwned[sender] = _rOwned[sender].sub(rAmount) (wildfire.sol#1104)\n\t\t- _rOwned[sender] = _rOwned[sender].sub(rAmount) (wildfire.sol#822)\n\t\t- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (wildfire.sol#1105)\n\t\t- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (wildfire.sol#1095)\n\t\t- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (wildfire.sol#824)\n\tSAFECOVID._rOwned (wildfire.sol#646) can be used in cross function reentrancies:\n\t- SAFECOVID._getCurrentSupply() (wildfire.sol#894-905)\n\t- SAFECOVID._takeLiquidity(uint256) (wildfire.sol#907-913)\n\t- SAFECOVID._transferBothExcluded(address,address,uint256) (wildfire.sol#819-828)\n\t- SAFECOVID._transferFromExcluded(address,address,uint256) (wildfire.sol#1101-1109)\n\t- SAFECOVID._transferStandard(address,address,uint256) (wildfire.sol#1082-1089)\n\t- SAFECOVID._transferToExcluded(address,address,uint256) (wildfire.sol#1091-1099)\n\t- SAFECOVID.balanceOf(address) (wildfire.sol#728-731)\n\t- SAFECOVID.constructor() (wildfire.sol#694-710)\n\t- SAFECOVID.deliver(uint256) (wildfire.sol#771-778)\n\t- SAFECOVID.excludeFromReward(address) (wildfire.sol#797-804)\n\t- _tokenTransfer(from,to,amount,takeFee) (wildfire.sol#1002)\n\t\t- _rTotal = _rTotal.sub(rFee) (wildfire.sol#864)\n\tSAFECOVID._rTotal (wildfire.sol#657) can be used in cross function reentrancies:\n\t- SAFECOVID._getCurrentSupply() (wildfire.sol#894-905)\n\t- SAFECOVID._reflectFee(uint256,uint256) (wildfire.sol#863-866)\n\t- SAFECOVID.constructor() (wildfire.sol#694-710)\n\t- SAFECOVID.deliver(uint256) (wildfire.sol#771-778)\n\t- SAFECOVID.tokenFromReflection(uint256) (wildfire.sol#791-795)\n\t- _tokenTransfer(from,to,amount,takeFee) (wildfire.sol#1002)\n\t\t- _tOwned[address(this)] = _tOwned[address(this)].add(tLiquidity) (wildfire.sol#912)\n\t\t- _tOwned[sender] = _tOwned[sender].sub(tAmount) (wildfire.sol#1103)\n\t\t- _tOwned[sender] = _tOwned[sender].sub(tAmount) (wildfire.sol#821)\n\t\t- _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount) (wildfire.sol#1094)\n\t\t- _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount) (wildfire.sol#823)\n\tSAFECOVID._tOwned (wildfire.sol#647) can be used in cross function reentrancies:\n\t- SAFECOVID._getCurrentSupply() (wildfire.sol#894-905)\n\t- SAFECOVID._takeLiquidity(uint256) (wildfire.sol#907-913)\n\t- SAFECOVID._transferBothExcluded(address,address,uint256) (wildfire.sol#819-828)\n\t- SAFECOVID._transferFromExcluded(address,address,uint256) (wildfire.sol#1101-1109)\n\t- SAFECOVID._transferToExcluded(address,address,uint256) (wildfire.sol#1091-1099)\n\t- SAFECOVID.balanceOf(address) (wildfire.sol#728-731)\n\t- SAFECOVID.excludeFromReward(address) (wildfire.sol#797-804)\n\t- SAFECOVID.includeInReward(address) (wildfire.sol#806-818)\n",
+            "name": "reentrancy-eth",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "SAFECOVID",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Wildfire Token Security Audit/Wildfirebeb20-main/wildfire.sol",
+            "function": "addLiquidity",
+            "impact": "Medium",
+            "line": 1046,
+            "line_end": 1059,
+            "message": "SAFECOVID.addLiquidity(uint256,uint256) (wildfire.sol#1046-1059) ignores return value by uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (wildfire.sol#1051-1058)\n",
+            "name": "unused-return",
+            "check": "FP"
+        },
+        {
+            "confidence": "High",
+            "contract": "Ownable",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Wildfire Token Security Audit/Wildfirebeb20-main/wildfire.sol",
+            "function": "owner",
+            "impact": "Low",
+            "line": 946,
+            "message": "SAFECOVID._approve(address,address,uint256).owner (wildfire.sol#946) shadows:\n\t- Ownable.owner() (wildfire.sol#385-387) (function)\n",
+            "name": "shadowing-local",
+            "check": "FP"
+        },
+        {
+            "confidence": "High",
+            "contract": "Ownable",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Wildfire Token Security Audit/Wildfirebeb20-main/wildfire.sol",
+            "function": "owner",
+            "impact": "Low",
+            "line": 738,
+            "message": "SAFECOVID.allowance(address,address).owner (wildfire.sol#738) shadows:\n\t- Ownable.owner() (wildfire.sol#385-387) (function)\n",
+            "name": "shadowing-local",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "SAFECOVID",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Wildfire Token Security Audit/Wildfirebeb20-main/wildfire.sol",
+            "function": "setTaxFeePercent",
+            "impact": "Low",
+            "line": 838,
+            "line_end": 840,
+            "message": "SAFECOVID.setTaxFeePercent(uint256) (wildfire.sol#838-840) should emit an event for: \n\t- _taxFee = taxFee (wildfire.sol#839) \n",
+            "name": "events-maths",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "SAFECOVID",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Wildfire Token Security Audit/Wildfirebeb20-main/wildfire.sol",
+            "function": "setLiquidityFeePercent",
+            "impact": "Low",
+            "line": 842,
+            "line_end": 844,
+            "message": "SAFECOVID.setLiquidityFeePercent(uint256) (wildfire.sol#842-844) should emit an event for: \n\t- _liquidityFee = liquidityFee (wildfire.sol#843) \n",
+            "name": "events-maths",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "SAFECOVID",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Wildfire Token Security Audit/Wildfirebeb20-main/wildfire.sol",
+            "function": "setMaxTxPercent",
+            "impact": "Low",
+            "line": 846,
+            "line_end": 850,
+            "message": "SAFECOVID.setMaxTxPercent(uint256) (wildfire.sol#846-850) should emit an event for: \n\t- _maxTxAmount = _tTotal.mul(maxTxPercent).div(10 ** 2) (wildfire.sol#847-849) \n",
+            "name": "events-maths",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "SAFECOVID",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Wildfire Token Security Audit/Wildfirebeb20-main/wildfire.sol",
+            "function": "_transfer",
+            "impact": "Low",
+            "line": 954,
+            "line_end": 1003,
+            "message": "Reentrancy in SAFECOVID._transfer(address,address,uint256) (wildfire.sol#954-1003):\n\tExternal calls:\n\t- swapAndLiquify(contractTokenBalance) (wildfire.sol#990)\n\t\t- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (wildfire.sol#1051-1058)\n\t\t- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (wildfire.sol#1037-1043)\n\tExternal calls sending eth:\n\t- swapAndLiquify(contractTokenBalance) (wildfire.sol#990)\n\t\t- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (wildfire.sol#1051-1058)\n\tState variables written after the call(s):\n\t- _tokenTransfer(from,to,amount,takeFee) (wildfire.sol#1002)\n\t\t- _liquidityFee = _previousLiquidityFee (wildfire.sol#939)\n\t\t- _liquidityFee = 0 (wildfire.sol#934)\n\t- _tokenTransfer(from,to,amount,takeFee) (wildfire.sol#1002)\n\t\t- _previousLiquidityFee = _liquidityFee (wildfire.sol#931)\n\t- _tokenTransfer(from,to,amount,takeFee) (wildfire.sol#1002)\n\t\t- _previousTaxFee = _taxFee (wildfire.sol#930)\n\t- _tokenTransfer(from,to,amount,takeFee) (wildfire.sol#1002)\n\t\t- _tFeeTotal = _tFeeTotal.add(tFee) (wildfire.sol#865)\n\t- _tokenTransfer(from,to,amount,takeFee) (wildfire.sol#1002)\n\t\t- _taxFee = _previousTaxFee (wildfire.sol#938)\n\t\t- _taxFee = 0 (wildfire.sol#933)\n",
+            "name": "reentrancy-benign",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "SAFECOVID",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Wildfire Token Security Audit/Wildfirebeb20-main/wildfire.sol",
+            "function": "swapAndLiquify",
+            "impact": "Low",
+            "line": 1005,
+            "line_end": 1026,
+            "message": "Reentrancy in SAFECOVID.swapAndLiquify(uint256) (wildfire.sol#1005-1026):\n\tExternal calls:\n\t- swapTokensForEth(half) (wildfire.sol#1017)\n\t\t- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (wildfire.sol#1037-1043)\n\t- addLiquidity(otherHalf,newBalance) (wildfire.sol#1023)\n\t\t- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (wildfire.sol#1051-1058)\n\tExternal calls sending eth:\n\t- addLiquidity(otherHalf,newBalance) (wildfire.sol#1023)\n\t\t- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (wildfire.sol#1051-1058)\n\tState variables written after the call(s):\n\t- addLiquidity(otherHalf,newBalance) (wildfire.sol#1023)\n\t\t- _allowances[owner][spender] = amount (wildfire.sol#950)\n",
+            "name": "reentrancy-benign",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "SAFECOVID",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Wildfire Token Security Audit/Wildfirebeb20-main/wildfire.sol",
+            "function": "transferFrom",
+            "impact": "Low",
+            "line": 747,
+            "line_end": 751,
+            "message": "Reentrancy in SAFECOVID.transferFrom(address,address,uint256) (wildfire.sol#747-751):\n\tExternal calls:\n\t- _transfer(sender,recipient,amount) (wildfire.sol#748)\n\t\t- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (wildfire.sol#1051-1058)\n\t\t- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (wildfire.sol#1037-1043)\n\tExternal calls sending eth:\n\t- _transfer(sender,recipient,amount) (wildfire.sol#748)\n\t\t- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (wildfire.sol#1051-1058)\n\tState variables written after the call(s):\n\t- _approve(sender,_msgSender(),_allowances[sender][_msgSender()].sub(amount,ERC20: transfer amount exceeds allowance)) (wildfire.sol#749)\n\t\t- _allowances[owner][spender] = amount (wildfire.sol#950)\n",
+            "name": "reentrancy-benign",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "SAFECOVID",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Wildfire Token Security Audit/Wildfirebeb20-main/wildfire.sol",
+            "function": "transferFrom",
+            "impact": "Low",
+            "line": 747,
+            "line_end": 751,
+            "message": "Reentrancy in SAFECOVID.transferFrom(address,address,uint256) (wildfire.sol#747-751):\n\tExternal calls:\n\t- _transfer(sender,recipient,amount) (wildfire.sol#748)\n\t\t- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (wildfire.sol#1051-1058)\n\t\t- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (wildfire.sol#1037-1043)\n\tExternal calls sending eth:\n\t- _transfer(sender,recipient,amount) (wildfire.sol#748)\n\t\t- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (wildfire.sol#1051-1058)\n\tEvent emitted after the call(s):\n\t- Approval(owner,spender,amount) (wildfire.sol#951)\n\t\t- _approve(sender,_msgSender(),_allowances[sender][_msgSender()].sub(amount,ERC20: transfer amount exceeds allowance)) (wildfire.sol#749)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "SAFECOVID",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Wildfire Token Security Audit/Wildfirebeb20-main/wildfire.sol",
+            "function": "_transfer",
+            "impact": "Low",
+            "line": 954,
+            "line_end": 1003,
+            "message": "Reentrancy in SAFECOVID._transfer(address,address,uint256) (wildfire.sol#954-1003):\n\tExternal calls:\n\t- swapAndLiquify(contractTokenBalance) (wildfire.sol#990)\n\t\t- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (wildfire.sol#1051-1058)\n\t\t- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (wildfire.sol#1037-1043)\n\tExternal calls sending eth:\n\t- swapAndLiquify(contractTokenBalance) (wildfire.sol#990)\n\t\t- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (wildfire.sol#1051-1058)\n\tEvent emitted after the call(s):\n\t- Transfer(sender,recipient,tTransferAmount) (wildfire.sol#1088)\n\t\t- _tokenTransfer(from,to,amount,takeFee) (wildfire.sol#1002)\n\t- Transfer(sender,recipient,tTransferAmount) (wildfire.sol#1098)\n\t\t- _tokenTransfer(from,to,amount,takeFee) (wildfire.sol#1002)\n\t- Transfer(sender,recipient,tTransferAmount) (wildfire.sol#1108)\n\t\t- _tokenTransfer(from,to,amount,takeFee) (wildfire.sol#1002)\n\t- Transfer(sender,recipient,tTransferAmount) (wildfire.sol#827)\n\t\t- _tokenTransfer(from,to,amount,takeFee) (wildfire.sol#1002)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "SAFECOVID",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Wildfire Token Security Audit/Wildfirebeb20-main/wildfire.sol",
+            "function": "swapAndLiquify",
+            "impact": "Low",
+            "line": 1005,
+            "line_end": 1026,
+            "message": "Reentrancy in SAFECOVID.swapAndLiquify(uint256) (wildfire.sol#1005-1026):\n\tExternal calls:\n\t- swapTokensForEth(half) (wildfire.sol#1017)\n\t\t- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (wildfire.sol#1037-1043)\n\t- addLiquidity(otherHalf,newBalance) (wildfire.sol#1023)\n\t\t- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (wildfire.sol#1051-1058)\n\tExternal calls sending eth:\n\t- addLiquidity(otherHalf,newBalance) (wildfire.sol#1023)\n\t\t- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (wildfire.sol#1051-1058)\n\tEvent emitted after the call(s):\n\t- Approval(owner,spender,amount) (wildfire.sol#951)\n\t\t- addLiquidity(otherHalf,newBalance) (wildfire.sol#1023)\n\t- SwapAndLiquify(half,newBalance,otherHalf) (wildfire.sol#1025)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "Ownable",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Wildfire Token Security Audit/Wildfirebeb20-main/wildfire.sol",
+            "function": "unlock",
+            "impact": "Low",
+            "line": 432,
+            "line_end": 437,
+            "message": "Ownable.unlock() (wildfire.sol#432-437) uses timestamp for comparisons\n\tDangerous comparisons:\n\t- require(bool,string)(now > _lockTime,Contract is locked until 7 days) (wildfire.sol#434)\n",
+            "name": "timestamp",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "SAFECOVID",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Wildfire Token Security Audit/Wildfirebeb20-main/wildfire.sol",
+            "function": "includeInReward",
+            "impact": "Informational",
+            "line": 806,
+            "line_end": 818,
+            "message": "SAFECOVID.includeInReward(address) (wildfire.sol#806-818) has costly operations inside a loop:\n\t- _excluded.pop() (wildfire.sol#814)\n",
+            "name": "costly-loop",
+            "check": "FP"
+        },
+        {
+            "confidence": "High",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Wildfire Token Security Audit/Wildfirebeb20-main/wildfire.sol",
+            "impact": "Informational",
+            "line": 668,
+            "message": "SAFECOVID._previousLiquidityFee (wildfire.sol#668) is set pre-construction with a non-constant function or state variable:\n\t- _liquidityFee\n",
+            "name": "function-init-state",
+            "check": "FP"
+        },
+        {
+            "confidence": "High",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Wildfire Token Security Audit/Wildfirebeb20-main/wildfire.sol",
+            "impact": "Informational",
+            "line": 665,
+            "message": "SAFECOVID._previousTaxFee (wildfire.sol#665) is set pre-construction with a non-constant function or state variable:\n\t- _taxFee\n",
+            "name": "function-init-state",
+            "check": "FP"
+        },
+        {
+            "confidence": "High",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Wildfire Token Security Audit/Wildfirebeb20-main/wildfire.sol",
+            "impact": "Informational",
+            "line": 657,
+            "message": "SAFECOVID._rTotal (wildfire.sol#657) is set pre-construction with a non-constant function or state variable:\n\t- (MAX - (MAX % _tTotal))\n",
+            "name": "function-init-state",
+            "check": "FP"
+        }
+    ],
+    "infos": [],
+    "parser": {
+        "id": "slither-0.10.0",
+        "mode": "solidity",
+        "version": "2024/04/30"
+    }
+}

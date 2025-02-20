@@ -1,0 +1,300 @@
+'solc --version' running
+'solc /sb/GLONK.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+Reentrancy in GLONK._transfer(address,address,uint256) (../../sb/GLONK.sol#716-760):
+	External calls:
+	- swapAndLiquify(contractTokenBalance) (../../sb/GLONK.sol#747)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/GLONK.sol#808-815)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/GLONK.sol#794-800)
+	External calls sending eth:
+	- swapAndLiquify(contractTokenBalance) (../../sb/GLONK.sol#747)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/GLONK.sol#808-815)
+	State variables written after the call(s):
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/GLONK.sol#759)
+		- _rOwned[address(this)] = _rOwned[address(this)].add(rLiquidity) (../../sb/GLONK.sol#672)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/GLONK.sol#841)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/GLONK.sol#850)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/GLONK.sol#861)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/GLONK.sol#588)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/GLONK.sol#842)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/GLONK.sol#862)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/GLONK.sol#852)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/GLONK.sol#590)
+	GLONK._rOwned (../../sb/GLONK.sol#413) can be used in cross function reentrancies:
+	- GLONK._getCurrentSupply() (../../sb/GLONK.sol#657-667)
+	- GLONK._takeLiquidity(uint256) (../../sb/GLONK.sol#669-675)
+	- GLONK._transferBothExcluded(address,address,uint256) (../../sb/GLONK.sol#585-594)
+	- GLONK._transferFromExcluded(address,address,uint256) (../../sb/GLONK.sol#858-866)
+	- GLONK._transferStandard(address,address,uint256) (../../sb/GLONK.sol#839-846)
+	- GLONK._transferToExcluded(address,address,uint256) (../../sb/GLONK.sol#848-856)
+	- GLONK.balanceOf(address) (../../sb/GLONK.sol#494-497)
+	- GLONK.constructor() (../../sb/GLONK.sol#460-476)
+	- GLONK.deliver(uint256) (../../sb/GLONK.sol#537-544)
+	- GLONK.excludeFromReward(address) (../../sb/GLONK.sol#563-571)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/GLONK.sol#759)
+		- _rTotal = _rTotal.sub(rFee) (../../sb/GLONK.sol#627)
+	GLONK._rTotal (../../sb/GLONK.sol#424) can be used in cross function reentrancies:
+	- GLONK._getCurrentSupply() (../../sb/GLONK.sol#657-667)
+	- GLONK._reflectFee(uint256,uint256) (../../sb/GLONK.sol#626-629)
+	- GLONK.constructor() (../../sb/GLONK.sol#460-476)
+	- GLONK.deliver(uint256) (../../sb/GLONK.sol#537-544)
+	- GLONK.tokenFromReflection(uint256) (../../sb/GLONK.sol#557-561)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/GLONK.sol#759)
+		- _tOwned[address(this)] = _tOwned[address(this)].add(tLiquidity) (../../sb/GLONK.sol#674)
+		- _tOwned[sender] = _tOwned[sender].sub(tAmount) (../../sb/GLONK.sol#587)
+		- _tOwned[sender] = _tOwned[sender].sub(tAmount) (../../sb/GLONK.sol#860)
+		- _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount) (../../sb/GLONK.sol#851)
+		- _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount) (../../sb/GLONK.sol#589)
+	GLONK._tOwned (../../sb/GLONK.sol#414) can be used in cross function reentrancies:
+	- GLONK._getCurrentSupply() (../../sb/GLONK.sol#657-667)
+	- GLONK._takeLiquidity(uint256) (../../sb/GLONK.sol#669-675)
+	- GLONK._transferBothExcluded(address,address,uint256) (../../sb/GLONK.sol#585-594)
+	- GLONK._transferFromExcluded(address,address,uint256) (../../sb/GLONK.sol#858-866)
+	- GLONK._transferToExcluded(address,address,uint256) (../../sb/GLONK.sol#848-856)
+	- GLONK.balanceOf(address) (../../sb/GLONK.sol#494-497)
+	- GLONK.excludeFromReward(address) (../../sb/GLONK.sol#563-571)
+	- GLONK.includeInReward(address) (../../sb/GLONK.sol#573-584)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities
+
+GLONK.addLiquidity(uint256,uint256) (../../sb/GLONK.sol#803-816) ignores return value by uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/GLONK.sol#808-815)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+GLONK.allowance(address,address).owner (../../sb/GLONK.sol#504) shadows:
+	- Ownable.owner() (../../sb/GLONK.sol#164-166) (function)
+GLONK._approve(address,address,uint256).owner (../../sb/GLONK.sol#708) shadows:
+	- Ownable.owner() (../../sb/GLONK.sol#164-166) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+GLONK.setTaxFeePercent(uint256) (../../sb/GLONK.sol#604-606) should emit an event for: 
+	- _taxFee = taxFee (../../sb/GLONK.sol#605) 
+GLONK.setLiquidityFeePercent(uint256) (../../sb/GLONK.sol#608-610) should emit an event for: 
+	- _liquidityFee = liquidityFee (../../sb/GLONK.sol#609) 
+GLONK.setMaxTxPercent(uint256) (../../sb/GLONK.sol#612-616) should emit an event for: 
+	- _maxTxAmount = _tTotal.mul(maxTxPercent).div(10 ** 2) (../../sb/GLONK.sol#613-615) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+Reentrancy in GLONK._transfer(address,address,uint256) (../../sb/GLONK.sol#716-760):
+	External calls:
+	- swapAndLiquify(contractTokenBalance) (../../sb/GLONK.sol#747)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/GLONK.sol#808-815)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/GLONK.sol#794-800)
+	External calls sending eth:
+	- swapAndLiquify(contractTokenBalance) (../../sb/GLONK.sol#747)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/GLONK.sol#808-815)
+	State variables written after the call(s):
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/GLONK.sol#759)
+		- _liquidityFee = _previousLiquidityFee (../../sb/GLONK.sol#701)
+		- _liquidityFee = 0 (../../sb/GLONK.sol#696)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/GLONK.sol#759)
+		- _previousLiquidityFee = _liquidityFee (../../sb/GLONK.sol#693)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/GLONK.sol#759)
+		- _previousTaxFee = _taxFee (../../sb/GLONK.sol#692)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/GLONK.sol#759)
+		- _tFeeTotal = _tFeeTotal.add(tFee) (../../sb/GLONK.sol#628)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/GLONK.sol#759)
+		- _taxFee = _previousTaxFee (../../sb/GLONK.sol#700)
+		- _taxFee = 0 (../../sb/GLONK.sol#695)
+Reentrancy in GLONK.swapAndLiquify(uint256) (../../sb/GLONK.sol#762-783):
+	External calls:
+	- swapTokensForEth(half) (../../sb/GLONK.sol#774)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/GLONK.sol#794-800)
+	- addLiquidity(otherHalf,newBalance) (../../sb/GLONK.sol#780)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/GLONK.sol#808-815)
+	External calls sending eth:
+	- addLiquidity(otherHalf,newBalance) (../../sb/GLONK.sol#780)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/GLONK.sol#808-815)
+	State variables written after the call(s):
+	- addLiquidity(otherHalf,newBalance) (../../sb/GLONK.sol#780)
+		- _allowances[owner][spender] = amount (../../sb/GLONK.sol#712)
+Reentrancy in GLONK.transferFrom(address,address,uint256) (../../sb/GLONK.sol#513-517):
+	External calls:
+	- _transfer(sender,recipient,amount) (../../sb/GLONK.sol#514)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/GLONK.sol#808-815)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/GLONK.sol#794-800)
+	External calls sending eth:
+	- _transfer(sender,recipient,amount) (../../sb/GLONK.sol#514)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/GLONK.sol#808-815)
+	State variables written after the call(s):
+	- _approve(sender,_msgSender(),_allowances[sender][_msgSender()].sub(amount,ERC20: transfer amount exceeds allowance)) (../../sb/GLONK.sol#515)
+		- _allowances[owner][spender] = amount (../../sb/GLONK.sol#712)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in GLONK._transfer(address,address,uint256) (../../sb/GLONK.sol#716-760):
+	External calls:
+	- swapAndLiquify(contractTokenBalance) (../../sb/GLONK.sol#747)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/GLONK.sol#808-815)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/GLONK.sol#794-800)
+	External calls sending eth:
+	- swapAndLiquify(contractTokenBalance) (../../sb/GLONK.sol#747)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/GLONK.sol#808-815)
+	Event emitted after the call(s):
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/GLONK.sol#845)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/GLONK.sol#759)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/GLONK.sol#855)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/GLONK.sol#759)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/GLONK.sol#865)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/GLONK.sol#759)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/GLONK.sol#593)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/GLONK.sol#759)
+Reentrancy in GLONK.swapAndLiquify(uint256) (../../sb/GLONK.sol#762-783):
+	External calls:
+	- swapTokensForEth(half) (../../sb/GLONK.sol#774)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/GLONK.sol#794-800)
+	- addLiquidity(otherHalf,newBalance) (../../sb/GLONK.sol#780)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/GLONK.sol#808-815)
+	External calls sending eth:
+	- addLiquidity(otherHalf,newBalance) (../../sb/GLONK.sol#780)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/GLONK.sol#808-815)
+	Event emitted after the call(s):
+	- Approval(owner,spender,amount) (../../sb/GLONK.sol#713)
+		- addLiquidity(otherHalf,newBalance) (../../sb/GLONK.sol#780)
+	- SwapAndLiquify(half,newBalance,otherHalf) (../../sb/GLONK.sol#782)
+Reentrancy in GLONK.transferFrom(address,address,uint256) (../../sb/GLONK.sol#513-517):
+	External calls:
+	- _transfer(sender,recipient,amount) (../../sb/GLONK.sol#514)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/GLONK.sol#808-815)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/GLONK.sol#794-800)
+	External calls sending eth:
+	- _transfer(sender,recipient,amount) (../../sb/GLONK.sol#514)
+		- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/GLONK.sol#808-815)
+	Event emitted after the call(s):
+	- Approval(owner,spender,amount) (../../sb/GLONK.sol#713)
+		- _approve(sender,_msgSender(),_allowances[sender][_msgSender()].sub(amount,ERC20: transfer amount exceeds allowance)) (../../sb/GLONK.sol#515)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Ownable.unlock() (../../sb/GLONK.sol#195-200) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(now > _lockTime,Contract is locked until 7 days) (../../sb/GLONK.sol#197)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/GLONK.sol#96-105) uses assembly
+	- INLINE ASM (../../sb/GLONK.sol#103)
+Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/GLONK.sol#131-148) uses assembly
+	- INLINE ASM (../../sb/GLONK.sol#140-143)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Different versions of Solidity are used:
+	- Version used: ['>=0.5.0', '>=0.6.2', '^0.6.12']
+	- >=0.5.0 (../../sb/GLONK.sol#2)
+	- >=0.5.0 (../../sb/GLONK.sol#3)
+	- >=0.6.2 (../../sb/GLONK.sol#4)
+	- >=0.6.2 (../../sb/GLONK.sol#5)
+	- ^0.6.12 (../../sb/GLONK.sol#1)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+
+GLONK.includeInReward(address) (../../sb/GLONK.sol#573-584) has costly operations inside a loop:
+	- _excluded.pop() (../../sb/GLONK.sol#580)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#costly-operations-inside-a-loop
+
+Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/GLONK.sol#131-148) is never used and should be removed
+Address.functionCall(address,bytes) (../../sb/GLONK.sol#114-116) is never used and should be removed
+Address.functionCall(address,bytes,string) (../../sb/GLONK.sol#118-120) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/GLONK.sol#122-124) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/GLONK.sol#126-129) is never used and should be removed
+Address.isContract(address) (../../sb/GLONK.sol#96-105) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/GLONK.sol#106-112) is never used and should be removed
+Context._msgData() (../../sb/GLONK.sol#89-92) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/GLONK.sol#74-76) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/GLONK.sol#78-81) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+GLONK._rTotal (../../sb/GLONK.sol#424) is set pre-construction with a non-constant function or state variable:
+	- (MAX - (MAX % _tTotal))
+GLONK._previousTaxFee (../../sb/GLONK.sol#432) is set pre-construction with a non-constant function or state variable:
+	- _taxFee
+GLONK._previousLiquidityFee (../../sb/GLONK.sol#435) is set pre-construction with a non-constant function or state variable:
+	- _liquidityFee
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#function-initializing-state
+
+Pragma version^0.6.12 (../../sb/GLONK.sol#1) allows old versions
+Pragma version>=0.5.0 (../../sb/GLONK.sol#2) allows old versions
+Pragma version>=0.5.0 (../../sb/GLONK.sol#3) allows old versions
+Pragma version>=0.6.2 (../../sb/GLONK.sol#4) allows old versions
+Pragma version>=0.6.2 (../../sb/GLONK.sol#5) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/GLONK.sol#106-112):
+	- (success) = recipient.call{value: amount}() (../../sb/GLONK.sol#110)
+Low level call in Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/GLONK.sol#131-148):
+	- (success,returndata) = target.call{value: weiValue}(data) (../../sb/GLONK.sol#134)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Function IUniswapV2Pair.DOMAIN_SEPARATOR() (../../sb/GLONK.sol#236) is not in mixedCase
+Function IUniswapV2Pair.PERMIT_TYPEHASH() (../../sb/GLONK.sol#237) is not in mixedCase
+Function IUniswapV2Pair.MINIMUM_LIQUIDITY() (../../sb/GLONK.sol#254) is not in mixedCase
+Function IUniswapV2Router01.WETH() (../../sb/GLONK.sol#275) is not in mixedCase
+Parameter GLONK.setSwapAndLiquifyEnabled(bool)._enabled (../../sb/GLONK.sol#618) is not in mixedCase
+Parameter GLONK.calculateTaxFee(uint256)._amount (../../sb/GLONK.sol#677) is not in mixedCase
+Parameter GLONK.calculateLiquidityFee(uint256)._amount (../../sb/GLONK.sol#683) is not in mixedCase
+Variable GLONK._taxFee (../../sb/GLONK.sol#431) is not in mixedCase
+Variable GLONK._liquidityFee (../../sb/GLONK.sol#434) is not in mixedCase
+Variable GLONK._maxTxAmount (../../sb/GLONK.sol#443) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/GLONK.sol#90)" inContext (../../sb/GLONK.sol#84-93)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Variable IUniswapV2Router01.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountADesired (../../sb/GLONK.sol#280) is too similar to IUniswapV2Router01.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountBDesired (../../sb/GLONK.sol#281)
+Variable GLONK._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/GLONK.sol#859) is too similar to GLONK._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/GLONK.sol#859)
+Variable GLONK._getValues(uint256).rTransferAmount (../../sb/GLONK.sol#633) is too similar to GLONK._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/GLONK.sol#859)
+Variable GLONK._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/GLONK.sol#586) is too similar to GLONK._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/GLONK.sol#859)
+Variable GLONK._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/GLONK.sol#648) is too similar to GLONK._transferStandard(address,address,uint256).tTransferAmount (../../sb/GLONK.sol#840)
+Variable GLONK._transferStandard(address,address,uint256).rTransferAmount (../../sb/GLONK.sol#840) is too similar to GLONK._transferStandard(address,address,uint256).tTransferAmount (../../sb/GLONK.sol#840)
+Variable GLONK._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/GLONK.sol#648) is too similar to GLONK._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/GLONK.sol#849)
+Variable GLONK._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/GLONK.sol#849) is too similar to GLONK._transferStandard(address,address,uint256).tTransferAmount (../../sb/GLONK.sol#840)
+Variable GLONK._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/GLONK.sol#648) is too similar to GLONK._getTValues(uint256).tTransferAmount (../../sb/GLONK.sol#640)
+Variable GLONK._transferStandard(address,address,uint256).rTransferAmount (../../sb/GLONK.sol#840) is too similar to GLONK._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/GLONK.sol#849)
+Variable GLONK._getValues(uint256).rTransferAmount (../../sb/GLONK.sol#633) is too similar to GLONK._transferStandard(address,address,uint256).tTransferAmount (../../sb/GLONK.sol#840)
+Variable GLONK._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/GLONK.sol#586) is too similar to GLONK._transferStandard(address,address,uint256).tTransferAmount (../../sb/GLONK.sol#840)
+Variable GLONK._transferStandard(address,address,uint256).rTransferAmount (../../sb/GLONK.sol#840) is too similar to GLONK._getTValues(uint256).tTransferAmount (../../sb/GLONK.sol#640)
+Variable GLONK._getValues(uint256).rTransferAmount (../../sb/GLONK.sol#633) is too similar to GLONK._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/GLONK.sol#586)
+Variable GLONK._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/GLONK.sol#586) is too similar to GLONK._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/GLONK.sol#586)
+Variable GLONK._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/GLONK.sol#849) is too similar to GLONK._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/GLONK.sol#849)
+Variable GLONK._getValues(uint256).rTransferAmount (../../sb/GLONK.sol#633) is too similar to GLONK._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/GLONK.sol#849)
+Variable GLONK._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/GLONK.sol#586) is too similar to GLONK._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/GLONK.sol#849)
+Variable GLONK.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/GLONK.sol#552) is too similar to GLONK._getTValues(uint256).tTransferAmount (../../sb/GLONK.sol#640)
+Variable GLONK._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/GLONK.sol#648) is too similar to GLONK._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/GLONK.sol#859)
+Variable GLONK._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/GLONK.sol#849) is too similar to GLONK._getTValues(uint256).tTransferAmount (../../sb/GLONK.sol#640)
+Variable GLONK._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/GLONK.sol#586) is too similar to GLONK._getTValues(uint256).tTransferAmount (../../sb/GLONK.sol#640)
+Variable GLONK._getValues(uint256).rTransferAmount (../../sb/GLONK.sol#633) is too similar to GLONK._getTValues(uint256).tTransferAmount (../../sb/GLONK.sol#640)
+Variable GLONK._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/GLONK.sol#859) is too similar to GLONK._getTValues(uint256).tTransferAmount (../../sb/GLONK.sol#640)
+Variable GLONK._transferStandard(address,address,uint256).rTransferAmount (../../sb/GLONK.sol#840) is too similar to GLONK._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/GLONK.sol#859)
+Variable GLONK.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/GLONK.sol#552) is too similar to GLONK._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/GLONK.sol#859)
+Variable GLONK._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/GLONK.sol#849) is too similar to GLONK._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/GLONK.sol#859)
+Variable GLONK._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/GLONK.sol#849) is too similar to GLONK._getValues(uint256).tTransferAmount (../../sb/GLONK.sol#632)
+Variable GLONK._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/GLONK.sol#648) is too similar to GLONK._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/GLONK.sol#586)
+Variable GLONK.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/GLONK.sol#552) is too similar to GLONK._transferStandard(address,address,uint256).tTransferAmount (../../sb/GLONK.sol#840)
+Variable GLONK._transferStandard(address,address,uint256).rTransferAmount (../../sb/GLONK.sol#840) is too similar to GLONK._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/GLONK.sol#586)
+Variable GLONK._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/GLONK.sol#859) is too similar to GLONK._transferStandard(address,address,uint256).tTransferAmount (../../sb/GLONK.sol#840)
+Variable GLONK.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/GLONK.sol#552) is too similar to GLONK._getValues(uint256).tTransferAmount (../../sb/GLONK.sol#632)
+Variable GLONK._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/GLONK.sol#849) is too similar to GLONK._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/GLONK.sol#586)
+Variable GLONK._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/GLONK.sol#859) is too similar to GLONK._getValues(uint256).tTransferAmount (../../sb/GLONK.sol#632)
+Variable GLONK.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/GLONK.sol#552) is too similar to GLONK._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/GLONK.sol#849)
+Variable GLONK.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/GLONK.sol#552) is too similar to GLONK._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/GLONK.sol#586)
+Variable GLONK._getValues(uint256).rTransferAmount (../../sb/GLONK.sol#633) is too similar to GLONK._getValues(uint256).tTransferAmount (../../sb/GLONK.sol#632)
+Variable GLONK._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/GLONK.sol#859) is too similar to GLONK._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/GLONK.sol#849)
+Variable GLONK._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/GLONK.sol#859) is too similar to GLONK._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/GLONK.sol#586)
+Variable GLONK._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/GLONK.sol#648) is too similar to GLONK._getValues(uint256).tTransferAmount (../../sb/GLONK.sol#632)
+Variable GLONK._transferStandard(address,address,uint256).rTransferAmount (../../sb/GLONK.sol#840) is too similar to GLONK._getValues(uint256).tTransferAmount (../../sb/GLONK.sol#632)
+Variable GLONK._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/GLONK.sol#586) is too similar to GLONK._getValues(uint256).tTransferAmount (../../sb/GLONK.sol#632)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+GLONK.slitherConstructorVariables() (../../sb/GLONK.sol#409-871) uses literals with too many digits:
+	- _tTotal = 1000000000 * 10 ** 6 * 10 ** 9 (../../sb/GLONK.sol#423)
+GLONK.slitherConstructorVariables() (../../sb/GLONK.sol#409-871) uses literals with too many digits:
+	- _maxTxAmount = 5000000 * 10 ** 6 * 10 ** 9 (../../sb/GLONK.sol#443)
+GLONK.slitherConstructorVariables() (../../sb/GLONK.sol#409-871) uses literals with too many digits:
+	- numTokensSellToAddToLiquidity = 500000 * 10 ** 6 * 10 ** 9 (../../sb/GLONK.sol#444)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+Loop condition i < _excluded.length (../../sb/GLONK.sol#660) should use cached array length instead of referencing `length` member of the storage array.
+ Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cache-array-length
+
+GLONK._decimals (../../sb/GLONK.sol#429) should be constant 
+GLONK._name (../../sb/GLONK.sol#427) should be constant 
+GLONK._symbol (../../sb/GLONK.sol#428) should be constant 
+GLONK._tTotal (../../sb/GLONK.sol#423) should be constant 
+GLONK.numTokensSellToAddToLiquidity (../../sb/GLONK.sol#444) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+/sb/GLONK.sol analyzed (10 contracts with 93 detectors), 102 result(s) found

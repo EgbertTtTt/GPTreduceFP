@@ -1,0 +1,300 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 66 Code Findings │
+└──────────────────┘
+                    
+    /sb/Holdefi.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          383┆ for (uint256 i = 0 ; i < operations.length ; i++) {
+            ⋮┆----------------------------------------
+          391┆ for (uint256 i = 0 ; i < operations.length ; i++) {
+            ⋮┆----------------------------------------
+          998┆ for (uint256 i = 0 ; i < marketsList.length ; i++) {
+            ⋮┆----------------------------------------
+         1018┆ for (uint256 i = 0 ; i < marketsList.length ; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          241┆ constructor () public {
+          242┆     owner = msg.sender;
+          243┆     emit OwnershipTransferred(owner, address(0));
+          244┆ }
+            ⋮┆----------------------------------------
+          302┆ constructor () public {
+          303┆     paused["supply"].isValid = true;
+          304┆     paused["withdrawSupply"].isValid = true;
+          305┆     paused["collateralize"].isValid = true;
+          306┆     paused["withdrawCollateral"].isValid = true;
+          307┆     paused["borrow"].isValid = true;
+          308┆     paused["repayBorrow"].isValid = true;
+          309┆     paused["liquidateBorrowerCollateral"].isValid = true;
+          310┆     paused["buyLiquidatedCollateral"].isValid = true;
+          311┆ }
+            ⋮┆----------------------------------------
+          491┆ constructor() public {
+          492┆    holdefiContract =         
+  msg.sender;                               
+          493┆ }
+            ⋮┆----------------------------------------
+          785┆ constructor(
+          786┆    HoldefiSettingsInterface                     
+  holdefiSettingsAddress,                                      
+          787┆    HoldefiPricesInterface                  
+  holdefiPricesAddress                                    
+          788┆ )
+          789┆       
+  public             
+          790┆ {
+          791┆    holdefiSettings =                     
+  holdefiSettingsAddress;                               
+          792┆    holdefiPrices =                   
+  holdefiPricesAddress;                             
+          793┆    holdefiCollaterals = new                   
+  HoldefiCollaterals();                                      
+          794┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+         1004┆ assetValue = holdefiPrices.getAssetValueFromAmount(market,       
+  totalDebt);                                                                   
+            ⋮┆----------------------------------------
+         1020┆ assetValue = holdefiPrices.getAssetValueFromAmount(market,       
+  marketDebt[collateral][market]);                                              
+            ⋮┆----------------------------------------
+         1020┆ assetValue = holdefiPrices.getAssetValueFromAmount(market,       
+  marketDebt[collateral][market]);                                              
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          383┆ for (uint256 i = 0 ; i < operations.length ; i++) {
+            ⋮┆----------------------------------------
+          391┆ for (uint256 i = 0 ; i < operations.length ; i++) {
+            ⋮┆----------------------------------------
+          998┆ for (uint256 i = 0 ; i < marketsList.length ; i++) {
+            ⋮┆----------------------------------------
+         1018┆ for (uint256 i = 0 ; i < marketsList.length ; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           88┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          103┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          120┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          137┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          154┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          248┆ require(msg.sender == owner, "Sender should be owner");
+            ⋮┆----------------------------------------
+          256┆ require(newOwner != address(0), "New owner can not be zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          265┆ require (pendingOwner != address(0), "Pending owner is empty");
+            ⋮┆----------------------------------------
+          266┆ require (pendingOwner == msg.sender, "Pending owner is not same  
+  as sender");                                                                  
+            ⋮┆----------------------------------------
+          315┆ require(msg.sender == owner || msg.sender == pauser , "Sender    
+  should be owner or pauser");                                                  
+            ⋮┆----------------------------------------
+          322┆ require(!isPaused(operation), "Operation is paused");
+            ⋮┆----------------------------------------
+          329┆ require(isPaused(operation), "Operation is unpaused");
+            ⋮┆----------------------------------------
+          336┆ require(paused[operation].isValid ,"Operation is not valid");
+            ⋮┆----------------------------------------
+          361┆ require (pauseDuration <= maxPauseDuration, "Duration not in     
+  range");                                                                      
+            ⋮┆----------------------------------------
+          382┆ require (operations.length == pauseDurations.length, "Lists are  
+  not equal in length");                                                        
+            ⋮┆----------------------------------------
+          497┆ require (msg.sender == holdefiContract, "Sender should be holdefi
+  contract");                                                                   
+            ⋮┆----------------------------------------
+          521┆ require (success, "Cannot Transfer");
+            ⋮┆----------------------------------------
+          800┆ require (asset != ethAddress, "Asset should not be ETH address");
+            ⋮┆----------------------------------------
+          807┆ require (holdefiSettings.marketAssets(market).isActive, "Market  
+  is not active");                                                              
+            ⋮┆----------------------------------------
+          814┆ require (holdefiSettings.collateralAssets(collateral).isActive,  
+  "Collateral is not active");                                                  
+            ⋮┆----------------------------------------
+          821┆ require (msg.sender != account, "Account is not valid");
+            ⋮┆----------------------------------------
+         1232┆ require(
+         1233┆    amount <=        
+  allowance,                       
+         1234┆    "Withdraw not      
+  allowed"                           
+         1235┆ );
+            ⋮┆----------------------------------------
+         1303┆ require(
+         1304┆    amount <=        
+  allowance,                       
+         1305┆    "Withdraw not      
+  allowed"                           
+         1306┆ );
+            ⋮┆----------------------------------------
+         1345┆ require(
+         1346┆    amount <=        
+  allowance,                       
+         1347┆    "Withdraw not      
+  allowed"                           
+         1348┆ );
+            ⋮┆----------------------------------------
+         1404┆ require(borrowData.balance > 0, "User should have debt");
+            ⋮┆----------------------------------------
+         1408┆ require (underCollateral || (timeSinceLastActivity >             
+  secondsPerYear),                                                              
+         1409┆    "User should be under collateral or time is   
+  over"                                                         
+         1410┆ );
+            ⋮┆----------------------------------------
+         1517┆ require (reserveScaled > increasedDebtScaled, "Amount should be  
+  less than max");                                                              
+            ⋮┆----------------------------------------
+         1537┆ require(msg.sender == address(holdefiSettings), "Sender should be
+  Holdefi Settings contract");                                                  
+            ⋮┆----------------------------------------
+         1541┆ require(promotionReserve > promotionDebt, "Not enough promotion  
+  reserve");                                                                    
+            ⋮┆----------------------------------------
+         1614┆ require (success, "Cannot Transfer");
+            ⋮┆----------------------------------------
+         1620┆ require (success, "Cannot Transfer");
+            ⋮┆----------------------------------------
+         1665┆ require (totalSuppliedBalance != 0, "Total balance should not be 
+  zero");                                                                       
+            ⋮┆----------------------------------------
+         1733┆ require (borrowPowerValue != 0, "Borrow power should not be      
+  zero");                                                                       
+            ⋮┆----------------------------------------
+         1766┆ require (
+         1767┆    amount <=                                                     
+  (marketAssets[market].totalSupply.sub(marketAssets[market].totalBorrow)),     
+         1768┆    "Amount should be less than   
+  cash"                                         
+         1769┆ );
+            ⋮┆----------------------------------------
+         1773┆ require (
+         1774┆    borrowPowerValue >=                 
+  assetToBorrowValue,                                 
+         1775┆    "Borrow power should be more than new borrow    
+  value"                                                          
+         1776┆ );
+            ⋮┆----------------------------------------
+         1817┆ require (totalBorrowedBalance != 0, "Total balance should not be 
+  zero");                                                                       
+            ⋮┆----------------------------------------
+         1868┆ require (marketAmount <= debt,
+         1869┆    "Amount should be less than total liquidated     
+  assets"                                                          
+         1870┆ );
+            ⋮┆----------------------------------------
+         1876┆ require (
+         1877┆    collateralAmountWithDiscount <=                        
+  totalLiquidatedCollateral,                                             
+         1878┆    "Collateral amount with discount should be less than total    
+  liquidated assets"                                                            
+         1879┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          383┆ for (uint256 i = 0 ; i < operations.length ; i++) {
+            ⋮┆----------------------------------------
+          391┆ for (uint256 i = 0 ; i < operations.length ; i++) {
+            ⋮┆----------------------------------------
+          998┆ for (uint256 i = 0 ; i < marketsList.length ; i++) {
+            ⋮┆----------------------------------------
+         1018┆ for (uint256 i = 0 ; i < marketsList.length ; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          120┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          256┆ require(newOwner != address(0), "New owner can not be zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          266┆ require (pendingOwner == msg.sender, "Pending owner is not same  
+  as sender");                                                                  
+            ⋮┆----------------------------------------
+          497┆ require (msg.sender == holdefiContract, "Sender should be holdefi
+  contract");                                                                   
+            ⋮┆----------------------------------------
+         1408┆ require (underCollateral || (timeSinceLastActivity >             
+  secondsPerYear),                                                              
+         1409┆    "User should be under collateral or time is   
+  over"                                                         
+         1410┆ );
+            ⋮┆----------------------------------------
+         1537┆ require(msg.sender == address(holdefiSettings), "Sender should be
+  Holdefi Settings contract");                                                  
+            ⋮┆----------------------------------------
+         1773┆ require (
+         1774┆    borrowPowerValue >=                 
+  assetToBorrowValue,                                 
+         1775┆    "Borrow power should be more than new borrow    
+  value"                                                          
+         1776┆ );
+            ⋮┆----------------------------------------
+         1868┆ require (marketAmount <= debt,
+         1869┆    "Amount should be less than total liquidated     
+  assets"                                                          
+         1870┆ );
+            ⋮┆----------------------------------------
+         1876┆ require (
+         1877┆    collateralAmountWithDiscount <=                        
+  totalLiquidatedCollateral,                                             
+         1878┆    "Collateral amount with discount should be less than total    
+  liquidated assets"                                                            
+         1879┆ );
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 66 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

@@ -1,0 +1,188 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 45 Code Findings │
+└──────────────────┘
+                
+    /sb/COX.sol 
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+           99┆ _guardCounter += 1;
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           37┆ require(initializing || isConstructor() || !initialized,         
+  "Contract instance has already been initialized");                            
+            ⋮┆----------------------------------------
+          102┆ require(localCounter == _guardCounter, "ReentrancyGuard:         
+  reentrant call");                                                             
+            ⋮┆----------------------------------------
+          133┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          187┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          370┆ require(_enableStake == true, "Can only be called when Staking is
+  Enabled.");                                                                   
+            ⋮┆----------------------------------------
+          375┆ require(msg.sender == _board.owner, "Can only be called by the   
+  owner.");                                                                     
+            ⋮┆----------------------------------------
+          380┆ require(msg.sender == address(presale), "olny presale can call   
+  this.");                                                                      
+            ⋮┆----------------------------------------
+          589┆ require(sender != address(0), "COX: transfer from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          590┆ require(recipient != address(0), "COX: transfer to the zero      
+  address");                                                                    
+            ⋮┆----------------------------------------
+          664┆ require(account != address(0), "COX: burn from the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+          694┆ require(owner != address(0), "COX: approve from the zero         
+  address");                                                                    
+            ⋮┆----------------------------------------
+          695┆ require(spender != address(0), "COX: approve to the zero         
+  address");                                                                    
+            ⋮┆----------------------------------------
+          771┆ require(amount >= _Min_Stake,"stake profit is less than min.     
+  stake");                                                                      
+            ⋮┆----------------------------------------
+          783┆ require(referral != address(0x0),"you cannot referral address    
+  0x0");                                                                        
+            ⋮┆----------------------------------------
+          784┆ require(msg.sender != referral,"you can not refer yourself");
+            ⋮┆----------------------------------------
+          920┆ require(userStaked > 0,"You're required to stake to participate  
+  in the stake pool.");                                                         
+            ⋮┆----------------------------------------
+          923┆ require(currentCycle > 0,"Start pool reward has not started");
+            ⋮┆----------------------------------------
+          924┆ require(                                                         
+  _board.parties[msg.sender].monthlyStakePool[currentCycle] == 0,"You already   
+  submit stake");                                                               
+            ⋮┆----------------------------------------
+          925┆ require(getDayOFCurrentCycle() <= _Entry_Days,"You can not submit
+  stake pool till next cycle");                                                 
+            ⋮┆----------------------------------------
+          944┆ require(getCurrentCycle() > cycle, "can not redeem profit for the
+  current cycle");                                                              
+            ⋮┆----------------------------------------
+          945┆ require(_board.parties[msg.sender].monthlyUnStake[cycle] != true,
+  "you have unstake record this cycle");                                        
+            ⋮┆----------------------------------------
+          947┆ require(userProfit > 0,"you do not have any profit to redeem");
+            ⋮┆----------------------------------------
+          956┆ require(getCurrentCycle() > cycle, "can not redeem profit for the
+  current cycle");                                                              
+            ⋮┆----------------------------------------
+          957┆ require(_board.parties[msg.sender].monthlyUnStake[cycle] != true,
+  "you have unstake record this cycle");                                        
+            ⋮┆----------------------------------------
+          959┆ require(userProfit > 0,"you do not have any profit to redeem");
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          618┆ if(_board.totalStaked > 0 && _enableStake == true){
+          619┆    _board.retPerStakeToken =                                     
+  _board.retPerStakeToken.add(toDistributeForStakers.mul(_Scale).div(_board.tota
+  lStaked));                                                                    
+          620┆ }else{
+          621┆     _board.parties[_bonusPool].balance =                         
+  _board.parties[_bonusPool].balance.add(toDistributeForStakers);               
+          622┆ }
+            ⋮┆----------------------------------------
+          627┆ if (currentCycle > 0 && _enableStake_Bonus == true) {
+          628┆     _board.totalMonthlyStakePoolReward[currentCycle] =           
+  _board.totalMonthlyStakePoolReward[currentCycle].add(toDistributeForStakePoolP
+  rovider.mul(_Scale));                                                         
+          629┆ } else if (_enableStake_Bonus == true && currentCycle <= 0 ){
+          630┆     _board.parties[_bonusPool].balance =                         
+  _board.parties[_bonusPool].balance.add(toDistributeForStakePoolProvider);     
+          631┆ }
+            ⋮┆----------------------------------------
+          629┆ } else if (_enableStake_Bonus == true && currentCycle <= 0 ){
+          630┆     _board.parties[_bonusPool].balance =                         
+  _board.parties[_bonusPool].balance.add(toDistributeForStakePoolProvider);     
+          631┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           37┆ require(initializing || isConstructor() || !initialized,         
+  "Contract instance has already been initialized");                            
+            ⋮┆----------------------------------------
+          187┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          370┆ require(_enableStake == true, "Can only be called when Staking is
+  Enabled.");                                                                   
+            ⋮┆----------------------------------------
+          589┆ require(sender != address(0), "COX: transfer from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          590┆ require(recipient != address(0), "COX: transfer to the zero      
+  address");                                                                    
+            ⋮┆----------------------------------------
+          694┆ require(owner != address(0), "COX: approve from the zero         
+  address");                                                                    
+            ⋮┆----------------------------------------
+          771┆ require(amount >= _Min_Stake,"stake profit is less than min.     
+  stake");                                                                      
+            ⋮┆----------------------------------------
+          920┆ require(userStaked > 0,"You're required to stake to participate  
+  in the stake pool.");                                                         
+            ⋮┆----------------------------------------
+          923┆ require(currentCycle > 0,"Start pool reward has not started");
+            ⋮┆----------------------------------------
+          925┆ require(getDayOFCurrentCycle() <= _Entry_Days,"You can not submit
+  stake pool till next cycle");                                                 
+            ⋮┆----------------------------------------
+          944┆ require(getCurrentCycle() > cycle, "can not redeem profit for the
+  current cycle");                                                              
+            ⋮┆----------------------------------------
+          945┆ require(_board.parties[msg.sender].monthlyUnStake[cycle] != true,
+  "you have unstake record this cycle");                                        
+            ⋮┆----------------------------------------
+          947┆ require(userProfit > 0,"you do not have any profit to redeem");
+            ⋮┆----------------------------------------
+          956┆ require(getCurrentCycle() > cycle, "can not redeem profit for the
+  current cycle");                                                              
+            ⋮┆----------------------------------------
+          957┆ require(_board.parties[msg.sender].monthlyUnStake[cycle] != true,
+  "you have unstake record this cycle");                                        
+            ⋮┆----------------------------------------
+          959┆ require(userProfit > 0,"you do not have any profit to redeem");
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 45 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

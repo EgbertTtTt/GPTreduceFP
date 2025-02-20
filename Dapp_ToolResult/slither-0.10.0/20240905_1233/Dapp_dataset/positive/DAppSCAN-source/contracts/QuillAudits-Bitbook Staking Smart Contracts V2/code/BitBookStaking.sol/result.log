@@ -1,0 +1,345 @@
+'solc --version' running
+'solc /sb/BitBookStaking.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+Reserve.safeTransfer(IBEP20,address,uint256) (../../sb/BitBookStaking.sol#762-773) ignores return value by rewardToken.transfer(_to,tokenBal) (../../sb/BitBookStaking.sol#769)
+Reserve.safeTransfer(IBEP20,address,uint256) (../../sb/BitBookStaking.sol#762-773) ignores return value by rewardToken.transfer(_to,_amount) (../../sb/BitBookStaking.sol#771)
+BitBookStaking.emergencyAdminWithdraw(uint256) (../../sb/BitBookStaking.sol#1068-1076) ignores return value by pool.rewardToken.transfer(owner(),balanceToWithdraw) (../../sb/BitBookStaking.sol#1072)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+Reentrancy in BitBookStaking.deposit(uint256,uint256) (../../sb/BitBookStaking.sol#975-1001):
+	External calls:
+	- payOrLockupPendingToken(_pid) (../../sb/BitBookStaking.sol#981)
+		- rewardReserve.safeTransfer(pool.rewardToken,msg.sender,totalRewards) (../../sb/BitBookStaking.sol#1039)
+	State variables written after the call(s):
+	- user.depositTimestamp = block.timestamp (../../sb/BitBookStaking.sol#984)
+	BitBookStaking.userInfo (../../sb/BitBookStaking.sol#815) can be used in cross function reentrancies:
+	- BitBookStaking.canHarvest(uint256,address) (../../sb/BitBookStaking.sol#938-941)
+	- BitBookStaking.deposit(uint256,uint256) (../../sb/BitBookStaking.sol#975-1001)
+	- BitBookStaking.emergencyWithdraw(uint256) (../../sb/BitBookStaking.sol#1058-1066)
+	- BitBookStaking.payOrLockupPendingToken(uint256) (../../sb/BitBookStaking.sol#1023-1046)
+	- BitBookStaking.pendingToken(uint256,address) (../../sb/BitBookStaking.sol#922-936)
+	- BitBookStaking.userInfo (../../sb/BitBookStaking.sol#815)
+	- BitBookStaking.withdraw(uint256,uint256) (../../sb/BitBookStaking.sol#1003-1021)
+Reentrancy in BitBookStaking.deposit(uint256,uint256) (../../sb/BitBookStaking.sol#975-1001):
+	External calls:
+	- payOrLockupPendingToken(_pid) (../../sb/BitBookStaking.sol#981)
+		- rewardReserve.safeTransfer(pool.rewardToken,msg.sender,totalRewards) (../../sb/BitBookStaking.sol#1039)
+	- pool.stakedToken.safeTransferFrom(address(msg.sender),address(this),_amount) (../../sb/BitBookStaking.sol#986)
+	- pool.stakedToken.safeTransfer(owner(),depositFee) (../../sb/BitBookStaking.sol#991)
+	State variables written after the call(s):
+	- pool.stakedAmount = pool.stakedAmount.add(delta).sub(depositFee) (../../sb/BitBookStaking.sol#993)
+	BitBookStaking.poolInfo (../../sb/BitBookStaking.sol#814) can be used in cross function reentrancies:
+	- BitBookStaking.add(uint256,IBEP20,IBEP20,uint16,uint256,uint256,BitBookStaking.WithdrawFeeInterval[]) (../../sb/BitBookStaking.sol#861-898)
+	- BitBookStaking.deposit(uint256,uint256) (../../sb/BitBookStaking.sol#975-1001)
+	- BitBookStaking.depositRewardToken(uint256,uint256) (../../sb/BitBookStaking.sol#965-973)
+	- BitBookStaking.emergencyAdminWithdraw(uint256) (../../sb/BitBookStaking.sol#1068-1076)
+	- BitBookStaking.emergencyWithdraw(uint256) (../../sb/BitBookStaking.sol#1058-1066)
+	- BitBookStaking.initialize() (../../sb/BitBookStaking.sol#842-851)
+	- BitBookStaking.payOrLockupPendingToken(uint256) (../../sb/BitBookStaking.sol#1023-1046)
+	- BitBookStaking.pendingToken(uint256,address) (../../sb/BitBookStaking.sol#922-936)
+	- BitBookStaking.poolInfo (../../sb/BitBookStaking.sol#814)
+	- BitBookStaking.poolLength() (../../sb/BitBookStaking.sol#857-859)
+	- BitBookStaking.set(uint256,uint256,uint16,uint256,uint256) (../../sb/BitBookStaking.sol#900-916)
+	- BitBookStaking.setLockDeposit(uint256,bool) (../../sb/BitBookStaking.sol#1083-1086)
+	- BitBookStaking.updatePool(uint256) (../../sb/BitBookStaking.sol#943-963)
+	- BitBookStaking.withdraw(uint256,uint256) (../../sb/BitBookStaking.sol#1003-1021)
+	- user.amount = user.amount.add(delta).sub(depositFee) (../../sb/BitBookStaking.sol#992)
+	BitBookStaking.userInfo (../../sb/BitBookStaking.sol#815) can be used in cross function reentrancies:
+	- BitBookStaking.canHarvest(uint256,address) (../../sb/BitBookStaking.sol#938-941)
+	- BitBookStaking.deposit(uint256,uint256) (../../sb/BitBookStaking.sol#975-1001)
+	- BitBookStaking.emergencyWithdraw(uint256) (../../sb/BitBookStaking.sol#1058-1066)
+	- BitBookStaking.payOrLockupPendingToken(uint256) (../../sb/BitBookStaking.sol#1023-1046)
+	- BitBookStaking.pendingToken(uint256,address) (../../sb/BitBookStaking.sol#922-936)
+	- BitBookStaking.userInfo (../../sb/BitBookStaking.sol#815)
+	- BitBookStaking.withdraw(uint256,uint256) (../../sb/BitBookStaking.sol#1003-1021)
+	- user.rewardDebt = user.amount.mul(pool.accTokenPerShare).div(1e12) (../../sb/BitBookStaking.sol#999)
+	BitBookStaking.userInfo (../../sb/BitBookStaking.sol#815) can be used in cross function reentrancies:
+	- BitBookStaking.canHarvest(uint256,address) (../../sb/BitBookStaking.sol#938-941)
+	- BitBookStaking.deposit(uint256,uint256) (../../sb/BitBookStaking.sol#975-1001)
+	- BitBookStaking.emergencyWithdraw(uint256) (../../sb/BitBookStaking.sol#1058-1066)
+	- BitBookStaking.payOrLockupPendingToken(uint256) (../../sb/BitBookStaking.sol#1023-1046)
+	- BitBookStaking.pendingToken(uint256,address) (../../sb/BitBookStaking.sol#922-936)
+	- BitBookStaking.userInfo (../../sb/BitBookStaking.sol#815)
+	- BitBookStaking.withdraw(uint256,uint256) (../../sb/BitBookStaking.sol#1003-1021)
+Reentrancy in BitBookStaking.deposit(uint256,uint256) (../../sb/BitBookStaking.sol#975-1001):
+	External calls:
+	- payOrLockupPendingToken(_pid) (../../sb/BitBookStaking.sol#981)
+		- rewardReserve.safeTransfer(pool.rewardToken,msg.sender,totalRewards) (../../sb/BitBookStaking.sol#1039)
+	- pool.stakedToken.safeTransferFrom(address(msg.sender),address(this),_amount) (../../sb/BitBookStaking.sol#986)
+	State variables written after the call(s):
+	- pool.stakedAmount = pool.stakedAmount.add(delta) (../../sb/BitBookStaking.sol#996)
+	BitBookStaking.poolInfo (../../sb/BitBookStaking.sol#814) can be used in cross function reentrancies:
+	- BitBookStaking.add(uint256,IBEP20,IBEP20,uint16,uint256,uint256,BitBookStaking.WithdrawFeeInterval[]) (../../sb/BitBookStaking.sol#861-898)
+	- BitBookStaking.deposit(uint256,uint256) (../../sb/BitBookStaking.sol#975-1001)
+	- BitBookStaking.depositRewardToken(uint256,uint256) (../../sb/BitBookStaking.sol#965-973)
+	- BitBookStaking.emergencyAdminWithdraw(uint256) (../../sb/BitBookStaking.sol#1068-1076)
+	- BitBookStaking.emergencyWithdraw(uint256) (../../sb/BitBookStaking.sol#1058-1066)
+	- BitBookStaking.initialize() (../../sb/BitBookStaking.sol#842-851)
+	- BitBookStaking.payOrLockupPendingToken(uint256) (../../sb/BitBookStaking.sol#1023-1046)
+	- BitBookStaking.pendingToken(uint256,address) (../../sb/BitBookStaking.sol#922-936)
+	- BitBookStaking.poolInfo (../../sb/BitBookStaking.sol#814)
+	- BitBookStaking.poolLength() (../../sb/BitBookStaking.sol#857-859)
+	- BitBookStaking.set(uint256,uint256,uint16,uint256,uint256) (../../sb/BitBookStaking.sol#900-916)
+	- BitBookStaking.setLockDeposit(uint256,bool) (../../sb/BitBookStaking.sol#1083-1086)
+	- BitBookStaking.updatePool(uint256) (../../sb/BitBookStaking.sol#943-963)
+	- BitBookStaking.withdraw(uint256,uint256) (../../sb/BitBookStaking.sol#1003-1021)
+	- user.amount = user.amount.add(delta) (../../sb/BitBookStaking.sol#995)
+	BitBookStaking.userInfo (../../sb/BitBookStaking.sol#815) can be used in cross function reentrancies:
+	- BitBookStaking.canHarvest(uint256,address) (../../sb/BitBookStaking.sol#938-941)
+	- BitBookStaking.deposit(uint256,uint256) (../../sb/BitBookStaking.sol#975-1001)
+	- BitBookStaking.emergencyWithdraw(uint256) (../../sb/BitBookStaking.sol#1058-1066)
+	- BitBookStaking.payOrLockupPendingToken(uint256) (../../sb/BitBookStaking.sol#1023-1046)
+	- BitBookStaking.pendingToken(uint256,address) (../../sb/BitBookStaking.sol#922-936)
+	- BitBookStaking.userInfo (../../sb/BitBookStaking.sol#815)
+	- BitBookStaking.withdraw(uint256,uint256) (../../sb/BitBookStaking.sol#1003-1021)
+Reentrancy in BitBookStaking.depositRewardToken(uint256,uint256) (../../sb/BitBookStaking.sol#965-973):
+	External calls:
+	- _poolInfo.rewardToken.safeTransferFrom(msg.sender,address(rewardReserve),amount) (../../sb/BitBookStaking.sol#968)
+	State variables written after the call(s):
+	- _poolInfo.rewardSupply += finalBalance.sub(initialBalance) (../../sb/BitBookStaking.sol#970)
+	BitBookStaking.poolInfo (../../sb/BitBookStaking.sol#814) can be used in cross function reentrancies:
+	- BitBookStaking.add(uint256,IBEP20,IBEP20,uint16,uint256,uint256,BitBookStaking.WithdrawFeeInterval[]) (../../sb/BitBookStaking.sol#861-898)
+	- BitBookStaking.deposit(uint256,uint256) (../../sb/BitBookStaking.sol#975-1001)
+	- BitBookStaking.depositRewardToken(uint256,uint256) (../../sb/BitBookStaking.sol#965-973)
+	- BitBookStaking.emergencyAdminWithdraw(uint256) (../../sb/BitBookStaking.sol#1068-1076)
+	- BitBookStaking.emergencyWithdraw(uint256) (../../sb/BitBookStaking.sol#1058-1066)
+	- BitBookStaking.initialize() (../../sb/BitBookStaking.sol#842-851)
+	- BitBookStaking.payOrLockupPendingToken(uint256) (../../sb/BitBookStaking.sol#1023-1046)
+	- BitBookStaking.pendingToken(uint256,address) (../../sb/BitBookStaking.sol#922-936)
+	- BitBookStaking.poolInfo (../../sb/BitBookStaking.sol#814)
+	- BitBookStaking.poolLength() (../../sb/BitBookStaking.sol#857-859)
+	- BitBookStaking.set(uint256,uint256,uint16,uint256,uint256) (../../sb/BitBookStaking.sol#900-916)
+	- BitBookStaking.setLockDeposit(uint256,bool) (../../sb/BitBookStaking.sol#1083-1086)
+	- BitBookStaking.updatePool(uint256) (../../sb/BitBookStaking.sol#943-963)
+	- BitBookStaking.withdraw(uint256,uint256) (../../sb/BitBookStaking.sol#1003-1021)
+Reentrancy in BitBookStaking.emergencyAdminWithdraw(uint256) (../../sb/BitBookStaking.sol#1068-1076):
+	External calls:
+	- pool.rewardToken.transfer(owner(),balanceToWithdraw) (../../sb/BitBookStaking.sol#1072)
+	- rewardReserve.safeTransfer(pool.rewardToken,owner(),pool.rewardToken.balanceOf(address(rewardReserve))) (../../sb/BitBookStaking.sol#1073)
+	State variables written after the call(s):
+	- delete poolInfo[_pid] (../../sb/BitBookStaking.sol#1075)
+	BitBookStaking.poolInfo (../../sb/BitBookStaking.sol#814) can be used in cross function reentrancies:
+	- BitBookStaking.add(uint256,IBEP20,IBEP20,uint16,uint256,uint256,BitBookStaking.WithdrawFeeInterval[]) (../../sb/BitBookStaking.sol#861-898)
+	- BitBookStaking.deposit(uint256,uint256) (../../sb/BitBookStaking.sol#975-1001)
+	- BitBookStaking.depositRewardToken(uint256,uint256) (../../sb/BitBookStaking.sol#965-973)
+	- BitBookStaking.emergencyAdminWithdraw(uint256) (../../sb/BitBookStaking.sol#1068-1076)
+	- BitBookStaking.emergencyWithdraw(uint256) (../../sb/BitBookStaking.sol#1058-1066)
+	- BitBookStaking.initialize() (../../sb/BitBookStaking.sol#842-851)
+	- BitBookStaking.payOrLockupPendingToken(uint256) (../../sb/BitBookStaking.sol#1023-1046)
+	- BitBookStaking.pendingToken(uint256,address) (../../sb/BitBookStaking.sol#922-936)
+	- BitBookStaking.poolInfo (../../sb/BitBookStaking.sol#814)
+	- BitBookStaking.poolLength() (../../sb/BitBookStaking.sol#857-859)
+	- BitBookStaking.set(uint256,uint256,uint16,uint256,uint256) (../../sb/BitBookStaking.sol#900-916)
+	- BitBookStaking.setLockDeposit(uint256,bool) (../../sb/BitBookStaking.sol#1083-1086)
+	- BitBookStaking.updatePool(uint256) (../../sb/BitBookStaking.sol#943-963)
+	- BitBookStaking.withdraw(uint256,uint256) (../../sb/BitBookStaking.sol#1003-1021)
+Reentrancy in BitBookStaking.emergencyWithdraw(uint256) (../../sb/BitBookStaking.sol#1058-1066):
+	External calls:
+	- pool.stakedToken.safeTransfer(address(msg.sender),amount) (../../sb/BitBookStaking.sol#1063)
+	State variables written after the call(s):
+	- delete userInfo[_pid][msg.sender] (../../sb/BitBookStaking.sol#1065)
+	BitBookStaking.userInfo (../../sb/BitBookStaking.sol#815) can be used in cross function reentrancies:
+	- BitBookStaking.canHarvest(uint256,address) (../../sb/BitBookStaking.sol#938-941)
+	- BitBookStaking.deposit(uint256,uint256) (../../sb/BitBookStaking.sol#975-1001)
+	- BitBookStaking.emergencyWithdraw(uint256) (../../sb/BitBookStaking.sol#1058-1066)
+	- BitBookStaking.payOrLockupPendingToken(uint256) (../../sb/BitBookStaking.sol#1023-1046)
+	- BitBookStaking.pendingToken(uint256,address) (../../sb/BitBookStaking.sol#922-936)
+	- BitBookStaking.userInfo (../../sb/BitBookStaking.sol#815)
+	- BitBookStaking.withdraw(uint256,uint256) (../../sb/BitBookStaking.sol#1003-1021)
+Reentrancy in BitBookStaking.withdraw(uint256,uint256) (../../sb/BitBookStaking.sol#1003-1021):
+	External calls:
+	- payOrLockupPendingToken(_pid) (../../sb/BitBookStaking.sol#1008)
+		- rewardReserve.safeTransfer(pool.rewardToken,msg.sender,totalRewards) (../../sb/BitBookStaking.sol#1039)
+	State variables written after the call(s):
+	- pool.stakedAmount = pool.stakedAmount.sub(_amount) (../../sb/BitBookStaking.sol#1015)
+	BitBookStaking.poolInfo (../../sb/BitBookStaking.sol#814) can be used in cross function reentrancies:
+	- BitBookStaking.add(uint256,IBEP20,IBEP20,uint16,uint256,uint256,BitBookStaking.WithdrawFeeInterval[]) (../../sb/BitBookStaking.sol#861-898)
+	- BitBookStaking.deposit(uint256,uint256) (../../sb/BitBookStaking.sol#975-1001)
+	- BitBookStaking.depositRewardToken(uint256,uint256) (../../sb/BitBookStaking.sol#965-973)
+	- BitBookStaking.emergencyAdminWithdraw(uint256) (../../sb/BitBookStaking.sol#1068-1076)
+	- BitBookStaking.emergencyWithdraw(uint256) (../../sb/BitBookStaking.sol#1058-1066)
+	- BitBookStaking.initialize() (../../sb/BitBookStaking.sol#842-851)
+	- BitBookStaking.payOrLockupPendingToken(uint256) (../../sb/BitBookStaking.sol#1023-1046)
+	- BitBookStaking.pendingToken(uint256,address) (../../sb/BitBookStaking.sol#922-936)
+	- BitBookStaking.poolInfo (../../sb/BitBookStaking.sol#814)
+	- BitBookStaking.poolLength() (../../sb/BitBookStaking.sol#857-859)
+	- BitBookStaking.set(uint256,uint256,uint16,uint256,uint256) (../../sb/BitBookStaking.sol#900-916)
+	- BitBookStaking.setLockDeposit(uint256,bool) (../../sb/BitBookStaking.sol#1083-1086)
+	- BitBookStaking.updatePool(uint256) (../../sb/BitBookStaking.sol#943-963)
+	- BitBookStaking.withdraw(uint256,uint256) (../../sb/BitBookStaking.sol#1003-1021)
+	- user.amount = user.amount.sub(_amount) (../../sb/BitBookStaking.sol#1011)
+	BitBookStaking.userInfo (../../sb/BitBookStaking.sol#815) can be used in cross function reentrancies:
+	- BitBookStaking.canHarvest(uint256,address) (../../sb/BitBookStaking.sol#938-941)
+	- BitBookStaking.deposit(uint256,uint256) (../../sb/BitBookStaking.sol#975-1001)
+	- BitBookStaking.emergencyWithdraw(uint256) (../../sb/BitBookStaking.sol#1058-1066)
+	- BitBookStaking.payOrLockupPendingToken(uint256) (../../sb/BitBookStaking.sol#1023-1046)
+	- BitBookStaking.pendingToken(uint256,address) (../../sb/BitBookStaking.sol#922-936)
+	- BitBookStaking.userInfo (../../sb/BitBookStaking.sol#815)
+	- BitBookStaking.withdraw(uint256,uint256) (../../sb/BitBookStaking.sol#1003-1021)
+Reentrancy in BitBookStaking.withdraw(uint256,uint256) (../../sb/BitBookStaking.sol#1003-1021):
+	External calls:
+	- payOrLockupPendingToken(_pid) (../../sb/BitBookStaking.sol#1008)
+		- rewardReserve.safeTransfer(pool.rewardToken,msg.sender,totalRewards) (../../sb/BitBookStaking.sol#1039)
+	- pool.stakedToken.safeTransfer(owner(),feeAmount) (../../sb/BitBookStaking.sol#1016)
+	- pool.stakedToken.safeTransfer(address(msg.sender),amountToTransfer) (../../sb/BitBookStaking.sol#1017)
+	State variables written after the call(s):
+	- user.rewardDebt = user.amount.mul(pool.accTokenPerShare).div(1e12) (../../sb/BitBookStaking.sol#1019)
+	BitBookStaking.userInfo (../../sb/BitBookStaking.sol#815) can be used in cross function reentrancies:
+	- BitBookStaking.canHarvest(uint256,address) (../../sb/BitBookStaking.sol#938-941)
+	- BitBookStaking.deposit(uint256,uint256) (../../sb/BitBookStaking.sol#975-1001)
+	- BitBookStaking.emergencyWithdraw(uint256) (../../sb/BitBookStaking.sol#1058-1066)
+	- BitBookStaking.payOrLockupPendingToken(uint256) (../../sb/BitBookStaking.sol#1023-1046)
+	- BitBookStaking.pendingToken(uint256,address) (../../sb/BitBookStaking.sol#922-936)
+	- BitBookStaking.userInfo (../../sb/BitBookStaking.sol#815)
+	- BitBookStaking.withdraw(uint256,uint256) (../../sb/BitBookStaking.sol#1003-1021)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+Reentrancy in BitBookStaking.payOrLockupPendingToken(uint256) (../../sb/BitBookStaking.sol#1023-1046):
+	External calls:
+	- rewardReserve.safeTransfer(pool.rewardToken,msg.sender,totalRewards) (../../sb/BitBookStaking.sol#1039)
+	State variables written after the call(s):
+	- rewardDistributions[_pid] = rewardDistributions[_pid].add(totalRewards) (../../sb/BitBookStaking.sol#1040)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in BitBookStaking.deposit(uint256,uint256) (../../sb/BitBookStaking.sol#975-1001):
+	External calls:
+	- payOrLockupPendingToken(_pid) (../../sb/BitBookStaking.sol#981)
+		- rewardReserve.safeTransfer(pool.rewardToken,msg.sender,totalRewards) (../../sb/BitBookStaking.sol#1039)
+	- pool.stakedToken.safeTransferFrom(address(msg.sender),address(this),_amount) (../../sb/BitBookStaking.sol#986)
+	- pool.stakedToken.safeTransfer(owner(),depositFee) (../../sb/BitBookStaking.sol#991)
+	Event emitted after the call(s):
+	- Deposit(msg.sender,_pid,_amount) (../../sb/BitBookStaking.sol#1000)
+Reentrancy in BitBookStaking.depositRewardToken(uint256,uint256) (../../sb/BitBookStaking.sol#965-973):
+	External calls:
+	- _poolInfo.rewardToken.safeTransferFrom(msg.sender,address(rewardReserve),amount) (../../sb/BitBookStaking.sol#968)
+	Event emitted after the call(s):
+	- RewardTokenDeposited(msg.sender,poolId,amount) (../../sb/BitBookStaking.sol#972)
+Reentrancy in BitBookStaking.emergencyAdminWithdraw(uint256) (../../sb/BitBookStaking.sol#1068-1076):
+	External calls:
+	- pool.rewardToken.transfer(owner(),balanceToWithdraw) (../../sb/BitBookStaking.sol#1072)
+	- rewardReserve.safeTransfer(pool.rewardToken,owner(),pool.rewardToken.balanceOf(address(rewardReserve))) (../../sb/BitBookStaking.sol#1073)
+	Event emitted after the call(s):
+	- AdminEmergencyWithdraw(_pid,pool.rewardToken.balanceOf(address(this)),pool.accTokenPerShare,pool.tokenPerBlock,pool.lastRewardBlock) (../../sb/BitBookStaking.sol#1074)
+Reentrancy in BitBookStaking.emergencyWithdraw(uint256) (../../sb/BitBookStaking.sol#1058-1066):
+	External calls:
+	- pool.stakedToken.safeTransfer(address(msg.sender),amount) (../../sb/BitBookStaking.sol#1063)
+	Event emitted after the call(s):
+	- EmergencyWithdraw(msg.sender,_pid,amount) (../../sb/BitBookStaking.sol#1064)
+Reentrancy in BitBookStaking.withdraw(uint256,uint256) (../../sb/BitBookStaking.sol#1003-1021):
+	External calls:
+	- payOrLockupPendingToken(_pid) (../../sb/BitBookStaking.sol#1008)
+		- rewardReserve.safeTransfer(pool.rewardToken,msg.sender,totalRewards) (../../sb/BitBookStaking.sol#1039)
+	- pool.stakedToken.safeTransfer(owner(),feeAmount) (../../sb/BitBookStaking.sol#1016)
+	- pool.stakedToken.safeTransfer(address(msg.sender),amountToTransfer) (../../sb/BitBookStaking.sol#1017)
+	Event emitted after the call(s):
+	- Withdraw(msg.sender,_pid,amountToTransfer) (../../sb/BitBookStaking.sol#1020)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+BitBookStaking.canHarvest(uint256,address) (../../sb/BitBookStaking.sol#938-941) uses timestamp for comparisons
+	Dangerous comparisons:
+	- user.amount != 0 && block.timestamp >= user.nextHarvestUntil (../../sb/BitBookStaking.sol#940)
+BitBookStaking.getWithdrawFee(uint256,uint256) (../../sb/BitBookStaking.sol#1048-1056) uses timestamp for comparisons
+	Dangerous comparisons:
+	- depositTime <= _withdrawFee[i].day (../../sb/BitBookStaking.sol#1053)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/BitBookStaking.sol#353-362) uses assembly
+	- INLINE ASM (../../sb/BitBookStaking.sol#360)
+Address._verifyCallResult(bool,bytes,string) (../../sb/BitBookStaking.sol#498-515) uses assembly
+	- INLINE ASM (../../sb/BitBookStaking.sol#507-510)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Different versions of Solidity are used:
+	- Version used: ['>=0.6.0<0.8.0', '>=0.6.2<0.8.0', '^0.6.0']
+	- >=0.6.0<0.8.0 (../../sb/BitBookStaking.sol#3)
+	- >=0.6.0<0.8.0 (../../sb/BitBookStaking.sol#6)
+	- >=0.6.0<0.8.0 (../../sb/BitBookStaking.sol#7)
+	- >=0.6.0<0.8.0 (../../sb/BitBookStaking.sol#8)
+	- >=0.6.2<0.8.0 (../../sb/BitBookStaking.sol#4)
+	- ABIEncoderV2 (../../sb/BitBookStaking.sol#10)
+	- ^0.6.0 (../../sb/BitBookStaking.sol#1)
+	- ^0.6.0 (../../sb/BitBookStaking.sol#2)
+	- ^0.6.0 (../../sb/BitBookStaking.sol#5)
+	- ^0.6.0 (../../sb/BitBookStaking.sol#9)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+
+Address.functionCall(address,bytes) (../../sb/BitBookStaking.sol#406-408) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/BitBookStaking.sol#431-433) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/BitBookStaking.sol#480-482) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/BitBookStaking.sol#490-496) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/BitBookStaking.sol#456-458) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/BitBookStaking.sol#466-472) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/BitBookStaking.sol#380-386) is never used and should be removed
+Context._msgData() (../../sb/BitBookStaking.sol#629-632) is never used and should be removed
+SafeBEP20.safeApprove(IBEP20,address,uint256) (../../sb/BitBookStaking.sol#556-570) is never used and should be removed
+SafeBEP20.safeDecreaseAllowance(IBEP20,address,uint256) (../../sb/BitBookStaking.sol#581-591) is never used and should be removed
+SafeBEP20.safeIncreaseAllowance(IBEP20,address,uint256) (../../sb/BitBookStaking.sol#572-579) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/BitBookStaking.sol#305-308) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/BitBookStaking.sol#267-270) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/BitBookStaking.sol#325-328) is never used and should be removed
+SafeMath.sub(uint256,uint256,string) (../../sb/BitBookStaking.sol#285-288) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/BitBookStaking.sol#139-143) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/BitBookStaking.sol#175-178) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/BitBookStaking.sol#185-188) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/BitBookStaking.sol#160-168) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/BitBookStaking.sol#150-153) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.6.0 (../../sb/BitBookStaking.sol#1) allows old versions
+Pragma version^0.6.0 (../../sb/BitBookStaking.sol#2) allows old versions
+Pragma version>=0.6.0<0.8.0 (../../sb/BitBookStaking.sol#3) is too complex
+Pragma version>=0.6.2<0.8.0 (../../sb/BitBookStaking.sol#4) is too complex
+Pragma version^0.6.0 (../../sb/BitBookStaking.sol#5) allows old versions
+Pragma version>=0.6.0<0.8.0 (../../sb/BitBookStaking.sol#6) is too complex
+Pragma version>=0.6.0<0.8.0 (../../sb/BitBookStaking.sol#7) is too complex
+Pragma version>=0.6.0<0.8.0 (../../sb/BitBookStaking.sol#8) is too complex
+Pragma version^0.6.0 (../../sb/BitBookStaking.sol#9) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/BitBookStaking.sol#380-386):
+	- (success) = recipient.call{value: amount}() (../../sb/BitBookStaking.sol#384)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/BitBookStaking.sol#441-448):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/BitBookStaking.sol#446)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/BitBookStaking.sol#466-472):
+	- (success,returndata) = target.staticcall(data) (../../sb/BitBookStaking.sol#470)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/BitBookStaking.sol#490-496):
+	- (success,returndata) = target.delegatecall(data) (../../sb/BitBookStaking.sol#494)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter Reserve.safeTransfer(IBEP20,address,uint256)._to (../../sb/BitBookStaking.sol#764) is not in mixedCase
+Parameter Reserve.safeTransfer(IBEP20,address,uint256)._amount (../../sb/BitBookStaking.sol#765) is not in mixedCase
+Parameter BitBookStaking.add(uint256,IBEP20,IBEP20,uint16,uint256,uint256,BitBookStaking.WithdrawFeeInterval[])._tokenPerBlock (../../sb/BitBookStaking.sol#862) is not in mixedCase
+Parameter BitBookStaking.add(uint256,IBEP20,IBEP20,uint16,uint256,uint256,BitBookStaking.WithdrawFeeInterval[])._stakedToken (../../sb/BitBookStaking.sol#863) is not in mixedCase
+Parameter BitBookStaking.add(uint256,IBEP20,IBEP20,uint16,uint256,uint256,BitBookStaking.WithdrawFeeInterval[])._rewardToken (../../sb/BitBookStaking.sol#864) is not in mixedCase
+Parameter BitBookStaking.add(uint256,IBEP20,IBEP20,uint16,uint256,uint256,BitBookStaking.WithdrawFeeInterval[])._depositFeeBP (../../sb/BitBookStaking.sol#865) is not in mixedCase
+Parameter BitBookStaking.add(uint256,IBEP20,IBEP20,uint16,uint256,uint256,BitBookStaking.WithdrawFeeInterval[])._minDeposit (../../sb/BitBookStaking.sol#866) is not in mixedCase
+Parameter BitBookStaking.add(uint256,IBEP20,IBEP20,uint16,uint256,uint256,BitBookStaking.WithdrawFeeInterval[])._harvestInterval (../../sb/BitBookStaking.sol#867) is not in mixedCase
+Parameter BitBookStaking.set(uint256,uint256,uint16,uint256,uint256)._pid (../../sb/BitBookStaking.sol#901) is not in mixedCase
+Parameter BitBookStaking.set(uint256,uint256,uint16,uint256,uint256)._tokenPerBlock (../../sb/BitBookStaking.sol#902) is not in mixedCase
+Parameter BitBookStaking.set(uint256,uint256,uint16,uint256,uint256)._depositFeeBP (../../sb/BitBookStaking.sol#903) is not in mixedCase
+Parameter BitBookStaking.set(uint256,uint256,uint16,uint256,uint256)._minDeposit (../../sb/BitBookStaking.sol#904) is not in mixedCase
+Parameter BitBookStaking.set(uint256,uint256,uint16,uint256,uint256)._harvestInterval (../../sb/BitBookStaking.sol#905) is not in mixedCase
+Parameter BitBookStaking.getMultiplier(uint256,uint256)._from (../../sb/BitBookStaking.sol#918) is not in mixedCase
+Parameter BitBookStaking.getMultiplier(uint256,uint256)._to (../../sb/BitBookStaking.sol#918) is not in mixedCase
+Parameter BitBookStaking.pendingToken(uint256,address)._pid (../../sb/BitBookStaking.sol#922) is not in mixedCase
+Parameter BitBookStaking.pendingToken(uint256,address)._user (../../sb/BitBookStaking.sol#922) is not in mixedCase
+Parameter BitBookStaking.canHarvest(uint256,address)._pid (../../sb/BitBookStaking.sol#938) is not in mixedCase
+Parameter BitBookStaking.canHarvest(uint256,address)._user (../../sb/BitBookStaking.sol#938) is not in mixedCase
+Parameter BitBookStaking.updatePool(uint256)._pid (../../sb/BitBookStaking.sol#943) is not in mixedCase
+Parameter BitBookStaking.deposit(uint256,uint256)._pid (../../sb/BitBookStaking.sol#975) is not in mixedCase
+Parameter BitBookStaking.deposit(uint256,uint256)._amount (../../sb/BitBookStaking.sol#975) is not in mixedCase
+Parameter BitBookStaking.withdraw(uint256,uint256)._pid (../../sb/BitBookStaking.sol#1003) is not in mixedCase
+Parameter BitBookStaking.withdraw(uint256,uint256)._amount (../../sb/BitBookStaking.sol#1003) is not in mixedCase
+Parameter BitBookStaking.payOrLockupPendingToken(uint256)._pid (../../sb/BitBookStaking.sol#1023) is not in mixedCase
+Parameter BitBookStaking.emergencyWithdraw(uint256)._pid (../../sb/BitBookStaking.sol#1058) is not in mixedCase
+Parameter BitBookStaking.emergencyAdminWithdraw(uint256)._pid (../../sb/BitBookStaking.sol#1068) is not in mixedCase
+Parameter BitBookStaking.updatePaused(bool)._value (../../sb/BitBookStaking.sol#1078) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/BitBookStaking.sol#630)" inContext (../../sb/BitBookStaking.sol#624-633)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+BitBookStaking.rewardReserve (../../sb/BitBookStaking.sol#807) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/BitBookStaking.sol analyzed (10 contracts with 93 detectors), 86 result(s) found

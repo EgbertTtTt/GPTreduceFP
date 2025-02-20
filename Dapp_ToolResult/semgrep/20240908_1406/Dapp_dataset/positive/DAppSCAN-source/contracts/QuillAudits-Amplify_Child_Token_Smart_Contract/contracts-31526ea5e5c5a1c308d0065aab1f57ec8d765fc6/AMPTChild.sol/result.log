@@ -1,0 +1,191 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 36 Code Findings │
+└──────────────────┘
+                      
+    /sb/AMPTChild.sol 
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+          102┆ totalSupply +=  amount;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+           72┆ constructor(address _childChainManagerProxy) {
+           73┆     require(_childChainManagerProxy != address(0), "Bad          
+  ChildChainManagerProxy address");                                             
+           74┆     childChainManagerProxy = _childChainManagerProxy;
+           75┆     deployer = msg.sender;
+           76┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          306┆ Checkpoint memory cp = checkpoints[account][center];
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           73┆ require(_childChainManagerProxy != address(0), "Bad              
+  ChildChainManagerProxy address");                                             
+            ⋮┆----------------------------------------
+           81┆ require(newChildChainManagerProxy != address(0), "Bad            
+  ChildChainManagerProxy address");                                             
+            ⋮┆----------------------------------------
+           82┆ require(msg.sender == deployer, "You're not allowed");
+            ⋮┆----------------------------------------
+           96┆ require(msg.sender == childChainManagerProxy, "You're not allowed
+  to deposit");                                                                 
+            ⋮┆----------------------------------------
+           97┆ require(user != address(0), "AMPT::deposit: cannot transfer from 
+  the zero address");                                                           
+            ⋮┆----------------------------------------
+          119┆ require(amount > 0, "Amount must be greater than 0");
+            ⋮┆----------------------------------------
+          180┆ require(currentAllowance >= subtractedValue, "ERC20: decreased   
+  allowance below zero");                                                       
+            ⋮┆----------------------------------------
+          187┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          188┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          226┆ require(spenderAllowance >= rawAmount, "AMPT::transferFrom:      
+  transfer amount exceeds spender allowance");                                  
+            ⋮┆----------------------------------------
+          259┆ require(signatory != address(0), "AMPT::delegateBySig: invalid   
+  signature");                                                                  
+            ⋮┆----------------------------------------
+          260┆ require(nonce == nonces[signatory], "AMPT::delegateBySig: invalid
+  nonce");                                                                      
+            ⋮┆----------------------------------------
+          262┆ require(getBlockTimestamp() <= expiry, "AMPT::delegateBySig:     
+  signature expired");                                                          
+            ⋮┆----------------------------------------
+          285┆ require(currentBlockNumber > blockNumber, "AMPT::getPriorVotes:  
+  not yet determined");                                                         
+            ⋮┆----------------------------------------
+          329┆ require(src != address(0), "AMPT::_transferTokens: cannot        
+  transfer from the zero address");                                             
+            ⋮┆----------------------------------------
+          330┆ require(dst != address(0), "AMPT::_transferTokens: cannot        
+  transfer to the zero address");                                               
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          225┆ if (spender != src && spenderAllowance != MAX_UINT256) {
+          226┆     require(spenderAllowance >= rawAmount, "AMPT::transferFrom:  
+  transfer amount exceeds spender allowance");                                  
+          227┆     uint256 newAllowance = spenderAllowance - rawAmount;
+          228┆     allowances[src][spender] = newAllowance;
+          229┆ 
+          230┆     emit Approval(src, spender, newAllowance);
+          231┆ }
+            ⋮┆----------------------------------------
+          340┆ if (srcRep != dstRep && amount > 0) {
+          341┆     if (srcRep != address(0)) {
+          342┆         uint256 srcRepNum = numCheckpoints[srcRep];
+          343┆         uint256 srcRepOld = srcRepNum > 0 ?                      
+  checkpoints[srcRep][srcRepNum - 1].votes : 0;                                 
+          344┆         uint256 srcRepNew = safeSub(srcRepOld, amount,           
+  "AMPT::_moveVotes: vote amount underflows");                                  
+          345┆         _writeCheckpoint(srcRep, srcRepNum, srcRepOld,           
+  srcRepNew);                                                                   
+          346┆     }
+          347┆ 
+          348┆     if (dstRep != address(0)) {
+          349┆         uint256 dstRepNum = numCheckpoints[dstRep];
+             [hid 5 additional lines, adjust with --max-lines-per-finding] 
+          360┆ if (nCheckpoints > 0 && checkpoints[delegatee][nCheckpoints -    
+  1].fromBlock == currentBlockNumber) {                                         
+          361┆     checkpoints[delegatee][nCheckpoints - 1].votes = newVotes;
+          362┆ } else {
+          363┆     checkpoints[delegatee][nCheckpoints] =                       
+  Checkpoint(currentBlockNumber, newVotes);                                     
+          364┆     numCheckpoints[delegatee] = nCheckpoints + 1;
+          365┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          261┆ nonces[signatory]++;
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           73┆ require(_childChainManagerProxy != address(0), "Bad              
+  ChildChainManagerProxy address");                                             
+            ⋮┆----------------------------------------
+           81┆ require(newChildChainManagerProxy != address(0), "Bad            
+  ChildChainManagerProxy address");                                             
+            ⋮┆----------------------------------------
+           97┆ require(user != address(0), "AMPT::deposit: cannot transfer from 
+  the zero address");                                                           
+            ⋮┆----------------------------------------
+          180┆ require(currentAllowance >= subtractedValue, "ERC20: decreased   
+  allowance below zero");                                                       
+            ⋮┆----------------------------------------
+          187┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          188┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          226┆ require(spenderAllowance >= rawAmount, "AMPT::transferFrom:      
+  transfer amount exceeds spender allowance");                                  
+            ⋮┆----------------------------------------
+          259┆ require(signatory != address(0), "AMPT::delegateBySig: invalid   
+  signature");                                                                  
+            ⋮┆----------------------------------------
+          260┆ require(nonce == nonces[signatory], "AMPT::delegateBySig: invalid
+  nonce");                                                                      
+            ⋮┆----------------------------------------
+          262┆ require(getBlockTimestamp() <= expiry, "AMPT::delegateBySig:     
+  signature expired");                                                          
+            ⋮┆----------------------------------------
+          285┆ require(currentBlockNumber > blockNumber, "AMPT::getPriorVotes:  
+  not yet determined");                                                         
+            ⋮┆----------------------------------------
+          329┆ require(src != address(0), "AMPT::_transferTokens: cannot        
+  transfer from the zero address");                                             
+            ⋮┆----------------------------------------
+          330┆ require(dst != address(0), "AMPT::_transferTokens: cannot        
+  transfer to the zero address");                                               
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 36 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

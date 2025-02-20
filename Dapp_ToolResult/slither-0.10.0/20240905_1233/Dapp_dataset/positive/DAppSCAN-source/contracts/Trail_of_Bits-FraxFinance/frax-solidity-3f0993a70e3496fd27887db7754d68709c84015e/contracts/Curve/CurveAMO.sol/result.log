@@ -1,0 +1,802 @@
+'solc --version' running
+'solc /sb/CurveAMO.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/CurveAMO.sol:
+Warning: Unused local variable.
+    --> /sb/CurveAMO.sol:3408:13:
+     |
+3408 |             uint256 frax_bal = fraxBalance();
+     |             ^^^^^^^^^^^^^^^^
+
+Warning: Contract code size exceeds 24576 bytes (a limit introduced in Spurious Dragon). This contract may not be deployable on mainnet. Consider enabling the optimizer (with a low "runs" value!), turning off revert strings, or using libraries.
+    --> /sb/CurveAMO.sol:2776:1:
+     |
+2776 | contract FraxPool is AccessControl {
+     | ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning: Contract code size exceeds 24576 bytes (a limit introduced in Spurious Dragon). This contract may not be deployable on mainnet. Consider enabling the optimizer (with a low "runs" value!), turning off revert strings, or using libraries.
+    --> /sb/CurveAMO.sol:3249:1:
+     |
+3249 | contract CurveAMO is AccessControl {
+     | ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+UniswapV2OracleLibrary.currentBlockTimestamp() (../../sb/CurveAMO.sol#2056-2058) uses a weak PRNG: "uint32(block.timestamp % 2 ** 32) (../../sb/CurveAMO.sol#2057)" 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#weak-PRNG
+
+FraxPool.mint1t1FRAX(uint256,uint256) (../../sb/CurveAMO.sol#2932-2949) ignores return value by collateral_token.transferFrom(msg.sender,address(this),collateral_amount) (../../sb/CurveAMO.sol#2947)
+FraxPool.mintFractionalFRAX(uint256,uint256,uint256) (../../sb/CurveAMO.sol#2970-2996) ignores return value by collateral_token.transferFrom(msg.sender,address(this),collateral_amount) (../../sb/CurveAMO.sol#2994)
+FraxPool.collectRedemption() (../../sb/CurveAMO.sol#3084-3116) ignores return value by FXS.transfer(msg.sender,FXSAmount) (../../sb/CurveAMO.sol#3110)
+FraxPool.collectRedemption() (../../sb/CurveAMO.sol#3084-3116) ignores return value by collateral_token.transfer(msg.sender,CollateralAmount) (../../sb/CurveAMO.sol#3114)
+FraxPool.recollateralizeFRAX(uint256,uint256) (../../sb/CurveAMO.sol#3123-3148) ignores return value by collateral_token.transferFrom(msg.sender,address(this),collateral_units_precision) (../../sb/CurveAMO.sol#3145)
+FraxPool.buyBackFXS(uint256,uint256) (../../sb/CurveAMO.sol#3152-3170) ignores return value by collateral_token.transfer(msg.sender,collateral_precision) (../../sb/CurveAMO.sol#3169)
+CurveAMO.giveCollatBack(uint256) (../../sb/CurveAMO.sol#3581-3585) ignores return value by collateral_token.transfer(address(pool),amount) (../../sb/CurveAMO.sol#3583)
+CurveAMO.recoverERC20(address,uint256) (../../sb/CurveAMO.sol#3811-3817) ignores return value by ERC20(tokenAddress).transfer(custodian_address,tokenAmount) (../../sb/CurveAMO.sol#3815)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+FRAXStablecoin.oracle_price(FRAXStablecoin.PriceChoice) (../../sb/CurveAMO.sol#2445-2460) performs a multiplication on the result of a division:
+	- eth_usd_price = uint256(eth_usd_pricer.getLatestPrice()).mul(PRICE_PRECISION).div(uint256(10) ** eth_usd_pricer_decimals) (../../sb/CurveAMO.sol#2447)
+	- eth_usd_price.mul(PRICE_PRECISION).div(price_vs_eth) (../../sb/CurveAMO.sol#2459)
+FraxPoolLibrary.calcMintFractionalFRAX(FraxPoolLibrary.MintFF_Params) (../../sb/CurveAMO.sol#2678-2701) performs a multiplication on the result of a division:
+	- c_dollar_value_d18 = params.collateral_amount.mul(params.col_price_usd).div(1e6) (../../sb/CurveAMO.sol#2688)
+	- calculated_fxs_dollar_value_d18 = (c_dollar_value_d18.mul(1e6).div(params.col_ratio)).sub(c_dollar_value_d18) (../../sb/CurveAMO.sol#2691-2693)
+FraxPoolLibrary.calcBuyBackFXS(FraxPoolLibrary.BuybackFXS_Params) (../../sb/CurveAMO.sol#2708-2724) performs a multiplication on the result of a division:
+	- fxs_dollar_value_d18 = params.FXS_amount.mul(params.fxs_price_usd).div(1e6) (../../sb/CurveAMO.sol#2713)
+	- collateral_equivalent_d18 = fxs_dollar_value_d18.mul(1e6).div(params.col_price_usd) (../../sb/CurveAMO.sol#2717)
+FraxPoolLibrary.calcRecollateralizeFRAXInner(uint256,uint256,uint256,uint256,uint256) (../../sb/CurveAMO.sol#2735-2755) performs a multiplication on the result of a division:
+	- effective_collateral_ratio = global_collat_value.mul(1e6).div(frax_total_supply) (../../sb/CurveAMO.sol#2743)
+	- recollat_possible = (global_collateral_ratio.mul(frax_total_supply).sub(frax_total_supply.mul(effective_collateral_ratio))).div(1e6) (../../sb/CurveAMO.sol#2744)
+FraxPoolLibrary.calcRecollateralizeFRAXInner(uint256,uint256,uint256,uint256,uint256) (../../sb/CurveAMO.sol#2735-2755) performs a multiplication on the result of a division:
+	- recollat_possible = (global_collateral_ratio.mul(frax_total_supply).sub(frax_total_supply.mul(effective_collateral_ratio))).div(1e6) (../../sb/CurveAMO.sol#2744)
+	- amount_to_recollat = recollat_possible (../../sb/CurveAMO.sol#2750)
+	- (amount_to_recollat.mul(1e6).div(col_price),amount_to_recollat) (../../sb/CurveAMO.sol#2753)
+FraxPool.collatDollarBalance() (../../sb/CurveAMO.sol#2889-2899) performs a multiplication on the result of a division:
+	- collat_usd_price = eth_usd_price.mul(PRICE_PRECISION).div(eth_collat_price) (../../sb/CurveAMO.sol#2896)
+	- (collateral_token.balanceOf(address(this)).sub(unclaimedPoolCollateral)).mul(10 ** missing_decimals).mul(collat_usd_price).div(PRICE_PRECISION) (../../sb/CurveAMO.sol#2897)
+FraxPool.redeemFractionalFRAX(uint256,uint256,uint256) (../../sb/CurveAMO.sol#3023-3056) performs a multiplication on the result of a division:
+	- FRAX_amount_post_fee = (FRAX_amount.mul(uint256(1e6).sub(redemption_fee))).div(PRICE_PRECISION) (../../sb/CurveAMO.sol#3030)
+	- fxs_dollar_value_d18 = FRAX_amount_post_fee.sub(FRAX_amount_post_fee.mul(global_collateral_ratio).div(PRICE_PRECISION)) (../../sb/CurveAMO.sol#3032)
+FraxPool.redeemFractionalFRAX(uint256,uint256,uint256) (../../sb/CurveAMO.sol#3023-3056) performs a multiplication on the result of a division:
+	- FRAX_amount_precision = FRAX_amount_post_fee.div(10 ** missing_decimals) (../../sb/CurveAMO.sol#3036)
+	- collateral_dollar_value = FRAX_amount_precision.mul(global_collateral_ratio).div(PRICE_PRECISION) (../../sb/CurveAMO.sol#3037)
+FraxPool.redeemFractionalFRAX(uint256,uint256,uint256) (../../sb/CurveAMO.sol#3023-3056) performs a multiplication on the result of a division:
+	- collateral_dollar_value = FRAX_amount_precision.mul(global_collateral_ratio).div(PRICE_PRECISION) (../../sb/CurveAMO.sol#3037)
+	- collateral_amount = collateral_dollar_value.mul(PRICE_PRECISION).div(col_price_usd) (../../sb/CurveAMO.sol#3038)
+FraxPool.redeemAlgorithmicFRAX(uint256,uint256) (../../sb/CurveAMO.sol#3059-3079) performs a multiplication on the result of a division:
+	- fxs_dollar_value_d18 = (fxs_dollar_value_d18.mul(uint256(1e6).sub(redemption_fee))).div(PRICE_PRECISION) (../../sb/CurveAMO.sol#3066)
+	- fxs_amount = fxs_dollar_value_d18.mul(PRICE_PRECISION).div(fxs_price) (../../sb/CurveAMO.sol#3068)
+CurveAMO.get_D() (../../sb/CurveAMO.sol#3435-3477) performs a multiplication on the result of a division:
+	- D_P = D * D / (_xp[j] * N_COINS) (../../sb/CurveAMO.sol#3458)
+	- D = (Ann * S / A_PRECISION + D_P * N_COINS) * D / ((Ann - A_PRECISION) * D / A_PRECISION + (N_COINS + 1) * D_P) (../../sb/CurveAMO.sol#3461)
+CurveAMO.mintRedeemPart1(uint256) (../../sb/CurveAMO.sol#3556-3574) performs a multiplication on the result of a division:
+	- redeem_amount_E6 = (frax_amount.mul(uint256(1e6).sub(redemption_fee))).div(1e6).div(10 ** missing_decimals) (../../sb/CurveAMO.sol#3561)
+	- expected_collat_amount = redeem_amount_E6.mul(global_collateral_ratio).div(1e6) (../../sb/CurveAMO.sol#3562)
+CurveAMO.mintRedeemPart1(uint256) (../../sb/CurveAMO.sol#3556-3574) performs a multiplication on the result of a division:
+	- expected_collat_amount = redeem_amount_E6.mul(global_collateral_ratio).div(1e6) (../../sb/CurveAMO.sol#3562)
+	- expected_collat_amount = expected_collat_amount.mul(1e6).div(col_price_usd) (../../sb/CurveAMO.sol#3563)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+IStableSwap3Pool (../../sb/CurveAMO.sol#6-46) has incorrect ERC20 function interface:IStableSwap3Pool.transfer(address,uint256) (../../sb/CurveAMO.sol#12)
+IMetaImplementationUSD (../../sb/CurveAMO.sol#48-95) has incorrect ERC20 function interface:IMetaImplementationUSD.transfer(address,uint256) (../../sb/CurveAMO.sol#56)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-erc20-interface
+
+FRAXShares._writeCheckpoint(address,uint32,uint96,uint96) (../../sb/CurveAMO.sol#1829-1840) uses a dangerous strict equality:
+	- nCheckpoints > 0 && checkpoints[voter][nCheckpoints - 1].fromBlock == blockNumber (../../sb/CurveAMO.sol#1832)
+CurveAMO.get_D() (../../sb/CurveAMO.sol#3435-3477) uses a dangerous strict equality:
+	- S == 0 (../../sb/CurveAMO.sol#3446)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+FRAXStablecoin.oracle_price(FRAXStablecoin.PriceChoice).price_vs_eth (../../sb/CurveAMO.sol#2448) is a local variable never initialized
+FraxPool.collectRedemption().CollateralAmount (../../sb/CurveAMO.sol#3089) is a local variable never initialized
+FraxPool.collectRedemption().FXSAmount (../../sb/CurveAMO.sol#3088) is a local variable never initialized
+FixedPoint.mul(FixedPoint.uq112x112,uint256).z (../../sb/CurveAMO.sol#2017) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+UniswapV2Library.getReserves(address,address,address) (../../sb/CurveAMO.sol#2110-2114) ignores return value by (reserve0,reserve1) = IUniswapV2Pair(pairFor(factory,tokenA,tokenB)).getReserves() (../../sb/CurveAMO.sol#2112)
+ChainlinkETHUSDPriceConsumer.getLatestPrice() (../../sb/CurveAMO.sol#2314-2323) ignores return value by (price) = priceFeed.latestRoundData() (../../sb/CurveAMO.sol#2315-2321)
+CurveAMO.mintRedeemPart1(uint256) (../../sb/CurveAMO.sol#3556-3574) ignores return value by FRAX.approve(address(pool),frax_amount) (../../sb/CurveAMO.sol#3572)
+CurveAMO.burnFXS(uint256) (../../sb/CurveAMO.sol#3593-3596) ignores return value by FXS.approve(address(this),amount) (../../sb/CurveAMO.sol#3594)
+CurveAMO.metapoolDeposit(uint256,uint256) (../../sb/CurveAMO.sol#3599-3643) ignores return value by collateral_token.approve(address(three_pool),_collateral_amount) (../../sb/CurveAMO.sol#3608)
+CurveAMO.metapoolDeposit(uint256,uint256) (../../sb/CurveAMO.sol#3599-3643) ignores return value by three_pool_erc20.approve(frax3crv_metapool_address,0) (../../sb/CurveAMO.sol#3623)
+CurveAMO.metapoolDeposit(uint256,uint256) (../../sb/CurveAMO.sol#3599-3643) ignores return value by three_pool_erc20.approve(frax3crv_metapool_address,threeCRV_received) (../../sb/CurveAMO.sol#3624)
+CurveAMO.metapoolDeposit(uint256,uint256) (../../sb/CurveAMO.sol#3599-3643) ignores return value by FRAX.approve(frax3crv_metapool_address,_frax_amount) (../../sb/CurveAMO.sol#3628)
+CurveAMO.metapoolWithdrawAtCurRatio(uint256,bool,uint256,uint256) (../../sb/CurveAMO.sol#3645-3671) ignores return value by frax3crv_metapool.approve(address(this),_metapool_lp_in) (../../sb/CurveAMO.sol#3647)
+CurveAMO.metapoolWithdrawAtCurRatio(uint256,bool,uint256,uint256) (../../sb/CurveAMO.sol#3645-3671) ignores return value by three_pool_erc20.approve(address(three_pool),0) (../../sb/CurveAMO.sol#3658)
+CurveAMO.metapoolWithdrawAtCurRatio(uint256,bool,uint256,uint256) (../../sb/CurveAMO.sol#3645-3671) ignores return value by three_pool_erc20.approve(address(three_pool),three_pool_received) (../../sb/CurveAMO.sol#3659)
+CurveAMO.metapoolWithdraw3pool(uint256) (../../sb/CurveAMO.sol#3684-3688) ignores return value by frax3crv_metapool.remove_liquidity_one_coin(_metapool_lp_in,1,min_3pool_out) (../../sb/CurveAMO.sol#3687)
+CurveAMO.three_pool_to_collateral(uint256) (../../sb/CurveAMO.sol#3690-3698) ignores return value by three_pool_erc20.approve(address(three_pool),0) (../../sb/CurveAMO.sol#3694)
+CurveAMO.three_pool_to_collateral(uint256) (../../sb/CurveAMO.sol#3690-3698) ignores return value by three_pool_erc20.approve(address(three_pool),_3pool_in) (../../sb/CurveAMO.sol#3695)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+ERC20.constructor(string,string).name (../../sb/CurveAMO.sol#584) shadows:
+	- ERC20.name() (../../sb/CurveAMO.sol#593-595) (function)
+ERC20.constructor(string,string).symbol (../../sb/CurveAMO.sol#584) shadows:
+	- ERC20.symbol() (../../sb/CurveAMO.sol#601-603) (function)
+FRAXStablecoin.oracle_price(FRAXStablecoin.PriceChoice).eth_usd_price (../../sb/CurveAMO.sol#2447) shadows:
+	- FRAXStablecoin.eth_usd_price() (../../sb/CurveAMO.sol#2472-2474) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+FRAXShares.setTimelock(address) (../../sb/CurveAMO.sol#1678-1680) should emit an event for: 
+	- timelock_address = new_timelock (../../sb/CurveAMO.sol#1679) 
+FRAXShares.setOwner(address) (../../sb/CurveAMO.sol#1690-1692) should emit an event for: 
+	- owner_address = _owner_address (../../sb/CurveAMO.sol#1691) 
+UniswapPairOracle.setOwner(address) (../../sb/CurveAMO.sol#2208-2210) should emit an event for: 
+	- owner_address = _owner_address (../../sb/CurveAMO.sol#2209) 
+UniswapPairOracle.setTimelock(address) (../../sb/CurveAMO.sol#2212-2214) should emit an event for: 
+	- timelock_address = _timelock_address (../../sb/CurveAMO.sol#2213) 
+FRAXStablecoin.setOwner(address) (../../sb/CurveAMO.sol#2571-2573) should emit an event for: 
+	- owner_address = _owner_address (../../sb/CurveAMO.sol#2572) 
+	- owner_address = _owner_address (../../sb/CurveAMO.sol#2572) 
+FRAXStablecoin.setTimelock(address) (../../sb/CurveAMO.sol#2605-2607) should emit an event for: 
+	- timelock_address = new_timelock (../../sb/CurveAMO.sol#2606) 
+	- timelock_address = new_timelock (../../sb/CurveAMO.sol#2606) 
+FRAXStablecoin.setController(address) (../../sb/CurveAMO.sol#2609-2611) should emit an event for: 
+	- controller_address = _controller_address (../../sb/CurveAMO.sol#2610) 
+FraxPool.setTimelock(address) (../../sb/CurveAMO.sol#3216-3218) should emit an event for: 
+	- timelock_address = new_timelock (../../sb/CurveAMO.sol#3217) 
+FraxPool.setOwner(address) (../../sb/CurveAMO.sol#3220-3222) should emit an event for: 
+	- owner_address = _owner_address (../../sb/CurveAMO.sol#3221) 
+CurveAMO.setTimelock(address) (../../sb/CurveAMO.sol#3734-3736) should emit an event for: 
+	- timelock_address = new_timelock (../../sb/CurveAMO.sol#3735) 
+CurveAMO.setOwner(address) (../../sb/CurveAMO.sol#3738-3740) should emit an event for: 
+	- owner_address = _owner_address (../../sb/CurveAMO.sol#3739) 
+CurveAMO.setMiscRewardsCustodian(address) (../../sb/CurveAMO.sol#3742-3744) should emit an event for: 
+	- custodian_address = _custodian_address (../../sb/CurveAMO.sol#3743) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-access-control
+
+UniswapPairOracle.setPeriod(uint256) (../../sb/CurveAMO.sol#2216-2218) should emit an event for: 
+	- PERIOD = _period (../../sb/CurveAMO.sol#2217) 
+UniswapPairOracle.setConsultLeniency(uint256) (../../sb/CurveAMO.sol#2220-2222) should emit an event for: 
+	- CONSULT_LENIENCY = _consult_leniency (../../sb/CurveAMO.sol#2221) 
+FRAXStablecoin.setRedemptionFee(uint256) (../../sb/CurveAMO.sol#2575-2577) should emit an event for: 
+	- redemption_fee = red_fee (../../sb/CurveAMO.sol#2576) 
+FRAXStablecoin.setMintingFee(uint256) (../../sb/CurveAMO.sol#2579-2581) should emit an event for: 
+	- minting_fee = min_fee (../../sb/CurveAMO.sol#2580) 
+FRAXStablecoin.setFraxStep(uint256) (../../sb/CurveAMO.sol#2583-2585) should emit an event for: 
+	- frax_step = _new_step (../../sb/CurveAMO.sol#2584) 
+FRAXStablecoin.setPriceTarget(uint256) (../../sb/CurveAMO.sol#2587-2589) should emit an event for: 
+	- price_target = _new_price_target (../../sb/CurveAMO.sol#2588) 
+FRAXStablecoin.setRefreshCooldown(uint256) (../../sb/CurveAMO.sol#2591-2593) should emit an event for: 
+	- refresh_cooldown = _new_cooldown (../../sb/CurveAMO.sol#2592) 
+FRAXStablecoin.setETHUSDOracle(address) (../../sb/CurveAMO.sol#2599-2603) should emit an event for: 
+	- eth_usd_pricer_decimals = eth_usd_pricer.getDecimals() (../../sb/CurveAMO.sol#2602) 
+FRAXStablecoin.setPriceBand(uint256) (../../sb/CurveAMO.sol#2613-2615) should emit an event for: 
+	- price_band = _price_band (../../sb/CurveAMO.sol#2614) 
+FraxPool.toggleCollateralPrice(uint256) (../../sb/CurveAMO.sol#3194-3203) should emit an event for: 
+	- pausedPrice = _new_price (../../sb/CurveAMO.sol#3198) 
+	- pausedPrice = 0 (../../sb/CurveAMO.sol#3200) 
+FraxPool.setPoolParameters(uint256,uint256,uint256,uint256,uint256,uint256,uint256) (../../sb/CurveAMO.sol#3206-3214) should emit an event for: 
+	- pool_ceiling = new_ceiling (../../sb/CurveAMO.sol#3207) 
+	- bonus_rate = new_bonus_rate (../../sb/CurveAMO.sol#3208) 
+	- redemption_delay = new_redemption_delay (../../sb/CurveAMO.sol#3209) 
+	- minting_fee = new_mint_fee (../../sb/CurveAMO.sol#3210) 
+	- redemption_fee = new_redeem_fee (../../sb/CurveAMO.sol#3211) 
+	- buyback_fee = new_buyback_fee (../../sb/CurveAMO.sol#3212) 
+	- recollat_fee = new_recollat_fee (../../sb/CurveAMO.sol#3213) 
+CurveAMO.mintRedeemPart1(uint256) (../../sb/CurveAMO.sol#3556-3574) should emit an event for: 
+	- borrowed_collat_historical = borrowed_collat_historical.add(expected_collat_amount) (../../sb/CurveAMO.sol#3566) 
+CurveAMO.giveCollatBack(uint256) (../../sb/CurveAMO.sol#3581-3585) should emit an event for: 
+	- returned_collat_historical = returned_collat_historical.add(amount) (../../sb/CurveAMO.sol#3584) 
+CurveAMO.burnFRAX(uint256) (../../sb/CurveAMO.sol#3588-3591) should emit an event for: 
+	- burned_frax_historical = burned_frax_historical.add(frax_amount) (../../sb/CurveAMO.sol#3590) 
+CurveAMO.metapoolDeposit(uint256,uint256) (../../sb/CurveAMO.sol#3599-3643) should emit an event for: 
+	- minted_frax_historical = minted_frax_historical.add(_frax_amount) (../../sb/CurveAMO.sol#3602) 
+CurveAMO.setConvergenceWindow(uint256) (../../sb/CurveAMO.sol#3784-3786) should emit an event for: 
+	- convergence_window = _window (../../sb/CurveAMO.sol#3785) 
+CurveAMO.setOverrideCollatBalance(bool,uint256) (../../sb/CurveAMO.sol#3788-3791) should emit an event for: 
+	- override_collat_balance_amount = _balance (../../sb/CurveAMO.sol#3790) 
+CurveAMO.setCustomFloor(bool,uint256) (../../sb/CurveAMO.sol#3794-3797) should emit an event for: 
+	- frax_floor = _floor_price (../../sb/CurveAMO.sol#3796) 
+CurveAMO.setDiscountRate(bool,uint256) (../../sb/CurveAMO.sol#3800-3803) should emit an event for: 
+	- discount_rate = _discount_rate (../../sb/CurveAMO.sol#3802) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+FRAXShares.constructor(string,string,address,address,address)._owner_address (../../sb/CurveAMO.sol#1657) lacks a zero-check on :
+		- owner_address = _owner_address (../../sb/CurveAMO.sol#1662)
+FRAXShares.constructor(string,string,address,address,address)._oracle_address (../../sb/CurveAMO.sol#1656) lacks a zero-check on :
+		- oracle_address = _oracle_address (../../sb/CurveAMO.sol#1663)
+FRAXShares.constructor(string,string,address,address,address)._timelock_address (../../sb/CurveAMO.sol#1658) lacks a zero-check on :
+		- timelock_address = _timelock_address (../../sb/CurveAMO.sol#1664)
+FRAXShares.setOracle(address).new_oracle (../../sb/CurveAMO.sol#1674) lacks a zero-check on :
+		- oracle_address = new_oracle (../../sb/CurveAMO.sol#1675)
+FRAXShares.setTimelock(address).new_timelock (../../sb/CurveAMO.sol#1678) lacks a zero-check on :
+		- timelock_address = new_timelock (../../sb/CurveAMO.sol#1679)
+FRAXShares.setOwner(address)._owner_address (../../sb/CurveAMO.sol#1690) lacks a zero-check on :
+		- owner_address = _owner_address (../../sb/CurveAMO.sol#1691)
+UniswapPairOracle.constructor(address,address,address,address,address)._owner_address (../../sb/CurveAMO.sol#2192) lacks a zero-check on :
+		- owner_address = _owner_address (../../sb/CurveAMO.sol#2204)
+UniswapPairOracle.constructor(address,address,address,address,address)._timelock_address (../../sb/CurveAMO.sol#2192) lacks a zero-check on :
+		- timelock_address = _timelock_address (../../sb/CurveAMO.sol#2205)
+UniswapPairOracle.setOwner(address)._owner_address (../../sb/CurveAMO.sol#2208) lacks a zero-check on :
+		- owner_address = _owner_address (../../sb/CurveAMO.sol#2209)
+UniswapPairOracle.setTimelock(address)._timelock_address (../../sb/CurveAMO.sol#2212) lacks a zero-check on :
+		- timelock_address = _timelock_address (../../sb/CurveAMO.sol#2213)
+FRAXStablecoin.constructor(string,string,address,address)._creator_address (../../sb/CurveAMO.sol#2422) lacks a zero-check on :
+		- creator_address = _creator_address (../../sb/CurveAMO.sol#2427)
+		- owner_address = _creator_address (../../sb/CurveAMO.sol#2431)
+FRAXStablecoin.constructor(string,string,address,address)._timelock_address (../../sb/CurveAMO.sol#2423) lacks a zero-check on :
+		- timelock_address = _timelock_address (../../sb/CurveAMO.sol#2428)
+FRAXStablecoin.setOwner(address)._owner_address (../../sb/CurveAMO.sol#2571) lacks a zero-check on :
+		- owner_address = _owner_address (../../sb/CurveAMO.sol#2572)
+FRAXStablecoin.setFXSAddress(address)._fxs_address (../../sb/CurveAMO.sol#2595) lacks a zero-check on :
+		- fxs_address = _fxs_address (../../sb/CurveAMO.sol#2596)
+FRAXStablecoin.setETHUSDOracle(address)._eth_usd_consumer_address (../../sb/CurveAMO.sol#2599) lacks a zero-check on :
+		- eth_usd_consumer_address = _eth_usd_consumer_address (../../sb/CurveAMO.sol#2600)
+FRAXStablecoin.setTimelock(address).new_timelock (../../sb/CurveAMO.sol#2605) lacks a zero-check on :
+		- timelock_address = new_timelock (../../sb/CurveAMO.sol#2606)
+FRAXStablecoin.setController(address)._controller_address (../../sb/CurveAMO.sol#2609) lacks a zero-check on :
+		- controller_address = _controller_address (../../sb/CurveAMO.sol#2610)
+FRAXStablecoin.setFRAXEthOracle(address,address)._frax_oracle_addr (../../sb/CurveAMO.sol#2618) lacks a zero-check on :
+		- frax_eth_oracle_address = _frax_oracle_addr (../../sb/CurveAMO.sol#2619)
+FRAXStablecoin.setFRAXEthOracle(address,address)._weth_address (../../sb/CurveAMO.sol#2618) lacks a zero-check on :
+		- weth_address = _weth_address (../../sb/CurveAMO.sol#2621)
+FRAXStablecoin.setFXSEthOracle(address,address)._fxs_oracle_addr (../../sb/CurveAMO.sol#2625) lacks a zero-check on :
+		- fxs_eth_oracle_address = _fxs_oracle_addr (../../sb/CurveAMO.sol#2626)
+FRAXStablecoin.setFXSEthOracle(address,address)._weth_address (../../sb/CurveAMO.sol#2625) lacks a zero-check on :
+		- weth_address = _weth_address (../../sb/CurveAMO.sol#2628)
+FraxPool.constructor(address,address,address,address,address,uint256)._frax_contract_address (../../sb/CurveAMO.sol#2860) lacks a zero-check on :
+		- frax_contract_address = _frax_contract_address (../../sb/CurveAMO.sol#2869)
+FraxPool.constructor(address,address,address,address,address,uint256)._fxs_contract_address (../../sb/CurveAMO.sol#2861) lacks a zero-check on :
+		- fxs_contract_address = _fxs_contract_address (../../sb/CurveAMO.sol#2870)
+FraxPool.constructor(address,address,address,address,address,uint256)._collateral_address (../../sb/CurveAMO.sol#2862) lacks a zero-check on :
+		- collateral_address = _collateral_address (../../sb/CurveAMO.sol#2871)
+FraxPool.constructor(address,address,address,address,address,uint256)._timelock_address (../../sb/CurveAMO.sol#2864) lacks a zero-check on :
+		- timelock_address = _timelock_address (../../sb/CurveAMO.sol#2872)
+FraxPool.constructor(address,address,address,address,address,uint256)._creator_address (../../sb/CurveAMO.sol#2863) lacks a zero-check on :
+		- owner_address = _creator_address (../../sb/CurveAMO.sol#2873)
+FraxPool.setCollatETHOracle(address,address)._collateral_weth_oracle_address (../../sb/CurveAMO.sol#2925) lacks a zero-check on :
+		- collat_eth_oracle_address = _collateral_weth_oracle_address (../../sb/CurveAMO.sol#2926)
+FraxPool.setCollatETHOracle(address,address)._weth_address (../../sb/CurveAMO.sol#2925) lacks a zero-check on :
+		- weth_address = _weth_address (../../sb/CurveAMO.sol#2928)
+FraxPool.setTimelock(address).new_timelock (../../sb/CurveAMO.sol#3216) lacks a zero-check on :
+		- timelock_address = new_timelock (../../sb/CurveAMO.sol#3217)
+FraxPool.setOwner(address)._owner_address (../../sb/CurveAMO.sol#3220) lacks a zero-check on :
+		- owner_address = _owner_address (../../sb/CurveAMO.sol#3221)
+CurveAMO.constructor(address,address,address,address,address,address,address,address,address,address)._frax_contract_address (../../sb/CurveAMO.sol#3321) lacks a zero-check on :
+		- frax_contract_address = _frax_contract_address (../../sb/CurveAMO.sol#3334)
+CurveAMO.constructor(address,address,address,address,address,address,address,address,address,address)._fxs_contract_address (../../sb/CurveAMO.sol#3322) lacks a zero-check on :
+		- fxs_contract_address = _fxs_contract_address (../../sb/CurveAMO.sol#3335)
+CurveAMO.constructor(address,address,address,address,address,address,address,address,address,address)._collateral_address (../../sb/CurveAMO.sol#3323) lacks a zero-check on :
+		- collateral_token_address = _collateral_address (../../sb/CurveAMO.sol#3336)
+CurveAMO.constructor(address,address,address,address,address,address,address,address,address,address)._timelock_address (../../sb/CurveAMO.sol#3326) lacks a zero-check on :
+		- timelock_address = _timelock_address (../../sb/CurveAMO.sol#3339)
+CurveAMO.constructor(address,address,address,address,address,address,address,address,address,address)._creator_address (../../sb/CurveAMO.sol#3324) lacks a zero-check on :
+		- owner_address = _creator_address (../../sb/CurveAMO.sol#3340)
+CurveAMO.constructor(address,address,address,address,address,address,address,address,address,address)._custodian_address (../../sb/CurveAMO.sol#3325) lacks a zero-check on :
+		- custodian_address = _custodian_address (../../sb/CurveAMO.sol#3341)
+CurveAMO.constructor(address,address,address,address,address,address,address,address,address,address)._frax3crv_metapool_address (../../sb/CurveAMO.sol#3327) lacks a zero-check on :
+		- frax3crv_metapool_address = _frax3crv_metapool_address (../../sb/CurveAMO.sol#3343)
+CurveAMO.constructor(address,address,address,address,address,address,address,address,address,address)._three_pool_address (../../sb/CurveAMO.sol#3328) lacks a zero-check on :
+		- three_pool_address = _three_pool_address (../../sb/CurveAMO.sol#3345)
+CurveAMO.constructor(address,address,address,address,address,address,address,address,address,address)._three_pool_token_address (../../sb/CurveAMO.sol#3329) lacks a zero-check on :
+		- three_pool_token_address = _three_pool_token_address (../../sb/CurveAMO.sol#3347)
+CurveAMO.constructor(address,address,address,address,address,address,address,address,address,address)._pool_address (../../sb/CurveAMO.sol#3330) lacks a zero-check on :
+		- pool_address = _pool_address (../../sb/CurveAMO.sol#3349)
+CurveAMO.setTimelock(address).new_timelock (../../sb/CurveAMO.sol#3734) lacks a zero-check on :
+		- timelock_address = new_timelock (../../sb/CurveAMO.sol#3735)
+CurveAMO.setOwner(address)._owner_address (../../sb/CurveAMO.sol#3738) lacks a zero-check on :
+		- owner_address = _owner_address (../../sb/CurveAMO.sol#3739)
+CurveAMO.setMiscRewardsCustodian(address)._custodian_address (../../sb/CurveAMO.sol#3742) lacks a zero-check on :
+		- custodian_address = _custodian_address (../../sb/CurveAMO.sol#3743)
+CurveAMO.setPool(address)._pool_address (../../sb/CurveAMO.sol#3746) lacks a zero-check on :
+		- pool_address = _pool_address (../../sb/CurveAMO.sol#3747)
+CurveAMO.setThreePool(address,address)._three_pool_address (../../sb/CurveAMO.sol#3751) lacks a zero-check on :
+		- three_pool_address = _three_pool_address (../../sb/CurveAMO.sol#3752)
+CurveAMO.setThreePool(address,address)._three_pool_token_address (../../sb/CurveAMO.sol#3751) lacks a zero-check on :
+		- three_pool_token_address = _three_pool_token_address (../../sb/CurveAMO.sol#3754)
+CurveAMO.setMetapool(address)._metapool_address (../../sb/CurveAMO.sol#3758) lacks a zero-check on :
+		- frax3crv_metapool_address = _metapool_address (../../sb/CurveAMO.sol#3759)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+FRAXStablecoin.globalCollateralValue() (../../sb/CurveAMO.sol#2492-2503) has external calls inside a loop: total_collateral_value_d18 = total_collateral_value_d18.add(FraxPool(frax_pools_array[i]).collatDollarBalance()) (../../sb/CurveAMO.sol#2498)
+CurveAMO.iterate() (../../sb/CurveAMO.sol#3482-3502) has external calls inside a loop: crv3_received = frax3crv_metapool.get_dy(0,1,1e18,(frax_balance,crv3_balance)) (../../sb/CurveAMO.sol#3492)
+CurveAMO.iterate() (../../sb/CurveAMO.sol#3482-3502) has external calls inside a loop: crv3_balance = crv3_balance.sub(frax3crv_metapool.get_dy(0,1,frax_to_swap,(frax_balance,crv3_balance))) (../../sb/CurveAMO.sol#3498)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in CurveAMO.burnFRAX(uint256) (../../sb/CurveAMO.sol#3588-3591):
+	External calls:
+	- FRAX.burn(frax_amount) (../../sb/CurveAMO.sol#3589)
+	State variables written after the call(s):
+	- burned_frax_historical = burned_frax_historical.add(frax_amount) (../../sb/CurveAMO.sol#3590)
+Reentrancy in CurveAMO.giveCollatBack(uint256) (../../sb/CurveAMO.sol#3581-3585):
+	External calls:
+	- collateral_token.transfer(address(pool),amount) (../../sb/CurveAMO.sol#3583)
+	State variables written after the call(s):
+	- returned_collat_historical = returned_collat_historical.add(amount) (../../sb/CurveAMO.sol#3584)
+Reentrancy in CurveAMO.metapoolDeposit(uint256,uint256) (../../sb/CurveAMO.sol#3599-3643):
+	External calls:
+	- FRAX.pool_mint(address(this),_frax_amount) (../../sb/CurveAMO.sol#3601)
+	State variables written after the call(s):
+	- minted_frax_historical = minted_frax_historical.add(_frax_amount) (../../sb/CurveAMO.sol#3602)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in CurveAMO.recoverERC20(address,uint256) (../../sb/CurveAMO.sol#3811-3817):
+	External calls:
+	- ERC20(tokenAddress).transfer(custodian_address,tokenAmount) (../../sb/CurveAMO.sol#3815)
+	Event emitted after the call(s):
+	- Recovered(tokenAddress,tokenAmount) (../../sb/CurveAMO.sol#3816)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+UniswapV2OracleLibrary.currentCumulativePrices(address) (../../sb/CurveAMO.sol#2061-2079) uses timestamp for comparisons
+	Dangerous comparisons:
+	- blockTimestampLast != blockTimestamp (../../sb/CurveAMO.sol#2070)
+FRAXStablecoin.refreshCollateralRatio() (../../sb/CurveAMO.sol#2509-2531) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp - last_call_time >= refresh_cooldown,Must wait for the refresh cooldown since last refresh) (../../sb/CurveAMO.sol#2512)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/CurveAMO.sol#373-382) uses assembly
+	- INLINE ASM (../../sb/CurveAMO.sol#380)
+Address._verifyCallResult(bool,bytes,string) (../../sb/CurveAMO.sol#518-535) uses assembly
+	- INLINE ASM (../../sb/CurveAMO.sol#527-530)
+FRAXShares.getChainId() (../../sb/CurveAMO.sol#1863-1867) uses assembly
+	- INLINE ASM (../../sb/CurveAMO.sol#1865)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+FRAXShares.onlyPools() (../../sb/CurveAMO.sol#1641-1644) compares to a boolean constant:
+	-require(bool,string)(FRAX.frax_pools(msg.sender) == true,Only frax pools can mint new FRAX) (../../sb/CurveAMO.sol#1642)
+FRAXStablecoin.refreshCollateralRatio() (../../sb/CurveAMO.sol#2509-2531) compares to a boolean constant:
+	-require(bool,string)(collateral_ratio_paused == false,Collateral Ratio has been paused) (../../sb/CurveAMO.sol#2510)
+FRAXStablecoin.addPool(address) (../../sb/CurveAMO.sol#2548-2552) compares to a boolean constant:
+	-require(bool,string)(frax_pools[pool_address] == false,address already exists) (../../sb/CurveAMO.sol#2549)
+FRAXStablecoin.removePool(address) (../../sb/CurveAMO.sol#2555-2569) compares to a boolean constant:
+	-require(bool,string)(frax_pools[pool_address] == true,address doesn't exist already) (../../sb/CurveAMO.sol#2556)
+FRAXStablecoin.onlyPools() (../../sb/CurveAMO.sol#2398-2401) compares to a boolean constant:
+	-require(bool,string)(frax_pools[msg.sender] == true,Only frax pools can call this function) (../../sb/CurveAMO.sol#2399)
+FRAXStablecoin.onlyByOwnerGovernanceOrPool() (../../sb/CurveAMO.sol#2408-2415) compares to a boolean constant:
+	-require(bool,string)(msg.sender == owner_address || msg.sender == timelock_address || frax_pools[msg.sender] == true,You are not the owner, the governance timelock, or a pool) (../../sb/CurveAMO.sol#2409-2413)
+FraxPool.collatDollarBalance() (../../sb/CurveAMO.sol#2889-2899) compares to a boolean constant:
+	-collateralPricePaused == true (../../sb/CurveAMO.sol#2890)
+FraxPool.getCollateralPrice() (../../sb/CurveAMO.sol#2916-2923) compares to a boolean constant:
+	-collateralPricePaused == true (../../sb/CurveAMO.sol#2917)
+FraxPool.collectRedemption() (../../sb/CurveAMO.sol#3084-3116) compares to a boolean constant:
+	-sendCollateral == true (../../sb/CurveAMO.sol#3112)
+FraxPool.collectRedemption() (../../sb/CurveAMO.sol#3084-3116) compares to a boolean constant:
+	-sendFXS == true (../../sb/CurveAMO.sol#3108)
+FraxPool.recollateralizeFRAX(uint256,uint256) (../../sb/CurveAMO.sol#3123-3148) compares to a boolean constant:
+	-require(bool,string)(recollateralizePaused == false,Recollateralize is paused) (../../sb/CurveAMO.sol#3124)
+FraxPool.buyBackFXS(uint256,uint256) (../../sb/CurveAMO.sol#3152-3170) compares to a boolean constant:
+	-require(bool,string)(buyBackPaused == false,Buyback is paused) (../../sb/CurveAMO.sol#3153)
+FraxPool.toggleCollateralPrice(uint256) (../../sb/CurveAMO.sol#3194-3203) compares to a boolean constant:
+	-collateralPricePaused == false (../../sb/CurveAMO.sol#3197)
+FraxPool.notRedeemPaused() (../../sb/CurveAMO.sol#2847-2850) compares to a boolean constant:
+	-require(bool,string)(redeemPaused == false,Redeeming is paused) (../../sb/CurveAMO.sol#2848)
+FraxPool.notMintPaused() (../../sb/CurveAMO.sol#2852-2855) compares to a boolean constant:
+	-require(bool,string)(mintPaused == false,Minting is paused) (../../sb/CurveAMO.sol#2853)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#boolean-equality
+
+AccessControl._setRoleAdmin(bytes32,bytes32) (../../sb/CurveAMO.sol#1572-1575) is never used and should be removed
+Address._verifyCallResult(bool,bytes,string) (../../sb/CurveAMO.sol#518-535) is never used and should be removed
+Address.functionCall(address,bytes) (../../sb/CurveAMO.sol#426-428) is never used and should be removed
+Address.functionCall(address,bytes,string) (../../sb/CurveAMO.sol#436-438) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/CurveAMO.sol#451-453) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/CurveAMO.sol#461-468) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/CurveAMO.sol#500-502) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/CurveAMO.sol#510-516) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/CurveAMO.sol#476-478) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/CurveAMO.sol#486-492) is never used and should be removed
+Address.isContract(address) (../../sb/CurveAMO.sol#373-382) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/CurveAMO.sol#400-406) is never used and should be removed
+Babylonian.sqrt(uint256) (../../sb/CurveAMO.sol#1965-1977) is never used and should be removed
+Context._msgData() (../../sb/CurveAMO.sol#116-119) is never used and should be removed
+ERC20._burnFrom(address,uint256) (../../sb/CurveAMO.sol#842-845) is never used and should be removed
+ERC20._mint(address,uint256) (../../sb/CurveAMO.sol#756-764) is never used and should be removed
+EnumerableSet.add(EnumerableSet.UintSet,uint256) (../../sb/CurveAMO.sol#1337-1339) is never used and should be removed
+EnumerableSet.at(EnumerableSet.UintSet,uint256) (../../sb/CurveAMO.sol#1375-1377) is never used and should be removed
+EnumerableSet.contains(EnumerableSet.UintSet,uint256) (../../sb/CurveAMO.sol#1354-1356) is never used and should be removed
+EnumerableSet.length(EnumerableSet.UintSet) (../../sb/CurveAMO.sol#1361-1363) is never used and should be removed
+EnumerableSet.remove(EnumerableSet.UintSet,uint256) (../../sb/CurveAMO.sol#1347-1349) is never used and should be removed
+FRAXShares.getChainId() (../../sb/CurveAMO.sol#1863-1867) is never used and should be removed
+FRAXShares.safe96(uint256,string) (../../sb/CurveAMO.sol#1847-1850) is never used and should be removed
+FixedPoint.decode(FixedPoint.uq112x112) (../../sb/CurveAMO.sol#2030-2032) is never used and should be removed
+FixedPoint.div(FixedPoint.uq112x112,uint112) (../../sb/CurveAMO.sol#2009-2012) is never used and should be removed
+FixedPoint.encode(uint112) (../../sb/CurveAMO.sol#1999-2001) is never used and should be removed
+FixedPoint.encode144(uint144) (../../sb/CurveAMO.sol#2004-2006) is never used and should be removed
+FixedPoint.reciprocal(FixedPoint.uq112x112) (../../sb/CurveAMO.sol#2040-2043) is never used and should be removed
+FixedPoint.sqrt(FixedPoint.uq112x112) (../../sb/CurveAMO.sol#2046-2048) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/CurveAMO.sol#254-256) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/CurveAMO.sol#271-274) is never used and should be removed
+UniswapV2Library.getAmountIn(uint256,uint256,uint256) (../../sb/CurveAMO.sol#2134-2140) is never used and should be removed
+UniswapV2Library.getAmountOut(uint256,uint256,uint256) (../../sb/CurveAMO.sol#2124-2131) is never used and should be removed
+UniswapV2Library.getAmountsIn(address,uint256,address[]) (../../sb/CurveAMO.sol#2154-2162) is never used and should be removed
+UniswapV2Library.getAmountsOut(address,uint256,address[]) (../../sb/CurveAMO.sol#2143-2151) is never used and should be removed
+UniswapV2Library.getReserves(address,address,address) (../../sb/CurveAMO.sol#2110-2114) is never used and should be removed
+UniswapV2Library.pairForCreate2(address,address,address) (../../sb/CurveAMO.sol#2099-2107) is never used and should be removed
+UniswapV2Library.quote(uint256,uint256,uint256) (../../sb/CurveAMO.sol#2117-2121) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.6.11 (../../sb/CurveAMO.sol#1) allows old versions
+solc-0.6.11 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/CurveAMO.sol#400-406):
+	- (success) = recipient.call{value: amount}() (../../sb/CurveAMO.sol#404)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/CurveAMO.sol#461-468):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/CurveAMO.sol#466)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/CurveAMO.sol#486-492):
+	- (success,returndata) = target.staticcall(data) (../../sb/CurveAMO.sol#490)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/CurveAMO.sol#510-516):
+	- (success,returndata) = target.delegatecall(data) (../../sb/CurveAMO.sol#514)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Function IStableSwap3Pool.__init__(address,address[3],address,uint256,uint256,uint256) (../../sb/CurveAMO.sol#8) is not in mixedCase
+Parameter IStableSwap3Pool.__init__(address,address[3],address,uint256,uint256,uint256)._pool_token (../../sb/CurveAMO.sol#8) is not in mixedCase
+Parameter IStableSwap3Pool.__init__(address,address[3],address,uint256,uint256,uint256)._A (../../sb/CurveAMO.sol#8) is not in mixedCase
+Parameter IStableSwap3Pool.__init__(address,address[3],address,uint256,uint256,uint256)._admin_fee (../../sb/CurveAMO.sol#8) is not in mixedCase
+Function IStableSwap3Pool.A() (../../sb/CurveAMO.sol#21) is not in mixedCase
+Function IStableSwap3Pool.get_virtual_price() (../../sb/CurveAMO.sol#22) is not in mixedCase
+Function IStableSwap3Pool.calc_token_amount(uint256[3],bool) (../../sb/CurveAMO.sol#23) is not in mixedCase
+Function IStableSwap3Pool.add_liquidity(uint256[3],uint256) (../../sb/CurveAMO.sol#24) is not in mixedCase
+Parameter IStableSwap3Pool.add_liquidity(uint256[3],uint256).min_mint_amount (../../sb/CurveAMO.sol#24) is not in mixedCase
+Function IStableSwap3Pool.get_dy(int128,int128,uint256) (../../sb/CurveAMO.sol#25) is not in mixedCase
+Function IStableSwap3Pool.get_dy_underlying(int128,int128,uint256) (../../sb/CurveAMO.sol#26) is not in mixedCase
+Parameter IStableSwap3Pool.exchange(int128,int128,uint256,uint256).min_dy (../../sb/CurveAMO.sol#27) is not in mixedCase
+Function IStableSwap3Pool.remove_liquidity(uint256,uint256[3]) (../../sb/CurveAMO.sol#28) is not in mixedCase
+Parameter IStableSwap3Pool.remove_liquidity(uint256,uint256[3]).min_amounts (../../sb/CurveAMO.sol#28) is not in mixedCase
+Function IStableSwap3Pool.remove_liquidity_imbalance(uint256[3],uint256) (../../sb/CurveAMO.sol#29) is not in mixedCase
+Parameter IStableSwap3Pool.remove_liquidity_imbalance(uint256[3],uint256).max_burn_amount (../../sb/CurveAMO.sol#29) is not in mixedCase
+Function IStableSwap3Pool.calc_withdraw_one_coin(uint256,int128) (../../sb/CurveAMO.sol#30) is not in mixedCase
+Parameter IStableSwap3Pool.calc_withdraw_one_coin(uint256,int128)._token_amount (../../sb/CurveAMO.sol#30) is not in mixedCase
+Function IStableSwap3Pool.remove_liquidity_one_coin(uint256,int128,uint256) (../../sb/CurveAMO.sol#31) is not in mixedCase
+Parameter IStableSwap3Pool.remove_liquidity_one_coin(uint256,int128,uint256)._token_amount (../../sb/CurveAMO.sol#31) is not in mixedCase
+Parameter IStableSwap3Pool.remove_liquidity_one_coin(uint256,int128,uint256).min_amount (../../sb/CurveAMO.sol#31) is not in mixedCase
+Function IStableSwap3Pool.ramp_A(uint256,uint256) (../../sb/CurveAMO.sol#34) is not in mixedCase
+Parameter IStableSwap3Pool.ramp_A(uint256,uint256)._future_A (../../sb/CurveAMO.sol#34) is not in mixedCase
+Parameter IStableSwap3Pool.ramp_A(uint256,uint256)._future_time (../../sb/CurveAMO.sol#34) is not in mixedCase
+Function IStableSwap3Pool.stop_ramp_A() (../../sb/CurveAMO.sol#35) is not in mixedCase
+Function IStableSwap3Pool.commit_new_fee(uint256,uint256) (../../sb/CurveAMO.sol#36) is not in mixedCase
+Parameter IStableSwap3Pool.commit_new_fee(uint256,uint256).new_fee (../../sb/CurveAMO.sol#36) is not in mixedCase
+Parameter IStableSwap3Pool.commit_new_fee(uint256,uint256).new_admin_fee (../../sb/CurveAMO.sol#36) is not in mixedCase
+Function IStableSwap3Pool.apply_new_fee() (../../sb/CurveAMO.sol#37) is not in mixedCase
+Function IStableSwap3Pool.commit_transfer_ownership(address) (../../sb/CurveAMO.sol#38) is not in mixedCase
+Function IStableSwap3Pool.apply_transfer_ownership() (../../sb/CurveAMO.sol#39) is not in mixedCase
+Function IStableSwap3Pool.revert_transfer_ownership() (../../sb/CurveAMO.sol#40) is not in mixedCase
+Function IStableSwap3Pool.admin_balances(uint256) (../../sb/CurveAMO.sol#41) is not in mixedCase
+Function IStableSwap3Pool.withdraw_admin_fees() (../../sb/CurveAMO.sol#42) is not in mixedCase
+Function IStableSwap3Pool.donate_admin_fees() (../../sb/CurveAMO.sol#43) is not in mixedCase
+Function IStableSwap3Pool.kill_me() (../../sb/CurveAMO.sol#44) is not in mixedCase
+Function IStableSwap3Pool.unkill_me() (../../sb/CurveAMO.sol#45) is not in mixedCase
+Function IMetaImplementationUSD.__init__() (../../sb/CurveAMO.sol#51) is not in mixedCase
+Parameter IMetaImplementationUSD.initialize(string,string,address,uint256,uint256,uint256,address)._A (../../sb/CurveAMO.sol#52) is not in mixedCase
+Function IMetaImplementationUSD.get_previous_balances() (../../sb/CurveAMO.sol#64) is not in mixedCase
+Function IMetaImplementationUSD.get_twap_balances(uint256[2],uint256[2],uint256) (../../sb/CurveAMO.sol#65) is not in mixedCase
+Parameter IMetaImplementationUSD.get_twap_balances(uint256[2],uint256[2],uint256)._first_balances (../../sb/CurveAMO.sol#65) is not in mixedCase
+Parameter IMetaImplementationUSD.get_twap_balances(uint256[2],uint256[2],uint256)._last_balances (../../sb/CurveAMO.sol#65) is not in mixedCase
+Parameter IMetaImplementationUSD.get_twap_balances(uint256[2],uint256[2],uint256)._time_elapsed (../../sb/CurveAMO.sol#65) is not in mixedCase
+Function IMetaImplementationUSD.get_price_cumulative_last() (../../sb/CurveAMO.sol#66) is not in mixedCase
+Function IMetaImplementationUSD.admin_fee() (../../sb/CurveAMO.sol#67) is not in mixedCase
+Function IMetaImplementationUSD.A() (../../sb/CurveAMO.sol#68) is not in mixedCase
+Function IMetaImplementationUSD.A_precise() (../../sb/CurveAMO.sol#69) is not in mixedCase
+Function IMetaImplementationUSD.get_virtual_price() (../../sb/CurveAMO.sol#70) is not in mixedCase
+Function IMetaImplementationUSD.calc_token_amount(uint256[2],bool) (../../sb/CurveAMO.sol#71) is not in mixedCase
+Parameter IMetaImplementationUSD.calc_token_amount(uint256[2],bool)._is_deposit (../../sb/CurveAMO.sol#71) is not in mixedCase
+Function IMetaImplementationUSD.calc_token_amount(uint256[2],bool,bool) (../../sb/CurveAMO.sol#72) is not in mixedCase
+Parameter IMetaImplementationUSD.calc_token_amount(uint256[2],bool,bool)._is_deposit (../../sb/CurveAMO.sol#72) is not in mixedCase
+Function IMetaImplementationUSD.add_liquidity(uint256[2],uint256) (../../sb/CurveAMO.sol#73) is not in mixedCase
+Parameter IMetaImplementationUSD.add_liquidity(uint256[2],uint256)._min_mint_amount (../../sb/CurveAMO.sol#73) is not in mixedCase
+Function IMetaImplementationUSD.add_liquidity(uint256[2],uint256,address) (../../sb/CurveAMO.sol#74) is not in mixedCase
+Parameter IMetaImplementationUSD.add_liquidity(uint256[2],uint256,address)._min_mint_amount (../../sb/CurveAMO.sol#74) is not in mixedCase
+Function IMetaImplementationUSD.get_dy(int128,int128,uint256) (../../sb/CurveAMO.sol#75) is not in mixedCase
+Function IMetaImplementationUSD.get_dy(int128,int128,uint256,uint256[2]) (../../sb/CurveAMO.sol#76) is not in mixedCase
+Function IMetaImplementationUSD.get_dy_underlying(int128,int128,uint256) (../../sb/CurveAMO.sol#77) is not in mixedCase
+Function IMetaImplementationUSD.get_dy_underlying(int128,int128,uint256,uint256[2]) (../../sb/CurveAMO.sol#78) is not in mixedCase
+Parameter IMetaImplementationUSD.exchange(int128,int128,uint256,uint256).min_dy (../../sb/CurveAMO.sol#79) is not in mixedCase
+Parameter IMetaImplementationUSD.exchange(int128,int128,uint256,uint256,address).min_dy (../../sb/CurveAMO.sol#80) is not in mixedCase
+Function IMetaImplementationUSD.exchange_underlying(int128,int128,uint256,uint256) (../../sb/CurveAMO.sol#81) is not in mixedCase
+Parameter IMetaImplementationUSD.exchange_underlying(int128,int128,uint256,uint256).min_dy (../../sb/CurveAMO.sol#81) is not in mixedCase
+Function IMetaImplementationUSD.exchange_underlying(int128,int128,uint256,uint256,address) (../../sb/CurveAMO.sol#82) is not in mixedCase
+Parameter IMetaImplementationUSD.exchange_underlying(int128,int128,uint256,uint256,address).min_dy (../../sb/CurveAMO.sol#82) is not in mixedCase
+Function IMetaImplementationUSD.remove_liquidity(uint256,uint256[2]) (../../sb/CurveAMO.sol#83) is not in mixedCase
+Parameter IMetaImplementationUSD.remove_liquidity(uint256,uint256[2])._burn_amount (../../sb/CurveAMO.sol#83) is not in mixedCase
+Parameter IMetaImplementationUSD.remove_liquidity(uint256,uint256[2])._min_amounts (../../sb/CurveAMO.sol#83) is not in mixedCase
+Function IMetaImplementationUSD.remove_liquidity(uint256,uint256[2],address) (../../sb/CurveAMO.sol#84) is not in mixedCase
+Parameter IMetaImplementationUSD.remove_liquidity(uint256,uint256[2],address)._burn_amount (../../sb/CurveAMO.sol#84) is not in mixedCase
+Parameter IMetaImplementationUSD.remove_liquidity(uint256,uint256[2],address)._min_amounts (../../sb/CurveAMO.sol#84) is not in mixedCase
+Function IMetaImplementationUSD.remove_liquidity_imbalance(uint256[2],uint256) (../../sb/CurveAMO.sol#85) is not in mixedCase
+Parameter IMetaImplementationUSD.remove_liquidity_imbalance(uint256[2],uint256)._max_burn_amount (../../sb/CurveAMO.sol#85) is not in mixedCase
+Function IMetaImplementationUSD.remove_liquidity_imbalance(uint256[2],uint256,address) (../../sb/CurveAMO.sol#86) is not in mixedCase
+Parameter IMetaImplementationUSD.remove_liquidity_imbalance(uint256[2],uint256,address)._max_burn_amount (../../sb/CurveAMO.sol#86) is not in mixedCase
+Function IMetaImplementationUSD.calc_withdraw_one_coin(uint256,int128) (../../sb/CurveAMO.sol#87) is not in mixedCase
+Parameter IMetaImplementationUSD.calc_withdraw_one_coin(uint256,int128)._burn_amount (../../sb/CurveAMO.sol#87) is not in mixedCase
+Function IMetaImplementationUSD.calc_withdraw_one_coin(uint256,int128,bool) (../../sb/CurveAMO.sol#88) is not in mixedCase
+Parameter IMetaImplementationUSD.calc_withdraw_one_coin(uint256,int128,bool)._burn_amount (../../sb/CurveAMO.sol#88) is not in mixedCase
+Function IMetaImplementationUSD.remove_liquidity_one_coin(uint256,int128,uint256) (../../sb/CurveAMO.sol#89) is not in mixedCase
+Parameter IMetaImplementationUSD.remove_liquidity_one_coin(uint256,int128,uint256)._burn_amount (../../sb/CurveAMO.sol#89) is not in mixedCase
+Parameter IMetaImplementationUSD.remove_liquidity_one_coin(uint256,int128,uint256)._min_received (../../sb/CurveAMO.sol#89) is not in mixedCase
+Function IMetaImplementationUSD.remove_liquidity_one_coin(uint256,int128,uint256,address) (../../sb/CurveAMO.sol#90) is not in mixedCase
+Parameter IMetaImplementationUSD.remove_liquidity_one_coin(uint256,int128,uint256,address)._burn_amount (../../sb/CurveAMO.sol#90) is not in mixedCase
+Parameter IMetaImplementationUSD.remove_liquidity_one_coin(uint256,int128,uint256,address)._min_received (../../sb/CurveAMO.sol#90) is not in mixedCase
+Function IMetaImplementationUSD.ramp_A(uint256,uint256) (../../sb/CurveAMO.sol#91) is not in mixedCase
+Parameter IMetaImplementationUSD.ramp_A(uint256,uint256)._future_A (../../sb/CurveAMO.sol#91) is not in mixedCase
+Parameter IMetaImplementationUSD.ramp_A(uint256,uint256)._future_time (../../sb/CurveAMO.sol#91) is not in mixedCase
+Function IMetaImplementationUSD.stop_ramp_A() (../../sb/CurveAMO.sol#92) is not in mixedCase
+Function IMetaImplementationUSD.admin_balances(uint256) (../../sb/CurveAMO.sol#93) is not in mixedCase
+Function IMetaImplementationUSD.withdraw_admin_fees() (../../sb/CurveAMO.sol#94) is not in mixedCase
+Parameter FRAXShares.setOracle(address).new_oracle (../../sb/CurveAMO.sol#1674) is not in mixedCase
+Parameter FRAXShares.setTimelock(address).new_timelock (../../sb/CurveAMO.sol#1678) is not in mixedCase
+Parameter FRAXShares.setFRAXAddress(address).frax_contract_address (../../sb/CurveAMO.sol#1682) is not in mixedCase
+Parameter FRAXShares.setFXSMinDAO(uint256).min_FXS (../../sb/CurveAMO.sol#1686) is not in mixedCase
+Parameter FRAXShares.setOwner(address)._owner_address (../../sb/CurveAMO.sol#1690) is not in mixedCase
+Function FRAXShares.pool_mint(address,uint256) (../../sb/CurveAMO.sol#1699-1710) is not in mixedCase
+Parameter FRAXShares.pool_mint(address,uint256).m_address (../../sb/CurveAMO.sol#1699) is not in mixedCase
+Parameter FRAXShares.pool_mint(address,uint256).m_amount (../../sb/CurveAMO.sol#1699) is not in mixedCase
+Function FRAXShares.pool_burn_from(address,uint256) (../../sb/CurveAMO.sol#1713-1724) is not in mixedCase
+Parameter FRAXShares.pool_burn_from(address,uint256).b_address (../../sb/CurveAMO.sol#1713) is not in mixedCase
+Parameter FRAXShares.pool_burn_from(address,uint256).b_amount (../../sb/CurveAMO.sol#1713) is not in mixedCase
+Variable FRAXShares.FRAXStablecoinAdd (../../sb/CurveAMO.sol#1615) is not in mixedCase
+Variable FRAXShares.FXS_DAO_min (../../sb/CurveAMO.sol#1618) is not in mixedCase
+Variable FRAXShares.owner_address (../../sb/CurveAMO.sol#1620) is not in mixedCase
+Variable FRAXShares.oracle_address (../../sb/CurveAMO.sol#1621) is not in mixedCase
+Variable FRAXShares.timelock_address (../../sb/CurveAMO.sol#1622) is not in mixedCase
+Variable FRAXShares.FRAX (../../sb/CurveAMO.sol#1623) is not in mixedCase
+Function IUniswapV2Pair.DOMAIN_SEPARATOR() (../../sb/CurveAMO.sol#1913) is not in mixedCase
+Function IUniswapV2Pair.PERMIT_TYPEHASH() (../../sb/CurveAMO.sol#1914) is not in mixedCase
+Function IUniswapV2Pair.MINIMUM_LIQUIDITY() (../../sb/CurveAMO.sol#1931) is not in mixedCase
+Struct FixedPoint.uq112x112 (../../sb/CurveAMO.sol#1984-1986) is not in CapWords
+Struct FixedPoint.uq144x112 (../../sb/CurveAMO.sol#1990-1992) is not in CapWords
+Parameter UniswapPairOracle.setOwner(address)._owner_address (../../sb/CurveAMO.sol#2208) is not in mixedCase
+Parameter UniswapPairOracle.setTimelock(address)._timelock_address (../../sb/CurveAMO.sol#2212) is not in mixedCase
+Parameter UniswapPairOracle.setPeriod(uint256)._period (../../sb/CurveAMO.sol#2216) is not in mixedCase
+Parameter UniswapPairOracle.setConsultLeniency(uint256)._consult_leniency (../../sb/CurveAMO.sol#2220) is not in mixedCase
+Parameter UniswapPairOracle.setAllowStaleConsults(bool)._allow_stale_consults (../../sb/CurveAMO.sol#2224) is not in mixedCase
+Variable UniswapPairOracle.owner_address (../../sb/CurveAMO.sol#2170) is not in mixedCase
+Variable UniswapPairOracle.timelock_address (../../sb/CurveAMO.sol#2171) is not in mixedCase
+Variable UniswapPairOracle.PERIOD (../../sb/CurveAMO.sol#2173) is not in mixedCase
+Variable UniswapPairOracle.CONSULT_LENIENCY (../../sb/CurveAMO.sol#2174) is not in mixedCase
+Variable UniswapPairOracle.ALLOW_STALE_CONSULTS (../../sb/CurveAMO.sol#2175) is not in mixedCase
+Function FRAXStablecoin.oracle_price(FRAXStablecoin.PriceChoice) (../../sb/CurveAMO.sol#2445-2460) is not in mixedCase
+Function FRAXStablecoin.frax_price() (../../sb/CurveAMO.sol#2463-2465) is not in mixedCase
+Function FRAXStablecoin.fxs_price() (../../sb/CurveAMO.sol#2468-2470) is not in mixedCase
+Function FRAXStablecoin.eth_usd_price() (../../sb/CurveAMO.sol#2472-2474) is not in mixedCase
+Function FRAXStablecoin.frax_info() (../../sb/CurveAMO.sol#2478-2489) is not in mixedCase
+Function FRAXStablecoin.pool_burn_from(address,uint256) (../../sb/CurveAMO.sol#2536-2539) is not in mixedCase
+Parameter FRAXStablecoin.pool_burn_from(address,uint256).b_address (../../sb/CurveAMO.sol#2536) is not in mixedCase
+Parameter FRAXStablecoin.pool_burn_from(address,uint256).b_amount (../../sb/CurveAMO.sol#2536) is not in mixedCase
+Function FRAXStablecoin.pool_mint(address,uint256) (../../sb/CurveAMO.sol#2542-2545) is not in mixedCase
+Parameter FRAXStablecoin.pool_mint(address,uint256).m_address (../../sb/CurveAMO.sol#2542) is not in mixedCase
+Parameter FRAXStablecoin.pool_mint(address,uint256).m_amount (../../sb/CurveAMO.sol#2542) is not in mixedCase
+Parameter FRAXStablecoin.addPool(address).pool_address (../../sb/CurveAMO.sol#2548) is not in mixedCase
+Parameter FRAXStablecoin.removePool(address).pool_address (../../sb/CurveAMO.sol#2555) is not in mixedCase
+Parameter FRAXStablecoin.setOwner(address)._owner_address (../../sb/CurveAMO.sol#2571) is not in mixedCase
+Parameter FRAXStablecoin.setRedemptionFee(uint256).red_fee (../../sb/CurveAMO.sol#2575) is not in mixedCase
+Parameter FRAXStablecoin.setMintingFee(uint256).min_fee (../../sb/CurveAMO.sol#2579) is not in mixedCase
+Parameter FRAXStablecoin.setFraxStep(uint256)._new_step (../../sb/CurveAMO.sol#2583) is not in mixedCase
+Parameter FRAXStablecoin.setPriceTarget(uint256)._new_price_target (../../sb/CurveAMO.sol#2587) is not in mixedCase
+Parameter FRAXStablecoin.setRefreshCooldown(uint256)._new_cooldown (../../sb/CurveAMO.sol#2591) is not in mixedCase
+Parameter FRAXStablecoin.setFXSAddress(address)._fxs_address (../../sb/CurveAMO.sol#2595) is not in mixedCase
+Parameter FRAXStablecoin.setETHUSDOracle(address)._eth_usd_consumer_address (../../sb/CurveAMO.sol#2599) is not in mixedCase
+Parameter FRAXStablecoin.setTimelock(address).new_timelock (../../sb/CurveAMO.sol#2605) is not in mixedCase
+Parameter FRAXStablecoin.setController(address)._controller_address (../../sb/CurveAMO.sol#2609) is not in mixedCase
+Parameter FRAXStablecoin.setPriceBand(uint256)._price_band (../../sb/CurveAMO.sol#2613) is not in mixedCase
+Parameter FRAXStablecoin.setFRAXEthOracle(address,address)._frax_oracle_addr (../../sb/CurveAMO.sol#2618) is not in mixedCase
+Parameter FRAXStablecoin.setFRAXEthOracle(address,address)._weth_address (../../sb/CurveAMO.sol#2618) is not in mixedCase
+Parameter FRAXStablecoin.setFXSEthOracle(address,address)._fxs_oracle_addr (../../sb/CurveAMO.sol#2625) is not in mixedCase
+Parameter FRAXStablecoin.setFXSEthOracle(address,address)._weth_address (../../sb/CurveAMO.sol#2625) is not in mixedCase
+Variable FRAXStablecoin.eth_usd_pricer (../../sb/CurveAMO.sol#2352) is not in mixedCase
+Variable FRAXStablecoin.eth_usd_pricer_decimals (../../sb/CurveAMO.sol#2353) is not in mixedCase
+Variable FRAXStablecoin.owner_address (../../sb/CurveAMO.sol#2359) is not in mixedCase
+Variable FRAXStablecoin.creator_address (../../sb/CurveAMO.sol#2360) is not in mixedCase
+Variable FRAXStablecoin.timelock_address (../../sb/CurveAMO.sol#2361) is not in mixedCase
+Variable FRAXStablecoin.controller_address (../../sb/CurveAMO.sol#2362) is not in mixedCase
+Variable FRAXStablecoin.fxs_address (../../sb/CurveAMO.sol#2363) is not in mixedCase
+Variable FRAXStablecoin.frax_eth_oracle_address (../../sb/CurveAMO.sol#2364) is not in mixedCase
+Variable FRAXStablecoin.fxs_eth_oracle_address (../../sb/CurveAMO.sol#2365) is not in mixedCase
+Variable FRAXStablecoin.weth_address (../../sb/CurveAMO.sol#2366) is not in mixedCase
+Variable FRAXStablecoin.eth_usd_consumer_address (../../sb/CurveAMO.sol#2367) is not in mixedCase
+Variable FRAXStablecoin.frax_pools_array (../../sb/CurveAMO.sol#2371) is not in mixedCase
+Variable FRAXStablecoin.frax_pools (../../sb/CurveAMO.sol#2374) is not in mixedCase
+Variable FRAXStablecoin.global_collateral_ratio (../../sb/CurveAMO.sol#2379) is not in mixedCase
+Variable FRAXStablecoin.redemption_fee (../../sb/CurveAMO.sol#2380) is not in mixedCase
+Variable FRAXStablecoin.minting_fee (../../sb/CurveAMO.sol#2381) is not in mixedCase
+Variable FRAXStablecoin.frax_step (../../sb/CurveAMO.sol#2382) is not in mixedCase
+Variable FRAXStablecoin.refresh_cooldown (../../sb/CurveAMO.sol#2383) is not in mixedCase
+Variable FRAXStablecoin.price_target (../../sb/CurveAMO.sol#2384) is not in mixedCase
+Variable FRAXStablecoin.price_band (../../sb/CurveAMO.sol#2385) is not in mixedCase
+Variable FRAXStablecoin.DEFAULT_ADMIN_ADDRESS (../../sb/CurveAMO.sol#2387) is not in mixedCase
+Variable FRAXStablecoin.collateral_ratio_paused (../../sb/CurveAMO.sol#2389) is not in mixedCase
+Variable FRAXStablecoin.last_call_time (../../sb/CurveAMO.sol#2508) is not in mixedCase
+Struct FraxPoolLibrary.MintFF_Params (../../sb/CurveAMO.sol#2652-2658) is not in CapWords
+Struct FraxPoolLibrary.BuybackFXS_Params (../../sb/CurveAMO.sol#2660-2665) is not in CapWords
+Parameter FraxPoolLibrary.calcMint1t1FRAX(uint256,uint256).col_price (../../sb/CurveAMO.sol#2669) is not in mixedCase
+Parameter FraxPoolLibrary.calcMint1t1FRAX(uint256,uint256).collateral_amount_d18 (../../sb/CurveAMO.sol#2669) is not in mixedCase
+Parameter FraxPoolLibrary.calcMintAlgorithmicFRAX(uint256,uint256).fxs_price_usd (../../sb/CurveAMO.sol#2673) is not in mixedCase
+Parameter FraxPoolLibrary.calcMintAlgorithmicFRAX(uint256,uint256).fxs_amount_d18 (../../sb/CurveAMO.sol#2673) is not in mixedCase
+Parameter FraxPoolLibrary.calcRedeem1t1FRAX(uint256,uint256).col_price_usd (../../sb/CurveAMO.sol#2703) is not in mixedCase
+Parameter FraxPoolLibrary.calcRedeem1t1FRAX(uint256,uint256).FRAX_amount (../../sb/CurveAMO.sol#2703) is not in mixedCase
+Parameter FraxPoolLibrary.recollateralizeAmount(uint256,uint256,uint256).total_supply (../../sb/CurveAMO.sol#2728) is not in mixedCase
+Parameter FraxPoolLibrary.recollateralizeAmount(uint256,uint256,uint256).global_collateral_ratio (../../sb/CurveAMO.sol#2728) is not in mixedCase
+Parameter FraxPoolLibrary.recollateralizeAmount(uint256,uint256,uint256).global_collat_value (../../sb/CurveAMO.sol#2728) is not in mixedCase
+Parameter FraxPoolLibrary.calcRecollateralizeFRAXInner(uint256,uint256,uint256,uint256,uint256).collateral_amount (../../sb/CurveAMO.sol#2736) is not in mixedCase
+Parameter FraxPoolLibrary.calcRecollateralizeFRAXInner(uint256,uint256,uint256,uint256,uint256).col_price (../../sb/CurveAMO.sol#2737) is not in mixedCase
+Parameter FraxPoolLibrary.calcRecollateralizeFRAXInner(uint256,uint256,uint256,uint256,uint256).global_collat_value (../../sb/CurveAMO.sol#2738) is not in mixedCase
+Parameter FraxPoolLibrary.calcRecollateralizeFRAXInner(uint256,uint256,uint256,uint256,uint256).frax_total_supply (../../sb/CurveAMO.sol#2739) is not in mixedCase
+Parameter FraxPoolLibrary.calcRecollateralizeFRAXInner(uint256,uint256,uint256,uint256,uint256).global_collateral_ratio (../../sb/CurveAMO.sol#2740) is not in mixedCase
+Parameter FraxPool.setCollatETHOracle(address,address)._collateral_weth_oracle_address (../../sb/CurveAMO.sol#2925) is not in mixedCase
+Parameter FraxPool.setCollatETHOracle(address,address)._weth_address (../../sb/CurveAMO.sol#2925) is not in mixedCase
+Parameter FraxPool.mint1t1FRAX(uint256,uint256).collateral_amount (../../sb/CurveAMO.sol#2932) is not in mixedCase
+Parameter FraxPool.mint1t1FRAX(uint256,uint256).FRAX_out_min (../../sb/CurveAMO.sol#2932) is not in mixedCase
+Parameter FraxPool.mintAlgorithmicFRAX(uint256,uint256).fxs_amount_d18 (../../sb/CurveAMO.sol#2952) is not in mixedCase
+Parameter FraxPool.mintAlgorithmicFRAX(uint256,uint256).FRAX_out_min (../../sb/CurveAMO.sol#2952) is not in mixedCase
+Parameter FraxPool.mintFractionalFRAX(uint256,uint256,uint256).collateral_amount (../../sb/CurveAMO.sol#2970) is not in mixedCase
+Parameter FraxPool.mintFractionalFRAX(uint256,uint256,uint256).fxs_amount (../../sb/CurveAMO.sol#2970) is not in mixedCase
+Parameter FraxPool.mintFractionalFRAX(uint256,uint256,uint256).FRAX_out_min (../../sb/CurveAMO.sol#2970) is not in mixedCase
+Parameter FraxPool.redeem1t1FRAX(uint256,uint256).FRAX_amount (../../sb/CurveAMO.sol#2999) is not in mixedCase
+Parameter FraxPool.redeem1t1FRAX(uint256,uint256).COLLATERAL_out_min (../../sb/CurveAMO.sol#2999) is not in mixedCase
+Parameter FraxPool.redeemFractionalFRAX(uint256,uint256,uint256).FRAX_amount (../../sb/CurveAMO.sol#3023) is not in mixedCase
+Parameter FraxPool.redeemFractionalFRAX(uint256,uint256,uint256).FXS_out_min (../../sb/CurveAMO.sol#3023) is not in mixedCase
+Parameter FraxPool.redeemFractionalFRAX(uint256,uint256,uint256).COLLATERAL_out_min (../../sb/CurveAMO.sol#3023) is not in mixedCase
+Parameter FraxPool.redeemAlgorithmicFRAX(uint256,uint256).FRAX_amount (../../sb/CurveAMO.sol#3059) is not in mixedCase
+Parameter FraxPool.redeemAlgorithmicFRAX(uint256,uint256).FXS_out_min (../../sb/CurveAMO.sol#3059) is not in mixedCase
+Parameter FraxPool.recollateralizeFRAX(uint256,uint256).collateral_amount (../../sb/CurveAMO.sol#3123) is not in mixedCase
+Parameter FraxPool.recollateralizeFRAX(uint256,uint256).FXS_out_min (../../sb/CurveAMO.sol#3123) is not in mixedCase
+Parameter FraxPool.buyBackFXS(uint256,uint256).FXS_amount (../../sb/CurveAMO.sol#3152) is not in mixedCase
+Parameter FraxPool.buyBackFXS(uint256,uint256).COLLATERAL_out_min (../../sb/CurveAMO.sol#3152) is not in mixedCase
+Parameter FraxPool.toggleCollateralPrice(uint256)._new_price (../../sb/CurveAMO.sol#3194) is not in mixedCase
+Parameter FraxPool.setPoolParameters(uint256,uint256,uint256,uint256,uint256,uint256,uint256).new_ceiling (../../sb/CurveAMO.sol#3206) is not in mixedCase
+Parameter FraxPool.setPoolParameters(uint256,uint256,uint256,uint256,uint256,uint256,uint256).new_bonus_rate (../../sb/CurveAMO.sol#3206) is not in mixedCase
+Parameter FraxPool.setPoolParameters(uint256,uint256,uint256,uint256,uint256,uint256,uint256).new_redemption_delay (../../sb/CurveAMO.sol#3206) is not in mixedCase
+Parameter FraxPool.setPoolParameters(uint256,uint256,uint256,uint256,uint256,uint256,uint256).new_mint_fee (../../sb/CurveAMO.sol#3206) is not in mixedCase
+Parameter FraxPool.setPoolParameters(uint256,uint256,uint256,uint256,uint256,uint256,uint256).new_redeem_fee (../../sb/CurveAMO.sol#3206) is not in mixedCase
+Parameter FraxPool.setPoolParameters(uint256,uint256,uint256,uint256,uint256,uint256,uint256).new_buyback_fee (../../sb/CurveAMO.sol#3206) is not in mixedCase
+Parameter FraxPool.setPoolParameters(uint256,uint256,uint256,uint256,uint256,uint256,uint256).new_recollat_fee (../../sb/CurveAMO.sol#3206) is not in mixedCase
+Parameter FraxPool.setTimelock(address).new_timelock (../../sb/CurveAMO.sol#3216) is not in mixedCase
+Parameter FraxPool.setOwner(address)._owner_address (../../sb/CurveAMO.sol#3220) is not in mixedCase
+Variable FraxPool.collateral_token (../../sb/CurveAMO.sol#2781) is not in mixedCase
+Variable FraxPool.collateral_address (../../sb/CurveAMO.sol#2782) is not in mixedCase
+Variable FraxPool.owner_address (../../sb/CurveAMO.sol#2783) is not in mixedCase
+Variable FraxPool.frax_contract_address (../../sb/CurveAMO.sol#2785) is not in mixedCase
+Variable FraxPool.fxs_contract_address (../../sb/CurveAMO.sol#2786) is not in mixedCase
+Variable FraxPool.timelock_address (../../sb/CurveAMO.sol#2787) is not in mixedCase
+Variable FraxPool.FXS (../../sb/CurveAMO.sol#2788) is not in mixedCase
+Variable FraxPool.FRAX (../../sb/CurveAMO.sol#2789) is not in mixedCase
+Variable FraxPool.collat_eth_oracle_address (../../sb/CurveAMO.sol#2792) is not in mixedCase
+Variable FraxPool.weth_address (../../sb/CurveAMO.sol#2793) is not in mixedCase
+Variable FraxPool.minting_fee (../../sb/CurveAMO.sol#2795) is not in mixedCase
+Variable FraxPool.redemption_fee (../../sb/CurveAMO.sol#2796) is not in mixedCase
+Variable FraxPool.buyback_fee (../../sb/CurveAMO.sol#2797) is not in mixedCase
+Variable FraxPool.recollat_fee (../../sb/CurveAMO.sol#2798) is not in mixedCase
+Variable FraxPool.missing_decimals (../../sb/CurveAMO.sol#2812) is not in mixedCase
+Variable FraxPool.pool_ceiling (../../sb/CurveAMO.sol#2815) is not in mixedCase
+Variable FraxPool.bonus_rate (../../sb/CurveAMO.sol#2821) is not in mixedCase
+Variable FraxPool.redemption_delay (../../sb/CurveAMO.sol#2824) is not in mixedCase
+Function CurveAMO.get_D() (../../sb/CurveAMO.sol#3435-3477) is not in mixedCase
+Parameter CurveAMO.mintRedeemPart1(uint256).frax_amount (../../sb/CurveAMO.sol#3556) is not in mixedCase
+Parameter CurveAMO.burnFRAX(uint256).frax_amount (../../sb/CurveAMO.sol#3588) is not in mixedCase
+Parameter CurveAMO.metapoolDeposit(uint256,uint256)._frax_amount (../../sb/CurveAMO.sol#3599) is not in mixedCase
+Parameter CurveAMO.metapoolDeposit(uint256,uint256)._collateral_amount (../../sb/CurveAMO.sol#3599) is not in mixedCase
+Parameter CurveAMO.metapoolWithdrawAtCurRatio(uint256,bool,uint256,uint256)._metapool_lp_in (../../sb/CurveAMO.sol#3645) is not in mixedCase
+Parameter CurveAMO.metapoolWithdrawAtCurRatio(uint256,bool,uint256,uint256).burn_the_frax (../../sb/CurveAMO.sol#3645) is not in mixedCase
+Parameter CurveAMO.metapoolWithdrawAtCurRatio(uint256,bool,uint256,uint256).min_frax (../../sb/CurveAMO.sol#3645) is not in mixedCase
+Parameter CurveAMO.metapoolWithdrawAtCurRatio(uint256,bool,uint256,uint256).min_3pool (../../sb/CurveAMO.sol#3645) is not in mixedCase
+Parameter CurveAMO.metapoolWithdrawFrax(uint256,bool)._metapool_lp_in (../../sb/CurveAMO.sol#3673) is not in mixedCase
+Parameter CurveAMO.metapoolWithdrawFrax(uint256,bool).burn_the_frax (../../sb/CurveAMO.sol#3673) is not in mixedCase
+Parameter CurveAMO.metapoolWithdraw3pool(uint256)._metapool_lp_in (../../sb/CurveAMO.sol#3684) is not in mixedCase
+Function CurveAMO.three_pool_to_collateral(uint256) (../../sb/CurveAMO.sol#3690-3698) is not in mixedCase
+Parameter CurveAMO.three_pool_to_collateral(uint256)._3pool_in (../../sb/CurveAMO.sol#3690) is not in mixedCase
+Parameter CurveAMO.metapoolWithdrawAndConvert3pool(uint256)._metapool_lp_in (../../sb/CurveAMO.sol#3700) is not in mixedCase
+Parameter CurveAMO.setTimelock(address).new_timelock (../../sb/CurveAMO.sol#3734) is not in mixedCase
+Parameter CurveAMO.setOwner(address)._owner_address (../../sb/CurveAMO.sol#3738) is not in mixedCase
+Parameter CurveAMO.setMiscRewardsCustodian(address)._custodian_address (../../sb/CurveAMO.sol#3742) is not in mixedCase
+Parameter CurveAMO.setPool(address)._pool_address (../../sb/CurveAMO.sol#3746) is not in mixedCase
+Parameter CurveAMO.setThreePool(address,address)._three_pool_address (../../sb/CurveAMO.sol#3751) is not in mixedCase
+Parameter CurveAMO.setThreePool(address,address)._three_pool_token_address (../../sb/CurveAMO.sol#3751) is not in mixedCase
+Parameter CurveAMO.setMetapool(address)._metapool_address (../../sb/CurveAMO.sol#3758) is not in mixedCase
+Parameter CurveAMO.setCollatBorrowCap(uint256)._collat_borrow_cap (../../sb/CurveAMO.sol#3772) is not in mixedCase
+Parameter CurveAMO.setMaxFraxOutstanding(uint256)._max_frax_outstanding (../../sb/CurveAMO.sol#3776) is not in mixedCase
+Parameter CurveAMO.setMinimumCollateralRatio(uint256)._min_cr (../../sb/CurveAMO.sol#3780) is not in mixedCase
+Parameter CurveAMO.setConvergenceWindow(uint256)._window (../../sb/CurveAMO.sol#3784) is not in mixedCase
+Parameter CurveAMO.setOverrideCollatBalance(bool,uint256)._state (../../sb/CurveAMO.sol#3788) is not in mixedCase
+Parameter CurveAMO.setOverrideCollatBalance(bool,uint256)._balance (../../sb/CurveAMO.sol#3788) is not in mixedCase
+Parameter CurveAMO.setCustomFloor(bool,uint256)._state (../../sb/CurveAMO.sol#3794) is not in mixedCase
+Parameter CurveAMO.setCustomFloor(bool,uint256)._floor_price (../../sb/CurveAMO.sol#3794) is not in mixedCase
+Parameter CurveAMO.setDiscountRate(bool,uint256)._state (../../sb/CurveAMO.sol#3800) is not in mixedCase
+Parameter CurveAMO.setDiscountRate(bool,uint256)._discount_rate (../../sb/CurveAMO.sol#3800) is not in mixedCase
+Parameter CurveAMO.setSlippages(uint256,uint256,uint256)._liq_slippage_3crv (../../sb/CurveAMO.sol#3805) is not in mixedCase
+Parameter CurveAMO.setSlippages(uint256,uint256,uint256)._add_liq_slippage_metapool (../../sb/CurveAMO.sol#3805) is not in mixedCase
+Parameter CurveAMO.setSlippages(uint256,uint256,uint256)._rem_liq_slippage_metapool (../../sb/CurveAMO.sol#3805) is not in mixedCase
+Variable CurveAMO.frax3crv_metapool (../../sb/CurveAMO.sol#3254) is not in mixedCase
+Variable CurveAMO.three_pool (../../sb/CurveAMO.sol#3255) is not in mixedCase
+Variable CurveAMO.three_pool_erc20 (../../sb/CurveAMO.sol#3258) is not in mixedCase
+Variable CurveAMO.FRAX (../../sb/CurveAMO.sol#3259) is not in mixedCase
+Variable CurveAMO.FXS (../../sb/CurveAMO.sol#3261) is not in mixedCase
+Variable CurveAMO.collateral_token (../../sb/CurveAMO.sol#3262) is not in mixedCase
+Variable CurveAMO.CRV (../../sb/CurveAMO.sol#3263) is not in mixedCase
+Variable CurveAMO.frax3crv_metapool_address (../../sb/CurveAMO.sol#3265) is not in mixedCase
+Variable CurveAMO.three_pool_address (../../sb/CurveAMO.sol#3266) is not in mixedCase
+Variable CurveAMO.three_pool_token_address (../../sb/CurveAMO.sol#3267) is not in mixedCase
+Variable CurveAMO.frax_contract_address (../../sb/CurveAMO.sol#3270) is not in mixedCase
+Variable CurveAMO.fxs_contract_address (../../sb/CurveAMO.sol#3271) is not in mixedCase
+Variable CurveAMO.collateral_token_address (../../sb/CurveAMO.sol#3272) is not in mixedCase
+Variable CurveAMO.timelock_address (../../sb/CurveAMO.sol#3273) is not in mixedCase
+Variable CurveAMO.owner_address (../../sb/CurveAMO.sol#3274) is not in mixedCase
+Variable CurveAMO.custodian_address (../../sb/CurveAMO.sol#3275) is not in mixedCase
+Variable CurveAMO.pool_address (../../sb/CurveAMO.sol#3276) is not in mixedCase
+Variable CurveAMO.minted_frax_historical (../../sb/CurveAMO.sol#3279) is not in mixedCase
+Variable CurveAMO.burned_frax_historical (../../sb/CurveAMO.sol#3280) is not in mixedCase
+Variable CurveAMO.max_frax_outstanding (../../sb/CurveAMO.sol#3283) is not in mixedCase
+Variable CurveAMO.borrowed_collat_historical (../../sb/CurveAMO.sol#3286) is not in mixedCase
+Variable CurveAMO.returned_collat_historical (../../sb/CurveAMO.sol#3287) is not in mixedCase
+Variable CurveAMO.collat_borrow_cap (../../sb/CurveAMO.sol#3290) is not in mixedCase
+Variable CurveAMO.min_cr (../../sb/CurveAMO.sol#3293) is not in mixedCase
+Variable CurveAMO.missing_decimals (../../sb/CurveAMO.sol#3296) is not in mixedCase
+Variable CurveAMO.liq_slippage_3crv (../../sb/CurveAMO.sol#3302) is not in mixedCase
+Variable CurveAMO.add_liq_slippage_metapool (../../sb/CurveAMO.sol#3305) is not in mixedCase
+Variable CurveAMO.rem_liq_slippage_metapool (../../sb/CurveAMO.sol#3306) is not in mixedCase
+Variable CurveAMO.THREE_POOL_COIN_INDEX (../../sb/CurveAMO.sol#3309) is not in mixedCase
+Variable CurveAMO.custom_floor (../../sb/CurveAMO.sol#3312) is not in mixedCase
+Variable CurveAMO.frax_floor (../../sb/CurveAMO.sol#3313) is not in mixedCase
+Variable CurveAMO.set_discount (../../sb/CurveAMO.sol#3315) is not in mixedCase
+Variable CurveAMO.discount_rate (../../sb/CurveAMO.sol#3316) is not in mixedCase
+Variable CurveAMO.override_collat_balance (../../sb/CurveAMO.sol#3426) is not in mixedCase
+Variable CurveAMO.override_collat_balance_amount (../../sb/CurveAMO.sol#3427) is not in mixedCase
+Variable CurveAMO.convergence_window (../../sb/CurveAMO.sol#3481) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/CurveAMO.sol#117)" inContext (../../sb/CurveAMO.sol#107-120)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Variable UniswapV2OracleLibrary.currentCumulativePrices(address).price0Cumulative (../../sb/CurveAMO.sol#2063) is too similar to UniswapV2OracleLibrary.currentCumulativePrices(address).price1Cumulative (../../sb/CurveAMO.sol#2063)
+Variable UniswapPairOracle.price0Average (../../sb/CurveAMO.sol#2184) is too similar to UniswapPairOracle.price1Average (../../sb/CurveAMO.sol#2185)
+Variable UniswapPairOracle.update().price0Cumulative (../../sb/CurveAMO.sol#2236) is too similar to UniswapPairOracle.update().price1Cumulative (../../sb/CurveAMO.sol#2236)
+Variable UniswapPairOracle.price0CumulativeLast (../../sb/CurveAMO.sol#2181) is too similar to UniswapPairOracle.price1CumulativeLast (../../sb/CurveAMO.sol#2182)
+Variable FRAXStablecoin.COLLATERAL_RATIO_PAUSER (../../sb/CurveAMO.sol#2388) is too similar to FRAXStablecoin.collateral_ratio_paused (../../sb/CurveAMO.sol#2389)
+Variable FraxPool.constructor(address,address,address,address,address,uint256)._fxs_contract_address (../../sb/CurveAMO.sol#2861) is too similar to FraxPool.frax_contract_address (../../sb/CurveAMO.sol#2785)
+Variable CurveAMO.constructor(address,address,address,address,address,address,address,address,address,address)._fxs_contract_address (../../sb/CurveAMO.sol#3322) is too similar to CurveAMO.frax_contract_address (../../sb/CurveAMO.sol#3270)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+FRAXShares.slitherConstructorConstantVariables() (../../sb/CurveAMO.sol#1607-1880) uses literals with too many digits:
+	- genesis_supply = 100000000e18 (../../sb/CurveAMO.sol#1617)
+FRAXStablecoin.constructor(string,string,address,address) (../../sb/CurveAMO.sol#2419-2440) uses literals with too many digits:
+	- global_collateral_ratio = 1000000 (../../sb/CurveAMO.sol#2436)
+FRAXStablecoin.constructor(string,string,address,address) (../../sb/CurveAMO.sol#2419-2440) uses literals with too many digits:
+	- price_target = 1000000 (../../sb/CurveAMO.sol#2438)
+FRAXStablecoin.refreshCollateralRatio() (../../sb/CurveAMO.sol#2509-2531) uses literals with too many digits:
+	- global_collateral_ratio.add(frax_step) >= 1000000 (../../sb/CurveAMO.sol#2523)
+FRAXStablecoin.refreshCollateralRatio() (../../sb/CurveAMO.sol#2509-2531) uses literals with too many digits:
+	- global_collateral_ratio = 1000000 (../../sb/CurveAMO.sol#2524)
+FRAXStablecoin.slitherConstructorConstantVariables() (../../sb/CurveAMO.sol#2347-2642) uses literals with too many digits:
+	- genesis_supply = 2000000e18 (../../sb/CurveAMO.sol#2368)
+FraxPool.mintFractionalFRAX(uint256,uint256,uint256) (../../sb/CurveAMO.sol#2970-2996) uses literals with too many digits:
+	- require(bool,string)(global_collateral_ratio < COLLATERAL_RATIO_MAX && global_collateral_ratio > 0,Collateral ratio needs to be between .000001 and .999999) (../../sb/CurveAMO.sol#2974)
+FraxPool.redeemFractionalFRAX(uint256,uint256,uint256) (../../sb/CurveAMO.sol#3023-3056) uses literals with too many digits:
+	- require(bool,string)(global_collateral_ratio < COLLATERAL_RATIO_MAX && global_collateral_ratio > 0,Collateral ratio needs to be between .000001 and .999999) (../../sb/CurveAMO.sol#3027)
+CurveAMO.slitherConstructorVariables() (../../sb/CurveAMO.sol#3249-3823) uses literals with too many digits:
+	- max_frax_outstanding = uint256(2000000e18) (../../sb/CurveAMO.sol#3283)
+CurveAMO.slitherConstructorVariables() (../../sb/CurveAMO.sol#3249-3823) uses literals with too many digits:
+	- collat_borrow_cap = uint256(1000000e6) (../../sb/CurveAMO.sol#3290)
+CurveAMO.slitherConstructorVariables() (../../sb/CurveAMO.sol#3249-3823) uses literals with too many digits:
+	- liq_slippage_3crv = 900000 (../../sb/CurveAMO.sol#3302)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+FraxPoolLibrary.PRICE_PRECISION (../../sb/CurveAMO.sol#2648) is never used in FraxPoolLibrary (../../sb/CurveAMO.sol#2644-2757)
+CurveAMO.CRV (../../sb/CurveAMO.sol#3263) is never used in CurveAMO (../../sb/CurveAMO.sol#3249-3823)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-state-variable
+
+Loop condition i < frax_pools_array.length (../../sb/CurveAMO.sol#2495) should use cached array length instead of referencing `length` member of the storage array.
+ Loop condition i < frax_pools_array.length (../../sb/CurveAMO.sol#2563) should use cached array length instead of referencing `length` member of the storage array.
+ Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cache-array-length
+
+CurveAMO.CRV (../../sb/CurveAMO.sol#3263) should be constant 
+CurveAMO.THREE_POOL_COIN_INDEX (../../sb/CurveAMO.sol#3309) should be constant 
+FRAXShares.FRAXStablecoinAdd (../../sb/CurveAMO.sol#1615) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+
+ChainlinkETHUSDPriceConsumer.priceFeed (../../sb/CurveAMO.sol#2304) should be immutable 
+CurveAMO.FRAX (../../sb/CurveAMO.sol#3259) should be immutable 
+CurveAMO.FXS (../../sb/CurveAMO.sol#3261) should be immutable 
+CurveAMO.collateral_token (../../sb/CurveAMO.sol#3262) should be immutable 
+CurveAMO.collateral_token_address (../../sb/CurveAMO.sol#3272) should be immutable 
+CurveAMO.frax_contract_address (../../sb/CurveAMO.sol#3270) should be immutable 
+CurveAMO.fxs_contract_address (../../sb/CurveAMO.sol#3271) should be immutable 
+CurveAMO.missing_decimals (../../sb/CurveAMO.sol#3296) should be immutable 
+ERC20._decimals (../../sb/CurveAMO.sol#573) should be immutable 
+FRAXStablecoin.DEFAULT_ADMIN_ADDRESS (../../sb/CurveAMO.sol#2387) should be immutable 
+FRAXStablecoin.creator_address (../../sb/CurveAMO.sol#2360) should be immutable 
+FraxPool.FRAX (../../sb/CurveAMO.sol#2789) should be immutable 
+FraxPool.FXS (../../sb/CurveAMO.sol#2788) should be immutable 
+FraxPool.collateral_address (../../sb/CurveAMO.sol#2782) should be immutable 
+FraxPool.collateral_token (../../sb/CurveAMO.sol#2781) should be immutable 
+FraxPool.frax_contract_address (../../sb/CurveAMO.sol#2785) should be immutable 
+FraxPool.fxs_contract_address (../../sb/CurveAMO.sol#2786) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/CurveAMO.sol analyzed (24 contracts with 93 detectors), 550 result(s) found

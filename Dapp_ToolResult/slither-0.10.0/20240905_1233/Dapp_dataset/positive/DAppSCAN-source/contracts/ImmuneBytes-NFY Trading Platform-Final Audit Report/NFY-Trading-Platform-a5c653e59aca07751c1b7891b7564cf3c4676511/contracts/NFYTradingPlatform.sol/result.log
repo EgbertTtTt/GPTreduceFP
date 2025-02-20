@@ -1,0 +1,239 @@
+'solc --version' running
+'solc /sb/NFYTradingPlatform.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/NFYTradingPlatform.sol:
+Warning: Unused local variable.
+   --> /sb/NFYTradingPlatform.sol:722:24:
+    |
+722 |         (bool success, bytes memory data) = tokens[_ticker].stakingAddress. ...
+    |                        ^^^^^^^^^^^^^^^^^
+
+Warning: Unused local variable.
+   --> /sb/NFYTradingPlatform.sol:739:24:
+    |
+739 |         (bool success, bytes memory data) = tokens[_ticker].stakingAddress. ...
+    |                        ^^^^^^^^^^^^^^^^^
+
+Warning: Unused local variable.
+   --> /sb/NFYTradingPlatform.sol:764:24:
+    |
+764 |         (bool success, bytes memory data) = tokens[_ticker].stakingAddress. ...
+    |                        ^^^^^^^^^^^^^^^^^
+
+
+
+NFYTradingPlatform.createLimitOrder(string,uint256,uint256,NFYTradingPlatform.Side) (../../sb/NFYTradingPlatform.sol#790-803) ignores return value by NFYToken.transferFrom(_msgSender(),devAddress,devFee) (../../sb/NFYTradingPlatform.sol#798)
+NFYTradingPlatform.createLimitOrder(string,uint256,uint256,NFYTradingPlatform.Side) (../../sb/NFYTradingPlatform.sol#790-803) ignores return value by NFYToken.transferFrom(_msgSender(),communityFund,communityFee) (../../sb/NFYTradingPlatform.sol#799)
+NFYTradingPlatform.createLimitOrder(string,uint256,uint256,NFYTradingPlatform.Side) (../../sb/NFYTradingPlatform.sol#790-803) ignores return value by NFYToken.transferFrom(_msgSender(),rewardPool,rewardFee) (../../sb/NFYTradingPlatform.sol#800)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+NFYTradingPlatform.pendingETH (../../sb/NFYTradingPlatform.sol#651) is never initialized. It is used in:
+	- NFYTradingPlatform._createOrder(bytes32,uint256,uint256,NFYTradingPlatform.Side) (../../sb/NFYTradingPlatform.sol#874-916)
+	- NFYTradingPlatform._matchOrder(bytes32,NFYTradingPlatform.Order[],uint256,uint256,NFYTradingPlatform.Side) (../../sb/NFYTradingPlatform.sol#918-978)
+	- NFYTradingPlatform.cancelOrder(string,NFYTradingPlatform.Side) (../../sb/NFYTradingPlatform.sol#980-995)
+NFYTradingPlatform.pendingToken (../../sb/NFYTradingPlatform.sol#653) is never initialized. It is used in:
+	- NFYTradingPlatform._createOrder(bytes32,uint256,uint256,NFYTradingPlatform.Side) (../../sb/NFYTradingPlatform.sol#874-916)
+	- NFYTradingPlatform._matchOrder(bytes32,NFYTradingPlatform.Order[],uint256,uint256,NFYTradingPlatform.Side) (../../sb/NFYTradingPlatform.sol#918-978)
+	- NFYTradingPlatform.cancelOrder(string,NFYTradingPlatform.Side) (../../sb/NFYTradingPlatform.sol#980-995)
+NFYTradingPlatform.orderBook (../../sb/NFYTradingPlatform.sol#659) is never initialized. It is used in:
+	- NFYTradingPlatform.getOrders(string,NFYTradingPlatform.Side) (../../sb/NFYTradingPlatform.sol#769-773)
+	- NFYTradingPlatform._limitOrder(string,uint256,uint256,NFYTradingPlatform.Side) (../../sb/NFYTradingPlatform.sol#806-872)
+	- NFYTradingPlatform._createOrder(bytes32,uint256,uint256,NFYTradingPlatform.Side) (../../sb/NFYTradingPlatform.sol#874-916)
+	- NFYTradingPlatform.cancelOrder(string,NFYTradingPlatform.Side) (../../sb/NFYTradingPlatform.sol#980-995)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-state-variables
+
+NFYTradingPlatform.createLimitOrder(string,uint256,uint256,NFYTradingPlatform.Side) (../../sb/NFYTradingPlatform.sol#790-803) performs a multiplication on the result of a division:
+	- devFee = platformFee.div(100).mul(10) (../../sb/NFYTradingPlatform.sol#793)
+NFYTradingPlatform.createLimitOrder(string,uint256,uint256,NFYTradingPlatform.Side) (../../sb/NFYTradingPlatform.sol#790-803) performs a multiplication on the result of a division:
+	- communityFee = platformFee.div(100).mul(5) (../../sb/NFYTradingPlatform.sol#794)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+Reentrancy in NFYTradingPlatform.withdrawStake(string,uint256) (../../sb/NFYTradingPlatform.sol#729-743):
+	External calls:
+	- addStakeholder(_ticker) (../../sb/NFYTradingPlatform.sol#733)
+		- (success,data) = tokens[_ticker].stakingAddress.call(abi.encodeWithSignature(addStakeholderExternal(address),_stakeholder)) (../../sb/NFYTradingPlatform.sol#764)
+	- (success,data) = tokens[_ticker].stakingAddress.call(abi.encodeWithSignature(incrementNFTValue(uint256,uint256),_tokenId,_amount)) (../../sb/NFYTradingPlatform.sol#739)
+	State variables written after the call(s):
+	- traderBalances[_msgSender()][_ticker] = traderBalances[_msgSender()][_ticker].sub(_amount) (../../sb/NFYTradingPlatform.sol#742)
+	NFYTradingPlatform.traderBalances (../../sb/NFYTradingPlatform.sol#657) can be used in cross function reentrancies:
+	- NFYTradingPlatform._createOrder(bytes32,uint256,uint256,NFYTradingPlatform.Side) (../../sb/NFYTradingPlatform.sol#874-916)
+	- NFYTradingPlatform._matchOrder(bytes32,NFYTradingPlatform.Order[],uint256,uint256,NFYTradingPlatform.Side) (../../sb/NFYTradingPlatform.sol#918-978)
+	- NFYTradingPlatform.cancelOrder(string,NFYTradingPlatform.Side) (../../sb/NFYTradingPlatform.sol#980-995)
+	- NFYTradingPlatform.depositStake(string,uint256,uint256) (../../sb/NFYTradingPlatform.sol#718-726)
+	- NFYTradingPlatform.getTraderBalance(address,string) (../../sb/NFYTradingPlatform.sol#699-703)
+	- NFYTradingPlatform.withdrawStake(string,uint256) (../../sb/NFYTradingPlatform.sol#729-743)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+NFYTradingPlatform._limitOrder(string,uint256,uint256,NFYTradingPlatform.Side).i (../../sb/NFYTradingPlatform.sol#817) is a local variable never initialized
+NFYTradingPlatform._limitOrder(string,uint256,uint256,NFYTradingPlatform.Side).i_scope_1 (../../sb/NFYTradingPlatform.sol#841) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+NFYTradingPlatform.setFee(uint256) (../../sb/NFYTradingPlatform.sol#684-686) should emit an event for: 
+	- platformFee = _fee (../../sb/NFYTradingPlatform.sol#685) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+Ownable.constructor(address)._dev (../../sb/NFYTradingPlatform.sol#584) lacks a zero-check on :
+		- dev = _dev (../../sb/NFYTradingPlatform.sol#586)
+Ownable.transferOwnership(address)._owner (../../sb/NFYTradingPlatform.sol#589) lacks a zero-check on :
+		- owner = _owner (../../sb/NFYTradingPlatform.sol#591)
+Ownable.transferDev(address)._dev (../../sb/NFYTradingPlatform.sol#595) lacks a zero-check on :
+		- dev = _dev (../../sb/NFYTradingPlatform.sol#596)
+NFYTradingPlatform.constructor(address,address,uint256,address,address,address)._rewardPool (../../sb/NFYTradingPlatform.sol#675) lacks a zero-check on :
+		- rewardPool = _rewardPool (../../sb/NFYTradingPlatform.sol#677)
+NFYTradingPlatform.constructor(address,address,uint256,address,address,address)._devFeeAddress (../../sb/NFYTradingPlatform.sol#675) lacks a zero-check on :
+		- devAddress = _devFeeAddress (../../sb/NFYTradingPlatform.sol#679)
+NFYTradingPlatform.constructor(address,address,uint256,address,address,address)._communityFundAddress (../../sb/NFYTradingPlatform.sol#675) lacks a zero-check on :
+		- communityFund = _communityFundAddress (../../sb/NFYTradingPlatform.sol#680)
+NFYTradingPlatform.setDevFeeAddress(address)._devAddress (../../sb/NFYTradingPlatform.sol#689) lacks a zero-check on :
+		- devAddress = _devAddress (../../sb/NFYTradingPlatform.sol#690)
+NFYTradingPlatform.setCommunityFeeAddress(address)._communityAddress (../../sb/NFYTradingPlatform.sol#694) lacks a zero-check on :
+		- communityFund = _communityAddress (../../sb/NFYTradingPlatform.sol#695)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in NFYTradingPlatform.createLimitOrder(string,uint256,uint256,NFYTradingPlatform.Side) (../../sb/NFYTradingPlatform.sol#790-803):
+	External calls:
+	- NFYToken.transferFrom(_msgSender(),devAddress,devFee) (../../sb/NFYTradingPlatform.sol#798)
+	- NFYToken.transferFrom(_msgSender(),communityFund,communityFee) (../../sb/NFYTradingPlatform.sol#799)
+	- NFYToken.transferFrom(_msgSender(),rewardPool,rewardFee) (../../sb/NFYTradingPlatform.sol#800)
+	State variables written after the call(s):
+	- _limitOrder(ticker,_amount,_price,_side) (../../sb/NFYTradingPlatform.sol#802)
+		- ethBalance[_msgSender()] = ethBalance[_msgSender()].sub(_amount.mul(_price).div(1e18)) (../../sb/NFYTradingPlatform.sol#880)
+		- ethBalance[_msgSender()] = ethBalance[_msgSender()].add(matched.mul(orders[i].price).div(1e18)) (../../sb/NFYTradingPlatform.sol#938)
+		- ethBalance[orders[i].userAddress] = ethBalance[orders[i].userAddress].add(matched.mul(orders[i].price).div(1e18)) (../../sb/NFYTradingPlatform.sol#959)
+		- ethBalance[_msgSender()] = ethBalance[_msgSender()].sub(matched.mul(orders[i].price).div(1e18)) (../../sb/NFYTradingPlatform.sol#960)
+	- _limitOrder(ticker,_amount,_price,_side) (../../sb/NFYTradingPlatform.sol#802)
+		- nextOrderId = nextOrderId.add(1) (../../sb/NFYTradingPlatform.sol#915)
+	- _limitOrder(ticker,_amount,_price,_side) (../../sb/NFYTradingPlatform.sol#802)
+		- nextTradeId = nextTradeId.add(1) (../../sb/NFYTradingPlatform.sol#823)
+		- nextTradeId = nextTradeId.add(1) (../../sb/NFYTradingPlatform.sol#846)
+	- _limitOrder(ticker,_amount,_price,_side) (../../sb/NFYTradingPlatform.sol#802)
+		- traderBalances[_msgSender()][_ticker] = traderBalances[_msgSender()][_ticker].sub(matched) (../../sb/NFYTradingPlatform.sol#936)
+		- traderBalances[orders[i].userAddress][_ticker] = traderBalances[orders[i].userAddress][_ticker].add(matched) (../../sb/NFYTradingPlatform.sol#937)
+		- traderBalances[_msgSender()][_ticker] = traderBalances[_msgSender()][_ticker].sub(_amount) (../../sb/NFYTradingPlatform.sol#886)
+		- traderBalances[_msgSender()][_ticker] = traderBalances[_msgSender()][_ticker].add(matched) (../../sb/NFYTradingPlatform.sol#958)
+Reentrancy in NFYTradingPlatform.depositStake(string,uint256,uint256) (../../sb/NFYTradingPlatform.sol#718-726):
+	External calls:
+	- (success,data) = tokens[_ticker].stakingAddress.call(abi.encodeWithSignature(decrementNFTValue(uint256,uint256),_tokenId,_amount)) (../../sb/NFYTradingPlatform.sol#722)
+	State variables written after the call(s):
+	- traderBalances[_msgSender()][_ticker] = traderBalances[_msgSender()][_ticker].add(_amount) (../../sb/NFYTradingPlatform.sol#725)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in NFYTradingPlatform.createLimitOrder(string,uint256,uint256,NFYTradingPlatform.Side) (../../sb/NFYTradingPlatform.sol#790-803):
+	External calls:
+	- NFYToken.transferFrom(_msgSender(),devAddress,devFee) (../../sb/NFYTradingPlatform.sol#798)
+	- NFYToken.transferFrom(_msgSender(),communityFund,communityFee) (../../sb/NFYTradingPlatform.sol#799)
+	- NFYToken.transferFrom(_msgSender(),rewardPool,rewardFee) (../../sb/NFYTradingPlatform.sol#800)
+	Event emitted after the call(s):
+	- NewTrade(nextTradeId,orders[i].id,_ticker,orders[i].userAddress,_msgSender(),matched,orders[i].price,now) (../../sb/NFYTradingPlatform.sol#924-933)
+		- _limitOrder(ticker,_amount,_price,_side) (../../sb/NFYTradingPlatform.sol#802)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+NFYTradingPlatform._createOrder(bytes32,uint256,uint256,NFYTradingPlatform.Side) (../../sb/NFYTradingPlatform.sol#874-916) uses timestamp for comparisons
+	Dangerous comparisons:
+	- i > 0 (../../sb/NFYTradingPlatform.sol#903)
+	- orders.length > 0 (../../sb/NFYTradingPlatform.sol#902)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/NFYTradingPlatform.sol#312-321) uses assembly
+	- INLINE ASM (../../sb/NFYTradingPlatform.sol#319)
+Address._verifyCallResult(bool,bytes,string) (../../sb/NFYTradingPlatform.sol#457-474) uses assembly
+	- INLINE ASM (../../sb/NFYTradingPlatform.sol#466-469)
+NFYTradingPlatform.stringToBytes32(string) (../../sb/NFYTradingPlatform.sol#1043-1056) uses assembly
+	- INLINE ASM (../../sb/NFYTradingPlatform.sol#1053-1055)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+NFYTradingPlatform.depositStake(string,uint256,uint256) (../../sb/NFYTradingPlatform.sol#718-726) compares to a boolean constant:
+	-require(bool,string)(success == true,decrement call failed) (../../sb/NFYTradingPlatform.sol#723)
+NFYTradingPlatform.withdrawStake(string,uint256) (../../sb/NFYTradingPlatform.sol#729-743) compares to a boolean constant:
+	-require(bool,string)(success == true,increment call failed) (../../sb/NFYTradingPlatform.sol#740)
+NFYTradingPlatform.addStakeholder(bytes32) (../../sb/NFYTradingPlatform.sol#762-766) compares to a boolean constant:
+	-require(bool,string)(success == true,add stakeholder call failed) (../../sb/NFYTradingPlatform.sol#765)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#boolean-equality
+
+NFYTradingPlatform._limitOrder(string,uint256,uint256,NFYTradingPlatform.Side) (../../sb/NFYTradingPlatform.sol#806-872) has a high cyclomatic complexity (15).
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cyclomatic-complexity
+
+Address._verifyCallResult(bool,bytes,string) (../../sb/NFYTradingPlatform.sol#457-474) is never used and should be removed
+Address.functionCall(address,bytes) (../../sb/NFYTradingPlatform.sol#365-367) is never used and should be removed
+Address.functionCall(address,bytes,string) (../../sb/NFYTradingPlatform.sol#375-377) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/NFYTradingPlatform.sol#390-392) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/NFYTradingPlatform.sol#400-407) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/NFYTradingPlatform.sol#439-441) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/NFYTradingPlatform.sol#449-455) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/NFYTradingPlatform.sol#415-417) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/NFYTradingPlatform.sol#425-431) is never used and should be removed
+Address.isContract(address) (../../sb/NFYTradingPlatform.sol#312-321) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/NFYTradingPlatform.sol#339-345) is never used and should be removed
+Context._msgData() (../../sb/NFYTradingPlatform.sol#560-563) is never used and should be removed
+SafeERC20._callOptionalReturn(IERC20,bytes) (../../sb/NFYTradingPlatform.sol#532-542) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/NFYTradingPlatform.sol#505-514) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/NFYTradingPlatform.sol#521-524) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/NFYTradingPlatform.sol#516-519) is never used and should be removed
+SafeERC20.safeTransfer(IERC20,address,uint256) (../../sb/NFYTradingPlatform.sol#490-492) is never used and should be removed
+SafeERC20.safeTransferFrom(IERC20,address,address,uint256) (../../sb/NFYTradingPlatform.sol#494-496) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/NFYTradingPlatform.sol#191-194) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/NFYTradingPlatform.sol#153-156) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/NFYTradingPlatform.sol#211-214) is never used and should be removed
+SafeMath.sub(uint256,uint256,string) (../../sb/NFYTradingPlatform.sol#171-174) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/NFYTradingPlatform.sol#25-29) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/NFYTradingPlatform.sol#61-64) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/NFYTradingPlatform.sol#71-74) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/NFYTradingPlatform.sol#46-54) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/NFYTradingPlatform.sol#36-39) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.6.10 (../../sb/NFYTradingPlatform.sol#1) allows old versions
+solc-0.6.10 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/NFYTradingPlatform.sol#339-345):
+	- (success) = recipient.call{value: amount}() (../../sb/NFYTradingPlatform.sol#343)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/NFYTradingPlatform.sol#400-407):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/NFYTradingPlatform.sol#405)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/NFYTradingPlatform.sol#425-431):
+	- (success,returndata) = target.staticcall(data) (../../sb/NFYTradingPlatform.sol#429)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/NFYTradingPlatform.sol#449-455):
+	- (success,returndata) = target.delegatecall(data) (../../sb/NFYTradingPlatform.sol#453)
+Low level call in NFYTradingPlatform.depositStake(string,uint256,uint256) (../../sb/NFYTradingPlatform.sol#718-726):
+	- (success,data) = tokens[_ticker].stakingAddress.call(abi.encodeWithSignature(decrementNFTValue(uint256,uint256),_tokenId,_amount)) (../../sb/NFYTradingPlatform.sol#722)
+Low level call in NFYTradingPlatform.withdrawStake(string,uint256) (../../sb/NFYTradingPlatform.sol#729-743):
+	- (success,data) = tokens[_ticker].stakingAddress.call(abi.encodeWithSignature(incrementNFTValue(uint256,uint256),_tokenId,_amount)) (../../sb/NFYTradingPlatform.sol#739)
+Low level call in NFYTradingPlatform.addStakeholder(bytes32) (../../sb/NFYTradingPlatform.sol#762-766):
+	- (success,data) = tokens[_ticker].stakingAddress.call(abi.encodeWithSignature(addStakeholderExternal(address),_stakeholder)) (../../sb/NFYTradingPlatform.sol#764)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter Ownable.transferOwnership(address)._owner (../../sb/NFYTradingPlatform.sol#589) is not in mixedCase
+Parameter Ownable.transferDev(address)._dev (../../sb/NFYTradingPlatform.sol#595) is not in mixedCase
+Parameter NFYTradingPlatform.setFee(uint256)._fee (../../sb/NFYTradingPlatform.sol#684) is not in mixedCase
+Parameter NFYTradingPlatform.setDevFeeAddress(address)._devAddress (../../sb/NFYTradingPlatform.sol#689) is not in mixedCase
+Parameter NFYTradingPlatform.setCommunityFeeAddress(address)._communityAddress (../../sb/NFYTradingPlatform.sol#694) is not in mixedCase
+Parameter NFYTradingPlatform.getTraderBalance(address,string)._user (../../sb/NFYTradingPlatform.sol#699) is not in mixedCase
+Parameter NFYTradingPlatform.getEthBalance(address)._user (../../sb/NFYTradingPlatform.sol#706) is not in mixedCase
+Parameter NFYTradingPlatform.addToken(string,NFTContract,address,address)._NFTContract (../../sb/NFYTradingPlatform.sol#711) is not in mixedCase
+Parameter NFYTradingPlatform.addToken(string,NFTContract,address,address)._nftAddress (../../sb/NFYTradingPlatform.sol#711) is not in mixedCase
+Parameter NFYTradingPlatform.addToken(string,NFTContract,address,address)._stakingAddress (../../sb/NFYTradingPlatform.sol#711) is not in mixedCase
+Parameter NFYTradingPlatform.depositStake(string,uint256,uint256)._tokenId (../../sb/NFYTradingPlatform.sol#718) is not in mixedCase
+Parameter NFYTradingPlatform.depositStake(string,uint256,uint256)._amount (../../sb/NFYTradingPlatform.sol#718) is not in mixedCase
+Parameter NFYTradingPlatform.withdrawStake(string,uint256)._amount (../../sb/NFYTradingPlatform.sol#729) is not in mixedCase
+Parameter NFYTradingPlatform.withdrawEth(uint256)._amount (../../sb/NFYTradingPlatform.sol#751) is not in mixedCase
+Parameter NFYTradingPlatform.addStakeholder(bytes32)._ticker (../../sb/NFYTradingPlatform.sol#762) is not in mixedCase
+Parameter NFYTradingPlatform.createLimitOrder(string,uint256,uint256,NFYTradingPlatform.Side)._amount (../../sb/NFYTradingPlatform.sol#790) is not in mixedCase
+Parameter NFYTradingPlatform.createLimitOrder(string,uint256,uint256,NFYTradingPlatform.Side)._price (../../sb/NFYTradingPlatform.sol#790) is not in mixedCase
+Parameter NFYTradingPlatform.createLimitOrder(string,uint256,uint256,NFYTradingPlatform.Side)._side (../../sb/NFYTradingPlatform.sol#790) is not in mixedCase
+Parameter NFYTradingPlatform.cancelOrder(string,NFYTradingPlatform.Side)._side (../../sb/NFYTradingPlatform.sol#980) is not in mixedCase
+Parameter NFYTradingPlatform.stringToBytes32(string)._source (../../sb/NFYTradingPlatform.sol#1043) is not in mixedCase
+Variable NFYTradingPlatform.NFYToken (../../sb/NFYTradingPlatform.sol#618) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/NFYTradingPlatform.sol#561)" inContext (../../sb/NFYTradingPlatform.sol#555-564)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+NFYTradingPlatform.ETH (../../sb/NFYTradingPlatform.sol#610) is never used in NFYTradingPlatform (../../sb/NFYTradingPlatform.sol#606-1058)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-state-variable
+
+Loop condition i < stakeTokenList.length (../../sb/NFYTradingPlatform.sol#778) should use cached array length instead of referencing `length` member of the storage array.
+ Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cache-array-length
+
+NFYTradingPlatform.NFYToken (../../sb/NFYTradingPlatform.sol#618) should be immutable 
+NFYTradingPlatform.rewardPool (../../sb/NFYTradingPlatform.sol#619) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/NFYTradingPlatform.sol analyzed (8 contracts with 93 detectors), 93 result(s) found

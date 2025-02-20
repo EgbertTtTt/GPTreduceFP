@@ -1,0 +1,93 @@
+'solc --version' running
+'solc /sb/code.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+Reentrancy in Controller.setStrategy(address,address) (../../sb/code.sol#229-238):
+	External calls:
+	- Strategy(_current).withdrawAll() (../../sb/code.sol#235)
+	State variables written after the call(s):
+	- strategies[_token] = _strategy (../../sb/code.sol#237)
+	Controller.strategies (../../sb/code.sol#168) can be used in cross function reentrancies:
+	- Controller.balanceOf(address) (../../sb/code.sol#254-256)
+	- Controller.earn(address,uint256) (../../sb/code.sol#240-252)
+	- Controller.setStrategy(address,address) (../../sb/code.sol#229-238)
+	- Controller.strategies (../../sb/code.sol#168)
+	- Controller.withdraw(address,uint256) (../../sb/code.sol#306-309)
+	- Controller.withdrawAll(address) (../../sb/code.sol#258-261)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+Controller.setStrategy(address,address) (../../sb/code.sol#229-238) ignores return value by Strategy(_current).withdrawAll() (../../sb/code.sol#235)
+Controller.withdrawAll(address) (../../sb/code.sol#258-261) ignores return value by Strategy(strategies[_token]).withdrawAll() (../../sb/code.sol#260)
+Controller.getExpectedReturn(address,address,uint256) (../../sb/code.sol#273-277) ignores return value by (expected,None) = OneSplitAudit(onesplit).getExpectedReturn(_token,_want,_balance,parts,0) (../../sb/code.sol#276)
+Controller.yearn(address,address,uint256) (../../sb/code.sol#280-304) ignores return value by OneSplitAudit(onesplit).swap(_token,_want,_amount,_expected,_distribution,0) (../../sb/code.sol#295)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+Controller.constructor(address)._rewards (../../sb/code.sol#176) lacks a zero-check on :
+		- rewards = _rewards (../../sb/code.sol#180)
+Controller.setRewards(address)._rewards (../../sb/code.sol#183) lacks a zero-check on :
+		- rewards = _rewards (../../sb/code.sol#185)
+Controller.setStrategist(address)._strategist (../../sb/code.sol#188) lacks a zero-check on :
+		- strategist = _strategist (../../sb/code.sol#190)
+Controller.setOneSplit(address)._onesplit (../../sb/code.sol#198) lacks a zero-check on :
+		- onesplit = _onesplit (../../sb/code.sol#200)
+Controller.setGovernance(address)._governance (../../sb/code.sol#203) lacks a zero-check on :
+		- governance = _governance (../../sb/code.sol#205)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Address.isContract(address) (../../sb/code.sol#65-71) uses assembly
+	- INLINE ASM (../../sb/code.sol#69)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Controller.setStrategy(address,address) (../../sb/code.sol#229-238) compares to a boolean constant:
+	-require(bool,string)(approvedStrategies[_token][_strategy] == true,!approved) (../../sb/code.sol#231)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#boolean-equality
+
+Address.sendValue(address,uint256) (../../sb/code.sol#75-81) is never used and should be removed
+Address.toPayable(address) (../../sb/code.sol#72-74) is never used and should be removed
+SafeERC20.safeTransferFrom(IERC20,address,address,uint256) (../../sb/code.sol#92-94) is never used and should be removed
+SafeMath.add(uint256,uint256) (../../sb/code.sol#20-25) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/code.sol#55-57) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/code.sol#58-61) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.5.16 (../../sb/code.sol#1) allows old versions
+solc-0.5.17 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/code.sol#75-81):
+	- (success) = recipient.call.value(amount)() (../../sb/code.sol#79)
+Low level call in SafeERC20.callOptionalReturn(IERC20,bytes) (../../sb/code.sol#102-113):
+	- (success,returndata) = address(token).call(data) (../../sb/code.sol#106)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter Controller.setRewards(address)._rewards (../../sb/code.sol#183) is not in mixedCase
+Parameter Controller.setStrategist(address)._strategist (../../sb/code.sol#188) is not in mixedCase
+Parameter Controller.setSplit(uint256)._split (../../sb/code.sol#193) is not in mixedCase
+Parameter Controller.setOneSplit(address)._onesplit (../../sb/code.sol#198) is not in mixedCase
+Parameter Controller.setGovernance(address)._governance (../../sb/code.sol#203) is not in mixedCase
+Parameter Controller.setVault(address,address)._token (../../sb/code.sol#208) is not in mixedCase
+Parameter Controller.setVault(address,address)._vault (../../sb/code.sol#208) is not in mixedCase
+Parameter Controller.approveStrategy(address,address)._token (../../sb/code.sol#214) is not in mixedCase
+Parameter Controller.approveStrategy(address,address)._strategy (../../sb/code.sol#214) is not in mixedCase
+Parameter Controller.revokeStrategy(address,address)._token (../../sb/code.sol#219) is not in mixedCase
+Parameter Controller.revokeStrategy(address,address)._strategy (../../sb/code.sol#219) is not in mixedCase
+Parameter Controller.setConverter(address,address,address)._input (../../sb/code.sol#224) is not in mixedCase
+Parameter Controller.setConverter(address,address,address)._output (../../sb/code.sol#224) is not in mixedCase
+Parameter Controller.setConverter(address,address,address)._converter (../../sb/code.sol#224) is not in mixedCase
+Parameter Controller.setStrategy(address,address)._token (../../sb/code.sol#229) is not in mixedCase
+Parameter Controller.setStrategy(address,address)._strategy (../../sb/code.sol#229) is not in mixedCase
+Parameter Controller.earn(address,uint256)._token (../../sb/code.sol#240) is not in mixedCase
+Parameter Controller.earn(address,uint256)._amount (../../sb/code.sol#240) is not in mixedCase
+Parameter Controller.balanceOf(address)._token (../../sb/code.sol#254) is not in mixedCase
+Parameter Controller.withdrawAll(address)._token (../../sb/code.sol#258) is not in mixedCase
+Parameter Controller.inCaseTokensGetStuck(address,uint256)._token (../../sb/code.sol#263) is not in mixedCase
+Parameter Controller.inCaseTokensGetStuck(address,uint256)._amount (../../sb/code.sol#263) is not in mixedCase
+Parameter Controller.inCaseStrategyTokenGetStuck(address,address)._strategy (../../sb/code.sol#268) is not in mixedCase
+Parameter Controller.inCaseStrategyTokenGetStuck(address,address)._token (../../sb/code.sol#268) is not in mixedCase
+Parameter Controller.getExpectedReturn(address,address,uint256)._strategy (../../sb/code.sol#273) is not in mixedCase
+Parameter Controller.getExpectedReturn(address,address,uint256)._token (../../sb/code.sol#273) is not in mixedCase
+Parameter Controller.yearn(address,address,uint256)._strategy (../../sb/code.sol#280) is not in mixedCase
+Parameter Controller.yearn(address,address,uint256)._token (../../sb/code.sol#280) is not in mixedCase
+Parameter Controller.withdraw(address,uint256)._token (../../sb/code.sol#306) is not in mixedCase
+Parameter Controller.withdraw(address,uint256)._amount (../../sb/code.sol#306) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+/sb/code.sol analyzed (8 contracts with 93 detectors), 52 result(s) found

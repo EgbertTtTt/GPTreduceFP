@@ -1,0 +1,121 @@
+'solc --version' running
+'solc /sb/GNTDeposit.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/GNTDeposit.sol:
+/sb/GNTDeposit.sol:57:5: Warning: Defining constructors as functions with the same name as the contract is deprecated. Use "constructor(...) { ... }" instead.
+    function GNTDeposit(
+    ^ (Relevant source part starts here and spans across multiple lines).
+/sb/GNTDeposit.sol:128:9: Warning: Use of the "var" keyword is deprecated.
+        var _amount = balances[msg.sender];
+        ^---------^
+/sb/GNTDeposit.sol:114:9: Warning: Invoking events without "emit" prefix is deprecated.
+        Unlock(msg.sender);
+        ^----------------^
+/sb/GNTDeposit.sol:119:9: Warning: Invoking events without "emit" prefix is deprecated.
+        Lock(msg.sender);
+        ^--------------^
+/sb/GNTDeposit.sol:124:9: Warning: Invoking events without "emit" prefix is deprecated.
+        Deposit(_from, _amount);
+        ^---------------------^
+/sb/GNTDeposit.sol:132:9: Warning: Invoking events without "emit" prefix is deprecated.
+        Withdraw(msg.sender, _to, _amount);
+        ^--------------------------------^
+/sb/GNTDeposit.sol:137:9: Warning: Invoking events without "emit" prefix is deprecated.
+        Burn(_whom, _burn);
+        ^----------------^
+/sb/GNTDeposit.sol:150:9: Warning: Invoking events without "emit" prefix is deprecated.
+        ReimburseForSubtask(_requestor, _provider, _amount, _subtask_id);
+        ^--------------------------------------------------------------^
+/sb/GNTDeposit.sol:163:9: Warning: Invoking events without "emit" prefix is deprecated.
+        ReimburseForNoPayment(_requestor, _provider, _amount, _closure_time);
+        ^------------------------------------------------------------------^
+/sb/GNTDeposit.sol:175:9: Warning: Invoking events without "emit" prefix is deprecated.
+        ReimburseForVerificationCosts(_from, _amount, _subtask_id);
+        ^--------------------------------------------------------^
+
+
+GNTDeposit.isLocked(address) (../../sb/GNTDeposit.sol#94-96) uses a dangerous strict equality:
+	- locked_until[_owner] == 0 (../../sb/GNTDeposit.sol#95)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+GNTDeposit.GNTDeposit(ERC20,address,address,uint256)._concent (../../sb/GNTDeposit.sol#59) lacks a zero-check on :
+		- concent = _concent (../../sb/GNTDeposit.sol#66)
+GNTDeposit.GNTDeposit(ERC20,address,address,uint256)._coldwallet (../../sb/GNTDeposit.sol#60) lacks a zero-check on :
+		- coldwallet = _coldwallet (../../sb/GNTDeposit.sol#67)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in GNTDeposit.burn(address,uint256) (../../sb/GNTDeposit.sol#135-138):
+	External calls:
+	- _reimburse(_whom,0xdeadbeef,_burn) (../../sb/GNTDeposit.sol#136)
+		- require(bool)(token.transfer(_to,_amount)) (../../sb/GNTDeposit.sol#186)
+	Event emitted after the call(s):
+	- Burn(_whom,_burn) (../../sb/GNTDeposit.sol#137)
+Reentrancy in GNTDeposit.reimburseForNoPayment(address,address,uint256,uint256) (../../sb/GNTDeposit.sol#153-164):
+	External calls:
+	- _reimburse(_requestor,_provider,_amount) (../../sb/GNTDeposit.sol#162)
+		- require(bool)(token.transfer(_to,_amount)) (../../sb/GNTDeposit.sol#186)
+	Event emitted after the call(s):
+	- ReimburseForNoPayment(_requestor,_provider,_amount,_closure_time) (../../sb/GNTDeposit.sol#163)
+Reentrancy in GNTDeposit.reimburseForSubtask(address,address,uint256,bytes32) (../../sb/GNTDeposit.sol#140-151):
+	External calls:
+	- _reimburse(_requestor,_provider,_amount) (../../sb/GNTDeposit.sol#149)
+		- require(bool)(token.transfer(_to,_amount)) (../../sb/GNTDeposit.sol#186)
+	Event emitted after the call(s):
+	- ReimburseForSubtask(_requestor,_provider,_amount,_subtask_id) (../../sb/GNTDeposit.sol#150)
+Reentrancy in GNTDeposit.reimburseForVerificationCosts(address,uint256,bytes32) (../../sb/GNTDeposit.sol#166-176):
+	External calls:
+	- _reimburse(_from,coldwallet,_amount) (../../sb/GNTDeposit.sol#174)
+		- require(bool)(token.transfer(_to,_amount)) (../../sb/GNTDeposit.sol#186)
+	Event emitted after the call(s):
+	- ReimburseForVerificationCosts(_from,_amount,_subtask_id) (../../sb/GNTDeposit.sol#175)
+Reentrancy in GNTDeposit.withdraw(address) (../../sb/GNTDeposit.sol#127-133):
+	External calls:
+	- require(bool)(token.transfer(_to,_amount)) (../../sb/GNTDeposit.sol#131)
+	Event emitted after the call(s):
+	- Withdraw(msg.sender,_to,_amount) (../../sb/GNTDeposit.sol#132)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+GNTDeposit.isLocked(address) (../../sb/GNTDeposit.sol#94-96) uses timestamp for comparisons
+	Dangerous comparisons:
+	- locked_until[_owner] == 0 (../../sb/GNTDeposit.sol#95)
+GNTDeposit.isTimeLocked(address) (../../sb/GNTDeposit.sol#98-100) uses timestamp for comparisons
+	Dangerous comparisons:
+	- locked_until[_owner] > block.timestamp (../../sb/GNTDeposit.sol#99)
+GNTDeposit.isUnlocked(address) (../../sb/GNTDeposit.sol#102-104) uses timestamp for comparisons
+	Dangerous comparisons:
+	- locked_until[_owner] != 0 && locked_until[_owner] < block.timestamp (../../sb/GNTDeposit.sol#103)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Pragma version^0.4.16 (../../sb/GNTDeposit.sol#1) allows old versions
+solc-0.4.26 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Parameter GNTDeposit.balanceOf(address)._owner (../../sb/GNTDeposit.sol#90) is not in mixedCase
+Parameter GNTDeposit.isLocked(address)._owner (../../sb/GNTDeposit.sol#94) is not in mixedCase
+Parameter GNTDeposit.isTimeLocked(address)._owner (../../sb/GNTDeposit.sol#98) is not in mixedCase
+Parameter GNTDeposit.isUnlocked(address)._owner (../../sb/GNTDeposit.sol#102) is not in mixedCase
+Parameter GNTDeposit.getTimelock(address)._owner (../../sb/GNTDeposit.sol#106) is not in mixedCase
+Parameter GNTDeposit.onTokenReceived(address,uint256,bytes)._from (../../sb/GNTDeposit.sol#122) is not in mixedCase
+Parameter GNTDeposit.onTokenReceived(address,uint256,bytes)._amount (../../sb/GNTDeposit.sol#122) is not in mixedCase
+Parameter GNTDeposit.withdraw(address)._to (../../sb/GNTDeposit.sol#127) is not in mixedCase
+Parameter GNTDeposit.burn(address,uint256)._whom (../../sb/GNTDeposit.sol#135) is not in mixedCase
+Parameter GNTDeposit.burn(address,uint256)._burn (../../sb/GNTDeposit.sol#135) is not in mixedCase
+Parameter GNTDeposit.reimburseForSubtask(address,address,uint256,bytes32)._requestor (../../sb/GNTDeposit.sol#141) is not in mixedCase
+Parameter GNTDeposit.reimburseForSubtask(address,address,uint256,bytes32)._provider (../../sb/GNTDeposit.sol#142) is not in mixedCase
+Parameter GNTDeposit.reimburseForSubtask(address,address,uint256,bytes32)._amount (../../sb/GNTDeposit.sol#143) is not in mixedCase
+Parameter GNTDeposit.reimburseForSubtask(address,address,uint256,bytes32)._subtask_id (../../sb/GNTDeposit.sol#144) is not in mixedCase
+Parameter GNTDeposit.reimburseForNoPayment(address,address,uint256,uint256)._requestor (../../sb/GNTDeposit.sol#154) is not in mixedCase
+Parameter GNTDeposit.reimburseForNoPayment(address,address,uint256,uint256)._provider (../../sb/GNTDeposit.sol#155) is not in mixedCase
+Parameter GNTDeposit.reimburseForNoPayment(address,address,uint256,uint256)._amount (../../sb/GNTDeposit.sol#156) is not in mixedCase
+Parameter GNTDeposit.reimburseForNoPayment(address,address,uint256,uint256)._closure_time (../../sb/GNTDeposit.sol#157) is not in mixedCase
+Parameter GNTDeposit.reimburseForVerificationCosts(address,uint256,bytes32)._from (../../sb/GNTDeposit.sol#167) is not in mixedCase
+Parameter GNTDeposit.reimburseForVerificationCosts(address,uint256,bytes32)._amount (../../sb/GNTDeposit.sol#168) is not in mixedCase
+Parameter GNTDeposit.reimburseForVerificationCosts(address,uint256,bytes32)._subtask_id (../../sb/GNTDeposit.sol#169) is not in mixedCase
+Variable GNTDeposit.withdrawal_delay (../../sb/GNTDeposit.sol#39) is not in mixedCase
+Variable GNTDeposit.locked_until (../../sb/GNTDeposit.sol#46) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+onTokenReceived(address,uint256,bytes) should be declared external:
+	- GNTDeposit.onTokenReceived(address,uint256,bytes) (../../sb/GNTDeposit.sol#122-125)
+	- ReceivingContract.onTokenReceived(address,uint256,bytes) (../../sb/GNTDeposit.sol#32)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#public-function-that-could-be-declared-external
+/sb/GNTDeposit.sol analyzed (4 contracts with 93 detectors), 37 result(s) found

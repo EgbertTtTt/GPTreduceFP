@@ -1,0 +1,280 @@
+'solc --version' running
+'solc /sb/LendingPair.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/LendingPair.sol:
+Warning: Contract code size exceeds 24576 bytes (a limit introduced in Spurious Dragon). This contract may not be deployable on mainnet. Consider enabling the optimizer (with a low "runs" value!), turning off revert strings, or using libraries.
+   --> /sb/LendingPair.sol:233:1:
+    |
+233 | contract LendingPair is ERC20, Ownable, IMasterContract {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+LendingPair.batch(bytes[],bool) (../../sb/LendingPair.sol#728-738) has delegatecall inside a loop in a payable function: (success,result) = address(this).delegatecall(calls[i]) (../../sb/LendingPair.sol#732)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#payable-functions-using-delegatecall-inside-a-loop
+
+LendingPair.accrue() (../../sb/LendingPair.sol#360-412) performs a multiplication on the result of a division:
+	- overFactor = utilization.sub(MAXIMUM_TARGET_UTILIZATION).mul(1e18) / uint256(1e18).sub(MAXIMUM_TARGET_UTILIZATION) (../../sb/LendingPair.sol#400)
+	- scale_scope_0 = INTEREST_ELASTICITY.add(overFactor.mul(overFactor).mul(blocks)) (../../sb/LendingPair.sol#401)
+LendingPair.accrue() (../../sb/LendingPair.sol#360-412) performs a multiplication on the result of a division:
+	- underFactor = MINIMUM_TARGET_UTILIZATION.sub(utilization).mul(1e18) / MINIMUM_TARGET_UTILIZATION (../../sb/LendingPair.sol#395)
+	- scale = INTEREST_ELASTICITY.add(underFactor.mul(underFactor).mul(blocks)) (../../sb/LendingPair.sol#396)
+LendingPair.accrue() (../../sb/LendingPair.sol#360-412) performs a multiplication on the result of a division:
+	- extraAmount = uint256(_totalBorrow.amount).mul(info.interestPerBlock).mul(blocks) / 1e18 (../../sb/LendingPair.sol#374)
+	- feeAmount = extraAmount.mul(PROTOCOL_FEE) / 1e5 (../../sb/LendingPair.sol#375)
+LendingPair.isSolvent(address,bool) (../../sb/LendingPair.sol#416-425) performs a multiplication on the result of a division:
+	- userCollateralAmount[user].mul(1e13).mul(CLOSED_COLLATERIZATION_RATE) >= (userBorrowFraction[user].mul(_totalBorrow.amount) / _totalBorrow.fraction).mul(exchangeRate) (../../sb/LendingPair.sol#423-424)
+LendingPair.isSolvent(address,bool) (../../sb/LendingPair.sol#416-425) performs a multiplication on the result of a division:
+	- userCollateralAmount[user].mul(1e13).mul(OPEN_COLLATERIZATION_RATE) >= (userBorrowFraction[user].mul(_totalBorrow.amount) / _totalBorrow.fraction).mul(exchangeRate) (../../sb/LendingPair.sol#423-424)
+LendingPair.liquidate(address[],uint256[],address,ISwapper,bool) (../../sb/LendingPair.sol#653-726) performs a multiplication on the result of a division:
+	- borrowAmount = borrowFraction.mul(_totalBorrow.amount) / _totalBorrow.fraction (../../sb/LendingPair.sol#667)
+	- collateralAmount = borrowAmount.mul(LIQUIDATION_MULTIPLIER).mul(exchangeRate) / 1e23 (../../sb/LendingPair.sol#669)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+LendingPair._addAssetAmount(address,uint256) (../../sb/LendingPair.sol#453-465) uses a dangerous strict equality:
+	- _totalAsset.fraction == 0 (../../sb/LendingPair.sol#456)
+LendingPair._addBorrowAmount(address,uint256) (../../sb/LendingPair.sol#468-480) uses a dangerous strict equality:
+	- _totalBorrow.fraction == 0 (../../sb/LendingPair.sol#471)
+LendingPair.accrue() (../../sb/LendingPair.sol#360-412) uses a dangerous strict equality:
+	- blocks == 0 (../../sb/LendingPair.sol#364)
+LendingPair.accrue() (../../sb/LendingPair.sol#360-412) uses a dangerous strict equality:
+	- _totalAsset.amount == 0 (../../sb/LendingPair.sol#383)
+LendingPair.isSolvent(address,bool) (../../sb/LendingPair.sol#416-425) uses a dangerous strict equality:
+	- userBorrowFraction[user] == 0 (../../sb/LendingPair.sol#418)
+LendingPair.swipe(IERC20) (../../sb/LendingPair.sol#774-793) uses a dangerous strict equality:
+	- require(bool,string)(success_scope_0 && (data.length == 0 || abi.decode(data,(bool))),LendingPair: Transfer failed) (../../sb/LendingPair.sol#787)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Reentrancy in LendingPair.liquidate(address[],uint256[],address,ISwapper,bool) (../../sb/LendingPair.sol#653-726):
+	External calls:
+	- updateExchangeRate() (../../sb/LendingPair.sol#655)
+		- (success,rate) = oracle.get(oracleData) (../../sb/LendingPair.sol#433)
+	State variables written after the call(s):
+	- totalBorrow = _totalBorrow (../../sb/LendingPair.sol#687)
+	LendingPair.totalBorrow (../../sb/LendingPair.sol#264) can be used in cross function reentrancies:
+	- LendingPair._addBorrowAmount(address,uint256) (../../sb/LendingPair.sol#468-480)
+	- LendingPair._removeBorrowFraction(address,uint256) (../../sb/LendingPair.sol#507-519)
+	- LendingPair.accrue() (../../sb/LendingPair.sol#360-412)
+	- LendingPair.isSolvent(address,bool) (../../sb/LendingPair.sol#416-425)
+	- LendingPair.liquidate(address[],uint256[],address,ISwapper,bool) (../../sb/LendingPair.sol#653-726)
+	- LendingPair.totalBorrow (../../sb/LendingPair.sol#264)
+Reentrancy in LendingPair.liquidate(address[],uint256[],address,ISwapper,bool) (../../sb/LendingPair.sol#653-726):
+	External calls:
+	- updateExchangeRate() (../../sb/LendingPair.sol#655)
+		- (success,rate) = oracle.get(oracleData) (../../sb/LendingPair.sol#433)
+	- bentoBox.transferFrom(collateral,address(this),address(swapper),allCollateralAmount) (../../sb/LendingPair.sol#695)
+	- swapper.swap(collateral,asset,allCollateralAmount,allBorrowAmount) (../../sb/LendingPair.sol#697)
+	- returnedAssetAmount = bentoBox.skim(asset) (../../sb/LendingPair.sol#698)
+	State variables written after the call(s):
+	- accrueInfo.feesPendingAmount = accrueInfo.feesPendingAmount.add(feeAmount.to128()) (../../sb/LendingPair.sol#703)
+	LendingPair.accrueInfo (../../sb/LendingPair.sol#279) can be used in cross function reentrancies:
+	- LendingPair.accrue() (../../sb/LendingPair.sol#360-412)
+	- LendingPair.accrueInfo (../../sb/LendingPair.sol#279)
+	- LendingPair.init(bytes) (../../sb/LendingPair.sol#347-353)
+	- LendingPair.liquidate(address[],uint256[],address,ISwapper,bool) (../../sb/LendingPair.sol#653-726)
+	- LendingPair.withdrawFees() (../../sb/LendingPair.sol#741-753)
+	- totalAsset.amount = totalAsset.amount.add(extraAssetAmount.sub(feeAmount).to128()) (../../sb/LendingPair.sol#704)
+	LendingPair.totalAsset (../../sb/LendingPair.sol#263) can be used in cross function reentrancies:
+	- LendingPair._addAssetAmount(address,uint256) (../../sb/LendingPair.sol#453-465)
+	- LendingPair._removeAssetFraction(address,uint256) (../../sb/LendingPair.sol#492-504)
+	- LendingPair.accrue() (../../sb/LendingPair.sol#360-412)
+	- LendingPair.borrow(uint256,address) (../../sb/LendingPair.sol#584-591)
+	- LendingPair.borrowToBento(uint256,address) (../../sb/LendingPair.sol#593-600)
+	- LendingPair.liquidate(address[],uint256[],address,ISwapper,bool) (../../sb/LendingPair.sol#653-726)
+	- LendingPair.swipe(IERC20) (../../sb/LendingPair.sol#774-793)
+	- LendingPair.totalAsset (../../sb/LendingPair.sol#263)
+	- LendingPair.totalSupply() (../../sb/LendingPair.sol#267-269)
+Reentrancy in LendingPair.liquidate(address[],uint256[],address,ISwapper,bool) (../../sb/LendingPair.sol#653-726):
+	External calls:
+	- updateExchangeRate() (../../sb/LendingPair.sol#655)
+		- (success,rate) = oracle.get(oracleData) (../../sb/LendingPair.sol#433)
+	- bentoBox.transferFrom(collateral,address(this),address(swapper),allCollateralAmount) (../../sb/LendingPair.sol#717)
+	- swapper.swap(collateral,asset,allCollateralAmount,allBorrowAmount) (../../sb/LendingPair.sol#719)
+	- returnedAssetAmount_scope_0 = bentoBox.skim(asset) (../../sb/LendingPair.sol#720)
+	State variables written after the call(s):
+	- totalAsset.amount = totalAsset.amount.add(extraAssetAmount_scope_1.to128()) (../../sb/LendingPair.sol#723)
+	LendingPair.totalAsset (../../sb/LendingPair.sol#263) can be used in cross function reentrancies:
+	- LendingPair._addAssetAmount(address,uint256) (../../sb/LendingPair.sol#453-465)
+	- LendingPair._removeAssetFraction(address,uint256) (../../sb/LendingPair.sol#492-504)
+	- LendingPair.accrue() (../../sb/LendingPair.sol#360-412)
+	- LendingPair.borrow(uint256,address) (../../sb/LendingPair.sol#584-591)
+	- LendingPair.borrowToBento(uint256,address) (../../sb/LendingPair.sol#593-600)
+	- LendingPair.liquidate(address[],uint256[],address,ISwapper,bool) (../../sb/LendingPair.sol#653-726)
+	- LendingPair.swipe(IERC20) (../../sb/LendingPair.sol#774-793)
+	- LendingPair.totalAsset (../../sb/LendingPair.sol#263)
+	- LendingPair.totalSupply() (../../sb/LendingPair.sol#267-269)
+Reentrancy in LendingPair.unwind(ISwapper,uint256,uint256) (../../sb/LendingPair.sol#635-650):
+	External calls:
+	- bentoBox.transferFrom(collateral,address(this),address(swapper),maxAmountCollateral) (../../sb/LendingPair.sol#638)
+	State variables written after the call(s):
+	- borrowAmount = _removeBorrowFraction(msg.sender,borrowFraction) (../../sb/LendingPair.sol#640)
+		- totalBorrow = _totalBorrow (../../sb/LendingPair.sol#517)
+	LendingPair.totalBorrow (../../sb/LendingPair.sol#264) can be used in cross function reentrancies:
+	- LendingPair._addBorrowAmount(address,uint256) (../../sb/LendingPair.sol#468-480)
+	- LendingPair._removeBorrowFraction(address,uint256) (../../sb/LendingPair.sol#507-519)
+	- LendingPair.accrue() (../../sb/LendingPair.sol#360-412)
+	- LendingPair.isSolvent(address,bool) (../../sb/LendingPair.sol#416-425)
+	- LendingPair.liquidate(address[],uint256[],address,ISwapper,bool) (../../sb/LendingPair.sol#653-726)
+	- LendingPair.totalBorrow (../../sb/LendingPair.sol#264)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+LendingPair.accrue().feeAmount (../../sb/LendingPair.sol#368) is a local variable never initialized
+LendingPair.liquidate(address[],uint256[],address,ISwapper,bool).allBorrowFraction (../../sb/LendingPair.sol#659) is a local variable never initialized
+LendingPair.liquidate(address[],uint256[],address,ISwapper,bool).allCollateralAmount (../../sb/LendingPair.sol#657) is a local variable never initialized
+LendingPair.accrue().extraAmount (../../sb/LendingPair.sol#367) is a local variable never initialized
+LendingPair.liquidate(address[],uint256[],address,ISwapper,bool).allBorrowAmount (../../sb/LendingPair.sol#658) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+LendingPair.peekExchangeRate() (../../sb/LendingPair.sol#427-429) ignores return value by oracle.peek(oracleData) (../../sb/LendingPair.sol#428)
+LendingPair.short(ISwapper,uint256,uint256) (../../sb/LendingPair.sol#618-632) ignores return value by swapper.swap(asset,collateral,assetAmount,minCollateralAmount) (../../sb/LendingPair.sol#626)
+LendingPair.liquidate(address[],uint256[],address,ISwapper,bool) (../../sb/LendingPair.sol#653-726) ignores return value by swapper.swap(collateral,asset,allCollateralAmount,allBorrowAmount) (../../sb/LendingPair.sol#697)
+LendingPair.liquidate(address[],uint256[],address,ISwapper,bool) (../../sb/LendingPair.sol#653-726) ignores return value by swapper.swap(collateral,asset,allCollateralAmount,allBorrowAmount) (../../sb/LendingPair.sol#719)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+Ownable.transferOwnership(address).newOwner (../../sb/LendingPair.sol#50) lacks a zero-check on :
+		- pendingOwner = newOwner (../../sb/LendingPair.sol#51)
+LendingPair.setFeeTo(address).newFeeTo (../../sb/LendingPair.sol#760) lacks a zero-check on :
+		- feeTo = newFeeTo (../../sb/LendingPair.sol#762)
+LendingPair.setDev(address).newDev (../../sb/LendingPair.sol#766) lacks a zero-check on :
+		- dev = newDev (../../sb/LendingPair.sol#769)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+LendingPair.batch(bytes[],bool) (../../sb/LendingPair.sol#728-738) has external calls inside a loop: (success,result) = address(this).delegatecall(calls[i]) (../../sb/LendingPair.sol#732)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in LendingPair.liquidate(address[],uint256[],address,ISwapper,bool) (../../sb/LendingPair.sol#653-726):
+	External calls:
+	- updateExchangeRate() (../../sb/LendingPair.sol#655)
+		- (success,rate) = oracle.get(oracleData) (../../sb/LendingPair.sol#433)
+	State variables written after the call(s):
+	- totalCollateralAmount = totalCollateralAmount.sub(allCollateralAmount) (../../sb/LendingPair.sol#688)
+	- userBorrowFraction[user] = userBorrowFraction[user].sub(borrowFraction) (../../sb/LendingPair.sol#674)
+	- userCollateralAmount[user] = userCollateralAmount[user].sub(collateralAmount) (../../sb/LendingPair.sol#672)
+Reentrancy in LendingPair.short(ISwapper,uint256,uint256) (../../sb/LendingPair.sol#618-632):
+	External calls:
+	- bentoBox.transferFrom(asset,address(this),address(swapper),assetAmount) (../../sb/LendingPair.sol#622)
+	- swapper.swap(asset,collateral,assetAmount,minCollateralAmount) (../../sb/LendingPair.sol#626)
+	- returnedCollateralAmount = bentoBox.skim(collateral) (../../sb/LendingPair.sol#627)
+	State variables written after the call(s):
+	- _addCollateralAmount(msg.sender,returnedCollateralAmount) (../../sb/LendingPair.sol#629)
+		- totalCollateralAmount = totalCollateralAmount.add(amount) (../../sb/LendingPair.sol#448)
+	- _addCollateralAmount(msg.sender,returnedCollateralAmount) (../../sb/LendingPair.sol#629)
+		- userCollateralAmount[user] = userCollateralAmount[user].add(amount) (../../sb/LendingPair.sol#446)
+Reentrancy in LendingPair.unwind(ISwapper,uint256,uint256) (../../sb/LendingPair.sol#635-650):
+	External calls:
+	- bentoBox.transferFrom(collateral,address(this),address(swapper),maxAmountCollateral) (../../sb/LendingPair.sol#638)
+	State variables written after the call(s):
+	- borrowAmount = _removeBorrowFraction(msg.sender,borrowFraction) (../../sb/LendingPair.sol#640)
+		- userBorrowFraction[user] = userBorrowFraction[user].sub(fraction) (../../sb/LendingPair.sol#510)
+Reentrancy in LendingPair.unwind(ISwapper,uint256,uint256) (../../sb/LendingPair.sol#635-650):
+	External calls:
+	- bentoBox.transferFrom(collateral,address(this),address(swapper),maxAmountCollateral) (../../sb/LendingPair.sol#638)
+	- usedAmount = swapper.swapExact(collateral,asset,maxAmountCollateral,borrowAmount,address(this)) (../../sb/LendingPair.sol#643)
+	- returnedAssetAmount = bentoBox.skim(asset) (../../sb/LendingPair.sol#644)
+	State variables written after the call(s):
+	- _removeCollateralAmount(msg.sender,maxAmountCollateral.sub(usedAmount)) (../../sb/LendingPair.sol#647)
+		- totalCollateralAmount = totalCollateralAmount.sub(amount) (../../sb/LendingPair.sol#487)
+	- _removeCollateralAmount(msg.sender,maxAmountCollateral.sub(usedAmount)) (../../sb/LendingPair.sol#647)
+		- userCollateralAmount[user] = userCollateralAmount[user].sub(amount) (../../sb/LendingPair.sol#485)
+Reentrancy in LendingPair.updateExchangeRate() (../../sb/LendingPair.sol#432-441):
+	External calls:
+	- (success,rate) = oracle.get(oracleData) (../../sb/LendingPair.sol#433)
+	State variables written after the call(s):
+	- exchangeRate = rate (../../sb/LendingPair.sol#437)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in LendingPair.liquidate(address[],uint256[],address,ISwapper,bool) (../../sb/LendingPair.sol#653-726):
+	External calls:
+	- updateExchangeRate() (../../sb/LendingPair.sol#655)
+		- (success,rate) = oracle.get(oracleData) (../../sb/LendingPair.sol#433)
+	Event emitted after the call(s):
+	- LogRemoveBorrow(user,borrowAmount,borrowFraction) (../../sb/LendingPair.sol#676)
+	- LogRemoveCollateral(user,collateralAmount) (../../sb/LendingPair.sol#675)
+Reentrancy in LendingPair.liquidate(address[],uint256[],address,ISwapper,bool) (../../sb/LendingPair.sol#653-726):
+	External calls:
+	- updateExchangeRate() (../../sb/LendingPair.sol#655)
+		- (success,rate) = oracle.get(oracleData) (../../sb/LendingPair.sol#433)
+	- bentoBox.transferFrom(collateral,address(this),address(swapper),allCollateralAmount) (../../sb/LendingPair.sol#695)
+	- swapper.swap(collateral,asset,allCollateralAmount,allBorrowAmount) (../../sb/LendingPair.sol#697)
+	- returnedAssetAmount = bentoBox.skim(asset) (../../sb/LendingPair.sol#698)
+	Event emitted after the call(s):
+	- LogAddAsset(address(0),extraAssetAmount,0) (../../sb/LendingPair.sol#705)
+Reentrancy in LendingPair.liquidate(address[],uint256[],address,ISwapper,bool) (../../sb/LendingPair.sol#653-726):
+	External calls:
+	- updateExchangeRate() (../../sb/LendingPair.sol#655)
+		- (success,rate) = oracle.get(oracleData) (../../sb/LendingPair.sol#433)
+	- bentoBox.transferFrom(collateral,address(this),address(swapper),allCollateralAmount) (../../sb/LendingPair.sol#717)
+	- swapper.swap(collateral,asset,allCollateralAmount,allBorrowAmount) (../../sb/LendingPair.sol#719)
+	- returnedAssetAmount_scope_0 = bentoBox.skim(asset) (../../sb/LendingPair.sol#720)
+	Event emitted after the call(s):
+	- LogAddAsset(address(0),extraAssetAmount_scope_1,0) (../../sb/LendingPair.sol#724)
+Reentrancy in LendingPair.short(ISwapper,uint256,uint256) (../../sb/LendingPair.sol#618-632):
+	External calls:
+	- bentoBox.transferFrom(asset,address(this),address(swapper),assetAmount) (../../sb/LendingPair.sol#622)
+	- swapper.swap(asset,collateral,assetAmount,minCollateralAmount) (../../sb/LendingPair.sol#626)
+	- returnedCollateralAmount = bentoBox.skim(collateral) (../../sb/LendingPair.sol#627)
+	Event emitted after the call(s):
+	- LogAddCollateral(msg.sender,amount) (../../sb/LendingPair.sol#449)
+		- _addCollateralAmount(msg.sender,returnedCollateralAmount) (../../sb/LendingPair.sol#629)
+Reentrancy in LendingPair.unwind(ISwapper,uint256,uint256) (../../sb/LendingPair.sol#635-650):
+	External calls:
+	- bentoBox.transferFrom(collateral,address(this),address(swapper),maxAmountCollateral) (../../sb/LendingPair.sol#638)
+	Event emitted after the call(s):
+	- LogRemoveBorrow(msg.sender,amount,fraction) (../../sb/LendingPair.sol#518)
+		- borrowAmount = _removeBorrowFraction(msg.sender,borrowFraction) (../../sb/LendingPair.sol#640)
+Reentrancy in LendingPair.unwind(ISwapper,uint256,uint256) (../../sb/LendingPair.sol#635-650):
+	External calls:
+	- bentoBox.transferFrom(collateral,address(this),address(swapper),maxAmountCollateral) (../../sb/LendingPair.sol#638)
+	- usedAmount = swapper.swapExact(collateral,asset,maxAmountCollateral,borrowAmount,address(this)) (../../sb/LendingPair.sol#643)
+	- returnedAssetAmount = bentoBox.skim(asset) (../../sb/LendingPair.sol#644)
+	Event emitted after the call(s):
+	- LogRemoveCollateral(msg.sender,amount) (../../sb/LendingPair.sol#488)
+		- _removeCollateralAmount(msg.sender,maxAmountCollateral.sub(usedAmount)) (../../sb/LendingPair.sol#647)
+Reentrancy in LendingPair.updateExchangeRate() (../../sb/LendingPair.sol#432-441):
+	External calls:
+	- (success,rate) = oracle.get(oracleData) (../../sb/LendingPair.sol#433)
+	Event emitted after the call(s):
+	- LogExchangeRate(rate) (../../sb/LendingPair.sol#438)
+Reentrancy in LendingPair.withdrawFees() (../../sb/LendingPair.sol#741-753):
+	External calls:
+	- bentoBox.withdraw(asset,_feeTo,feeAmount.sub(devFeeAmount)) (../../sb/LendingPair.sol#748)
+	- bentoBox.withdraw(asset,_dev,devFeeAmount) (../../sb/LendingPair.sol#750)
+	Event emitted after the call(s):
+	- LogWithdrawFees() (../../sb/LendingPair.sol#752)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+ERC20.permit(address,address,uint256,uint256,uint8,bytes32,bytes32) (../../sb/LendingPair.sol#119-133) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp < deadline,ERC20: Expired) (../../sb/LendingPair.sol#121)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+ERC20.DOMAIN_SEPARATOR() (../../sb/LendingPair.sol#113-117) uses assembly
+	- INLINE ASM (../../sb/LendingPair.sol#115)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Pragma version0.6.12 (../../sb/LendingPair.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in LendingPair.symbol() (../../sb/LendingPair.sol#282-290):
+	- (success,data) = address(asset).staticcall(abi.encodeWithSelector(0x95d89b41)) (../../sb/LendingPair.sol#283)
+	- (success,data) = address(collateral).staticcall(abi.encodeWithSelector(0x95d89b41)) (../../sb/LendingPair.sol#286)
+Low level call in LendingPair.name() (../../sb/LendingPair.sol#292-300):
+	- (success,data) = address(asset).staticcall(abi.encodeWithSelector(0x06fdde03)) (../../sb/LendingPair.sol#293)
+	- (success,data) = address(collateral).staticcall(abi.encodeWithSelector(0x06fdde03)) (../../sb/LendingPair.sol#296)
+Low level call in LendingPair.decimals() (../../sb/LendingPair.sol#302-305):
+	- (success,data) = address(asset).staticcall(abi.encodeWithSelector(0x313ce567)) (../../sb/LendingPair.sol#303)
+Low level call in LendingPair.batch(bytes[],bool) (../../sb/LendingPair.sol#728-738):
+	- (success,result) = address(this).delegatecall(calls[i]) (../../sb/LendingPair.sol#732)
+Low level call in LendingPair.swipe(IERC20) (../../sb/LendingPair.sol#774-793):
+	- (success) = msg.sender.call{value: balanceETH}(new bytes(0)) (../../sb/LendingPair.sol#780)
+	- (success_scope_0,data) = address(token).call(abi.encodeWithSelector(0xa9059cbb,msg.sender,balanceAmount)) (../../sb/LendingPair.sol#786)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Function ERC20.DOMAIN_SEPARATOR() (../../sb/LendingPair.sol#113-117) is not in mixedCase
+Function IBentoBox.WETH() (../../sb/LendingPair.sol#167) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Variable LendingPair.MAXIMUM_INTEREST_PER_BLOCK (../../sb/LendingPair.sol#336) is too similar to LendingPair.MINIMUM_INTEREST_PER_BLOCK (../../sb/LendingPair.sol#335)
+Variable LendingPair.MAXIMUM_TARGET_UTILIZATION (../../sb/LendingPair.sol#332) is too similar to LendingPair.MINIMUM_TARGET_UTILIZATION (../../sb/LendingPair.sol#331)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+/sb/LendingPair.sol analyzed (13 contracts with 93 detectors), 56 result(s) found

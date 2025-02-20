@@ -1,0 +1,392 @@
+'solc --version' running
+'solc /sb/RToken.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+EIP20NonStandardInterface (../../sb/RToken.sol#108-170) has incorrect ERC20 function interface:EIP20NonStandardInterface.transfer(address,uint256) (../../sb/RToken.sol#134)
+EIP20NonStandardInterface (../../sb/RToken.sol#108-170) has incorrect ERC20 function interface:EIP20NonStandardInterface.transferFrom(address,address,uint256) (../../sb/RToken.sol#148)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-erc20-interface
+
+RToken.accrueInterest() (../../sb/RToken.sol#1569-1647) uses a dangerous strict equality:
+	- accrualBlockNumberPrior == currentBlockNumber (../../sb/RToken.sol#1575)
+RToken.accrueInterest() (../../sb/RToken.sol#1569-1647) uses a dangerous strict equality:
+	- require(bool,string)(mathErr == MathError.NO_ERROR,could not calculate block delta) (../../sb/RToken.sol#1591)
+RToken.balanceOfUnderlying(address) (../../sb/RToken.sol#1375-1380) uses a dangerous strict equality:
+	- require(bool,string)(mErr == MathError.NO_ERROR,balance could not be calculated) (../../sb/RToken.sol#1378)
+RToken.borrowBalanceStored(address) (../../sb/RToken.sol#1456-1460) uses a dangerous strict equality:
+	- require(bool,string)(err == MathError.NO_ERROR,borrowBalanceStored: borrowBalanceStoredInternal failed) (../../sb/RToken.sol#1458)
+CarefulMath.divUInt(uint256,uint256) (../../sb/RToken.sol#776-782) uses a dangerous strict equality:
+	- b == 0 (../../sb/RToken.sol#777)
+RToken.exchangeRateStored() (../../sb/RToken.sol#1513-1517) uses a dangerous strict equality:
+	- require(bool,string)(err == MathError.NO_ERROR,exchangeRateStored: exchangeRateStoredInternal failed) (../../sb/RToken.sol#1515)
+RToken.exchangeRateStoredInternal() (../../sb/RToken.sol#1524-1554) uses a dangerous strict equality:
+	- _totalSupply == 0 (../../sb/RToken.sol#1526)
+RToken.initialize(IronControllerInterface,InterestRateModel,uint256,string,string,uint8) (../../sb/RToken.sol#1210-1241) uses a dangerous strict equality:
+	- require(bool,string)(accrualBlockNumber == 0 && borrowIndex == 0,market may only be initialized once) (../../sb/RToken.sol#1217)
+RToken.initialize(IronControllerInterface,InterestRateModel,uint256,string,string,uint8) (../../sb/RToken.sol#1210-1241) uses a dangerous strict equality:
+	- require(bool,string)(err == uint256(Error.NO_ERROR),setting ironController failed) (../../sb/RToken.sol#1225)
+RToken.initialize(IronControllerInterface,InterestRateModel,uint256,string,string,uint8) (../../sb/RToken.sol#1210-1241) uses a dangerous strict equality:
+	- require(bool,string)(err == uint256(Error.NO_ERROR),setting interest rate model failed) (../../sb/RToken.sol#1233)
+RToken.liquidateBorrowFresh(address,address,uint256,RTokenInterface) (../../sb/RToken.sol#2140-2209) uses a dangerous strict equality:
+	- require(bool,string)(amountSeizeError == uint256(Error.NO_ERROR),LIQUIDATE_IRON_CONTROLLER_CALCULATE_AMOUNT_SEIZE_FAILED) (../../sb/RToken.sol#2185)
+RToken.liquidateBorrowFresh(address,address,uint256,RTokenInterface) (../../sb/RToken.sol#2140-2209) uses a dangerous strict equality:
+	- require(bool,string)(seizeError == uint256(Error.NO_ERROR),token seizure failed) (../../sb/RToken.sol#2199)
+RToken.mintFresh(address,uint256) (../../sb/RToken.sol#1682-1747) uses a dangerous strict equality:
+	- require(bool,string)(vars.mathErr == MathError.NO_ERROR,MINT_EXCHANGE_CALCULATION_FAILED) (../../sb/RToken.sol#1721)
+RToken.mintFresh(address,uint256) (../../sb/RToken.sol#1682-1747) uses a dangerous strict equality:
+	- require(bool,string)(vars.mathErr == MathError.NO_ERROR,MINT_NEW_TOTAL_SUPPLY_CALCULATION_FAILED) (../../sb/RToken.sol#1729)
+RToken.mintFresh(address,uint256) (../../sb/RToken.sol#1682-1747) uses a dangerous strict equality:
+	- require(bool,string)(vars.mathErr == MathError.NO_ERROR,MINT_NEW_ACCOUNT_BALANCE_CALCULATION_FAILED) (../../sb/RToken.sol#1732)
+Exponential.mulExp(ExponentialNoError.Exp,ExponentialNoError.Exp) (../../sb/RToken.sol#1145-1165) uses a dangerous strict equality:
+	- assert(bool)(err2 == MathError.NO_ERROR) (../../sb/RToken.sol#1162)
+CarefulMath.mulUInt(uint256,uint256) (../../sb/RToken.sol#759-771) uses a dangerous strict equality:
+	- a == 0 (../../sb/RToken.sol#760)
+RToken.repayBorrowFresh(address,address,uint256) (../../sb/RToken.sol#2037-2104) uses a dangerous strict equality:
+	- require(bool,string)(vars.mathErr == MathError.NO_ERROR,REPAY_BORROW_NEW_ACCOUNT_BORROW_BALANCE_CALCULATION_FAILED) (../../sb/RToken.sol#2086)
+RToken.repayBorrowFresh(address,address,uint256) (../../sb/RToken.sol#2037-2104) uses a dangerous strict equality:
+	- require(bool,string)(vars.mathErr == MathError.NO_ERROR,REPAY_BORROW_NEW_TOTAL_BALANCE_CALCULATION_FAILED) (../../sb/RToken.sol#2089)
+RToken.transfer(address,uint256) (../../sb/RToken.sol#1320-1322) uses a dangerous strict equality:
+	- transfeRTokens(msg.sender,msg.sender,dst,amount) == uint256(Error.NO_ERROR) (../../sb/RToken.sol#1321)
+RToken.transferFrom(address,address,uint256) (../../sb/RToken.sol#1331-1333) uses a dangerous strict equality:
+	- transfeRTokens(msg.sender,src,dst,amount) == uint256(Error.NO_ERROR) (../../sb/RToken.sol#1332)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Reentrancy in RToken.liquidateBorrowInternal(address,uint256,RTokenInterface) (../../sb/RToken.sol#2114-2129):
+	External calls:
+	- error = RTokenCollateral.accrueInterest() (../../sb/RToken.sol#2121)
+	- liquidateBorrowFresh(msg.sender,borrower,repayAmount,RTokenCollateral) (../../sb/RToken.sol#2128)
+		- allowed = ironController.repayBorrowAllowed(address(this),payer,borrower,repayAmount) (../../sb/RToken.sol#2039)
+		- allowed = ironController.seizeAllowed(address(this),seizeRToken,liquidator,borrower,seizeTokens) (../../sb/RToken.sol#2236)
+		- allowed = ironController.liquidateBorrowAllowed(address(this),address(RTokenCollateral),liquidator,borrower,repayAmount) (../../sb/RToken.sol#2142)
+		- seizeError = RTokenCollateral.seize(liquidator,borrower,seizeTokens) (../../sb/RToken.sol#2195)
+	State variables written after the call(s):
+	- liquidateBorrowFresh(msg.sender,borrower,repayAmount,RTokenCollateral) (../../sb/RToken.sol#2128)
+		- totalBorrows = vars.totalBorrowsNew (../../sb/RToken.sol#2094)
+	RTokenStorage.totalBorrows (../../sb/RToken.sol#247) can be used in cross function reentrancies:
+	- RToken.accrueInterest() (../../sb/RToken.sol#1569-1647)
+	- RToken.borrowRatePerBlock() (../../sb/RToken.sol#1420-1422)
+	- RToken.exchangeRateStoredInternal() (../../sb/RToken.sol#1524-1554)
+	- RToken.supplyRatePerBlock() (../../sb/RToken.sol#1428-1430)
+	- RTokenStorage.totalBorrows (../../sb/RToken.sol#247)
+Reentrancy in RToken.redeemFresh(address,uint256,uint256) (../../sb/RToken.sol#1799-1893):
+	External calls:
+	- allowed = ironController.redeemAllowed(address(this),redeemer,vars.redeemTokens) (../../sb/RToken.sol#1839)
+	State variables written after the call(s):
+	- totalSupply = vars.totalSupplyNew (../../sb/RToken.sol#1882)
+	RTokenStorage.totalSupply (../../sb/RToken.sol#257) can be used in cross function reentrancies:
+	- RToken.exchangeRateStoredInternal() (../../sb/RToken.sol#1524-1554)
+	- RTokenStorage.totalSupply (../../sb/RToken.sol#257)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+RToken.borrowFresh(address,uint256).vars (../../sb/RToken.sol#1939) is a local variable never initialized
+RToken.redeemFresh(address,uint256,uint256).vars (../../sb/RToken.sol#1802) is a local variable never initialized
+RToken.mintFresh(address,uint256).vars (../../sb/RToken.sol#1694) is a local variable never initialized
+RToken.repayBorrowFresh(address,address,uint256).vars (../../sb/RToken.sol#2049) is a local variable never initialized
+RToken._addReservesFresh(uint256).actualAddAmount (../../sb/RToken.sol#2432) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+Exponential.divScalarByExpTruncate(uint256,ExponentialNoError.Exp).fraction (../../sb/RToken.sol#1134) shadows:
+	- ExponentialNoError.fraction(uint256,uint256) (../../sb/RToken.sol#1011-1013) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+RToken.initialize(IronControllerInterface,InterestRateModel,uint256,string,string,uint8) (../../sb/RToken.sol#1210-1241) should emit an event for: 
+	- initialExchangeRateMantissa = initialExchangeRateMantissa_ (../../sb/RToken.sol#1220) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+RToken._setPendingAdmin(address).newPendingAdmin (../../sb/RToken.sol#2292) lacks a zero-check on :
+		- pendingAdmin = newPendingAdmin (../../sb/RToken.sol#2302)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in RToken.borrowFresh(address,uint256) (../../sb/RToken.sol#1922-1986):
+	External calls:
+	- allowed = ironController.borrowAllowed(address(this),borrower,borrowAmount) (../../sb/RToken.sol#1924)
+	State variables written after the call(s):
+	- accountBorrows[borrower].principal = vars.accountBorrowsNew (../../sb/RToken.sol#1974)
+	- accountBorrows[borrower].interestIndex = borrowIndex (../../sb/RToken.sol#1975)
+	- totalBorrows = vars.totalBorrowsNew (../../sb/RToken.sol#1976)
+Reentrancy in RToken.mintFresh(address,uint256) (../../sb/RToken.sol#1682-1747):
+	External calls:
+	- allowed = ironController.mintAllowed(address(this),minter,mintAmount) (../../sb/RToken.sol#1684)
+	State variables written after the call(s):
+	- accountTokens[minter] = vars.accountTokensNew (../../sb/RToken.sol#1736)
+	- totalSupply = vars.totalSupplyNew (../../sb/RToken.sol#1735)
+Reentrancy in RToken.redeemFresh(address,uint256,uint256) (../../sb/RToken.sol#1799-1893):
+	External calls:
+	- allowed = ironController.redeemAllowed(address(this),redeemer,vars.redeemTokens) (../../sb/RToken.sol#1839)
+	State variables written after the call(s):
+	- accountTokens[redeemer] = vars.accountTokensNew (../../sb/RToken.sol#1883)
+Reentrancy in RToken.repayBorrowFresh(address,address,uint256) (../../sb/RToken.sol#2037-2104):
+	External calls:
+	- allowed = ironController.repayBorrowAllowed(address(this),payer,borrower,repayAmount) (../../sb/RToken.sol#2039)
+	State variables written after the call(s):
+	- accountBorrows[borrower].principal = vars.accountBorrowsNew (../../sb/RToken.sol#2092)
+	- accountBorrows[borrower].interestIndex = borrowIndex (../../sb/RToken.sol#2093)
+	- totalBorrows = vars.totalBorrowsNew (../../sb/RToken.sol#2094)
+Reentrancy in RToken.seizeInternal(address,address,address,uint256) (../../sb/RToken.sol#2234-2281):
+	External calls:
+	- allowed = ironController.seizeAllowed(address(this),seizeRToken,liquidator,borrower,seizeTokens) (../../sb/RToken.sol#2236)
+	State variables written after the call(s):
+	- accountTokens[borrower] = borroweRTokensNew (../../sb/RToken.sol#2270)
+	- accountTokens[liquidator] = liquidatoRTokensNew (../../sb/RToken.sol#2271)
+Reentrancy in RToken.transfeRTokens(address,address,address,uint256) (../../sb/RToken.sol#1252-1312):
+	External calls:
+	- allowed = ironController.transferAllowed(address(this),src,dst,tokens) (../../sb/RToken.sol#1254)
+	State variables written after the call(s):
+	- accountTokens[src] = srRTokensNew (../../sb/RToken.sol#1297)
+	- accountTokens[dst] = dstTokensNew (../../sb/RToken.sol#1298)
+	- transferAllowances[src][spender] = allowanceNew (../../sb/RToken.sol#1302)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in RToken.borrowFresh(address,uint256) (../../sb/RToken.sol#1922-1986):
+	External calls:
+	- allowed = ironController.borrowAllowed(address(this),borrower,borrowAmount) (../../sb/RToken.sol#1924)
+	Event emitted after the call(s):
+	- Borrow(borrower,borrowAmount,vars.accountBorrowsNew,vars.totalBorrowsNew) (../../sb/RToken.sol#1979)
+	- Failure(uint256(err),uint256(info),opaqueError) (../../sb/RToken.sol#732)
+		- failOpaque(Error.IRON_CONTROLLER_REJECTION,FailureInfo.BORROW_IRON_CONTROLLER_REJECTION,allowed) (../../sb/RToken.sol#1926)
+	- Failure(uint256(err),uint256(info),opaqueError) (../../sb/RToken.sol#732)
+		- failOpaque(Error.MATH_ERROR,FailureInfo.BORROW_NEW_ACCOUNT_BORROW_BALANCE_CALCULATION_FAILED,uint256(vars.mathErr)) (../../sb/RToken.sol#1953)
+	- Failure(uint256(err),uint256(info),0) (../../sb/RToken.sol#723)
+		- fail(Error.MARKET_NOT_FRESH,FailureInfo.BORROW_FRESHNESS_CHECK) (../../sb/RToken.sol#1931)
+	- Failure(uint256(err),uint256(info),0) (../../sb/RToken.sol#723)
+		- fail(Error.TOKEN_INSUFFICIENT_CASH,FailureInfo.BORROW_CASH_NOT_AVAILABLE) (../../sb/RToken.sol#1936)
+	- Failure(uint256(err),uint256(info),opaqueError) (../../sb/RToken.sol#732)
+		- failOpaque(Error.MATH_ERROR,FailureInfo.BORROW_ACCUMULATED_BALANCE_CALCULATION_FAILED,uint256(vars.mathErr)) (../../sb/RToken.sol#1948)
+	- Failure(uint256(err),uint256(info),opaqueError) (../../sb/RToken.sol#732)
+		- failOpaque(Error.MATH_ERROR,FailureInfo.BORROW_NEW_TOTAL_BALANCE_CALCULATION_FAILED,uint256(vars.mathErr)) (../../sb/RToken.sol#1958)
+Reentrancy in RToken.liquidateBorrowFresh(address,address,uint256,RTokenInterface) (../../sb/RToken.sol#2140-2209):
+	External calls:
+	- allowed = ironController.liquidateBorrowAllowed(address(this),address(RTokenCollateral),liquidator,borrower,repayAmount) (../../sb/RToken.sol#2142)
+	Event emitted after the call(s):
+	- Failure(uint256(err),uint256(info),0) (../../sb/RToken.sol#723)
+		- (fail(Error.INVALID_ACCOUNT_PAIR,FailureInfo.LIQUIDATE_LIQUIDATOR_IS_BORROWER),0) (../../sb/RToken.sol#2159)
+	- Failure(uint256(err),uint256(info),0) (../../sb/RToken.sol#723)
+		- (fail(Error.INVALID_CLOSE_AMOUNT_REQUESTED,FailureInfo.LIQUIDATE_CLOSE_AMOUNT_IS_ZERO),0) (../../sb/RToken.sol#2164)
+	- Failure(uint256(err),uint256(info),opaqueError) (../../sb/RToken.sol#732)
+		- (failOpaque(Error.IRON_CONTROLLER_REJECTION,FailureInfo.LIQUIDATE_IRON_CONTROLLER_REJECTION,allowed),0) (../../sb/RToken.sol#2144)
+	- Failure(uint256(err),uint256(info),0) (../../sb/RToken.sol#723)
+		- (fail(Error.MARKET_NOT_FRESH,FailureInfo.LIQUIDATE_COLLATERAL_FRESHNESS_CHECK),0) (../../sb/RToken.sol#2154)
+	- Failure(uint256(err),uint256(info),0) (../../sb/RToken.sol#723)
+		- (fail(Error.MARKET_NOT_FRESH,FailureInfo.LIQUIDATE_FRESHNESS_CHECK),0) (../../sb/RToken.sol#2149)
+	- Failure(uint256(err),uint256(info),0) (../../sb/RToken.sol#723)
+		- (fail(Error.INVALID_CLOSE_AMOUNT_REQUESTED,FailureInfo.LIQUIDATE_CLOSE_AMOUNT_IS_UINT_MAX),0) (../../sb/RToken.sol#2169)
+Reentrancy in RToken.liquidateBorrowFresh(address,address,uint256,RTokenInterface) (../../sb/RToken.sol#2140-2209):
+	External calls:
+	- allowed = ironController.liquidateBorrowAllowed(address(this),address(RTokenCollateral),liquidator,borrower,repayAmount) (../../sb/RToken.sol#2142)
+	- (repayBorrowError,actualRepayAmount) = repayBorrowFresh(liquidator,borrower,repayAmount) (../../sb/RToken.sol#2174)
+		- allowed = ironController.repayBorrowAllowed(address(this),payer,borrower,repayAmount) (../../sb/RToken.sol#2039)
+	Event emitted after the call(s):
+	- Failure(uint256(err),uint256(info),0) (../../sb/RToken.sol#723)
+		- (repayBorrowError,actualRepayAmount) = repayBorrowFresh(liquidator,borrower,repayAmount) (../../sb/RToken.sol#2174)
+	- Failure(uint256(err),uint256(info),opaqueError) (../../sb/RToken.sol#732)
+		- (repayBorrowError,actualRepayAmount) = repayBorrowFresh(liquidator,borrower,repayAmount) (../../sb/RToken.sol#2174)
+	- Failure(uint256(err),uint256(info),0) (../../sb/RToken.sol#723)
+		- (fail(TokenErrorReporter.Error(repayBorrowError),FailureInfo.LIQUIDATE_REPAY_BORROW_FRESH_FAILED),0) (../../sb/RToken.sol#2176)
+	- RepayBorrow(payer,borrower,vars.actualRepayAmount,vars.accountBorrowsNew,vars.totalBorrowsNew) (../../sb/RToken.sol#2097)
+		- (repayBorrowError,actualRepayAmount) = repayBorrowFresh(liquidator,borrower,repayAmount) (../../sb/RToken.sol#2174)
+Reentrancy in RToken.liquidateBorrowFresh(address,address,uint256,RTokenInterface) (../../sb/RToken.sol#2140-2209):
+	External calls:
+	- allowed = ironController.liquidateBorrowAllowed(address(this),address(RTokenCollateral),liquidator,borrower,repayAmount) (../../sb/RToken.sol#2142)
+	- (repayBorrowError,actualRepayAmount) = repayBorrowFresh(liquidator,borrower,repayAmount) (../../sb/RToken.sol#2174)
+		- allowed = ironController.repayBorrowAllowed(address(this),payer,borrower,repayAmount) (../../sb/RToken.sol#2039)
+	- seizeError = seizeInternal(address(this),liquidator,borrower,seizeTokens) (../../sb/RToken.sol#2193)
+		- allowed = ironController.seizeAllowed(address(this),seizeRToken,liquidator,borrower,seizeTokens) (../../sb/RToken.sol#2236)
+	Event emitted after the call(s):
+	- Failure(uint256(err),uint256(info),opaqueError) (../../sb/RToken.sol#732)
+		- seizeError = seizeInternal(address(this),liquidator,borrower,seizeTokens) (../../sb/RToken.sol#2193)
+	- Failure(uint256(err),uint256(info),0) (../../sb/RToken.sol#723)
+		- seizeError = seizeInternal(address(this),liquidator,borrower,seizeTokens) (../../sb/RToken.sol#2193)
+	- Transfer(borrower,liquidator,seizeTokens) (../../sb/RToken.sol#2274)
+		- seizeError = seizeInternal(address(this),liquidator,borrower,seizeTokens) (../../sb/RToken.sol#2193)
+Reentrancy in RToken.liquidateBorrowFresh(address,address,uint256,RTokenInterface) (../../sb/RToken.sol#2140-2209):
+	External calls:
+	- allowed = ironController.liquidateBorrowAllowed(address(this),address(RTokenCollateral),liquidator,borrower,repayAmount) (../../sb/RToken.sol#2142)
+	- (repayBorrowError,actualRepayAmount) = repayBorrowFresh(liquidator,borrower,repayAmount) (../../sb/RToken.sol#2174)
+		- allowed = ironController.repayBorrowAllowed(address(this),payer,borrower,repayAmount) (../../sb/RToken.sol#2039)
+	- seizeError = seizeInternal(address(this),liquidator,borrower,seizeTokens) (../../sb/RToken.sol#2193)
+		- allowed = ironController.seizeAllowed(address(this),seizeRToken,liquidator,borrower,seizeTokens) (../../sb/RToken.sol#2236)
+	- seizeError = RTokenCollateral.seize(liquidator,borrower,seizeTokens) (../../sb/RToken.sol#2195)
+	Event emitted after the call(s):
+	- LiquidateBorrow(liquidator,borrower,actualRepayAmount,address(RTokenCollateral),seizeTokens) (../../sb/RToken.sol#2202)
+Reentrancy in RToken.mintFresh(address,uint256) (../../sb/RToken.sol#1682-1747):
+	External calls:
+	- allowed = ironController.mintAllowed(address(this),minter,mintAmount) (../../sb/RToken.sol#1684)
+	Event emitted after the call(s):
+	- Failure(uint256(err),uint256(info),0) (../../sb/RToken.sol#723)
+		- (fail(Error.MARKET_NOT_FRESH,FailureInfo.MINT_FRESHNESS_CHECK),0) (../../sb/RToken.sol#1691)
+	- Failure(uint256(err),uint256(info),opaqueError) (../../sb/RToken.sol#732)
+		- (failOpaque(Error.IRON_CONTROLLER_REJECTION,FailureInfo.MINT_IRON_CONTROLLER_REJECTION,allowed),0) (../../sb/RToken.sol#1686)
+	- Failure(uint256(err),uint256(info),opaqueError) (../../sb/RToken.sol#732)
+		- (failOpaque(Error.MATH_ERROR,FailureInfo.MINT_EXCHANGE_RATE_READ_FAILED,uint256(vars.mathErr)),0) (../../sb/RToken.sol#1698)
+	- Mint(minter,vars.actualMintAmount,vars.mintTokens) (../../sb/RToken.sol#1739)
+	- Transfer(address(this),minter,vars.mintTokens) (../../sb/RToken.sol#1740)
+Reentrancy in RToken.redeemFresh(address,uint256,uint256) (../../sb/RToken.sol#1799-1893):
+	External calls:
+	- allowed = ironController.redeemAllowed(address(this),redeemer,vars.redeemTokens) (../../sb/RToken.sol#1839)
+	Event emitted after the call(s):
+	- Failure(uint256(err),uint256(info),opaqueError) (../../sb/RToken.sol#732)
+		- failOpaque(Error.IRON_CONTROLLER_REJECTION,FailureInfo.REDEEM_IRON_CONTROLLER_REJECTION,allowed) (../../sb/RToken.sol#1841)
+	- Failure(uint256(err),uint256(info),0) (../../sb/RToken.sol#723)
+		- fail(Error.TOKEN_INSUFFICIENT_CASH,FailureInfo.REDEEM_TRANSFER_OUT_NOT_POSSIBLE) (../../sb/RToken.sol#1866)
+	- Failure(uint256(err),uint256(info),opaqueError) (../../sb/RToken.sol#732)
+		- failOpaque(Error.MATH_ERROR,FailureInfo.REDEEM_NEW_TOTAL_SUPPLY_CALCULATION_FAILED,uint256(vars.mathErr)) (../../sb/RToken.sol#1856)
+	- Failure(uint256(err),uint256(info),0) (../../sb/RToken.sol#723)
+		- fail(Error.MARKET_NOT_FRESH,FailureInfo.REDEEM_FRESHNESS_CHECK) (../../sb/RToken.sol#1846)
+	- Failure(uint256(err),uint256(info),opaqueError) (../../sb/RToken.sol#732)
+		- failOpaque(Error.MATH_ERROR,FailureInfo.REDEEM_NEW_ACCOUNT_BALANCE_CALCULATION_FAILED,uint256(vars.mathErr)) (../../sb/RToken.sol#1861)
+	- Redeem(redeemer,vars.redeemAmount,vars.redeemTokens) (../../sb/RToken.sol#1887)
+	- Transfer(redeemer,address(this),vars.redeemTokens) (../../sb/RToken.sol#1886)
+Reentrancy in RToken.repayBorrowFresh(address,address,uint256) (../../sb/RToken.sol#2037-2104):
+	External calls:
+	- allowed = ironController.repayBorrowAllowed(address(this),payer,borrower,repayAmount) (../../sb/RToken.sol#2039)
+	Event emitted after the call(s):
+	- Failure(uint256(err),uint256(info),opaqueError) (../../sb/RToken.sol#732)
+		- (failOpaque(Error.MATH_ERROR,FailureInfo.REPAY_BORROW_ACCUMULATED_BALANCE_CALCULATION_FAILED,uint256(vars.mathErr)),0) (../../sb/RToken.sol#2057)
+	- Failure(uint256(err),uint256(info),0) (../../sb/RToken.sol#723)
+		- (fail(Error.MARKET_NOT_FRESH,FailureInfo.REPAY_BORROW_FRESHNESS_CHECK),0) (../../sb/RToken.sol#2046)
+	- Failure(uint256(err),uint256(info),opaqueError) (../../sb/RToken.sol#732)
+		- (failOpaque(Error.IRON_CONTROLLER_REJECTION,FailureInfo.REPAY_BORROW_IRON_CONTROLLER_REJECTION,allowed),0) (../../sb/RToken.sol#2041)
+	- RepayBorrow(payer,borrower,vars.actualRepayAmount,vars.accountBorrowsNew,vars.totalBorrowsNew) (../../sb/RToken.sol#2097)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Exponential.addExp(ExponentialNoError.Exp,ExponentialNoError.Exp) (../../sb/RToken.sol#1047-1051) is never used and should be removed
+Exponential.divExp(ExponentialNoError.Exp,ExponentialNoError.Exp) (../../sb/RToken.sol#1190-1192) is never used and should be removed
+Exponential.divScalar(ExponentialNoError.Exp,uint256) (../../sb/RToken.sol#1101-1108) is never used and should be removed
+Exponential.divScalarByExp(uint256,ExponentialNoError.Exp) (../../sb/RToken.sol#1113-1128) is never used and should be removed
+Exponential.divScalarByExpTruncate(uint256,ExponentialNoError.Exp) (../../sb/RToken.sol#1133-1140) is never used and should be removed
+Exponential.mulExp(ExponentialNoError.Exp,ExponentialNoError.Exp) (../../sb/RToken.sol#1145-1165) is never used and should be removed
+Exponential.mulExp(uint256,uint256) (../../sb/RToken.sol#1170-1172) is never used and should be removed
+Exponential.mulExp3(ExponentialNoError.Exp,ExponentialNoError.Exp,ExponentialNoError.Exp) (../../sb/RToken.sol#1177-1183) is never used and should be removed
+Exponential.subExp(ExponentialNoError.Exp,ExponentialNoError.Exp) (../../sb/RToken.sol#1056-1060) is never used and should be removed
+ExponentialNoError.add_(ExponentialNoError.Double,ExponentialNoError.Double) (../../sb/RToken.sol#910-912) is never used and should be removed
+ExponentialNoError.add_(ExponentialNoError.Exp,ExponentialNoError.Exp) (../../sb/RToken.sol#906-908) is never used and should be removed
+ExponentialNoError.add_(uint256,uint256) (../../sb/RToken.sol#914-916) is never used and should be removed
+ExponentialNoError.add_(uint256,uint256,string) (../../sb/RToken.sol#918-922) is never used and should be removed
+ExponentialNoError.div_(ExponentialNoError.Double,ExponentialNoError.Double) (../../sb/RToken.sol#990-992) is never used and should be removed
+ExponentialNoError.div_(ExponentialNoError.Double,uint256) (../../sb/RToken.sol#994-996) is never used and should be removed
+ExponentialNoError.div_(ExponentialNoError.Exp,ExponentialNoError.Exp) (../../sb/RToken.sol#978-980) is never used and should be removed
+ExponentialNoError.div_(ExponentialNoError.Exp,uint256) (../../sb/RToken.sol#982-984) is never used and should be removed
+ExponentialNoError.div_(uint256,ExponentialNoError.Double) (../../sb/RToken.sol#998-1000) is never used and should be removed
+ExponentialNoError.div_(uint256,ExponentialNoError.Exp) (../../sb/RToken.sol#986-988) is never used and should be removed
+ExponentialNoError.div_(uint256,uint256) (../../sb/RToken.sol#1002-1004) is never used and should be removed
+ExponentialNoError.div_(uint256,uint256,string) (../../sb/RToken.sol#1006-1009) is never used and should be removed
+ExponentialNoError.fraction(uint256,uint256) (../../sb/RToken.sol#1011-1013) is never used and should be removed
+ExponentialNoError.greaterThanExp(ExponentialNoError.Exp,ExponentialNoError.Exp) (../../sb/RToken.sol#885-887) is never used and should be removed
+ExponentialNoError.isZeroExp(ExponentialNoError.Exp) (../../sb/RToken.sol#892-894) is never used and should be removed
+ExponentialNoError.lessThanExp(ExponentialNoError.Exp,ExponentialNoError.Exp) (../../sb/RToken.sol#871-873) is never used and should be removed
+ExponentialNoError.lessThanOrEqualExp(ExponentialNoError.Exp,ExponentialNoError.Exp) (../../sb/RToken.sol#878-880) is never used and should be removed
+ExponentialNoError.mul_(ExponentialNoError.Double,ExponentialNoError.Double) (../../sb/RToken.sol#953-955) is never used and should be removed
+ExponentialNoError.mul_(ExponentialNoError.Double,uint256) (../../sb/RToken.sol#957-959) is never used and should be removed
+ExponentialNoError.mul_(ExponentialNoError.Exp,ExponentialNoError.Exp) (../../sb/RToken.sol#941-943) is never used and should be removed
+ExponentialNoError.mul_(ExponentialNoError.Exp,uint256) (../../sb/RToken.sol#945-947) is never used and should be removed
+ExponentialNoError.mul_(uint256,ExponentialNoError.Double) (../../sb/RToken.sol#961-963) is never used and should be removed
+ExponentialNoError.mul_(uint256,ExponentialNoError.Exp) (../../sb/RToken.sol#949-951) is never used and should be removed
+ExponentialNoError.mul_(uint256,uint256) (../../sb/RToken.sol#965-967) is never used and should be removed
+ExponentialNoError.mul_(uint256,uint256,string) (../../sb/RToken.sol#969-976) is never used and should be removed
+ExponentialNoError.mul_ScalarTruncate(ExponentialNoError.Exp,uint256) (../../sb/RToken.sol#855-858) is never used and should be removed
+ExponentialNoError.mul_ScalarTruncateAddUInt(ExponentialNoError.Exp,uint256,uint256) (../../sb/RToken.sol#863-866) is never used and should be removed
+ExponentialNoError.safe224(uint256,string) (../../sb/RToken.sol#896-899) is never used and should be removed
+ExponentialNoError.safe32(uint256,string) (../../sb/RToken.sol#901-904) is never used and should be removed
+ExponentialNoError.sub_(ExponentialNoError.Double,ExponentialNoError.Double) (../../sb/RToken.sol#928-930) is never used and should be removed
+ExponentialNoError.sub_(ExponentialNoError.Exp,ExponentialNoError.Exp) (../../sb/RToken.sol#924-926) is never used and should be removed
+ExponentialNoError.sub_(uint256,uint256) (../../sb/RToken.sol#932-934) is never used and should be removed
+ExponentialNoError.sub_(uint256,uint256,string) (../../sb/RToken.sol#936-939) is never used and should be removed
+IronControllerErrorReporter.fail(IronControllerErrorReporter.Error,IronControllerErrorReporter.FailureInfo) (../../sb/RToken.sol#586-590) is never used and should be removed
+IronControllerErrorReporter.failOpaque(IronControllerErrorReporter.Error,IronControllerErrorReporter.FailureInfo,uint256) (../../sb/RToken.sol#595-599) is never used and should be removed
+RToken._addReservesFresh(uint256) (../../sb/RToken.sol#2429-2466) is never used and should be removed
+RToken._addReservesInternal(uint256) (../../sb/RToken.sol#2411-2421) is never used and should be removed
+RToken.borrowFresh(address,uint256) (../../sb/RToken.sol#1922-1986) is never used and should be removed
+RToken.borrowInternal(uint256) (../../sb/RToken.sol#1900-1908) is never used and should be removed
+RToken.liquidateBorrowFresh(address,address,uint256,RTokenInterface) (../../sb/RToken.sol#2140-2209) is never used and should be removed
+RToken.liquidateBorrowInternal(address,uint256,RTokenInterface) (../../sb/RToken.sol#2114-2129) is never used and should be removed
+RToken.mintFresh(address,uint256) (../../sb/RToken.sol#1682-1747) is never used and should be removed
+RToken.mintInternal(uint256) (../../sb/RToken.sol#1655-1663) is never used and should be removed
+RToken.redeemFresh(address,uint256,uint256) (../../sb/RToken.sol#1799-1893) is never used and should be removed
+RToken.redeemInternal(uint256) (../../sb/RToken.sol#1755-1763) is never used and should be removed
+RToken.redeemUnderlyingInternal(uint256) (../../sb/RToken.sol#1771-1779) is never used and should be removed
+RToken.repayBorrowBehalfInternal(address,uint256) (../../sb/RToken.sol#2009-2017) is never used and should be removed
+RToken.repayBorrowFresh(address,address,uint256) (../../sb/RToken.sol#2037-2104) is never used and should be removed
+RToken.repayBorrowInternal(uint256) (../../sb/RToken.sol#1993-2001) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.5.16 (../../sb/RToken.sol#1) allows old versions
+solc-0.5.17 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Parameter IronControllerInterface.enterMarkets(address[]).RTokens (../../sb/RToken.sol#10) is not in mixedCase
+Parameter IronControllerInterface.exitMarket(address).RToken (../../sb/RToken.sol#11) is not in mixedCase
+Parameter IronControllerInterface.mintAllowed(address,address,uint256).RToken (../../sb/RToken.sol#15) is not in mixedCase
+Parameter IronControllerInterface.mintVerify(address,address,uint256,uint256).RToken (../../sb/RToken.sol#16) is not in mixedCase
+Parameter IronControllerInterface.redeemAllowed(address,address,uint256).RToken (../../sb/RToken.sol#18) is not in mixedCase
+Parameter IronControllerInterface.redeemVerify(address,address,uint256,uint256).RToken (../../sb/RToken.sol#19) is not in mixedCase
+Parameter IronControllerInterface.borrowAllowed(address,address,uint256).RToken (../../sb/RToken.sol#21) is not in mixedCase
+Parameter IronControllerInterface.borrowVerify(address,address,uint256).RToken (../../sb/RToken.sol#22) is not in mixedCase
+Parameter IronControllerInterface.repayBorrowAllowed(address,address,address,uint256).RToken (../../sb/RToken.sol#25) is not in mixedCase
+Parameter IronControllerInterface.repayBorrowVerify(address,address,address,uint256,uint256).RToken (../../sb/RToken.sol#30) is not in mixedCase
+Parameter IronControllerInterface.liquidateBorrowAllowed(address,address,address,address,uint256).RTokenBorrowed (../../sb/RToken.sol#37) is not in mixedCase
+Parameter IronControllerInterface.liquidateBorrowAllowed(address,address,address,address,uint256).RTokenCollateral (../../sb/RToken.sol#38) is not in mixedCase
+Parameter IronControllerInterface.liquidateBorrowVerify(address,address,address,address,uint256,uint256).RTokenBorrowed (../../sb/RToken.sol#43) is not in mixedCase
+Parameter IronControllerInterface.liquidateBorrowVerify(address,address,address,address,uint256,uint256).RTokenCollateral (../../sb/RToken.sol#44) is not in mixedCase
+Parameter IronControllerInterface.seizeAllowed(address,address,address,address,uint256).RTokenCollateral (../../sb/RToken.sol#51) is not in mixedCase
+Parameter IronControllerInterface.seizeAllowed(address,address,address,address,uint256).RTokenBorrowed (../../sb/RToken.sol#52) is not in mixedCase
+Parameter IronControllerInterface.seizeVerify(address,address,address,address,uint256).RTokenCollateral (../../sb/RToken.sol#57) is not in mixedCase
+Parameter IronControllerInterface.seizeVerify(address,address,address,address,uint256).RTokenBorrowed (../../sb/RToken.sol#58) is not in mixedCase
+Parameter IronControllerInterface.transferAllowed(address,address,address,uint256).RToken (../../sb/RToken.sol#63) is not in mixedCase
+Parameter IronControllerInterface.transferVerify(address,address,address,uint256).RToken (../../sb/RToken.sol#64) is not in mixedCase
+Parameter IronControllerInterface.liquidateCalculateSeizeTokens(address,address,uint256).RTokenBorrowed (../../sb/RToken.sol#69) is not in mixedCase
+Parameter IronControllerInterface.liquidateCalculateSeizeTokens(address,address,uint256).RTokenCollateral (../../sb/RToken.sol#70) is not in mixedCase
+Constant RTokenStorage.borrowRateMaxMantissa (../../sb/RToken.sol#197) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant RTokenStorage.reserveFactorMaxMantissa (../../sb/RToken.sol#202) is not in UPPER_CASE_WITH_UNDERSCORES
+Function RTokenInterface._setPendingAdmin(address) (../../sb/RToken.sol#401) is not in mixedCase
+Function RTokenInterface._acceptAdmin() (../../sb/RToken.sol#402) is not in mixedCase
+Function RTokenInterface._setIronController(IronControllerInterface) (../../sb/RToken.sol#403) is not in mixedCase
+Function RTokenInterface._setReserveFactor(uint256) (../../sb/RToken.sol#404) is not in mixedCase
+Function RTokenInterface._reduceReserves(uint256) (../../sb/RToken.sol#405) is not in mixedCase
+Function RTokenInterface._setInterestRateModel(InterestRateModel) (../../sb/RToken.sol#406) is not in mixedCase
+Parameter RErc20Interface.liquidateBorrow(address,uint256,RTokenInterface).RTokenCollateral (../../sb/RToken.sol#426) is not in mixedCase
+Function RErc20Interface._addReserves(uint256) (../../sb/RToken.sol#432) is not in mixedCase
+Contract rDelegatorInterface (../../sb/RToken.sol#442-455) is not in CapWords
+Function rDelegatorInterface._setImplementation(address,bool,bytes) (../../sb/RToken.sol#454) is not in mixedCase
+Function RDelegateInterface._becomeImplementation(bytes) (../../sb/RToken.sol#463) is not in mixedCase
+Function RDelegateInterface._resignImplementation() (../../sb/RToken.sol#468) is not in mixedCase
+Function ExponentialNoError.mul_ScalarTruncate(ExponentialNoError.Exp,uint256) (../../sb/RToken.sol#855-858) is not in mixedCase
+Function ExponentialNoError.mul_ScalarTruncateAddUInt(ExponentialNoError.Exp,uint256,uint256) (../../sb/RToken.sol#863-866) is not in mixedCase
+Constant ExponentialNoError.expScale (../../sb/RToken.sol#830) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant ExponentialNoError.doubleScale (../../sb/RToken.sol#831) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant ExponentialNoError.halfExpScale (../../sb/RToken.sol#832) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant ExponentialNoError.mantissaOne (../../sb/RToken.sol#833) is not in UPPER_CASE_WITH_UNDERSCORES
+Parameter RToken.liquidateBorrowInternal(address,uint256,RTokenInterface).RTokenCollateral (../../sb/RToken.sol#2114) is not in mixedCase
+Parameter RToken.liquidateBorrowFresh(address,address,uint256,RTokenInterface).RTokenCollateral (../../sb/RToken.sol#2140) is not in mixedCase
+Function RToken._setPendingAdmin(address) (../../sb/RToken.sol#2292-2308) is not in mixedCase
+Function RToken._acceptAdmin() (../../sb/RToken.sol#2315-2336) is not in mixedCase
+Function RToken._setIronController(IronControllerInterface) (../../sb/RToken.sol#2343-2360) is not in mixedCase
+Function RToken._setReserveFactor(uint256) (../../sb/RToken.sol#2367-2375) is not in mixedCase
+Function RToken._reduceReserves(uint256) (../../sb/RToken.sol#2474-2482) is not in mixedCase
+Function RToken._setInterestRateModel(InterestRateModel) (../../sb/RToken.sol#2539-2547) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Variable RToken.seizeInternal(address,address,address,uint256).seizeRToken (../../sb/RToken.sol#2234) is too similar to RTokenInterface.seize(address,address,uint256).seizeTokens (../../sb/RToken.sol#396)
+Variable RToken.seizeInternal(address,address,address,uint256).seizeRToken (../../sb/RToken.sol#2234) is too similar to RToken.seizeInternal(address,address,address,uint256).seizeTokens (../../sb/RToken.sol#2234)
+Variable RToken.seizeInternal(address,address,address,uint256).seizeRToken (../../sb/RToken.sol#2234) is too similar to RToken.liquidateBorrowFresh(address,address,uint256,RTokenInterface).seizeTokens (../../sb/RToken.sol#2184)
+Variable RToken.seizeInternal(address,address,address,uint256).seizeRToken (../../sb/RToken.sol#2234) is too similar to RToken.seize(address,address,uint256).seizeTokens (../../sb/RToken.sol#2220)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+RToken (../../sb/RToken.sol#1200-2619) does not implement functions:
+	- RToken.doTransferIn(address,uint256) (../../sb/RToken.sol#2598)
+	- RToken.doTransferOut(address,uint256) (../../sb/RToken.sol#2605)
+	- RToken.getCashPrior() (../../sb/RToken.sol#2592)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unimplemented-functions
+
+_setImplementation(address,bool,bytes) should be declared external:
+	- rDelegatorInterface._setImplementation(address,bool,bytes) (../../sb/RToken.sol#454)
+Moreover, the following function parameters should change its data location:
+becomeImplementationData location should be calldata
+_becomeImplementation(bytes) should be declared external:
+	- RDelegateInterface._becomeImplementation(bytes) (../../sb/RToken.sol#463)
+Moreover, the following function parameters should change its data location:
+data location should be calldata
+initialize(IronControllerInterface,InterestRateModel,uint256,string,string,uint8) should be declared external:
+	- RToken.initialize(IronControllerInterface,InterestRateModel,uint256,string,string,uint8) (../../sb/RToken.sol#1210-1241)
+Moreover, the following function parameters should change its data location:
+name_ location should be calldata
+symbol_ location should be calldata
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#public-function-that-could-be-declared-external
+/sb/RToken.sol analyzed (17 contracts with 93 detectors), 165 result(s) found

@@ -1,0 +1,441 @@
+'solc --version' running
+'solc /sb/LPool.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/LPool.sol:
+Warning: Visibility for constructor is ignored. If you want the contract to be non-deployable, making it "abstract" is sufficient.
+    --> /sb/LPool.sol:1291:5:
+     |
+1291 |     constructor () internal {
+     |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning: Contract code size exceeds 24576 bytes (a limit introduced in Spurious Dragon). This contract may not be deployable on mainnet. Consider enabling the optimizer (with a low "runs" value!), turning off revert strings, or using libraries.
+    --> /sb/LPool.sol:1488:1:
+     |
+1488 | contract LPool is DelegateInterface, Adminable, LPoolInterface, Exponential, ReentrancyGuard {
+     | ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+LPool.doTransferOut(address,uint256,bool) (../../sb/LPool.sol#1779-1786) sends eth to arbitrary user
+	Dangerous calls:
+	- to.transfer(amount) (../../sb/LPool.sol#1782)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#functions-that-send-ether-to-arbitrary-destinations
+
+Reentrancy in LPool.addReserves(uint256) (../../sb/LPool.sol#2467-2475):
+	External calls:
+	- actualAddAmount = doTransferIn(msg.sender,addAmount,true) (../../sb/LPool.sol#2471)
+		- IWETH(underlying).deposit{value: msg.value}() (../../sb/LPool.sol#1760)
+		- IERC20(underlying).transferFrom(from,address(this),amount) (../../sb/LPool.sol#1762)
+	External calls sending eth:
+	- actualAddAmount = doTransferIn(msg.sender,addAmount,true) (../../sb/LPool.sol#2471)
+		- IWETH(underlying).deposit{value: msg.value}() (../../sb/LPool.sol#1760)
+	State variables written after the call(s):
+	- totalReserves = totalReservesNew (../../sb/LPool.sol#2473)
+	LPoolStorage.totalReserves (../../sb/LPool.sol#75) can be used in cross function reentrancies:
+	- LPool.accrueInterest() (../../sb/LPool.sol#2087-2151)
+	- LPool.addReserves(uint256) (../../sb/LPool.sol#2467-2475)
+	- LPool.availableForBorrow() (../../sb/LPool.sol#1788-1802)
+	- LPool.borrowRatePerBlock() (../../sb/LPool.sol#1843-1845)
+	- LPool.calCurrentBorrowIndex() (../../sb/LPool.sol#2061-2080)
+	- LPool.exchangeRateStoredInternal() (../../sb/LPool.sol#2021-2051)
+	- LPool.reduceReserves(address,uint256) (../../sb/LPool.sol#2477-2484)
+	- LPool.supplyRatePerBlock() (../../sb/LPool.sol#1851-1853)
+	- LPool.totalBorrowsCurrent() (../../sb/LPool.sol#1896-1933)
+	- LPoolStorage.totalReserves (../../sb/LPool.sol#75)
+Reentrancy in LPool.borrowFresh(address,address,uint256) (../../sb/LPool.sol#2312-2352):
+	External calls:
+	- (ControllerInterface(controller)).borrowAllowed(address(this),borrower,payee,borrowAmount) (../../sb/LPool.sol#2314)
+	- doTransferOut(payee,borrowAmount,false) (../../sb/LPool.sol#2341)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/LPool.sol#1250)
+		- IWETH(underlying).withdraw(amount) (../../sb/LPool.sol#1781)
+		- IERC20(underlying).safeTransfer(to,amount) (../../sb/LPool.sol#1784)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/LPool.sol#1118)
+	External calls sending eth:
+	- doTransferOut(payee,borrowAmount,false) (../../sb/LPool.sol#2341)
+		- to.transfer(amount) (../../sb/LPool.sol#1782)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/LPool.sol#1118)
+	State variables written after the call(s):
+	- accountBorrows[borrower].principal = vars.accountBorrowsNew (../../sb/LPool.sol#2344)
+	LPoolStorage.accountBorrows (../../sb/LPool.sol#99) can be used in cross function reentrancies:
+	- LPool.borrowBalanceStored(address) (../../sb/LPool.sol#1947-1949)
+	- LPool.borrowBalanceStoredInternalWithBorrowerIndex(address,uint256) (../../sb/LPool.sol#1965-1995)
+	- accountBorrows[borrower].interestIndex = borrowIndex (../../sb/LPool.sol#2345)
+	LPoolStorage.accountBorrows (../../sb/LPool.sol#99) can be used in cross function reentrancies:
+	- LPool.borrowBalanceStored(address) (../../sb/LPool.sol#1947-1949)
+	- LPool.borrowBalanceStoredInternalWithBorrowerIndex(address,uint256) (../../sb/LPool.sol#1965-1995)
+	- totalBorrows = vars.totalBorrowsNew (../../sb/LPool.sol#2346)
+	LPoolStorage.totalBorrows (../../sb/LPool.sol#67) can be used in cross function reentrancies:
+	- LPool.accrueInterest() (../../sb/LPool.sol#2087-2151)
+	- LPool.availableForBorrow() (../../sb/LPool.sol#1788-1802)
+	- LPool.borrowRatePerBlock() (../../sb/LPool.sol#1843-1845)
+	- LPool.calCurrentBorrowIndex() (../../sb/LPool.sol#2061-2080)
+	- LPool.exchangeRateStoredInternal() (../../sb/LPool.sol#2021-2051)
+	- LPool.supplyRatePerBlock() (../../sb/LPool.sol#1851-1853)
+	- LPoolStorage.totalBorrows (../../sb/LPool.sol#67)
+	- LPool.totalBorrowsCurrent() (../../sb/LPool.sol#1896-1933)
+Reentrancy in LPool.mintFresh(address,uint256) (../../sb/LPool.sol#2169-2216):
+	External calls:
+	- vars.actualMintAmount = doTransferIn(minter,mintAmount,true) (../../sb/LPool.sol#2182)
+		- IWETH(underlying).deposit{value: msg.value}() (../../sb/LPool.sol#1760)
+		- IERC20(underlying).transferFrom(from,address(this),amount) (../../sb/LPool.sol#1762)
+	- (ControllerInterface(controller)).mintAllowed(address(this),minter,vars.mintTokens) (../../sb/LPool.sol#2193)
+	External calls sending eth:
+	- vars.actualMintAmount = doTransferIn(minter,mintAmount,true) (../../sb/LPool.sol#2182)
+		- IWETH(underlying).deposit{value: msg.value}() (../../sb/LPool.sol#1760)
+	State variables written after the call(s):
+	- totalSupply = vars.totalSupplyNew (../../sb/LPool.sol#2206)
+	LPoolStorage.totalSupply (../../sb/LPool.sol#28) can be used in cross function reentrancies:
+	- LPool.exchangeRateStoredInternal() (../../sb/LPool.sol#2021-2051)
+	- LPoolStorage.totalSupply (../../sb/LPool.sol#28)
+Reentrancy in LPool.redeemFresh(address,uint256,uint256) (../../sb/LPool.sol#2235-2298):
+	External calls:
+	- (ControllerInterface(controller)).redeemAllowed(address(this),redeemer,vars.redeemTokens) (../../sb/LPool.sol#2268)
+	- doTransferOut(redeemer,vars.redeemAmount,true) (../../sb/LPool.sol#2288)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/LPool.sol#1250)
+		- IWETH(underlying).withdraw(amount) (../../sb/LPool.sol#1781)
+		- IERC20(underlying).safeTransfer(to,amount) (../../sb/LPool.sol#1784)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/LPool.sol#1118)
+	External calls sending eth:
+	- doTransferOut(redeemer,vars.redeemAmount,true) (../../sb/LPool.sol#2288)
+		- to.transfer(amount) (../../sb/LPool.sol#1782)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/LPool.sol#1118)
+	State variables written after the call(s):
+	- accountTokens[redeemer] = vars.accountTokensNew (../../sb/LPool.sol#2291)
+	LPoolStorage.accountTokens (../../sb/LPool.sol#32) can be used in cross function reentrancies:
+	- LPool.balanceOf(address) (../../sb/LPool.sol#1654-1656)
+	- LPool.balanceOfUnderlying(address) (../../sb/LPool.sol#1664-1669)
+	- LPool.getAccountSnapshot(address) (../../sb/LPool.sol#1811-1829)
+	- totalSupply = vars.totalSupplyNew (../../sb/LPool.sol#2290)
+	LPoolStorage.totalSupply (../../sb/LPool.sol#28) can be used in cross function reentrancies:
+	- LPool.exchangeRateStoredInternal() (../../sb/LPool.sol#2021-2051)
+	- LPoolStorage.totalSupply (../../sb/LPool.sol#28)
+Reentrancy in LPool.repayBorrowFresh(address,address,uint256,bool) (../../sb/LPool.sol#2370-2428):
+	External calls:
+	- (ControllerInterface(controller)).repayBorrowAllowed(address(this),payer,borrower,repayAmount,isEnd) (../../sb/LPool.sol#2372)
+	- vars.actualRepayAmount = doTransferIn(payer,vars.repayAmount,false) (../../sb/LPool.sol#2397)
+		- IWETH(underlying).deposit{value: msg.value}() (../../sb/LPool.sol#1760)
+		- IERC20(underlying).transferFrom(from,address(this),amount) (../../sb/LPool.sol#1762)
+	External calls sending eth:
+	- vars.actualRepayAmount = doTransferIn(payer,vars.repayAmount,false) (../../sb/LPool.sol#2397)
+		- IWETH(underlying).deposit{value: msg.value}() (../../sb/LPool.sol#1760)
+	State variables written after the call(s):
+	- accountBorrows[borrower].principal = vars.accountBorrowsNew (../../sb/LPool.sol#2418)
+	LPoolStorage.accountBorrows (../../sb/LPool.sol#99) can be used in cross function reentrancies:
+	- LPool.borrowBalanceStored(address) (../../sb/LPool.sol#1947-1949)
+	- LPool.borrowBalanceStoredInternalWithBorrowerIndex(address,uint256) (../../sb/LPool.sol#1965-1995)
+	- accountBorrows[borrower].interestIndex = borrowIndex (../../sb/LPool.sol#2419)
+	LPoolStorage.accountBorrows (../../sb/LPool.sol#99) can be used in cross function reentrancies:
+	- LPool.borrowBalanceStored(address) (../../sb/LPool.sol#1947-1949)
+	- LPool.borrowBalanceStoredInternalWithBorrowerIndex(address,uint256) (../../sb/LPool.sol#1965-1995)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities
+
+LPool.doTransferIn(address,uint256,bool) (../../sb/LPool.sol#1757-1768) ignores return value by IERC20(underlying).transferFrom(from,address(this),amount) (../../sb/LPool.sol#1762)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+LPool.getSupplyRateInternal(uint256,uint256,uint256,uint256) (../../sb/LPool.sol#1886-1891) performs a multiplication on the result of a division:
+	- rateToPool = borrowRate.mul(oneMinusReserveFactor).div(1e18) (../../sb/LPool.sol#1889)
+	- utilizationRate(cash,borrows,reserves).mul(rateToPool).div(1e18) (../../sb/LPool.sol#1890)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+LPool.accrueInterest() (../../sb/LPool.sol#2087-2151) uses a dangerous strict equality:
+	- accrualBlockNumberPrior == currentBlockNumber (../../sb/LPool.sol#2093)
+LPool.accrueInterest() (../../sb/LPool.sol#2087-2151) uses a dangerous strict equality:
+	- require(bool,string)(mathErr == MathError.NO_ERROR,calc block delta erro) (../../sb/LPool.sol#2109)
+LPool.accrueInterest() (../../sb/LPool.sol#2087-2151) uses a dangerous strict equality:
+	- require(bool,string)(mathErr == MathError.NO_ERROR,calc interest factor error) (../../sb/LPool.sol#2127)
+LPool.accrueInterest() (../../sb/LPool.sol#2087-2151) uses a dangerous strict equality:
+	- require(bool,string)(mathErr == MathError.NO_ERROR,calc interest acc error) (../../sb/LPool.sol#2130)
+LPool.accrueInterest() (../../sb/LPool.sol#2087-2151) uses a dangerous strict equality:
+	- require(bool,string)(mathErr == MathError.NO_ERROR,calc total borrows error) (../../sb/LPool.sol#2133)
+LPool.accrueInterest() (../../sb/LPool.sol#2087-2151) uses a dangerous strict equality:
+	- require(bool,string)(mathErr == MathError.NO_ERROR,calc total reserves error) (../../sb/LPool.sol#2136)
+LPool.accrueInterest() (../../sb/LPool.sol#2087-2151) uses a dangerous strict equality:
+	- require(bool,string)(mathErr == MathError.NO_ERROR,calc borrows index error) (../../sb/LPool.sol#2139)
+LPool.balanceOfUnderlying(address) (../../sb/LPool.sol#1664-1669) uses a dangerous strict equality:
+	- require(bool,string)(mErr == MathError.NO_ERROR,calc failed) (../../sb/LPool.sol#1667)
+LPool.borrowBalanceCurrent(address) (../../sb/LPool.sol#1939-1945) uses a dangerous strict equality:
+	- require(bool,string)(err0 == MathError.NO_ERROR,calc borrow index fail) (../../sb/LPool.sol#1941)
+LPool.borrowBalanceCurrent(address) (../../sb/LPool.sol#1939-1945) uses a dangerous strict equality:
+	- require(bool,string)(err1 == MathError.NO_ERROR,calc fail) (../../sb/LPool.sol#1943)
+LPool.borrowFresh(address,address,uint256) (../../sb/LPool.sol#2312-2352) uses a dangerous strict equality:
+	- require(bool,string)(vars.mathErr == MathError.NO_ERROR,calc acc borrows error) (../../sb/LPool.sol#2327)
+LPool.borrowFresh(address,address,uint256) (../../sb/LPool.sol#2312-2352) uses a dangerous strict equality:
+	- require(bool,string)(vars.mathErr == MathError.NO_ERROR,calc acc borrows error) (../../sb/LPool.sol#2330)
+LPool.borrowFresh(address,address,uint256) (../../sb/LPool.sol#2312-2352) uses a dangerous strict equality:
+	- require(bool,string)(vars.mathErr == MathError.NO_ERROR,calc total borrows error) (../../sb/LPool.sol#2333)
+LPool.calCurrentBorrowIndex() (../../sb/LPool.sol#2061-2080) uses a dangerous strict equality:
+	- accrualBlockNumberPrior == currentBlockNumber (../../sb/LPool.sol#2067)
+CarefulMath.divUInt(uint256,uint256) (../../sb/LPool.sol#492-498) uses a dangerous strict equality:
+	- b == 0 (../../sb/LPool.sol#493)
+LPool.exchangeRateStored() (../../sb/LPool.sol#2010-2014) uses a dangerous strict equality:
+	- require(bool,string)(err == MathError.NO_ERROR,calc fail) (../../sb/LPool.sol#2012)
+LPool.exchangeRateStoredInternal() (../../sb/LPool.sol#2021-2051) uses a dangerous strict equality:
+	- _totalSupply == 0 (../../sb/LPool.sol#2023)
+LPool.initialize(address,bool,address,uint256,uint256,uint256,uint256,uint256,string,string,uint8) (../../sb/LPool.sol#1503-1550) uses a dangerous strict equality:
+	- require(bool,string)(accrualBlockNumber == 0 && borrowIndex == 0,inited once) (../../sb/LPool.sol#1518)
+LPool.mintFresh(address,uint256) (../../sb/LPool.sol#2169-2216) uses a dangerous strict equality:
+	- require(bool,string)(vars.mathErr == MathError.NO_ERROR,calc exchangerate error) (../../sb/LPool.sol#2172)
+LPool.mintFresh(address,uint256) (../../sb/LPool.sol#2169-2216) uses a dangerous strict equality:
+	- require(bool,string)(vars.mathErr == MathError.NO_ERROR,calc mint token error) (../../sb/LPool.sol#2190)
+LPool.mintFresh(address,uint256) (../../sb/LPool.sol#2169-2216) uses a dangerous strict equality:
+	- require(bool,string)(vars.mathErr == MathError.NO_ERROR,calc supply new failed) (../../sb/LPool.sol#2200)
+LPool.mintFresh(address,uint256) (../../sb/LPool.sol#2169-2216) uses a dangerous strict equality:
+	- require(bool,string)(vars.mathErr == MathError.NO_ERROR,calc tokens new ailed) (../../sb/LPool.sol#2203)
+Exponential.mulExp(Exponential.Exp,Exponential.Exp) (../../sb/LPool.sol#679-699) uses a dangerous strict equality:
+	- assert(bool)(err2 == MathError.NO_ERROR) (../../sb/LPool.sol#696)
+CarefulMath.mulUInt(uint256,uint256) (../../sb/LPool.sol#475-487) uses a dangerous strict equality:
+	- a == 0 (../../sb/LPool.sol#476)
+LPool.redeemFresh(address,uint256,uint256) (../../sb/LPool.sol#2235-2298) uses a dangerous strict equality:
+	- require(bool,string)(vars.mathErr == MathError.NO_ERROR,calc exchangerate error) (../../sb/LPool.sol#2242)
+LPool.redeemFresh(address,uint256,uint256) (../../sb/LPool.sol#2235-2298) uses a dangerous strict equality:
+	- require(bool,string)(vars.mathErr == MathError.NO_ERROR,calc redeem amount error) (../../sb/LPool.sol#2254)
+LPool.redeemFresh(address,uint256,uint256) (../../sb/LPool.sol#2235-2298) uses a dangerous strict equality:
+	- require(bool,string)(vars.mathErr == MathError.NO_ERROR,calc redeem tokens error) (../../sb/LPool.sol#2263)
+LPool.redeemFresh(address,uint256,uint256) (../../sb/LPool.sol#2235-2298) uses a dangerous strict equality:
+	- require(bool,string)(vars.mathErr == MathError.NO_ERROR,calc supply new error) (../../sb/LPool.sol#2276)
+LPool.redeemFresh(address,uint256,uint256) (../../sb/LPool.sol#2235-2298) uses a dangerous strict equality:
+	- require(bool,string)(vars.mathErr == MathError.NO_ERROR,calc token new error) (../../sb/LPool.sol#2279)
+LPool.repayBorrowFresh(address,address,uint256,bool) (../../sb/LPool.sol#2370-2428) uses a dangerous strict equality:
+	- require(bool,string)(vars.mathErr == MathError.NO_ERROR,calc acc borrow error) (../../sb/LPool.sol#2381)
+LPool.repayBorrowFresh(address,address,uint256,bool) (../../sb/LPool.sol#2370-2428) uses a dangerous strict equality:
+	- require(bool,string)(vars.mathErr == MathError.NO_ERROR,calc acc borrows error) (../../sb/LPool.sol#2409)
+LPool.totalBorrowsCurrent() (../../sb/LPool.sol#1896-1933) uses a dangerous strict equality:
+	- accrualBlockNumberPrior == currentBlockNumber (../../sb/LPool.sol#1902)
+LPool.totalBorrowsCurrent() (../../sb/LPool.sol#1896-1933) uses a dangerous strict equality:
+	- require(bool,string)(mathErr == MathError.NO_ERROR,calc block delta erro) (../../sb/LPool.sol#1917)
+LPool.totalBorrowsCurrent() (../../sb/LPool.sol#1896-1933) uses a dangerous strict equality:
+	- require(bool,string)(mathErr == MathError.NO_ERROR,calc interest factor error) (../../sb/LPool.sol#1924)
+LPool.totalBorrowsCurrent() (../../sb/LPool.sol#1896-1933) uses a dangerous strict equality:
+	- require(bool,string)(mathErr == MathError.NO_ERROR,calc interest acc error) (../../sb/LPool.sol#1927)
+LPool.totalBorrowsCurrent() (../../sb/LPool.sol#1896-1933) uses a dangerous strict equality:
+	- require(bool,string)(mathErr == MathError.NO_ERROR,calc total borrows error) (../../sb/LPool.sol#1930)
+LPool.transferTokens(address,address,address,uint256) (../../sb/LPool.sol#1561-1601) uses a dangerous strict equality:
+	- require(bool,string)(mathErr == MathError.NO_ERROR,not allowed) (../../sb/LPool.sol#1583)
+LPool.transferTokens(address,address,address,uint256) (../../sb/LPool.sol#1561-1601) uses a dangerous strict equality:
+	- require(bool,string)(mathErr == MathError.NO_ERROR,not enough) (../../sb/LPool.sol#1586)
+LPool.transferTokens(address,address,address,uint256) (../../sb/LPool.sol#1561-1601) uses a dangerous strict equality:
+	- require(bool,string)(mathErr == MathError.NO_ERROR,too much) (../../sb/LPool.sol#1589)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+LPool.redeemFresh(address,uint256,uint256).vars (../../sb/LPool.sol#2238) is a local variable never initialized
+LPool.repayBorrowFresh(address,address,uint256,bool).vars (../../sb/LPool.sol#2374) is a local variable never initialized
+LPool.mintFresh(address,uint256).vars (../../sb/LPool.sol#2170) is a local variable never initialized
+LPool.borrowFresh(address,address,uint256).vars (../../sb/LPool.sol#2319) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+LPool.initialize(address,bool,address,uint256,uint256,uint256,uint256,uint256,string,string,uint8) (../../sb/LPool.sol#1503-1550) ignores return value by IERC20(underlying).totalSupply() (../../sb/LPool.sol#1549)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+LPool.borrowBalanceCurrent(address).borrowIndex (../../sb/LPool.sol#1940) shadows:
+	- LPoolStorage.borrowIndex (../../sb/LPool.sol#62) (state variable)
+LPool.borrowBalanceStoredInternalWithBorrowerIndex(address,uint256).borrowIndex (../../sb/LPool.sol#1965) shadows:
+	- LPoolStorage.borrowIndex (../../sb/LPool.sol#62) (state variable)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+LPool.initialize(address,bool,address,uint256,uint256,uint256,uint256,uint256,string,string,uint8) (../../sb/LPool.sol#1503-1550) should emit an event for: 
+	- initialExchangeRateMantissa = initialExchangeRateMantissa_ (../../sb/LPool.sol#1521) 
+	- baseRatePerBlock = baseRatePerBlock_ (../../sb/LPool.sol#1527) 
+	- multiplierPerBlock = multiplierPerBlock_ (../../sb/LPool.sol#1528) 
+	- jumpMultiplierPerBlock = jumpMultiplierPerBlock_ (../../sb/LPool.sol#1529) 
+	- kink = kink_ (../../sb/LPool.sol#1530) 
+LPool.setBorrowCapFactorMantissa(uint256) (../../sb/LPool.sol#2444-2446) should emit an event for: 
+	- borrowCapFactorMantissa = newBorrowCapFactorMantissa (../../sb/LPool.sol#2445) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+Adminable.setPendingAdmin(address).newPendingAdmin (../../sb/LPool.sol#906) lacks a zero-check on :
+		- pendingAdmin = newPendingAdmin (../../sb/LPool.sol#910)
+LPool.setController(address).newController (../../sb/LPool.sol#2436) lacks a zero-check on :
+		- controller = newController (../../sb/LPool.sol#2439)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in LPool.mintFresh(address,uint256) (../../sb/LPool.sol#2169-2216):
+	External calls:
+	- vars.actualMintAmount = doTransferIn(minter,mintAmount,true) (../../sb/LPool.sol#2182)
+		- IWETH(underlying).deposit{value: msg.value}() (../../sb/LPool.sol#1760)
+		- IERC20(underlying).transferFrom(from,address(this),amount) (../../sb/LPool.sol#1762)
+	- (ControllerInterface(controller)).mintAllowed(address(this),minter,vars.mintTokens) (../../sb/LPool.sol#2193)
+	External calls sending eth:
+	- vars.actualMintAmount = doTransferIn(minter,mintAmount,true) (../../sb/LPool.sol#2182)
+		- IWETH(underlying).deposit{value: msg.value}() (../../sb/LPool.sol#1760)
+	State variables written after the call(s):
+	- accountTokens[minter] = vars.accountTokensNew (../../sb/LPool.sol#2207)
+Reentrancy in LPool.repayBorrowFresh(address,address,uint256,bool) (../../sb/LPool.sol#2370-2428):
+	External calls:
+	- (ControllerInterface(controller)).repayBorrowAllowed(address(this),payer,borrower,repayAmount,isEnd) (../../sb/LPool.sol#2372)
+	- vars.actualRepayAmount = doTransferIn(payer,vars.repayAmount,false) (../../sb/LPool.sol#2397)
+		- IWETH(underlying).deposit{value: msg.value}() (../../sb/LPool.sol#1760)
+		- IERC20(underlying).transferFrom(from,address(this),amount) (../../sb/LPool.sol#1762)
+	External calls sending eth:
+	- vars.actualRepayAmount = doTransferIn(payer,vars.repayAmount,false) (../../sb/LPool.sol#2397)
+		- IWETH(underlying).deposit{value: msg.value}() (../../sb/LPool.sol#1760)
+	State variables written after the call(s):
+	- totalBorrows = vars.totalBorrowsNew (../../sb/LPool.sol#2420)
+Reentrancy in LPool.transferTokens(address,address,address,uint256) (../../sb/LPool.sol#1561-1601):
+	External calls:
+	- (ControllerInterface(controller)).transferAllowed(address(this),src,dst,tokens) (../../sb/LPool.sol#1566)
+	State variables written after the call(s):
+	- accountTokens[src] = srcTokensNew (../../sb/LPool.sol#1591)
+	- accountTokens[dst] = dstTokensNew (../../sb/LPool.sol#1592)
+	- transferAllowances[src][spender] = allowanceNew (../../sb/LPool.sol#1596)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in LPool.addReserves(uint256) (../../sb/LPool.sol#2467-2475):
+	External calls:
+	- actualAddAmount = doTransferIn(msg.sender,addAmount,true) (../../sb/LPool.sol#2471)
+		- IWETH(underlying).deposit{value: msg.value}() (../../sb/LPool.sol#1760)
+		- IERC20(underlying).transferFrom(from,address(this),amount) (../../sb/LPool.sol#1762)
+	External calls sending eth:
+	- actualAddAmount = doTransferIn(msg.sender,addAmount,true) (../../sb/LPool.sol#2471)
+		- IWETH(underlying).deposit{value: msg.value}() (../../sb/LPool.sol#1760)
+	Event emitted after the call(s):
+	- ReservesAdded(msg.sender,actualAddAmount,totalReservesNew) (../../sb/LPool.sol#2474)
+Reentrancy in LPool.reduceReserves(address,uint256) (../../sb/LPool.sol#2477-2484):
+	External calls:
+	- doTransferOut(to,reduceAmount,true) (../../sb/LPool.sol#2482)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/LPool.sol#1250)
+		- IWETH(underlying).withdraw(amount) (../../sb/LPool.sol#1781)
+		- IERC20(underlying).safeTransfer(to,amount) (../../sb/LPool.sol#1784)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/LPool.sol#1118)
+	External calls sending eth:
+	- doTransferOut(to,reduceAmount,true) (../../sb/LPool.sol#2482)
+		- to.transfer(amount) (../../sb/LPool.sol#1782)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/LPool.sol#1118)
+	Event emitted after the call(s):
+	- ReservesReduced(to,reduceAmount,totalReservesNew) (../../sb/LPool.sol#2483)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Address.isContract(address) (../../sb/LPool.sol#1025-1034) uses assembly
+	- INLINE ASM (../../sb/LPool.sol#1032)
+Address._verifyCallResult(bool,bytes,string) (../../sb/LPool.sol#1170-1187) uses assembly
+	- INLINE ASM (../../sb/LPool.sol#1179-1182)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.functionCall(address,bytes) (../../sb/LPool.sol#1078-1080) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/LPool.sol#1103-1105) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/LPool.sol#1152-1154) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/LPool.sol#1162-1168) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/LPool.sol#1128-1130) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/LPool.sol#1138-1144) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/LPool.sol#1052-1058) is never used and should be removed
+Exponential.addExp(Exponential.Exp,Exponential.Exp) (../../sb/LPool.sol#581-585) is never used and should be removed
+Exponential.add_(Exponential.Double,Exponential.Double) (../../sb/LPool.sol#779-781) is never used and should be removed
+Exponential.add_(Exponential.Exp,Exponential.Exp) (../../sb/LPool.sol#775-777) is never used and should be removed
+Exponential.add_(uint256,uint256) (../../sb/LPool.sol#783-785) is never used and should be removed
+Exponential.add_(uint256,uint256,string) (../../sb/LPool.sol#787-791) is never used and should be removed
+Exponential.divExp(Exponential.Exp,Exponential.Exp) (../../sb/LPool.sol#724-726) is never used and should be removed
+Exponential.divScalar(Exponential.Exp,uint256) (../../sb/LPool.sol#635-642) is never used and should be removed
+Exponential.div_(Exponential.Double,Exponential.Double) (../../sb/LPool.sol#859-861) is never used and should be removed
+Exponential.div_(Exponential.Double,uint256) (../../sb/LPool.sol#863-865) is never used and should be removed
+Exponential.div_(Exponential.Exp,Exponential.Exp) (../../sb/LPool.sol#847-849) is never used and should be removed
+Exponential.div_(Exponential.Exp,uint256) (../../sb/LPool.sol#851-853) is never used and should be removed
+Exponential.div_(uint256,Exponential.Double) (../../sb/LPool.sol#867-869) is never used and should be removed
+Exponential.div_(uint256,Exponential.Exp) (../../sb/LPool.sol#855-857) is never used and should be removed
+Exponential.div_(uint256,uint256) (../../sb/LPool.sol#871-873) is never used and should be removed
+Exponential.div_(uint256,uint256,string) (../../sb/LPool.sol#875-878) is never used and should be removed
+Exponential.fraction(uint256,uint256) (../../sb/LPool.sol#880-882) is never used and should be removed
+Exponential.greaterThanExp(Exponential.Exp,Exponential.Exp) (../../sb/LPool.sol#754-756) is never used and should be removed
+Exponential.isZeroExp(Exponential.Exp) (../../sb/LPool.sol#761-763) is never used and should be removed
+Exponential.lessThanExp(Exponential.Exp,Exponential.Exp) (../../sb/LPool.sol#740-742) is never used and should be removed
+Exponential.lessThanOrEqualExp(Exponential.Exp,Exponential.Exp) (../../sb/LPool.sol#747-749) is never used and should be removed
+Exponential.mulExp(Exponential.Exp,Exponential.Exp) (../../sb/LPool.sol#679-699) is never used and should be removed
+Exponential.mulExp(uint256,uint256) (../../sb/LPool.sol#704-706) is never used and should be removed
+Exponential.mulExp3(Exponential.Exp,Exponential.Exp,Exponential.Exp) (../../sb/LPool.sol#711-717) is never used and should be removed
+Exponential.mul_(Exponential.Double,Exponential.Double) (../../sb/LPool.sol#822-824) is never used and should be removed
+Exponential.mul_(Exponential.Double,uint256) (../../sb/LPool.sol#826-828) is never used and should be removed
+Exponential.mul_(Exponential.Exp,Exponential.Exp) (../../sb/LPool.sol#810-812) is never used and should be removed
+Exponential.mul_(Exponential.Exp,uint256) (../../sb/LPool.sol#814-816) is never used and should be removed
+Exponential.mul_(uint256,Exponential.Double) (../../sb/LPool.sol#830-832) is never used and should be removed
+Exponential.mul_(uint256,Exponential.Exp) (../../sb/LPool.sol#818-820) is never used and should be removed
+Exponential.mul_(uint256,uint256) (../../sb/LPool.sol#834-836) is never used and should be removed
+Exponential.mul_(uint256,uint256,string) (../../sb/LPool.sol#838-845) is never used and should be removed
+Exponential.safe224(uint256,string) (../../sb/LPool.sol#765-768) is never used and should be removed
+Exponential.safe32(uint256,string) (../../sb/LPool.sol#770-773) is never used and should be removed
+Exponential.subExp(Exponential.Exp,Exponential.Exp) (../../sb/LPool.sol#590-594) is never used and should be removed
+Exponential.sub_(Exponential.Double,Exponential.Double) (../../sb/LPool.sol#797-799) is never used and should be removed
+Exponential.sub_(Exponential.Exp,Exponential.Exp) (../../sb/LPool.sol#793-795) is never used and should be removed
+Exponential.sub_(uint256,uint256) (../../sb/LPool.sol#801-803) is never used and should be removed
+Exponential.sub_(uint256,uint256,string) (../../sb/LPool.sol#805-808) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/LPool.sol#1218-1227) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/LPool.sol#1234-1237) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/LPool.sol#1229-1232) is never used and should be removed
+SafeERC20.safeTransferFrom(IERC20,address,address,uint256) (../../sb/LPool.sol#1207-1209) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/LPool.sol#428-431) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/LPool.sol#390-393) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/LPool.sol#448-451) is never used and should be removed
+SafeMath.sub(uint256,uint256,string) (../../sb/LPool.sol#408-411) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/LPool.sol#262-266) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/LPool.sol#298-301) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/LPool.sol#308-311) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/LPool.sol#283-291) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/LPool.sol#273-276) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.7.6 (../../sb/LPool.sol#1) allows old versions
+solc-0.7.6 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/LPool.sol#1052-1058):
+	- (success) = recipient.call{value: amount}() (../../sb/LPool.sol#1056)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/LPool.sol#1113-1120):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/LPool.sol#1118)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/LPool.sol#1138-1144):
+	- (success,returndata) = target.staticcall(data) (../../sb/LPool.sol#1142)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/LPool.sol#1162-1168):
+	- (success,returndata) = target.delegatecall(data) (../../sb/LPool.sol#1166)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Constant LPoolStorage.borrowRateMaxMantissa (../../sb/LPool.sol#39) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant Exponential.expScale (../../sb/LPool.sol#546) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant Exponential.doubleScale (../../sb/LPool.sol#547) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant Exponential.halfExpScale (../../sb/LPool.sol#548) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant Exponential.mantissaOne (../../sb/LPool.sol#549) is not in UPPER_CASE_WITH_UNDERSCORES
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Reentrancy in LPool.borrowFresh(address,address,uint256) (../../sb/LPool.sol#2312-2352):
+	External calls:
+	- doTransferOut(payee,borrowAmount,false) (../../sb/LPool.sol#2341)
+		- to.transfer(amount) (../../sb/LPool.sol#1782)
+	External calls sending eth:
+	- doTransferOut(payee,borrowAmount,false) (../../sb/LPool.sol#2341)
+		- to.transfer(amount) (../../sb/LPool.sol#1782)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/LPool.sol#1118)
+	State variables written after the call(s):
+	- accountBorrows[borrower].principal = vars.accountBorrowsNew (../../sb/LPool.sol#2344)
+	- accountBorrows[borrower].interestIndex = borrowIndex (../../sb/LPool.sol#2345)
+	- totalBorrows = vars.totalBorrowsNew (../../sb/LPool.sol#2346)
+	Event emitted after the call(s):
+	- Borrow(borrower,payee,borrowAmount,vars.accountBorrowsNew,vars.totalBorrowsNew) (../../sb/LPool.sol#2349)
+Reentrancy in LPool.redeemFresh(address,uint256,uint256) (../../sb/LPool.sol#2235-2298):
+	External calls:
+	- doTransferOut(redeemer,vars.redeemAmount,true) (../../sb/LPool.sol#2288)
+		- to.transfer(amount) (../../sb/LPool.sol#1782)
+	External calls sending eth:
+	- doTransferOut(redeemer,vars.redeemAmount,true) (../../sb/LPool.sol#2288)
+		- to.transfer(amount) (../../sb/LPool.sol#1782)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/LPool.sol#1118)
+	State variables written after the call(s):
+	- accountTokens[redeemer] = vars.accountTokensNew (../../sb/LPool.sol#2291)
+	- totalSupply = vars.totalSupplyNew (../../sb/LPool.sol#2290)
+	Event emitted after the call(s):
+	- Redeem(redeemer,vars.redeemAmount,vars.redeemTokens) (../../sb/LPool.sol#2295)
+	- Transfer(redeemer,address(this),vars.redeemTokens) (../../sb/LPool.sol#2294)
+Reentrancy in LPool.reduceReserves(address,uint256) (../../sb/LPool.sol#2477-2484):
+	External calls:
+	- doTransferOut(to,reduceAmount,true) (../../sb/LPool.sol#2482)
+		- to.transfer(amount) (../../sb/LPool.sol#1782)
+	External calls sending eth:
+	- doTransferOut(to,reduceAmount,true) (../../sb/LPool.sol#2482)
+		- to.transfer(amount) (../../sb/LPool.sol#1782)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/LPool.sol#1118)
+	Event emitted after the call(s):
+	- ReservesReduced(to,reduceAmount,totalReservesNew) (../../sb/LPool.sol#2483)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-4
+
+Exponential.mantissaOne (../../sb/LPool.sol#549) is never used in LPool (../../sb/LPool.sol#1488-2491)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-state-variable
+
+DelegateInterface.implementation (../../sb/LPool.sol#1321) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+
+Adminable.developer (../../sb/LPool.sol#888) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/LPool.sol analyzed (16 contracts with 93 detectors), 140 result(s) found

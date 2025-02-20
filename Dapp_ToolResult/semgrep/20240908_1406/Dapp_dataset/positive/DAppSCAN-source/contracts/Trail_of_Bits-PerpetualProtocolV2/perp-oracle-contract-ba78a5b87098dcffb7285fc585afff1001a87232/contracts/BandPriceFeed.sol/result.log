@@ -1,0 +1,138 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 24 Code Findings │
+└──────────────────┘
+                          
+    /sb/BandPriceFeed.sol 
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          263┆ constructor(IStdReference stdRefArg, string memory baseAssetArg) 
+  {                                                                             
+          264┆     // BPF_ANC: Reference address is not contract
+          265┆     require(address(stdRefArg).isContract(), "BPF_ANC");
+          266┆ 
+          267┆     stdRef = stdRefArg;
+          268┆     baseAsset = baseAssetArg;
+          269┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          425┆ if (observations[index].timestamp <= targetTimestamp) {
+            ⋮┆----------------------------------------
+          428┆ if (observations[index].timestamp == 0) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           51┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+           55┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          112┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          113┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          137┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          161┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          265┆ require(address(stdRefArg).isContract(), "BPF_ANC");
+            ⋮┆----------------------------------------
+          288┆ require(bandData.lastUpdatedBase > lastObservation.timestamp,    
+  "BPF_IT");                                                                    
+            ⋮┆----------------------------------------
+          313┆ revert("BPF_ND");
+            ⋮┆----------------------------------------
+          378┆ require(bandData.lastUpdatedQuote > 0, "BPF_TQZ");
+            ⋮┆----------------------------------------
+          380┆ require(bandData.lastUpdatedBase > 0, "BPF_TBZ");
+            ⋮┆----------------------------------------
+          382┆ require(bandData.rate > 0, "BPF_IP");
+            ⋮┆----------------------------------------
+          442┆ revert("BPF_NEH");
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          276┆ if (currentObservationIndex == 0 && observations[0].timestamp == 
+  0) {                                                                          
+          277┆     observations[0] = Observation({
+          278┆         price: bandData.rate,
+          279┆         priceCumulative: 0,
+          280┆         timestamp: bandData.lastUpdatedBase
+          281┆     });
+          282┆     emit PriceUpdated(baseAsset, bandData.rate,                  
+  bandData.lastUpdatedBase, 0);                                                 
+          283┆     return;
+          284┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-decrement-not-postfix                    
+          Consider using the prefix decrement expression whenever the return    
+  value is not needed. The                                                      
+          prefix decrement expression is cheaper in terms of gas.               
+                                                                                
+          436┆ index--;
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          292┆ currentObservationIndex++;
+            ⋮┆----------------------------------------
+          424┆ for (i = 0; i < observationLen; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           55┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          112┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          137┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          161┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 24 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

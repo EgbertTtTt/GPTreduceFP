@@ -1,0 +1,481 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                     
+                     
+┌───────────────────┐
+│ 145 Code Findings │
+└───────────────────┘
+                                    
+    /sb/FraxUnifiedFarmTemplate.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          977┆ (bool success, bytes memory data) =                              
+  token.call(abi.encodeWithSelector(0x095ea7b3, to, value));                    
+            ⋮┆----------------------------------------
+          983┆ (bool success, bytes memory data) =                              
+  token.call(abi.encodeWithSelector(0xa9059cbb, to, value));                    
+            ⋮┆----------------------------------------
+          989┆ (bool success, bytes memory data) =                              
+  token.call(abi.encodeWithSelector(0x23b872dd, from, to, value));              
+            ⋮┆----------------------------------------
+         1013┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+         1017┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+         1035┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+         1040┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+         1045┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+         1305┆ for (uint256 i = 0; i < _rewardTokens.length; i++){
+            ⋮┆----------------------------------------
+         1368┆ for (uint256 i = 0; i < rewardsPerTokenStored.length; i++){
+            ⋮┆----------------------------------------
+         1385┆ for (uint256 i = 0; i < rewardTokens.length; i++){
+            ⋮┆----------------------------------------
+         1390┆ for (uint256 i = 0; i < rewardTokens.length; i++){
+            ⋮┆----------------------------------------
+         1401┆ for (uint256 i = 0; i < rewardRatesManual.length; i++){
+            ⋮┆----------------------------------------
+         1555┆ for (uint256 i = 0; i < earned_arr.length; i++){
+            ⋮┆----------------------------------------
+         1560┆ for (uint256 i = 0; i < earned_arr.length; i++){
+            ⋮┆----------------------------------------
+         1584┆ for (uint256 i = 0; i < rewardTokens.length; i++){
+            ⋮┆----------------------------------------
+         1613┆ for (uint256 i = 0; i < rewardTokens.length; i++){
+            ⋮┆----------------------------------------
+         1635┆ for (uint256 i = 0; i < rewardsPerTokenStored.length; i++){
+            ⋮┆----------------------------------------
+         1645┆ for (uint256 i = 0; i < gaugeControllers.length; i++){
+            ⋮┆----------------------------------------
+         1721┆ for (uint256 i = 0; i < rewardTokens.length; i++){
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          693┆ constructor (string memory __name, string memory __symbol) public
+  {                                                                             
+          694┆     _name = __name;
+          695┆     _symbol = __symbol;
+          696┆     _decimals = 18;
+          697┆ }
+            ⋮┆----------------------------------------
+         1131┆ constructor (address _owner) public {
+         1132┆     require(_owner != address(0), "Owner address cannot be 0");
+         1133┆     owner = _owner;
+         1134┆     emit OwnerChanged(address(0), _owner);
+         1135┆ }
+            ⋮┆----------------------------------------
+         1292┆ constructor (
+         1293┆     address _owner,
+         1294┆     address[] memory _rewardTokens,
+         1295┆     address[] memory _rewardManagers,
+         1296┆     uint256[] memory _rewardRatesManual,
+         1297┆     address[] memory _gaugeControllers
+         1298┆ ) Owned(_owner) {
+         1299┆ 
+         1300┆     // Address arrays
+         1301┆     rewardTokens = _rewardTokens;
+             [hid 27 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+         1307┆ rewardTokenAddrToIdx[_rewardTokens[i]] = i;
+            ⋮┆----------------------------------------
+         1310┆ rewardsPerTokenStored.push(0);
+            ⋮┆----------------------------------------
+         1313┆ rewardManagers[_rewardTokens[i]] = _rewardManagers[i];
+            ⋮┆----------------------------------------
+         1316┆ last_gauge_relative_weights.push(0);
+            ⋮┆----------------------------------------
+         1319┆ last_gauge_time_totals.push(0);
+            ⋮┆----------------------------------------
+         1368┆ for (uint256 i = 0; i < rewardsPerTokenStored.length; i++){
+            ⋮┆----------------------------------------
+         1369┆ newRewardsPerTokenStored[i] = rewardsPerTokenStored[i] + (
+            ⋮┆----------------------------------------
+         1370┆ ((lastTimeRewardApplicable() - lastUpdateTime) * rewardRates(i) *
+  1e18) / _total_combined_weight                                                
+            ⋮┆----------------------------------------
+         1370┆ ((lastTimeRewardApplicable() - lastUpdateTime) * rewardRates(i) *
+  1e18) / _total_combined_weight                                                
+            ⋮┆----------------------------------------
+         1385┆ for (uint256 i = 0; i < rewardTokens.length; i++){
+            ⋮┆----------------------------------------
+         1390┆ for (uint256 i = 0; i < rewardTokens.length; i++){
+            ⋮┆----------------------------------------
+         1391┆ new_earned[i] = ((_combined_weights[account] * (reward_arr[i] -  
+  userRewardsPerTokenPaid[account][i])) / 1e18)                                 
+            ⋮┆----------------------------------------
+         1391┆ new_earned[i] = ((_combined_weights[account] * (reward_arr[i] -  
+  userRewardsPerTokenPaid[account][i])) / 1e18)                                 
+            ⋮┆----------------------------------------
+         1392┆ + rewards[account][i];
+            ⋮┆----------------------------------------
+         1401┆ for (uint256 i = 0; i < rewardRatesManual.length; i++){
+            ⋮┆----------------------------------------
+         1402┆ rewards_per_duration_arr[i] = rewardRates(i) * rewardsDuration;
+            ⋮┆----------------------------------------
+         1556┆ rewards[account][i] = earned_arr[i];
+            ⋮┆----------------------------------------
+         1561┆ userRewardsPerTokenPaid[account][i] = rewardsPerTokenStored[i];
+            ⋮┆----------------------------------------
+         1561┆ userRewardsPerTokenPaid[account][i] = rewardsPerTokenStored[i];
+            ⋮┆----------------------------------------
+         1584┆ for (uint256 i = 0; i < rewardTokens.length; i++){
+            ⋮┆----------------------------------------
+         1585┆ rewards_before[i] = rewards[rewardee][i];
+            ⋮┆----------------------------------------
+         1586┆ rewards[rewardee][i] = 0;
+            ⋮┆----------------------------------------
+         1587┆ TransferHelper.safeTransfer(rewardTokens[i], destination_address,
+  rewards_before[i]);                                                           
+            ⋮┆----------------------------------------
+         1613┆ for (uint256 i = 0; i < rewardTokens.length; i++){
+            ⋮┆----------------------------------------
+         1614┆  ... rewardsDuration * (num_periods_elapsed + 1)) <=             
+  ERC20(rewardTokens[i]).balanceOf(address(this)), string(abi.encodePacked("Not 
+  enough reward tokens available: ", ... [0m                                    
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+         1614┆  ... rewardTokens[i]).balanceOf(address(this)),                  
+  string(abi.encodePacked("Not enough reward tokens available: ",               
+  rewardTokens[i])) ); ... [0m                                                  
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+         1614┆  ... rewardTokens[i])) ); ... [0m
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+         1635┆ for (uint256 i = 0; i < rewardsPerTokenStored.length; i++){
+            ⋮┆----------------------------------------
+         1636┆ rewardsPerTokenStored[i] = rewards_per_token[i];
+            ⋮┆----------------------------------------
+         1645┆ for (uint256 i = 0; i < gaugeControllers.length; i++){
+            ⋮┆----------------------------------------
+         1646┆ address gauge_controller_address = gaugeControllers[i];
+            ⋮┆----------------------------------------
+         1648┆ if (force_update || (block.timestamp >                           
+  last_gauge_time_totals[i])){                                                  
+            ⋮┆----------------------------------------
+         1650┆ last_gauge_relative_weights[i] =                                 
+  IFraxGaugeController(gauge_controller_address).gauge_relative_weight_write(add
+  ress(this), block.timestamp);                                                 
+            ⋮┆----------------------------------------
+         1651┆ last_gauge_time_totals[i] =                                      
+  IFraxGaugeController(gauge_controller_address).time_total();                  
+            ⋮┆----------------------------------------
+         1721┆ for (uint256 i = 0; i < rewardTokens.length; i++){
+            ⋮┆----------------------------------------
+         1722┆ if (rewardTokens[i] == tokenAddress) {
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+         1305┆ for (uint256 i = 0; i < _rewardTokens.length; i++){
+            ⋮┆----------------------------------------
+         1368┆ for (uint256 i = 0; i < rewardsPerTokenStored.length; i++){
+            ⋮┆----------------------------------------
+         1385┆ for (uint256 i = 0; i < rewardTokens.length; i++){
+            ⋮┆----------------------------------------
+         1390┆ for (uint256 i = 0; i < rewardTokens.length; i++){
+            ⋮┆----------------------------------------
+         1401┆ for (uint256 i = 0; i < rewardRatesManual.length; i++){
+            ⋮┆----------------------------------------
+         1555┆ for (uint256 i = 0; i < earned_arr.length; i++){
+            ⋮┆----------------------------------------
+         1560┆ for (uint256 i = 0; i < earned_arr.length; i++){
+            ⋮┆----------------------------------------
+         1584┆ for (uint256 i = 0; i < rewardTokens.length; i++){
+            ⋮┆----------------------------------------
+         1613┆ for (uint256 i = 0; i < rewardTokens.length; i++){
+            ⋮┆----------------------------------------
+         1635┆ for (uint256 i = 0; i < rewardsPerTokenStored.length; i++){
+            ⋮┆----------------------------------------
+         1645┆ for (uint256 i = 0; i < gaugeControllers.length; i++){
+            ⋮┆----------------------------------------
+         1721┆ for (uint256 i = 0; i < rewardTokens.length; i++){
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          256┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          310┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          510┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          514┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          571┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          572┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          596┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          620┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          846┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          847┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          866┆ require(account != address(0), "ERC20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+          915┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          938┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          939┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          978┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'TransferHelper: APPROVE_FAILED');                                  
+            ⋮┆----------------------------------------
+          984┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'TransferHelper: TRANSFER_FAILED');                                 
+            ⋮┆----------------------------------------
+          990┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'TransferHelper: TRANSFER_FROM_FAILED');                            
+            ⋮┆----------------------------------------
+          995┆ require(success, 'TransferHelper: ETH_TRANSFER_FAILED');
+            ⋮┆----------------------------------------
+         1032┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+         1033┆     "SafeERC20: approve from non-zero to non-zero allowance"
+         1034┆ );
+            ⋮┆----------------------------------------
+         1062┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+         1113┆ require(_status != _ENTERED, "ReentrancyGuard: reentrant call");
+            ⋮┆----------------------------------------
+         1132┆ require(_owner != address(0), "Owner address cannot be 0");
+            ⋮┆----------------------------------------
+         1143┆ require(msg.sender == nominatedOwner, "You must be nominated     
+  before you can accept ownership");                                            
+            ⋮┆----------------------------------------
+         1150┆ require(msg.sender == owner, "Only the contract owner may perform
+  this action");                                                                
+            ⋮┆----------------------------------------
+         1271┆ require(msg.sender == owner || msg.sender ==                     
+  0x8412ebf45bAC1B340BbE8F318b928C466c4E39CA, "Not owner or timelock");         
+            ⋮┆----------------------------------------
+         1276┆ require(msg.sender == owner || isTokenManagerFor(msg.sender,     
+  reward_token_address), "Not owner or tkn mgr");                               
+            ⋮┆----------------------------------------
+         1281┆ require(migrationsOn == true, "Not in migration");
+            ⋮┆----------------------------------------
+         1438┆ revert("Need calcCurCombinedWeight logic");
+            ⋮┆----------------------------------------
+         1461┆ revert("Need fraxPerLPToken logic");
+            ⋮┆----------------------------------------
+                
+                
+         1500┆ require(valid_migrators[migrator_address], "Invalid migrator     
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1570┆ revert("Need _getRewardExtraLogic logic");
+            ⋮┆----------------------------------------
+         1575┆ require(rewardsCollectionPaused == false,"Rewards collection     
+  paused");                                                                     
+            ⋮┆----------------------------------------
+         1742┆ revert("No valid tokens to recover");
+            ⋮┆----------------------------------------
+         1752┆ require(_lock_max_multiplier >= MULTIPLIER_PRECISION, "Mult must 
+  be >= MULTIPLIER_PRECISION");                                                 
+            ⋮┆----------------------------------------
+         1753┆ require(_vefxs_max_multiplier >= 0, "veFXS mul must be >= 0");
+            ⋮┆----------------------------------------
+         1754┆ require(_vefxs_per_frax_for_max_boost > 0, "veFXS pct max must be
+  >= 0");                                                                       
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 145 findings.
+            ⋮┆----------------------------------------
+         1755┆ require(_vefxs_boost_scale_factor > 0, "veFXS boost scale factor 
+  must be >= 0");                                                               
+            ⋮┆----------------------------------------
+         1764┆ require(_lock_time_for_max_multiplier >= 1, "Mul max time must be
+  >= 1");                                                                       
+            ⋮┆----------------------------------------
+         1765┆ require(_lock_time_min >= 1, "Mul min time must be >= 1");
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          978┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'TransferHelper: APPROVE_FAILED');                                  
+            ⋮┆----------------------------------------
+          984┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'TransferHelper: TRANSFER_FAILED');                                 
+            ⋮┆----------------------------------------
+          990┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'TransferHelper: TRANSFER_FROM_FAILED');                            
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         1729┆ if (isRewardToken && rewardManagers[tokenAddress] == msg.sender){
+         1730┆     ERC20(tokenAddress).transfer(msg.sender, tokenAmount);
+         1731┆     return;
+         1732┆ }
+         1733┆ 
+         1734┆ // Other tokens, like the staking token, airdrops, or accidental 
+  deposits, can be withdrawn by the owner                                       
+         1735┆ else if (!isRewardToken && (msg.sender == owner)){
+         1736┆     ERC20(tokenAddress).transfer(msg.sender, tokenAmount);
+         1737┆     return;
+         1738┆ }
+             [hid 5 additional lines, adjust with --max-lines-per-finding] 
+         1735┆ else if (!isRewardToken && (msg.sender == owner)){
+         1736┆     ERC20(tokenAddress).transfer(msg.sender, tokenAmount);
+         1737┆     return;
+         1738┆ }
+         1739┆ 
+         1740┆ // If none of the above conditions are true
+         1741┆ else {
+         1742┆     revert("No valid tokens to recover");
+         1743┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+         1305┆ for (uint256 i = 0; i < _rewardTokens.length; i++){
+            ⋮┆----------------------------------------
+         1368┆ for (uint256 i = 0; i < rewardsPerTokenStored.length; i++){
+            ⋮┆----------------------------------------
+         1385┆ for (uint256 i = 0; i < rewardTokens.length; i++){
+            ⋮┆----------------------------------------
+         1390┆ for (uint256 i = 0; i < rewardTokens.length; i++){
+            ⋮┆----------------------------------------
+         1401┆ for (uint256 i = 0; i < rewardRatesManual.length; i++){
+            ⋮┆----------------------------------------
+         1555┆ for (uint256 i = 0; i < earned_arr.length; i++){
+            ⋮┆----------------------------------------
+         1560┆ for (uint256 i = 0; i < earned_arr.length; i++){
+            ⋮┆----------------------------------------
+         1584┆ for (uint256 i = 0; i < rewardTokens.length; i++){
+            ⋮┆----------------------------------------
+         1613┆ for (uint256 i = 0; i < rewardTokens.length; i++){
+            ⋮┆----------------------------------------
+         1635┆ for (uint256 i = 0; i < rewardsPerTokenStored.length; i++){
+            ⋮┆----------------------------------------
+         1645┆ for (uint256 i = 0; i < gaugeControllers.length; i++){
+            ⋮┆----------------------------------------
+         1721┆ for (uint256 i = 0; i < rewardTokens.length; i++){
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          310┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          514┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          571┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          596┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          620┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          846┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          847┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          915┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          938┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          939┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          990┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'TransferHelper: TRANSFER_FROM_FAILED');                            
+            ⋮┆----------------------------------------
+          995┆ require(success, 'TransferHelper: ETH_TRANSFER_FAILED');
+            ⋮┆----------------------------------------
+         1032┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+         1033┆     "SafeERC20: approve from non-zero to non-zero allowance"
+         1034┆ );
+            ⋮┆----------------------------------------
+         1062┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+         1143┆ require(msg.sender == nominatedOwner, "You must be nominated     
+  before you can accept ownership");                                            
+            ⋮┆----------------------------------------
+         1150┆ require(msg.sender == owner, "Only the contract owner may perform
+  this action");                                                                
+            ⋮┆----------------------------------------
+         1752┆ require(_lock_max_multiplier >= MULTIPLIER_PRECISION, "Mult must 
+  be >= MULTIPLIER_PRECISION");                                                 
+            ⋮┆----------------------------------------
+         1755┆ require(_vefxs_boost_scale_factor > 0, "veFXS boost scale factor 
+  must be >= 0");                                                               
+
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

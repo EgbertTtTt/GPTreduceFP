@@ -1,0 +1,86 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 18 Code Findings │
+└──────────────────┘
+                            
+    /sb/LeverageService.sol 
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          181┆ constructor(ISettings _settings) public {
+          182┆     admin = msg.sender;
+          183┆     settings = ISettings(_settings);
+          184┆ 
+          185┆     commission = 500; // 0.5%
+          186┆     emit LeverageFeeUpdated(commission);
+          187┆ 
+          188┆     minEther = 1 ether;
+          189┆     emit LeverageMinEtherUpdated(minEther);
+          190┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           21┆ require(c / a == b, 'mul');
+            ⋮┆----------------------------------------
+           31┆ require(b > 0, 'div');
+            ⋮┆----------------------------------------
+           42┆ require(b <= a, 'sub');
+            ⋮┆----------------------------------------
+           53┆ require(c >= a, 'add');
+            ⋮┆----------------------------------------
+          162┆ require(admin == msg.sender, "You have no access");
+            ⋮┆----------------------------------------
+          168┆ require(bids[_id].owner == msg.sender, "Bid isn't your");
+            ⋮┆----------------------------------------
+          173┆ require(bids[_id].owner != address(0), "Bid doesn't exist");
+            ⋮┆----------------------------------------
+          194┆ require(_beneficiary != address(0), "Zero address, be careful");
+            ⋮┆----------------------------------------
+          195┆ require(systemETH > 0, "There is no available ETH");
+            ⋮┆----------------------------------------
+          204┆ require(_beneficiary != address(0), "Zero address, be careful");
+            ⋮┆----------------------------------------
+          207┆ require(_amount > 0, "There are no tokens");
+            ⋮┆----------------------------------------
+          213┆ require(_value <= 10000, "Too much");
+            ⋮┆----------------------------------------
+          220┆ require(_value <= 100 ether, "Too much");
+            ⋮┆----------------------------------------
+          227┆ require(_newAdmin != address(0), "Zero address, be careful");
+            ⋮┆----------------------------------------
+          233┆ require(msg.value >= minEther, "Too small funds");
+            ⋮┆----------------------------------------
+          234┆ require(_percent >=                                              
+  ILogic(settings.logicManager()).withdrawPercent(msg.value), "Collateralization
+  is not enough");                                                              
+            ⋮┆----------------------------------------
+          260┆ require(msg.value == _eth, "Incorrect ETH value");
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 18 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

@@ -1,0 +1,83 @@
+'solc --version' running
+'solc /sb/MixinSignatureValidator.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+LibBytes.rawAddress(bytes) (../../sb/MixinSignatureValidator.sol#30-39) is declared view but contains assembly code
+LibBytes.contentAddress(bytes) (../../sb/MixinSignatureValidator.sol#44-53) is declared view but contains assembly code
+LibBytes.memCopy(uint256,uint256,uint256) (../../sb/MixinSignatureValidator.sol#59-160) is declared view but contains assembly code
+LibBytes.sliceDestructive(bytes,uint256,uint256) (../../sb/MixinSignatureValidator.sol#200-224) is declared view but contains assembly code
+LibBytes.popLastByte(bytes) (../../sb/MixinSignatureValidator.sol#229-248) is declared view but contains assembly code
+LibBytes.popLast20Bytes(bytes) (../../sb/MixinSignatureValidator.sol#253-272) is declared view but contains assembly code
+LibBytes.readAddress(bytes,uint256) (../../sb/MixinSignatureValidator.sol#296-322) is declared view but contains assembly code
+LibBytes.writeAddress(bytes,uint256,address) (../../sb/MixinSignatureValidator.sol#328-368) is declared view but contains assembly code
+LibBytes.readBytes32(bytes,uint256) (../../sb/MixinSignatureValidator.sol#374-395) is declared view but contains assembly code
+LibBytes.writeBytes32(bytes,uint256,bytes32) (../../sb/MixinSignatureValidator.sol#401-421) is declared view but contains assembly code
+LibBytes.readBytes4(bytes,uint256) (../../sb/MixinSignatureValidator.sol#457-476) is declared view but contains assembly code
+LibBytes.readBytesWithLength(bytes,uint256) (../../sb/MixinSignatureValidator.sol#484-508) is declared view but contains assembly code
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#constant-functions-using-assembly-code
+
+Reentrancy in MixinSignatureValidator.preSign(bytes32,address,bytes) (../../sb/MixinSignatureValidator.sol#817-834):
+	External calls:
+	- require(bool,string)(isValidSignature(hash,signerAddress,signature),INVALID_SIGNATURE) (../../sb/MixinSignatureValidator.sol#825-832)
+		- isValid = IWallet(signerAddress).isValidSignature(hash,signature) (../../sb/MixinSignatureValidator.sol#962)
+		- isValid = IValidator(validatorAddress).isValidSignature(hash,signerAddress,signature) (../../sb/MixinSignatureValidator.sol#981-985)
+	State variables written after the call(s):
+	- preSigned[hash][signerAddress] = true (../../sb/MixinSignatureValidator.sol#833)
+	MixinSignatureValidator.preSigned (../../sb/MixinSignatureValidator.sol#808) can be used in cross function reentrancies:
+	- MixinSignatureValidator.isValidSignature(bytes32,address,bytes) (../../sb/MixinSignatureValidator.sol#859-1028)
+	- MixinSignatureValidator.preSign(bytes32,address,bytes) (../../sb/MixinSignatureValidator.sol#817-834)
+	- MixinSignatureValidator.preSigned (../../sb/MixinSignatureValidator.sol#808)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+LibBytes.rawAddress(bytes) (../../sb/MixinSignatureValidator.sol#30-39) uses assembly
+	- INLINE ASM (../../sb/MixinSignatureValidator.sol#35-38)
+LibBytes.contentAddress(bytes) (../../sb/MixinSignatureValidator.sol#44-53) uses assembly
+	- INLINE ASM (../../sb/MixinSignatureValidator.sol#49-52)
+LibBytes.memCopy(uint256,uint256,uint256) (../../sb/MixinSignatureValidator.sol#59-160) uses assembly
+	- INLINE ASM (../../sb/MixinSignatureValidator.sol#71-77)
+	- INLINE ASM (../../sb/MixinSignatureValidator.sol#99-127)
+	- INLINE ASM (../../sb/MixinSignatureValidator.sol#128-158)
+LibBytes.sliceDestructive(bytes,uint256,uint256) (../../sb/MixinSignatureValidator.sol#200-224) uses assembly
+	- INLINE ASM (../../sb/MixinSignatureValidator.sol#219-223)
+LibBytes.popLastByte(bytes) (../../sb/MixinSignatureValidator.sol#229-248) uses assembly
+	- INLINE ASM (../../sb/MixinSignatureValidator.sol#242-247)
+LibBytes.popLast20Bytes(bytes) (../../sb/MixinSignatureValidator.sol#253-272) uses assembly
+	- INLINE ASM (../../sb/MixinSignatureValidator.sol#266-271)
+LibBytes.readAddress(bytes,uint256) (../../sb/MixinSignatureValidator.sol#296-322) uses assembly
+	- INLINE ASM (../../sb/MixinSignatureValidator.sol#315-321)
+LibBytes.writeAddress(bytes,uint256,address) (../../sb/MixinSignatureValidator.sol#328-368) uses assembly
+	- INLINE ASM (../../sb/MixinSignatureValidator.sol#347-368)
+LibBytes.readBytes32(bytes,uint256) (../../sb/MixinSignatureValidator.sol#374-395) uses assembly
+	- INLINE ASM (../../sb/MixinSignatureValidator.sol#391-394)
+LibBytes.writeBytes32(bytes,uint256,bytes32) (../../sb/MixinSignatureValidator.sol#401-421) uses assembly
+	- INLINE ASM (../../sb/MixinSignatureValidator.sol#418-421)
+LibBytes.readBytes4(bytes,uint256) (../../sb/MixinSignatureValidator.sol#457-476) uses assembly
+	- INLINE ASM (../../sb/MixinSignatureValidator.sol#469-475)
+LibBytes.readBytesWithLength(bytes,uint256) (../../sb/MixinSignatureValidator.sol#484-508) uses assembly
+	- INLINE ASM (../../sb/MixinSignatureValidator.sol#504-507)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+LibBytes.contentAddress(bytes) (../../sb/MixinSignatureValidator.sol#44-53) is never used and should be removed
+LibBytes.deepCopyBytes(bytes,bytes) (../../sb/MixinSignatureValidator.sol#540-558) is never used and should be removed
+LibBytes.equals(bytes,bytes) (../../sb/MixinSignatureValidator.sol#278-290) is never used and should be removed
+LibBytes.memCopy(uint256,uint256,uint256) (../../sb/MixinSignatureValidator.sol#59-160) is never used and should be removed
+LibBytes.rawAddress(bytes) (../../sb/MixinSignatureValidator.sol#30-39) is never used and should be removed
+LibBytes.readBytes4(bytes,uint256) (../../sb/MixinSignatureValidator.sol#457-476) is never used and should be removed
+LibBytes.readBytesWithLength(bytes,uint256) (../../sb/MixinSignatureValidator.sol#484-508) is never used and should be removed
+LibBytes.readUint256(bytes,uint256) (../../sb/MixinSignatureValidator.sol#427-436) is never used and should be removed
+LibBytes.slice(bytes,uint256,uint256) (../../sb/MixinSignatureValidator.sol#167-192) is never used and should be removed
+LibBytes.sliceDestructive(bytes,uint256,uint256) (../../sb/MixinSignatureValidator.sol#200-224) is never used and should be removed
+LibBytes.writeAddress(bytes,uint256,address) (../../sb/MixinSignatureValidator.sol#328-368) is never used and should be removed
+LibBytes.writeBytes32(bytes,uint256,bytes32) (../../sb/MixinSignatureValidator.sol#401-421) is never used and should be removed
+LibBytes.writeBytesWithLength(bytes,uint256,bytes) (../../sb/MixinSignatureValidator.sol#514-535) is never used and should be removed
+LibBytes.writeUint256(bytes,uint256,uint256) (../../sb/MixinSignatureValidator.sol#442-451) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.4.24 (../../sb/MixinSignatureValidator.sol#1) allows old versions
+solc-0.4.24 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+MixinSignatureValidator (../../sb/MixinSignatureValidator.sol#802-1029) does not implement functions:
+	- ITransactions.executeTransaction(uint256,address,bytes,bytes) (../../sb/MixinSignatureValidator.sol#679-685)
+	- MTransactions.getCurrentContextAddress() (../../sb/MixinSignatureValidator.sol#713-716)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unimplemented-functions
+/sb/MixinSignatureValidator.sol analyzed (8 contracts with 93 detectors), 42 result(s) found

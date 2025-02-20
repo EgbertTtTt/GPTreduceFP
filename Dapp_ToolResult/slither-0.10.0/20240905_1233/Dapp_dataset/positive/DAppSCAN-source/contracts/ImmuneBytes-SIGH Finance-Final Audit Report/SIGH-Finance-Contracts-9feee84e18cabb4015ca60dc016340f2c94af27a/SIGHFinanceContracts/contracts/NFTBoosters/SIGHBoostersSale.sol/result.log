@@ -1,0 +1,174 @@
+'solc --version' running
+'solc /sb/SIGHBoostersSale.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/SIGHBoostersSale.sol:
+Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> /sb/SIGHBoostersSale.sol:978:80:
+    |
+978 |     function onERC721Received(address operator, address from, uint256 tokenId, bytes memory _data) public virtual override returns (bytes4) {
+    |                                                                                ^^^^^^^^^^^^^^^^^^
+
+
+
+SIGHBoostersSale.transferBalance(address,uint256) (../../sb/SIGHBoostersSale.sol#844-849) ignores return value by tokenAcceptedAsPayment.transfer(to,amount) (../../sb/SIGHBoostersSale.sol#847)
+SIGHBoostersSale.transferTokens(address,address,uint256) (../../sb/SIGHBoostersSale.sol#859-866) ignores return value by token_.transfer(to,amount) (../../sb/SIGHBoostersSale.sol#864)
+SIGHBoostersSale.transferFunds(address,uint256) (../../sb/SIGHBoostersSale.sol#966-972) ignores return value by tokenAcceptedAsPayment.transferFrom(from,address(this),amount) (../../sb/SIGHBoostersSale.sol#968)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+SIGHBoostersSale.transferFunds(address,uint256) (../../sb/SIGHBoostersSale.sol#966-972) uses a dangerous strict equality:
+	- require(bool,string)(newBalance == prevBalance.add(amount),Funds Transfer failed) (../../sb/SIGHBoostersSale.sol#970)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Reentrancy in SIGHBoostersSale.buyBoosters(address,string,uint256) (../../sb/SIGHBoostersSale.sol#873-885):
+	External calls:
+	- require(bool,string)(transferFunds(msg.sender,amountToBePaid),Funds transfer Failed) (../../sb/SIGHBoostersSale.sol#881)
+		- tokenAcceptedAsPayment.transferFrom(from,address(this),amount) (../../sb/SIGHBoostersSale.sol#968)
+	- require(bool,string)(transferBoosters(receiver,_BoosterType,boostersToBuy),Boosters transfer Failed) (../../sb/SIGHBoostersSale.sol#882)
+		- _SIGH_NFT_BoostersContract.safeTransferFrom(address(this),to,_boosterId) (../../sb/SIGHBoostersSale.sol#944)
+	State variables written after the call(s):
+	- require(bool,string)(transferBoosters(receiver,_BoosterType,boostersToBuy),Boosters transfer Failed) (../../sb/SIGHBoostersSale.sol#882)
+		- listOfBoosters[_BoosterType].boosterIdsList[0] = listOfBoosters[_BoosterType].boosterIdsList[listLength.sub(1)] (../../sb/SIGHBoostersSale.sol#948)
+		- listOfBoosters[_BoosterType].boosterIdsList.pop() (../../sb/SIGHBoostersSale.sol#949)
+		- listOfBoosters[_BoosterType].totalAvailable = listOfBoosters[_BoosterType].totalAvailable.sub(1) (../../sb/SIGHBoostersSale.sol#953)
+		- listOfBoosters[_BoosterType].totalBoostersSold = listOfBoosters[_BoosterType].totalBoostersSold.add(1) (../../sb/SIGHBoostersSale.sol#954)
+	SIGHBoostersSale.listOfBoosters (../../sb/SIGHBoostersSale.sol#808) can be used in cross function reentrancies:
+	- SIGHBoostersSale.addBoosterForSaleInternal(uint256) (../../sb/SIGHBoostersSale.sol#921-933)
+	- SIGHBoostersSale.buyBoosters(address,string,uint256) (../../sb/SIGHBoostersSale.sol#873-885)
+	- SIGHBoostersSale.getBoosterSaleDetails(string) (../../sb/SIGHBoostersSale.sol#892-897)
+	- SIGHBoostersSale.transferBoosters(address,string,uint256) (../../sb/SIGHBoostersSale.sol#936-963)
+	- SIGHBoostersSale.updateSalePrice(string,uint256) (../../sb/SIGHBoostersSale.sol#829-834)
+Reentrancy in SIGHBoostersSale.transferBoosters(address,string,uint256) (../../sb/SIGHBoostersSale.sol#936-963):
+	External calls:
+	- _SIGH_NFT_BoostersContract.safeTransferFrom(address(this),to,_boosterId) (../../sb/SIGHBoostersSale.sol#944)
+	State variables written after the call(s):
+	- boosterIdsForSale[_boosterId] = false (../../sb/SIGHBoostersSale.sol#957)
+	SIGHBoostersSale.boosterIdsForSale (../../sb/SIGHBoostersSale.sol#809) can be used in cross function reentrancies:
+	- SIGHBoostersSale.addBoosterForSaleInternal(uint256) (../../sb/SIGHBoostersSale.sol#921-933)
+	- SIGHBoostersSale.transferBoosters(address,string,uint256) (../../sb/SIGHBoostersSale.sol#936-963)
+	- listOfBoosters[_BoosterType].boosterIdsList[0] = listOfBoosters[_BoosterType].boosterIdsList[listLength.sub(1)] (../../sb/SIGHBoostersSale.sol#948)
+	SIGHBoostersSale.listOfBoosters (../../sb/SIGHBoostersSale.sol#808) can be used in cross function reentrancies:
+	- SIGHBoostersSale.addBoosterForSaleInternal(uint256) (../../sb/SIGHBoostersSale.sol#921-933)
+	- SIGHBoostersSale.buyBoosters(address,string,uint256) (../../sb/SIGHBoostersSale.sol#873-885)
+	- SIGHBoostersSale.getBoosterSaleDetails(string) (../../sb/SIGHBoostersSale.sol#892-897)
+	- SIGHBoostersSale.transferBoosters(address,string,uint256) (../../sb/SIGHBoostersSale.sol#936-963)
+	- SIGHBoostersSale.updateSalePrice(string,uint256) (../../sb/SIGHBoostersSale.sol#829-834)
+	- listOfBoosters[_BoosterType].boosterIdsList.pop() (../../sb/SIGHBoostersSale.sol#949)
+	SIGHBoostersSale.listOfBoosters (../../sb/SIGHBoostersSale.sol#808) can be used in cross function reentrancies:
+	- SIGHBoostersSale.addBoosterForSaleInternal(uint256) (../../sb/SIGHBoostersSale.sol#921-933)
+	- SIGHBoostersSale.buyBoosters(address,string,uint256) (../../sb/SIGHBoostersSale.sol#873-885)
+	- SIGHBoostersSale.getBoosterSaleDetails(string) (../../sb/SIGHBoostersSale.sol#892-897)
+	- SIGHBoostersSale.transferBoosters(address,string,uint256) (../../sb/SIGHBoostersSale.sol#936-963)
+	- SIGHBoostersSale.updateSalePrice(string,uint256) (../../sb/SIGHBoostersSale.sol#829-834)
+	- listOfBoosters[_BoosterType].totalAvailable = listOfBoosters[_BoosterType].totalAvailable.sub(1) (../../sb/SIGHBoostersSale.sol#953)
+	SIGHBoostersSale.listOfBoosters (../../sb/SIGHBoostersSale.sol#808) can be used in cross function reentrancies:
+	- SIGHBoostersSale.addBoosterForSaleInternal(uint256) (../../sb/SIGHBoostersSale.sol#921-933)
+	- SIGHBoostersSale.buyBoosters(address,string,uint256) (../../sb/SIGHBoostersSale.sol#873-885)
+	- SIGHBoostersSale.getBoosterSaleDetails(string) (../../sb/SIGHBoostersSale.sol#892-897)
+	- SIGHBoostersSale.transferBoosters(address,string,uint256) (../../sb/SIGHBoostersSale.sol#936-963)
+	- SIGHBoostersSale.updateSalePrice(string,uint256) (../../sb/SIGHBoostersSale.sol#829-834)
+	- listOfBoosters[_BoosterType].totalBoostersSold = listOfBoosters[_BoosterType].totalBoostersSold.add(1) (../../sb/SIGHBoostersSale.sol#954)
+	SIGHBoostersSale.listOfBoosters (../../sb/SIGHBoostersSale.sol#808) can be used in cross function reentrancies:
+	- SIGHBoostersSale.addBoosterForSaleInternal(uint256) (../../sb/SIGHBoostersSale.sol#921-933)
+	- SIGHBoostersSale.buyBoosters(address,string,uint256) (../../sb/SIGHBoostersSale.sol#873-885)
+	- SIGHBoostersSale.getBoosterSaleDetails(string) (../../sb/SIGHBoostersSale.sol#892-897)
+	- SIGHBoostersSale.transferBoosters(address,string,uint256) (../../sb/SIGHBoostersSale.sol#936-963)
+	- SIGHBoostersSale.updateSalePrice(string,uint256) (../../sb/SIGHBoostersSale.sol#829-834)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+SIGHBoostersSale.addBoosterForSaleInternal(uint256) (../../sb/SIGHBoostersSale.sol#921-933) ignores return value by (_BoosterType) = _SIGH_NFT_BoostersContract.getBoosterInfo(boosterId) (../../sb/SIGHBoostersSale.sol#923)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+ISIGHBoosters._updateBaseURI(string).baseURI (../../sb/SIGHBoostersSale.sol#665) shadows:
+	- ISIGHBoosters.baseURI() (../../sb/SIGHBoostersSale.sol#678) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+Reentrancy in SIGHBoostersSale.buyBoosters(address,string,uint256) (../../sb/SIGHBoostersSale.sol#873-885):
+	External calls:
+	- require(bool,string)(transferFunds(msg.sender,amountToBePaid),Funds transfer Failed) (../../sb/SIGHBoostersSale.sol#881)
+		- tokenAcceptedAsPayment.transferFrom(from,address(this),amount) (../../sb/SIGHBoostersSale.sol#968)
+	- require(bool,string)(transferBoosters(receiver,_BoosterType,boostersToBuy),Boosters transfer Failed) (../../sb/SIGHBoostersSale.sol#882)
+		- _SIGH_NFT_BoostersContract.safeTransferFrom(address(this),to,_boosterId) (../../sb/SIGHBoostersSale.sol#944)
+	Event emitted after the call(s):
+	- BoosterSold(to,_BoosterType,_boosterId,listOfBoosters[_BoosterType].salePrice) (../../sb/SIGHBoostersSale.sol#959)
+		- require(bool,string)(transferBoosters(receiver,_BoosterType,boostersToBuy),Boosters transfer Failed) (../../sb/SIGHBoostersSale.sol#882)
+	- BoostersBought(msg.sender,receiver,_BoosterType,boostersToBuy,amountToBePaid) (../../sb/SIGHBoostersSale.sol#884)
+Reentrancy in SIGHBoostersSale.transferBalance(address,uint256) (../../sb/SIGHBoostersSale.sol#844-849):
+	External calls:
+	- tokenAcceptedAsPayment.transfer(to,amount) (../../sb/SIGHBoostersSale.sol#847)
+	Event emitted after the call(s):
+	- FundsTransferred(amount) (../../sb/SIGHBoostersSale.sol#848)
+Reentrancy in SIGHBoostersSale.transferBoosters(address,string,uint256) (../../sb/SIGHBoostersSale.sol#936-963):
+	External calls:
+	- _SIGH_NFT_BoostersContract.safeTransferFrom(address(this),to,_boosterId) (../../sb/SIGHBoostersSale.sol#944)
+	Event emitted after the call(s):
+	- BoosterSold(to,_BoosterType,_boosterId,listOfBoosters[_BoosterType].salePrice) (../../sb/SIGHBoostersSale.sol#959)
+Reentrancy in SIGHBoostersSale.transferTokens(address,address,uint256) (../../sb/SIGHBoostersSale.sol#859-866):
+	External calls:
+	- token_.transfer(to,amount) (../../sb/SIGHBoostersSale.sol#864)
+	Event emitted after the call(s):
+	- TokensTransferred(token,to,amount) (../../sb/SIGHBoostersSale.sol#865)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+SIGHBoostersSale.updateSaleTime(uint256) (../../sb/SIGHBoostersSale.sol#852-856) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp < timestamp,Invalid stamp) (../../sb/SIGHBoostersSale.sol#853)
+SIGHBoostersSale.buyBoosters(address,string,uint256) (../../sb/SIGHBoostersSale.sol#873-885) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp > initiateTimestamp,Sale not begin) (../../sb/SIGHBoostersSale.sol#874)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+BoostersStringUtils.compare(string,string) (../../sb/SIGHBoostersSale.sol#590-607) is never used and should be removed
+BoostersStringUtils.equal(string,string) (../../sb/SIGHBoostersSale.sol#610-612) is never used and should be removed
+BoostersStringUtils.indexOf(string,string) (../../sb/SIGHBoostersSale.sol#615-640) is never used and should be removed
+Context._msgData() (../../sb/SIGHBoostersSale.sol#21-24) is never used and should be removed
+ERC20._burn(address,uint256) (../../sb/SIGHBoostersSale.sol#526-534) is never used and should be removed
+ERC20._mint(address,uint256) (../../sb/SIGHBoostersSale.sol#505-513) is never used and should be removed
+ERC20._setupDecimals(uint8) (../../sb/SIGHBoostersSale.sol#564-566) is never used and should be removed
+SafeMath.div(uint256,uint256) (../../sb/SIGHBoostersSale.sol#164-166) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/SIGHBoostersSale.sol#180-186) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/SIGHBoostersSale.sol#200-202) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/SIGHBoostersSale.sol#216-219) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.7.0 (../../sb/SIGHBoostersSale.sol#2) allows old versions
+solc-0.7.0 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Parameter BoostersStringUtils.compare(string,string)._a (../../sb/SIGHBoostersSale.sol#590) is not in mixedCase
+Parameter BoostersStringUtils.compare(string,string)._b (../../sb/SIGHBoostersSale.sol#590) is not in mixedCase
+Parameter BoostersStringUtils.equal(string,string)._a (../../sb/SIGHBoostersSale.sol#610) is not in mixedCase
+Parameter BoostersStringUtils.equal(string,string)._b (../../sb/SIGHBoostersSale.sol#610) is not in mixedCase
+Parameter BoostersStringUtils.indexOf(string,string)._haystack (../../sb/SIGHBoostersSale.sol#615) is not in mixedCase
+Parameter BoostersStringUtils.indexOf(string,string)._needle (../../sb/SIGHBoostersSale.sol#615) is not in mixedCase
+Event ISIGHBoosters.baseURIUpdated(string) (../../sb/SIGHBoostersSale.sol#649) is not in CapWords
+Event ISIGHBoosters.newCategoryAdded(string,uint256,uint256) (../../sb/SIGHBoostersSale.sol#650) is not in CapWords
+Event ISIGHBoosters.boosterURIUpdated(uint256,string) (../../sb/SIGHBoostersSale.sol#652) is not in CapWords
+Event ISIGHBoosters.discountMultiplierUpdated(string,uint256,uint256) (../../sb/SIGHBoostersSale.sol#653) is not in CapWords
+Function ISIGHBoosters._updateBaseURI(string) (../../sb/SIGHBoostersSale.sol#665) is not in mixedCase
+Parameter ISIGHBoostersSale.updateSalePrice(string,uint256)._BoosterType (../../sb/SIGHBoostersSale.sol#742) is not in mixedCase
+Parameter ISIGHBoostersSale.buyBoosters(address,string,uint256)._BoosterType (../../sb/SIGHBoostersSale.sol#759) is not in mixedCase
+Parameter ISIGHBoostersSale.getBoosterSaleDetails(string)._Boostertype (../../sb/SIGHBoostersSale.sol#766) is not in mixedCase
+Struct SIGHBoostersSale.boosterList (../../sb/SIGHBoostersSale.sol#801-806) is not in CapWords
+Parameter SIGHBoostersSale.updateSalePrice(string,uint256)._BoosterType (../../sb/SIGHBoostersSale.sol#829) is not in mixedCase
+Parameter SIGHBoostersSale.updateSalePrice(string,uint256)._price (../../sb/SIGHBoostersSale.sol#829) is not in mixedCase
+Parameter SIGHBoostersSale.buyBoosters(address,string,uint256)._BoosterType (../../sb/SIGHBoostersSale.sol#873) is not in mixedCase
+Parameter SIGHBoostersSale.getBoosterSaleDetails(string)._Boostertype (../../sb/SIGHBoostersSale.sol#892) is not in mixedCase
+Parameter SIGHBoostersSale.transferBoosters(address,string,uint256)._BoosterType (../../sb/SIGHBoostersSale.sol#936) is not in mixedCase
+Variable SIGHBoostersSale._SIGH_NFT_BoostersContract (../../sb/SIGHBoostersSale.sol#796) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/SIGHBoostersSale.sol#22)" inContext (../../sb/SIGHBoostersSale.sol#16-25)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Variable SIGHBoostersSale.updateSalePrice(string,uint256)._BoosterType (../../sb/SIGHBoostersSale.sol#829) is too similar to SIGHBoostersSale.boosterTypes (../../sb/SIGHBoostersSale.sol#810)
+Variable SIGHBoostersSale.transferBoosters(address,string,uint256)._BoosterType (../../sb/SIGHBoostersSale.sol#936) is too similar to SIGHBoostersSale.boosterTypes (../../sb/SIGHBoostersSale.sol#810)
+Variable ISIGHBoostersSale.buyBoosters(address,string,uint256)._BoosterType (../../sb/SIGHBoostersSale.sol#759) is too similar to SIGHBoostersSale.boosterTypes (../../sb/SIGHBoostersSale.sol#810)
+Variable ISIGHBoostersSale.getBoosterSaleDetails(string)._Boostertype (../../sb/SIGHBoostersSale.sol#766) is too similar to SIGHBoostersSale.boosterTypes (../../sb/SIGHBoostersSale.sol#810)
+Variable SIGHBoostersSale.getBoosterSaleDetails(string)._Boostertype (../../sb/SIGHBoostersSale.sol#892) is too similar to SIGHBoostersSale.boosterTypes (../../sb/SIGHBoostersSale.sol#810)
+Variable ISIGHBoostersSale.updateSalePrice(string,uint256)._BoosterType (../../sb/SIGHBoostersSale.sol#742) is too similar to SIGHBoostersSale.boosterTypes (../../sb/SIGHBoostersSale.sol#810)
+Variable SIGHBoostersSale.buyBoosters(address,string,uint256)._BoosterType (../../sb/SIGHBoostersSale.sol#873) is too similar to SIGHBoostersSale.boosterTypes (../../sb/SIGHBoostersSale.sol#810)
+Variable SIGHBoostersSale.addBoosterForSaleInternal(uint256)._BoosterType (../../sb/SIGHBoostersSale.sol#923) is too similar to SIGHBoostersSale.boosterTypes (../../sb/SIGHBoostersSale.sol#810)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+SIGHBoostersSale._SIGH_NFT_BoostersContract (../../sb/SIGHBoostersSale.sol#796) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/SIGHBoostersSale.sol analyzed (10 contracts with 93 detectors), 58 result(s) found

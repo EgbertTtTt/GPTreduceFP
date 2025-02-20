@@ -1,0 +1,249 @@
+{
+    "errors": [],
+    "fails": [],
+    "findings": [
+        {
+            "confidence": "Medium",
+            "contract": "LiquidityGeneratorToken",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Big Doge Coin Security Audit/code/code.sol",
+            "function": "_transfer",
+            "impact": "High",
+            "line": 989,
+            "line_end": 1033,
+            "message": "Reentrancy in LiquidityGeneratorToken._transfer(address,address,uint256) (code.sol#989-1033):\n\tExternal calls:\n\t- swapAndLiquify(contractTokenBalance) (code.sol#1020)\n\t\t- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (code.sol#1081-1088)\n\t\t- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (code.sol#1067-1073)\n\tExternal calls sending eth:\n\t- swapAndLiquify(contractTokenBalance) (code.sol#1020)\n\t\t- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (code.sol#1081-1088)\n\tState variables written after the call(s):\n\t- _tokenTransfer(from,to,amount,takeFee) (code.sol#1032)\n\t\t- _rOwned[address(this)] = _rOwned[address(this)].add(rLiquidity) (code.sol#945)\n\t\t- _rOwned[sender] = _rOwned[sender].sub(rAmount) (code.sol#1114)\n\t\t- _rOwned[sender] = _rOwned[sender].sub(rAmount) (code.sol#1123)\n\t\t- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (code.sol#1115)\n\t\t- _rOwned[sender] = _rOwned[sender].sub(rAmount) (code.sol#1134)\n\t\t- _rOwned[sender] = _rOwned[sender].sub(rAmount) (code.sol#858)\n\t\t- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (code.sol#1135)\n\t\t- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (code.sol#1125)\n\t\t- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (code.sol#860)\n\tLiquidityGeneratorToken._rOwned (code.sol#688) can be used in cross function reentrancies:\n\t- LiquidityGeneratorToken._getCurrentSupply() (code.sol#930-940)\n\t- LiquidityGeneratorToken._takeLiquidity(uint256) (code.sol#942-948)\n\t- LiquidityGeneratorToken._transferBothExcluded(address,address,uint256) (code.sol#855-864)\n\t- LiquidityGeneratorToken._transferFromExcluded(address,address,uint256) (code.sol#1131-1139)\n\t- LiquidityGeneratorToken._transferStandard(address,address,uint256) (code.sol#1112-1119)\n\t- LiquidityGeneratorToken._transferToExcluded(address,address,uint256) (code.sol#1121-1129)\n\t- LiquidityGeneratorToken.balanceOf(address) (code.sol#785-788)\n\t- LiquidityGeneratorToken.constructor(address,string,string,uint8,uint256,uint8,uint8,uint256,uint256,uint256) (code.sol#737-767)\n\t- LiquidityGeneratorToken.deliver(uint256) (code.sol#828-835)\n\t- _tokenTransfer(from,to,amount,takeFee) (code.sol#1032)\n\t\t- _rTotal = _rTotal.sub(rFee) (code.sol#900)\n\tLiquidityGeneratorToken._rTotal (code.sol#700) can be used in cross function reentrancies:\n\t- LiquidityGeneratorToken._getCurrentSupply() (code.sol#930-940)\n\t- LiquidityGeneratorToken._reflectFee(uint256,uint256) (code.sol#899-902)\n\t- LiquidityGeneratorToken.constructor(address,string,string,uint8,uint256,uint8,uint8,uint256,uint256,uint256) (code.sol#737-767)\n\t- LiquidityGeneratorToken.deliver(uint256) (code.sol#828-835)\n\t- LiquidityGeneratorToken.tokenFromReflection(uint256) (code.sol#848-852)\n\t- _tokenTransfer(from,to,amount,takeFee) (code.sol#1032)\n\t\t- _tOwned[address(this)] = _tOwned[address(this)].add(tLiquidity) (code.sol#947)\n\t\t- _tOwned[sender] = _tOwned[sender].sub(tAmount) (code.sol#857)\n\t\t- _tOwned[sender] = _tOwned[sender].sub(tAmount) (code.sol#1133)\n\t\t- _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount) (code.sol#1124)\n\t\t- _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount) (code.sol#859)\n\tLiquidityGeneratorToken._tOwned (code.sol#689) can be used in cross function reentrancies:\n\t- LiquidityGeneratorToken._getCurrentSupply() (code.sol#930-940)\n\t- LiquidityGeneratorToken._takeLiquidity(uint256) (code.sol#942-948)\n\t- LiquidityGeneratorToken._transferBothExcluded(address,address,uint256) (code.sol#855-864)\n\t- LiquidityGeneratorToken._transferFromExcluded(address,address,uint256) (code.sol#1131-1139)\n\t- LiquidityGeneratorToken._transferToExcluded(address,address,uint256) (code.sol#1121-1129)\n\t- LiquidityGeneratorToken.balanceOf(address) (code.sol#785-788)\n",
+            "name": "reentrancy-eth",
+            "check": "FP"
+        },
+        {
+            "confidence": "High",
+            "contract": "LiquidityGeneratorToken",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Big Doge Coin Security Audit/code/code.sol",
+            "function": "balanceOf",
+            "impact": "High",
+            "line": 695,
+            "message": "LiquidityGeneratorToken._isExcluded (code.sol#695) is never initialized. It is used in:\n\t- LiquidityGeneratorToken.balanceOf(address) (code.sol#785-788)\n\t- LiquidityGeneratorToken.isExcludedFromReward(address) (code.sol#820-822)\n\t- LiquidityGeneratorToken.deliver(uint256) (code.sol#828-835)\n\t- LiquidityGeneratorToken._takeLiquidity(uint256) (code.sol#942-948)\n\t- LiquidityGeneratorToken._tokenTransfer(address,address,uint256,bool) (code.sol#1092-1110)\n",
+            "name": "uninitialized-state",
+            "check": "FP"
+        },
+        {
+            "confidence": "High",
+            "contract": "LiquidityGeneratorToken",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Big Doge Coin Security Audit/code/code.sol",
+            "function": "_getCurrentSupply",
+            "impact": "High",
+            "line": 696,
+            "message": "LiquidityGeneratorToken._excluded (code.sol#696) is never initialized. It is used in:\n\t- LiquidityGeneratorToken._getCurrentSupply() (code.sol#930-940)\n",
+            "name": "uninitialized-state",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "LiquidityGeneratorToken",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Big Doge Coin Security Audit/code/code.sol",
+            "function": "addLiquidity",
+            "impact": "Medium",
+            "line": 1076,
+            "line_end": 1089,
+            "message": "LiquidityGeneratorToken.addLiquidity(uint256,uint256) (code.sol#1076-1089) ignores return value by uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (code.sol#1081-1088)\n",
+            "name": "unused-return",
+            "check": "FP"
+        },
+        {
+            "confidence": "High",
+            "contract": "LiquidityGeneratorToken",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Big Doge Coin Security Audit/code/code.sol",
+            "function": "symbol",
+            "impact": "Low",
+            "line": 737,
+            "message": "LiquidityGeneratorToken.constructor(address,string,string,uint8,uint256,uint8,uint8,uint256,uint256,uint256).symbol (code.sol#737) shadows:\n\t- LiquidityGeneratorToken.symbol() (code.sol#773-775) (function)\n",
+            "name": "shadowing-local",
+            "check": "FP"
+        },
+        {
+            "confidence": "High",
+            "contract": "LiquidityGeneratorToken",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Big Doge Coin Security Audit/code/code.sol",
+            "function": "name",
+            "impact": "Low",
+            "line": 737,
+            "message": "LiquidityGeneratorToken.constructor(address,string,string,uint8,uint256,uint8,uint8,uint256,uint256,uint256).name (code.sol#737) shadows:\n\t- LiquidityGeneratorToken.name() (code.sol#769-771) (function)\n",
+            "name": "shadowing-local",
+            "check": "FP"
+        },
+        {
+            "confidence": "High",
+            "contract": "Ownable",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Big Doge Coin Security Audit/code/code.sol",
+            "function": "owner",
+            "impact": "Low",
+            "line": 981,
+            "message": "LiquidityGeneratorToken._approve(address,address,uint256).owner (code.sol#981) shadows:\n\t- Ownable.owner() (code.sol#418-420) (function)\n",
+            "name": "shadowing-local",
+            "check": "FP"
+        },
+        {
+            "confidence": "High",
+            "contract": "Ownable",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Big Doge Coin Security Audit/code/code.sol",
+            "function": "owner",
+            "impact": "Low",
+            "line": 795,
+            "message": "LiquidityGeneratorToken.allowance(address,address).owner (code.sol#795) shadows:\n\t- Ownable.owner() (code.sol#418-420) (function)\n",
+            "name": "shadowing-local",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "LiquidityGeneratorToken",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Big Doge Coin Security Audit/code/code.sol",
+            "function": "setTaxFeePercent",
+            "impact": "Low",
+            "line": 874,
+            "line_end": 877,
+            "message": "LiquidityGeneratorToken.setTaxFeePercent(uint256) (code.sol#874-877) should emit an event for: \n\t- _taxFee = taxFee (code.sol#876) \n",
+            "name": "events-maths",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "LiquidityGeneratorToken",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Big Doge Coin Security Audit/code/code.sol",
+            "function": "setLiquidityFeePercent",
+            "impact": "Low",
+            "line": 879,
+            "line_end": 882,
+            "message": "LiquidityGeneratorToken.setLiquidityFeePercent(uint256) (code.sol#879-882) should emit an event for: \n\t- _liquidityFee = liquidityFee (code.sol#881) \n",
+            "name": "events-maths",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "LiquidityGeneratorToken",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Big Doge Coin Security Audit/code/code.sol",
+            "function": "setMaxTxPercent",
+            "impact": "Low",
+            "line": 884,
+            "line_end": 889,
+            "message": "LiquidityGeneratorToken.setMaxTxPercent(uint256) (code.sol#884-889) should emit an event for: \n\t- _maxTxAmount = _tTotal.mul(maxTxPercent).div(10 ** 2) (code.sol#886-888) \n",
+            "name": "events-maths",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "LiquidityGeneratorToken",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Big Doge Coin Security Audit/code/code.sol",
+            "function": "_transfer",
+            "impact": "Low",
+            "line": 989,
+            "line_end": 1033,
+            "message": "Reentrancy in LiquidityGeneratorToken._transfer(address,address,uint256) (code.sol#989-1033):\n\tExternal calls:\n\t- swapAndLiquify(contractTokenBalance) (code.sol#1020)\n\t\t- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (code.sol#1081-1088)\n\t\t- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (code.sol#1067-1073)\n\tExternal calls sending eth:\n\t- swapAndLiquify(contractTokenBalance) (code.sol#1020)\n\t\t- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (code.sol#1081-1088)\n\tState variables written after the call(s):\n\t- _tokenTransfer(from,to,amount,takeFee) (code.sol#1032)\n\t\t- _liquidityFee = _previousLiquidityFee (code.sol#974)\n\t\t- _liquidityFee = 0 (code.sol#969)\n\t- _tokenTransfer(from,to,amount,takeFee) (code.sol#1032)\n\t\t- _previousLiquidityFee = _liquidityFee (code.sol#966)\n\t- _tokenTransfer(from,to,amount,takeFee) (code.sol#1032)\n\t\t- _previousTaxFee = _taxFee (code.sol#965)\n\t- _tokenTransfer(from,to,amount,takeFee) (code.sol#1032)\n\t\t- _tFeeTotal = _tFeeTotal.add(tFee) (code.sol#901)\n\t- _tokenTransfer(from,to,amount,takeFee) (code.sol#1032)\n\t\t- _taxFee = _previousTaxFee (code.sol#973)\n\t\t- _taxFee = 0 (code.sol#968)\n",
+            "name": "reentrancy-benign",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "LiquidityGeneratorToken",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Big Doge Coin Security Audit/code/code.sol",
+            "function": "swapAndLiquify",
+            "impact": "Low",
+            "line": 1035,
+            "line_end": 1056,
+            "message": "Reentrancy in LiquidityGeneratorToken.swapAndLiquify(uint256) (code.sol#1035-1056):\n\tExternal calls:\n\t- swapTokensForEth(half) (code.sol#1047)\n\t\t- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (code.sol#1067-1073)\n\t- addLiquidity(otherHalf,newBalance) (code.sol#1053)\n\t\t- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (code.sol#1081-1088)\n\tExternal calls sending eth:\n\t- addLiquidity(otherHalf,newBalance) (code.sol#1053)\n\t\t- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (code.sol#1081-1088)\n\tState variables written after the call(s):\n\t- addLiquidity(otherHalf,newBalance) (code.sol#1053)\n\t\t- _allowances[owner][spender] = amount (code.sol#985)\n",
+            "name": "reentrancy-benign",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "LiquidityGeneratorToken",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Big Doge Coin Security Audit/code/code.sol",
+            "function": "transferFrom",
+            "impact": "Low",
+            "line": 804,
+            "line_end": 808,
+            "message": "Reentrancy in LiquidityGeneratorToken.transferFrom(address,address,uint256) (code.sol#804-808):\n\tExternal calls:\n\t- _transfer(sender,recipient,amount) (code.sol#805)\n\t\t- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (code.sol#1081-1088)\n\t\t- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (code.sol#1067-1073)\n\tExternal calls sending eth:\n\t- _transfer(sender,recipient,amount) (code.sol#805)\n\t\t- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (code.sol#1081-1088)\n\tState variables written after the call(s):\n\t- _approve(sender,_msgSender(),_allowances[sender][_msgSender()].sub(amount,ERC20: transfer amount exceeds allowance)) (code.sol#806)\n\t\t- _allowances[owner][spender] = amount (code.sol#985)\n",
+            "name": "reentrancy-benign",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "LiquidityGeneratorToken",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Big Doge Coin Security Audit/code/code.sol",
+            "function": "transferFrom",
+            "impact": "Low",
+            "line": 804,
+            "line_end": 808,
+            "message": "Reentrancy in LiquidityGeneratorToken.transferFrom(address,address,uint256) (code.sol#804-808):\n\tExternal calls:\n\t- _transfer(sender,recipient,amount) (code.sol#805)\n\t\t- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (code.sol#1081-1088)\n\t\t- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (code.sol#1067-1073)\n\tExternal calls sending eth:\n\t- _transfer(sender,recipient,amount) (code.sol#805)\n\t\t- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (code.sol#1081-1088)\n\tEvent emitted after the call(s):\n\t- Approval(owner,spender,amount) (code.sol#986)\n\t\t- _approve(sender,_msgSender(),_allowances[sender][_msgSender()].sub(amount,ERC20: transfer amount exceeds allowance)) (code.sol#806)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "LiquidityGeneratorToken",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Big Doge Coin Security Audit/code/code.sol",
+            "function": "_transfer",
+            "impact": "Low",
+            "line": 989,
+            "line_end": 1033,
+            "message": "Reentrancy in LiquidityGeneratorToken._transfer(address,address,uint256) (code.sol#989-1033):\n\tExternal calls:\n\t- swapAndLiquify(contractTokenBalance) (code.sol#1020)\n\t\t- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (code.sol#1081-1088)\n\t\t- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (code.sol#1067-1073)\n\tExternal calls sending eth:\n\t- swapAndLiquify(contractTokenBalance) (code.sol#1020)\n\t\t- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (code.sol#1081-1088)\n\tEvent emitted after the call(s):\n\t- Transfer(sender,recipient,tTransferAmount) (code.sol#1118)\n\t\t- _tokenTransfer(from,to,amount,takeFee) (code.sol#1032)\n\t- Transfer(sender,recipient,tTransferAmount) (code.sol#1128)\n\t\t- _tokenTransfer(from,to,amount,takeFee) (code.sol#1032)\n\t- Transfer(sender,recipient,tTransferAmount) (code.sol#1138)\n\t\t- _tokenTransfer(from,to,amount,takeFee) (code.sol#1032)\n\t- Transfer(sender,recipient,tTransferAmount) (code.sol#863)\n\t\t- _tokenTransfer(from,to,amount,takeFee) (code.sol#1032)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "LiquidityGeneratorToken",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Big Doge Coin Security Audit/code/code.sol",
+            "function": "swapAndLiquify",
+            "impact": "Low",
+            "line": 1035,
+            "line_end": 1056,
+            "message": "Reentrancy in LiquidityGeneratorToken.swapAndLiquify(uint256) (code.sol#1035-1056):\n\tExternal calls:\n\t- swapTokensForEth(half) (code.sol#1047)\n\t\t- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (code.sol#1067-1073)\n\t- addLiquidity(otherHalf,newBalance) (code.sol#1053)\n\t\t- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (code.sol#1081-1088)\n\tExternal calls sending eth:\n\t- addLiquidity(otherHalf,newBalance) (code.sol#1053)\n\t\t- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,dead,block.timestamp) (code.sol#1081-1088)\n\tEvent emitted after the call(s):\n\t- Approval(owner,spender,amount) (code.sol#986)\n\t\t- addLiquidity(otherHalf,newBalance) (code.sol#1053)\n\t- SwapAndLiquify(half,newBalance,otherHalf) (code.sol#1055)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "Ownable",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Big Doge Coin Security Audit/code/code.sol",
+            "function": "unlock",
+            "impact": "Low",
+            "line": 465,
+            "line_end": 470,
+            "message": "Ownable.unlock() (code.sol#465-470) uses timestamp for comparisons\n\tDangerous comparisons:\n\t- require(bool,string)(now > _lockTime,Contract is locked until 7 days) (code.sol#467)\n",
+            "name": "timestamp",
+            "check": "FP"
+        },
+        {
+            "confidence": "High",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Big Doge Coin Security Audit/code/code.sol",
+            "impact": "Informational",
+            "line": 3,
+            "message": "Different versions of Solidity are used:\n\t- Version used: ['>=0.5.0', '>=0.6.2', '^0.6.12']\n\t- >=0.5.0 (code.sol#3)\n\t- >=0.5.0 (code.sol#4)\n\t- >=0.6.2 (code.sol#5)\n\t- >=0.6.2 (code.sol#6)\n\t- ABIEncoderV2 (code.sol#2)\n\t- ^0.6.12 (code.sol#1)\n",
+            "name": "pragma",
+            "check": "FP"
+        },
+        {
+            "confidence": "High",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Big Doge Coin Security Audit/code/code.sol",
+            "impact": "Informational",
+            "line": 712,
+            "message": "LiquidityGeneratorToken._previousLiquidityFee (code.sol#712) is set pre-construction with a non-constant function or state variable:\n\t- _liquidityFee\n",
+            "name": "function-init-state",
+            "check": "FP"
+        },
+        {
+            "confidence": "High",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Callisto_Network-Big Doge Coin Security Audit/code/code.sol",
+            "impact": "Informational",
+            "line": 709,
+            "message": "LiquidityGeneratorToken._previousTaxFee (code.sol#709) is set pre-construction with a non-constant function or state variable:\n\t- _taxFee\n",
+            "name": "function-init-state",
+            "check": "FP"
+        }
+    ],
+    "infos": [],
+    "parser": {
+        "id": "slither-0.10.0",
+        "mode": "solidity",
+        "version": "2024/04/30"
+    }
+}

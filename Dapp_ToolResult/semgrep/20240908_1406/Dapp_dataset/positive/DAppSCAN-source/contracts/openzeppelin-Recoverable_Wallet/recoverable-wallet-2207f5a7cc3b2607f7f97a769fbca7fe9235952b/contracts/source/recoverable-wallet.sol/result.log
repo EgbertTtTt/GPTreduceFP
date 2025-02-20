@@ -1,0 +1,142 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 25 Code Findings │
+└──────────────────┘
+                               
+    /sb/recoverable-wallet.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+           60┆ contract RecoverableWallet is Ownable, Erc777TokensRecipient {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+            9┆ constructor() public {
+           10┆                                                                  
+  Erc1820Registry(0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24).setInterfaceImplem
+  enter(address(this), keccak256(abi.encodePacked("ERC777TokensRecipient")),    
+  addres ... [0m                                                                
+           11┆ }
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+           24┆ constructor(address _owner) public {
+           25┆    require(_owner != address(0), "Contract must have an       
+  owner.");                                                                  
+           26┆    owner =     
+  _owner;                     
+           27┆ }
+            ⋮┆----------------------------------------
+           82┆ constructor(address _initial_owner) Ownable(_initial_owner)      
+  public {                                                                      
+           83┆    //swc-Code With No Effects: 
+  L83                                         
+           84┆                  
+  reset_recovery();             
+           85┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           25┆ require(_owner != address(0), "Contract must have an owner.");
+            ⋮┆----------------------------------------
+           30┆ require(msg.sender == owner, "Only the owner may call this       
+  method.");                                                                    
+            ⋮┆----------------------------------------
+           35┆ require(msg.sender == pending_owner, "Only the pending owner can 
+  call this method.");                                                          
+            ⋮┆----------------------------------------
+           41┆ require(_pending_owner != address(0), "Contract must have an     
+  owner.");                                                                     
+            ⋮┆----------------------------------------
+           73┆ require(active_recovery_address != address(0), "This method can  
+  only be called during a recovery.");                                          
+            ⋮┆----------------------------------------
+           78┆ require(active_recovery_address == address(0), "This method      
+  cannot be called during a recovery.");                                        
+            ⋮┆----------------------------------------
+           92┆ require(_recovery_delay_in_days > 0, "Recovery delay must be at  
+  least 1 day.");                                                               
+            ⋮┆----------------------------------------
+          104┆ require(_proposed_recovery_delay != 0, "Only designated recovery 
+  addresseses can initiate the recovery process.");                             
+            ⋮┆----------------------------------------
+          110┆ require(_proposed_recovery_delay < _active_recovery_delay,       
+  "Recovery is already under way and new recovery doesn't have a higher         
+  priority.");                                                                  
+            ⋮┆----------------------------------------
+          125┆ require(active_recovery_address != address(0), "No recovery in   
+  progress.");                                                                  
+            ⋮┆----------------------------------------
+          126┆ require(block.timestamp > active_recovery_end_time, "You must    
+  wait until the recovery delay is over before finishing the recovery.");       
+            ⋮┆----------------------------------------
+          140┆ require(new_contract != address(0), "Contract creation failed.");
+            ⋮┆----------------------------------------
+          146┆ require(_success, "Contract execution failed.");
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           30┆ require(msg.sender == owner, "Only the owner may call this       
+  method.");                                                                    
+            ⋮┆----------------------------------------
+           35┆ require(msg.sender == pending_owner, "Only the pending owner can 
+  call this method.");                                                          
+            ⋮┆----------------------------------------
+           73┆ require(active_recovery_address != address(0), "This method can  
+  only be called during a recovery.");                                          
+            ⋮┆----------------------------------------
+           78┆ require(active_recovery_address == address(0), "This method      
+  cannot be called during a recovery.");                                        
+            ⋮┆----------------------------------------
+           92┆ require(_recovery_delay_in_days > 0, "Recovery delay must be at  
+  least 1 day.");                                                               
+            ⋮┆----------------------------------------
+          104┆ require(_proposed_recovery_delay != 0, "Only designated recovery 
+  addresseses can initiate the recovery process.");                             
+            ⋮┆----------------------------------------
+          110┆ require(_proposed_recovery_delay < _active_recovery_delay,       
+  "Recovery is already under way and new recovery doesn't have a higher         
+  priority.");                                                                  
+            ⋮┆----------------------------------------
+          126┆ require(block.timestamp > active_recovery_end_time, "You must    
+  wait until the recovery delay is over before finishing the recovery.");       
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+Some files were skipped or only partially analyzed.
+  Partially scanned: 1 files only partially analyzed due to parsing or internal Semgrep errors
+
+Ran 48 rules on 1 file: 25 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

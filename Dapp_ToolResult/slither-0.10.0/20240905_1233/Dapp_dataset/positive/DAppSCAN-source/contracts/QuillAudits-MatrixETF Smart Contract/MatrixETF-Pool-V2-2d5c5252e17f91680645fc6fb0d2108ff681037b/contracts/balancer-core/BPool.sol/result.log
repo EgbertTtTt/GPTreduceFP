@@ -1,0 +1,307 @@
+'solc --version' running
+'solc /sb/BPool.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/BPool.sol:
+Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.
+   --> /sb/BPool.sol:551:14:
+    |
+551 |         uint normalizedWeight = bdiv(tokenWeightIn, totalWeight);
+    |              ^^^^^^^^^^^^^^^^
+
+Warning: This declaration shadows an existing declaration.
+   --> /sb/BPool.sol:677:9:
+    |
+677 |         uint poolAmountIn = bsub(poolSupply, newPoolSupply);
+    |         ^^^^^^^^^^^^^^^^^
+Note: The shadowed declaration is here:
+   --> /sb/BPool.sol:661:18:
+    |
+661 |         returns (uint poolAmountIn)
+    |                  ^^^^^^^^^^^^^^^^^
+
+Warning: Function state mutability can be restricted to pure
+   --> /sb/BPool.sol:330:5:
+    |
+330 |     function _validateAddress(address addr) internal {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning: Function state mutability can be restricted to pure
+   --> /sb/BPool.sol:349:5:
+    |
+349 |     function decimals() public view returns(uint8) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning: Function state mutability can be restricted to view
+    --> /sb/BPool.sol:2560:5:
+     |
+2560 |     function _checkSwapsDisabled()
+     |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning: Contract code size exceeds 24576 bytes (a limit introduced in Spurious Dragon). This contract may not be deployable on mainnet. Consider enabling the optimizer (with a low "runs" value!), turning off revert strings, or using libraries.
+    --> /sb/BPool.sol:1291:1:
+     |
+1291 | contract BPool is BToken, BMath, BPoolInterface {
+     | ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+BPool._totalWeight (../../sb/BPool.sol#1413) is never initialized. It is used in:
+	- BPool._getTotalWeight() (../../sb/BPool.sol#2575-2580)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-state-variables
+
+Reentrancy in BPool.exitPool(uint256,uint256[]) (../../sb/BPool.sol#1998-2033):
+	External calls:
+	- _pushUnderlying(t,msg.sender,tokenAmountOut) (../../sb/BPool.sol#2029)
+		- xfer = IERC20(erc20).transfer(to,amount) (../../sb/BPool.sol#2464)
+	State variables written after the call(s):
+	- _records[t].balance = bsub(_records[t].balance,tokenAmountOut) (../../sb/BPool.sol#2027)
+	BPool._records (../../sb/BPool.sol#1411) can be used in cross function reentrancies:
+	- BPool._getDenormWeight(address) (../../sb/BPool.sol#2568-2573)
+	- BPool._requireTokenIsBound(address) (../../sb/BPool.sol#2505-2509)
+	- BPool.bind(address,uint256,uint256) (../../sb/BPool.sol#1786-1805)
+	- BPool.calcTokensForAmount(uint256) (../../sb/BPool.sol#1928-1941)
+	- BPool.exitPool(uint256,uint256[]) (../../sb/BPool.sol#1998-2033)
+	- BPool.exitswapExternAmountOut(address,uint256,uint256) (../../sb/BPool.sol#2402-2447)
+	- BPool.exitswapPoolAmountIn(address,uint256,uint256) (../../sb/BPool.sol#2343-2388)
+	- BPool.getBalance(address) (../../sb/BPool.sol#1527-1535)
+	- BPool.getSpotPrice(address,address) (../../sb/BPool.sol#1899-1908)
+	- BPool.getSpotPriceSansFee(address,address) (../../sb/BPool.sol#1916-1926)
+	- BPool.isBound(address) (../../sb/BPool.sol#1437-1442)
+	- BPool.joinPool(uint256,uint256[]) (../../sb/BPool.sol#1951-1985)
+	- BPool.joinswapExternAmountIn(address,uint256,uint256) (../../sb/BPool.sol#2225-2270)
+	- BPool.joinswapPoolAmountOut(address,uint256,uint256) (../../sb/BPool.sol#2283-2329)
+	- BPool.rebind(address,uint256,uint256) (../../sb/BPool.sol#1813-1844)
+	- BPool.swapExactAmountIn(address,uint256,address,uint256,uint256) (../../sb/BPool.sol#2047-2121)
+	- BPool.swapExactAmountOut(address,uint256,address,uint256,uint256) (../../sb/BPool.sol#2137-2211)
+	- BPool.unbind(address) (../../sb/BPool.sol#1851-1879)
+Reentrancy in BPool.joinPool(uint256,uint256[]) (../../sb/BPool.sol#1951-1985):
+	External calls:
+	- _pullUnderlying(t,msg.sender,tokenAmountIn) (../../sb/BPool.sol#1972)
+		- xfer = IERC20(erc20).transferFrom(from,address(this),amount) (../../sb/BPool.sol#2457)
+	State variables written after the call(s):
+	- _records[t].balance = badd(_records[t].balance,tokenAmountIn) (../../sb/BPool.sol#1970)
+	BPool._records (../../sb/BPool.sol#1411) can be used in cross function reentrancies:
+	- BPool._getDenormWeight(address) (../../sb/BPool.sol#2568-2573)
+	- BPool._requireTokenIsBound(address) (../../sb/BPool.sol#2505-2509)
+	- BPool.bind(address,uint256,uint256) (../../sb/BPool.sol#1786-1805)
+	- BPool.calcTokensForAmount(uint256) (../../sb/BPool.sol#1928-1941)
+	- BPool.exitPool(uint256,uint256[]) (../../sb/BPool.sol#1998-2033)
+	- BPool.exitswapExternAmountOut(address,uint256,uint256) (../../sb/BPool.sol#2402-2447)
+	- BPool.exitswapPoolAmountIn(address,uint256,uint256) (../../sb/BPool.sol#2343-2388)
+	- BPool.getBalance(address) (../../sb/BPool.sol#1527-1535)
+	- BPool.getSpotPrice(address,address) (../../sb/BPool.sol#1899-1908)
+	- BPool.getSpotPriceSansFee(address,address) (../../sb/BPool.sol#1916-1926)
+	- BPool.isBound(address) (../../sb/BPool.sol#1437-1442)
+	- BPool.joinPool(uint256,uint256[]) (../../sb/BPool.sol#1951-1985)
+	- BPool.joinswapExternAmountIn(address,uint256,uint256) (../../sb/BPool.sol#2225-2270)
+	- BPool.joinswapPoolAmountOut(address,uint256,uint256) (../../sb/BPool.sol#2283-2329)
+	- BPool.rebind(address,uint256,uint256) (../../sb/BPool.sol#1813-1844)
+	- BPool.swapExactAmountIn(address,uint256,address,uint256,uint256) (../../sb/BPool.sol#2047-2121)
+	- BPool.swapExactAmountOut(address,uint256,address,uint256,uint256) (../../sb/BPool.sol#2137-2211)
+	- BPool.unbind(address) (../../sb/BPool.sol#1851-1879)
+	- _mintPoolShare(poolAmountOut) (../../sb/BPool.sol#1981)
+		- _totalSupply = badd(_totalSupply,amt) (../../sb/BPool.sol#302)
+	BTokenBase._totalSupply (../../sb/BPool.sol#295) can be used in cross function reentrancies:
+	- BTokenBase._burn(uint256) (../../sb/BPool.sol#306-311)
+	- BTokenBase._mint(uint256) (../../sb/BPool.sol#300-304)
+	- BPool._mintPoolShare(uint256) (../../sb/BPool.sol#2487-2495)
+	- BPool.exitswapExternAmountOut(address,uint256,uint256) (../../sb/BPool.sol#2402-2447)
+	- BPool.exitswapPoolAmountIn(address,uint256,uint256) (../../sb/BPool.sol#2343-2388)
+	- BPool.joinswapExternAmountIn(address,uint256,uint256) (../../sb/BPool.sol#2225-2270)
+	- BPool.joinswapPoolAmountOut(address,uint256,uint256) (../../sb/BPool.sol#2283-2329)
+	- BToken.totalSupply() (../../sb/BPool.sol#361-363)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+BPool._preventSameTxOrigin() (../../sb/BPool.sol#2553-2558) uses tx.origin for authorization: require(bool,string)(block.number > _lastSwapBlock[tx.origin],SAME_TX_ORIGIN) (../../sb/BPool.sol#2556)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-usage-of-txorigin
+
+BMath.calcPoolInGivenSingleOut(uint256,uint256,uint256,uint256,uint256,uint256).poolAmountIn_scope_0 (../../sb/BPool.sol#677) shadows:
+	- BMath.calcPoolInGivenSingleOut(uint256,uint256,uint256,uint256,uint256,uint256).poolAmountIn (../../sb/BPool.sol#661) (return variable)
+	- BMath.calcPoolInGivenSingleOut(uint256,uint256,uint256,uint256,uint256,uint256).poolAmountIn (../../sb/BPool.sol#661) (return variable)
+	- BMath.calcPoolInGivenSingleOut(uint256,uint256,uint256,uint256,uint256,uint256).poolAmountIn (../../sb/BPool.sol#661) (return variable)
+	- BMath.calcPoolInGivenSingleOut(uint256,uint256,uint256,uint256,uint256,uint256).poolAmountIn (../../sb/BPool.sol#661) (return variable)
+BPool.constructor(string,string).name (../../sb/BPool.sol#1418) shadows:
+	- BToken.name() (../../sb/BPool.sol#341-343) (function)
+BPool.constructor(string,string).symbol (../../sb/BPool.sol#1418) shadows:
+	- BToken.symbol() (../../sb/BPool.sol#345-347) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+BPool.setSwapFee(uint256) (../../sb/BPool.sol#1643-1651) should emit an event for: 
+	- _swapFee = swapFee (../../sb/BPool.sol#1650) 
+BPool.setCommunityFeeAndReceiver(uint256,uint256,uint256,address) (../../sb/BPool.sol#1661-1679) should emit an event for: 
+	- _communitySwapFee = communitySwapFee (../../sb/BPool.sol#1675) 
+	- _communityJoinFee = communityJoinFee (../../sb/BPool.sol#1676) 
+	- _communityExitFee = communityExitFee (../../sb/BPool.sol#1677) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+BPool.setCommunityFeeAndReceiver(uint256,uint256,uint256,address).communityFeeReceiver (../../sb/BPool.sol#1665) lacks a zero-check on :
+		- _communityFeeReceiver = communityFeeReceiver (../../sb/BPool.sol#1678)
+BPool.setController(address).manager (../../sb/BPool.sol#1698) lacks a zero-check on :
+		- _controller = manager (../../sb/BPool.sol#1704)
+BPool.setWrapper(address,bool).wrapper (../../sb/BPool.sol#1725) lacks a zero-check on :
+		- _wrapper = wrapper (../../sb/BPool.sol#1731)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+BPool._pullUnderlying(address,address,uint256) (../../sb/BPool.sol#2454-2459) has external calls inside a loop: xfer = IERC20(erc20).transferFrom(from,address(this),amount) (../../sb/BPool.sol#2457)
+BPool._pushUnderlying(address,address,uint256) (../../sb/BPool.sol#2461-2466) has external calls inside a loop: xfer = IERC20(erc20).transfer(to,amount) (../../sb/BPool.sol#2464)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in BPool.joinPool(uint256,uint256[]) (../../sb/BPool.sol#1951-1985):
+	External calls:
+	- _pullUnderlying(t,msg.sender,tokenAmountIn) (../../sb/BPool.sol#1972)
+		- xfer = IERC20(erc20).transferFrom(from,address(this),amount) (../../sb/BPool.sol#2457)
+	State variables written after the call(s):
+	- _mintPoolShare(poolAmountOut) (../../sb/BPool.sol#1981)
+		- _balance[address(this)] = badd(_balance[address(this)],amt) (../../sb/BPool.sol#301)
+	- _pushPoolShare(msg.sender,poolAmountOut) (../../sb/BPool.sol#1982)
+		- _balance[src] = bsub(_balance[src],amt) (../../sb/BPool.sol#317)
+		- _balance[dst] = badd(_balance[dst],amt) (../../sb/BPool.sol#318)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in BPool.callVoting(address,bytes4,bytes,uint256) (../../sb/BPool.sol#1765-1776):
+	External calls:
+	- (success,data) = voting.call{value: value}(abi.encodePacked(signature,args)) (../../sb/BPool.sol#1773)
+	Event emitted after the call(s):
+	- LOG_CALL_VOTING(voting,success,signature,args,data) (../../sb/BPool.sol#1775)
+Reentrancy in BPool.exitPool(uint256,uint256[]) (../../sb/BPool.sol#1998-2033):
+	External calls:
+	- _pushUnderlying(t,msg.sender,tokenAmountOut) (../../sb/BPool.sol#2029)
+		- xfer = IERC20(erc20).transfer(to,amount) (../../sb/BPool.sol#2464)
+	Event emitted after the call(s):
+	- LOG_COMMUNITY_FEE(msg.sender,_communityFeeReceiver,address(this),poolAmountInFee) (../../sb/BPool.sol#2032)
+	- LOG_EXIT(msg.sender,t,tokenAmountOut) (../../sb/BPool.sol#2028)
+Reentrancy in BPool.exitswapExternAmountOut(address,uint256,uint256) (../../sb/BPool.sol#2402-2447):
+	External calls:
+	- _pushUnderlying(tokenOut,msg.sender,tokenAmountOutAfterFee) (../../sb/BPool.sol#2441)
+		- xfer = IERC20(erc20).transfer(to,amount) (../../sb/BPool.sol#2464)
+	- _pushUnderlying(tokenOut,_communityFeeReceiver,tokenAmountOutFee) (../../sb/BPool.sol#2442)
+		- xfer = IERC20(erc20).transfer(to,amount) (../../sb/BPool.sol#2464)
+	Event emitted after the call(s):
+	- LOG_COMMUNITY_FEE(msg.sender,_communityFeeReceiver,tokenOut,tokenAmountOutFee) (../../sb/BPool.sol#2444)
+Reentrancy in BPool.exitswapPoolAmountIn(address,uint256,uint256) (../../sb/BPool.sol#2343-2388):
+	External calls:
+	- _pushUnderlying(tokenOut,msg.sender,tokenAmountOutAfterFee) (../../sb/BPool.sol#2382)
+		- xfer = IERC20(erc20).transfer(to,amount) (../../sb/BPool.sol#2464)
+	- _pushUnderlying(tokenOut,_communityFeeReceiver,tokenAmountOutFee) (../../sb/BPool.sol#2383)
+		- xfer = IERC20(erc20).transfer(to,amount) (../../sb/BPool.sol#2464)
+	Event emitted after the call(s):
+	- LOG_COMMUNITY_FEE(msg.sender,_communityFeeReceiver,tokenOut,tokenAmountOutFee) (../../sb/BPool.sol#2385)
+Reentrancy in BPool.joinPool(uint256,uint256[]) (../../sb/BPool.sol#1951-1985):
+	External calls:
+	- _pullUnderlying(t,msg.sender,tokenAmountIn) (../../sb/BPool.sol#1972)
+		- xfer = IERC20(erc20).transferFrom(from,address(this),amount) (../../sb/BPool.sol#2457)
+	Event emitted after the call(s):
+	- LOG_JOIN(msg.sender,t,tokenAmountIn) (../../sb/BPool.sol#1971)
+	- Transfer(address(0),address(this),amt) (../../sb/BPool.sol#303)
+		- _mintPoolShare(poolAmountOut) (../../sb/BPool.sol#1981)
+	- Transfer(src,dst,amt) (../../sb/BPool.sol#319)
+		- _pushPoolShare(msg.sender,poolAmountOut) (../../sb/BPool.sol#1982)
+Reentrancy in BPool.joinswapExternAmountIn(address,uint256,uint256) (../../sb/BPool.sol#2225-2270):
+	External calls:
+	- _pullCommunityFeeUnderlying(tokenIn,msg.sender,tokenAmountInFee) (../../sb/BPool.sol#2264)
+		- xfer = IERC20(erc20).transferFrom(from,_communityFeeReceiver,amount) (../../sb/BPool.sol#2471)
+	- _pullUnderlying(tokenIn,msg.sender,tokenAmountInAfterFee) (../../sb/BPool.sol#2265)
+		- xfer = IERC20(erc20).transferFrom(from,address(this),amount) (../../sb/BPool.sol#2457)
+	Event emitted after the call(s):
+	- LOG_COMMUNITY_FEE(msg.sender,_communityFeeReceiver,tokenIn,tokenAmountInFee) (../../sb/BPool.sol#2267)
+Reentrancy in BPool.joinswapPoolAmountOut(address,uint256,uint256) (../../sb/BPool.sol#2283-2329):
+	External calls:
+	- _pullUnderlying(tokenIn,msg.sender,tokenAmountIn) (../../sb/BPool.sol#2324)
+		- xfer = IERC20(erc20).transferFrom(from,address(this),amount) (../../sb/BPool.sol#2457)
+	Event emitted after the call(s):
+	- LOG_COMMUNITY_FEE(msg.sender,_communityFeeReceiver,address(this),poolAmountOutFee) (../../sb/BPool.sol#2326)
+Reentrancy in BPool.swapExactAmountIn(address,uint256,address,uint256,uint256) (../../sb/BPool.sol#2047-2121):
+	External calls:
+	- _pullCommunityFeeUnderlying(tokenIn,msg.sender,tokenAmountInFee) (../../sb/BPool.sol#2114)
+		- xfer = IERC20(erc20).transferFrom(from,_communityFeeReceiver,amount) (../../sb/BPool.sol#2471)
+	- _pullUnderlying(tokenIn,msg.sender,tokenAmountInAfterFee) (../../sb/BPool.sol#2115)
+		- xfer = IERC20(erc20).transferFrom(from,address(this),amount) (../../sb/BPool.sol#2457)
+	- _pushUnderlying(tokenOut,msg.sender,tokenAmountOut) (../../sb/BPool.sol#2116)
+		- xfer = IERC20(erc20).transfer(to,amount) (../../sb/BPool.sol#2464)
+	Event emitted after the call(s):
+	- LOG_COMMUNITY_FEE(msg.sender,_communityFeeReceiver,tokenIn,tokenAmountInFee) (../../sb/BPool.sol#2118)
+Reentrancy in BPool.swapExactAmountOut(address,uint256,address,uint256,uint256) (../../sb/BPool.sol#2137-2211):
+	External calls:
+	- _pullUnderlying(tokenIn,msg.sender,tokenAmountIn) (../../sb/BPool.sol#2204)
+		- xfer = IERC20(erc20).transferFrom(from,address(this),amount) (../../sb/BPool.sol#2457)
+	- _pushUnderlying(tokenOut,msg.sender,tokenAmountOutAfterFee) (../../sb/BPool.sol#2205)
+		- xfer = IERC20(erc20).transfer(to,amount) (../../sb/BPool.sol#2464)
+	- _pushUnderlying(tokenOut,_communityFeeReceiver,tokenAmountOutFee) (../../sb/BPool.sol#2206)
+		- xfer = IERC20(erc20).transfer(to,amount) (../../sb/BPool.sol#2464)
+	Event emitted after the call(s):
+	- LOG_COMMUNITY_FEE(msg.sender,_communityFeeReceiver,tokenOut,tokenAmountOutFee) (../../sb/BPool.sol#2208)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Address.isContract(address) (../../sb/BPool.sol#1048-1057) uses assembly
+	- INLINE ASM (../../sb/BPool.sol#1055)
+Address._verifyCallResult(bool,bytes,string) (../../sb/BPool.sol#1193-1210) uses assembly
+	- INLINE ASM (../../sb/BPool.sol#1202-1205)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address._verifyCallResult(bool,bytes,string) (../../sb/BPool.sol#1193-1210) is never used and should be removed
+Address.functionCall(address,bytes) (../../sb/BPool.sol#1101-1103) is never used and should be removed
+Address.functionCall(address,bytes,string) (../../sb/BPool.sol#1111-1113) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/BPool.sol#1126-1128) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/BPool.sol#1136-1143) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/BPool.sol#1175-1177) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/BPool.sol#1185-1191) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/BPool.sol#1151-1153) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/BPool.sol#1161-1167) is never used and should be removed
+Address.isContract(address) (../../sb/BPool.sol#1048-1057) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/BPool.sol#1075-1081) is never used and should be removed
+BNum.div(uint256,uint256) (../../sb/BPool.sol#199-202) is never used and should be removed
+SafeERC20._callOptionalReturn(IERC20,bytes) (../../sb/BPool.sol#1268-1278) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/BPool.sol#1241-1250) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/BPool.sol#1257-1260) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/BPool.sol#1252-1255) is never used and should be removed
+SafeERC20.safeTransfer(IERC20,address,uint256) (../../sb/BPool.sol#1226-1228) is never used and should be removed
+SafeERC20.safeTransferFrom(IERC20,address,address,uint256) (../../sb/BPool.sol#1230-1232) is never used and should be removed
+SafeMath.add(uint256,uint256) (../../sb/BPool.sol#896-900) is never used and should be removed
+SafeMath.div(uint256,uint256) (../../sb/BPool.sol#946-949) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/BPool.sol#1001-1004) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/BPool.sol#963-966) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/BPool.sol#1021-1024) is never used and should be removed
+SafeMath.mul(uint256,uint256) (../../sb/BPool.sol#927-932) is never used and should be removed
+SafeMath.sub(uint256,uint256) (../../sb/BPool.sol#912-915) is never used and should be removed
+SafeMath.sub(uint256,uint256,string) (../../sb/BPool.sol#981-984) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/BPool.sol#835-839) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/BPool.sol#871-874) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/BPool.sol#881-884) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/BPool.sol#856-864) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/BPool.sol#846-849) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.6.12 (../../sb/BPool.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/BPool.sol#1075-1081):
+	- (success) = recipient.call{value: amount}() (../../sb/BPool.sol#1079)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/BPool.sol#1136-1143):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/BPool.sol#1141)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/BPool.sol#1161-1167):
+	- (success,returndata) = target.staticcall(data) (../../sb/BPool.sol#1165)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/BPool.sol#1185-1191):
+	- (success,returndata) = target.delegatecall(data) (../../sb/BPool.sol#1189)
+Low level call in BPool.callVoting(address,bytes4,bytes,uint256) (../../sb/BPool.sol#1765-1776):
+	- (success,data) = voting.call{value: value}(abi.encodePacked(signature,args)) (../../sb/BPool.sol#1773)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Event BPool.LOG_SWAP(address,address,address,uint256,uint256) (../../sb/BPool.sol#1304-1310) is not in CapWords
+Event BPool.LOG_JOIN(address,address,uint256) (../../sb/BPool.sol#1313-1317) is not in CapWords
+Event BPool.LOG_EXIT(address,address,uint256) (../../sb/BPool.sol#1320-1324) is not in CapWords
+Event BPool.LOG_CALL(bytes4,address,bytes) (../../sb/BPool.sol#1327-1331) is not in CapWords
+Event BPool.LOG_CALL_VOTING(address,bool,bytes4,bytes,bytes) (../../sb/BPool.sol#1334-1340) is not in CapWords
+Event BPool.LOG_COMMUNITY_FEE(address,address,address,uint256) (../../sb/BPool.sol#1343-1348) is not in CapWords
+Parameter BPool.calcTokensForAmount(uint256)._amount (../../sb/BPool.sol#1928) is not in mixedCase
+Modifier BPool._logs_() (../../sb/BPool.sol#1352-1355) is not in mixedCase
+Modifier BPool._lock_() (../../sb/BPool.sol#1357-1362) is not in mixedCase
+Modifier BPool._viewlock_() (../../sb/BPool.sol#1364-1367) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+BPool.slitherConstructorConstantVariables() (../../sb/BPool.sol#1291-2634) uses literals with too many digits:
+	- MIN_WEIGHT = 1000000000 (../../sb/BPool.sol#100)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+BPool._totalWeight (../../sb/BPool.sol#1413) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+/sb/BPool.sol analyzed (13 contracts with 93 detectors), 76 result(s) found

@@ -1,0 +1,145 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 27 Code Findings │
+└──────────────────┘
+                            
+    /sb/incognito_proxy.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          305┆ for (uint i = 0; i < sigIdx.length; i++) {
+            ⋮┆----------------------------------------
+          306┆ if ((i > 0 && sigIdx[i] <= sigIdx[i-1]) || sigIdx[i] >=          
+  signers.length) {                                                             
+            ⋮┆----------------------------------------
+          393┆ for (uint i = 0; i < path.length; i++) {
+            ⋮┆----------------------------------------
+          465┆ for (uint i = 0; i < v.length; i++){
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+           11┆ constructor(address _admin) public {
+           12┆     admin = _admin;
+           13┆     paused = false;
+           14┆     expire = block.timestamp + 365 * 1 days;
+           15┆ }
+            ⋮┆----------------------------------------
+          101┆ constructor(
+          102┆     address admin,
+          103┆     address[] memory beaconCommittee,
+          104┆     address[] memory bridgeCommittee
+          105┆ ) public AdminPausable(admin) {
+          106┆     beaconCommittees.push(Committee({
+          107┆         pubkeys: beaconCommittee,
+          108┆         startBlock: 0
+          109┆     }));
+          110┆ 
+             [hid 5 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          348┆ if (beaconCommittees[m].startBlock <= blkHeight) {
+            ⋮┆----------------------------------------
+          368┆ if (bridgeCommittees[m].startBlock <= blkHeight) {
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          305┆ for (uint i = 0; i < sigIdx.length; i++) {
+            ⋮┆----------------------------------------
+          393┆ for (uint i = 0; i < path.length; i++) {
+            ⋮┆----------------------------------------
+          437┆ for (uint i = 0; i < numVals; i++) {
+            ⋮┆----------------------------------------
+          465┆ for (uint i = 0; i < v.length; i++){
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           23┆ require(msg.sender == admin, "not admin");
+            ⋮┆----------------------------------------
+           28┆ require(paused, "not paused right now");
+            ⋮┆----------------------------------------
+           33┆ require(!paused, "paused right now");
+            ⋮┆----------------------------------------
+           38┆ require(block.timestamp < expire, "expired");
+            ⋮┆----------------------------------------
+           47┆ require(msg.sender == successor, "unauthorized");
+            ⋮┆----------------------------------------
+           53┆ require(n < 366, "cannot extend for too long"); // To prevent    
+  overflow                                                                      
+            ⋮┆----------------------------------------
+          198┆ require(startHeight >                                            
+  bridgeCommittees[bridgeCommittees.length-1].startBlock, "cannot change old    
+  committee");                                                                  
+            ⋮┆----------------------------------------
+          250┆ require(startHeight >                                            
+  beaconCommittees[beaconCommittees.length-1].startBlock, "cannot change old    
+  committee");                                                                  
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          195┆ require(meta == 71 && shard == 1);
+            ⋮┆----------------------------------------
+          247┆ require(meta == 70 && shard == 1);
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          306┆ if ((i > 0 && sigIdx[i] <= sigIdx[i-1]) || sigIdx[i] >=          
+  signers.length) {                                                             
+          307┆     return false;
+          308┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          305┆ for (uint i = 0; i < sigIdx.length; i++) {
+            ⋮┆----------------------------------------
+          393┆ for (uint i = 0; i < path.length; i++) {
+            ⋮┆----------------------------------------
+          437┆ for (uint i = 0; i < numVals; i++) {
+            ⋮┆----------------------------------------
+          465┆ for (uint i = 0; i < v.length; i++){
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 27 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

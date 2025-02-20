@@ -1,0 +1,148 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 29 Code Findings │
+└──────────────────┘
+                                  
+    /sb/DepositSecurityModule.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          320┆ for (uint256 i = 0; i < addresses.length; ++i) {
+            ⋮┆----------------------------------------
+          493┆ for (uint256 i = 0; i < sigs.length; ++i) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          112┆ constructor(
+          113┆     address _lido,
+          114┆     address _depositContract,
+          115┆     address _nodeOperatorsRegistry,
+          116┆     uint256 _networkId,
+          117┆     uint256 _maxDepositsPerBlock,
+          118┆     uint256 _minDepositBlockDistance,
+          119┆     uint256 _pauseIntentValidityPeriodBlocks
+          120┆ ) {
+          121┆     LIDO = _lido;
+             [hid 24 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          320┆ for (uint256 i = 0; i < addresses.length; ++i) {
+            ⋮┆----------------------------------------
+          493┆ for (uint256 i = 0; i < sigs.length; ++i) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           29┆ require(uint256(s) <=                                            
+  0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0, "ECDSA:   
+  invalid signature 's' value");                                                
+            ⋮┆----------------------------------------
+           30┆ require(v == 27 || v == 28, "ECDSA: invalid signature 'v'        
+  value");                                                                      
+            ⋮┆----------------------------------------
+           34┆ require(signer != address(0), "ECDSA: invalid signature");
+            ⋮┆----------------------------------------
+          156┆ require(msg.sender == owner, "not an owner");
+            ⋮┆----------------------------------------
+          208┆ require(newValue > 0, "invalid value for                         
+  pauseIntentValidityPeriodBlocks: must be greater then 0");                    
+            ⋮┆----------------------------------------
+          249┆ require(newValue > 0, "invalid value for minDepositBlockDistance:
+  must be greater then 0");                                                     
+            ⋮┆----------------------------------------
+          327┆ require(!_isGuardian(addr), "duplicate address");
+            ⋮┆----------------------------------------
+          340┆ require(indexOneBased != 0, "not a guardian");
+            ⋮┆----------------------------------------
+          389┆ require(guardianIndex != -1, "invalid signature");
+            ⋮┆----------------------------------------
+          392┆ require(
+          393┆     block.number - blockNumber <=                                
+  pauseIntentValidityPeriodBlocks,                                              
+          394┆     "pause intent expired"
+          395┆ );
+            ⋮┆----------------------------------------
+          450┆ require(depositRoot == onchainDepositRoot, "deposit root         
+  changed");                                                                    
+            ⋮┆----------------------------------------
+          452┆ require(!paused, "deposits are paused");
+            ⋮┆----------------------------------------
+          453┆ require(quorum > 0 && sortedGuardianSignatures.length >= quorum, 
+  "no guardian quorum");                                                        
+            ⋮┆----------------------------------------
+          455┆ require(block.number - lastDepositBlock >=                       
+  minDepositBlockDistance, "too frequent deposits");                            
+            ⋮┆----------------------------------------
+          456┆ require(blockHash != bytes32(0) && blockhash(blockNumber) ==     
+  blockHash, "unexpected block hash");                                          
+            ⋮┆----------------------------------------
+          459┆ require(keysOpIndex == onchainKeysOpIndex, "keys op index        
+  changed");                                                                    
+            ⋮┆----------------------------------------
+          495┆ require(_isGuardian(signerAddr), "invalid signature");
+            ⋮┆----------------------------------------
+          496┆ require(signerAddr > prevSignerAddr, "signatures not sorted");
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          453┆ require(quorum > 0 && sortedGuardianSignatures.length >= quorum, 
+  "no guardian quorum");                                                        
+            ⋮┆----------------------------------------
+          456┆ require(blockHash != bytes32(0) && blockhash(blockNumber) ==     
+  blockHash, "unexpected block hash");                                          
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           29┆ require(uint256(s) <=                                            
+  0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0, "ECDSA:   
+  invalid signature 's' value");                                                
+            ⋮┆----------------------------------------
+           30┆ require(v == 27 || v == 28, "ECDSA: invalid signature 'v'        
+  value");                                                                      
+            ⋮┆----------------------------------------
+          208┆ require(newValue > 0, "invalid value for                         
+  pauseIntentValidityPeriodBlocks: must be greater then 0");                    
+            ⋮┆----------------------------------------
+          249┆ require(newValue > 0, "invalid value for minDepositBlockDistance:
+  must be greater then 0");                                                     
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 29 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

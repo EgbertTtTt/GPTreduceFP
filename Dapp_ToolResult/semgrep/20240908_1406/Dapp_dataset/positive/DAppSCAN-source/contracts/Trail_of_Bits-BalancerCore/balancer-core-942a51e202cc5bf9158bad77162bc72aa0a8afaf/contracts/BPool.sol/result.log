@@ -1,0 +1,293 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                     
+                     
+┌───────────────────┐
+│ 106 Code Findings │
+└───────────────────┘
+                  
+    /sb/BPool.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          991┆ for (uint i = 0; i < _tokens.length; i++) {
+            ⋮┆----------------------------------------
+         1022┆ for (uint i = 0; i < _tokens.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          697┆ constructor() public {
+          698┆     _controller = msg.sender;
+          699┆     _factory = msg.sender;
+          700┆     _swapFee = MIN_FEE;
+          701┆     _publicSwap = false;
+          702┆     _finalized = false;
+          703┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          991┆ for (uint i = 0; i < _tokens.length; i++) {
+            ⋮┆----------------------------------------
+          992┆ address t = _tokens[i];
+            ⋮┆----------------------------------------
+          993┆ uint bal = _records[t].balance;
+            ⋮┆----------------------------------------
+          996┆ _records[t].balance = badd(_records[t].balance, tokenAmountIn);
+            ⋮┆----------------------------------------
+          996┆ _records[t].balance = badd(_records[t].balance, tokenAmountIn);
+            ⋮┆----------------------------------------
+         1022┆ for (uint i = 0; i < _tokens.length; i++) {
+            ⋮┆----------------------------------------
+         1023┆ address t = _tokens[i];
+            ⋮┆----------------------------------------
+         1024┆ uint bal = _records[t].balance;
+            ⋮┆----------------------------------------
+         1027┆ _records[t].balance = bsub(_records[t].balance, tokenAmountOut);
+            ⋮┆----------------------------------------
+         1027┆ _records[t].balance = bsub(_records[t].balance, tokenAmountOut);
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          200┆ for (uint i = 1; term >= precision; i++) {
+            ⋮┆----------------------------------------
+          991┆ for (uint i = 0; i < _tokens.length; i++) {
+            ⋮┆----------------------------------------
+         1022┆ for (uint i = 0; i < _tokens.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           95┆ require(c >= a, "ERR_ADD_OVERFLOW");
+            ⋮┆----------------------------------------
+          104┆ require(!flag, "ERR_SUB_UNDERFLOW");
+            ⋮┆----------------------------------------
+          124┆ require(a == 0 || c0 / a == b, "ERR_MUL_OVERFLOW");
+            ⋮┆----------------------------------------
+          126┆ require(c1 >= c0, "ERR_MUL_OVERFLOW");
+            ⋮┆----------------------------------------
+          135┆ require(b != 0, "ERR_DIV_ZERO");
+            ⋮┆----------------------------------------
+          137┆ require(a == 0 || c0 / a == BONE, "ERR_DIV_INTERNAL"); // bmul   
+  overflow                                                                      
+            ⋮┆----------------------------------------
+          139┆ require(c1 >= c0, "ERR_DIV_INTERNAL"); //  badd require
+            ⋮┆----------------------------------------
+          168┆ require(base >= MIN_BPOW_BASE, "ERR_BPOW_BASE_TOO_LOW");
+            ⋮┆----------------------------------------
+          169┆ require(base <= MAX_BPOW_BASE, "ERR_BPOW_BASE_TOO_HIGH");
+            ⋮┆----------------------------------------
+          263┆ require(_balance[address(this)] >= amt, "ERR_INSUFFICIENT_BAL");
+            ⋮┆----------------------------------------
+          270┆ require(_balance[src] >= amt, "ERR_INSUFFICIENT_BAL");
+            ⋮┆----------------------------------------
+          344┆ require(msg.sender == src || amt <= _allowance[src][msg.sender], 
+  "ERR_BTOKEN_BAD_CALLER");                                                     
+            ⋮┆----------------------------------------
+          671┆ require(!_mutex, "ERR_REENTRY");
+            ⋮┆----------------------------------------
+          678┆ require(!_mutex, "ERR_REENTRY");
+            ⋮┆----------------------------------------
+          745┆ require(_finalized, "ERR_NOT_FINALIZED");
+            ⋮┆----------------------------------------
+          755┆ require(_records[token].bound, "ERR_NOT_BOUND");
+            ⋮┆----------------------------------------
+          773┆ require(_records[token].bound, "ERR_NOT_BOUND");
+            ⋮┆----------------------------------------
+          784┆ require(_records[token].bound, "ERR_NOT_BOUND");
+            ⋮┆----------------------------------------
+          809┆ require(!_finalized, "ERR_IS_FINALIZED");
+            ⋮┆----------------------------------------
+          810┆ require(msg.sender == _controller, "ERR_NOT_CONTROLLER");
+            ⋮┆----------------------------------------
+          811┆ require(swapFee >= MIN_FEE, "ERR_MIN_FEE");
+            ⋮┆----------------------------------------
+          812┆ require(swapFee <= MAX_FEE, "ERR_MAX_FEE");
+            ⋮┆----------------------------------------
+          821┆ require(msg.sender == _controller, "ERR_NOT_CONTROLLER");
+            ⋮┆----------------------------------------
+          830┆ require(!_finalized, "ERR_IS_FINALIZED");
+            ⋮┆----------------------------------------
+          831┆ require(msg.sender == _controller, "ERR_NOT_CONTROLLER");
+            ⋮┆----------------------------------------
+          840┆ require(msg.sender == _controller, "ERR_NOT_CONTROLLER");
+            ⋮┆----------------------------------------
+          841┆ require(!_finalized, "ERR_IS_FINALIZED");
+            ⋮┆----------------------------------------
+          842┆ require(initSupply >= MIN_POOL_SUPPLY, "ERR_MIN_POOL_SUPPLY");
+            ⋮┆----------------------------------------
+          857┆ require(msg.sender == _controller, "ERR_NOT_CONTROLLER");
+            ⋮┆----------------------------------------
+          858┆ require(!_records[token].bound, "ERR_IS_BOUND");
+            ⋮┆----------------------------------------
+          859┆ require(!_finalized, "ERR_IS_FINALIZED");
+            ⋮┆----------------------------------------
+          861┆ require(_tokens.length < MAX_BOUND_TOKENS, "ERR_MAX_TOKENS");
+            ⋮┆----------------------------------------
+          879┆ require(msg.sender == _controller, "ERR_NOT_CONTROLLER");
+            ⋮┆----------------------------------------
+          880┆ require(_records[token].bound, "ERR_NOT_BOUND");
+            ⋮┆----------------------------------------
+          881┆ require(!_finalized, "ERR_IS_FINALIZED");
+            ⋮┆----------------------------------------
+          883┆ require(denorm >= MIN_WEIGHT, "ERR_MIN_WEIGHT");
+            ⋮┆----------------------------------------
+          884┆ require(denorm <= MAX_WEIGHT, "ERR_MAX_WEIGHT");
+            ⋮┆----------------------------------------
+          885┆ require(balance >= MIN_BALANCE, "ERR_MIN_BALANCE");
+            ⋮┆----------------------------------------
+          886┆ require(balance <= MAX_BALANCE, "ERR_MAX_BALANCE");
+            ⋮┆----------------------------------------
+          892┆ require(_totalWeight <= MAX_TOTAL_WEIGHT,                        
+  "ERR_MAX_TOTAL_WEIGHT");                                                      
+            ⋮┆----------------------------------------
+          918┆ require(msg.sender == _controller, "ERR_NOT_CONTROLLER");
+            ⋮┆----------------------------------------
+          919┆ require(_records[token].bound, "ERR_NOT_BOUND");
+            ⋮┆----------------------------------------
+          920┆ require(!_finalized, "ERR_IS_FINALIZED");
+            ⋮┆----------------------------------------
+          951┆ require(_records[token].bound, "ERR_NOT_BOUND");
+            ⋮┆----------------------------------------
+          960┆ require(_records[tokenIn].bound, "ERR_NOT_BOUND");
+            ⋮┆----------------------------------------
+          961┆ require(_records[tokenOut].bound, "ERR_NOT_BOUND");
+            ⋮┆----------------------------------------
+          972┆ require(_records[tokenIn].bound, "ERR_NOT_BOUND");
+            ⋮┆----------------------------------------
+          973┆ require(_records[tokenOut].bound, "ERR_NOT_BOUND");
+            ⋮┆----------------------------------------
+          984┆ require(_finalized, "ERR_NOT_FINALIZED");
+            ⋮┆----------------------------------------
+          989┆ require(ratio != 0, "ERR_MATH_APPROX");
+            ⋮┆----------------------------------------
+          995┆ require(tokenAmountIn <= maxAmountsIn[i], "ERR_LIMIT_IN");
+            ⋮┆----------------------------------------
+         1009┆ require(_finalized, "ERR_NOT_FINALIZED");
+            ⋮┆----------------------------------------
+         1016┆ require(ratio != 0, "ERR_MATH_APPROX");
+            ⋮┆----------------------------------------
+         1026┆ require(tokenAmountOut >= minAmountsOut[i], "ERR_LIMIT_OUT");
+            ⋮┆----------------------------------------
+         1048┆ require(_records[tokenIn].bound, "ERR_NOT_BOUND");
+            ⋮┆----------------------------------------
+         1049┆ require(_records[tokenOut].bound, "ERR_NOT_BOUND");
+            ⋮┆----------------------------------------
+         1050┆ require(_publicSwap, "ERR_SWAP_NOT_PUBLIC");
+            ⋮┆----------------------------------------
+         1055┆ require(tokenAmountIn <= bmul(inRecord.balance, MAX_IN_RATIO),   
+  "ERR_MAX_IN_RATIO");                                                          
+            ⋮┆----------------------------------------
+         1064┆ require(spotPriceBefore <= maxPrice, "ERR_BAD_LIMIT_PRICE");
+            ⋮┆----------------------------------------
+         1074┆ require(tokenAmountOut >= minAmountOut, "ERR_LIMIT_OUT");
+            ⋮┆----------------------------------------
+         1086┆ require(spotPriceAfter >= spotPriceBefore, "ERR_MATH_APPROX");
+            ⋮┆----------------------------------------
+         1087┆ require(spotPriceAfter <= maxPrice, "ERR_LIMIT_PRICE");
+            ⋮┆----------------------------------------
+         1088┆ require(spotPriceBefore <= bdiv(tokenAmountIn, tokenAmountOut),  
+  "ERR_MATH_APPROX");                                                           
+            ⋮┆----------------------------------------
+         1110┆ require(_records[tokenIn].bound, "ERR_NOT_BOUND");
+            ⋮┆----------------------------------------
+         1111┆ require(_records[tokenOut].bound, "ERR_NOT_BOUND");
+            ⋮┆----------------------------------------
+         1112┆ require(_publicSwap, "ERR_SWAP_NOT_PUBLIC");
+            ⋮┆----------------------------------------
+         1117┆ require(tokenAmountOut <= bmul(outRecord.balance, MAX_OUT_RATIO),
+  "ERR_MAX_OUT_RATIO");                                                         
+            ⋮┆----------------------------------------
+         1126┆ require(spotPriceBefore <= maxPrice, "ERR_BAD_LIMIT_PRICE");
+            ⋮┆----------------------------------------
+         1136┆ require(tokenAmountIn <= maxAmountIn, "ERR_LIMIT_IN");
+            ⋮┆----------------------------------------
+         1148┆ require(spotPriceAfter >= spotPriceBefore, "ERR_MATH_APPROX");
+            ⋮┆----------------------------------------
+         1149┆ require(spotPriceAfter <= maxPrice, "ERR_LIMIT_PRICE");
+            ⋮┆----------------------------------------
+         1150┆ require(spotPriceBefore <= bdiv(tokenAmountIn, tokenAmountOut),  
+  "ERR_MATH_APPROX");                                                           
+            ⋮┆----------------------------------------
+         1168┆ require(_records[tokenIn].bound, "ERR_NOT_BOUND");
+            ⋮┆----------------------------------------
+         1169┆ require(_publicSwap, "ERR_SWAP_NOT_PUBLIC");
+            ⋮┆----------------------------------------
+         1182┆ require(poolAmountOut >= minPoolAmountOut, "ERR_LIMIT_OUT");
+            ⋮┆----------------------------------------
+         1201┆ require(_records[tokenIn].bound, "ERR_NOT_BOUND");
+            ⋮┆----------------------------------------
+         1202┆ require(_publicSwap, "ERR_SWAP_NOT_PUBLIC");
+            ⋮┆----------------------------------------
+         1215┆ require(tokenAmountIn <= maxAmountIn, "ERR_LIMIT_IN");
+            ⋮┆----------------------------------------
+         1235┆ require(_records[tokenOut].bound, "ERR_NOT_BOUND");
+            ⋮┆----------------------------------------
+         1236┆ require(_publicSwap, "ERR_SWAP_NOT_PUBLIC");
+            ⋮┆----------------------------------------
+         1249┆ require(tokenAmountOut >= minAmountOut, "ERR_LIMIT_OUT");
+            ⋮┆----------------------------------------
+         1272┆ require(_records[tokenOut].bound, "ERR_NOT_BOUND");
+            ⋮┆----------------------------------------
+         1273┆ require(_publicSwap, "ERR_SWAP_NOT_PUBLIC");
+            ⋮┆----------------------------------------
+         1286┆ require(poolAmountIn <= maxPoolAmountIn, "ERR_LIMIT_IN");
+            ⋮┆----------------------------------------
+         1311┆ require(xfer, "ERR_ERC20_FALSE");
+            ⋮┆----------------------------------------
+         1318┆ require(xfer, "ERR_ERC20_FALSE");
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          346┆ if (msg.sender != src && _allowance[src][msg.sender] !=          
+  uint256(-1)) {                                                                
+          347┆     _allowance[src][msg.sender] =                                
+  bsub(_allowance[src][msg.sender], amt);                                       
+          348┆     emit Approval(msg.sender, dst, _allowance[src][msg.sender]);
+          349┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          200┆ for (uint i = 1; term >= precision; i++) {
+            ⋮┆----------------------------------------
+          991┆ for (uint i = 0; i < _tokens.length; i++) {
+            ⋮┆----------------------------------------
+         1022┆ for (uint i = 0; i < _tokens.length; i++) {
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 106 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

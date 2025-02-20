@@ -1,0 +1,97 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 13 Code Findings │
+└──────────────────┘
+                
+    /sb/DTT.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          375┆ for (uint i = 0; i < recipients.length; ++i) {
+            ⋮┆----------------------------------------
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+          381┆ totalSupply += total;
+            ⋮┆----------------------------------------
+          403┆ totalSupply += remaining;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+           74┆ constructor (string tokenName, string tokenSymbol) public {
+           75┆     name = tokenName;
+           76┆     symbol = tokenSymbol;
+           77┆     rescueAccount = tokenDistributor = msg.sender;
+           78┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          376┆ balanceOf[recipients[i]] += amounts[i];
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          171┆ for (uint8 i = 0; i < 32; ++i) {
+            ⋮┆----------------------------------------
+          375┆ for (uint i = 0; i < recipients.length; ++i) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+           85┆ require(to != 0x0 && balanceOf[from] >= value && balanceOf[to] + 
+  value >= balanceOf[to]);                                                      
+            ⋮┆----------------------------------------
+           97┆ require( // Prevent people from accidentally burning their tokens
+  + uint256 wrap prevention                                                     
+           98┆     to1 != 0x0 && to2 != 0x0 && value1 + value2 >= value1 &&     
+  balanceOf[from] >= value1 + value2                                            
+           99┆     && balanceOf[to1] + value1 >= balanceOf[to1] &&              
+  balanceOf[to2] + value2 >= balanceOf[to2]                                     
+          100┆ );
+            ⋮┆----------------------------------------
+          132┆ require(block.timestamp <= deadline &&                           
+  !usedSigIds[signer][sigId]); // solium-disable-line security/no-block-members 
+            ⋮┆----------------------------------------
+          307┆ require(value <= allowance[from][signer] && value >= fee);
+            ⋮┆----------------------------------------
+          371┆ require(tokenDistributor != 0x0 && tokenDistributor == msg.sender
+  && recipients.length == amounts.length);                                      
+            ⋮┆----------------------------------------
+          391┆ require(tokenDistributor != 0x0 && tokenDistributor == msg.sender
+  && totalSupply > 0);                                                          
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 13 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

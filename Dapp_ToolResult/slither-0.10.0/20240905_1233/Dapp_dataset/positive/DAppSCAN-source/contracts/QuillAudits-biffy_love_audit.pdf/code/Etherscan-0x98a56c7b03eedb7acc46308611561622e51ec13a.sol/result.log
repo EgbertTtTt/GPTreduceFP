@@ -1,0 +1,205 @@
+'solc --version' running
+'solc /sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+Ownable.______gap (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#312) shadows:
+	- Initializable.______gap (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#208)
+ERC20.______gap (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#797) shadows:
+	- Initializable.______gap (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#208)
+MinterRole.______gap (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#878) shadows:
+	- Initializable.______gap (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#208)
+ERC20Mintable.______gap (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#905) shadows:
+	- MinterRole.______gap (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#878)
+	- ERC20.______gap (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#797)
+	- Initializable.______gap (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#208)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variable-shadowing
+
+LPTokenWrapper.stake(uint256) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#933-940) ignores return value by loveLP.transferFrom(sender,address(this),amount) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#939)
+BiffysLoveFarm.getReward() (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1023-1030) ignores return value by biffysLove.transfer(msg.sender,reward) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1027)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+Reentrancy in BiffysLoveFarm.checkhalve() (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1052-1062):
+	External calls:
+	- biffysLove.mint(address(this),initreward) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1055)
+	State variables written after the call(s):
+	- periodFinish = block.timestamp.add(duration) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1058)
+	BiffysLoveFarm.periodFinish (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#949) can be used in cross function reentrancies:
+	- BiffysLoveFarm.checkhalve() (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1052-1062)
+	- BiffysLoveFarm.fixEmissionRate(uint256) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1046-1050)
+	- BiffysLoveFarm.lastTimeRewardApplicable() (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#986-988)
+	- BiffysLoveFarm.periodFinish (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#949)
+Reentrancy in BiffysLoveFarm.getReward() (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1023-1030):
+	External calls:
+	- checkhalve() (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1023)
+		- biffysLove.mint(address(this),initreward) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1055)
+	State variables written after the call(s):
+	- rewards[msg.sender] = 0 (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1026)
+	BiffysLoveFarm.rewards (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#954) can be used in cross function reentrancies:
+	- BiffysLoveFarm.earned(address) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1004-1010)
+	- BiffysLoveFarm.getReward() (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1023-1030)
+	- BiffysLoveFarm.rewards (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#954)
+	- BiffysLoveFarm.updateReward(address) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#976-984)
+Reentrancy in BiffysLoveFarm.stake(uint256) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1013-1021):
+	External calls:
+	- super.stake(amount) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1015)
+		- loveLP.transferFrom(sender,address(this),amount) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#939)
+	- checkhalve() (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1013)
+		- biffysLove.mint(address(this),initreward) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1055)
+	State variables written after the call(s):
+	- super.stake(amount) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1015)
+		- _balances[sender] = _balances[sender].add(amount) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#938)
+	LPTokenWrapper._balances (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#917) can be used in cross function reentrancies:
+	- LPTokenWrapper.balanceOf(address) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#929-931)
+	- LPTokenWrapper.stake(uint256) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#933-940)
+	- super.stake(amount) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1015)
+		- _totalSupply = _totalSupply.add(amount) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#937)
+	LPTokenWrapper._totalSupply (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#916) can be used in cross function reentrancies:
+	- LPTokenWrapper.stake(uint256) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#933-940)
+	- LPTokenWrapper.totalSupply() (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#925-927)
+	- userRewardPerTokenPaid[msg.sender] = rewardPerToken() (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1018)
+	BiffysLoveFarm.userRewardPerTokenPaid (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#953) can be used in cross function reentrancies:
+	- BiffysLoveFarm.earned(address) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1004-1010)
+	- BiffysLoveFarm.fixRewardPerTokenStored(address,uint256) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1039-1043)
+	- BiffysLoveFarm.stake(uint256) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1013-1021)
+	- BiffysLoveFarm.updateReward(address) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#976-984)
+	- BiffysLoveFarm.userRewardPerTokenPaid (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#953)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+LPTokenWrapper.stake(uint256) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#933-940) uses tx.origin for authorization: require(bool,string)(tx.origin == sender,plz farm by hand) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#936)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-usage-of-txorigin
+
+BiffysLoveFarm.fixEmissionRate(uint256) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1046-1050) ignores return value by biffysLove.mint(address(this),initreward.sub(biffysLove.balanceOf(address(this)))) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1048)
+BiffysLoveFarm.checkhalve() (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1052-1062) ignores return value by biffysLove.mint(address(this),initreward) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1055)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+BiffysLoveFarm.initialize(IERC20,ERC20Mintable,uint256,uint256,uint256,address)._owner (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#966) shadows:
+	- Ownable._owner (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#249) (state variable)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+BiffysLoveFarm.fixEmissionRate(uint256) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1046-1050) should emit an event for: 
+	- rewardRate = initreward.div(periodFinish.sub(now)) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1049) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+Ownable.initialize(address).sender (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#256) lacks a zero-check on :
+		- _owner = sender (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#257)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in BiffysLoveFarm.checkhalve() (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1052-1062):
+	External calls:
+	- biffysLove.mint(address(this),initreward) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1055)
+	State variables written after the call(s):
+	- rewardRate = initreward.div(duration) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1057)
+Reentrancy in BiffysLoveFarm.fixEmissionRate(uint256) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1046-1050):
+	External calls:
+	- biffysLove.mint(address(this),initreward.sub(biffysLove.balanceOf(address(this)))) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1048)
+	State variables written after the call(s):
+	- rewardRate = initreward.div(periodFinish.sub(now)) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1049)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in BiffysLoveFarm.checkhalve() (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1052-1062):
+	External calls:
+	- biffysLove.mint(address(this),initreward) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1055)
+	Event emitted after the call(s):
+	- RewardAdded(initreward) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1059)
+Reentrancy in BiffysLoveFarm.getReward() (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1023-1030):
+	External calls:
+	- biffysLove.transfer(msg.sender,reward) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1027)
+	- checkhalve() (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1023)
+		- biffysLove.mint(address(this),initreward) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1055)
+	Event emitted after the call(s):
+	- RewardPaid(msg.sender,reward) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1028)
+Reentrancy in BiffysLoveFarm.stake(uint256) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1013-1021):
+	External calls:
+	- super.stake(amount) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1015)
+		- loveLP.transferFrom(sender,address(this),amount) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#939)
+	- checkhalve() (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1013)
+		- biffysLove.mint(address(this),initreward) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1055)
+	Event emitted after the call(s):
+	- Staked(msg.sender,amount) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1020)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+BiffysLoveFarm.getReward() (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1023-1030) uses timestamp for comparisons
+	Dangerous comparisons:
+	- reward > 0 (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1025)
+BiffysLoveFarm.setInitReward(uint256) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1033-1036) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(rewardRate == 0,Must not have yet set the reward rate.) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1034)
+BiffysLoveFarm.fixRewardPerTokenStored(address,uint256) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1039-1043) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(earned(account) > 0,Must be a staker) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1040)
+	- require(bool,string)(userRewardPerTokenPaid[account] == 0,Must have incorrect reward) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1041)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Initializable.isConstructor() (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#195-205) uses assembly
+	- INLINE ASM (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#203)
+Address.isContract(address) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#337-346) uses assembly
+	- INLINE ASM (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#344)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Different versions of Solidity are used:
+	- Version used: ['0.5.17', '>=0.4.24<0.7.0', '^0.5.0', '^0.5.5']
+	- 0.5.17 (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#12)
+	- >=0.4.24<0.7.0 (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#2)
+	- ^0.5.0 (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1)
+	- ^0.5.0 (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#3)
+	- ^0.5.0 (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#4)
+	- ^0.5.0 (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#6)
+	- ^0.5.0 (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#7)
+	- ^0.5.0 (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#8)
+	- ^0.5.0 (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#9)
+	- ^0.5.0 (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#10)
+	- ^0.5.0 (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#11)
+	- ^0.5.5 (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#5)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+
+Address.sendValue(address,uint256) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#376-382) is never used and should be removed
+Address.toPayable(address) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#354-356) is never used and should be removed
+Context._msgData() (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#232-235) is never used and should be removed
+ERC20._burn(address,uint256) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#757-763) is never used and should be removed
+ERC20._burnFrom(address,uint256) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#792-795) is never used and should be removed
+Math.average(uint256,uint256) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#409-412) is never used and should be removed
+Math.max(uint256,uint256) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#394-396) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#548-550) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#565-568) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.5.0 (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1) allows old versions
+Pragma version>=0.4.24<0.7.0 (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#2) allows old versions
+Pragma version^0.5.0 (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#3) allows old versions
+Pragma version^0.5.0 (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#4) allows old versions
+Pragma version^0.5.5 (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#5) is known to contain severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+Pragma version^0.5.0 (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#6) allows old versions
+Pragma version^0.5.0 (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#7) allows old versions
+Pragma version^0.5.0 (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#8) allows old versions
+Pragma version^0.5.0 (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#9) allows old versions
+Pragma version^0.5.0 (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#10) allows old versions
+Pragma version^0.5.0 (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#11) allows old versions
+Pragma version0.5.17 (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#12) allows old versions
+solc-0.5.17 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#376-382):
+	- (success) = recipient.call.value(amount)() (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#380)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Variable Initializable.______gap (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#208) is not in mixedCase
+Variable Ownable.______gap (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#312) is not in mixedCase
+Variable ERC20.______gap (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#797) is not in mixedCase
+Variable MinterRole.______gap (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#878) is not in mixedCase
+Variable ERC20Mintable.______gap (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#905) is not in mixedCase
+Parameter LPTokenWrapper.init(IERC20)._loveLP (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#920) is not in mixedCase
+Parameter BiffysLoveFarm.initialize(IERC20,ERC20Mintable,uint256,uint256,uint256,address)._loveLP (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#961) is not in mixedCase
+Parameter BiffysLoveFarm.initialize(IERC20,ERC20Mintable,uint256,uint256,uint256,address)._biffysLove (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#962) is not in mixedCase
+Parameter BiffysLoveFarm.initialize(IERC20,ERC20Mintable,uint256,uint256,uint256,address)._duration (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#963) is not in mixedCase
+Parameter BiffysLoveFarm.initialize(IERC20,ERC20Mintable,uint256,uint256,uint256,address)._initreward (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#964) is not in mixedCase
+Parameter BiffysLoveFarm.initialize(IERC20,ERC20Mintable,uint256,uint256,uint256,address)._starttime (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#965) is not in mixedCase
+Parameter BiffysLoveFarm.initialize(IERC20,ERC20Mintable,uint256,uint256,uint256,address)._owner (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#966) is not in mixedCase
+Parameter BiffysLoveFarm.fixRewardPerTokenStored(address,uint256)._rewardPerToken (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1039) is not in mixedCase
+Parameter BiffysLoveFarm.fixEmissionRate(uint256)._initReward (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#1046) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#233)" inContext (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#222-236)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+ERC20Mintable.______gap (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#905) is never used in ERC20Mintable (../../sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol#888-906)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-state-variable
+/sb/Etherscan-0x98a56c7b03eedb7acc46308611561622e51ec13a.sol analyzed (13 contracts with 93 detectors), 65 result(s) found

@@ -1,0 +1,88 @@
+'solc --version' running
+'solc /sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/sb' running
+
+Contract locking ether found:
+	Contract Oracula (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#809-1338) has payable functions:
+	 - Oracula.receive() (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#1330-1334)
+	But does not have a function to withdraw the ether
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#contracts-that-lock-ether
+
+Oracula.allowance(address,address).owner (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#1002) shadows:
+	- Ownable.owner() (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#181-185) (function)
+Oracula._approve(address,address,uint256).owner (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#1156) shadows:
+	- Ownable.owner() (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#181-185) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+Reentrancy in Oracula.updateUniswapV2Router(address) (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#1224-1236):
+	External calls:
+	- _pancakePair = IPancakeFactory(pancakeRouter.factory()).createPair(address(this),pancakeRouter.WETH()) (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#1230-1232)
+	State variables written after the call(s):
+	- _setExchangePairs(_pancakePair,true) (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#1234)
+		- exchangePairs[pair] = value (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#1316)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Oracula._transfer(address,address,uint256) (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#1084-1150) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp >= nextBurn && _balances[address(this)] > 0 (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#1114)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#29-37) uses assembly
+	- INLINE ASM (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#33)
+Address._verifyCallResult(bool,bytes,string) (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#133-159) uses assembly
+	- INLINE ASM (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#143-149)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address._verifyCallResult(bool,bytes,string) (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#133-159) is never used and should be removed
+Address.functionCall(address,bytes) (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#53-57) is never used and should be removed
+Address.functionCall(address,bytes,string) (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#61-65) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#69-73) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#77-87) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#113-117) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#121-129) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#91-95) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#99-107) is never used and should be removed
+Address.isContract(address) (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#29-37) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#41-49) is never used and should be removed
+Context._msgData() (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#15-21) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.8.11 (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#1) allows old versions
+solc-0.8.11 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#41-49):
+	- (success) = recipient.call{value: amount}() (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#45)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#77-87):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#83)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#99-107):
+	- (success,returndata) = target.staticcall(data) (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#103)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#121-129):
+	- (success,returndata) = target.delegatecall(data) (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#125)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Function IPancakePair.DOMAIN_SEPARATOR() (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#473) is not in mixedCase
+Function IPancakePair.PERMIT_TYPEHASH() (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#475) is not in mixedCase
+Function IPancakePair.MINIMUM_LIQUIDITY() (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#509) is not in mixedCase
+Function IPancakeRouter01.WETH() (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#547) is not in mixedCase
+Parameter Oracula.distributeFees(address,uint256)._from (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#1186) is not in mixedCase
+Parameter Oracula.distributeFees(address,uint256)._amount (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#1186) is not in mixedCase
+Parameter Oracula.changeAllFees(uint256,uint256,uint256)._burnFee (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#1240) is not in mixedCase
+Parameter Oracula.changeAllFees(uint256,uint256,uint256)._devFee (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#1240) is not in mixedCase
+Parameter Oracula.changeAllFees(uint256,uint256,uint256)._rewardFee (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#1240) is not in mixedCase
+Parameter Oracula.changeFeeAddresses(address,address)._devAddress (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#1270) is not in mixedCase
+Parameter Oracula.changeFeeAddresses(address,address)._rewardAddress (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#1270) is not in mixedCase
+Variable Oracula._isExcludedFromFees (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#835) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#17)" inContext (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#5-23)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Variable IPancakeRouter01.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountADesired (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#557) is too similar to IPancakeRouter01.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountBDesired (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#559)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+Oracula._decimals (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#819) should be constant 
+Oracula._name (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#815) should be constant 
+Oracula._symbol (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#817) should be constant 
+Oracula._totalSupply (../../sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol#813) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+/sb/Oracula0x85f3ec4EC49aB6a5901278176235957ef521970d.sol analyzed (9 contracts with 93 detectors), 43 result(s) found

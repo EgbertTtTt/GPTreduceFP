@@ -1,0 +1,257 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 54 Code Findings │
+└──────────────────┘
+                          
+    /sb/UniswapV3Pool.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+         1745┆ (bool success, bytes memory data) =
+         1746┆ // SWC-104-Unchecked Call Return Value: L21
+         1747┆                                                                  
+  token.call(abi.encodeWithSelector(IERC20Minimal.transfer.selector, to,        
+  value));                                                                      
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+         1668┆ for (uint256 i = 0; i < secondsAgos.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+         2905┆ feeGrowthGlobal0X128 += FullMath.mulDiv(paid0 - fees0,           
+  FixedPoint128.Q128, _liquidity);                                              
+            ⋮┆----------------------------------------
+         2911┆ feeGrowthGlobal1X128 += FullMath.mulDiv(paid1 - fees1,           
+  FixedPoint128.Q128, _liquidity);                                              
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+         2316┆ constructor() {
+         2317┆     int24 _tickSpacing;
+         2318┆     (factory, token0, token1, fee, _tickSpacing) =               
+  IUniswapV3PoolDeployer(msg.sender).parameters();                              
+         2319┆     tickSpacing = _tickSpacing;
+         2320┆ 
+         2321┆     maxLiquidityPerTick =                                        
+  Tick.tickSpacingToMaxLiquidityPerTick(_tickSpacing);                          
+         2322┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+         2747┆ (step.tickNext, step.initialized) =                              
+  tickBitmap.nextInitializedTickWithinOneWord(                                  
+            ⋮┆----------------------------------------
+         2798┆ ticks.cross(
+            ⋮┆----------------------------------------
+         2800┆ (zeroForOne ? state.feeGrowthGlobalX128 : feeGrowthGlobal0X128),
+            ⋮┆----------------------------------------
+         2801┆ (zeroForOne ? feeGrowthGlobal1X128 : state.feeGrowthGlobalX128)
+            ⋮┆----------------------------------------
+         2807┆ secondsOutside.cross(step.tickNext, tickSpacing,                 
+  cache.blockTimestamp);                                                        
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+         1668┆ for (uint256 i = 0; i < secondsAgos.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          536┆ require(absTick <= uint256(MAX_TICK), 'T');
+            ⋮┆----------------------------------------
+          574┆ require(sqrtPriceX96 >= MIN_SQRT_RATIO && sqrtPriceX96 <         
+  MAX_SQRT_RATIO, 'R');                                                         
+            ⋮┆----------------------------------------
+          724┆ require((z = x - uint128(-y)) < x, 'LS');
+            ⋮┆----------------------------------------
+          726┆ require((z = x + uint128(y)) >= x, 'LA');
+            ⋮┆----------------------------------------
+          832┆ require(liquidityGrossAfter <= maxLiquidity, 'LO');
+            ⋮┆----------------------------------------
+         1336┆ require(_self.liquidity > 0, 'NP'); // disallow pokes for 0      
+  liquidity positions                                                           
+            ⋮┆----------------------------------------
+         1475┆ require(current > 0, 'I');
+            ⋮┆----------------------------------------
+         1587┆ require(lte(time, beforeOrAt.blockTimestamp, target), 'OLD');
+            ⋮┆----------------------------------------
+         1664┆ require(cardinality > 0, 'I');
+            ⋮┆----------------------------------------
+         1748┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'TF');                                                              
+            ⋮┆----------------------------------------
+         2304┆ require(slot0.unlocked, 'LOK');
+            ⋮┆----------------------------------------
+         2326┆ require(tickLower < tickUpper, 'TLU');
+            ⋮┆----------------------------------------
+         2327┆ require(tickLower >= TickMath.MIN_TICK, 'TLM');
+            ⋮┆----------------------------------------
+         2328┆ require(tickUpper <= TickMath.MAX_TICK, 'TUM');
+            ⋮┆----------------------------------------
+         2349┆ require(ticks[tickLower].liquidityGross > 0 &&                   
+  ticks[tickUpper].liquidityGross > 0, 'X');                                    
+            ⋮┆----------------------------------------
+         2391┆ require(slot0.sqrtPriceX96 == 0, 'AI');
+            ⋮┆----------------------------------------
+         2591┆ if (amount0 > 0) require(balance0Before.add(amount0) <=          
+  balance0(), 'M0');                                                            
+            ⋮┆----------------------------------------
+         2592┆ if (amount1 > 0) require(balance1Before.add(amount1) <=          
+  balance1(), 'M1');                                                            
+            ⋮┆----------------------------------------
+         2706┆ require(amountSpecified != 0, 'AS');
+            ⋮┆----------------------------------------
+         2710┆ require(slot0Start.unlocked, 'LOK');
+            ⋮┆----------------------------------------
+         2711┆ require(
+         2712┆     zeroForOne
+         2713┆         ? sqrtPriceLimitX96 < slot0Start.sqrtPriceX96 &&         
+  sqrtPriceLimitX96 > TickMath.MIN_SQRT_RATIO                                   
+         2714┆         : sqrtPriceLimitX96 > slot0Start.sqrtPriceX96 &&         
+  sqrtPriceLimitX96 < TickMath.MAX_SQRT_RATIO,                                  
+         2715┆     'SPL'
+         2716┆ );
+            ⋮┆----------------------------------------
+         2858┆ require(balance0Before.add(uint256(amount0)) <= balance0(),      
+  'IIA');                                                                       
+            ⋮┆----------------------------------------
+         2864┆ require(balance1Before.add(uint256(amount1)) <= balance1(),      
+  'IIA');                                                                       
+            ⋮┆----------------------------------------
+         2879┆ require(_liquidity > 0, 'L');
+            ⋮┆----------------------------------------
+         2894┆ require(balance0Before.add(fee0) <= balance0After, 'F0');
+            ⋮┆----------------------------------------
+         2895┆ require(balance1Before.add(fee1) <= balance1After, 'F1');
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          574┆ require(sqrtPriceX96 >= MIN_SQRT_RATIO && sqrtPriceX96 <         
+  MAX_SQRT_RATIO, 'R');                                                         
+            ⋮┆----------------------------------------
+         1748┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), 'TF');                                                              
+            ⋮┆----------------------------------------
+         1812┆ require((product = amount * sqrtPX96) / amount == sqrtPX96 &&    
+  numerator1 > product);                                                        
+            ⋮┆----------------------------------------
+         2349┆ require(ticks[tickLower].liquidityGross > 0 &&                   
+  ticks[tickUpper].liquidityGross > 0, 'X');                                    
+            ⋮┆----------------------------------------
+         2711┆ require(
+         2712┆     zeroForOne
+         2713┆         ? sqrtPriceLimitX96 < slot0Start.sqrtPriceX96 &&         
+  sqrtPriceLimitX96 > TickMath.MIN_SQRT_RATIO                                   
+         2714┆         : sqrtPriceLimitX96 > slot0Start.sqrtPriceX96 &&         
+  sqrtPriceLimitX96 < TickMath.MAX_SQRT_RATIO,                                  
+         2715┆     'SPL'
+         2716┆ );
+            ⋮┆----------------------------------------
+         2919┆ require(
+         2920┆     (feeProtocol0 == 0 || (feeProtocol0 >= 4 && feeProtocol0 <=  
+  10)) &&                                                                       
+         2921┆         (feeProtocol1 == 0 || (feeProtocol1 >= 4 && feeProtocol1 
+  <= 10))                                                                       
+         2922┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         1013┆ if (tick < 0 && tick % tickSpacing != 0) compressed--; // round  
+  towards negative infinity                                                     
+            ⋮┆----------------------------------------
+         1455┆ if (cardinalityNext > cardinality && index == (cardinality - 1)) 
+  {                                                                             
+         1456┆     cardinalityUpdated = cardinalityNext;
+         1457┆ } else {
+         1458┆     cardinalityUpdated = cardinality;
+         1459┆ }
+            ⋮┆----------------------------------------
+         1496┆ if (a <= time && b <= time) return a <= b;
+            ⋮┆----------------------------------------
+         1540┆ if (targetAtOrAfter && lte(time, target,                         
+  atOrAfter.blockTimestamp)) break;                                             
+            ⋮┆----------------------------------------
+         2067┆ if (!exactIn && amountOut > uint256(-amountRemaining)) {
+         2068┆     amountOut = uint256(-amountRemaining);
+         2069┆ }
+            ⋮┆----------------------------------------
+         2071┆ if (exactIn && sqrtRatioNextX96 != sqrtRatioTargetX96) {
+         2072┆     // we didn't reach the target, so take the remainder of the  
+  maximum input as fee                                                          
+         2073┆     feeAmount = uint256(amountRemaining) - amountIn;
+         2074┆ } else {
+         2075┆     feeAmount = FullMath.mulDivRoundingUp(amountIn, feePips, 1e6 
+  - feePips);                                                                   
+         2076┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-decrement-not-postfix                    
+          Consider using the prefix decrement expression whenever the return    
+  value is not needed. The                                                      
+          prefix decrement expression is cheaper in terms of gas.               
+                                                                                
+         1013┆ if (tick < 0 && tick % tickSpacing != 0) compressed--; // round  
+  towards negative infinity                                                     
+            ⋮┆----------------------------------------
+         2938┆ if (amount0 == protocolFees.token0) amount0--; // ensure that the
+  slot is not cleared, for gas savings                                          
+            ⋮┆----------------------------------------
+         2943┆ if (amount1 == protocolFees.token1) amount1--; // ensure that the
+  slot is not cleared, for gas savings                                          
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+         1480┆ for (uint16 i = current; i < next; i++) self[i].blockTimestamp = 
+  1;                                                                            
+            ⋮┆----------------------------------------
+         1668┆ for (uint256 i = 0; i < secondsAgos.length; i++) {
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 54 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

@@ -1,0 +1,129 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 35 Code Findings │
+└──────────────────┘
+                 
+    /sb/code.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          107┆ for (i = 0; i < _owners.length; i++) {
+            ⋮┆----------------------------------------
+          236┆ for (i = 0; i < nOwners.length; i++) {
+            ⋮┆----------------------------------------
+          244┆ for(j = 0; j < _owners.length; j++) {
+            ⋮┆----------------------------------------
+          246┆ _owners[j] = _owners[_owners.length - 1];
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+           43┆ constructor(address[] memory owners_, uint16[] memory vPowers_,  
+  uint16 requiredVote_) {                                                       
+           44┆     _changeOwners(owners_, vPowers_, requiredVote_);
+           45┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          107┆ for (i = 0; i < _owners.length; i++) {
+            ⋮┆----------------------------------------
+          108┆ values[i] = (_votePowers[_owners[i]]);
+            ⋮┆----------------------------------------
+          108┆ values[i] = (_votePowers[_owners[i]]);
+            ⋮┆----------------------------------------
+          238┆ uint16 cPower = _votePowers[nOwner];
+            ⋮┆----------------------------------------
+          244┆ for(j = 0; j < _owners.length; j++) {
+            ⋮┆----------------------------------------
+          245┆ if (_owners[j] == nOwner) {
+            ⋮┆----------------------------------------
+          246┆ _owners[j] = _owners[_owners.length - 1];
+            ⋮┆----------------------------------------
+          246┆ _owners[j] = _owners[_owners.length - 1];
+            ⋮┆----------------------------------------
+          246┆ _owners[j] = _owners[_owners.length - 1];
+            ⋮┆----------------------------------------
+          247┆ _owners.pop();
+            ⋮┆----------------------------------------
+          248┆ delete _votes[nOwner];
+            ⋮┆----------------------------------------
+          257┆ _owners.push(nOwner);
+            ⋮┆----------------------------------------
+          260┆ _votePowers[nOwner] = vPower;
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           69┆ require(msg.sender == address(this), "C98MSiG: Wallet only");
+            ⋮┆----------------------------------------
+           74┆ require(_votePowers[owner] > 0, "C98MSiG: Not an owner");
+            ⋮┆----------------------------------------
+           79┆ require(_votePowers[owner] == 0, "C98MSiG: Already an owner");
+            ⋮┆----------------------------------------
+           84┆ require(vPower > 0, "C98MSiG: Invalid vote weight");
+            ⋮┆----------------------------------------
+          160┆ require(progress.requestId == 0, "C98MSiG: Request pending");
+            ⋮┆----------------------------------------
+          184┆ require(progress.requestId > 0, "C98MSiG: No pending request");
+            ⋮┆----------------------------------------
+          211┆ require(progress.requestId > 0, "C98MSiG: No pending request");
+            ⋮┆----------------------------------------
+          212┆ require(block.timestamp - progress.timestamp > 600, "C98MSiG: 10 
+  mins not passed");                                                            
+            ⋮┆----------------------------------------
+          240┆ require(vPower <= 256, "C98MSiG: Invalid vRate");
+            ⋮┆----------------------------------------
+          267┆ require(requirement.requiredVote > 0, "C98MSiG: Invalid vRate");
+            ⋮┆----------------------------------------
+          268┆ require(requirement.requiredVote <= requirement.totalVote,       
+  "C98MSiG: Invalid vRate");                                                    
+            ⋮┆----------------------------------------
+          269┆ require(requirement.totalVote <= 4096, "C98MSiG: Max weight      
+  reached");                                                                    
+            ⋮┆----------------------------------------
+          270┆ require(ownerCount > 0, "C98MSiG: At least 1 owner");
+            ⋮┆----------------------------------------
+          271┆ require(ownerCount <= 64, "C98MSiG: Max owner reached");
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          107┆ for (i = 0; i < _owners.length; i++) {
+            ⋮┆----------------------------------------
+          236┆ for (i = 0; i < nOwners.length; i++) {
+            ⋮┆----------------------------------------
+          244┆ for(j = 0; j < _owners.length; j++) {
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 35 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

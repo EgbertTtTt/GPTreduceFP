@@ -1,0 +1,444 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                     
+                     
+┌───────────────────┐
+│ 130 Code Findings │
+└───────────────────┘
+                        
+    /sb/AniaLottery.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          837┆ uint256 index = projectsWhitelist[projectId].length - 1;
+            ⋮┆----------------------------------------
+          891┆ uint256 index = lotteryWinners[projectId].length - 1;
+            ⋮┆----------------------------------------
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+          382┆ _totalSupply += amount;
+            ⋮┆----------------------------------------
+          604┆ totalStaked += newStake;
+            ⋮┆----------------------------------------
+          678┆ totalStaked += reward;
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+          504┆ uint256 public totalStaked = 0;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          179┆ constructor(string memory name_, string memory symbol_) {
+          180┆     _name = name_;
+          181┆     _symbol = symbol_;
+          182┆ }
+            ⋮┆----------------------------------------
+          486┆ constructor() ERC20("Arkania Protocol", "ANIA") {
+          487┆     _mint(msg.sender, 100000000 * 10 ** decimals());
+          488┆ }
+            ⋮┆----------------------------------------
+          739┆ constructor(AniaStake _tokenStaking) {
+          740┆     tokenStaking = _tokenStaking;
+          741┆     owner = msg.sender;
+          742┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          671┆ uint256 index = stakes[users[i]];
+            ⋮┆----------------------------------------
+          672┆ uint256 reward =                                                 
+  calculateStakeReward(stakers[index].address_stake);                           
+            ⋮┆----------------------------------------
+          675┆ stakers[index].address_stake = Stake(stakers[index].user,        
+  stakers[index].address_stake.amount + reward, block.timestamp);               
+            ⋮┆----------------------------------------
+          675┆ stakers[index].address_stake = Stake(stakers[index].user,        
+  stakers[index].address_stake.amount + reward, block.timestamp);               
+            ⋮┆----------------------------------------
+          675┆ stakers[index].address_stake = Stake(stakers[index].user,        
+  stakers[index].address_stake.amount + reward, block.timestamp);               
+            ⋮┆----------------------------------------
+          678┆ totalStaked += reward;
+            ⋮┆----------------------------------------
+          829┆ projectsWhitelist[projectId].push(
+            ⋮┆----------------------------------------
+          836┆ projectStakeCap[projectId] += getUserTicketValue(users[i]);
+            ⋮┆----------------------------------------
+          837┆ uint256 index = projectsWhitelist[projectId].length - 1;
+            ⋮┆----------------------------------------
+          838┆ projectUserIndex[projectId][users[i]] = index;
+            ⋮┆----------------------------------------
+          839┆ projectUserCount[projectId]++;
+            ⋮┆----------------------------------------
+          883┆ lotteryWinners[projectId].push(
+            ⋮┆----------------------------------------
+          891┆ uint256 index = lotteryWinners[projectId].length - 1;
+            ⋮┆----------------------------------------
+          892┆ projectWinnerIndex[projectId][user] = index;
+            ⋮┆----------------------------------------
+          893┆ lotteryWinnerCount[projectId]++;
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          670┆ for (uint256 i = 0; i < users.length; i++) {
+            ⋮┆----------------------------------------
+          827┆ for (uint i; i < users.length; i++) {
+            ⋮┆----------------------------------------
+          847┆ for (uint i; i < users.length; i++) {
+            ⋮┆----------------------------------------
+          878┆ for (uint i; i < users.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          283┆ require(currentAllowance >= amount, "ERC20: transfer amount      
+  exceeds allowance");                                                          
+            ⋮┆----------------------------------------
+          324┆ require(currentAllowance >= subtractedValue, "ERC20: decreased   
+  allowance below zero");                                                       
+            ⋮┆----------------------------------------
+          351┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          352┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          357┆ require(senderBalance >= amount, "ERC20: transfer amount exceeds 
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          378┆ require(account != address(0), "ERC20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+          401┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          406┆ require(accountBalance >= amount, "ERC20: burn amount exceeds    
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          435┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          436┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          581┆ require(_amount > 0, "amount cannot be 0");
+            ⋮┆----------------------------------------
+          619┆ require(userStakes > 0, "amount has to be more than 0");
+            ⋮┆----------------------------------------
+          626┆ require(_amount <= stakedWithRewards, "amount has to be less or  
+  equal than current stakes with rewards");                                     
+            ⋮┆----------------------------------------
+          668┆ require(msg.sender == owner, "Only contract creator can          
+  redistribute");                                                               
+            ⋮┆----------------------------------------
+          685┆ require(msg.sender == owner, "Only contract creator can change   
+  APY");                                                                        
+            ⋮┆----------------------------------------
+          686┆ require(
+          687┆     _value > 0,
+          688┆     "APY value has to be more than 0, try 100 for (0.100% daily) 
+  instead"                                                                      
+          689┆ );
+            ⋮┆----------------------------------------
+          780┆ require(!_checkProjectExistById(projectId), "Project with this ID
+  exist.");                                                                     
+            ⋮┆----------------------------------------
+          790┆ require(projects[projectId].id == projectId, "Project with this  
+  ID not exist.");                                                              
+            ⋮┆----------------------------------------
+          823┆ require(_checkOpenProject(projectId), "Project is close.");
+            ⋮┆----------------------------------------
+          826┆ require(!projects[projectId].draw, "The lottery has been launched
+  and project is completed close.");                                            
+            ⋮┆----------------------------------------
+          873┆ require(_checkProjectExistById(projectId), "Project with this ID 
+  does not exist.");                                                            
+            ⋮┆----------------------------------------
+          874┆ require(!_checkOpenProject(projectId), "Project is open and      
+  should be closed.");                                                          
+            ⋮┆----------------------------------------
+          876┆ require(!projects[projectId].draw, "The lottery has been already 
+  drawn.");                                                                     
+            ⋮┆----------------------------------------
+          913┆ require(projectsWhitelist[projectId][index].userAddress ==       
+  userAddress, "User not found");                                               
+            ⋮┆----------------------------------------
+          919┆ require(lotteryWinners[projectId][index].userAddress ==          
+  userAddress, "Winner not found");                                             
+            ⋮┆----------------------------------------
+          929┆ require(lotteryWinners[projectId][index].userAddress ==          
+  userAddress, "User not found");                                               
+            ⋮┆----------------------------------------
+          935┆ require(_value > 0, "Tier value has to be more than 0");
+            ⋮┆----------------------------------------
+          936┆ require(_value > tierTwo, "Tier value has to be more than Tier   
+  Two");                                                                        
+            ⋮┆----------------------------------------
+          937┆ require(_value > tierThree, "Tier value has to be more than Tier 
+  Three");                                                                      
+            ⋮┆----------------------------------------
+          941┆ require(_value > 0, "Tier value has to be more than 0");
+            ⋮┆----------------------------------------
+          942┆ require(_value < tierOne, "Tier value has to be less than Tier   
+  One");                                                                        
+            ⋮┆----------------------------------------
+          943┆ require(_value > tierThree, "Tier value has to be more than Tier 
+  Three");                                                                      
+            ⋮┆----------------------------------------
+          947┆ require(_value > 0, "Tier value has to be more than 0");
+            ⋮┆----------------------------------------
+          948┆ require(_value < tierOne, "Tier value has to be less than Tier   
+  One");                                                                        
+            ⋮┆----------------------------------------
+          949┆ require(_value < tierTwo, "Tier value has to be less than Tier   
+  Two");                                                                        
+            ⋮┆----------------------------------------
+          953┆ require(_value > 0, "Tier Ticket value has to be more than 0");
+            ⋮┆----------------------------------------
+          954┆ require(_value > tierTwoTicketValue, "Tier Ticket value has to be
+  more than Tier Two");                                                         
+            ⋮┆----------------------------------------
+          955┆ require(_value > tierThreeTicketValue, "Tier Ticket value has to 
+  be more than Tier Three");                                                    
+            ⋮┆----------------------------------------
+          959┆ require(_value > 0, "Tier Ticket value has to be more than 0");
+            ⋮┆----------------------------------------
+          960┆ require(_value < tierOneTicketValue, "Tier Ticket value has to be
+  less than Tier One");                                                         
+            ⋮┆----------------------------------------
+          961┆ require(_value > tierThreeTicketValue, "Tier Ticket value has to 
+  be more than Tier Three");                                                    
+            ⋮┆----------------------------------------
+          965┆ require(_value > 0, "Tier Ticket value has to be more than 0");
+            ⋮┆----------------------------------------
+          966┆ require(_value < tierOneTicketValue, "Tier Ticket value has to be
+  less than Tier One");                                                         
+            ⋮┆----------------------------------------
+          967┆ require(_value < tierTwoTicketValue, "Tier Ticket value has to be
+  less than Tier Two");                                                         
+            ⋮┆----------------------------------------
+          974┆ require(_checkOpenProject(projectId), "Project is close.");
+            ⋮┆----------------------------------------
+          976┆ require(!_checkUserExistInProject(projectId, msg.sender), "User  
+  is already in whitelist.");                                                   
+            ⋮┆----------------------------------------
+         1007┆ require(projectId > 0, "ProjectId must be selected");
+            ⋮┆----------------------------------------
+         1008┆ require(_checkProjectExistById(projectId), "Project with this ID 
+  does not exist.");                                                            
+            ⋮┆----------------------------------------
+         1015┆ require(availableTokens > 0, "Insufficient tokens in contract");
+            ⋮┆----------------------------------------
+         1018┆ require(tokensToBuy > 0, "Insufficient tokens to send");
+            ⋮┆----------------------------------------
+         1019┆ require(tokensToBuy < availableTokens, "Insufficient tokens in   
+  contract to send");                                                           
+            ⋮┆----------------------------------------
+         1023┆ require(!winner.claimed, "User already claimed the reward");
+            ⋮┆----------------------------------------
+         1030┆ require(stableCoins[tokenForPayContractAddress], "This Token is  
+  not available for payment");                                                  
+            ⋮┆----------------------------------------
+         1033┆ require(pay > 0, "You need to send some ether");
+            ⋮┆----------------------------------------
+         1034┆ require(getUserTicketValue(msg.sender) == pay, "You need to pay  
+  the exact tier value before claiming the reward");                            
+            ⋮┆----------------------------------------
+         1043┆ require(billingAddress != contractAddress, "Billing Address must 
+  be different as Contract Address");                                           
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          880┆ if(_checkUserExistInProject(projectId, user) &&                  
+  !_checkUserIsProjectWinner(projectId, user)){                                 
+          881┆     uint reward = getUserTicketValue(user);
+          882┆     if (reward > 0) {
+          883┆         lotteryWinners[projectId].push(
+          884┆             LotteryWinner({
+          885┆                 projectId: projectId,
+          886┆                 userAddress: user,
+          887┆                 reward: reward,
+          888┆                 claimed: false
+          889┆             })
+             [hid 7 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-prefix-decrement-not-postfix                    
+          Consider using the prefix decrement expression whenever the return    
+  value is not needed. The                                                      
+          prefix decrement expression is cheaper in terms of gas.               
+                                                                                
+         1107┆ projectUserCount[projectId]--;
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          670┆ for (uint256 i = 0; i < users.length; i++) {
+            ⋮┆----------------------------------------
+          827┆ for (uint i; i < users.length; i++) {
+            ⋮┆----------------------------------------
+          839┆ projectUserCount[projectId]++;
+            ⋮┆----------------------------------------
+          847┆ for (uint i; i < users.length; i++) {
+            ⋮┆----------------------------------------
+          878┆ for (uint i; i < users.length; i++) {
+            ⋮┆----------------------------------------
+          893┆ lotteryWinnerCount[projectId]++;
+            ⋮┆----------------------------------------
+          987┆ projectUserCount[projectId]++;
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          283┆ require(currentAllowance >= amount, "ERC20: transfer amount      
+  exceeds allowance");                                                          
+            ⋮┆----------------------------------------
+          324┆ require(currentAllowance >= subtractedValue, "ERC20: decreased   
+  allowance below zero");                                                       
+            ⋮┆----------------------------------------
+          351┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          352┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          357┆ require(senderBalance >= amount, "ERC20: transfer amount exceeds 
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          401┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          406┆ require(accountBalance >= amount, "ERC20: burn amount exceeds    
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          435┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          436┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+          626┆ require(_amount <= stakedWithRewards, "amount has to be less or  
+  equal than current stakes with rewards");                                     
+            ⋮┆----------------------------------------
+          668┆ require(msg.sender == owner, "Only contract creator can          
+  redistribute");                                                               
+            ⋮┆----------------------------------------
+          685┆ require(msg.sender == owner, "Only contract creator can change   
+  APY");                                                                        
+            ⋮┆----------------------------------------
+          686┆ require(
+          687┆     _value > 0,
+          688┆     "APY value has to be more than 0, try 100 for (0.100% daily) 
+  instead"                                                                      
+
+Ran 48 rules on 1 file: 130 findings.
+          689┆ );
+            ⋮┆----------------------------------------
+          826┆ require(!projects[projectId].draw, "The lottery has been launched
+  and project is completed close.");                                            
+            ⋮┆----------------------------------------
+          873┆ require(_checkProjectExistById(projectId), "Project with this ID 
+  does not exist.");                                                            
+            ⋮┆----------------------------------------
+          874┆ require(!_checkOpenProject(projectId), "Project is open and      
+  should be closed.");                                                          
+            ⋮┆----------------------------------------
+          876┆ require(!projects[projectId].draw, "The lottery has been already 
+  drawn.");                                                                     
+            ⋮┆----------------------------------------
+          936┆ require(_value > tierTwo, "Tier value has to be more than Tier   
+  Two");                                                                        
+            ⋮┆----------------------------------------
+          937┆ require(_value > tierThree, "Tier value has to be more than Tier 
+  Three");                                                                      
+            ⋮┆----------------------------------------
+          942┆ require(_value < tierOne, "Tier value has to be less than Tier   
+  One");                                                                        
+            ⋮┆----------------------------------------
+          943┆ require(_value > tierThree, "Tier value has to be more than Tier 
+  Three");                                                                      
+            ⋮┆----------------------------------------
+          948┆ require(_value < tierOne, "Tier value has to be less than Tier   
+  One");                                                                        
+            ⋮┆----------------------------------------
+          949┆ require(_value < tierTwo, "Tier value has to be less than Tier   
+  Two");                                                                        
+            ⋮┆----------------------------------------
+          953┆ require(_value > 0, "Tier Ticket value has to be more than 0");
+            ⋮┆----------------------------------------
+          954┆ require(_value > tierTwoTicketValue, "Tier Ticket value has to be
+  more than Tier Two");                                                         
+            ⋮┆----------------------------------------
+          955┆ require(_value > tierThreeTicketValue, "Tier Ticket value has to 
+  be more than Tier Three");                                                    
+            ⋮┆----------------------------------------
+          959┆ require(_value > 0, "Tier Ticket value has to be more than 0");
+            ⋮┆----------------------------------------
+          960┆ require(_value < tierOneTicketValue, "Tier Ticket value has to be
+  less than Tier One");                                                         
+            ⋮┆----------------------------------------
+          961┆ require(_value > tierThreeTicketValue, "Tier Ticket value has to 
+  be more than Tier Three");                                                    
+            ⋮┆----------------------------------------
+          965┆ require(_value > 0, "Tier Ticket value has to be more than 0");
+            ⋮┆----------------------------------------
+          966┆ require(_value < tierOneTicketValue, "Tier Ticket value has to be
+  less than Tier One");                                                         
+            ⋮┆----------------------------------------
+          967┆ require(_value < tierTwoTicketValue, "Tier Ticket value has to be
+  less than Tier Two");                                                         
+            ⋮┆----------------------------------------
+         1008┆ require(_checkProjectExistById(projectId), "Project with this ID 
+  does not exist.");                                                            
+            ⋮┆----------------------------------------
+         1019┆ require(tokensToBuy < availableTokens, "Insufficient tokens in   
+  contract to send");                                                           
+            ⋮┆----------------------------------------
+         1030┆ require(stableCoins[tokenForPayContractAddress], "This Token is  
+  not available for payment");                                                  
+            ⋮┆----------------------------------------
+         1034┆ require(getUserTicketValue(msg.sender) == pay, "You need to pay  
+  the exact tier value before claiming the reward");                            
+            ⋮┆----------------------------------------
+         1043┆ require(billingAddress != contractAddress, "Billing Address must 
+  be different as Contract Address");                                           
+
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

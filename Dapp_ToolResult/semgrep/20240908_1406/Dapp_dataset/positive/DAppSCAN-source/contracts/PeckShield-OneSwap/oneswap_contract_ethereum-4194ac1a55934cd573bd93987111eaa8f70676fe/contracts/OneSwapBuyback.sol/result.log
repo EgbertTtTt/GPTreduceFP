@@ -1,0 +1,162 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 35 Code Findings │
+└──────────────────┘
+                           
+    /sb/OneSwapBuyback.sol 
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          177┆ constructor(address _weth, address _ones, address _router,       
+  address _factory) public {                                                    
+          178┆     weth = _weth;
+          179┆     ones = _ones;
+          180┆     router = _router;
+          181┆     factory = _factory;
+          182┆ 
+          183┆     // add WETH & ONES to main token list
+          184┆     _mainTokens[_ones] = true;
+          185┆     _mainTokenArr.push(_ones);
+          186┆     _mainTokens[_weth] = true;
+             [hid 2 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          208┆ if (_mainTokenArr[i] == token) {
+            ⋮┆----------------------------------------
+          209┆ _mainTokenArr[i] = _mainTokenArr[lastIdx];
+            ⋮┆----------------------------------------
+          209┆ _mainTokenArr[i] = _mainTokenArr[lastIdx];
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          207┆ for (uint256 i = 0; i < lastIdx; i++) {
+            ⋮┆----------------------------------------
+          228┆ for (uint256 i = 0; i < pairs.length; i++) {
+            ⋮┆----------------------------------------
+          253┆ for (uint256 i = 0; i < pairs.length; i++) {
+            ⋮┆----------------------------------------
+          285┆ for (uint256 i = 0; i < pairs.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          192┆ require(msg.sender == IOneSwapToken(ones).owner(),               
+  "OneSwapBuyback: NOT_ONES_OWNER");                                            
+            ⋮┆----------------------------------------
+          201┆ require(msg.sender == IOneSwapToken(ones).owner(),               
+  "OneSwapBuyback: NOT_ONES_OWNER");                                            
+            ⋮┆----------------------------------------
+          202┆ require(token != ones, "OneSwapBuyback: REMOVE_ONES_FROM_MAIN");
+            ⋮┆----------------------------------------
+          203┆ require(token != weth, "OneSwapBuyback: REMOVE_WETH_FROM_MAIN");
+            ⋮┆----------------------------------------
+          234┆ require(a != address(0) && b != address(0), "OneSwapBuyback:     
+  INVALID_PAIR");                                                               
+            ⋮┆----------------------------------------
+          237┆ require(amt > 0, "OneSwapBuyback: NO_LIQUIDITY");
+            ⋮┆----------------------------------------
+          259┆ require(a != address(0) && b != address(0), "OneSwapBuyback:     
+  INVALID_PAIR");                                                               
+            ⋮┆----------------------------------------
+          264┆ require(!_mainTokens[b], "OneSwapBuyback: SWAP_TWO_MAIN_TOKENS");
+            ⋮┆----------------------------------------
+          267┆ require(_mainTokens[b], "OneSwapBuyback: SWAP_TWO_MINOR_TOKENS");
+            ⋮┆----------------------------------------
+          272┆ require(minorTokenAmt > 0, "OneSwapBuyback: NO_MINOR_TOKENS");
+            ⋮┆----------------------------------------
+          296┆ require(a != address(0) && b != address(0), "OneSwapBuyback:     
+  INVALID_PAIR");                                                               
+            ⋮┆----------------------------------------
+          297┆ require(a == ones || b == ones, "OneSwapBuyback:                 
+  ONES_NOT_IN_PAIR");                                                           
+            ⋮┆----------------------------------------
+          300┆ require(_mainTokens[token], "OneSwapBuyback:                     
+  MAIN_TOKEN_NOT_IN_PAIR");                                                     
+            ⋮┆----------------------------------------
+          302┆ require(tokenAmt > 0, "OneSwapBuyback: NO_MAIN_TOKENS");
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          234┆ require(a != address(0) && b != address(0), "OneSwapBuyback:     
+  INVALID_PAIR");                                                               
+            ⋮┆----------------------------------------
+          259┆ require(a != address(0) && b != address(0), "OneSwapBuyback:     
+  INVALID_PAIR");                                                               
+            ⋮┆----------------------------------------
+          296┆ require(a != address(0) && b != address(0), "OneSwapBuyback:     
+  INVALID_PAIR");                                                               
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          246┆ if ((aIsMain && !bIsMain) || (!aIsMain && bIsMain)) {
+          247┆     _swapForMainToken(pair);
+          248┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          207┆ for (uint256 i = 0; i < lastIdx; i++) {
+            ⋮┆----------------------------------------
+          228┆ for (uint256 i = 0; i < pairs.length; i++) {
+            ⋮┆----------------------------------------
+          253┆ for (uint256 i = 0; i < pairs.length; i++) {
+            ⋮┆----------------------------------------
+          285┆ for (uint256 i = 0; i < pairs.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          202┆ require(token != ones, "OneSwapBuyback: REMOVE_ONES_FROM_MAIN");
+            ⋮┆----------------------------------------
+          203┆ require(token != weth, "OneSwapBuyback: REMOVE_WETH_FROM_MAIN");
+            ⋮┆----------------------------------------
+          264┆ require(!_mainTokens[b], "OneSwapBuyback: SWAP_TWO_MAIN_TOKENS");
+            ⋮┆----------------------------------------
+          267┆ require(_mainTokens[b], "OneSwapBuyback: SWAP_TWO_MINOR_TOKENS");
+            ⋮┆----------------------------------------
+          300┆ require(_mainTokens[token], "OneSwapBuyback:                     
+  MAIN_TOKEN_NOT_IN_PAIR");                                                     
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 35 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

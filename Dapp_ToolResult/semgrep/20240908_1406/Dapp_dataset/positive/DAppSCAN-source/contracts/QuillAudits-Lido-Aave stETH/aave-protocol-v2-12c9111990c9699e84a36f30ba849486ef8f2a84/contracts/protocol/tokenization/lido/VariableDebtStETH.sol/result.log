@@ -1,0 +1,183 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 40 Code Findings │
+└──────────────────┘
+                              
+    /sb/VariableDebtStETH.sol 
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+          838┆ uint256 private lastInitializedRevision = 0;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+         1150┆ constructor(
+         1151┆   string memory name,
+         1152┆   string memory symbol,
+         1153┆   uint8 decimals,
+         1154┆   address incentivesController
+         1155┆ ) public {
+         1156┆   _name = name;
+         1157┆   _symbol = symbol;
+         1158┆   _decimals = decimals;
+         1159┆   _incentivesController =                                        
+  IAaveIncentivesController(incentivesController);                              
+             [hid 1 additional lines, adjust with --max-lines-per-finding] 
+         1685┆ constructor(
+         1686┆   address pool,
+         1687┆   address underlyingAsset,
+         1688┆   string memory name,
+         1689┆   string memory symbol,
+         1690┆   address incentivesController
+         1691┆ ) public DebtTokenBase(pool, underlyingAsset, name, symbol,      
+  incentivesController) {}                                                      
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          850┆ require(
+          851┆   initializing || isConstructor() || revision >                  
+  lastInitializedRevision,                                                      
+          852┆   'Contract instance has already been initialized'
+          853┆ );
+            ⋮┆----------------------------------------
+         1001┆ require(c >= a, 'SafeMath: addition overflow');
+            ⋮┆----------------------------------------
+         1057┆ require(c / a == b, 'SafeMath: multiplication overflow');
+            ⋮┆----------------------------------------
+         1295┆ require(sender != address(0), 'ERC20: transfer from the zero     
+  address');                                                                    
+            ⋮┆----------------------------------------
+         1296┆ require(recipient != address(0), 'ERC20: transfer to the zero    
+  address');                                                                    
+            ⋮┆----------------------------------------
+         1315┆ require(account != address(0), 'ERC20: mint to the zero          
+  address');                                                                    
+            ⋮┆----------------------------------------
+         1331┆ require(account != address(0), 'ERC20: burn from the zero        
+  address');                                                                    
+            ⋮┆----------------------------------------
+         1351┆ require(owner != address(0), 'ERC20: approve from the zero       
+  address');                                                                    
+            ⋮┆----------------------------------------
+         1352┆ require(spender != address(0), 'ERC20: approve to the zero       
+  address');                                                                    
+            ⋮┆----------------------------------------
+         1459┆ revert('TRANSFER_NOT_SUPPORTED');
+            ⋮┆----------------------------------------
+         1471┆ revert('ALLOWANCE_NOT_SUPPORTED');
+            ⋮┆----------------------------------------
+         1477┆ revert('APPROVAL_NOT_SUPPORTED');
+            ⋮┆----------------------------------------
+         1488┆ revert('TRANSFER_NOT_SUPPORTED');
+            ⋮┆----------------------------------------
+         1499┆ revert('ALLOWANCE_NOT_SUPPORTED');
+            ⋮┆----------------------------------------
+         1510┆ revert('ALLOWANCE_NOT_SUPPORTED');
+            ⋮┆----------------------------------------
+         1603┆ require(!(a == -1 && b == _INT256_MIN), 'SignedSafeMath:         
+  multiplication overflow');                                                    
+            ⋮┆----------------------------------------
+         1606┆ require(c / a == b, 'SignedSafeMath: multiplication overflow');
+            ⋮┆----------------------------------------
+         1624┆ require(b != 0, 'SignedSafeMath: division by zero');
+            ⋮┆----------------------------------------
+         1625┆ require(!(b == -1 && a == _INT256_MIN), 'SignedSafeMath: division
+  overflow');                                                                   
+            ⋮┆----------------------------------------
+         1644┆ require((b >= 0 && c <= a) || (b < 0 && c > a), 'SignedSafeMath: 
+  subtraction overflow');                                                       
+            ⋮┆----------------------------------------
+         1661┆ require((b >= 0 && c >= a) || (b < 0 && c < a), 'SignedSafeMath: 
+  addition overflow');                                                          
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+         1603┆ require(!(a == -1 && b == _INT256_MIN), 'SignedSafeMath:         
+  multiplication overflow');                                                    
+            ⋮┆----------------------------------------
+         1625┆ require(!(b == -1 && a == _INT256_MIN), 'SignedSafeMath: division
+  overflow');                                                                   
+            ⋮┆----------------------------------------
+         1644┆ require((b >= 0 && c <= a) || (b < 0 && c > a), 'SignedSafeMath: 
+  subtraction overflow');                                                       
+            ⋮┆----------------------------------------
+         1661┆ require((b >= 0 && c >= a) || (b < 0 && c < a), 'SignedSafeMath: 
+  addition overflow');                                                          
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          850┆ require(
+          851┆   initializing || isConstructor() || revision >                  
+  lastInitializedRevision,                                                      
+          852┆   'Contract instance has already been initialized'
+          853┆ );
+            ⋮┆----------------------------------------
+         1057┆ require(c / a == b, 'SafeMath: multiplication overflow');
+            ⋮┆----------------------------------------
+         1295┆ require(sender != address(0), 'ERC20: transfer from the zero     
+  address');                                                                    
+            ⋮┆----------------------------------------
+         1296┆ require(recipient != address(0), 'ERC20: transfer to the zero    
+  address');                                                                    
+            ⋮┆----------------------------------------
+         1331┆ require(account != address(0), 'ERC20: burn from the zero        
+  address');                                                                    
+            ⋮┆----------------------------------------
+         1351┆ require(owner != address(0), 'ERC20: approve from the zero       
+  address');                                                                    
+            ⋮┆----------------------------------------
+         1352┆ require(spender != address(0), 'ERC20: approve to the zero       
+  address');                                                                    
+            ⋮┆----------------------------------------
+         1603┆ require(!(a == -1 && b == _INT256_MIN), 'SignedSafeMath:         
+  multiplication overflow');                                                    
+            ⋮┆----------------------------------------
+         1606┆ require(c / a == b, 'SignedSafeMath: multiplication overflow');
+            ⋮┆----------------------------------------
+         1625┆ require(!(b == -1 && a == _INT256_MIN), 'SignedSafeMath: division
+  overflow');                                                                   
+            ⋮┆----------------------------------------
+         1644┆ require((b >= 0 && c <= a) || (b < 0 && c > a), 'SignedSafeMath: 
+  subtraction overflow');                                                       
+            ⋮┆----------------------------------------
+         1661┆ require((b >= 0 && c >= a) || (b < 0 && c < a), 'SignedSafeMath: 
+  addition overflow');                                                          
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 40 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

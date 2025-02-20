@@ -1,0 +1,270 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 56 Code Findings │
+└──────────────────┘
+                        
+    /sb/token_audit.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+           87┆ for(uint i = 0; i < PendingTransactionList.length; i++)
+            ⋮┆----------------------------------------
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+          182┆ currentTotalSupply += _amount;
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+            8┆ uint public TransactionsCount = 0;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+           34┆ constructor() ERC20("XXXToken", "XXX") {
+           35┆     VestingWallet = address(this) ;
+           36┆     _mint(msg.sender, 10000000000 * 10 ** 6);
+           37┆     owner = msg.sender;
+           38┆     signers[0x75Df3A4B10a18774c716221270037F55C32F41f4] = true;
+           39┆     signers[0xFEBF8C088d8B823cAADC93ec40F99E162b50B6FF] = true;
+           40┆     currentTotalSupply = totalSupply();
+           41┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+           51┆ for(uint i = 0; i<TransactionsCount; i++){
+            ⋮┆----------------------------------------
+           52┆ if( keccak256(abi.encodePacked((VestingTransactions[i].status))) 
+  == keccak256(abi.encodePacked(("pending")))){                                 
+            ⋮┆----------------------------------------
+           66┆ for(uint i = 0; i < TransactionsCount; i++)
+            ⋮┆----------------------------------------
+           68┆ if( VestingTransactions[i].to == account &&                      
+  keccak256(abi.encodePacked((VestingTransactions[i].status))) !=               
+  keccak256(abi.encodePacked(("successful"))))                                  
+            ⋮┆----------------------------------------
+           68┆ if( VestingTransactions[i].to == account &&                      
+  keccak256(abi.encodePacked((VestingTransactions[i].status))) !=               
+  keccak256(abi.encodePacked(("successful"))))                                  
+            ⋮┆----------------------------------------
+           70┆ Total_amount=Total_amount+VestingTransactions[i].amount;
+            ⋮┆----------------------------------------
+           87┆ for(uint i = 0; i < PendingTransactionList.length; i++)
+            ⋮┆----------------------------------------
+           90┆ if( block.timestamp > VestingTransactions[i].DueDate)
+            ⋮┆----------------------------------------
+           92┆ VestingTransactions[i].status = "Duted";
+            ⋮┆----------------------------------------
+           93┆ PendingTransactionList[i]=0;
+            ⋮┆----------------------------------------
+           95┆  ... VestingTransactions[i].ExecuteDate + 3600 &&                
+  keccak256(abi.encodePacked((VestingTransactions[i].status))) ==               
+  keccak256(abi.encodePacked(("pending")))){ ... [0m                            
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+           95┆  ... VestingTransactions[i].status))) ==                         
+  keccak256(abi.encodePacked(("pending")))){ ... [0m                            
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+           96┆ VestingTransactions[i].status = "failed";
+            ⋮┆----------------------------------------
+           97┆ PendingTransactionList[i]=0;
+            ⋮┆----------------------------------------
+          104┆ for( i = 0; i < TransactionsCount; i++)
+            ⋮┆----------------------------------------
+          106┆ if(keccak256(abi.encodePacked((VestingTransactions[i].status)))  
+  == keccak256(abi.encodePacked(("pending"))))                                  
+            ⋮┆----------------------------------------
+          159┆ for(uint i = 0; i<TransactionsCount; i++)
+            ⋮┆----------------------------------------
+          161┆ if(VestingTransactions[i].DueDate <= block.timestamp &&          
+  VestingTransactions[i].to == _msgSender() )                                   
+            ⋮┆----------------------------------------
+          161┆ if(VestingTransactions[i].DueDate <= block.timestamp &&          
+  VestingTransactions[i].to == _msgSender() )                                   
+            ⋮┆----------------------------------------
+          164┆ if(keccak256(abi.encodePacked((VestingTransactions[i].status)))  
+  == keccak256(abi.encodePacked(("approved"))))                                 
+            ⋮┆----------------------------------------
+          166┆ address _to = VestingTransactions[i].to;
+            ⋮┆----------------------------------------
+          167┆ uint _amount = VestingTransactions[i].amount;
+            ⋮┆----------------------------------------
+          168┆ _transfer(VestingWallet, msg.sender, _amount);
+            ⋮┆----------------------------------------
+          169┆ VestingTransactions[i].status = "successful";
+            ⋮┆----------------------------------------
+          170┆ emit SoldToken(VestingWallet, _to, _amount);
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+           51┆ for(uint i = 0; i<TransactionsCount; i++){
+            ⋮┆----------------------------------------
+           66┆ for(uint i = 0; i < TransactionsCount; i++)
+            ⋮┆----------------------------------------
+           87┆ for(uint i = 0; i < PendingTransactionList.length; i++)
+            ⋮┆----------------------------------------
+          159┆ for(uint i = 0; i<TransactionsCount; i++)
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           26┆ require(msg.sender == owner, "You are not the owner of this smart
+  contract. Contact info@futiracoin.com for help.");                            
+            ⋮┆----------------------------------------
+           29┆ require(msg.sender == VestingWallet, "You are not the            
+  VestingWallet of this smart contract. Contact info@futiracoin.com for help.");
+            ⋮┆----------------------------------------
+           32┆ require(signers[msg.sender] == true, "You are not the signer of  
+  this smart contract. Contact info@futiracoin.com for help.");                 
+            ⋮┆----------------------------------------
+          173┆ revert("You currently don't have duted transactions . Contact    
+  info@futiracoin.com for help.");                                              
+            ⋮┆----------------------------------------
+          186┆ require(currentTotalSupply >= _amount, "The amount is greater    
+  than the total supply. Contact info@futiracoin.com for help.");               
+            ⋮┆----------------------------------------
+          192┆ revert("This operation is not acceptable. Contact                
+  info@futiracoin.com for help.");                                              
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+           68┆ if( VestingTransactions[i].to == account &&                      
+  keccak256(abi.encodePacked((VestingTransactions[i].status))) !=               
+  keccak256(abi.encodePacked(("successful"))))                                  
+           69┆ {
+           70┆    Total_amount=Total_amount+VestingTransactions[i].amount;
+           71┆    numberofTRX=numberofTRX+1;
+           72┆ }  }
+            ⋮┆----------------------------------------
+           95┆  ... if(block.timestamp > VestingTransactions[i].ExecuteDate +   
+  3600 && keccak256(abi.encodePacked((VestingTransactions[i].status))) ==       
+  keccak256(abi.encodePacked(("p ... [0m                                        
+           96┆     VestingTransactions[i].status = "failed";
+           97┆     PendingTransactionList[i]=0;
+           98┆ }  }
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+          124┆ if(block.timestamp < VestingTransactions[_id].ExecuteDate + 3600 
+  && keccak256(abi.encodePacked((VestingTransactions[_id].status))) ==          
+  keccak256(abi.encodePacked ... [0m                                            
+          125┆ {
+          126┆     if(VestingTransactions[_id].DueDate < block.timestamp ){
+          127┆         VestingTransactions[_id].status ="successful";
+          128┆         _transfer(owner, VestingTransactions[_id].to,            
+  VestingTransactions[_id].amount);                                             
+          129┆         PendingTransactionList[_id]=0;
+          130┆     }
+          131┆     else {
+          132┆     VestingTransactions[_id].status ="approved";
+          133┆      _transfer(owner, VestingWallet,                             
+  VestingTransactions[_id].amount);                                             
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+             [hid 9 additional lines, adjust with --max-lines-per-finding] 
+          138┆  ... if (block.timestamp > VestingTransactions[_id].ExecuteDate +
+  3600 && keccak256(abi.encodePacked((VestingTransactions[_id].status))) ==     
+  keccak256(abi.encodePacke ... [0m                                             
+          139┆     VestingTransactions[_id].status ="failed";
+          140┆     PendingTransactionList[_id]=0;
+          141┆      return false;
+          142┆ }   }
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+          161┆ if(VestingTransactions[i].DueDate <= block.timestamp &&          
+  VestingTransactions[i].to == _msgSender() )                                   
+          162┆ {
+          163┆     status = true;
+          164┆ if(keccak256(abi.encodePacked((VestingTransactions[i].status)))  
+  == keccak256(abi.encodePacked(("approved"))))                                 
+          165┆ {
+          166┆     address _to = VestingTransactions[i].to;
+          167┆     uint _amount = VestingTransactions[i].amount;
+          168┆     _transfer(VestingWallet, msg.sender, _amount);
+          169┆     VestingTransactions[i].status = "successful";
+          170┆     emit SoldToken(VestingWallet, _to, _amount);
+             [hid 1 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+           51┆ for(uint i = 0; i<TransactionsCount; i++){
+            ⋮┆----------------------------------------
+           53┆ count++;
+            ⋮┆----------------------------------------
+           66┆ for(uint i = 0; i < TransactionsCount; i++)
+            ⋮┆----------------------------------------
+           87┆ for(uint i = 0; i < PendingTransactionList.length; i++)
+            ⋮┆----------------------------------------
+          104┆ for( i = 0; i < TransactionsCount; i++)
+            ⋮┆----------------------------------------
+          159┆ for(uint i = 0; i<TransactionsCount; i++)
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           26┆ require(msg.sender == owner, "You are not the owner of this smart
+  contract. Contact info@futiracoin.com for help.");                            
+            ⋮┆----------------------------------------
+           29┆ require(msg.sender == VestingWallet, "You are not the            
+  VestingWallet of this smart contract. Contact info@futiracoin.com for help.");
+            ⋮┆----------------------------------------
+           32┆ require(signers[msg.sender] == true, "You are not the signer of  
+  this smart contract. Contact info@futiracoin.com for help.");                 
+            ⋮┆----------------------------------------
+          173┆ revert("You currently don't have duted transactions . Contact    
+  info@futiracoin.com for help.");                                              
+            ⋮┆----------------------------------------
+          186┆ require(currentTotalSupply >= _amount, "The amount is greater    
+  than the total supply. Contact info@futiracoin.com for help.");               
+            ⋮┆----------------------------------------
+          192┆ revert("This operation is not acceptable. Contact                
+  info@futiracoin.com for help.");                                              
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 56 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

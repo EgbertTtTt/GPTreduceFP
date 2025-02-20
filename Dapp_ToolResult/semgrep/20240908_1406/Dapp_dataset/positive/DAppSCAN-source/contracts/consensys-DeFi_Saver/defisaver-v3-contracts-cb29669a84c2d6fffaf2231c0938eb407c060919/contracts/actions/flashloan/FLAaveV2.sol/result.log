@@ -1,0 +1,211 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 47 Code Findings │
+└──────────────────┘
+                     
+    /sb/FLAaveV2.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          205┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          214┆ _callOptionalReturn(
+          215┆     token,
+          216┆     abi.encodeWithSelector(token.transferFrom.selector, from, to,
+  value)                                                                        
+          217┆ );
+            ⋮┆----------------------------------------
+          229┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, 0));                  
+            ⋮┆----------------------------------------
+          230┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          239┆ _callOptionalReturn(
+          240┆     token,
+          241┆     abi.encodeWithSelector(token.approve.selector, spender,      
+  newAllowance)                                                                 
+          242┆ );
+            ⋮┆----------------------------------------
+          254┆ _callOptionalReturn(
+          255┆     token,
+          256┆     abi.encodeWithSelector(token.approve.selector, spender,      
+  newAllowance)                                                                 
+          257┆ );
+            ⋮┆----------------------------------------
+         1857┆ IDSProxy(proxy).execute{value: address(this).balance}(
+         1858┆     taskExecutor,
+         1859┆     abi.encodeWithSelector(CALLBACK_SELECTOR, currTask,          
+  bytes32(_amounts[0] + _fees[0]))                                              
+         1860┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          938┆ for (uint i = 0; i < usersPos[_user].length; ++i) {
+            ⋮┆----------------------------------------
+         1850┆ for (uint256 i = 0; i < _assets.length; ++i) {
+            ⋮┆----------------------------------------
+         1863┆ for (uint256 i = 0; i < _assets.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          278┆ constructor() {
+          279┆     owner = msg.sender;
+          280┆     admin = 0x25eFA336886C74eA8E282ac466BdCd0199f85BB9;
+          281┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          938┆ for (uint i = 0; i < usersPos[_user].length; ++i) {
+            ⋮┆----------------------------------------
+          939┆ userStrategies[i] = strategies[usersPos[_user][i]];
+            ⋮┆----------------------------------------
+          939┆ userStrategies[i] = strategies[usersPos[_user][i]];
+            ⋮┆----------------------------------------
+          955┆ strategiesPerPage[count] = strategies[i];
+            ⋮┆----------------------------------------
+          972┆ templatesPerPage[count] = templates[i];
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          938┆ for (uint i = 0; i < usersPos[_user].length; ++i) {
+            ⋮┆----------------------------------------
+          954┆ for (uint i = start; i < end; i++) {
+            ⋮┆----------------------------------------
+          971┆ for (uint i = start; i < end; i++) {
+            ⋮┆----------------------------------------
+         1850┆ for (uint256 i = 0; i < _assets.length; ++i) {
+            ⋮┆----------------------------------------
+         1863┆ for (uint256 i = 0; i < _assets.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           62┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+           66┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+           96┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          106┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          132┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          161┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          268┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          286┆ require(admin == msg.sender, "msg.sender not admin");
+            ⋮┆----------------------------------------
+          293┆ require(admin == msg.sender, "msg.sender not admin");
+            ⋮┆----------------------------------------
+          306┆ require(adminVault.owner() == msg.sender, "msg.sender not        
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          311┆ require(adminVault.admin() == msg.sender, "msg.sender not        
+  admin");                                                                      
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         1696┆ if (_from != address(0) && _from != address(this) && _token !=   
+  ETH_ADDR && _amount != 0) {                                                   
+         1697┆     IERC20(_token).safeTransferFrom(_from, address(this),        
+  _amount);                                                                     
+         1698┆ }
+            ⋮┆----------------------------------------
+         1712┆ if (_to != address(0) && _to != address(this) && _amount != 0) {
+         1713┆     if (_token != ETH_ADDR) {
+         1714┆         IERC20(_token).safeTransfer(_to, _amount);
+         1715┆     } else {
+         1716┆         payable(_to).transfer(_amount);
+         1717┆     }
+         1718┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          809┆ updateCounter++;
+            ⋮┆----------------------------------------
+          838┆ updateCounter++;
+            ⋮┆----------------------------------------
+          869┆ updateCounter++;
+            ⋮┆----------------------------------------
+          954┆ for (uint i = start; i < end; i++) {
+            ⋮┆----------------------------------------
+          956┆ count++;
+            ⋮┆----------------------------------------
+          971┆ for (uint i = start; i < end; i++) {
+            ⋮┆----------------------------------------
+          973┆ count++;
+            ⋮┆----------------------------------------
+         1863┆ for (uint256 i = 0; i < _assets.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           66┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+           96┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          161┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          268┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+       solidity.security.basic-arithmetic-underflow
+          Possible arithmetic underflow            
+                                                   
+         1794┆ bytes memory taskData = _callData[_callData.length - 1];
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 47 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

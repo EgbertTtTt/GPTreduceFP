@@ -1,0 +1,143 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 26 Code Findings │
+└──────────────────┘
+                    
+    /sb/Staking.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          581┆ for (uint i = 0; i < tokens.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          391┆ constructor (uint256 _epoch1Start, uint256 _epochDuration) public
+  {                                                                             
+          392┆     epoch1Start = _epoch1Start;
+          393┆     epochDuration = _epochDuration;
+          394┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          582┆ Pool storage p = poolSize[tokens[i]][epochId];
+            ⋮┆----------------------------------------
+          591┆ p.size = poolSize[tokens[i]][epochId - 1].size;
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          581┆ for (uint i = 0; i < tokens.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          161┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          176┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          193┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          210┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          227┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          336┆ require(_status != _ENTERED, "ReentrancyGuard: reentrant call");
+            ⋮┆----------------------------------------
+          400┆ require(amount > 0, "Staking: Amount must be > 0");
+            ⋮┆----------------------------------------
+          404┆ require(allowance >= amount, "Staking: Token allowance too       
+  small");                                                                      
+            ⋮┆----------------------------------------
+          491┆ require(balances[msg.sender][tokenAddress] >= amount, "Staking:  
+  balance too small");                                                          
+            ⋮┆----------------------------------------
+          579┆ require(epochId <= getCurrentEpoch(), "can't init a future       
+  epoch");                                                                      
+            ⋮┆----------------------------------------
+          588┆ require(!epochIsInitialized(tokens[i], epochId), "Staking: epoch 
+  already initialized");                                                        
+            ⋮┆----------------------------------------
+          589┆ require(epochIsInitialized(tokens[i], epochId - 1), "Staking:    
+  previous epoch not initialized");                                             
+            ⋮┆----------------------------------------
+          600┆ require((getCurrentEpoch() - lastWithdrawEpochId[tokenAddress])  
+  >= 10, "At least 10 epochs must pass without success");                       
+            ⋮┆----------------------------------------
+          603┆ require(totalUserBalance > 0, "Amount must be > 0");
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          466┆ if (last >= 1 && checkpoints[last - 1].epochId == currentEpoch) {
+          467┆     checkpoints[last - 1].multiplier = computeNewMultiplier(
+          468┆         getCheckpointBalance(checkpoints[last - 1]),
+          469┆         checkpoints[last - 1].multiplier,
+          470┆         amount,
+          471┆         currentMultiplier
+          472┆     );
+          473┆     checkpoints[last - 1].newDeposits = checkpoints[last -       
+  1].newDeposits.add(amount);                                                   
+          474┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          581┆ for (uint i = 0; i < tokens.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          193┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          404┆ require(allowance >= amount, "Staking: Token allowance too       
+  small");                                                                      
+            ⋮┆----------------------------------------
+          588┆ require(!epochIsInitialized(tokens[i], epochId), "Staking: epoch 
+  already initialized");                                                        
+            ⋮┆----------------------------------------
+          589┆ require(epochIsInitialized(tokens[i], epochId - 1), "Staking:    
+  previous epoch not initialized");                                             
+            ⋮┆----------------------------------------
+          600┆ require((getCurrentEpoch() - lastWithdrawEpochId[tokenAddress])  
+  >= 10, "At least 10 epochs must pass without success");                       
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 26 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

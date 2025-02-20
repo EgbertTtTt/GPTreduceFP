@@ -1,0 +1,645 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                     
+                     
+┌───────────────────┐
+│ 170 Code Findings │
+└───────────────────┘
+                     
+    /sb/FraxPool.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+         2056┆ for (uint i; i < path.length - 1; i++) {
+            ⋮┆----------------------------------------
+         2067┆ for (uint i = path.length - 1; i > 0; i--) {
+            ⋮┆----------------------------------------
+         2404┆ for (uint i = 0; i < frax_pools_array.length; i++){
+            ⋮┆----------------------------------------
+         2472┆ for (uint i = 0; i < frax_pools_array.length; i++){
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+         2084┆ bool public ALLOW_STALE_CONSULTS = false; // If false, consult() 
+  will fail if the TWAP is stale                                                
+            ⋮┆----------------------------------------
+         2298┆ bool public collateral_ratio_paused = false;
+            ⋮┆----------------------------------------
+         2724┆ uint256 public pool_ceiling = 0;
+            ⋮┆----------------------------------------
+         2727┆ uint256 public pausedPrice = 0;
+            ⋮┆----------------------------------------
+         2743┆ bool public mintPaused = false;
+            ⋮┆----------------------------------------
+         2744┆ bool public redeemPaused = false;
+            ⋮┆----------------------------------------
+         2745┆ bool public recollateralizePaused = false;
+            ⋮┆----------------------------------------
+         2746┆ bool public buyBackPaused = false;
+            ⋮┆----------------------------------------
+         2747┆ bool public collateralPricePaused = false;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          174┆ constructor () internal { }
+            ⋮┆----------------------------------------
+          769┆ constructor (string memory name, string memory symbol) public {
+          770┆     _name = name;
+          771┆     _symbol = symbol;
+          772┆     _decimals = 18;
+          773┆ }
+            ⋮┆----------------------------------------
+         1562┆ constructor(
+         1563┆     string memory _name,
+         1564┆     string memory _symbol,
+         1565┆     address _oracle_address,
+         1566┆     address _owner_address,
+         1567┆     address _timelock_address
+         1568┆ ) public {
+         1569┆     name = _name;
+         1570┆     symbol = _symbol;
+         1571┆     owner_address = _owner_address;
+             [hid 8 additional lines, adjust with --max-lines-per-finding] 
+         2101┆ constructor(address factory, address tokenA, address tokenB,     
+  address _owner_address, address _timelock_address) public {                   
+         2102┆     IUniswapV2Pair _pair =                                       
+  IUniswapV2Pair(UniswapV2Library.pairFor(factory, tokenA, tokenB));            
+         2103┆     pair = _pair;
+         2104┆     token0 = _pair.token0();
+         2105┆     token1 = _pair.token1();
+         2106┆     price0CumulativeLast = _pair.price0CumulativeLast(); // Fetch
+  the current accumulated price value (1 / 0)                                   
+         2107┆     price1CumulativeLast = _pair.price1CumulativeLast(); // Fetch
+  the current accumulated price value (0 / 1)                                   
+         2108┆     uint112 reserve0;
+         2109┆     uint112 reserve1;
+         2110┆     (reserve0, reserve1, blockTimestampLast) =                   
+  _pair.getReserves();                                                          
+             [hid 5 additional lines, adjust with --max-lines-per-finding] 
+         2216┆ constructor() public {
+         2217┆     priceFeed =                                                  
+  AggregatorV3Interface(0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419);            
+         2218┆ }
+            ⋮┆----------------------------------------
+         2328┆ constructor(
+         2329┆     string memory _name,
+         2330┆     string memory _symbol,
+         2331┆     address _creator_address,
+         2332┆     address _timelock_address
+         2333┆ ) public {
+         2334┆     name = _name;
+         2335┆     symbol = _symbol;
+         2336┆     creator_address = _creator_address;
+         2337┆     timelock_address = _timelock_address;
+             [hid 12 additional lines, adjust with --max-lines-per-finding] 
+         2768┆ constructor(
+         2769┆     address _frax_contract_address,
+         2770┆     address _fxs_contract_address,
+         2771┆     address _collateral_address,
+         2772┆     address _creator_address,
+         2773┆     address _timelock_address,
+         2774┆     uint256 _pool_ceiling
+         2775┆ ) public {
+         2776┆     FRAX = FRAXStablecoin(_frax_contract_address);
+         2777┆     FXS = FRAXShares(_fxs_contract_address);
+             [hid 16 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+         1704┆ Checkpoint memory cp = checkpoints[account][center];
+            ⋮┆----------------------------------------
+         2404┆ for (uint i = 0; i < frax_pools_array.length; i++){
+            ⋮┆----------------------------------------
+         2406┆ if (frax_pools_array[i] != address(0)){
+            ⋮┆----------------------------------------
+         2407┆ total_collateral_value_d18 =                                     
+  total_collateral_value_d18.add(FraxPool(frax_pools_array[i]).collatDollarBalan
+  ce());                                                                        
+            ⋮┆----------------------------------------
+         2472┆ for (uint i = 0; i < frax_pools_array.length; i++){
+            ⋮┆----------------------------------------
+         2473┆ if (frax_pools_array[i] == pool_address) {
+            ⋮┆----------------------------------------
+         2474┆ frax_pools_array[i] = address(0); // This will leave a null in   
+  the array and keep the indices the same                                       
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+         2056┆ for (uint i; i < path.length - 1; i++) {
+            ⋮┆----------------------------------------
+         2404┆ for (uint i = 0; i < frax_pools_array.length; i++){
+            ⋮┆----------------------------------------
+         2472┆ for (uint i = 0; i < frax_pools_array.length; i++){
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           31┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+           85┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          310┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          314┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          371┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          372┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          396┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          420┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          596┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          597┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          616┆ require(account != address(0), "ERC20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+          665┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          688┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          689┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          922┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          923┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          942┆ require(account != address(0), "ERC20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+          991┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1014┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1015┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1175┆ require(set._values.length > index, "EnumerableSet: index out of 
+  bounds");                                                                     
+            ⋮┆----------------------------------------
+         1416┆ require(hasRole(_roles[role].adminRole, _msgSender()),           
+  "AccessControl: sender must be an admin to grant");                           
+            ⋮┆----------------------------------------
+         1431┆ require(hasRole(_roles[role].adminRole, _msgSender()),           
+  "AccessControl: sender must be an admin to revoke");                          
+            ⋮┆----------------------------------------
+         1451┆ require(account == _msgSender(), "AccessControl: can only        
+  renounce roles for self");                                                    
+            ⋮┆----------------------------------------
+         1551┆ require(FRAX.frax_pools(msg.sender) == true, "Only frax pools can
+  mint new FRAX");                                                              
+            ⋮┆----------------------------------------
+         1556┆ require(msg.sender == owner_address || msg.sender ==             
+  timelock_address, "You are not an owner or the governance timelock");         
+            ⋮┆----------------------------------------
+         1683┆ require(blockNumber < block.number, "FXS::getPriorVotes: not yet 
+  determined");                                                                 
+            ⋮┆----------------------------------------
+         1919┆ require(x != 0, 'FixedPoint: DIV_BY_ZERO');
+            ⋮┆----------------------------------------
+         1927┆ require(y == 0 || (z = uint(self._x) * y) / y == uint(self._x),  
+  "FixedPoint: MULTIPLICATION_OVERFLOW");                                       
+            ⋮┆----------------------------------------
+         1934┆ require(denominator > 0, "FixedPoint: DIV_BY_ZERO");
+            ⋮┆----------------------------------------
+         1950┆ require(self._x != 0, 'FixedPoint: ZERO_RECIPROCAL');
+            ⋮┆----------------------------------------
+         1996┆ require(tokenA != tokenB, 'UniswapV2Library:                     
+  IDENTICAL_ADDRESSES');                                                        
+            ⋮┆----------------------------------------
+         1998┆ require(token0 != address(0), 'UniswapV2Library: ZERO_ADDRESS');
+            ⋮┆----------------------------------------
+         2027┆ require(amountA > 0, 'UniswapV2Library: INSUFFICIENT_AMOUNT');
+            ⋮┆----------------------------------------
+         2028┆ require(reserveA > 0 && reserveB > 0, 'UniswapV2Library:         
+  INSUFFICIENT_LIQUIDITY');                                                     
+            ⋮┆----------------------------------------
+         2034┆ require(amountIn > 0, 'UniswapV2Library:                         
+  INSUFFICIENT_INPUT_AMOUNT');                                                  
+            ⋮┆----------------------------------------
+         2035┆ require(reserveIn > 0 && reserveOut > 0, 'UniswapV2Library:      
+  INSUFFICIENT_LIQUIDITY');                                                     
+            ⋮┆----------------------------------------
+         2044┆ require(amountOut > 0, 'UniswapV2Library:                        
+  INSUFFICIENT_OUTPUT_AMOUNT');                                                 
+            ⋮┆----------------------------------------
+         2045┆ require(reserveIn > 0 && reserveOut > 0, 'UniswapV2Library:      
+  INSUFFICIENT_LIQUIDITY');                                                     
+            ⋮┆----------------------------------------
+         2053┆ require(path.length >= 2, 'UniswapV2Library: INVALID_PATH');
+            ⋮┆----------------------------------------
+         2064┆ require(path.length >= 2, 'UniswapV2Library: INVALID_PATH');
+            ⋮┆----------------------------------------
+         2097┆ require(msg.sender == owner_address || msg.sender ==             
+  timelock_address, "You are not an owner or the governance timelock");         
+            ⋮┆----------------------------------------
+         2111┆ require(reserve0 != 0 && reserve1 != 0, 'UniswapPairOracle:      
+  NO_RESERVES'); // Ensure that there's liquidity in the pair                   
+            ⋮┆----------------------------------------
+         2150┆ require(timeElapsed >= PERIOD, 'UniswapPairOracle:               
+  PERIOD_NOT_ELAPSED');                                                         
+            ⋮┆----------------------------------------
+         2168┆ require((timeElapsed < (PERIOD + CONSULT_LENIENCY)) ||           
+  ALLOW_STALE_CONSULTS, 'UniswapPairOracle:                                     
+  PRICE_IS_STALE_NEED_TO_CALL_UPDATE');                                         
+            ⋮┆----------------------------------------
+         2173┆ require(token == token1, 'UniswapPairOracle: INVALID_TOKEN');
+            ⋮┆----------------------------------------
+         2308┆ require(frax_pools[msg.sender] == true, "Only frax pools can call
+  this function");                                                              
+            ⋮┆----------------------------------------
+         2313┆ require(msg.sender == owner_address || msg.sender ==             
+  timelock_address || msg.sender == controller_address, "You are not the owner, 
+  controller, or the governance ... [0m                                         
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+         2318┆ require(
+         2319┆     msg.sender == owner_address
+         2320┆     || msg.sender == timelock_address
+         2321┆     || frax_pools[msg.sender] == true,
+         2322┆     "You are not the owner, the governance timelock, or a pool");
+            ⋮┆----------------------------------------
+         2365┆ else revert("INVALID PRICE CHOICE. Needs to be either 0 (FRAX) or
+  1 (FXS)");                                                                    
+            ⋮┆----------------------------------------
+         2419┆ require(collateral_ratio_paused == false, "Collateral Ratio has  
+  been paused");                                                                
+            ⋮┆----------------------------------------
+         2421┆ require(block.timestamp - last_call_time >= refresh_cooldown,    
+  "Must wait for the refresh cooldown since last refresh");                     
+            ⋮┆----------------------------------------
+         2458┆ require(frax_pools[pool_address] == false, "address already      
+  exists");                                                                     
+            ⋮┆----------------------------------------
+         2465┆ require(frax_pools[pool_address] == true, "address doesn't exist 
+  already");                                                                    
+            ⋮┆----------------------------------------
+         2619┆ require(params.excess_collateral_dollar_value_d18 > 0, "No excess
+  collateral to buy back!");                                                    
+            ⋮┆----------------------------------------
+         2623┆ require(fxs_dollar_value_d18 <=                                  
+  params.excess_collateral_dollar_value_d18, "You are trying to buy back more   
+  than the excess!");                                                           
+            ⋮┆----------------------------------------
+         2752┆ require(msg.sender == timelock_address || msg.sender ==          
+  owner_address, "You are not the owner or the governance timelock");           
+            ⋮┆----------------------------------------
+         2757┆ require(redeemPaused == false, "Redeeming is paused");
+            ⋮┆----------------------------------------
+         2762┆ require(mintPaused == false, "Minting is paused");
+            ⋮┆----------------------------------------
+         2844┆ require(FRAX.global_collateral_ratio() >= COLLATERAL_RATIO_MAX,  
+  "Collateral ratio must be >= 1");                                             
+            ⋮┆----------------------------------------
+         2845┆                                                                  
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 170 findings.
+  require((collateral_token.balanceOf(address(this))).sub(unclaimedPoolCollatera
+  l).add(collateral_amount) <= pool_ceiling, "[Pool's Closed]: Ceiling          
+  reached");                                                                    
+            ⋮┆----------------------------------------
+         2853┆ require(FRAX_out_min <= frax_amount_d18, "Slippage limit         
+  reached");                                                                    
+            ⋮┆----------------------------------------
+         2863┆ require(FRAX.global_collateral_ratio() == 0, "Collateral ratio   
+  must be 0");                                                                  
+            ⋮┆----------------------------------------
+         2871┆ require(FRAX_out_min <= frax_amount_d18, "Slippage limit         
+  reached");                                                                    
+            ⋮┆----------------------------------------
+         2883┆ require(global_collateral_ratio < COLLATERAL_RATIO_MAX &&        
+  global_collateral_ratio > 0, "Collateral ratio needs to be between .000001 and
+  .999999");                                                                    
+            ⋮┆----------------------------------------
+         2884┆                                                                  
+  require(collateral_token.balanceOf(address(this)).sub(unclaimedPoolCollateral)
+  .add(collateral_amount) <= pool_ceiling, "Pool ceiling reached, no more FRAX  
+  can b ... [0m                                                                 
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+         2898┆ require(FRAX_out_min <= mint_amount, "Slippage limit reached");
+            ⋮┆----------------------------------------
+         2899┆ require(fxs_needed <= fxs_amount, "Not enough FXS inputted");
+            ⋮┆----------------------------------------
+         2909┆ require(FRAX.global_collateral_ratio() == COLLATERAL_RATIO_MAX,  
+  "Collateral ratio must be == 1");                                             
+            ⋮┆----------------------------------------
+         2919┆ require(collateral_needed <=                                     
+  collateral_token.balanceOf(address(this)).sub(unclaimedPoolCollateral), "Not  
+  enough collateral in pool");                                                  
+            ⋮┆----------------------------------------
+         2920┆ require(COLLATERAL_out_min <= collateral_needed, "Slippage limit 
+  reached");                                                                    
+            ⋮┆----------------------------------------
+         2936┆ require(global_collateral_ratio < COLLATERAL_RATIO_MAX &&        
+  global_collateral_ratio > 0, "Collateral ratio needs to be between .000001 and
+  .999999");                                                                    
+            ⋮┆----------------------------------------
+         2950┆ require(collateral_amount <=                                     
+  collateral_token.balanceOf(address(this)).sub(unclaimedPoolCollateral), "Not  
+  enough collateral in pool");                                                  
+            ⋮┆----------------------------------------
+         2951┆ require(COLLATERAL_out_min <= collateral_amount, "Slippage limit 
+  reached [collateral]");                                                       
+            ⋮┆----------------------------------------
+         2952┆ require(FXS_out_min <= fxs_amount, "Slippage limit reached       
+  [FXS]");                                                                      
+            ⋮┆----------------------------------------
+         2972┆ require(global_collateral_ratio == 0, "Collateral ratio must be  
+  0");                                                                          
+            ⋮┆----------------------------------------
+         2984┆ require(FXS_out_min <= fxs_amount, "Slippage limit reached");
+            ⋮┆----------------------------------------
+         2994┆ require((lastRedeemed[msg.sender].add(redemption_delay)) <=      
+  block.number, "Must wait for redemption_delay blocks before collecting        
+  redemption");                                                                 
+            ⋮┆----------------------------------------
+         3033┆ require(recollateralizePaused == false, "Recollateralize is      
+  paused");                                                                     
+            ⋮┆----------------------------------------
+         3052┆ require(FXS_out_min <= fxs_paid_back, "Slippage limit reached");
+            ⋮┆----------------------------------------
+         3062┆ require(buyBackPaused == false, "Buyback is paused");
+            ⋮┆----------------------------------------
+         3075┆ require(COLLATERAL_out_min <= collateral_precision, "Slippage    
+  limit reached");                                                              
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+         2028┆ require(reserveA > 0 && reserveB > 0, 'UniswapV2Library:         
+  INSUFFICIENT_LIQUIDITY');                                                     
+            ⋮┆----------------------------------------
+         2035┆ require(reserveIn > 0 && reserveOut > 0, 'UniswapV2Library:      
+  INSUFFICIENT_LIQUIDITY');                                                     
+            ⋮┆----------------------------------------
+         2045┆ require(reserveIn > 0 && reserveOut > 0, 'UniswapV2Library:      
+  INSUFFICIENT_LIQUIDITY');                                                     
+            ⋮┆----------------------------------------
+         2111┆ require(reserve0 != 0 && reserve1 != 0, 'UniswapPairOracle:      
+  NO_RESERVES'); // Ensure that there's liquidity in the pair                   
+            ⋮┆----------------------------------------
+         2883┆ require(global_collateral_ratio < COLLATERAL_RATIO_MAX &&        
+  global_collateral_ratio > 0, "Collateral ratio needs to be between .000001 and
+  .999999");                                                                    
+            ⋮┆----------------------------------------
+         2936┆ require(global_collateral_ratio < COLLATERAL_RATIO_MAX &&        
+  global_collateral_ratio > 0, "Collateral ratio needs to be between .000001 and
+  .999999");                                                                    
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         1721┆ if (srcRep != dstRep && amount > 0) {
+         1722┆     if (srcRep != address(0)) {
+         1723┆         uint32 srcRepNum = numCheckpoints[srcRep];
+         1724┆         uint96 srcRepOld = srcRepNum > 0 ?                       
+  checkpoints[srcRep][srcRepNum - 1].votes : 0;                                 
+         1725┆         uint96 srcRepNew = sub96(srcRepOld, amount,              
+  "FXS::_moveVotes: vote amount underflows");                                   
+         1726┆         _writeCheckpoint(srcRep, srcRepNum, srcRepOld,           
+  srcRepNew);                                                                   
+         1727┆     }
+         1728┆ 
+         1729┆     if (dstRep != address(0)) {
+         1730┆         uint32 dstRepNum = numCheckpoints[dstRep];
+             [hid 5 additional lines, adjust with --max-lines-per-finding] 
+         1741┆ if (nCheckpoints > 0 && checkpoints[voter][nCheckpoints -        
+  1].fromBlock == blockNumber) {                                                
+         1742┆     checkpoints[voter][nCheckpoints - 1].votes = newVotes;
+         1743┆ } else {
+         1744┆     checkpoints[voter][nCheckpoints] = Checkpoint(blockNumber,   
+  newVotes);                                                                    
+         1745┆     numCheckpoints[voter] = nCheckpoints + 1;
+         1746┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-decrement-not-postfix                    
+          Consider using the prefix decrement expression whenever the return    
+  value is not needed. The                                                      
+          prefix decrement expression is cheaper in terms of gas.               
+                                                                                
+         2067┆ for (uint i = path.length - 1; i > 0; i--) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+         2056┆ for (uint i; i < path.length - 1; i++) {
+            ⋮┆----------------------------------------
+         2404┆ for (uint i = 0; i < frax_pools_array.length; i++){
+            ⋮┆----------------------------------------
+         2472┆ for (uint i = 0; i < frax_pools_array.length; i++){
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           85┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          314┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          371┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          396┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          420┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          596┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          597┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          665┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          688┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          689┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          922┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          923┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          991┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1014┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1015┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1175┆ require(set._values.length > index, "EnumerableSet: index out of 
+  bounds");                                                                     
+            ⋮┆----------------------------------------
+         1416┆ require(hasRole(_roles[role].adminRole, _msgSender()),           
+  "AccessControl: sender must be an admin to grant");                           
+            ⋮┆----------------------------------------
+         1431┆ require(hasRole(_roles[role].adminRole, _msgSender()),           
+  "AccessControl: sender must be an admin to revoke");                          
+            ⋮┆----------------------------------------
+         1451┆ require(account == _msgSender(), "AccessControl: can only        
+  renounce roles for self");                                                    
+            ⋮┆----------------------------------------
+         1551┆ require(FRAX.frax_pools(msg.sender) == true, "Only frax pools can
+  mint new FRAX");                                                              
+            ⋮┆----------------------------------------
+         1556┆ require(msg.sender == owner_address || msg.sender ==             
+  timelock_address, "You are not an owner or the governance timelock");         
+            ⋮┆----------------------------------------
+         1683┆ require(blockNumber < block.number, "FXS::getPriorVotes: not yet 
+  determined");                                                                 
+            ⋮┆----------------------------------------
+         1927┆ require(y == 0 || (z = uint(self._x) * y) / y == uint(self._x),  
+  "FixedPoint: MULTIPLICATION_OVERFLOW");                                       
+            ⋮┆----------------------------------------
+         1996┆ require(tokenA != tokenB, 'UniswapV2Library:                     
+  IDENTICAL_ADDRESSES');                                                        
+            ⋮┆----------------------------------------
+         2027┆ require(amountA > 0, 'UniswapV2Library: INSUFFICIENT_AMOUNT');
+            ⋮┆----------------------------------------
+         2028┆ require(reserveA > 0 && reserveB > 0, 'UniswapV2Library:         
+  INSUFFICIENT_LIQUIDITY');                                                     
+            ⋮┆----------------------------------------
+         2034┆ require(amountIn > 0, 'UniswapV2Library:                         
+  INSUFFICIENT_INPUT_AMOUNT');                                                  
+            ⋮┆----------------------------------------
+         2035┆ require(reserveIn > 0 && reserveOut > 0, 'UniswapV2Library:      
+  INSUFFICIENT_LIQUIDITY');                                                     
+            ⋮┆----------------------------------------
+         2044┆ require(amountOut > 0, 'UniswapV2Library:                        
+  INSUFFICIENT_OUTPUT_AMOUNT');                                                 
+            ⋮┆----------------------------------------
+         2045┆ require(reserveIn > 0 && reserveOut > 0, 'UniswapV2Library:      
+  INSUFFICIENT_LIQUIDITY');                                                     
+            ⋮┆----------------------------------------
+         2097┆ require(msg.sender == owner_address || msg.sender ==             
+  timelock_address, "You are not an owner or the governance timelock");         
+            ⋮┆----------------------------------------
+         2150┆ require(timeElapsed >= PERIOD, 'UniswapPairOracle:               
+  PERIOD_NOT_ELAPSED');                                                         
+            ⋮┆----------------------------------------
+         2168┆ require((timeElapsed < (PERIOD + CONSULT_LENIENCY)) ||           
+  ALLOW_STALE_CONSULTS, 'UniswapPairOracle:                                     
+  PRICE_IS_STALE_NEED_TO_CALL_UPDATE');                                         
+            ⋮┆----------------------------------------
+         2308┆ require(frax_pools[msg.sender] == true, "Only frax pools can call
+  this function");                                                              
+            ⋮┆----------------------------------------
+         2313┆ require(msg.sender == owner_address || msg.sender ==             
+  timelock_address || msg.sender == controller_address, "You are not the owner, 
+  controller, or the governance ... [0m                                         
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+         2318┆ require(
+         2319┆     msg.sender == owner_address
+         2320┆     || msg.sender == timelock_address
+         2321┆     || frax_pools[msg.sender] == true,
+         2322┆     "You are not the owner, the governance timelock, or a pool");
+            ⋮┆----------------------------------------
+         2365┆ else revert("INVALID PRICE CHOICE. Needs to be either 0 (FRAX) or
+  1 (FXS)");                                                                    
+            ⋮┆----------------------------------------
+         2421┆ require(block.timestamp - last_call_time >= refresh_cooldown,    
+  "Must wait for the refresh cooldown since last refresh");                     
+            ⋮┆----------------------------------------
+         2619┆ require(params.excess_collateral_dollar_value_d18 > 0, "No excess
+  collateral to buy back!");                                                    
+            ⋮┆----------------------------------------
+         2623┆ require(fxs_dollar_value_d18 <=                                  
+  params.excess_collateral_dollar_value_d18, "You are trying to buy back more   
+  than the excess!");                                                           
+            ⋮┆----------------------------------------
+         2752┆ require(msg.sender == timelock_address || msg.sender ==          
+  owner_address, "You are not the owner or the governance timelock");           
+            ⋮┆----------------------------------------
+         2883┆ require(global_collateral_ratio < COLLATERAL_RATIO_MAX &&        
+  global_collateral_ratio > 0, "Collateral ratio needs to be between .000001 and
+  .999999");                                                                    
+            ⋮┆----------------------------------------
+         2884┆                                                                  
+  require(collateral_token.balanceOf(address(this)).sub(unclaimedPoolCollateral)
+  .add(collateral_amount) <= pool_ceiling, "Pool ceiling reached, no more FRAX  
+  can b ... [0m                                                                 
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+         2936┆ require(global_collateral_ratio < COLLATERAL_RATIO_MAX &&        
+  global_collateral_ratio > 0, "Collateral ratio needs to be between .000001 and
+  .999999");                                                                    
+            ⋮┆----------------------------------------
+         2951┆ require(COLLATERAL_out_min <= collateral_amount, "Slippage limit 
+  reached [collateral]");                                                       
+            ⋮┆----------------------------------------
+         2994┆ require((lastRedeemed[msg.sender].add(redemption_delay)) <=      
+  block.number, "Must wait for redemption_delay blocks before collecting        
+  redemption");                                                                 
+
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

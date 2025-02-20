@@ -1,0 +1,241 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 49 Code Findings │
+└──────────────────┘
+                       
+    /sb/WUSDMaster.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          512┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          521┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          543┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          552┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          564┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          104┆ abstract contract Withdrawable is Context, Ownable {
+            ⋮┆----------------------------------------
+          602┆ contract WUSDMaster is Ownable, Withdrawable, ReentrancyGuard {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          640┆ constructor(IWUSD _wusd, IERC20 _usdt, IERC20 _wex, IWswapRouter 
+  _wswapRouter, address _treasury, uint256 _maxStakeAmount) {                   
+          641┆     require(
+          642┆         address(_wusd) != address(0) &&
+          643┆         address(_usdt) != address(0) &&
+          644┆         address(_wex) != address(0) &&
+          645┆         address(_wswapRouter) != address(0) &&
+          646┆         _treasury != address(0),
+          647┆         "zero address in constructor"
+          648┆     );
+          649┆     wusd = _wusd;
+             [hid 8 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           61┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+           81┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          135┆ require(_withdrawer == _msgSender(), "Withdrawable: caller is not
+  the withdrawer");                                                             
+            ⋮┆----------------------------------------
+          144┆ require(newWithdrawer != address(0), "Withdrawable: new          
+  withdrawer is the zero address");                                             
+            ⋮┆----------------------------------------
+          197┆ require(_status != _ENTERED, "ReentrancyGuard: reentrant call");
+            ⋮┆----------------------------------------
+          338┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          341┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          411┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          412┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          439┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          466┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          539┆ require(
+          540┆     (value == 0) || (token.allowance(address(this), spender) ==  
+  0),                                                                           
+          541┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          542┆ );
+            ⋮┆----------------------------------------
+          562┆ require(oldAllowance >= value, "SafeERC20: decreased allowance   
+  below zero");                                                                 
+            ⋮┆----------------------------------------
+          582┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          641┆ require(
+          642┆     address(_wusd) != address(0) &&
+          643┆     address(_usdt) != address(0) &&
+          644┆     address(_wex) != address(0) &&
+          645┆     address(_wswapRouter) != address(0) &&
+          646┆     _treasury != address(0),
+          647┆     "zero address in constructor"
+          648┆ );
+            ⋮┆----------------------------------------
+          666┆ require(_wexPermille <= 500, 'wexPermille too high!');
+            ⋮┆----------------------------------------
+          673┆ require(_treasuryPermille <= 50, 'treasuryPermille too high!');
+            ⋮┆----------------------------------------
+          680┆ require(_feePermille <= 20, 'feePermille too high!');
+            ⋮┆----------------------------------------
+          705┆ require(amount > 0, 'amount cant be zero');
+            ⋮┆----------------------------------------
+          706┆ require(wusdClaimAmount[msg.sender] == 0, 'you have to claim     
+  first');                                                                      
+            ⋮┆----------------------------------------
+          707┆ require(amount <= maxStakeAmount, 'amount too high');
+            ⋮┆----------------------------------------
+          732┆ require(wusdClaimAmount[msg.sender] > 0, 'there is nothing to    
+  claim');                                                                      
+            ⋮┆----------------------------------------
+          733┆ require(wusdClaimBlock[msg.sender] < block.number, 'you cant     
+  claim yet');                                                                  
+            ⋮┆----------------------------------------
+          743┆ require(amount > 0, 'amount cant be zero');
+            ⋮┆----------------------------------------
+          744┆ require(usdtClaimAmount[msg.sender] == 0, 'you have to claim     
+  first');                                                                      
+            ⋮┆----------------------------------------
+          754┆ require(usdtClaimAmount[msg.sender] > 0, 'there is nothing to    
+  claim');                                                                      
+            ⋮┆----------------------------------------
+          755┆ require(usdtClaimBlock[msg.sender] < block.number, 'you cant     
+  claim yet');                                                                  
+            ⋮┆----------------------------------------
+          778┆ require(strategist != address(0), 'strategist not set');
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          641┆ require(
+          642┆     address(_wusd) != address(0) &&
+          643┆     address(_usdt) != address(0) &&
+          644┆     address(_wex) != address(0) &&
+          645┆     address(_wswapRouter) != address(0) &&
+          646┆     _treasury != address(0),
+          647┆     "zero address in constructor"
+          648┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           81┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          135┆ require(_withdrawer == _msgSender(), "Withdrawable: caller is not
+  the withdrawer");                                                             
+            ⋮┆----------------------------------------
+          144┆ require(newWithdrawer != address(0), "Withdrawable: new          
+  withdrawer is the zero address");                                             
+            ⋮┆----------------------------------------
+          341┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          411┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          439┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          466┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          539┆ require(
+          540┆     (value == 0) || (token.allowance(address(this), spender) ==  
+  0),                                                                           
+          541┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          542┆ );
+            ⋮┆----------------------------------------
+          562┆ require(oldAllowance >= value, "SafeERC20: decreased allowance   
+  below zero");                                                                 
+            ⋮┆----------------------------------------
+          582┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+       solidity.security.no-slippage-check          
+          No slippage check in a Uniswap v2/v3 trade
+                                                    
+          717┆                                                                  
+  wswapRouter.swapExactTokensForTokensSupportingFeeOnTransferTokens(            
+          718┆     wexAmount,
+          719┆     0,
+          720┆     swapPath,
+          721┆     address(this),
+          722┆     block.timestamp
+          723┆ );
+            ⋮┆----------------------------------------
+          766┆                                                                  
+  wswapRouter.swapExactTokensForTokensSupportingFeeOnTransferTokens(            
+          767┆     wexTransferAmount,
+          768┆     0,
+          769┆     swapPathReverse,
+          770┆     msg.sender,
+          771┆     block.timestamp
+          772┆ );
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 49 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

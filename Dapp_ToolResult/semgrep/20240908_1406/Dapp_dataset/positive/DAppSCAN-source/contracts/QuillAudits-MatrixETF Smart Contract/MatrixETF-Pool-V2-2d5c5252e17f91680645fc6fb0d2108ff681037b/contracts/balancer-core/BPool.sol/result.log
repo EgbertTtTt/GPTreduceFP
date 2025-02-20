@@ -1,0 +1,375 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                     
+                     
+┌───────────────────┐
+│ 111 Code Findings │
+└───────────────────┘
+                  
+    /sb/BPool.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+         1227┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+         1231┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+         1249┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+         1254┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+         1259┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+         1935┆ for (uint256 i = 0; i < tokens.length; i++) {
+            ⋮┆----------------------------------------
+         1964┆ for (uint i = 0; i < _tokens.length; i++) {
+            ⋮┆----------------------------------------
+         2021┆ for (uint i = 0; i < _tokens.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+         1418┆ constructor(string memory name, string memory symbol) public {
+         1419┆     _name = name;
+         1420┆     _symbol = symbol;
+         1421┆     _controller = msg.sender;
+         1422┆     _swapFee = MIN_FEE;
+         1423┆     _communitySwapFee = 0;
+         1424┆     _communityJoinFee = 0;
+         1425┆     _communityExitFee = 0;
+         1426┆     _swapsDisabled = false;
+         1427┆     _finalized = false;
+             [hid 1 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+         1937┆ uint256 bal = _records[t].balance;
+            ⋮┆----------------------------------------
+         1964┆ for (uint i = 0; i < _tokens.length; i++) {
+            ⋮┆----------------------------------------
+         1965┆ address t = _tokens[i];
+            ⋮┆----------------------------------------
+         1966┆ uint bal = _records[t].balance;
+            ⋮┆----------------------------------------
+         1970┆ _records[t].balance = badd(_records[t].balance, tokenAmountIn);
+            ⋮┆----------------------------------------
+         1970┆ _records[t].balance = badd(_records[t].balance, tokenAmountIn);
+            ⋮┆----------------------------------------
+         2021┆ for (uint i = 0; i < _tokens.length; i++) {
+            ⋮┆----------------------------------------
+         2022┆ address t = _tokens[i];
+            ⋮┆----------------------------------------
+         2023┆ uint bal = _records[t].balance;
+            ⋮┆----------------------------------------
+         2027┆ _records[t].balance = bsub(_records[t].balance, tokenAmountOut);
+            ⋮┆----------------------------------------
+         2027┆ _records[t].balance = bsub(_records[t].balance, tokenAmountOut);
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          260┆ for (uint i = 1; term >= precision; i++) {
+            ⋮┆----------------------------------------
+         1935┆ for (uint256 i = 0; i < tokens.length; i++) {
+            ⋮┆----------------------------------------
+         1964┆ for (uint i = 0; i < _tokens.length; i++) {
+            ⋮┆----------------------------------------
+         2021┆ for (uint i = 0; i < _tokens.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          150┆ require(c >= a, "ERR_ADD_OVERFLOW");
+            ⋮┆----------------------------------------
+          159┆ require(!flag, "ERR_SUB_UNDERFLOW");
+            ⋮┆----------------------------------------
+          179┆ require(a == 0 || c0 / a == b, "ERR_MUL_OVERFLOW");
+            ⋮┆----------------------------------------
+          181┆ require(c1 >= c0, "ERR_MUL_OVERFLOW");
+            ⋮┆----------------------------------------
+          190┆ require(b != 0, "ERR_DIV_ZERO");
+            ⋮┆----------------------------------------
+          192┆ require(a == 0 || c0 / a == BONE, "ERR_DIV_INTERNAL"); // bmul   
+  overflow                                                                      
+            ⋮┆----------------------------------------
+          194┆ require(c1 >= c0, "ERR_DIV_INTERNAL"); //  badd require
+            ⋮┆----------------------------------------
+          200┆ require(b > 0, "ERR_DIV_ZERO");
+            ⋮┆----------------------------------------
+          228┆ require(base >= MIN_BPOW_BASE, "ERR_BPOW_BASE_TOO_LOW");
+            ⋮┆----------------------------------------
+          229┆ require(base <= MAX_BPOW_BASE, "ERR_BPOW_BASE_TOO_HIGH");
+            ⋮┆----------------------------------------
+          307┆ require(_balance[address(this)] >= amt, "ERR_INSUFFICIENT_BAL");
+            ⋮┆----------------------------------------
+          314┆ require(_balance[src] >= amt, "ERR_INSUFFICIENT_BAL");
+            ⋮┆----------------------------------------
+          331┆ require(addr != address(0), "ERR_NULL_ADDRESS");
+            ⋮┆----------------------------------------
+          397┆ require(msg.sender == src || amt <= _allowance[src][msg.sender], 
+  "ERR_BTOKEN_BAD_CALLER");                                                     
+            ⋮┆----------------------------------------
+          898┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          913┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          930┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          947┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          964┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+         1076┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+         1080┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+         1137┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+         1138┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+         1162┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+         1186┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+         1246┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+         1247┆     "SafeERC20: approve from non-zero to non-zero allowance"
+         1248┆ );
+            ⋮┆----------------------------------------
+         1276┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+         1745┆ require(_tokens.length >= MIN_BOUND_TOKENS, "MIN_TOKENS");
+            ⋮┆----------------------------------------
+         1770┆ require(_restrictions.isVotingSignatureAllowed(voting,           
+  signature), "NOT_ALLOWED_SIG");                                               
+            ⋮┆----------------------------------------
+         1774┆ require(success, "NOT_SUCCESS");
+            ⋮┆----------------------------------------
+         1793┆ require(!_records[token].bound, "IS_BOUND");
+            ⋮┆----------------------------------------
+         1795┆ require(_tokens.length < MAX_BOUND_TOKENS, "MAX_TOKENS");
+            ⋮┆----------------------------------------
+         1822┆ require(denorm >= MIN_WEIGHT && denorm <= MAX_WEIGHT,            
+  "WEIGHT_BOUNDS");                                                             
+            ⋮┆----------------------------------------
+         1823┆ require(balance >= MIN_BALANCE, "MIN_BALANCE");
+            ⋮┆----------------------------------------
+         1904┆ require(_records[tokenIn].bound && _records[tokenOut].bound,     
+  "NOT_BOUND");                                                                 
+            ⋮┆----------------------------------------
+         1969┆ require(tokenAmountIn < maxAmountsIn[i], "LIMIT_IN");
+            ⋮┆----------------------------------------
+         2026┆ require(tokenAmountOut > minAmountsOut[i], "LIMIT_OUT");
+            ⋮┆----------------------------------------
+         2075┆ require(spotPriceBefore <= maxPrice, "LIMIT_PRICE");
+            ⋮┆----------------------------------------
+         2083┆ require(tokenAmountInAfterFee <= bmul(inRecord.balance,          
+  MAX_IN_RATIO), "MAX_IN_RATIO");                                               
+            ⋮┆----------------------------------------
+         2093┆ require(tokenAmountOut >= minAmountOut, "LIMIT_OUT");
+            ⋮┆----------------------------------------
+         2105┆ require(
+         2106┆     spotPriceAfter >= spotPriceBefore &&
+         2107┆     spotPriceBefore <= bdiv(tokenAmountInAfterFee,               
+  tokenAmountOut),                                                              
+         2108┆     "MATH_APPROX"
+         2109┆ );
+            ⋮┆----------------------------------------
+         2110┆ require(spotPriceAfter <= maxPrice, "LIMIT_PRICE");
+            ⋮┆----------------------------------------
+         2158┆ require(tokenAmountOut <= bmul(outRecord.balance, MAX_OUT_RATIO),
+  "OUT_RATIO");                                                                 
+            ⋮┆----------------------------------------
+         2167┆ require(spotPriceBefore <= maxPrice, "LIMIT_PRICE");
+            ⋮┆----------------------------------------
+         2183┆ require(tokenAmountIn <= maxAmountIn, "LIMIT_IN");
+            ⋮┆----------------------------------------
+         2195┆ require(
+         2196┆     spotPriceAfter >= spotPriceBefore &&
+         2197┆     spotPriceBefore <= bdiv(tokenAmountIn,                       
+  tokenAmountOutAfterFee),                                                      
+         2198┆     "MATH_APPROX"
+         2199┆ );
+            ⋮┆----------------------------------------
+         2200┆ require(spotPriceAfter <= maxPrice, "LIMIT_PRICE");
+            ⋮┆----------------------------------------
+         2237┆ require(tokenAmountIn <= bmul(_records[tokenIn].balance,         
+  MAX_IN_RATIO), "MAX_IN_RATIO");                                               
+            ⋮┆----------------------------------------
+         2256┆ require(poolAmountOut >= minPoolAmountOut, "LIMIT_OUT");
+            ⋮┆----------------------------------------
+         2313┆ require(tokenAmountIn <= maxAmountIn, "LIMIT_IN");
+            ⋮┆----------------------------------------
+         2315┆ require(tokenAmountIn <= bmul(_records[tokenIn].balance,         
+  MAX_IN_RATIO), "MAX_IN_RATIO");                                               
+            ⋮┆----------------------------------------
+         2366┆ require(tokenAmountOut >= minAmountOut, "LIMIT_OUT");
+            ⋮┆----------------------------------------
+         2368┆ require(tokenAmountOut <= bmul(_records[tokenOut].balance,       
+  MAX_OUT_RATIO), "OUT_RATIO");                                                 
+            ⋮┆----------------------------------------
+         2413┆ require(tokenAmountOut <= bmul(_records[tokenOut].balance,       
+  MAX_OUT_RATIO), "OUT_RATIO");                                                 
+            ⋮┆----------------------------------------
+         2433┆ require(poolAmountIn <= maxPoolAmountIn, "LIMIT_IN");
+            ⋮┆----------------------------------------
+         2458┆ require(xfer, "ERC20_FALSE");
+            ⋮┆----------------------------------------
+         2465┆ require(xfer, "ERC20_FALSE");
+            ⋮┆----------------------------------------
+         2472┆ require(xfer, "ERC20_FALSE");
+            ⋮┆----------------------------------------
+         2492┆ require(badd(_totalSupply, amount) <= maxTotalSupply,            
+  "MAX_SUPPLY");                                                                
+            ⋮┆----------------------------------------
+         2508┆ require(_records[token].bound, "NOT_BOUND");
+            ⋮┆----------------------------------------
+         2514┆ require(msg.sender == _controller, "NOT_CONTROLLER");
+            ⋮┆----------------------------------------
+         2520┆ require(!_finalized, "IS_FINALIZED");
+            ⋮┆----------------------------------------
+         2526┆ require(_finalized, "NOT_FINALIZED");
+            ⋮┆----------------------------------------
+         2532┆ require(_fee >= MIN_FEE && _fee <= MAX_FEE, "FEE_BOUNDS");
+            ⋮┆----------------------------------------
+         2538┆ require(_value != 0, "MATH_APPROX");
+            ⋮┆----------------------------------------
+         2544┆ require(!_mutex, "REENTRY");
+            ⋮┆----------------------------------------
+         2550┆ require(!_wrapperMode || msg.sender == _wrapper, "ONLY_WRAPPER");
+            ⋮┆----------------------------------------
+         2556┆ require(block.number > _lastSwapBlock[tx.origin],                
+  "SAME_TX_ORIGIN");                                                            
+            ⋮┆----------------------------------------
+         2563┆ require(!_swapsDisabled, "SWAPS_DISABLED");
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+         1822┆ require(denorm >= MIN_WEIGHT && denorm <= MAX_WEIGHT,            
+  "WEIGHT_BOUNDS");                                                             
+            ⋮┆----------------------------------------
+         1904┆ require(_records[tokenIn].bound && _records[tokenOut].bound,     
+  "NOT_BOUND");                                                                 
+            ⋮┆----------------------------------------
+         2105┆ require(
+         2106┆     spotPriceAfter >= spotPriceBefore &&
+         2107┆     spotPriceBefore <= bdiv(tokenAmountInAfterFee,               
+  tokenAmountOut),                                                              
+         2108┆     "MATH_APPROX"
+         2109┆ );
+            ⋮┆----------------------------------------
+         2195┆ require(
+         2196┆     spotPriceAfter >= spotPriceBefore &&
+         2197┆     spotPriceBefore <= bdiv(tokenAmountIn,                       
+  tokenAmountOutAfterFee),                                                      
+         2198┆     "MATH_APPROX"
+         2199┆ );
+            ⋮┆----------------------------------------
+         2532┆ require(_fee >= MIN_FEE && _fee <= MAX_FEE, "FEE_BOUNDS");
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          399┆ if (msg.sender != src && _allowance[src][msg.sender] !=          
+  uint256(-1)) {                                                                
+          400┆     _allowance[src][msg.sender] =                                
+  bsub(_allowance[src][msg.sender], amt);                                       
+          401┆     emit Approval(src, msg.sender, _allowance[src][msg.sender]);
+          402┆ }
+            ⋮┆----------------------------------------
+         2604┆ if (address(_restrictions) != address(0) &&                      
+  _restrictions.isWithoutFee(operator)) {                                       
+         2605┆     return (tokenAmountIn, 0);
+         2606┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 111 findings.
+                                                                                
+          260┆ for (uint i = 1; term >= precision; i++) {
+            ⋮┆----------------------------------------
+         1935┆ for (uint256 i = 0; i < tokens.length; i++) {
+            ⋮┆----------------------------------------
+         1964┆ for (uint i = 0; i < _tokens.length; i++) {
+            ⋮┆----------------------------------------
+         2021┆ for (uint i = 0; i < _tokens.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          930┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+         1080┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+         1137┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+         1162┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+         1186┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+         1246┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+         1247┆     "SafeERC20: approve from non-zero to non-zero allowance"
+         1248┆ );
+            ⋮┆----------------------------------------
+         1276┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

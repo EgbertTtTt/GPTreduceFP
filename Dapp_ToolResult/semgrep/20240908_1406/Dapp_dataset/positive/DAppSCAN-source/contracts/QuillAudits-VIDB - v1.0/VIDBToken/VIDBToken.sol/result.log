@@ -1,0 +1,232 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 58 Code Findings │
+└──────────────────┘
+                      
+    /sb/VIDBToken.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          615┆ contract VIDBToken is ERC20Detailed, ERC20, Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          722┆ for(uint256 j = 0; j<lockList[lockedAddress].length; j++) {
+            ⋮┆----------------------------------------
+          747┆ for(uint256 i = 0; i<lockedAddressList.length; i++) {
+            ⋮┆----------------------------------------
+          756┆ for(uint256 i = 0; i<lockedAddressList.length; i++) {
+            ⋮┆----------------------------------------
+          768┆ for(uint256 i = 0; i<lockedAddressList.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          251┆ constructor () internal { }
+            ⋮┆----------------------------------------
+          502┆ constructor (string memory name, string memory symbol, uint8     
+  decimals) public {                                                            
+          503┆     _name = name;
+          504┆     _symbol = symbol;
+          505┆     _decimals = decimals;
+          506┆ }
+            ⋮┆----------------------------------------
+          557┆ constructor () internal {
+          558┆     address msgSender = _msgSender();
+          559┆     _owner = msgSender;
+          560┆     emit OwnershipTransferred(address(0), msgSender);
+          561┆ }
+            ⋮┆----------------------------------------
+          637┆     constructor() public ERC20Detailed("VNDC International       
+  Digital Banking", "VIDB", 8) {                                                
+          638┆ 
+          639┆            reserveMap[1]=1623456000; //              
+  2021-06-12T00:00:00Z                                              
+          640┆            reserveMap[2]=1639267200; //          
+  2021-12-12T00:00:00Z                                          
+          641┆ 
+          642┆            foundationMap[1]=1615507200; //          
+  2021-03-12T00:00:00Z                                             
+          643┆            foundationMap[2]=1623456000; //          
+  2021-06-12T00:00:00Z                                             
+          644┆            foundationMap[3]=1631404800; //          
+  2021-09-12T00:00:00Z                                             
+          645┆            foundationMap[4]=1639267200; //          
+  2021-12-12T00:00:00Z                                             
+          646┆            foundationMap[5]=1647043200; //          
+  2022-03-12T00:00:00Z                                             
+             [hid 46 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          678┆ transferWithLock(reserveWallet, 125000000 * 10 **                
+  uint256(decimals()), reserveMap[i]);                                          
+            ⋮┆----------------------------------------
+          678┆ transferWithLock(reserveWallet, 125000000 * 10 **                
+  uint256(decimals()), reserveMap[i]);                                          
+            ⋮┆----------------------------------------
+          682┆ transferWithLock(foundationWallet, 7812500 * 10 **               
+  uint256(decimals()), foundationMap[i]);                                       
+            ⋮┆----------------------------------------
+          682┆ transferWithLock(foundationWallet, 7812500 * 10 **               
+  uint256(decimals()), foundationMap[i]);                                       
+            ⋮┆----------------------------------------
+          686┆ transferWithLock(airdropWallet, 8333333 * 10 **                  
+  uint256(decimals()), foundationMap[i]);                                       
+            ⋮┆----------------------------------------
+          686┆ transferWithLock(airdropWallet, 8333333 * 10 **                  
+  uint256(decimals()), foundationMap[i]);                                       
+            ⋮┆----------------------------------------
+          722┆ for(uint256 j = 0; j<lockList[lockedAddress].length; j++) {
+            ⋮┆----------------------------------------
+          723┆ if(now < lockList[lockedAddress][j].releaseDate) {
+            ⋮┆----------------------------------------
+          724┆ uint256 temp = lockList[lockedAddress][j].amount;
+            ⋮┆----------------------------------------
+          747┆ for(uint256 i = 0; i<lockedAddressList.length; i++) {
+            ⋮┆----------------------------------------
+          748┆ if (getLockedAmount(lockedAddressList[i])>0) count++;
+            ⋮┆----------------------------------------
+          756┆ for(uint256 i = 0; i<lockedAddressList.length; i++) {
+            ⋮┆----------------------------------------
+          757┆ if (getLockedAmount(lockedAddressList[i])>0) {
+            ⋮┆----------------------------------------
+          758┆ list[j] = lockedAddressList[i];
+            ⋮┆----------------------------------------
+          768┆ for(uint256 i = 0; i<lockedAddressList.length; i++) {
+            ⋮┆----------------------------------------
+          769┆ uint256 lockedAmount = getLockedAmount(lockedAddressList[i]);
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          677┆ for(uint i = 1; i<= 2; i++) {
+            ⋮┆----------------------------------------
+          681┆ for(uint i = 1; i<= 16; i++) {
+            ⋮┆----------------------------------------
+          685┆ for(uint i = 1; i<= 5; i++) {
+            ⋮┆----------------------------------------
+          722┆ for(uint256 j = 0; j<lockList[lockedAddress].length; j++) {
+            ⋮┆----------------------------------------
+          747┆ for(uint256 i = 0; i<lockedAddressList.length; i++) {
+            ⋮┆----------------------------------------
+          756┆ for(uint256 i = 0; i<lockedAddressList.length; i++) {
+            ⋮┆----------------------------------------
+          768┆ for(uint256 i = 0; i<lockedAddressList.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          108┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          162┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          412┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          413┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          430┆ require(account != address(0), "ERC20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+          449┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          470┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          471┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          574┆ require(isOwner(), "Ownable: caller is not the owner");
+            ⋮┆----------------------------------------
+          609┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          677┆ for(uint i = 1; i<= 2; i++) {
+            ⋮┆----------------------------------------
+          681┆ for(uint i = 1; i<= 16; i++) {
+            ⋮┆----------------------------------------
+          685┆ for(uint i = 1; i<= 5; i++) {
+            ⋮┆----------------------------------------
+          722┆ for(uint256 j = 0; j<lockList[lockedAddress].length; j++) {
+            ⋮┆----------------------------------------
+          747┆ for(uint256 i = 0; i<lockedAddressList.length; i++) {
+            ⋮┆----------------------------------------
+          748┆ if (getLockedAmount(lockedAddressList[i])>0) count++;
+            ⋮┆----------------------------------------
+          756┆ for(uint256 i = 0; i<lockedAddressList.length; i++) {
+            ⋮┆----------------------------------------
+          759┆ j++;
+            ⋮┆----------------------------------------
+          768┆ for(uint256 i = 0; i<lockedAddressList.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          162┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          412┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          413┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          449┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          470┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          471┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          609┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 58 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

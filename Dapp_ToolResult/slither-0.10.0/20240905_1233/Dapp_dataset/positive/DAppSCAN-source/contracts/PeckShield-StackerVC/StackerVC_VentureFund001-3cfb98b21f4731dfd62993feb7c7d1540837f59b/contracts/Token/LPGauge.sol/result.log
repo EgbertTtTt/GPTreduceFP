@@ -1,0 +1,152 @@
+'solc --version' running
+'solc /sb/LPGauge.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+Reentrancy in LPGauge.deposit(uint256) (../../sb/LPGauge.sol#671-685):
+	External calls:
+	- _claimSTACK(msg.sender) (../../sb/LPGauge.sol#674)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/LPGauge.sol#536)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/LPGauge.sol#404)
+		- IMinter(STACK).minters(address(this)) (../../sb/LPGauge.sol#740)
+		- IERC20(STACK).safeTransfer(_user,_tokensGive) (../../sb/LPGauge.sol#725)
+		- IMinter(STACK).mint(address(this),_tokensToMint) (../../sb/LPGauge.sol#762)
+	- IERC20(token).safeTransferFrom(msg.sender,address(this),_amount) (../../sb/LPGauge.sol#676)
+	External calls sending eth:
+	- _claimSTACK(msg.sender) (../../sb/LPGauge.sol#674)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/LPGauge.sol#404)
+	State variables written after the call(s):
+	- balances[msg.sender] = _state (../../sb/LPGauge.sol#684)
+	LPGauge.balances (../../sb/LPGauge.sol#639) can be used in cross function reentrancies:
+	- LPGauge.balances (../../sb/LPGauge.sol#639)
+	- deposited = deposited.add(_amount) (../../sb/LPGauge.sol#680)
+	LPGauge.deposited (../../sb/LPGauge.sol#623) can be used in cross function reentrancies:
+	- LPGauge._kick() (../../sb/LPGauge.sol#729-768)
+	- LPGauge.deposited (../../sb/LPGauge.sol#623)
+Reentrancy in LPGauge.withdraw(uint256) (../../sb/LPGauge.sol#687-705):
+	External calls:
+	- _claimSTACK(msg.sender) (../../sb/LPGauge.sol#688)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/LPGauge.sol#536)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/LPGauge.sol#404)
+		- IMinter(STACK).minters(address(this)) (../../sb/LPGauge.sol#740)
+		- IERC20(STACK).safeTransfer(_user,_tokensGive) (../../sb/LPGauge.sol#725)
+		- IMinter(STACK).mint(address(this),_tokensToMint) (../../sb/LPGauge.sol#762)
+	External calls sending eth:
+	- _claimSTACK(msg.sender) (../../sb/LPGauge.sol#688)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/LPGauge.sol#404)
+	State variables written after the call(s):
+	- balances[msg.sender] = _state (../../sb/LPGauge.sol#702)
+	LPGauge.balances (../../sb/LPGauge.sol#639) can be used in cross function reentrancies:
+	- LPGauge.balances (../../sb/LPGauge.sol#639)
+	- deposited = deposited.sub(_amount) (../../sb/LPGauge.sol#697)
+	LPGauge.deposited (../../sb/LPGauge.sol#623) can be used in cross function reentrancies:
+	- LPGauge._kick() (../../sb/LPGauge.sol#729-768)
+	- LPGauge.deposited (../../sb/LPGauge.sol#623)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities
+
+LPGauge._kick() (../../sb/LPGauge.sol#729-768) uses a dangerous strict equality:
+	- lastBlock == block.number || lastBlock >= endBlock || block.number < startBlock (../../sb/LPGauge.sol#736)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Reentrancy in LPGauge._kick() (../../sb/LPGauge.sol#729-768):
+	External calls:
+	- IMinter(STACK).minters(address(this)) (../../sb/LPGauge.sol#740)
+	- IMinter(STACK).mint(address(this),_tokensToMint) (../../sb/LPGauge.sol#762)
+	State variables written after the call(s):
+	- lastBlock = block.number (../../sb/LPGauge.sol#767)
+	LPGauge.lastBlock (../../sb/LPGauge.sol#631) can be used in cross function reentrancies:
+	- LPGauge._kick() (../../sb/LPGauge.sol#729-768)
+	- LPGauge.lastBlock (../../sb/LPGauge.sol#631)
+Reentrancy in LPGauge.setEmissionRate(uint256) (../../sb/LPGauge.sol#657-661):
+	External calls:
+	- _kick() (../../sb/LPGauge.sol#659)
+		- IMinter(STACK).minters(address(this)) (../../sb/LPGauge.sol#740)
+		- IMinter(STACK).mint(address(this),_tokensToMint) (../../sb/LPGauge.sol#762)
+	State variables written after the call(s):
+	- emissionRate = _new (../../sb/LPGauge.sol#660)
+	LPGauge.emissionRate (../../sb/LPGauge.sol#621) can be used in cross function reentrancies:
+	- LPGauge._kick() (../../sb/LPGauge.sol#729-768)
+	- LPGauge.constructor(address,address,uint256) (../../sb/LPGauge.sol#644-650)
+	- LPGauge.emissionRate (../../sb/LPGauge.sol#621)
+	- LPGauge.setEmissionRate(uint256) (../../sb/LPGauge.sol#657-661)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+LPGauge.setEmissionRate(uint256) (../../sb/LPGauge.sol#657-661) should emit an event for: 
+	- emissionRate = _new (../../sb/LPGauge.sol#660) 
+LPGauge.setEndBlock(uint256) (../../sb/LPGauge.sol#663-669) should emit an event for: 
+	- endBlock = _block (../../sb/LPGauge.sol#668) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+LPGauge.constructor(address,address,uint256)._STACK (../../sb/LPGauge.sol#644) lacks a zero-check on :
+		- STACK = _STACK (../../sb/LPGauge.sol#647)
+LPGauge.constructor(address,address,uint256)._token (../../sb/LPGauge.sol#644) lacks a zero-check on :
+		- token = _token (../../sb/LPGauge.sol#648)
+LPGauge.setGovernance(address)._new (../../sb/LPGauge.sol#652) lacks a zero-check on :
+		- governance = _new (../../sb/LPGauge.sol#654)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in LPGauge._claimSTACK(address) (../../sb/LPGauge.sol#711-727):
+	External calls:
+	- _kick() (../../sb/LPGauge.sol#712)
+		- IMinter(STACK).minters(address(this)) (../../sb/LPGauge.sol#740)
+		- IMinter(STACK).mint(address(this),_tokensToMint) (../../sb/LPGauge.sol#762)
+	State variables written after the call(s):
+	- balances[_user] = _state (../../sb/LPGauge.sol#723)
+Reentrancy in LPGauge._kick() (../../sb/LPGauge.sol#729-768):
+	External calls:
+	- IMinter(STACK).minters(address(this)) (../../sb/LPGauge.sol#740)
+	State variables written after the call(s):
+	- tokensAccrued = tokensAccrued.add(_tokensToMint.mul(1e18).div(_totalDeposited)) (../../sb/LPGauge.sol#761)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Address.isContract(address) (../../sb/LPGauge.sol#311-320) uses assembly
+	- INLINE ASM (../../sb/LPGauge.sol#318)
+Address._verifyCallResult(bool,bytes,string) (../../sb/LPGauge.sol#456-473) uses assembly
+	- INLINE ASM (../../sb/LPGauge.sol#465-468)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.functionCall(address,bytes) (../../sb/LPGauge.sol#364-366) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/LPGauge.sol#389-391) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/LPGauge.sol#438-440) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/LPGauge.sol#448-454) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/LPGauge.sol#414-416) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/LPGauge.sol#424-430) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/LPGauge.sol#338-344) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/LPGauge.sol#504-513) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/LPGauge.sol#520-523) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/LPGauge.sol#515-518) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/LPGauge.sol#264-267) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/LPGauge.sol#226-229) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/LPGauge.sol#284-287) is never used and should be removed
+SafeMath.sub(uint256,uint256,string) (../../sb/LPGauge.sol#244-247) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/LPGauge.sol#98-102) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/LPGauge.sol#134-137) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/LPGauge.sol#144-147) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/LPGauge.sol#119-127) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/LPGauge.sol#109-112) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.6.11 (../../sb/LPGauge.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/LPGauge.sol#338-344):
+	- (success) = recipient.call{value: amount}() (../../sb/LPGauge.sol#342)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/LPGauge.sol#399-406):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/LPGauge.sol#404)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/LPGauge.sol#424-430):
+	- (success,returndata) = target.staticcall(data) (../../sb/LPGauge.sol#428)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/LPGauge.sol#448-454):
+	- (success,returndata) = target.delegatecall(data) (../../sb/LPGauge.sol#452)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter LPGauge.setGovernance(address)._new (../../sb/LPGauge.sol#652) is not in mixedCase
+Parameter LPGauge.setEmissionRate(uint256)._new (../../sb/LPGauge.sol#657) is not in mixedCase
+Parameter LPGauge.setEndBlock(uint256)._block (../../sb/LPGauge.sol#663) is not in mixedCase
+Parameter LPGauge.deposit(uint256)._amount (../../sb/LPGauge.sol#671) is not in mixedCase
+Parameter LPGauge.withdraw(uint256)._amount (../../sb/LPGauge.sol#687) is not in mixedCase
+Variable LPGauge.STACK (../../sb/LPGauge.sol#618) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+LPGauge.STACK (../../sb/LPGauge.sol#618) should be immutable 
+LPGauge.token (../../sb/LPGauge.sol#619) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/LPGauge.sol analyzed (7 contracts with 93 detectors), 47 result(s) found

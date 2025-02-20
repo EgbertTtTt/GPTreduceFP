@@ -1,0 +1,392 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 78 Code Findings │
+└──────────────────┘
+                        
+    /sb/LendingPool.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+         1615┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+         1619┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+         1637┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+         1642┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+         1647┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+         1153┆ contract LendingPoolAddressesProvider is Ownable,                
+  ILendingPoolAddressesProvider {                                               
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+         3751┆ for (vars.i = 0; vars.i < reserves.length; vars.i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+          278┆ uint256 private lastInitializedRevision = 0;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+         3140┆ constructor(
+         3141┆   string memory name,
+         3142┆   string memory symbol,
+         3143┆   uint8 decimals,
+         3144┆   address incentivesController
+         3145┆ ) public {
+         3146┆   _name = name;
+         3147┆   _symbol = symbol;
+         3148┆   _decimals = decimals;
+         3149┆   _incentivesController =                                        
+  IAaveIncentivesController(incentivesController);                              
+             [hid 1 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           74┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+           89┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          106┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          123┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          140┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          290┆ require(
+          291┆   initializing || isConstructor() || revision >                  
+  lastInitializedRevision,                                                      
+          292┆   'Contract instance has already been initialized'
+          293┆ );
+            ⋮┆----------------------------------------
+          609┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          630┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          755┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          759┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          816┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          817┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          841┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          865┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          938┆ require(
+          939┆   Address.isContract(newImplementation),
+          940┆   'Cannot set a proxy implementation to a non-contract address'
+          941┆ );
+            ⋮┆----------------------------------------
+         1032┆ require(newAdmin != address(0), 'Cannot change the admin of a    
+  proxy to the zero address');                                                  
+            ⋮┆----------------------------------------
+         1092┆ require(msg.sender != _admin(), 'Cannot call fallback function   
+  from the proxy admin');                                                       
+            ⋮┆----------------------------------------
+         1634┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+         1635┆     "SafeERC20: approve from non-zero to non-zero allowance"
+         1636┆ );
+            ⋮┆----------------------------------------
+         1664┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+         2371┆ require(vars.newLiquidityRate < (1 << 128), 'ReserveLogic:       
+  Liquidity rate overflow');                                                    
+            ⋮┆----------------------------------------
+         2372┆ require(vars.newStableRate < (1 << 128), 'ReserveLogic: Stable   
+  borrow rate overflow');                                                       
+            ⋮┆----------------------------------------
+         2373┆ require(vars.newVariableRate < (1 << 128), 'ReserveLogic:        
+  Variable borrow rate overflow');                                              
+            ⋮┆----------------------------------------
+         2983┆ require(c >= a, 'SafeMath: addition overflow');
+            ⋮┆----------------------------------------
+         3039┆ require(c / a == b, 'SafeMath: multiplication overflow');
+            ⋮┆----------------------------------------
+         3285┆ require(sender != address(0), 'ERC20: transfer from the zero     
+  address');                                                                    
+            ⋮┆----------------------------------------
+         3286┆ require(recipient != address(0), 'ERC20: transfer to the zero    
+  address');                                                                    
+            ⋮┆----------------------------------------
+         3305┆ require(account != address(0), 'ERC20: mint to the zero          
+  address');                                                                    
+            ⋮┆----------------------------------------
+         3321┆ require(account != address(0), 'ERC20: burn from the zero        
+  address');                                                                    
+            ⋮┆----------------------------------------
+         3341┆ require(owner != address(0), 'ERC20: approve from the zero       
+  address');                                                                    
+            ⋮┆----------------------------------------
+         3342┆ require(spender != address(0), 'ERC20: approve to the zero       
+  address');                                                                    
+            ⋮┆----------------------------------------
+         3422┆ revert('TRANSFER_NOT_SUPPORTED');
+            ⋮┆----------------------------------------
+         3434┆ revert('ALLOWANCE_NOT_SUPPORTED');
+            ⋮┆----------------------------------------
+         3440┆ revert('APPROVAL_NOT_SUPPORTED');
+            ⋮┆----------------------------------------
+         3451┆ revert('TRANSFER_NOT_SUPPORTED');
+            ⋮┆----------------------------------------
+         3462┆ revert('ALLOWANCE_NOT_SUPPORTED');
+            ⋮┆----------------------------------------
+         3473┆ revert('ALLOWANCE_NOT_SUPPORTED');
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+         4064┆ require(
+         4065┆   (stableDebt > 0 &&
+         4066┆     ReserveLogic.InterestRateMode(rateMode) ==                   
+  ReserveLogic.InterestRateMode.STABLE) ||                                      
+         4067┆     (variableDebt > 0 &&
+         4068┆       ReserveLogic.InterestRateMode(rateMode) ==                 
+  ReserveLogic.InterestRateMode.VARIABLE),                                      
+         4069┆   Errors.NO_DEBT_OF_SELECTED_TYPE
+         4070┆ );
+            ⋮┆----------------------------------------
+         5302┆ require(
+         5303┆   usageRatio >= REBALANCE_UP_USAGE_RATIO_THRESHOLD &&
+         5304┆   currentLiquidityRate <=
+         5305┆                                                                  
+  maxVariableBorrowRate.percentMul(REBALANCE_UP_LIQUIDITY_RATE_THRESHOLD),      
+         5306┆   Errors.INTEREST_RATE_REBALANCE_CONDITIONS_NOT_MET
+         5307┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         3766┆ if (vars.ltv != 0 && userConfig.isUsingAsCollateral(vars.i)) {
+         3767┆   vars.compoundedLiquidityBalance =                              
+  IERC20(currentReserve.aTokenAddress).balanceOf(user);                         
+         3768┆ 
+         3769┆   uint256 liquidityBalanceETH = vars
+         3770┆     .reserveUnitPrice
+         3771┆     .mul(vars.compoundedLiquidityBalance)
+         3772┆     .div(vars.tokenUnit);
+         3773┆ 
+         3774┆   vars.totalCollateralBalanceETH =                               
+  vars.totalCollateralBalanceETH.add(liquidityBalanceETH);                      
+         3775┆ 
+             [hid 5 additional lines, adjust with --max-lines-per-finding] 
+         4209┆ if (userStableDebt == 0 && userVariableDebt == 0) {
+         4210┆   return (
+         4211┆                                                                  
+  uint256(Errors.CollateralManagerErrors.CURRRENCY_NOT_BORROWED),               
+         4212┆     Errors.SPECIFIED_CURRENCY_NOT_BORROWED_BY_USER
+         4213┆   );
+         4214┆ }
+            ⋮┆----------------------------------------
+         4244┆ if (
+         4245┆   msg.sender != user && userHealthFactor >=                      
+  GenericLogic.HEALTH_FACTOR_LIQUIDATION_THRESHOLD                              
+         4246┆ ) {
+         4247┆   return (
+         4248┆                                                                  
+  uint256(Errors.CollateralManagerErrors.HEALTH_FACTOR_ABOVE_THRESHOLD),        
+         4249┆     Errors.HEALTH_FACTOR_NOT_BELOW_THRESHOLD
+         4250┆   );
+         4251┆ }
+            ⋮┆----------------------------------------
+         4266┆ if (userStableDebt == 0 && userVariableDebt == 0) {
+         4267┆   return (
+         4268┆                                                                  
+  uint256(Errors.CollateralManagerErrors.CURRRENCY_NOT_BORROWED),               
+         4269┆     Errors.SPECIFIED_CURRENCY_NOT_BORROWED_BY_USER
+         4270┆   );
+         4271┆ }
+            ⋮┆----------------------------------------
+         5178┆ if (amount != type(uint256).max && amount < paybackAmount) {
+         5179┆   paybackAmount = amount;
+         5180┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+         3751┆ for (vars.i = 0; vars.i < reserves.length; vars.i++) {
+            ⋮┆----------------------------------------
+         5861┆ for (uint256 i = 0; i < _reservesList.length; i++)
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          106┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          290┆ require(
+          291┆   initializing || isConstructor() || revision >                  
+  lastInitializedRevision,                                                      
+          292┆   'Contract instance has already been initialized'
+          293┆ );
+            ⋮┆----------------------------------------
+          630┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          759┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          816┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          841┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          865┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          938┆ require(
+          939┆   Address.isContract(newImplementation),
+          940┆   'Cannot set a proxy implementation to a non-contract address'
+          941┆ );
+            ⋮┆----------------------------------------
+         1032┆ require(newAdmin != address(0), 'Cannot change the admin of a    
+  proxy to the zero address');                                                  
+            ⋮┆----------------------------------------
+         1092┆ require(msg.sender != _admin(), 'Cannot call fallback function   
+  from the proxy admin');                                                       
+            ⋮┆----------------------------------------
+         1634┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+         1635┆     "SafeERC20: approve from non-zero to non-zero allowance"
+         1636┆ );
+            ⋮┆----------------------------------------
+         1664┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+         2371┆ require(vars.newLiquidityRate < (1 << 128), 'ReserveLogic:       
+  Liquidity rate overflow');                                                    
+            ⋮┆----------------------------------------
+         2372┆ require(vars.newStableRate < (1 << 128), 'ReserveLogic: Stable   
+  borrow rate overflow');                                                       
+            ⋮┆----------------------------------------
+         2373┆ require(vars.newVariableRate < (1 << 128), 'ReserveLogic:        
+  Variable borrow rate overflow');                                              
+            ⋮┆----------------------------------------
+         3039┆ require(c / a == b, 'SafeMath: multiplication overflow');
+            ⋮┆----------------------------------------
+         3285┆ require(sender != address(0), 'ERC20: transfer from the zero     
+  address');                                                                    
+            ⋮┆----------------------------------------
+         3286┆ require(recipient != address(0), 'ERC20: transfer to the zero    
+  address');                                                                    
+            ⋮┆----------------------------------------
+         3321┆ require(account != address(0), 'ERC20: burn from the zero        
+  address');                                                                    
+            ⋮┆----------------------------------------
+         3341┆ require(owner != address(0), 'ERC20: approve from the zero       
+  address');                                                                    
+            ⋮┆----------------------------------------
+         3342┆ require(spender != address(0), 'ERC20: approve to the zero       
+  address');                                                                    
+            ⋮┆----------------------------------------
+       solidity.security.delegatecall-to-arbitrary-address               
+          An attacker may perform delegatecall() to an arbitrary address.
+                                                                         
+         5367┆ (bool success, bytes memory result) =                            
+  collateralManager.delegatecall(                                               
+         5368┆   abi.encodeWithSignature(
+         5369┆     'liquidationCall(address,address,address,uint256,bool)',
+         5370┆     collateral,
+         5371┆     asset,
+         5372┆     user,
+         5373┆     purchaseAmount,
+         5374┆     receiveAToken
+         5375┆   )
+         5376┆ );
+            ⋮┆----------------------------------------
+         5414┆ (bool success, bytes memory result) =                            
+  collateralManager.delegatecall(                                               
+         5415┆   abi.encodeWithSignature(
+         5416┆                                                                  
+  'repayWithCollateral(address,address,address,uint256,address,bytes)',         
+         5417┆     collateral,
+         5418┆     principal,
+         5419┆     user,
+         5420┆     principalAmount,
+         5421┆     receiver,
+         5422┆     params
+         5423┆   )
+             [hid 1 additional lines, adjust with --max-lines-per-finding] 
+         5530┆ (bool success, bytes memory result) =                            
+  collateralManager.delegatecall(                                               
+         5531┆   abi.encodeWithSignature(
+         5532┆     'swapLiquidity(address,address,address,uint256,bytes)',
+         5533┆     receiverAddress,
+         5534┆     fromAsset,
+         5535┆     toAsset,
+         5536┆     amountToSwap,
+         5537┆     params
+         5538┆   )
+         5539┆ );
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 78 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

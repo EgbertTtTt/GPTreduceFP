@@ -1,0 +1,155 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 34 Code Findings │
+└──────────────────┘
+                       
+    /sb/CoreVoting.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          178┆ for (uint256 i = 0; i < votingVaults.length; i++) {
+            ⋮┆----------------------------------------
+          272┆ for (uint256 i = 0; i < votingVaults.length; i++) {
+            ⋮┆----------------------------------------
+          274┆ for (uint256 j = i + 1; j < votingVaults.length; j++) {
+            ⋮┆----------------------------------------
+          335┆ for (uint256 i = 0; i < targets.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+          250┆ proposalCount += 1;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+           27┆ constructor() {
+           28┆     owner = msg.sender;
+           29┆ }
+            ⋮┆----------------------------------------
+          169┆ constructor(
+          170┆     address _timelock,
+          171┆     uint256 _baseQuorum,
+          172┆     uint256 _minProposalPower,
+          173┆     address _gsc,
+          174┆     address[] memory votingVaults
+          175┆ ) Authorizable() {
+          176┆     baseQuorum = _baseQuorum;
+          177┆     minProposalPower = _minProposalPower;
+          178┆     for (uint256 i = 0; i < votingVaults.length; i++) {
+             [hid 5 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          179┆ approvedVaults[votingVaults[i]] = true;
+            ⋮┆----------------------------------------
+          211┆ uint256 unitQuorum = _quorums[targets[i]][selector];
+            ⋮┆----------------------------------------
+          214┆ unitQuorum = unitQuorum == 0 ? baseQuorum : unitQuorum;
+            ⋮┆----------------------------------------
+          277┆ require(approvedVaults[votingVaults[i]], "unverified vault");
+            ⋮┆----------------------------------------
+          281┆ proposals[proposalId].created,
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          178┆ for (uint256 i = 0; i < votingVaults.length; i++) {
+            ⋮┆----------------------------------------
+          208┆ for (uint256 i = 0; i < targets.length; i++) {
+            ⋮┆----------------------------------------
+          272┆ for (uint256 i = 0; i < votingVaults.length; i++) {
+            ⋮┆----------------------------------------
+          274┆ for (uint256 j = i + 1; j < votingVaults.length; j++) {
+            ⋮┆----------------------------------------
+          335┆ for (uint256 i = 0; i < targets.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           33┆ require(msg.sender == owner, "Sender not owner");
+            ⋮┆----------------------------------------
+           39┆ require(isAuthorized(msg.sender), "Sender not Authorized");
+            ⋮┆----------------------------------------
+          199┆ require(targets.length == calldatas.length, "array length        
+  mismatch");                                                                   
+            ⋮┆----------------------------------------
+          240┆ require(votingPower >= minPower, "insufficient voting power");
+            ⋮┆----------------------------------------
+          268┆ require(block.number <= proposals[proposalId].expiration,        
+  "Expired");                                                                   
+            ⋮┆----------------------------------------
+          275┆ require(votingVaults[i] != votingVaults[j], "duplicate vault");
+            ⋮┆----------------------------------------
+          277┆ require(approvedVaults[votingVaults[i]], "unverified vault");
+            ⋮┆----------------------------------------
+          311┆ require(block.number >= proposals[proposalId].unlock, "not       
+  unlocked");                                                                   
+            ⋮┆----------------------------------------
+          313┆ require(proposals[proposalId].unlock != 0, "Previously           
+  executed");                                                                   
+            ⋮┆----------------------------------------
+          316┆ require(
+          317┆     keccak256(abi.encodePacked(targets, abi.encode(calldatas)))  
+  ==                                                                            
+          318┆         proposals[proposalId].proposalHash,
+          319┆     "hash mismatch"
+          320┆ );
+            ⋮┆----------------------------------------
+          330┆ require(passesQuorum && majorityInFavor, "Cannot execute");
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          330┆ require(passesQuorum && majorityInFavor, "Cannot execute");
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          178┆ for (uint256 i = 0; i < votingVaults.length; i++) {
+            ⋮┆----------------------------------------
+          208┆ for (uint256 i = 0; i < targets.length; i++) {
+            ⋮┆----------------------------------------
+          272┆ for (uint256 i = 0; i < votingVaults.length; i++) {
+            ⋮┆----------------------------------------
+          274┆ for (uint256 j = i + 1; j < votingVaults.length; j++) {
+            ⋮┆----------------------------------------
+          335┆ for (uint256 i = 0; i < targets.length; i++) {
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 34 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

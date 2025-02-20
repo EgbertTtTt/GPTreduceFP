@@ -1,0 +1,229 @@
+'solc --version' running
+'solc /sb/FlashLoanLogic.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/FlashLoanLogic.sol:
+Warning: Contract code size exceeds 24576 bytes (a limit introduced in Spurious Dragon). This contract may not be deployable on mainnet. Consider enabling the optimizer (with a low "runs" value!), turning off revert strings, or using libraries.
+    --> /sb/FlashLoanLogic.sol:4320:1:
+     |
+4320 | library BorrowLogic {
+     | ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+FlashLoanLogic.executeFlashLoan(mapping(address => DataTypes.ReserveData),mapping(uint256 => address),mapping(uint8 => DataTypes.EModeCategory),DataTypes.UserConfigurationMap,DataTypes.FlashloanParams) (../../sb/FlashLoanLogic.sol#4658-4769) uses arbitrary from in transferFrom: IERC20(vars.currentAsset).safeTransferFrom(params.receiverAddress,vars.currentATokenAddress,vars.currentAmountPlusPremium) (../../sb/FlashLoanLogic.sol#4728-4732)
+FlashLoanLogic.executeFlashLoanSimple(DataTypes.ReserveData,DataTypes.FlashloanSimpleParams) (../../sb/FlashLoanLogic.sol#4779-4835) uses arbitrary from in transferFrom: IERC20(params.asset).safeTransferFrom(params.receiverAddress,reserveCache.aTokenAddress,vars.amountPlusPremium) (../../sb/FlashLoanLogic.sol#4821-4825)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#arbitrary-from-in-transferfrom
+
+MathUtils.calculateCompoundedInterest(uint256,uint40,uint256) (../../sb/FlashLoanLogic.sol#3042-3077) performs a multiplication on the result of a division:
+	- basePowerTwo = rate.rayMul(rate) / (SECONDS_PER_YEAR * SECONDS_PER_YEAR) (../../sb/FlashLoanLogic.sol#3063)
+	- secondTerm = exp * expMinusOne * basePowerTwo (../../sb/FlashLoanLogic.sol#3067)
+MathUtils.calculateCompoundedInterest(uint256,uint40,uint256) (../../sb/FlashLoanLogic.sol#3042-3077) performs a multiplication on the result of a division:
+	- basePowerThree = basePowerTwo.rayMul(rate) / SECONDS_PER_YEAR (../../sb/FlashLoanLogic.sol#3064)
+	- thirdTerm = exp * expMinusOne * expMinusTwo * basePowerThree (../../sb/FlashLoanLogic.sol#3071)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+MathUtils.calculateCompoundedInterest(uint256,uint40,uint256) (../../sb/FlashLoanLogic.sol#3042-3077) uses a dangerous strict equality:
+	- exp == 0 (../../sb/FlashLoanLogic.sol#3050)
+ReserveLogic.getNormalizedDebt(DataTypes.ReserveData) (../../sb/FlashLoanLogic.sol#3145-3163) uses a dangerous strict equality:
+	- timestamp == uint40(block.timestamp) (../../sb/FlashLoanLogic.sol#3153)
+ReserveLogic.getNormalizedIncome(DataTypes.ReserveData) (../../sb/FlashLoanLogic.sol#3118-3136) uses a dangerous strict equality:
+	- timestamp == uint40(block.timestamp) (../../sb/FlashLoanLogic.sol#3126)
+GenericLogic.calculateUserAccountData(mapping(address => DataTypes.ReserveData),mapping(uint256 => address),mapping(uint8 => DataTypes.EModeCategory),DataTypes.CalculateUserAccountDataParams) (../../sb/FlashLoanLogic.sol#3483-3634) uses a dangerous strict equality:
+	- vars.hasZeroLtvCollateral = vars.hasZeroLtvCollateral || vars.ltv == 0 (../../sb/FlashLoanLogic.sol#3568)
+GenericLogic.calculateUserAccountData(mapping(address => DataTypes.ReserveData),mapping(uint256 => address),mapping(uint8 => DataTypes.EModeCategory),DataTypes.CalculateUserAccountDataParams) (../../sb/FlashLoanLogic.sol#3483-3634) uses a dangerous strict equality:
+	- (vars.totalDebtInBaseCurrency == 0) (../../sb/FlashLoanLogic.sol#3621-3625)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+ValidationLogic.validateBorrow(mapping(address => DataTypes.ReserveData),mapping(uint256 => address),mapping(uint8 => DataTypes.EModeCategory),DataTypes.ValidateBorrowParams).vars (../../sb/FlashLoanLogic.sol#3763) is a local variable never initialized
+ReserveLogic.updateInterestRates(DataTypes.ReserveData,DataTypes.ReserveCache,address,uint256,uint256).vars (../../sb/FlashLoanLogic.sol#3246) is a local variable never initialized
+ValidationLogic.validateLiquidationCall(DataTypes.UserConfigurationMap,DataTypes.ReserveData,DataTypes.ValidateLiquidationCallParams).vars (../../sb/FlashLoanLogic.sol#4130) is a local variable never initialized
+ValidationLogic.validateHFAndLtv(mapping(address => DataTypes.ReserveData),mapping(uint256 => address),mapping(uint8 => DataTypes.EModeCategory),DataTypes.UserConfigurationMap,address,address,uint256,address,uint8).vars (../../sb/FlashLoanLogic.sol#4232) is a local variable never initialized
+GenericLogic.calculateUserAccountData(mapping(address => DataTypes.ReserveData),mapping(uint256 => address),mapping(uint8 => DataTypes.EModeCategory),DataTypes.CalculateUserAccountDataParams).vars (../../sb/FlashLoanLogic.sol#3504) is a local variable never initialized
+ReserveLogic._accrueToTreasury(DataTypes.ReserveData,DataTypes.ReserveCache).vars (../../sb/FlashLoanLogic.sol#3305) is a local variable never initialized
+FlashLoanLogic.executeFlashLoan(mapping(address => DataTypes.ReserveData),mapping(uint256 => address),mapping(uint8 => DataTypes.EModeCategory),DataTypes.UserConfigurationMap,DataTypes.FlashloanParams).vars (../../sb/FlashLoanLogic.sol#4665) is a local variable never initialized
+FlashLoanLogic.executeFlashLoanSimple(DataTypes.ReserveData,DataTypes.FlashloanSimpleParams).vars (../../sb/FlashLoanLogic.sol#4783) is a local variable never initialized
+ReserveLogic.cache(DataTypes.ReserveData).reserveCache (../../sb/FlashLoanLogic.sol#3399) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+GenericLogic.calculateUserAccountData(mapping(address => DataTypes.ReserveData),mapping(uint256 => address),mapping(uint8 => DataTypes.EModeCategory),DataTypes.CalculateUserAccountDataParams) (../../sb/FlashLoanLogic.sol#3483-3634) ignores return value by (vars.ltv,vars.liquidationThreshold,None,vars.decimals,None,vars.eModeAssetCategory) = currentReserve.configuration.getParams() (../../sb/FlashLoanLogic.sol#3537-3544)
+ValidationLogic.validateSupply(DataTypes.ReserveCache,uint256) (../../sb/FlashLoanLogic.sol#3684-3708) ignores return value by (isActive,isFrozen,isPaused) = reserveCache.reserveConfiguration.getFlags() (../../sb/FlashLoanLogic.sol#3688-3690)
+ValidationLogic.validateWithdraw(DataTypes.ReserveCache,uint256,uint256) (../../sb/FlashLoanLogic.sol#3716-3727) ignores return value by (isActive,isPaused) = reserveCache.reserveConfiguration.getFlags() (../../sb/FlashLoanLogic.sol#3724)
+ValidationLogic.validateBorrow(mapping(address => DataTypes.ReserveData),mapping(uint256 => address),mapping(uint8 => DataTypes.EModeCategory),DataTypes.ValidateBorrowParams) (../../sb/FlashLoanLogic.sol#3757-3922) ignores return value by (vars.userCollateralInBaseCurrency,vars.userDebtInBaseCurrency,vars.currentLtv,vars.currentLiquidationThreshold,vars.healthFactor,None) = GenericLogic.calculateUserAccountData(reservesData,reserves,eModeCategories,DataTypes.CalculateUserAccountDataParams(params.userConfig,params.reservesCount,params.userAddress,params.oracle,params.userEModeCategory)) (../../sb/FlashLoanLogic.sol#3846-3864)
+ValidationLogic.validateRepay(DataTypes.ReserveCache,uint256,DataTypes.InterestRateMode,address,uint256,uint256) (../../sb/FlashLoanLogic.sol#3933-3973) ignores return value by (isActive,isPaused) = reserveCache.reserveConfiguration.getFlags() (../../sb/FlashLoanLogic.sol#3941)
+ValidationLogic.validateSwapRateMode(DataTypes.ReserveData,DataTypes.ReserveCache,DataTypes.UserConfigurationMap,uint256,uint256,DataTypes.InterestRateMode) (../../sb/FlashLoanLogic.sol#3984-4022) ignores return value by (isActive,isFrozen,stableRateEnabled,isPaused) = reserveCache.reserveConfiguration.getFlags() (../../sb/FlashLoanLogic.sol#3992-3994)
+ValidationLogic.validateRebalanceStableBorrowRate(DataTypes.ReserveData,DataTypes.ReserveCache,address,IERC20,IERC20,address) (../../sb/FlashLoanLogic.sol#4033-4066) ignores return value by (isActive,isPaused) = reserveCache.reserveConfiguration.getFlags() (../../sb/FlashLoanLogic.sol#4041)
+ValidationLogic.validateSetUseReserveAsCollateral(DataTypes.ReserveCache,uint256) (../../sb/FlashLoanLogic.sol#4073-4082) ignores return value by (isActive,isPaused) = reserveCache.reserveConfiguration.getFlags() (../../sb/FlashLoanLogic.sol#4077)
+ValidationLogic.validateLiquidationCall(DataTypes.UserConfigurationMap,DataTypes.ReserveData,DataTypes.ValidateLiquidationCallParams) (../../sb/FlashLoanLogic.sol#4125-4169) ignores return value by (vars.collateralReserveActive,None,None,None,vars.collateralReservePaused) = collateralReserve.configuration.getFlags() (../../sb/FlashLoanLogic.sol#4132-4134)
+ValidationLogic.validateLiquidationCall(DataTypes.UserConfigurationMap,DataTypes.ReserveData,DataTypes.ValidateLiquidationCallParams) (../../sb/FlashLoanLogic.sol#4125-4169) ignores return value by (vars.principalReserveActive,None,None,None,vars.principalReservePaused) = params.debtReserveCache.reserveConfiguration.getFlags() (../../sb/FlashLoanLogic.sol#4136-4139)
+ValidationLogic.validateHealthFactor(mapping(address => DataTypes.ReserveData),mapping(uint256 => address),mapping(uint8 => DataTypes.EModeCategory),DataTypes.UserConfigurationMap,address,uint8,uint256,address) (../../sb/FlashLoanLogic.sol#4171-4201) ignores return value by (healthFactor,hasZeroLtvCollateral) = GenericLogic.calculateUserAccountData(reservesData,reserves,eModeCategories,DataTypes.CalculateUserAccountDataParams(userConfig,reservesCount,user,oracle,userEModeCategory)) (../../sb/FlashLoanLogic.sol#4181-4193)
+BorrowLogic.executeRepay(mapping(address => DataTypes.ReserveData),mapping(uint256 => address),DataTypes.ReserveData,DataTypes.UserConfigurationMap,DataTypes.ExecuteRepayParams) (../../sb/FlashLoanLogic.sol#4446-4534) ignores return value by (isolationModeActive,isolationModeCollateralAddress) = userConfig.getIsolationModeState(reserves,reservesList) (../../sb/FlashLoanLogic.sol#4495-4496)
+BorrowLogic.rebalanceStableBorrowRate(DataTypes.ReserveData,address,address) (../../sb/FlashLoanLogic.sol#4536-4567) ignores return value by IStableDebtToken(address(stableDebtToken)).burn(user,stableDebt) (../../sb/FlashLoanLogic.sol#4558)
+BorrowLogic.rebalanceStableBorrowRate(DataTypes.ReserveData,address,address) (../../sb/FlashLoanLogic.sol#4536-4567) ignores return value by (None,reserveCache.nextTotalStableDebt,reserveCache.nextAvgStableBorrowRate) = IStableDebtToken(address(stableDebtToken)).mint(user,user,stableDebt,reserve.currentStableBorrowRate) (../../sb/FlashLoanLogic.sol#4560-4562)
+BorrowLogic.swapBorrowRateMode(DataTypes.ReserveData,DataTypes.UserConfigurationMap,address,uint256) (../../sb/FlashLoanLogic.sol#4569-4613) ignores return value by (None,reserveCache.nextScaledVariableDebt) = IVariableDebtToken(reserveCache.variableDebtTokenAddress).mint(msg.sender,msg.sender,stableDebt,reserveCache.nextVariableBorrowIndex) (../../sb/FlashLoanLogic.sol#4597-4599)
+BorrowLogic.swapBorrowRateMode(DataTypes.ReserveData,DataTypes.UserConfigurationMap,address,uint256) (../../sb/FlashLoanLogic.sol#4569-4613) ignores return value by (None,reserveCache.nextTotalStableDebt,reserveCache.nextAvgStableBorrowRate) = IStableDebtToken(reserveCache.stableDebtTokenAddress).mint(msg.sender,msg.sender,variableDebt,reserve.currentStableBorrowRate) (../../sb/FlashLoanLogic.sol#4605-4607)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+FlashLoanLogic.executeFlashLoan(mapping(address => DataTypes.ReserveData),mapping(uint256 => address),mapping(uint8 => DataTypes.EModeCategory),DataTypes.UserConfigurationMap,DataTypes.FlashloanParams) (../../sb/FlashLoanLogic.sol#4658-4769) has external calls inside a loop: IAToken(vars.aTokenAddresses[vars.i]).transferUnderlyingTo(params.receiverAddress,params.amounts[vars.i]) (../../sb/FlashLoanLogic.sol#4680-4683)
+FlashLoanLogic.executeFlashLoan(mapping(address => DataTypes.ReserveData),mapping(uint256 => address),mapping(uint8 => DataTypes.EModeCategory),DataTypes.UserConfigurationMap,DataTypes.FlashloanParams) (../../sb/FlashLoanLogic.sol#4658-4769) has external calls inside a loop: reserve.cumulateToLiquidityIndex(IERC20(vars.currentATokenAddress).totalSupply(),vars.currentPremiumToLP) (../../sb/FlashLoanLogic.sol#4712-4715)
+FlashLoanLogic.executeFlashLoan(mapping(address => DataTypes.ReserveData),mapping(uint256 => address),mapping(uint8 => DataTypes.EModeCategory),DataTypes.UserConfigurationMap,DataTypes.FlashloanParams) (../../sb/FlashLoanLogic.sol#4658-4769) has external calls inside a loop: vars.oracle = IPoolAddressesProvider(params.addressesProvider).getPriceOracle() (../../sb/FlashLoanLogic.sol#4736)
+FlashLoanLogic.executeFlashLoan(mapping(address => DataTypes.ReserveData),mapping(uint256 => address),mapping(uint8 => DataTypes.EModeCategory),DataTypes.UserConfigurationMap,DataTypes.FlashloanParams) (../../sb/FlashLoanLogic.sol#4658-4769) has external calls inside a loop: vars.oracleSentinel = IPoolAddressesProvider(params.addressesProvider).getPriceOracleSentinel() (../../sb/FlashLoanLogic.sol#4737-4738)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in BorrowLogic.executeBorrow(mapping(address => DataTypes.ReserveData),mapping(uint256 => address),mapping(uint8 => DataTypes.EModeCategory),DataTypes.UserConfigurationMap,DataTypes.ExecuteBorrowParams) (../../sb/FlashLoanLogic.sol#4347-4444):
+	External calls:
+	- (isFirstBorrowing,reserveCache.nextTotalStableDebt,reserveCache.nextAvgStableBorrowRate) = IStableDebtToken(reserveCache.stableDebtTokenAddress).mint(params.user,params.onBehalfOf,params.amount,currentStableRate) (../../sb/FlashLoanLogic.sol#4393-4402)
+	- (isFirstBorrowing,reserveCache.nextScaledVariableDebt) = IVariableDebtToken(reserveCache.variableDebtTokenAddress).mint(params.user,params.onBehalfOf,params.amount,reserveCache.nextVariableBorrowIndex) (../../sb/FlashLoanLogic.sol#4404-4406)
+	- IAToken(reserveCache.aTokenAddress).transferUnderlyingTo(params.user,params.amount) (../../sb/FlashLoanLogic.sol#4430)
+	Event emitted after the call(s):
+	- Borrow(params.asset,params.user,params.onBehalfOf,params.amount,params.interestRateMode,currentStableRate,params.referralCode) (../../sb/FlashLoanLogic.sol#4433-4443)
+	- Borrow(params.asset,params.user,params.onBehalfOf,params.amount,params.interestRateMode,reserve.currentVariableBorrowRate,params.referralCode) (../../sb/FlashLoanLogic.sol#4433-4443)
+Reentrancy in FlashLoanLogic.executeFlashLoan(mapping(address => DataTypes.ReserveData),mapping(uint256 => address),mapping(uint8 => DataTypes.EModeCategory),DataTypes.UserConfigurationMap,DataTypes.FlashloanParams) (../../sb/FlashLoanLogic.sol#4658-4769):
+	External calls:
+	- IAToken(vars.aTokenAddresses[vars.i]).transferUnderlyingTo(params.receiverAddress,params.amounts[vars.i]) (../../sb/FlashLoanLogic.sol#4680-4683)
+	- require(bool,string)(vars.receiver.executeOperation(params.assets,params.amounts,vars.totalPremiums,msg.sender,params.params),Errors.P_INVALID_FLASH_LOAN_EXECUTOR_RETURN) (../../sb/FlashLoanLogic.sol#4686-4695)
+	- IERC20(vars.currentAsset).safeTransferFrom(params.receiverAddress,vars.currentATokenAddress,vars.currentAmountPlusPremium) (../../sb/FlashLoanLogic.sol#4728-4732)
+	- BorrowLogic.executeBorrow(reserves,reservesList,eModeCategories,userConfig,DataTypes.ExecuteBorrowParams(vars.currentAsset,msg.sender,params.onBehalfOf,vars.currentAmount,params.modes[vars.i],params.referralCode,false,params.maxStableRateBorrowSizePercent,params.reservesCount,vars.oracle,params.userEModeCategory,vars.oracleSentinel)) (../../sb/FlashLoanLogic.sol#4739-4758)
+	Event emitted after the call(s):
+	- FlashLoan(params.receiverAddress,msg.sender,vars.currentAsset,vars.currentAmount,vars.totalPremiums[vars.i],params.referralCode) (../../sb/FlashLoanLogic.sol#4760-4767)
+Reentrancy in FlashLoanLogic.executeFlashLoanSimple(DataTypes.ReserveData,DataTypes.FlashloanSimpleParams) (../../sb/FlashLoanLogic.sol#4779-4835):
+	External calls:
+	- IAToken(reserveCache.aTokenAddress).transferUnderlyingTo(params.receiverAddress,params.amount) (../../sb/FlashLoanLogic.sol#4794)
+	- require(bool,string)(vars.receiver.executeOperation(params.asset,params.amount,vars.totalPremium,msg.sender,params.params),Errors.P_INVALID_FLASH_LOAN_EXECUTOR_RETURN) (../../sb/FlashLoanLogic.sol#4796-4805)
+	- IERC20(params.asset).safeTransferFrom(params.receiverAddress,reserveCache.aTokenAddress,vars.amountPlusPremium) (../../sb/FlashLoanLogic.sol#4821-4825)
+	Event emitted after the call(s):
+	- FlashLoan(params.receiverAddress,msg.sender,params.asset,params.amount,vars.totalPremium,0) (../../sb/FlashLoanLogic.sol#4827-4834)
+Reentrancy in BorrowLogic.executeRepay(mapping(address => DataTypes.ReserveData),mapping(uint256 => address),DataTypes.ReserveData,DataTypes.UserConfigurationMap,DataTypes.ExecuteRepayParams) (../../sb/FlashLoanLogic.sol#4446-4534):
+	External calls:
+	- (reserveCache.nextTotalStableDebt,reserveCache.nextAvgStableBorrowRate) = IStableDebtToken(reserveCache.stableDebtTokenAddress).burn(params.onBehalfOf,paybackAmount) (../../sb/FlashLoanLogic.sol#4480-4482)
+	- reserveCache.nextScaledVariableDebt = IVariableDebtToken(reserveCache.variableDebtTokenAddress).burn(params.onBehalfOf,paybackAmount,reserveCache.nextVariableBorrowIndex) (../../sb/FlashLoanLogic.sol#4484-4486)
+	- IAToken(reserveCache.aTokenAddress).burn(msg.sender,reserveCache.aTokenAddress,paybackAmount,reserveCache.nextLiquidityIndex) (../../sb/FlashLoanLogic.sol#4520-4525)
+	- IERC20(params.asset).safeTransferFrom(msg.sender,reserveCache.aTokenAddress,paybackAmount) (../../sb/FlashLoanLogic.sol#4527)
+	- IAToken(reserveCache.aTokenAddress).handleRepayment(msg.sender,paybackAmount) (../../sb/FlashLoanLogic.sol#4528)
+	Event emitted after the call(s):
+	- Repay(params.asset,params.onBehalfOf,msg.sender,paybackAmount) (../../sb/FlashLoanLogic.sol#4531)
+Reentrancy in BorrowLogic.rebalanceStableBorrowRate(DataTypes.ReserveData,address,address) (../../sb/FlashLoanLogic.sol#4536-4567):
+	External calls:
+	- IStableDebtToken(address(stableDebtToken)).burn(user,stableDebt) (../../sb/FlashLoanLogic.sol#4558)
+	- (None,reserveCache.nextTotalStableDebt,reserveCache.nextAvgStableBorrowRate) = IStableDebtToken(address(stableDebtToken)).mint(user,user,stableDebt,reserve.currentStableBorrowRate) (../../sb/FlashLoanLogic.sol#4560-4562)
+	Event emitted after the call(s):
+	- RebalanceStableBorrowRate(asset,user) (../../sb/FlashLoanLogic.sol#4566)
+Reentrancy in BorrowLogic.swapBorrowRateMode(DataTypes.ReserveData,DataTypes.UserConfigurationMap,address,uint256) (../../sb/FlashLoanLogic.sol#4569-4613):
+	External calls:
+	- (reserveCache.nextTotalStableDebt,reserveCache.nextAvgStableBorrowRate) = IStableDebtToken(reserveCache.stableDebtTokenAddress).burn(msg.sender,stableDebt) (../../sb/FlashLoanLogic.sol#4593-4595)
+	- (None,reserveCache.nextScaledVariableDebt) = IVariableDebtToken(reserveCache.variableDebtTokenAddress).mint(msg.sender,msg.sender,stableDebt,reserveCache.nextVariableBorrowIndex) (../../sb/FlashLoanLogic.sol#4597-4599)
+	- reserveCache.nextScaledVariableDebt = IVariableDebtToken(reserveCache.variableDebtTokenAddress).burn(msg.sender,variableDebt,reserveCache.nextVariableBorrowIndex) (../../sb/FlashLoanLogic.sol#4601-4603)
+	- (None,reserveCache.nextTotalStableDebt,reserveCache.nextAvgStableBorrowRate) = IStableDebtToken(reserveCache.stableDebtTokenAddress).mint(msg.sender,msg.sender,variableDebt,reserve.currentStableBorrowRate) (../../sb/FlashLoanLogic.sol#4605-4607)
+	Event emitted after the call(s):
+	- Swap(asset,msg.sender,rateMode) (../../sb/FlashLoanLogic.sol#4612)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+MathUtils.calculateCompoundedInterest(uint256,uint40,uint256) (../../sb/FlashLoanLogic.sol#3042-3077) uses timestamp for comparisons
+	Dangerous comparisons:
+	- exp == 0 (../../sb/FlashLoanLogic.sol#3050)
+	- exp > 2 (../../sb/FlashLoanLogic.sol#3061)
+ReserveLogic.getNormalizedIncome(DataTypes.ReserveData) (../../sb/FlashLoanLogic.sol#3118-3136) uses timestamp for comparisons
+	Dangerous comparisons:
+	- timestamp == uint40(block.timestamp) (../../sb/FlashLoanLogic.sol#3126)
+ReserveLogic.getNormalizedDebt(DataTypes.ReserveData) (../../sb/FlashLoanLogic.sol#3145-3163) uses timestamp for comparisons
+	Dangerous comparisons:
+	- timestamp == uint40(block.timestamp) (../../sb/FlashLoanLogic.sol#3153)
+ValidationLogic.validateRepay(DataTypes.ReserveCache,uint256,DataTypes.InterestRateMode,address,uint256,uint256) (../../sb/FlashLoanLogic.sol#3933-3973) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)((stableRatePreviousTimestamp < uint40(block.timestamp) && DataTypes.InterestRateMode(rateMode) == DataTypes.InterestRateMode.STABLE) || (variableDebtPreviousIndex < reserveCache.nextVariableBorrowIndex && DataTypes.InterestRateMode(rateMode) == DataTypes.InterestRateMode.VARIABLE),Errors.VL_SAME_BLOCK_BORROW_REPAY) (../../sb/FlashLoanLogic.sol#3953-3959)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/FlashLoanLogic.sol#97-108) uses assembly
+	- INLINE ASM (../../sb/FlashLoanLogic.sol#104-106)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+GenericLogic.calculateUserAccountData(mapping(address => DataTypes.ReserveData),mapping(uint256 => address),mapping(uint8 => DataTypes.EModeCategory),DataTypes.CalculateUserAccountDataParams) (../../sb/FlashLoanLogic.sol#3483-3634) has a high cyclomatic complexity (16).
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cyclomatic-complexity
+
+Address.sendValue(address,uint256) (../../sb/FlashLoanLogic.sol#126-132) is never used and should be removed
+GenericLogic.calculateAvailableBorrows(uint256,uint256,uint256) (../../sb/FlashLoanLogic.sol#3644-3657) is never used and should be removed
+Helpers.getUserCurrentDebtMemory(address,DataTypes.ReserveData) (../../sb/FlashLoanLogic.sol#2524-2533) is never used and should be removed
+ReserveConfiguration.getBorrowingEnabled(DataTypes.ReserveConfigurationMap) (../../sb/FlashLoanLogic.sol#1976-1982) is never used and should be removed
+ReserveConfiguration.getCaps(DataTypes.ReserveConfigurationMap) (../../sb/FlashLoanLogic.sol#2281-2292) is never used and should be removed
+ReserveConfiguration.getFrozen(DataTypes.ReserveConfigurationMap) (../../sb/FlashLoanLogic.sol#1933-1935) is never used and should be removed
+ReserveConfiguration.getLiquidationBonus(DataTypes.ReserveConfigurationMap) (../../sb/FlashLoanLogic.sol#1862-1868) is never used and should be removed
+ReserveConfiguration.getLiquidationProtocolFee(DataTypes.ReserveConfigurationMap) (../../sb/FlashLoanLogic.sol#2145-2152) is never used and should be removed
+ReserveConfiguration.getLiquidationThreshold(DataTypes.ReserveConfigurationMap) (../../sb/FlashLoanLogic.sol#1833-1839) is never used and should be removed
+ReserveConfiguration.getStableRateBorrowingEnabled(DataTypes.ReserveConfigurationMap) (../../sb/FlashLoanLogic.sol#2003-2009) is never used and should be removed
+ReserveConfiguration.getSupplyCap(DataTypes.ReserveConfigurationMap) (../../sb/FlashLoanLogic.sol#2086-2092) is never used and should be removed
+ReserveConfiguration.setActive(DataTypes.ReserveConfigurationMap,bool) (../../sb/FlashLoanLogic.sol#1902-1906) is never used and should be removed
+ReserveConfiguration.setBorrowCap(DataTypes.ReserveConfigurationMap,uint256) (../../sb/FlashLoanLogic.sol#2045-2052) is never used and should be removed
+ReserveConfiguration.setBorrowingEnabled(DataTypes.ReserveConfigurationMap,bool) (../../sb/FlashLoanLogic.sol#1962-1969) is never used and should be removed
+ReserveConfiguration.setDebtCeiling(DataTypes.ReserveConfigurationMap,uint256) (../../sb/FlashLoanLogic.sol#2099-2106) is never used and should be removed
+ReserveConfiguration.setDecimals(DataTypes.ReserveConfigurationMap,uint256) (../../sb/FlashLoanLogic.sol#1875-1882) is never used and should be removed
+ReserveConfiguration.setEModeCategory(DataTypes.ReserveConfigurationMap,uint256) (../../sb/FlashLoanLogic.sol#2188-2195) is never used and should be removed
+ReserveConfiguration.setFrozen(DataTypes.ReserveConfigurationMap,bool) (../../sb/FlashLoanLogic.sol#1922-1926) is never used and should be removed
+ReserveConfiguration.setLiquidationBonus(DataTypes.ReserveConfigurationMap,uint256) (../../sb/FlashLoanLogic.sol#1846-1855) is never used and should be removed
+ReserveConfiguration.setLiquidationProtocolFee(DataTypes.ReserveConfigurationMap,uint256) (../../sb/FlashLoanLogic.sol#2126-2138) is never used and should be removed
+ReserveConfiguration.setLiquidationThreshold(DataTypes.ReserveConfigurationMap,uint256) (../../sb/FlashLoanLogic.sol#1817-1826) is never used and should be removed
+ReserveConfiguration.setLtv(DataTypes.ReserveConfigurationMap,uint256) (../../sb/FlashLoanLogic.sol#1797-1801) is never used and should be removed
+ReserveConfiguration.setPaused(DataTypes.ReserveConfigurationMap,bool) (../../sb/FlashLoanLogic.sol#1942-1946) is never used and should be removed
+ReserveConfiguration.setReserveFactor(DataTypes.ReserveConfigurationMap,uint256) (../../sb/FlashLoanLogic.sol#2016-2025) is never used and should be removed
+ReserveConfiguration.setStableRateBorrowingEnabled(DataTypes.ReserveConfigurationMap,bool) (../../sb/FlashLoanLogic.sol#1989-1996) is never used and should be removed
+ReserveConfiguration.setSupplyCap(DataTypes.ReserveConfigurationMap,uint256) (../../sb/FlashLoanLogic.sol#2072-2079) is never used and should be removed
+ReserveConfiguration.setUnbackedMintCap(DataTypes.ReserveConfigurationMap,uint256) (../../sb/FlashLoanLogic.sol#2159-2168) is never used and should be removed
+ReserveLogic.init(DataTypes.ReserveData,address,address,address,address) (../../sb/FlashLoanLogic.sol#3206-3221) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/FlashLoanLogic.sol#155-165) is never used and should be removed
+SafeERC20.safeTransfer(IERC20,address,uint256) (../../sb/FlashLoanLogic.sol#138-144) is never used and should be removed
+UserConfiguration.isBorrowingAny(DataTypes.UserConfigurationMap) (../../sb/FlashLoanLogic.sol#2425-2427) is never used and should be removed
+UserConfiguration.setUsingAsCollateral(DataTypes.UserConfigurationMap,uint256,bool) (../../sb/FlashLoanLogic.sol#2328-2339) is never used and should be removed
+ValidationLogic.validateDropReserve(DataTypes.ReserveData) (../../sb/FlashLoanLogic.sol#4262-4272) is never used and should be removed
+ValidationLogic.validateHFAndLtv(mapping(address => DataTypes.ReserveData),mapping(uint256 => address),mapping(uint8 => DataTypes.EModeCategory),DataTypes.UserConfigurationMap,address,address,uint256,address,uint8) (../../sb/FlashLoanLogic.sol#4221-4248) is never used and should be removed
+ValidationLogic.validateHealthFactor(mapping(address => DataTypes.ReserveData),mapping(uint256 => address),mapping(uint8 => DataTypes.EModeCategory),DataTypes.UserConfigurationMap,address,uint8,uint256,address) (../../sb/FlashLoanLogic.sol#4171-4201) is never used and should be removed
+ValidationLogic.validateLiquidationCall(DataTypes.UserConfigurationMap,DataTypes.ReserveData,DataTypes.ValidateLiquidationCallParams) (../../sb/FlashLoanLogic.sol#4125-4169) is never used and should be removed
+ValidationLogic.validateSetUseReserveAsCollateral(DataTypes.ReserveCache,uint256) (../../sb/FlashLoanLogic.sol#4073-4082) is never used and should be removed
+ValidationLogic.validateSetUserEMode(mapping(address => DataTypes.ReserveData),mapping(uint256 => address),mapping(uint8 => DataTypes.EModeCategory),DataTypes.UserConfigurationMap,uint256,uint8) (../../sb/FlashLoanLogic.sol#4282-4317) is never used and should be removed
+ValidationLogic.validateSupply(DataTypes.ReserveCache,uint256) (../../sb/FlashLoanLogic.sol#3684-3708) is never used and should be removed
+ValidationLogic.validateTransfer(DataTypes.ReserveData) (../../sb/FlashLoanLogic.sol#4254-4256) is never used and should be removed
+ValidationLogic.validateWithdraw(DataTypes.ReserveCache,uint256,uint256) (../../sb/FlashLoanLogic.sol#3716-3727) is never used and should be removed
+WadRayMath.halfRay() (../../sb/FlashLoanLogic.sol#2561-2563) is never used and should be removed
+WadRayMath.halfWad() (../../sb/FlashLoanLogic.sol#2568-2570) is never used and should be removed
+WadRayMath.rayToWad(uint256) (../../sb/FlashLoanLogic.sol#2645-2653) is never used and should be removed
+WadRayMath.wad() (../../sb/FlashLoanLogic.sol#2554-2556) is never used and should be removed
+WadRayMath.wadMul(uint256,uint256) (../../sb/FlashLoanLogic.sol#2578-2588) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.8.7 (../../sb/FlashLoanLogic.sol#1) allows old versions
+solc-0.8.7 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/FlashLoanLogic.sol#126-132):
+	- (success) = recipient.call{value: amount}() (../../sb/FlashLoanLogic.sol#130)
+Low level call in SafeERC20.callOptionalReturn(IERC20,bytes) (../../sb/FlashLoanLogic.sol#167-179):
+	- (success,returndata) = address(token).call(data) (../../sb/FlashLoanLogic.sol#171)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Function IPool.MAX_STABLE_RATE_BORROW_SIZE_PERCENT() (../../sb/FlashLoanLogic.sol#1223) is not in mixedCase
+Function IPool.FLASHLOAN_PREMIUM_TOTAL() (../../sb/FlashLoanLogic.sol#1229) is not in mixedCase
+Function IPool.BRIDGE_PROTOCOL_FEE() (../../sb/FlashLoanLogic.sol#1235) is not in mixedCase
+Function IPool.FLASHLOAN_PREMIUM_TO_PROTOCOL() (../../sb/FlashLoanLogic.sol#1241) is not in mixedCase
+Function IPool.MAX_NUMBER_RESERVES() (../../sb/FlashLoanLogic.sol#1247) is not in mixedCase
+Function IAaveIncentivesController.REWARD_TOKEN() (../../sb/FlashLoanLogic.sol#1415) is not in mixedCase
+Function IAaveIncentivesController.PRECISION() (../../sb/FlashLoanLogic.sol#1421) is not in mixedCase
+Function IAToken.UNDERLYING_ASSET_ADDRESS() (../../sb/FlashLoanLogic.sol#1582) is not in mixedCase
+Function IAToken.RESERVE_TREASURY_ADDRESS() (../../sb/FlashLoanLogic.sol#1587) is not in mixedCase
+Function IFlashLoanReceiver.ADDRESSES_PROVIDER() (../../sb/FlashLoanLogic.sol#1610) is not in mixedCase
+Function IFlashLoanReceiver.POOL() (../../sb/FlashLoanLogic.sol#1612) is not in mixedCase
+Function IFlashLoanSimpleReceiver.ADDRESSES_PROVIDER() (../../sb/FlashLoanLogic.sol#1635) is not in mixedCase
+Function IFlashLoanSimpleReceiver.POOL() (../../sb/FlashLoanLogic.sol#1637) is not in mixedCase
+Function IPriceOracleGetter.BASE_CURRENCY() (../../sb/FlashLoanLogic.sol#2971) is not in mixedCase
+Function IPriceOracleGetter.BASE_CURRENCY_UNIT() (../../sb/FlashLoanLogic.sol#2977) is not in mixedCase
+Struct ValidationLogic.validateHFAndLtvLocalVars (../../sb/FlashLoanLogic.sol#4203-4209) is not in CapWords
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+ReserveConfiguration.slitherConstructorConstantVariables() (../../sb/FlashLoanLogic.sol#1743-2293) uses literals with too many digits:
+	- BORROW_CAP_MASK = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000000FFFFFFFFFFFFFFFFFFFF (../../sb/FlashLoanLogic.sol#1754)
+ReserveConfiguration.slitherConstructorConstantVariables() (../../sb/FlashLoanLogic.sol#1743-2293) uses literals with too many digits:
+	- SUPPLY_CAP_MASK = 0xFFFFFFFFFFFFFFFFFFFFFFFFFF000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFF (../../sb/FlashLoanLogic.sol#1755)
+ReserveConfiguration.slitherConstructorConstantVariables() (../../sb/FlashLoanLogic.sol#1743-2293) uses literals with too many digits:
+	- UNBACKED_MINT_CAP_MASK = 0xFFFFFFFFFFF000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF (../../sb/FlashLoanLogic.sol#1758)
+ReserveConfiguration.slitherConstructorConstantVariables() (../../sb/FlashLoanLogic.sol#1743-2293) uses literals with too many digits:
+	- DEBT_CEILING_MASK = 0xF0000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF (../../sb/FlashLoanLogic.sol#1759)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+ReserveConfiguration.DEBT_CEILING_DECIMALS (../../sb/FlashLoanLogic.sol#1790) is never used in ReserveConfiguration (../../sb/FlashLoanLogic.sol#1743-2293)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-state-variable
+/sb/FlashLoanLogic.sol analyzed (30 contracts with 93 detectors), 121 result(s) found

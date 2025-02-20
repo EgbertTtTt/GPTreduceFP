@@ -1,0 +1,107 @@
+'solc --version' running
+'solc /sb/Staking.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+Staking.deposit(address,uint256) (../../sb/Staking.sol#399-485) ignores return value by token.transferFrom(msg.sender,address(this),amount) (../../sb/Staking.sol#408)
+Staking.withdraw(address,uint256) (../../sb/Staking.sol#490-571) ignores return value by token.transfer(msg.sender,amount) (../../sb/Staking.sol#496)
+Staking.emergencyWithdraw(address) (../../sb/Staking.sol#599-611) ignores return value by token.transfer(msg.sender,totalUserBalance) (../../sb/Staking.sol#608)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+Staking.balanceCheckpoints (../../sb/Staking.sol#382) is never initialized. It is used in:
+	- Staking.deposit(address,uint256) (../../sb/Staking.sol#399-485)
+	- Staking.withdraw(address,uint256) (../../sb/Staking.sol#490-571)
+	- Staking.getEpochUserBalance(address,address,uint128) (../../sb/Staking.sol#618-645)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-state-variables
+
+Staking.deposit(address,uint256) (../../sb/Staking.sol#399-485) uses a dangerous strict equality:
+	- checkpoints[last].epochId == currentEpoch (../../sb/Staking.sol#453)
+Staking.deposit(address,uint256) (../../sb/Staking.sol#399-485) uses a dangerous strict equality:
+	- last >= 1 && checkpoints[last - 1].epochId == currentEpoch (../../sb/Staking.sol#466)
+Staking.manualEpochInit(address[],uint128) (../../sb/Staking.sol#578-597) uses a dangerous strict equality:
+	- epochId == 0 (../../sb/Staking.sol#584)
+Staking.withdraw(address,uint256) (../../sb/Staking.sol#490-571) uses a dangerous strict equality:
+	- checkpoints[last].epochId == currentEpoch (../../sb/Staking.sol#526)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Reentrancy in Staking.deposit(address,uint256) (../../sb/Staking.sol#399-485):
+	External calls:
+	- token.transferFrom(msg.sender,address(this),amount) (../../sb/Staking.sol#408)
+	State variables written after the call(s):
+	- manualEpochInit(tokens,currentEpoch) (../../sb/Staking.sol#417)
+		- p.size = uint256(0) (../../sb/Staking.sol#585)
+		- p.set = true (../../sb/Staking.sol#586)
+		- p.size = poolSize[tokens[i]][epochId - 1].size (../../sb/Staking.sol#591)
+		- p.set = true (../../sb/Staking.sol#592)
+	- pNextEpoch.size = token.balanceOf(address(this)) (../../sb/Staking.sol#422)
+	- pNextEpoch.set = true (../../sb/Staking.sol#423)
+	- poolSize[tokenAddress][currentEpoch].size = poolSize[tokenAddress][currentEpoch].size.add(balanceAfter.sub(balanceBefore)) (../../sb/Staking.sol#482)
+Reentrancy in Staking.withdraw(address,uint256) (../../sb/Staking.sol#490-571):
+	External calls:
+	- token.transfer(msg.sender,amount) (../../sb/Staking.sol#496)
+	State variables written after the call(s):
+	- lastWithdrawEpochId[tokenAddress] = currentEpoch (../../sb/Staking.sol#501)
+	- manualEpochInit(tokens,currentEpoch) (../../sb/Staking.sol#506)
+		- p.size = uint256(0) (../../sb/Staking.sol#585)
+		- p.set = true (../../sb/Staking.sol#586)
+		- p.size = poolSize[tokens[i]][epochId - 1].size (../../sb/Staking.sol#591)
+		- p.set = true (../../sb/Staking.sol#592)
+	- pNextEpoch.size = token.balanceOf(address(this)) (../../sb/Staking.sol#511)
+	- pNextEpoch.set = true (../../sb/Staking.sol#512)
+	- poolSize[tokenAddress][currentEpoch].size = poolSize[tokenAddress][currentEpoch].size.sub(amount) (../../sb/Staking.sol#523)
+	- poolSize[tokenAddress][currentEpoch].size = poolSize[tokenAddress][currentEpoch].size.sub(amount) (../../sb/Staking.sol#531)
+	- poolSize[tokenAddress][currentEpoch].size = poolSize[tokenAddress][currentEpoch].size.sub(balanceBefore.sub(balanceAfter)) (../../sb/Staking.sol#565)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in Staking.emergencyWithdraw(address) (../../sb/Staking.sol#599-611):
+	External calls:
+	- token.transfer(msg.sender,totalUserBalance) (../../sb/Staking.sol#608)
+	Event emitted after the call(s):
+	- EmergencyWithdraw(msg.sender,tokenAddress,totalUserBalance) (../../sb/Staking.sol#610)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Staking.deposit(address,uint256) (../../sb/Staking.sol#399-485) uses timestamp for comparisons
+	Dangerous comparisons:
+	- checkpoints[last].epochId < currentEpoch (../../sb/Staking.sol#442)
+	- checkpoints[last].epochId == currentEpoch (../../sb/Staking.sol#453)
+	- last >= 1 && checkpoints[last - 1].epochId == currentEpoch (../../sb/Staking.sol#466)
+Staking.withdraw(address,uint256) (../../sb/Staking.sol#490-571) uses timestamp for comparisons
+	Dangerous comparisons:
+	- checkpoints[last].epochId < currentEpoch (../../sb/Staking.sol#520)
+	- checkpoints[last].epochId == currentEpoch (../../sb/Staking.sol#526)
+Staking.manualEpochInit(address[],uint128) (../../sb/Staking.sol#578-597) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(epochId <= getCurrentEpoch(),can't init a future epoch) (../../sb/Staking.sol#579)
+	- epochId == 0 (../../sb/Staking.sol#584)
+	- require(bool,string)(! epochIsInitialized(tokens[i],epochId),Staking: epoch already initialized) (../../sb/Staking.sol#588)
+	- require(bool,string)(epochIsInitialized(tokens[i],epochId - 1),Staking: previous epoch not initialized) (../../sb/Staking.sol#589)
+Staking.emergencyWithdraw(address) (../../sb/Staking.sol#599-611) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)((getCurrentEpoch() - lastWithdrawEpochId[tokenAddress]) >= 10,At least 10 epochs must pass without success) (../../sb/Staking.sol#600)
+Staking.getEpochUserBalance(address,address,uint128) (../../sb/Staking.sol#618-645) uses timestamp for comparisons
+	Dangerous comparisons:
+	- checkpoints.length == 0 || epochId < checkpoints[0].epochId (../../sb/Staking.sol#622)
+	- epochId >= checkpoints[max].epochId (../../sb/Staking.sol#630)
+	- checkpoints[mid].epochId <= epochId (../../sb/Staking.sol#637)
+Staking.getCurrentEpoch() (../../sb/Staking.sol#657-663) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp < epoch1Start (../../sb/Staking.sol#658)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+SafeMath.div(uint256,uint256,string) (../../sb/Staking.sol#264-267) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/Staking.sol#226-229) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/Staking.sol#284-287) is never used and should be removed
+SafeMath.sub(uint256,uint256,string) (../../sb/Staking.sol#244-247) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/Staking.sol#98-102) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/Staking.sol#134-137) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/Staking.sol#144-147) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/Staking.sol#119-127) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/Staking.sol#109-112) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.6.0 (../../sb/Staking.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Staking.epoch1Start (../../sb/Staking.sol#357) should be immutable 
+Staking.epochDuration (../../sb/Staking.sol#360) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/Staking.sol analyzed (4 contracts with 93 detectors), 30 result(s) found

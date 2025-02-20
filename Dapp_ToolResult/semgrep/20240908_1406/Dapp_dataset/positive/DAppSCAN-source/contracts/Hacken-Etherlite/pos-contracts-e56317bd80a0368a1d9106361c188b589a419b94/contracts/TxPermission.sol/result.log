@@ -1,0 +1,132 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 15 Code Findings │
+└──────────────────┘
+                         
+    /sb/TxPermission.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          233┆ _allowedSenders.length--;
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          231┆ if (_sender == _allowedSenders[i]) {
+            ⋮┆----------------------------------------
+          232┆ _allowedSenders[i] = _allowedSenders[allowedSendersLength - 1];
+            ⋮┆----------------------------------------
+          232┆ _allowedSenders[i] = _allowedSenders[allowedSendersLength - 1];
+            ⋮┆----------------------------------------
+          233┆ _allowedSenders.length--;
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          207┆ for (uint256 i = 0; i < _allowed.length; i++) {
+            ⋮┆----------------------------------------
+          230┆ for (uint256 i = 0; i < allowedSendersLength; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          315┆ if (_to == address(0) && _data.length >                          
+  deployerInputLengthLimit(_sender)) {                                          
+          316┆     // Don't let to deploy too big contracts
+          317┆     return (NONE, false);
+          318┆ }
+            ⋮┆----------------------------------------
+          327┆ if (signature == COMMIT_HASH_SIGNATURE && _data.length > 4+32) {
+          328┆     bytes32 numberHash;
+          329┆     assembly { numberHash := mload(add(_data, 36)) }
+          330┆     return (IRandomAuRa(_to).commitHashCallable(_sender,         
+  numberHash) ? CALL : NONE, false);                                            
+          331┆ } else if (
+          332┆     (signature == REVEAL_NUMBER_SIGNATURE || signature ==        
+  REVEAL_SECRET_SIGNATURE) &&                                                   
+          333┆     _data.length == 4+32
+          334┆ ) {
+          335┆     uint256 num;
+          336┆     assembly { num := mload(add(_data, 36)) }
+             [hid 4 additional lines, adjust with --max-lines-per-finding] 
+          331┆ } else if (
+          332┆     (signature == REVEAL_NUMBER_SIGNATURE || signature ==        
+  REVEAL_SECRET_SIGNATURE) &&                                                   
+          333┆     _data.length == 4+32
+          334┆ ) {
+          335┆     uint256 num;
+          336┆     assembly { num := mload(add(_data, 36)) }
+          337┆     return (IRandomAuRa(_to).revealNumberCallable(_sender, num) ?
+  CALL : NONE, false);                                                          
+          338┆ } else {
+          339┆     return (NONE, false);
+          340┆ }
+            ⋮┆----------------------------------------
+          349┆ } else if (signature == REPORT_MALICIOUS_SIGNATURE &&            
+  _data.length >= 4+64) {                                                       
+          350┆     address maliciousMiningAddress;
+          351┆     uint256 blockNumber;
+          352┆     assembly {
+          353┆         maliciousMiningAddress := mload(add(_data, 36))
+          354┆         blockNumber := mload(add(_data, 68))
+          355┆     }
+          356┆     // The `reportMalicious()` can only be called by the         
+  validator's mining address                                                    
+          357┆     // when the calling is allowed
+          358┆     (bool callable,) =                                           
+  validatorSetContract.reportMaliciousCallable(                                 
+             [hid 9 additional lines, adjust with --max-lines-per-finding] 
+          370┆ if (validatorSetContract.isValidator(_sender) && _gasPrice > 0) {
+          371┆     // Let the validator's mining address send their accumulated 
+  tx fees to some wallet                                                        
+          372┆     return (_sender.balance > 0 ? BASIC : NONE, false);
+          373┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-decrement-not-postfix                    
+          Consider using the prefix decrement expression whenever the return    
+  value is not needed. The                                                      
+          prefix decrement expression is cheaper in terms of gas.               
+                                                                                
+          233┆ _allowedSenders.length--;
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          207┆ for (uint256 i = 0; i < _allowed.length; i++) {
+            ⋮┆----------------------------------------
+          230┆ for (uint256 i = 0; i < allowedSendersLength; i++) {
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 15 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

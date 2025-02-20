@@ -1,0 +1,396 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                     
+                     
+┌───────────────────┐
+│ 109 Code Findings │
+└───────────────────┘
+                          
+    /sb/AvalaunchSale.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          578┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          582┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          600┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          605┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          610┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          770┆ for(uint256 i = 0; i < _unlockingTimes.length; i++) {
+            ⋮┆----------------------------------------
+          932┆ for(uint i = 0; i < roundIds.length; i++) {
+            ⋮┆----------------------------------------
+         1136┆ while((i+1) < roundIds.length && block.timestamp >               
+  roundIdToRound[roundIds[i+1]].startTime) {                                    
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          754┆ constructor(address _admin, address _allocationStaking) public {
+          755┆     require(_admin != address(0));
+          756┆     require(_allocationStaking != address(0));
+          757┆     admin = IAdmin(_admin);
+          758┆     factory = ISalesFactory(msg.sender);
+          759┆     allocationStakingContract =                                  
+  IAllocationStaking(_allocationStaking);                                       
+          760┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          771┆ vestingPortionsUnlockTime.push(_unlockingTimes[i]);
+            ⋮┆----------------------------------------
+          772┆ vestingPercentPerPortion.push(_percents[i]);
+            ⋮┆----------------------------------------
+          848┆ require(startTimes[i] > registration.registrationTimeEnds);
+            ⋮┆----------------------------------------
+          849┆ require(startTimes[i] < sale.saleEnd);
+            ⋮┆----------------------------------------
+          859┆ roundIds.push(roundId);
+            ⋮┆----------------------------------------
+          864┆ roundIdToRound[roundId] = round;
+            ⋮┆----------------------------------------
+          932┆ for(uint i = 0; i < roundIds.length; i++) {
+            ⋮┆----------------------------------------
+          933┆ Round storage round = roundIdToRound[roundIds[i]];
+            ⋮┆----------------------------------------
+          933┆ Round storage round = roundIdToRound[roundIds[i]];
+            ⋮┆----------------------------------------
+          967┆ Round storage round = roundIdToRound[rounds[i]];
+            ⋮┆----------------------------------------
+         1136┆ while((i+1) < roundIds.length && block.timestamp >               
+  roundIdToRound[roundIds[i+1]].startTime) {                                    
+            ⋮┆----------------------------------------
+         1136┆ while((i+1) < roundIds.length && block.timestamp >               
+  roundIdToRound[roundIds[i+1]].startTime) {                                    
+            ⋮┆----------------------------------------
+         1136┆ while((i+1) < roundIds.length && block.timestamp >               
+  roundIdToRound[roundIds[i+1]].startTime) {                                    
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          770┆ for(uint256 i = 0; i < _unlockingTimes.length; i++) {
+            ⋮┆----------------------------------------
+          847┆ for(uint i = 0; i < startTimes.length; i++) {
+            ⋮┆----------------------------------------
+          932┆ for(uint i = 0; i < roundIds.length; i++) {
+            ⋮┆----------------------------------------
+          964┆ for(uint i = 0; i < rounds.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          108┆ revert("ECDSA: invalid signature length");
+            ⋮┆----------------------------------------
+          142┆ require(uint256(s) <=                                            
+  0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0, "ECDSA:   
+  invalid signature 's' value");                                                
+            ⋮┆----------------------------------------
+          143┆ require(v == 27 || v == 28, "ECDSA: invalid signature 'v'        
+  value");                                                                      
+            ⋮┆----------------------------------------
+          147┆ require(signer != address(0), "ECDSA: invalid signature");
+            ⋮┆----------------------------------------
+          249┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          264┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          281┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          298┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          315┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          427┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          431┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          488┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          489┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          513┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          537┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          597┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          598┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          599┆ );
+            ⋮┆----------------------------------------
+          627┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          734┆ require(msg.sender == sale.saleOwner, 'OnlySaleOwner::           
+  Restricted');                                                                 
+            ⋮┆----------------------------------------
+          739┆ require(admin.isAdmin(msg.sender), "Only admin can call this     
+  function.");                                                                  
+            ⋮┆----------------------------------------
+          789┆ require(!sale.isCreated, "setSaleParams: Sale is already         
+  created.");                                                                   
+            ⋮┆----------------------------------------
+          790┆ require(_token != address(0), "setSaleParams: Token address can  
+  not be 0.");                                                                  
+            ⋮┆----------------------------------------
+          791┆ require(_saleOwner != address(0), "setSaleParams: Sale owner     
+  address can not be 0.");                                                      
+            ⋮┆----------------------------------------
+          792┆ require(_tokenPriceInAVAX != 0 && _amountOfTokensToSell != 0 &&  
+  _saleEnd > block.timestamp &&                                                 
+          793┆     _tokensUnlockTime > block.timestamp, "setSaleParams: Bad     
+  input");                                                                      
+            ⋮┆----------------------------------------
+          842┆ require(startTimes.length == maxParticipations.length,           
+  "setRounds: Bad input.");                                                     
+            ⋮┆----------------------------------------
+          843┆ require(roundIds.length == 0, "setRounds: Rounds are already");
+            ⋮┆----------------------------------------
+          880┆ require(roundId != 0, "Round ID can not be 0.");
+            ⋮┆----------------------------------------
+          881┆ require(roundId <= roundIds.length, "Invalid round id");
+            ⋮┆----------------------------------------
+          882┆ require(block.timestamp >= registration.registrationTimeStarts &&
+  block.timestamp <= registration.registrationTimeEnds, "Registration gate is   
+  closed.");                                                                    
+            ⋮┆----------------------------------------
+          883┆ require(checkRegistrationSignature(signature, msg.sender,        
+  roundId), "Invalid signature");                                               
+            ⋮┆----------------------------------------
+          884┆ require(addressToRoundRegisteredFor[msg.sender] == 0, "User can  
+  not register twice.");                                                        
+            ⋮┆----------------------------------------
+          910┆ require(block.timestamp < roundIdToRound[roundIds[0]].startTime, 
+  "1st round already started.");                                                
+            ⋮┆----------------------------------------
+          911┆ require(price > 0, "Price can not be 0.");
+            ⋮┆----------------------------------------
+          929┆ require(block.timestamp < roundIdToRound[roundIds[0]].startTime, 
+  "1st round already started.");                                                
+            ⋮┆----------------------------------------
+          946┆ require(registration.registrationTimeEnds.add(timeToAdd) <       
+  roundIdToRound[roundIds[0]].startTime,                                        
+          947┆     "Registration period overflows sale start.");
+            ⋮┆----------------------------------------
+          961┆ require(block.timestamp < roundIdToRound[roundIds[0]].startTime, 
+  "1st round already started.");                                                
+            ⋮┆----------------------------------------
+          962┆ require(rounds.length == caps.length, "Arrays length is          
+  different.");                                                                 
+            ⋮┆----------------------------------------
+          965┆ require(caps[i] > 0, "Can't set max participation to 0");
+            ⋮┆----------------------------------------
+          981┆ require(sale.totalTokensSold == 0 &&                             
+  sale.token.balanceOf(address(this)) == 0, "Deposit can be done only once");   
+            ⋮┆----------------------------------------
+          982┆ require(block.timestamp < roundIdToRound[roundIds[0]].startTime, 
+  "Deposit too late. Round already started.");                                  
+            ⋮┆----------------------------------------
+         1000┆ require(sale.tokensDeposited == true, "Tokens not deposited      
+  yet");                                                                        
+            ⋮┆----------------------------------------
+         1002┆ require(roundId != 0, "Round can not be 0.");
+            ⋮┆----------------------------------------
+         1004┆ require(amount <= roundIdToRound[roundId].maxParticipation,      
+  "Overflowing maximal participation for this round.");                         
+            ⋮┆----------------------------------------
+         1007┆ require(addressToRoundRegisteredFor[msg.sender] == roundId, "Not 
+  registered for this round");                                                  
+            ⋮┆----------------------------------------
+         1010┆ require(checkParticipationSignature(signature, msg.sender,       
+  amount, amountXavaToBurn, roundId), "Invalid signature. Verification failed");
+            ⋮┆----------------------------------------
+         1013┆ require(isParticipated[msg.sender] == false, "User can           
+  participate only once.");                                                     
+            ⋮┆----------------------------------------
+         1016┆ require(msg.sender == tx.origin, "Only direct contract calls.");
+            ⋮┆----------------------------------------
+         1022┆ require(roundId == currentRound, "You can not participate in this
+  round.");                                                                     
+            ⋮┆----------------------------------------
+         1028┆ require(amountOfTokensBuying > 0, "Can't buy 0 tokens");
+            ⋮┆----------------------------------------
+         1031┆ require(amountOfTokensBuying <= amount, "Trying to buy more than 
+  allowed.");                                                                   
+            ⋮┆----------------------------------------
+         1067┆ require(block.timestamp >= sale.tokensUnlockTime, "Tokens can not
+  be withdrawn yet.");                                                          
+            ⋮┆----------------------------------------
+         1079┆ revert("Tokens already withdrawn.");
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          767┆ require(vestingPercentPerPortion.length == 0 &&                  
+  vestingPortionsUnlockTime.length == 0);                                       
+            ⋮┆----------------------------------------
+          792┆ require(_tokenPriceInAVAX != 0 && _amountOfTokensToSell != 0 &&  
+  _saleEnd > block.timestamp &&                                                 
+          793┆     _tokensUnlockTime > block.timestamp, "setSaleParams: Bad     
+  input");                                                                      
+            ⋮┆----------------------------------------
+          821┆ require(_registrationTimeStarts >= block.timestamp &&            
+  _registrationTimeEnds > _registrationTimeStarts);                             
+            ⋮┆----------------------------------------
+          882┆ require(block.timestamp >= registration.registrationTimeStarts &&
+  block.timestamp <= registration.registrationTimeEnds, "Registration gate is   
+  closed.");                                                                    
+            ⋮┆----------------------------------------
+          981┆ require(sale.totalTokensSold == 0 &&                             
+  sale.token.balanceOf(address(this)) == 0, "Deposit can be done only once");   
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         1072┆ if(!p.isPortionWithdrawn[portionId] &&                           
+  vestingPortionsUnlockTime[portionId] >= block.timestamp) {                    
+         1073┆     p.isPortionWithdrawn[portionId];
+         1074┆     uint256 amountWithdrawing =                                  
+  p.amountBought.mul(vestingPercentPerPortion[portionId]).div(100);             
+         1075┆     // Withdraw percent which is unlocked at that portion
+         1076┆     sale.token.safeTransfer(msg.sender, amountWithdrawing);
+         1077┆     emit TokensWithdrawn(msg.sender, amountWithdrawing);
+         1078┆ } else {
+         1079┆     revert("Tokens already withdrawn.");
+         1080┆ }
+            ⋮┆----------------------------------------
+         1118┆ if(leftover > 0 && !withBurn) {
+         1119┆     sale.token.safeTransfer(msg.sender, leftover);
+         1120┆     return;
+         1121┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          770┆ for(uint256 i = 0; i < _unlockingTimes.length; i++) {
+            ⋮┆----------------------------------------
+          847┆ for(uint i = 0; i < startTimes.length; i++) {
+            ⋮┆----------------------------------------
+          896┆ registration.numberOfRegistrants++;
+            ⋮┆----------------------------------------
+          932┆ for(uint i = 0; i < roundIds.length; i++) {
+            ⋮┆----------------------------------------
+          964┆ for(uint i = 0; i < rounds.length; i++) {
+            ⋮┆----------------------------------------
+         1059┆ numberOfParticipants ++;
+            ⋮┆----------------------------------------
+         1137┆ i++;
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          142┆ require(uint256(s) <=                                            
+  0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0, "ECDSA:   
+  invalid signature 's' value");                                                
+            ⋮┆----------------------------------------
+          143┆ require(v == 27 || v == 28, "ECDSA: invalid signature 'v'        
+  value");                                                                      
+            ⋮┆----------------------------------------
+          281┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          431┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          488┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          513┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          537┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          597┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          598┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          599┆ );
+            ⋮┆----------------------------------------
+          627┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          739┆ require(admin.isAdmin(msg.sender), "Only admin can call this     
+  function.");                                                                  
+            ⋮┆----------------------------------------
+          789┆ require(!sale.isCreated, "setSaleParams: Sale is already         
+  created.");                                                                   
+            ⋮┆----------------------------------------
+          790┆ require(_token != address(0), "setSaleParams: Token address can  
+  not be 0.");                                                                  
+            ⋮┆----------------------------------------
+          791┆ require(_saleOwner != address(0), "setSaleParams: Sale owner     
+  address can not be 0.");                                                      
+            ⋮┆----------------------------------------
+          946┆ require(registration.registrationTimeEnds.add(timeToAdd) <       
+  roundIdToRound[roundIds[0]].startTime,                                        
+          947┆     "Registration period overflows sale start.");
+            ⋮┆----------------------------------------
+          982┆ require(block.timestamp < roundIdToRound[roundIds[0]].startTime, 
+  "Deposit too late. Round already started.");                                  
+            ⋮┆----------------------------------------
+         1004┆ require(amount <= roundIdToRound[roundId].maxParticipation,      
+  "Overflowing maximal participation for this round.");                         
+            ⋮┆----------------------------------------
+         1010┆ require(checkParticipationSignature(signature, msg.sender,       
+  amount, amountXavaToBurn, roundId), "Invalid signature. Verification failed");
+            ⋮┆----------------------------------------
+         1022┆ require(roundId == currentRound, "You can not participate in this
+  round.");                                                                     
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 109 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

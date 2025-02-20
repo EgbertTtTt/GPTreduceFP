@@ -1,0 +1,116 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 27 Code Findings │
+└──────────────────┘
+                 
+    /sb/Gate.sol 
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          190┆ constructor(ISettings _settings) public {
+          191┆     admin = msg.sender;
+          192┆     timviWallet = msg.sender;
+          193┆     settings = ISettings(_settings);
+          194┆ 
+          195┆     feePercentTMV = 500; // 0.5%
+          196┆     feePercentETH = 500; // 0.5%
+          197┆     minOrder = 10 ** 18; // 1 TMV by default
+          198┆ 
+          199┆     emit GateTmvFeeUpdated(feePercentTMV);
+             [hid 5 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          289┆ require(orders[id].owner != address(0), "Order doesn't exist");
+            ⋮┆----------------------------------------
+          291┆ uint256 tmv = orders[id].amount;
+            ⋮┆----------------------------------------
+          296┆ address payable owner = orders[id].owner;
+            ⋮┆----------------------------------------
+          297┆ delete orders[id];
+            ⋮┆----------------------------------------
+          298┆ IToken(settings.tmvAddress()).transfer(timviWallet, tmv);
+            ⋮┆----------------------------------------
+          298┆ IToken(settings.tmvAddress()).transfer(timviWallet, tmv);
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          286┆ for (uint256 i = 0; i < _ids.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           21┆ require(c / a == b, 'mul');
+            ⋮┆----------------------------------------
+           31┆ require(b > 0, 'div');
+            ⋮┆----------------------------------------
+           42┆ require(b <= a, 'sub');
+            ⋮┆----------------------------------------
+           53┆ require(c >= a, 'add');
+            ⋮┆----------------------------------------
+          182┆ require(admin == msg.sender, "You have no access");
+            ⋮┆----------------------------------------
+          213┆ require(_beneficiary != address(0), "Zero address, be careful");
+            ⋮┆----------------------------------------
+          214┆ require(address(this).balance >= _amount, "Insufficient funds");
+            ⋮┆----------------------------------------
+          221┆ require(_value <= 10000, "Too much");
+            ⋮┆----------------------------------------
+          228┆ require(_value <= 10000, "Too much");
+            ⋮┆----------------------------------------
+          236┆ require(_value <= 100 ether, "Too much");
+            ⋮┆----------------------------------------
+          244┆ require(_wallet != address(0), "Zero address, be careful");
+            ⋮┆----------------------------------------
+          252┆ require(_newAdmin != address(0), "Zero address, be careful");
+            ⋮┆----------------------------------------
+          258┆ require(_amount >= minOrder, "Too small amount");
+            ⋮┆----------------------------------------
+          273┆ require(orders[_id].owner == msg.sender, "Order isn't your");
+            ⋮┆----------------------------------------
+          289┆ require(orders[id].owner != address(0), "Order doesn't exist");
+            ⋮┆----------------------------------------
+          294┆ require(address(this).balance >= eth, "Not enough funds");
+            ⋮┆----------------------------------------
+          306┆ require(orders[_id].owner != address(0), "Order doesn't exist");
+            ⋮┆----------------------------------------
+          315┆ require(msg.value >= eth, "Not enough funds");
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          286┆ for (uint256 i = 0; i < _ids.length; i++) {
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 27 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

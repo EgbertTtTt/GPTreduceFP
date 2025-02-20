@@ -1,0 +1,99 @@
+'solc --version' running
+'solc /sb/GovernorAlpha.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/GovernorAlpha.sol:
+/sb/GovernorAlpha.sol:2:1: Warning: Experimental features are turned on. Do not use experimental features on live deployments.
+pragma experimental ABIEncoderV2;
+^-------------------------------^
+
+
+GovernorAlpha.execute(uint256) (../../sb/GovernorAlpha.sol#196-204) sends eth to arbitrary user
+	Dangerous calls:
+	- timelock.executeTransaction.value(proposal.values[i])(proposal.targets[i],proposal.values[i],proposal.signatures[i],proposal.calldatas[i],proposal.eta) (../../sb/GovernorAlpha.sol#201)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#functions-that-send-ether-to-arbitrary-destinations
+
+Reentrancy in GovernorAlpha.queue(uint256) (../../sb/GovernorAlpha.sol#180-189):
+	External calls:
+	- _queueOrRevert(proposal.targets[i],proposal.values[i],proposal.signatures[i],proposal.calldatas[i],eta) (../../sb/GovernorAlpha.sol#185)
+		- timelock.queueTransaction(target,value,signature,data,eta) (../../sb/GovernorAlpha.sol#193)
+	State variables written after the call(s):
+	- proposal.eta = eta (../../sb/GovernorAlpha.sol#187)
+	GovernorAlpha.proposals (../../sb/GovernorAlpha.sol#103) can be used in cross function reentrancies:
+	- GovernorAlpha._castVote(address,uint256,bool) (../../sb/GovernorAlpha.sol#265-283)
+	- GovernorAlpha.cancel(uint256) (../../sb/GovernorAlpha.sol#206-219)
+	- GovernorAlpha.execute(uint256) (../../sb/GovernorAlpha.sol#196-204)
+	- GovernorAlpha.getActions(uint256) (../../sb/GovernorAlpha.sol#221-224)
+	- GovernorAlpha.getReceipt(uint256,address) (../../sb/GovernorAlpha.sol#226-228)
+	- GovernorAlpha.proposals (../../sb/GovernorAlpha.sol#103)
+	- GovernorAlpha.propose(address[],uint256[],string[],bytes[],string) (../../sb/GovernorAlpha.sol#140-178)
+	- GovernorAlpha.queue(uint256) (../../sb/GovernorAlpha.sol#180-189)
+	- GovernorAlpha.state(uint256) (../../sb/GovernorAlpha.sol#230-250)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+GovernorAlpha._queueOrRevert(address,uint256,string,bytes,uint256) (../../sb/GovernorAlpha.sol#191-194) ignores return value by timelock.queueTransaction(target,value,signature,data,eta) (../../sb/GovernorAlpha.sol#193)
+GovernorAlpha.execute(uint256) (../../sb/GovernorAlpha.sol#196-204) ignores return value by timelock.executeTransaction.value(proposal.values[i])(proposal.targets[i],proposal.values[i],proposal.signatures[i],proposal.calldatas[i],proposal.eta) (../../sb/GovernorAlpha.sol#201)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+GovernorAlpha.cancel(uint256).state (../../sb/GovernorAlpha.sol#207) shadows:
+	- GovernorAlpha.state(uint256) (../../sb/GovernorAlpha.sol#230-250) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+GovernorAlpha._queueOrRevert(address,uint256,string,bytes,uint256) (../../sb/GovernorAlpha.sol#191-194) has external calls inside a loop: require(bool,string)(! timelock.queuedTransactions(keccak256(bytes)(abi.encode(target,value,signature,data,eta))),GovernorAlpha::_queueOrRevert: proposal action already queued at eta) (../../sb/GovernorAlpha.sol#192)
+GovernorAlpha._queueOrRevert(address,uint256,string,bytes,uint256) (../../sb/GovernorAlpha.sol#191-194) has external calls inside a loop: timelock.queueTransaction(target,value,signature,data,eta) (../../sb/GovernorAlpha.sol#193)
+GovernorAlpha.execute(uint256) (../../sb/GovernorAlpha.sol#196-204) has external calls inside a loop: timelock.executeTransaction.value(proposal.values[i])(proposal.targets[i],proposal.values[i],proposal.signatures[i],proposal.calldatas[i],proposal.eta) (../../sb/GovernorAlpha.sol#201)
+GovernorAlpha.cancel(uint256) (../../sb/GovernorAlpha.sol#206-219) has external calls inside a loop: timelock.cancelTransaction(proposal.targets[i],proposal.values[i],proposal.signatures[i],proposal.calldatas[i],proposal.eta) (../../sb/GovernorAlpha.sol#215)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in GovernorAlpha.cancel(uint256) (../../sb/GovernorAlpha.sol#206-219):
+	External calls:
+	- timelock.cancelTransaction(proposal.targets[i],proposal.values[i],proposal.signatures[i],proposal.calldatas[i],proposal.eta) (../../sb/GovernorAlpha.sol#215)
+	Event emitted after the call(s):
+	- ProposalCanceled(proposalId) (../../sb/GovernorAlpha.sol#218)
+Reentrancy in GovernorAlpha.execute(uint256) (../../sb/GovernorAlpha.sol#196-204):
+	External calls:
+	- timelock.executeTransaction.value(proposal.values[i])(proposal.targets[i],proposal.values[i],proposal.signatures[i],proposal.calldatas[i],proposal.eta) (../../sb/GovernorAlpha.sol#201)
+	Event emitted after the call(s):
+	- ProposalExecuted(proposalId) (../../sb/GovernorAlpha.sol#203)
+Reentrancy in GovernorAlpha.queue(uint256) (../../sb/GovernorAlpha.sol#180-189):
+	External calls:
+	- _queueOrRevert(proposal.targets[i],proposal.values[i],proposal.signatures[i],proposal.calldatas[i],eta) (../../sb/GovernorAlpha.sol#185)
+		- timelock.queueTransaction(target,value,signature,data,eta) (../../sb/GovernorAlpha.sol#193)
+	Event emitted after the call(s):
+	- ProposalQueued(proposalId,eta) (../../sb/GovernorAlpha.sol#188)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+GovernorAlpha._queueOrRevert(address,uint256,string,bytes,uint256) (../../sb/GovernorAlpha.sol#191-194) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(! timelock.queuedTransactions(keccak256(bytes)(abi.encode(target,value,signature,data,eta))),GovernorAlpha::_queueOrRevert: proposal action already queued at eta) (../../sb/GovernorAlpha.sol#192)
+GovernorAlpha.state(uint256) (../../sb/GovernorAlpha.sol#230-250) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp >= add256(proposal.eta,timelock.GRACE_PERIOD()) (../../sb/GovernorAlpha.sol#245)
+GovernorAlpha.add256(uint256,uint256) (../../sb/GovernorAlpha.sol#285-289) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(c >= a,addition overflow) (../../sb/GovernorAlpha.sol#287)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+GovernorAlpha.getChainId() (../../sb/GovernorAlpha.sol#296-300) uses assembly
+	- INLINE ASM (../../sb/GovernorAlpha.sol#298)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+GovernorAlpha._castVote(address,uint256,bool) (../../sb/GovernorAlpha.sol#265-283) compares to a boolean constant:
+	-require(bool,string)(receipt.hasVoted == false,GovernorAlpha::_castVote: voter already voted) (../../sb/GovernorAlpha.sol#269)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#boolean-equality
+
+Pragma version^0.5.16 (../../sb/GovernorAlpha.sol#1) allows old versions
+solc-0.5.17 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Function TimelockInterface.GRACE_PERIOD() (../../sb/GovernorAlpha.sol#305) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+propose(address[],uint256[],string[],bytes[],string) should be declared external:
+	- GovernorAlpha.propose(address[],uint256[],string[],bytes[],string) (../../sb/GovernorAlpha.sol#140-178)
+Moreover, the following function parameters should change its data location:
+targets location should be calldata
+values location should be calldata
+signatures location should be calldata
+calldatas location should be calldata
+description location should be calldata
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#public-function-that-could-be-declared-external
+/sb/GovernorAlpha.sol analyzed (3 contracts with 93 detectors), 21 result(s) found

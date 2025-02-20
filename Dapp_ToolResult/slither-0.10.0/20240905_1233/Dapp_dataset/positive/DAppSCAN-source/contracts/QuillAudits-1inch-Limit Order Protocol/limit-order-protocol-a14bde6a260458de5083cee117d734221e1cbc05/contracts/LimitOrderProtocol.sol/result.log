@@ -1,0 +1,285 @@
+'solc --version' running
+'solc /sb/LimitOrderProtocol.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/LimitOrderProtocol.sol:
+Warning: Visibility for constructor is ignored. If you want the contract to be non-deployable, making it "abstract" is sufficient.
+   --> /sb/LimitOrderProtocol.sol:260:5:
+    |
+260 |     constructor(string memory name, string memory version) internal {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning: Contract code size exceeds 24576 bytes (a limit introduced in Spurious Dragon). This contract may not be deployable on mainnet. Consider enabling the optimizer (with a low "runs" value!), turning off revert strings, or using libraries.
+    --> /sb/LimitOrderProtocol.sol:1385:1:
+     |
+1385 | contract LimitOrderProtocol is
+     | ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+ERC721Proxy.func_40aVqeY(address,address,uint256,IERC721) (../../sb/LimitOrderProtocol.sol#1107-1109) uses arbitrary from in transferFrom: token.transferFrom(from,to,tokenId) (../../sb/LimitOrderProtocol.sol#1108)
+ERC20Proxy.func_50BkM4K(address,address,uint256,IERC20) (../../sb/LimitOrderProtocol.sol#967-969) uses arbitrary from in transferFrom: token.safeTransferFrom(from,to,amount) (../../sb/LimitOrderProtocol.sol#968)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#arbitrary-from-in-transferfrom
+
+Reentrancy in LimitOrderProtocol.fillOrderTo(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address) (../../sb/LimitOrderProtocol.sol#1640-1706):
+	External calls:
+	- _permit(order.permit) (../../sb/LimitOrderProtocol.sol#1660)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/LimitOrderProtocol.sol#381)
+		- token.uncheckedFunctionCall(abi.encodePacked(IERC20Permit.permit.selector,permit),LOP: permit failed) (../../sb/LimitOrderProtocol.sol#1710)
+	External calls sending eth:
+	- _permit(order.permit) (../../sb/LimitOrderProtocol.sol#1660)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/LimitOrderProtocol.sol#381)
+	State variables written after the call(s):
+	- _remaining[orderHash] = remainingMakerAmount + 1 (../../sb/LimitOrderProtocol.sol#1688)
+	LimitOrderProtocol._remaining (../../sb/LimitOrderProtocol.sol#1453) can be used in cross function reentrancies:
+	- LimitOrderProtocol.cancelOrder(LimitOrderProtocol.Order) (../../sb/LimitOrderProtocol.sol#1516-1522)
+	- LimitOrderProtocol.fillOrderTo(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address) (../../sb/LimitOrderProtocol.sol#1640-1706)
+	- LimitOrderProtocol.remaining(bytes32) (../../sb/LimitOrderProtocol.sol#1462-1464)
+	- LimitOrderProtocol.remainingRaw(bytes32) (../../sb/LimitOrderProtocol.sol#1468-1470)
+	- LimitOrderProtocol.remainingsRaw(bytes32[]) (../../sb/LimitOrderProtocol.sol#1473-1478)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities
+
+LimitOrderProtocol.fillOrderRFQTo(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address) (../../sb/LimitOrderProtocol.sol#1555-1608) performs a multiplication on the result of a division:
+	- takingAmount = (makingAmount.mul(orderTakerAmount).add(orderMakerAmount).sub(1)).div(orderMakerAmount) (../../sb/LimitOrderProtocol.sol#1585)
+	- makingAmount = takingAmount.mul(orderMakerAmount).div(orderTakerAmount) (../../sb/LimitOrderProtocol.sol#1588)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+LimitOrderProtocol._permit(bytes) (../../sb/LimitOrderProtocol.sol#1708-1711) ignores return value by token.uncheckedFunctionCall(abi.encodePacked(IERC20Permit.permit.selector,permit),LOP: permit failed) (../../sb/LimitOrderProtocol.sol#1710)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+ImmutableOwner.constructor(address)._immutableOwner (../../sb/LimitOrderProtocol.sol#685) lacks a zero-check on :
+		- immutableOwner = _immutableOwner (../../sb/LimitOrderProtocol.sol#686)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+LimitOrderProtocol.simulateCalls(address[],bytes[]) (../../sb/LimitOrderProtocol.sol#1499-1513) has external calls inside a loop: (success,result) = targets[i].call(data[i]) (../../sb/LimitOrderProtocol.sol#1504)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in LimitOrderProtocol.fillOrderRFQTo(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address) (../../sb/LimitOrderProtocol.sol#1555-1608):
+	External calls:
+	- _callMakerAssetTransferFrom(order.makerAsset,order.makerAssetData,target,makingAmount) (../../sb/LimitOrderProtocol.sol#1603)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/LimitOrderProtocol.sol#381)
+		- result = makerAsset.uncheckedFunctionCall(makerAssetData,LOP: makerAsset.call failed) (../../sb/LimitOrderProtocol.sol#1779)
+	- _callTakerAssetTransferFrom(order.takerAsset,order.takerAssetData,takingAmount) (../../sb/LimitOrderProtocol.sol#1604)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/LimitOrderProtocol.sol#381)
+		- result = takerAsset.uncheckedFunctionCall(takerAssetData,LOP: takerAsset.call failed) (../../sb/LimitOrderProtocol.sol#1795)
+	External calls sending eth:
+	- _callMakerAssetTransferFrom(order.makerAsset,order.makerAssetData,target,makingAmount) (../../sb/LimitOrderProtocol.sol#1603)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/LimitOrderProtocol.sol#381)
+	- _callTakerAssetTransferFrom(order.takerAsset,order.takerAssetData,takingAmount) (../../sb/LimitOrderProtocol.sol#1604)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/LimitOrderProtocol.sol#381)
+	Event emitted after the call(s):
+	- OrderFilledRFQ(orderHash,makingAmount) (../../sb/LimitOrderProtocol.sol#1606)
+Reentrancy in LimitOrderProtocol.fillOrderRFQToWithPermit(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address,bytes) (../../sb/LimitOrderProtocol.sol#1543-1553):
+	External calls:
+	- _permit(permit) (../../sb/LimitOrderProtocol.sol#1551)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/LimitOrderProtocol.sol#381)
+		- token.uncheckedFunctionCall(abi.encodePacked(IERC20Permit.permit.selector,permit),LOP: permit failed) (../../sb/LimitOrderProtocol.sol#1710)
+	- fillOrderRFQTo(order,signature,makingAmount,takingAmount,target) (../../sb/LimitOrderProtocol.sol#1552)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/LimitOrderProtocol.sol#381)
+		- result = takerAsset.uncheckedFunctionCall(takerAssetData,LOP: takerAsset.call failed) (../../sb/LimitOrderProtocol.sol#1795)
+		- result = makerAsset.uncheckedFunctionCall(makerAssetData,LOP: makerAsset.call failed) (../../sb/LimitOrderProtocol.sol#1779)
+	External calls sending eth:
+	- _permit(permit) (../../sb/LimitOrderProtocol.sol#1551)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/LimitOrderProtocol.sol#381)
+	- fillOrderRFQTo(order,signature,makingAmount,takingAmount,target) (../../sb/LimitOrderProtocol.sol#1552)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/LimitOrderProtocol.sol#381)
+	Event emitted after the call(s):
+	- OrderFilledRFQ(orderHash,makingAmount) (../../sb/LimitOrderProtocol.sol#1606)
+		- fillOrderRFQTo(order,signature,makingAmount,takingAmount,target) (../../sb/LimitOrderProtocol.sol#1552)
+Reentrancy in LimitOrderProtocol.fillOrderTo(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address) (../../sb/LimitOrderProtocol.sol#1640-1706):
+	External calls:
+	- _permit(order.permit) (../../sb/LimitOrderProtocol.sol#1660)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/LimitOrderProtocol.sol#381)
+		- token.uncheckedFunctionCall(abi.encodePacked(IERC20Permit.permit.selector,permit),LOP: permit failed) (../../sb/LimitOrderProtocol.sol#1710)
+	External calls sending eth:
+	- _permit(order.permit) (../../sb/LimitOrderProtocol.sol#1660)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/LimitOrderProtocol.sol#381)
+	Event emitted after the call(s):
+	- OrderFilled(msg.sender,orderHash,remainingMakerAmount) (../../sb/LimitOrderProtocol.sol#1689)
+Reentrancy in LimitOrderProtocol.fillOrderToWithPermit(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address,bytes) (../../sb/LimitOrderProtocol.sol#1626-1637):
+	External calls:
+	- _permit(permit) (../../sb/LimitOrderProtocol.sol#1635)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/LimitOrderProtocol.sol#381)
+		- token.uncheckedFunctionCall(abi.encodePacked(IERC20Permit.permit.selector,permit),LOP: permit failed) (../../sb/LimitOrderProtocol.sol#1710)
+	- fillOrderTo(order,signature,makingAmount,takingAmount,thresholdAmount,target) (../../sb/LimitOrderProtocol.sol#1636)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/LimitOrderProtocol.sol#381)
+		- token.uncheckedFunctionCall(abi.encodePacked(IERC20Permit.permit.selector,permit),LOP: permit failed) (../../sb/LimitOrderProtocol.sol#1710)
+		- result = takerAsset.uncheckedFunctionCall(takerAssetData,LOP: takerAsset.call failed) (../../sb/LimitOrderProtocol.sol#1795)
+		- result = makerAsset.uncheckedFunctionCall(makerAssetData,LOP: makerAsset.call failed) (../../sb/LimitOrderProtocol.sol#1779)
+		- InteractiveMaker(order.makerAssetData.decodeAddress(_FROM_INDEX)).notifyFillOrder(order.makerAsset,order.takerAsset,makingAmount,takingAmount,order.interaction) (../../sb/LimitOrderProtocol.sol#1698-1699)
+	External calls sending eth:
+	- _permit(permit) (../../sb/LimitOrderProtocol.sol#1635)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/LimitOrderProtocol.sol#381)
+	- fillOrderTo(order,signature,makingAmount,takingAmount,thresholdAmount,target) (../../sb/LimitOrderProtocol.sol#1636)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/LimitOrderProtocol.sol#381)
+	Event emitted after the call(s):
+	- OrderFilled(msg.sender,orderHash,remainingMakerAmount) (../../sb/LimitOrderProtocol.sol#1689)
+		- fillOrderTo(order,signature,makingAmount,takingAmount,thresholdAmount,target) (../../sb/LimitOrderProtocol.sol#1636)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+ChainlinkCalculator.singlePrice(AggregatorV3Interface,uint256,uint256) (../../sb/LimitOrderProtocol.sol#459-469) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(oracle.latestTimestamp() + _ORACLE_EXPIRATION_TIME > block.timestamp,CC: stale data) (../../sb/LimitOrderProtocol.sol#461)
+ChainlinkCalculator.doublePrice(AggregatorV3Interface,AggregatorV3Interface,uint256,uint256) (../../sb/LimitOrderProtocol.sol#473-480) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(oracle1.latestTimestamp() + _ORACLE_EXPIRATION_TIME > block.timestamp,CC: stale data O1) (../../sb/LimitOrderProtocol.sol#475)
+	- require(bool,string)(oracle2.latestTimestamp() + _ORACLE_EXPIRATION_TIME > block.timestamp,CC: stale data O2) (../../sb/LimitOrderProtocol.sol#477)
+PredicateHelper.timestampBelow(uint256) (../../sb/LimitOrderProtocol.sol#1204-1206) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp < time (../../sb/LimitOrderProtocol.sol#1205)
+LimitOrderProtocol.fillOrderRFQTo(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address) (../../sb/LimitOrderProtocol.sol#1555-1608) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(expiration == 0 || block.timestamp <= expiration,LOP: order expired) (../../sb/LimitOrderProtocol.sol#1564)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+EIP712._getChainId() (../../sb/LimitOrderProtocol.sol#313-319) uses assembly
+	- INLINE ASM (../../sb/LimitOrderProtocol.sol#316-318)
+UncheckedAddress._verifyCallResult(bool,bytes,string) (../../sb/LimitOrderProtocol.sol#395-411) uses assembly
+	- INLINE ASM (../../sb/LimitOrderProtocol.sol#404-406)
+Address.isContract(address) (../../sb/LimitOrderProtocol.sol#725-734) uses assembly
+	- INLINE ASM (../../sb/LimitOrderProtocol.sol#732)
+Address._verifyCallResult(bool,bytes,string) (../../sb/LimitOrderProtocol.sol#870-887) uses assembly
+	- INLINE ASM (../../sb/LimitOrderProtocol.sol#879-882)
+ArgumentsDecoder.decodeSelector(bytes) (../../sb/LimitOrderProtocol.sol#1235-1239) uses assembly
+	- INLINE ASM (../../sb/LimitOrderProtocol.sol#1236-1238)
+ArgumentsDecoder.decodeAddress(bytes,uint256) (../../sb/LimitOrderProtocol.sol#1241-1245) uses assembly
+	- INLINE ASM (../../sb/LimitOrderProtocol.sol#1242-1244)
+ArgumentsDecoder.decodeUint256(bytes,uint256) (../../sb/LimitOrderProtocol.sol#1247-1251) uses assembly
+	- INLINE ASM (../../sb/LimitOrderProtocol.sol#1248-1250)
+ArgumentsDecoder.patchAddress(bytes,uint256,address) (../../sb/LimitOrderProtocol.sol#1253-1257) uses assembly
+	- INLINE ASM (../../sb/LimitOrderProtocol.sol#1254-1256)
+ArgumentsDecoder.patchUint256(bytes,uint256,uint256) (../../sb/LimitOrderProtocol.sol#1259-1263) uses assembly
+	- INLINE ASM (../../sb/LimitOrderProtocol.sol#1260-1262)
+SilentECDSA.recover(bytes32,bytes) (../../sb/LimitOrderProtocol.sol#1290-1324) uses assembly
+	- INLINE ASM (../../sb/LimitOrderProtocol.sol#1303-1307)
+	- INLINE ASM (../../sb/LimitOrderProtocol.sol#1312-1317)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.functionCall(address,bytes) (../../sb/LimitOrderProtocol.sol#778-780) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/LimitOrderProtocol.sol#803-805) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/LimitOrderProtocol.sol#852-854) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/LimitOrderProtocol.sol#862-868) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/LimitOrderProtocol.sol#828-830) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/LimitOrderProtocol.sol#838-844) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/LimitOrderProtocol.sol#752-758) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/LimitOrderProtocol.sol#918-927) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/LimitOrderProtocol.sol#934-937) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/LimitOrderProtocol.sol#929-932) is never used and should be removed
+SafeERC20.safeTransfer(IERC20,address,uint256) (../../sb/LimitOrderProtocol.sol#903-905) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/LimitOrderProtocol.sol#191-194) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/LimitOrderProtocol.sol#153-156) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/LimitOrderProtocol.sol#211-214) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/LimitOrderProtocol.sol#25-29) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/LimitOrderProtocol.sol#61-64) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/LimitOrderProtocol.sol#71-74) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/LimitOrderProtocol.sol#46-54) is never used and should be removed
+SilentECDSA.toEthSignedMessageHash(bytes32) (../../sb/LimitOrderProtocol.sol#1364-1368) is never used and should be removed
+SilentECDSA.toTypedDataHash(bytes32,bytes32) (../../sb/LimitOrderProtocol.sol#1379-1381) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.7.6 (../../sb/LimitOrderProtocol.sol#1) allows old versions
+solc-0.7.6 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in UncheckedAddress.uncheckedFunctionCallWithValue(address,bytes,uint256,string) (../../sb/LimitOrderProtocol.sol#375-383):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/LimitOrderProtocol.sol#381)
+Low level call in UncheckedAddress.uncheckedFunctionStaticCall(address,bytes,string) (../../sb/LimitOrderProtocol.sol#385-392):
+	- (success,returndata) = target.staticcall(data) (../../sb/LimitOrderProtocol.sol#390)
+Low level call in Address.sendValue(address,uint256) (../../sb/LimitOrderProtocol.sol#752-758):
+	- (success) = recipient.call{value: amount}() (../../sb/LimitOrderProtocol.sol#756)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/LimitOrderProtocol.sol#813-820):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/LimitOrderProtocol.sol#818)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/LimitOrderProtocol.sol#838-844):
+	- (success,returndata) = target.staticcall(data) (../../sb/LimitOrderProtocol.sol#842)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/LimitOrderProtocol.sol#862-868):
+	- (success,returndata) = target.delegatecall(data) (../../sb/LimitOrderProtocol.sol#866)
+Low level call in LimitOrderProtocol.simulateCalls(address[],bytes[]) (../../sb/LimitOrderProtocol.sol#1499-1513):
+	- (success,result) = targets[i].call(data[i]) (../../sb/LimitOrderProtocol.sol#1504)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Variable EIP712._CACHED_DOMAIN_SEPARATOR (../../sb/LimitOrderProtocol.sol#240) is not in mixedCase
+Variable EIP712._CACHED_CHAIN_ID (../../sb/LimitOrderProtocol.sol#241) is not in mixedCase
+Variable EIP712._HASHED_NAME (../../sb/LimitOrderProtocol.sol#243) is not in mixedCase
+Variable EIP712._HASHED_VERSION (../../sb/LimitOrderProtocol.sol#244) is not in mixedCase
+Variable EIP712._TYPE_HASH (../../sb/LimitOrderProtocol.sol#245) is not in mixedCase
+Function IERC20Permit.DOMAIN_SEPARATOR() (../../sb/LimitOrderProtocol.sol#367) is not in mixedCase
+Function ERC1155Proxy.func_733NCGU(address,address,uint256,IERC1155,uint256,bytes) (../../sb/LimitOrderProtocol.sol#697-699) is not in mixedCase
+Function ERC20Proxy.func_50BkM4K(address,address,uint256,IERC20) (../../sb/LimitOrderProtocol.sol#967-969) is not in mixedCase
+Function ERC721Proxy.func_40aVqeY(address,address,uint256,IERC721) (../../sb/LimitOrderProtocol.sol#1107-1109) is not in mixedCase
+Function ERC721Proxy.func_20xtkDI(address,address,uint256,IERC721) (../../sb/LimitOrderProtocol.sol#1112-1114) is not in mixedCase
+Function LimitOrderProtocol.DOMAIN_SEPARATOR() (../../sb/LimitOrderProtocol.sol#1457-1459) is not in mixedCase
+Variable LimitOrderProtocol._MAX_SELECTOR (../../sb/LimitOrderProtocol.sol#1447) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/LimitOrderProtocol.sol#314)" inEIP712 (../../sb/LimitOrderProtocol.sol#236-320)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Variable AmountCalculator.getMakerAmount(uint256,uint256,uint256).orderMakerAmount (../../sb/LimitOrderProtocol.sol#421) is too similar to AmountCalculator.getMakerAmount(uint256,uint256,uint256).orderTakerAmount (../../sb/LimitOrderProtocol.sol#421)
+Variable AmountCalculator.getTakerAmount(uint256,uint256,uint256).orderMakerAmount (../../sb/LimitOrderProtocol.sol#427) is too similar to AmountCalculator.getMakerAmount(uint256,uint256,uint256).orderTakerAmount (../../sb/LimitOrderProtocol.sol#421)
+Variable AmountCalculator.getTakerAmount(uint256,uint256,uint256).orderMakerAmount (../../sb/LimitOrderProtocol.sol#427) is too similar to AmountCalculator.getTakerAmount(uint256,uint256,uint256).orderTakerAmount (../../sb/LimitOrderProtocol.sol#427)
+Variable AmountCalculator.getMakerAmount(uint256,uint256,uint256).orderMakerAmount (../../sb/LimitOrderProtocol.sol#421) is too similar to AmountCalculator.getTakerAmount(uint256,uint256,uint256).orderTakerAmount (../../sb/LimitOrderProtocol.sol#427)
+Variable AmountCalculator.getTakerAmount(uint256,uint256,uint256).swapMakerAmount (../../sb/LimitOrderProtocol.sol#427) is too similar to AmountCalculator.getMakerAmount(uint256,uint256,uint256).swapTakerAmount (../../sb/LimitOrderProtocol.sol#421)
+Variable InteractiveMaker.notifyFillOrder(address,address,uint256,uint256,bytes).makingAmount (../../sb/LimitOrderProtocol.sol#1228) is too similar to InteractiveMaker.notifyFillOrder(address,address,uint256,uint256,bytes).takingAmount (../../sb/LimitOrderProtocol.sol#1229)
+Variable LimitOrderProtocol._callGetTakerAmount(LimitOrderProtocol.Order,uint256).makerAmount (../../sb/LimitOrderProtocol.sol#1812) is too similar to LimitOrderProtocol._callGetTakerAmount(LimitOrderProtocol.Order,uint256).takerAmount (../../sb/LimitOrderProtocol.sol#1812)
+Variable LimitOrderProtocol._callGetMakerAmount(LimitOrderProtocol.Order,uint256).makerAmount (../../sb/LimitOrderProtocol.sol#1801) is too similar to LimitOrderProtocol._callGetTakerAmount(LimitOrderProtocol.Order,uint256).takerAmount (../../sb/LimitOrderProtocol.sol#1812)
+Variable LimitOrderProtocol._validate(bytes,bytes,bytes,bytes32).makerAssetData (../../sb/LimitOrderProtocol.sol#1748) is too similar to LimitOrderProtocol._callTakerAssetTransferFrom(address,bytes,uint256).takerAssetData (../../sb/LimitOrderProtocol.sol#1785)
+Variable LimitOrderProtocol._validate(bytes,bytes,bytes,bytes32).makerAssetData (../../sb/LimitOrderProtocol.sol#1748) is too similar to LimitOrderProtocol._validate(bytes,bytes,bytes,bytes32).takerAssetData (../../sb/LimitOrderProtocol.sol#1748)
+Variable LimitOrderProtocol._callMakerAssetTransferFrom(address,bytes,address,uint256).makerAssetData (../../sb/LimitOrderProtocol.sol#1763) is too similar to LimitOrderProtocol._callTakerAssetTransferFrom(address,bytes,uint256).takerAssetData (../../sb/LimitOrderProtocol.sol#1785)
+Variable LimitOrderProtocol._validate(bytes,bytes,bytes,bytes32).makerSelector (../../sb/LimitOrderProtocol.sol#1751) is too similar to LimitOrderProtocol._validate(bytes,bytes,bytes,bytes32).takerSelector (../../sb/LimitOrderProtocol.sol#1752)
+Variable LimitOrderProtocol.fillOrderToWithPermit(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address,bytes).makingAmount (../../sb/LimitOrderProtocol.sol#1629) is too similar to LimitOrderProtocol.fillOrderRFQ(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256).takingAmount (../../sb/LimitOrderProtocol.sol#1538)
+Variable LimitOrderProtocol.fillOrderRFQTo(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address).makingAmount (../../sb/LimitOrderProtocol.sol#1558) is too similar to LimitOrderProtocol.fillOrderTo(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address).takingAmount (../../sb/LimitOrderProtocol.sol#1644)
+Variable LimitOrderProtocol._callMakerAssetTransferFrom(address,bytes,address,uint256).makingAmount (../../sb/LimitOrderProtocol.sol#1763) is too similar to LimitOrderProtocol._callTakerAssetTransferFrom(address,bytes,uint256).takingAmount (../../sb/LimitOrderProtocol.sol#1785)
+Variable LimitOrderProtocol._callMakerAssetTransferFrom(address,bytes,address,uint256).makingAmount (../../sb/LimitOrderProtocol.sol#1763) is too similar to LimitOrderProtocol.fillOrderRFQ(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256).takingAmount (../../sb/LimitOrderProtocol.sol#1538)
+Variable LimitOrderProtocol.fillOrderRFQTo(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address).makingAmount (../../sb/LimitOrderProtocol.sol#1558) is too similar to LimitOrderProtocol.fillOrderToWithPermit(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address,bytes).takingAmount (../../sb/LimitOrderProtocol.sol#1630)
+Variable LimitOrderProtocol.fillOrderRFQTo(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address).makingAmount (../../sb/LimitOrderProtocol.sol#1558) is too similar to LimitOrderProtocol.fillOrderRFQToWithPermit(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address,bytes).takingAmount (../../sb/LimitOrderProtocol.sol#1547)
+Variable LimitOrderProtocol.fillOrder(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256).makingAmount (../../sb/LimitOrderProtocol.sol#1619) is too similar to LimitOrderProtocol.fillOrderTo(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address).takingAmount (../../sb/LimitOrderProtocol.sol#1644)
+Variable LimitOrderProtocol.fillOrderToWithPermit(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address,bytes).makingAmount (../../sb/LimitOrderProtocol.sol#1629) is too similar to LimitOrderProtocol.fillOrderTo(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address).takingAmount (../../sb/LimitOrderProtocol.sol#1644)
+Variable LimitOrderProtocol._callMakerAssetTransferFrom(address,bytes,address,uint256).makingAmount (../../sb/LimitOrderProtocol.sol#1763) is too similar to LimitOrderProtocol.fillOrderTo(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address).takingAmount (../../sb/LimitOrderProtocol.sol#1644)
+Variable LimitOrderProtocol.fillOrder(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256).makingAmount (../../sb/LimitOrderProtocol.sol#1619) is too similar to LimitOrderProtocol.fillOrderRFQToWithPermit(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address,bytes).takingAmount (../../sb/LimitOrderProtocol.sol#1547)
+Variable LimitOrderProtocol.fillOrder(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256).makingAmount (../../sb/LimitOrderProtocol.sol#1619) is too similar to LimitOrderProtocol.fillOrderToWithPermit(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address,bytes).takingAmount (../../sb/LimitOrderProtocol.sol#1630)
+Variable LimitOrderProtocol.fillOrderToWithPermit(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address,bytes).makingAmount (../../sb/LimitOrderProtocol.sol#1629) is too similar to LimitOrderProtocol.fillOrderRFQToWithPermit(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address,bytes).takingAmount (../../sb/LimitOrderProtocol.sol#1547)
+Variable LimitOrderProtocol.fillOrderRFQTo(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address).makingAmount (../../sb/LimitOrderProtocol.sol#1558) is too similar to LimitOrderProtocol.fillOrder(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256).takingAmount (../../sb/LimitOrderProtocol.sol#1620)
+Variable LimitOrderProtocol.fillOrderRFQ(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256).makingAmount (../../sb/LimitOrderProtocol.sol#1537) is too similar to LimitOrderProtocol.fillOrderTo(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address).takingAmount (../../sb/LimitOrderProtocol.sol#1644)
+Variable LimitOrderProtocol.fillOrderRFQTo(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address).makingAmount (../../sb/LimitOrderProtocol.sol#1558) is too similar to LimitOrderProtocol._callTakerAssetTransferFrom(address,bytes,uint256).takingAmount (../../sb/LimitOrderProtocol.sol#1785)
+Variable LimitOrderProtocol._callMakerAssetTransferFrom(address,bytes,address,uint256).makingAmount (../../sb/LimitOrderProtocol.sol#1763) is too similar to LimitOrderProtocol.fillOrderToWithPermit(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address,bytes).takingAmount (../../sb/LimitOrderProtocol.sol#1630)
+Variable LimitOrderProtocol.fillOrderRFQTo(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address).makingAmount (../../sb/LimitOrderProtocol.sol#1558) is too similar to LimitOrderProtocol.fillOrderRFQ(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256).takingAmount (../../sb/LimitOrderProtocol.sol#1538)
+Variable LimitOrderProtocol._callMakerAssetTransferFrom(address,bytes,address,uint256).makingAmount (../../sb/LimitOrderProtocol.sol#1763) is too similar to LimitOrderProtocol.fillOrderRFQToWithPermit(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address,bytes).takingAmount (../../sb/LimitOrderProtocol.sol#1547)
+Variable LimitOrderProtocol.fillOrderRFQ(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256).makingAmount (../../sb/LimitOrderProtocol.sol#1537) is too similar to LimitOrderProtocol.fillOrderRFQToWithPermit(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address,bytes).takingAmount (../../sb/LimitOrderProtocol.sol#1547)
+Variable LimitOrderProtocol.fillOrder(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256).makingAmount (../../sb/LimitOrderProtocol.sol#1619) is too similar to LimitOrderProtocol._callTakerAssetTransferFrom(address,bytes,uint256).takingAmount (../../sb/LimitOrderProtocol.sol#1785)
+Variable LimitOrderProtocol.fillOrder(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256).makingAmount (../../sb/LimitOrderProtocol.sol#1619) is too similar to LimitOrderProtocol.fillOrderRFQ(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256).takingAmount (../../sb/LimitOrderProtocol.sol#1538)
+Variable AmountCalculator.getMakerAmount(uint256,uint256,uint256).orderMakerAmount (../../sb/LimitOrderProtocol.sol#421) is too similar to LimitOrderProtocol.fillOrderRFQTo(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address).orderTakerAmount (../../sb/LimitOrderProtocol.sol#1578)
+Variable LimitOrderProtocol.fillOrderRFQTo(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address).orderMakerAmount (../../sb/LimitOrderProtocol.sol#1577) is too similar to LimitOrderProtocol.fillOrderRFQTo(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address).orderTakerAmount (../../sb/LimitOrderProtocol.sol#1578)
+Variable AmountCalculator.getTakerAmount(uint256,uint256,uint256).orderMakerAmount (../../sb/LimitOrderProtocol.sol#427) is too similar to LimitOrderProtocol.fillOrderRFQTo(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address).orderTakerAmount (../../sb/LimitOrderProtocol.sol#1578)
+Variable LimitOrderProtocol.fillOrderRFQTo(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address).orderMakerAmount (../../sb/LimitOrderProtocol.sol#1577) is too similar to AmountCalculator.getMakerAmount(uint256,uint256,uint256).orderTakerAmount (../../sb/LimitOrderProtocol.sol#421)
+Variable LimitOrderProtocol.fillOrderRFQTo(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address).orderMakerAmount (../../sb/LimitOrderProtocol.sol#1577) is too similar to AmountCalculator.getTakerAmount(uint256,uint256,uint256).orderTakerAmount (../../sb/LimitOrderProtocol.sol#427)
+Variable LimitOrderProtocol._callGetTakerAmount(LimitOrderProtocol.Order,uint256).makerAmount (../../sb/LimitOrderProtocol.sol#1812) is too similar to LimitOrderProtocol._callGetMakerAmount(LimitOrderProtocol.Order,uint256).takerAmount (../../sb/LimitOrderProtocol.sol#1801)
+Variable LimitOrderProtocol._callGetMakerAmount(LimitOrderProtocol.Order,uint256).makerAmount (../../sb/LimitOrderProtocol.sol#1801) is too similar to LimitOrderProtocol._callGetMakerAmount(LimitOrderProtocol.Order,uint256).takerAmount (../../sb/LimitOrderProtocol.sol#1801)
+Variable LimitOrderProtocol._callMakerAssetTransferFrom(address,bytes,address,uint256).makerAssetData (../../sb/LimitOrderProtocol.sol#1763) is too similar to LimitOrderProtocol._validate(bytes,bytes,bytes,bytes32).takerAssetData (../../sb/LimitOrderProtocol.sol#1748)
+Variable LimitOrderProtocol.fillOrderRFQ(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256).makingAmount (../../sb/LimitOrderProtocol.sol#1537) is too similar to LimitOrderProtocol._callTakerAssetTransferFrom(address,bytes,uint256).takingAmount (../../sb/LimitOrderProtocol.sol#1785)
+Variable LimitOrderProtocol.fillOrderRFQ(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256).makingAmount (../../sb/LimitOrderProtocol.sol#1537) is too similar to LimitOrderProtocol.fillOrderToWithPermit(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address,bytes).takingAmount (../../sb/LimitOrderProtocol.sol#1630)
+Variable LimitOrderProtocol._callMakerAssetTransferFrom(address,bytes,address,uint256).makingAmount (../../sb/LimitOrderProtocol.sol#1763) is too similar to LimitOrderProtocol.fillOrderRFQTo(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address).takingAmount (../../sb/LimitOrderProtocol.sol#1559)
+Variable LimitOrderProtocol.fillOrderRFQToWithPermit(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address,bytes).makingAmount (../../sb/LimitOrderProtocol.sol#1546) is too similar to LimitOrderProtocol.fillOrderRFQTo(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address).takingAmount (../../sb/LimitOrderProtocol.sol#1559)
+Variable LimitOrderProtocol.fillOrderRFQ(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256).makingAmount (../../sb/LimitOrderProtocol.sol#1537) is too similar to LimitOrderProtocol.fillOrderRFQ(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256).takingAmount (../../sb/LimitOrderProtocol.sol#1538)
+Variable LimitOrderProtocol.fillOrderToWithPermit(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address,bytes).makingAmount (../../sb/LimitOrderProtocol.sol#1629) is too similar to LimitOrderProtocol.fillOrderRFQTo(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address).takingAmount (../../sb/LimitOrderProtocol.sol#1559)
+Variable LimitOrderProtocol.fillOrderToWithPermit(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address,bytes).makingAmount (../../sb/LimitOrderProtocol.sol#1629) is too similar to LimitOrderProtocol.fillOrder(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256).takingAmount (../../sb/LimitOrderProtocol.sol#1620)
+Variable LimitOrderProtocol._callMakerAssetTransferFrom(address,bytes,address,uint256).makingAmount (../../sb/LimitOrderProtocol.sol#1763) is too similar to LimitOrderProtocol.fillOrder(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256).takingAmount (../../sb/LimitOrderProtocol.sol#1620)
+Variable LimitOrderProtocol.fillOrderRFQToWithPermit(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address,bytes).makingAmount (../../sb/LimitOrderProtocol.sol#1546) is too similar to LimitOrderProtocol.fillOrder(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256).takingAmount (../../sb/LimitOrderProtocol.sol#1620)
+Variable LimitOrderProtocol.fillOrderTo(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address).makingAmount (../../sb/LimitOrderProtocol.sol#1643) is too similar to LimitOrderProtocol._callTakerAssetTransferFrom(address,bytes,uint256).takingAmount (../../sb/LimitOrderProtocol.sol#1785)
+Variable LimitOrderProtocol.fillOrderTo(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address).makingAmount (../../sb/LimitOrderProtocol.sol#1643) is too similar to LimitOrderProtocol.fillOrderToWithPermit(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address,bytes).takingAmount (../../sb/LimitOrderProtocol.sol#1630)
+Variable LimitOrderProtocol.fillOrderTo(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address).makingAmount (../../sb/LimitOrderProtocol.sol#1643) is too similar to LimitOrderProtocol.fillOrderRFQ(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256).takingAmount (../../sb/LimitOrderProtocol.sol#1538)
+Variable LimitOrderProtocol.fillOrderTo(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address).makingAmount (../../sb/LimitOrderProtocol.sol#1643) is too similar to LimitOrderProtocol.fillOrderRFQToWithPermit(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address,bytes).takingAmount (../../sb/LimitOrderProtocol.sol#1547)
+Variable LimitOrderProtocol.fillOrderRFQToWithPermit(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address,bytes).makingAmount (../../sb/LimitOrderProtocol.sol#1546) is too similar to LimitOrderProtocol.fillOrderTo(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address).takingAmount (../../sb/LimitOrderProtocol.sol#1644)
+Variable LimitOrderProtocol.fillOrder(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256).makingAmount (../../sb/LimitOrderProtocol.sol#1619) is too similar to LimitOrderProtocol.fillOrderRFQTo(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address).takingAmount (../../sb/LimitOrderProtocol.sol#1559)
+Variable LimitOrderProtocol.fillOrderToWithPermit(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address,bytes).makingAmount (../../sb/LimitOrderProtocol.sol#1629) is too similar to LimitOrderProtocol._callTakerAssetTransferFrom(address,bytes,uint256).takingAmount (../../sb/LimitOrderProtocol.sol#1785)
+Variable LimitOrderProtocol.fillOrderRFQToWithPermit(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address,bytes).makingAmount (../../sb/LimitOrderProtocol.sol#1546) is too similar to LimitOrderProtocol._callTakerAssetTransferFrom(address,bytes,uint256).takingAmount (../../sb/LimitOrderProtocol.sol#1785)
+Variable LimitOrderProtocol.fillOrder(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256).makingAmount (../../sb/LimitOrderProtocol.sol#1619) is too similar to LimitOrderProtocol.fillOrder(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256).takingAmount (../../sb/LimitOrderProtocol.sol#1620)
+Variable LimitOrderProtocol.fillOrderRFQ(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256).makingAmount (../../sb/LimitOrderProtocol.sol#1537) is too similar to LimitOrderProtocol.fillOrderRFQTo(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address).takingAmount (../../sb/LimitOrderProtocol.sol#1559)
+Variable LimitOrderProtocol.fillOrderToWithPermit(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address,bytes).makingAmount (../../sb/LimitOrderProtocol.sol#1629) is too similar to LimitOrderProtocol.fillOrderToWithPermit(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address,bytes).takingAmount (../../sb/LimitOrderProtocol.sol#1630)
+Variable LimitOrderProtocol.fillOrderRFQToWithPermit(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address,bytes).makingAmount (../../sb/LimitOrderProtocol.sol#1546) is too similar to LimitOrderProtocol.fillOrderToWithPermit(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address,bytes).takingAmount (../../sb/LimitOrderProtocol.sol#1630)
+Variable LimitOrderProtocol.fillOrderRFQ(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256).makingAmount (../../sb/LimitOrderProtocol.sol#1537) is too similar to LimitOrderProtocol.fillOrder(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256).takingAmount (../../sb/LimitOrderProtocol.sol#1620)
+Variable LimitOrderProtocol.fillOrderRFQToWithPermit(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address,bytes).makingAmount (../../sb/LimitOrderProtocol.sol#1546) is too similar to LimitOrderProtocol.fillOrderRFQ(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256).takingAmount (../../sb/LimitOrderProtocol.sol#1538)
+Variable LimitOrderProtocol.fillOrderRFQToWithPermit(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address,bytes).makingAmount (../../sb/LimitOrderProtocol.sol#1546) is too similar to LimitOrderProtocol.fillOrderRFQToWithPermit(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address,bytes).takingAmount (../../sb/LimitOrderProtocol.sol#1547)
+Variable LimitOrderProtocol.fillOrderTo(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address).makingAmount (../../sb/LimitOrderProtocol.sol#1643) is too similar to LimitOrderProtocol.fillOrderTo(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address).takingAmount (../../sb/LimitOrderProtocol.sol#1644)
+Variable LimitOrderProtocol.fillOrderRFQTo(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address).makingAmount (../../sb/LimitOrderProtocol.sol#1558) is too similar to LimitOrderProtocol.fillOrderRFQTo(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address).takingAmount (../../sb/LimitOrderProtocol.sol#1559)
+Variable LimitOrderProtocol.fillOrderTo(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address).makingAmount (../../sb/LimitOrderProtocol.sol#1643) is too similar to LimitOrderProtocol.fillOrderRFQTo(LimitOrderProtocol.OrderRFQ,bytes,uint256,uint256,address).takingAmount (../../sb/LimitOrderProtocol.sol#1559)
+Variable LimitOrderProtocol.fillOrderTo(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256,address).makingAmount (../../sb/LimitOrderProtocol.sol#1643) is too similar to LimitOrderProtocol.fillOrder(LimitOrderProtocol.Order,bytes,uint256,uint256,uint256).takingAmount (../../sb/LimitOrderProtocol.sol#1620)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+/sb/LimitOrderProtocol.sol analyzed (24 contracts with 93 detectors), 136 result(s) found

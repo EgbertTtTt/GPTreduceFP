@@ -1,0 +1,296 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 75 Code Findings │
+└──────────────────┘
+                        
+    /sb/ChimVesting.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          669┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          673┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          691┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          696┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          701┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          723┆ contract ChimVesting is Ownable, ReentrancyGuard {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          787┆ constructor(address erc20TokenAddress_) {
+          788┆     require(erc20TokenAddress_ != address(0), "ChimVesting:      
+  Invalid erc20 token address");                                                
+          789┆     _erc20TokenAddress = erc20TokenAddress_;
+          790┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          880┆ for (uint256 i = 1; i <= Counters.current(_lockPLanIdTracker);   
+  i++) {                                                                        
+            ⋮┆----------------------------------------
+          881┆ AddressLockData storage addressLockData =                        
+  _addressLocks[account_][i];                                                   
+            ⋮┆----------------------------------------
+          914┆ for (uint256 i = 1; i <= Counters.current(_lockPLanIdTracker);   
+  i++) {                                                                        
+            ⋮┆----------------------------------------
+          915┆ LockPlanData storage lockPlan = _lockPLans[i];
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          880┆ for (uint256 i = 1; i <= Counters.current(_lockPLanIdTracker);   
+  i++) {                                                                        
+            ⋮┆----------------------------------------
+          914┆ for (uint256 i = 1; i <= Counters.current(_lockPLanIdTracker);   
+  i++) {                                                                        
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           63┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+           84┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          136┆ require(_status != _ENTERED, "ReentrancyGuard: reentrant call");
+            ⋮┆----------------------------------------
+          231┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          246┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          263┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          280┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          297┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          518┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          522┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          579┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          580┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          604┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          628┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          688┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          689┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          690┆ );
+            ⋮┆----------------------------------------
+          718┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          788┆ require(erc20TokenAddress_ != address(0), "ChimVesting: Invalid  
+  erc20 token address");                                                        
+            ⋮┆----------------------------------------
+          990┆ require(_releaseTime != 0, "ChimVesting: The release time not    
+  set");                                                                        
+            ⋮┆----------------------------------------
+          991┆ require(lockPlanId_ > 0 && lockPlanId_ <=                        
+  Counters.current(_lockPLanIdTracker), "ChimVesting: LockPlanId not exist");   
+            ⋮┆----------------------------------------
+         1018┆ require(_releaseTime == 0, "ChimVesting: The release time can    
+  only be set once");                                                           
+            ⋮┆----------------------------------------
+         1048┆ require(Counters.current(_lockPLanIdTracker) < _MAX_LOCK_PLANS,  
+  "ChimVesting: Max lock plans limit reached");                                 
+            ⋮┆----------------------------------------
+         1049┆ require(bytes(name_).length != 0, "ChimVesting: Invalid name");
+            ⋮┆----------------------------------------
+         1050┆ require(maxPlanTotal_ != 0, "ChimVesting: Invalid max plan       
+  total");                                                                      
+            ⋮┆----------------------------------------
+         1051┆ require(startPercent_ <= _MAX_PERCENT, "ChimVesting: Invalid     
+  start percent");                                                              
+            ⋮┆----------------------------------------
+         1052┆ require(nextPercent_ <= _MAX_PERCENT, "ChimVesting: Invalid next 
+  percent");                                                                    
+            ⋮┆----------------------------------------
+         1053┆ require(startPercent_ == _MAX_PERCENT || (nextPercent_ > 0 &&    
+  nextDelay_ > 0), "ChimVesting: Invalid plan params");                         
+            ⋮┆----------------------------------------
+         1089┆ require(lockPlanId_ > 0 && lockPlanId_ <=                        
+  Counters.current(_lockPLanIdTracker), "ChimVesting: LockPlanId not exist");   
+            ⋮┆----------------------------------------
+         1090┆ require(bytes(name_).length != 0, "ChimVesting: Invalid name");
+            ⋮┆----------------------------------------
+         1091┆ require(startPercent_ <= _MAX_PERCENT, "ChimVesting: Invalid     
+  start percent");                                                              
+            ⋮┆----------------------------------------
+         1092┆ require(nextPercent_ <= _MAX_PERCENT, "ChimVesting: Invalid next 
+  percent");                                                                    
+            ⋮┆----------------------------------------
+         1093┆ require(startPercent_ == _MAX_PERCENT || (nextPercent_ > 0 &&    
+  nextDelay_ > 0), "ChimVesting: Invalid plan params");                         
+            ⋮┆----------------------------------------
+         1123┆ require(account_ != address(0), "ChimVesting: Invalid address");
+            ⋮┆----------------------------------------
+         1124┆ require(lockPlanId_ > 0 && lockPlanId_ <=                        
+  Counters.current(_lockPLanIdTracker), "ChimVesting: LockPlanId not exist");   
+            ⋮┆----------------------------------------
+         1128┆ require(lockPlan.maxPlanTotal >= lockPlan.total, "ChimVesting:   
+  Max plan total limit reached");                                               
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          991┆ require(lockPlanId_ > 0 && lockPlanId_ <=                        
+  Counters.current(_lockPLanIdTracker), "ChimVesting: LockPlanId not exist");   
+            ⋮┆----------------------------------------
+         1053┆ require(startPercent_ == _MAX_PERCENT || (nextPercent_ > 0 &&    
+  nextDelay_ > 0), "ChimVesting: Invalid plan params");                         
+            ⋮┆----------------------------------------
+         1089┆ require(lockPlanId_ > 0 && lockPlanId_ <=                        
+  Counters.current(_lockPLanIdTracker), "ChimVesting: LockPlanId not exist");   
+            ⋮┆----------------------------------------
+         1093┆ require(startPercent_ == _MAX_PERCENT || (nextPercent_ > 0 &&    
+  nextDelay_ > 0), "ChimVesting: Invalid plan params");                         
+            ⋮┆----------------------------------------
+         1124┆ require(lockPlanId_ > 0 && lockPlanId_ <=                        
+  Counters.current(_lockPLanIdTracker), "ChimVesting: LockPlanId not exist");   
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          880┆ for (uint256 i = 1; i <= Counters.current(_lockPLanIdTracker);   
+  i++) {                                                                        
+            ⋮┆----------------------------------------
+          914┆ for (uint256 i = 1; i <= Counters.current(_lockPLanIdTracker);   
+  i++) {                                                                        
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           84┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          263┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          522┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          579┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          604┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          628┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          688┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          689┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          690┆ );
+            ⋮┆----------------------------------------
+          718┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          788┆ require(erc20TokenAddress_ != address(0), "ChimVesting: Invalid  
+  erc20 token address");                                                        
+            ⋮┆----------------------------------------
+          990┆ require(_releaseTime != 0, "ChimVesting: The release time not    
+  set");                                                                        
+            ⋮┆----------------------------------------
+          991┆ require(lockPlanId_ > 0 && lockPlanId_ <=                        
+  Counters.current(_lockPLanIdTracker), "ChimVesting: LockPlanId not exist");   
+            ⋮┆----------------------------------------
+         1018┆ require(_releaseTime == 0, "ChimVesting: The release time can    
+  only be set once");                                                           
+            ⋮┆----------------------------------------
+         1048┆ require(Counters.current(_lockPLanIdTracker) < _MAX_LOCK_PLANS,  
+  "ChimVesting: Max lock plans limit reached");                                 
+            ⋮┆----------------------------------------
+         1050┆ require(maxPlanTotal_ != 0, "ChimVesting: Invalid max plan       
+  total");                                                                      
+            ⋮┆----------------------------------------
+         1051┆ require(startPercent_ <= _MAX_PERCENT, "ChimVesting: Invalid     
+  start percent");                                                              
+            ⋮┆----------------------------------------
+         1052┆ require(nextPercent_ <= _MAX_PERCENT, "ChimVesting: Invalid next 
+  percent");                                                                    
+            ⋮┆----------------------------------------
+         1089┆ require(lockPlanId_ > 0 && lockPlanId_ <=                        
+  Counters.current(_lockPLanIdTracker), "ChimVesting: LockPlanId not exist");   
+            ⋮┆----------------------------------------
+         1091┆ require(startPercent_ <= _MAX_PERCENT, "ChimVesting: Invalid     
+  start percent");                                                              
+            ⋮┆----------------------------------------
+         1092┆ require(nextPercent_ <= _MAX_PERCENT, "ChimVesting: Invalid next 
+  percent");                                                                    
+            ⋮┆----------------------------------------
+         1124┆ require(lockPlanId_ > 0 && lockPlanId_ <=                        
+  Counters.current(_lockPLanIdTracker), "ChimVesting: LockPlanId not exist");   
+            ⋮┆----------------------------------------
+         1128┆ require(lockPlan.maxPlanTotal >= lockPlan.total, "ChimVesting:   
+  Max plan total limit reached");                                               
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 75 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

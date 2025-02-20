@@ -1,0 +1,204 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 48 Code Findings │
+└──────────────────┘
+                   
+    /sb/bVault.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          229┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          233┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          240┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          245┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          250┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+           20┆ constructor () internal { }
+            ⋮┆----------------------------------------
+           37┆ constructor () internal {
+           38┆     _owner = _msgSender();
+           39┆     emit OwnershipTransferred(address(0), _owner);
+           40┆ }
+            ⋮┆----------------------------------------
+          143┆ constructor (string memory name, string memory symbol, uint8     
+  decimals) public {                                                            
+          144┆     _name = name;
+          145┆     _symbol = symbol;
+          146┆     _decimals = decimals;
+          147┆ }
+            ⋮┆----------------------------------------
+          303┆ constructor (address _token,uint _earnLowerlimit) public         
+  ERC20Detailed(                                                                
+          304┆     string(abi.encodePacked("bt:vault: ",                        
+  ERC20Detailed(_token).name())),                                               
+          305┆     string(abi.encodePacked("b",                                 
+  ERC20Detailed(_token).symbol())),                                             
+          306┆     ERC20Detailed(_token).decimals()
+          307┆ ) {
+          308┆     token = IERC20(_token);
+          309┆     governance = tx.origin;
+          310┆     controller = 0x03D2079c54967f463Fd6e89E76012F74EBC62615;
+          311┆     earnLowerlimit = _earnLowerlimit;
+          312┆     feeAddress = tx.origin;
+             [hid 2 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           45┆ require(isOwner(), "Ownable: caller is not the owner");
+            ⋮┆----------------------------------------
+           59┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          104┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          105┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          112┆ require(account != address(0), "ERC20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+          119┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          126┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          127┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          162┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          181┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          216┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          220┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          237┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          238┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          239┆ );
+            ⋮┆----------------------------------------
+          253┆ require(address(token).isContract(), "SafeERC20: call to         
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          257┆ require(success, "SafeERC20: low-level call failed");
+            ⋮┆----------------------------------------
+          261┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          299┆ require(!RestrictContractCall || !s.isContract(), "Contract      
+  cannot call");                                                                
+            ⋮┆----------------------------------------
+          322┆ require(msg.sender == governance, "!governance");
+            ⋮┆----------------------------------------
+          327┆ require(msg.sender == governance, "!governance");
+            ⋮┆----------------------------------------
+          332┆ require(msg.sender == timelock, "!timelock");
+            ⋮┆----------------------------------------
+          336┆ require(msg.sender == governance, "!governance");
+            ⋮┆----------------------------------------
+          357┆ require(_amount > 0, "Cannot deposit 0");
+            ⋮┆----------------------------------------
+          384┆ require(_shares > 0, "Cannot withdraw 0");
+            ⋮┆----------------------------------------
+          430┆ require(msg.sender == timelock, "!timelock");
+            ⋮┆----------------------------------------
+          431┆ require(fees[0]<feeMax&&fees[1]<feeMax&&fees[2]<feeMax,"The fee  
+  is too high");                                                                
+            ⋮┆----------------------------------------
+          439┆ require(msg.sender == timelock, "!timelock");
+            ⋮┆----------------------------------------
+          445┆ require(msg.sender == timelock, "!timelock");
+            ⋮┆----------------------------------------
+          450┆ require(msg.sender == governance, "!governance");
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          431┆ require(fees[0]<feeMax&&fees[1]<feeMax&&fees[2]<feeMax,"The fee  
+  is too high");                                                                
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           59┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          104┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          105┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          119┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          126┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          127┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          181┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          220┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          237┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          238┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          239┆ );
+            ⋮┆----------------------------------------
+          261┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 48 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

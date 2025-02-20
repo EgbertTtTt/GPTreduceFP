@@ -1,0 +1,109 @@
+'solc --version' running
+'solc /sb/WUSDMaster.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/sb' running
+
+Reentrancy in WUSDMaster.redeem(uint256) (../../sb/WUSDMaster.sol#742-751):
+	External calls:
+	- wusd.burn(msg.sender,amount) (../../sb/WUSDMaster.sol#746)
+	State variables written after the call(s):
+	- usdtClaimAmount[msg.sender] = amount (../../sb/WUSDMaster.sol#747)
+	WUSDMaster.usdtClaimAmount (../../sb/WUSDMaster.sol#623) can be used in cross function reentrancies:
+	- WUSDMaster.usdtClaimAmount (../../sb/WUSDMaster.sol#623)
+Reentrancy in WUSDMaster.stake(uint256) (../../sb/WUSDMaster.sol#704-729):
+	External calls:
+	- usdt.safeTransferFrom(msg.sender,address(this),amount) (../../sb/WUSDMaster.sol#709)
+	- usdt.safeTransfer(treasury,feeAmount) (../../sb/WUSDMaster.sol#712)
+	- usdt.approve(address(wswapRouter),wexAmount) (../../sb/WUSDMaster.sol#716)
+	- wswapRouter.swapExactTokensForTokensSupportingFeeOnTransferTokens(wexAmount,0,swapPath,address(this),block.timestamp) (../../sb/WUSDMaster.sol#717-723)
+	State variables written after the call(s):
+	- wusdClaimAmount[msg.sender] = amount (../../sb/WUSDMaster.sol#725)
+	WUSDMaster.wusdClaimAmount (../../sb/WUSDMaster.sol#621) can be used in cross function reentrancies:
+	- WUSDMaster.wusdClaimAmount (../../sb/WUSDMaster.sol#621)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+WUSDMaster.stake(uint256) (../../sb/WUSDMaster.sol#704-729) ignores return value by usdt.approve(address(wswapRouter),wexAmount) (../../sb/WUSDMaster.sol#716)
+WUSDMaster.claimUsdt() (../../sb/WUSDMaster.sol#753-775) ignores return value by wex.approve(address(wswapRouter),wexTransferAmount) (../../sb/WUSDMaster.sol#765)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+WUSDMaster.setTreasuryAddress(address)._treasury (../../sb/WUSDMaster.sol#686) lacks a zero-check on :
+		- treasury = _treasury (../../sb/WUSDMaster.sol#687)
+WUSDMaster.setStrategistAddress(address)._strategist (../../sb/WUSDMaster.sol#692) lacks a zero-check on :
+		- strategist = _strategist (../../sb/WUSDMaster.sol#693)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in WUSDMaster.redeem(uint256) (../../sb/WUSDMaster.sol#742-751):
+	External calls:
+	- wusd.burn(msg.sender,amount) (../../sb/WUSDMaster.sol#746)
+	State variables written after the call(s):
+	- usdtClaimBlock[msg.sender] = block.number (../../sb/WUSDMaster.sol#748)
+Reentrancy in WUSDMaster.stake(uint256) (../../sb/WUSDMaster.sol#704-729):
+	External calls:
+	- usdt.safeTransferFrom(msg.sender,address(this),amount) (../../sb/WUSDMaster.sol#709)
+	- usdt.safeTransfer(treasury,feeAmount) (../../sb/WUSDMaster.sol#712)
+	- usdt.approve(address(wswapRouter),wexAmount) (../../sb/WUSDMaster.sol#716)
+	- wswapRouter.swapExactTokensForTokensSupportingFeeOnTransferTokens(wexAmount,0,swapPath,address(this),block.timestamp) (../../sb/WUSDMaster.sol#717-723)
+	State variables written after the call(s):
+	- wusdClaimBlock[msg.sender] = block.number (../../sb/WUSDMaster.sol#726)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in WUSDMaster.withdrawUsdt(uint256) (../../sb/WUSDMaster.sol#777-782):
+	External calls:
+	- usdt.safeTransfer(strategist,amount) (../../sb/WUSDMaster.sol#779)
+	Event emitted after the call(s):
+	- UsdtWithdrawn(amount) (../../sb/WUSDMaster.sol#781)
+Reentrancy in WUSDMaster.withdrawWex(uint256) (../../sb/WUSDMaster.sol#784-788):
+	External calls:
+	- wex.safeTransfer(msg.sender,amount) (../../sb/WUSDMaster.sol#785)
+	Event emitted after the call(s):
+	- WexWithdrawn(amount) (../../sb/WUSDMaster.sol#787)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Address.isContract(address) (../../sb/WUSDMaster.sol#309-319) uses assembly
+	- INLINE ASM (../../sb/WUSDMaster.sol#315-317)
+Address._verifyCallResult(bool,bytes,string) (../../sb/WUSDMaster.sol#472-492) uses assembly
+	- INLINE ASM (../../sb/WUSDMaster.sol#484-487)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.functionCall(address,bytes) (../../sb/WUSDMaster.sol#362-364) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/WUSDMaster.sol#391-397) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/WUSDMaster.sol#451-453) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/WUSDMaster.sol#461-470) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/WUSDMaster.sol#424-426) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/WUSDMaster.sol#434-443) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/WUSDMaster.sol#337-342) is never used and should be removed
+Context._msgData() (../../sb/WUSDMaster.sol#21-23) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/WUSDMaster.sol#531-544) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/WUSDMaster.sol#555-566) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/WUSDMaster.sol#546-553) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.8.0 (../../sb/WUSDMaster.sol#1) allows old versions
+solc-0.8.27 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/WUSDMaster.sol#337-342):
+	- (success) = recipient.call{value: amount}() (../../sb/WUSDMaster.sol#340)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/WUSDMaster.sol#405-416):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/WUSDMaster.sol#414)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/WUSDMaster.sol#434-443):
+	- (success,returndata) = target.staticcall(data) (../../sb/WUSDMaster.sol#441)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/WUSDMaster.sol#461-470):
+	- (success,returndata) = target.delegatecall(data) (../../sb/WUSDMaster.sol#468)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter WUSDMaster.setSwapPath(address[])._swapPath (../../sb/WUSDMaster.sol#659) is not in mixedCase
+Parameter WUSDMaster.setWexPermille(uint256)._wexPermille (../../sb/WUSDMaster.sol#665) is not in mixedCase
+Parameter WUSDMaster.setTreasuryPermille(uint256)._treasuryPermille (../../sb/WUSDMaster.sol#672) is not in mixedCase
+Parameter WUSDMaster.setFeePermille(uint256)._feePermille (../../sb/WUSDMaster.sol#679) is not in mixedCase
+Parameter WUSDMaster.setTreasuryAddress(address)._treasury (../../sb/WUSDMaster.sol#686) is not in mixedCase
+Parameter WUSDMaster.setStrategistAddress(address)._strategist (../../sb/WUSDMaster.sol#692) is not in mixedCase
+Parameter WUSDMaster.setMaxStakeAmount(uint256)._maxStakeAmount (../../sb/WUSDMaster.sol#698) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Variable WUSDMaster.usdtClaimAmount (../../sb/WUSDMaster.sol#623) is too similar to WUSDMaster.wusdClaimAmount (../../sb/WUSDMaster.sol#621)
+Variable WUSDMaster.usdtClaimBlock (../../sb/WUSDMaster.sol#624) is too similar to WUSDMaster.wusdClaimBlock (../../sb/WUSDMaster.sol#622)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+WUSDMaster.usdt (../../sb/WUSDMaster.sol#606) should be immutable 
+WUSDMaster.wex (../../sb/WUSDMaster.sol#607) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/WUSDMaster.sol analyzed (10 contracts with 93 detectors), 40 result(s) found

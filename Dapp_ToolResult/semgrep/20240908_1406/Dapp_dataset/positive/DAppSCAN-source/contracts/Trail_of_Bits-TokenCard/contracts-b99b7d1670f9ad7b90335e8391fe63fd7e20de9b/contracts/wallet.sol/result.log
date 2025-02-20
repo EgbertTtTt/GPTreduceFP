@@ -1,0 +1,697 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                     
+                     
+┌───────────────────┐
+│ 221 Code Findings │
+└───────────────────┘
+                   
+    /sb/wallet.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          261┆ contract Licence is Claimable, Ownable {
+            ⋮┆----------------------------------------
+          500┆ contract Controller is IController, Ownable, Claimable {
+            ⋮┆----------------------------------------
+         1784┆ contract TokenWhitelist is ENSResolvable, Controllable, Ownable, 
+  Claimable {                                                                   
+            ⋮┆----------------------------------------
+         2077┆ contract ControllableOwnable is Controllable, Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          872┆ if ((contentType & contentTypes) != 0 &&                         
+  record.abis[contentType].length > 0) {                                        
+            ⋮┆----------------------------------------
+         1744┆ for(i = 0; i < parts.length; i++) {
+            ⋮┆----------------------------------------
+         1747┆ if (i < parts.length - 1) {
+            ⋮┆----------------------------------------
+         1837┆ for (uint i = 0; i < _tokens.length; i++) {
+            ⋮┆----------------------------------------
+         1863┆ for (uint i = 0; i < _tokens.length; i++) {
+            ⋮┆----------------------------------------
+         1871┆ for (uint j = 0; j < _tokenAddressArray.length.sub(1); j++) {
+            ⋮┆----------------------------------------
+         1873┆ _tokenAddressArray[j] =                                          
+  _tokenAddressArray[_tokenAddressArray.length.sub(1)];                         
+            ⋮┆----------------------------------------
+         1877┆ _tokenAddressArray.length--;
+            ⋮┆----------------------------------------
+         2109┆ for (uint i = 0; i < _addresses.length; i++) {
+            ⋮┆----------------------------------------
+         2138┆ for (uint i = 0; i < _addresses.length; i++) {
+            ⋮┆----------------------------------------
+         2173┆ for (uint i = 0; i < _pendingWhitelistAddition.length; i++) {
+            ⋮┆----------------------------------------
+         2225┆ for (uint i = 0; i < _pendingWhitelistRemoval.length; i++) {
+            ⋮┆----------------------------------------
+         2229┆ for (uint j = 0; j < whitelistArray.length.sub(1); j++) {
+            ⋮┆----------------------------------------
+         2231┆ whitelistArray[j] = whitelistArray[whitelistArray.length - 1];
+            ⋮┆----------------------------------------
+         2235┆ whitelistArray.length--;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          129┆ constructor(address _account_, bool _transferable_) internal {
+          130┆     _owner = _account_;
+          131┆     _isTransferable = _transferable_;
+          132┆     // Emit the LockedOwnership event if no longer transferable.
+          133┆     if (!_isTransferable) {
+          134┆         emit LockedOwnership(_account_);
+          135┆     }
+          136┆     emit TransferredOwnership(address(0), _account_);
+          137┆ }
+            ⋮┆----------------------------------------
+          312┆ constructor(address _owner_, bool _transferable_, uint _licence_,
+  address _float_, address _holder_, address _tknAddress_) Ownable(_owner_,     
+  _transferable_) publ ... [0m                                                  
+          313┆     _licenceAmountScaled = _licence_;
+          314┆     _cryptoFloat = _float_;
+          315┆     _tokenHolder = _holder_;
+          316┆     if (_tknAddress_ != address(0)) {
+          317┆         _tknContractAddress = _tknAddress_;
+          318┆     }
+          319┆ }
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+          517┆ constructor(address _ownerAddress_, bool _transferable_)         
+  Ownable(_ownerAddress_, _transferable_) public { }                            
+            ⋮┆----------------------------------------
+          752┆ constructor(ENS ensAddr) public {
+          753┆     ens = ensAddr;
+          754┆ }
+            ⋮┆----------------------------------------
+          963┆ constructor(address _ensReg_) internal {
+          964┆     _ensRegistry = _ensReg_;
+          965┆     _ens = ENS(_ensRegistry);
+          966┆ }
+            ⋮┆----------------------------------------
+         1006┆ constructor(bytes32 _controllerNameHash_) internal {
+         1007┆     _controllerNode = _controllerNameHash_;
+         1008┆ }
+            ⋮┆----------------------------------------
+         1821┆ constructor(address _ens_, bytes32 _oracleNameHash_, bytes32     
+  _controllerNameHash_, address _owner_, bool _transferable_, address           
+  _stabelcoinAddress_) ENSResolva ... [0m                                       
+         1822┆     _oracleNode = _oracleNameHash_;
+         1823┆     _stablecoin = _stabelcoinAddress_;
+         1824┆ }
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+         1974┆ constructor(bytes32 _tokenWhitelistNameHash_) internal {
+         1975┆     _tokenWhitelistNode = _tokenWhitelistNameHash_;
+         1976┆ }
+            ⋮┆----------------------------------------
+         2358┆ constructor(uint _limit_) internal {
+         2359┆     _spendLimit = DailyLimit(_limit_, _limit_, now, 0, false);
+         2360┆ }
+            ⋮┆----------------------------------------
+         2411┆ constructor() internal {
+         2412┆     _gasTopUpLimit = DailyLimit(_MAXIMUM_GAS_TOPUP_LIMIT,        
+  _MAXIMUM_GAS_TOPUP_LIMIT, now, 0, false);                                     
+         2413┆ }
+            ⋮┆----------------------------------------
+         2528┆ constructor(address _owner_, bool _transferable_, bytes32        
+  _tokenWhitelistNameHash_, bytes32 _controllerNameHash_, uint _spendLimit_)    
+  SpendLimit(_spendLimit_) Ow ... [0m                                           
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+         2628┆ constructor(address _owner_, bool _transferable_, address _ens_, 
+  bytes32 _tokenWhitelistNameHash_, bytes32 _controllerNameHash_, bytes32       
+  _licenceNameHash_, uint ... [0m                                               
+         2629┆     // Get the stablecoin's magnitude.
+         2630┆     ( ,uint256 stablecoinMagnitude, , , , , ) =                  
+  _getStablecoinInfo();                                                         
+         2631┆     require(stablecoinMagnitude > 0, "stablecoin not set");
+         2632┆     _initializeLoadLimit(_DEFAULT_MAX_STABLECOIN_LOAD_LIMIT *    
+  stablecoinMagnitude);                                                         
+         2633┆     _licenceNode = _licenceNameHash_;
+         2634┆ }
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+         1839┆ require(!_tokenInfoMap[_tokens[i]].available, "token already     
+  available");                                                                  
+            ⋮┆----------------------------------------
+         1843┆ _tokenInfoMap[_tokens[i]] = Token({
+            ⋮┆----------------------------------------
+         1853┆ _tokenAddressArray.push(_tokens[i]);
+            ⋮┆----------------------------------------
+         1865┆ require(_tokenInfoMap[_tokens[i]].available, "token is not       
+  available");                                                                  
+            ⋮┆----------------------------------------
+         1869┆ delete _tokenInfoMap[token];
+            ⋮┆----------------------------------------
+         1871┆ for (uint j = 0; j < _tokenAddressArray.length.sub(1); j++) {
+            ⋮┆----------------------------------------
+         1872┆ if (_tokenAddressArray[j] == token) {
+            ⋮┆----------------------------------------
+         1873┆ _tokenAddressArray[j] =                                          
+  _tokenAddressArray[_tokenAddressArray.length.sub(1)];                         
+            ⋮┆----------------------------------------
+         1873┆ _tokenAddressArray[j] =                                          
+  _tokenAddressArray[_tokenAddressArray.length.sub(1)];                         
+            ⋮┆----------------------------------------
+         1873┆ _tokenAddressArray[j] =                                          
+  _tokenAddressArray[_tokenAddressArray.length.sub(1)];                         
+            ⋮┆----------------------------------------
+         1877┆ _tokenAddressArray.length--;
+            ⋮┆----------------------------------------
+         2140┆ whitelistMap[_addresses[i]] = true;
+            ⋮┆----------------------------------------
+         2142┆ whitelistArray.push(_addresses[i]);
+            ⋮┆----------------------------------------
+         2173┆ for (uint i = 0; i < _pendingWhitelistAddition.length; i++) {
+            ⋮┆----------------------------------------
+         2175┆ if (!whitelistMap[_pendingWhitelistAddition[i]]) {
+            ⋮┆----------------------------------------
+         2175┆ if (!whitelistMap[_pendingWhitelistAddition[i]]) {
+            ⋮┆----------------------------------------
+         2177┆ whitelistMap[_pendingWhitelistAddition[i]] = true;
+            ⋮┆----------------------------------------
+         2177┆ whitelistMap[_pendingWhitelistAddition[i]] = true;
+            ⋮┆----------------------------------------
+         2178┆ whitelistArray.push(_pendingWhitelistAddition[i]);
+            ⋮┆----------------------------------------
+         2178┆ whitelistArray.push(_pendingWhitelistAddition[i]);
+            ⋮┆----------------------------------------
+         2225┆ for (uint i = 0; i < _pendingWhitelistRemoval.length; i++) {
+            ⋮┆----------------------------------------
+         2227┆ if (whitelistMap[_pendingWhitelistRemoval[i]]) {
+            ⋮┆----------------------------------------
+         2227┆ if (whitelistMap[_pendingWhitelistRemoval[i]]) {
+            ⋮┆----------------------------------------
+         2228┆ whitelistMap[_pendingWhitelistRemoval[i]] = false;
+            ⋮┆----------------------------------------
+         2228┆ whitelistMap[_pendingWhitelistRemoval[i]] = false;
+            ⋮┆----------------------------------------
+         2229┆ for (uint j = 0; j < whitelistArray.length.sub(1); j++) {
+            ⋮┆----------------------------------------
+         2230┆ if (whitelistArray[j] == _pendingWhitelistRemoval[i]) {
+            ⋮┆----------------------------------------
+         2230┆ if (whitelistArray[j] == _pendingWhitelistRemoval[i]) {
+            ⋮┆----------------------------------------
+         2231┆ whitelistArray[j] = whitelistArray[whitelistArray.length - 1];
+            ⋮┆----------------------------------------
+         2231┆ whitelistArray[j] = whitelistArray[whitelistArray.length - 1];
+            ⋮┆----------------------------------------
+         2231┆ whitelistArray[j] = whitelistArray[whitelistArray.length - 1];
+            ⋮┆----------------------------------------
+         2235┆ whitelistArray.length--;
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+         1366┆ for (uint i = 1; i < length; i++) {
+            ⋮┆----------------------------------------
+         1837┆ for (uint i = 0; i < _tokens.length; i++) {
+            ⋮┆----------------------------------------
+         1863┆ for (uint i = 0; i < _tokens.length; i++) {
+            ⋮┆----------------------------------------
+         1871┆ for (uint j = 0; j < _tokenAddressArray.length.sub(1); j++) {
+            ⋮┆----------------------------------------
+         2109┆ for (uint i = 0; i < _addresses.length; i++) {
+            ⋮┆----------------------------------------
+         2138┆ for (uint i = 0; i < _addresses.length; i++) {
+            ⋮┆----------------------------------------
+         2173┆ for (uint i = 0; i < _pendingWhitelistAddition.length; i++) {
+            ⋮┆----------------------------------------
+         2225┆ for (uint i = 0; i < _pendingWhitelistRemoval.length; i++) {
+            ⋮┆----------------------------------------
+         2229┆ for (uint j = 0; j < whitelistArray.length.sub(1); j++) {
+            ⋮┆----------------------------------------
+         2785┆ for (uint8 i = 0; i < 20; i++) {
+            ⋮┆----------------------------------------
+         2803┆ for (uint8 i = 0; i < 4; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          141┆ require(_isOwner(msg.sender), "sender is not an owner");
+            ⋮┆----------------------------------------
+          150┆ require(_isTransferable, "ownership is not transferable");
+            ⋮┆----------------------------------------
+          152┆ require(_account != address(0), "owner cannot be set to zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          176┆ require(_isTransferable, "ownership is not transferable");
+            ⋮┆----------------------------------------
+          228┆ require(ERC20(_asset).transfer(_to, _amount), "ERC20 token       
+  transfer was unsuccessful");                                                  
+            ⋮┆----------------------------------------
+          302┆ require(msg.sender == _licenceDAO, "the sender isn't the DAO");
+            ⋮┆----------------------------------------
+          323┆ require(msg.data.length == 0, "msg data length should be 0");
+            ⋮┆----------------------------------------
+          384┆ require(!floatLocked(), "float is locked");
+            ⋮┆----------------------------------------
+          392┆ require(!holderLocked(), "holder contract is locked");
+            ⋮┆----------------------------------------
+          400┆ require(!licenceDAOLocked(), "DAO is locked");
+            ⋮┆----------------------------------------
+          408┆ require(!tknContractAddressLocked(), "TKN is locked");
+            ⋮┆----------------------------------------
+          416┆ require(1 <= _newAmount && _newAmount <= MAX_AMOUNT_SCALE,       
+  "licence amount out of range");                                               
+            ⋮┆----------------------------------------
+          428┆ require(ERC20(_asset).transferFrom(msg.sender, _cryptoFloat,     
+  loadAmount), "TKN transfer from external account was unsuccessful");          
+            ⋮┆----------------------------------------
+          434┆ require(ERC20(_asset).transferFrom(msg.sender, _tokenHolder,     
+  licenceAmount), "ERC20 licenceAmount transfer from external account was       
+  unsuccessful");                                                               
+            ⋮┆----------------------------------------
+          435┆ require(ERC20(_asset).transferFrom(msg.sender, _cryptoFloat,     
+  loadAmount), "ERC20 token transfer from external account was unsuccessful");  
+            ⋮┆----------------------------------------
+          437┆ require(msg.value == _amount, "ETH sent is not equal to amount");
+            ⋮┆----------------------------------------
+          521┆ require(isAdmin(msg.sender), "sender is not an admin");
+            ⋮┆----------------------------------------
+          527┆ require(isController(msg.sender), "sender is not a controller");
+            ⋮┆----------------------------------------
+          580┆ require(!_isAdmin[_account], "provided account is already an     
+  admin");                                                                      
+            ⋮┆----------------------------------------
+          581┆ require(!_isController[_account], "provided account is already a 
+  controller");                                                                 
+            ⋮┆----------------------------------------
+          582┆ require(!_isOwner(_account), "provided account is already the    
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          583┆ require(_account != address(0), "provided account is the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          591┆ require(_isAdmin[_account], "provided account is not an admin");
+            ⋮┆----------------------------------------
+          599┆ require(!_isAdmin[_account], "provided account is already an     
+  admin");                                                                      
+            ⋮┆----------------------------------------
+          600┆ require(!_isController[_account], "provided account is already a 
+  controller");                                                                 
+            ⋮┆----------------------------------------
+          601┆ require(!_isOwner(_account), "provided account is already the    
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          602┆ require(_account != address(0), "provided account is the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          610┆ require(_isController[_account], "provided account is not a      
+  controller");                                                                 
+            ⋮┆----------------------------------------
+         1012┆ require(_isController(msg.sender), "sender is not a controller");
+            ⋮┆----------------------------------------
+         1808┆ require (_isController(msg.sender) || msg.sender ==              
+  oracleAddress, "either oracle or controller");                                
+            ⋮┆----------------------------------------
+         1835┆ require(_tokens.length == _symbols.length && _tokens.length ==   
+  _magnitude.length && _tokens.length == _loadable.length && _tokens.length ==  
+  _loadable.length, "p ... [0m                                                  
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+         1839┆ require(!_tokenInfoMap[_tokens[i]].available, "token already     
+  available");                                                                  
+            ⋮┆----------------------------------------
+         1865┆ require(_tokenInfoMap[_tokens[i]].available, "token is not       
+  available");                                                                  
+            ⋮┆----------------------------------------
+         1889┆ require(_tokenInfoMap[_token].available, "token is not           
+  available");                                                                  
+            ⋮┆----------------------------------------
+         2080┆ require (_isOwner(msg.sender) || _isController(msg.sender),      
+  "either owner or controller");                                                
+            ⋮┆----------------------------------------
+         2110┆ require(!_isOwner(_addresses[i]), "provided whitelist contains   
+  the owner address");                                                          
+            ⋮┆----------------------------------------
+         2111┆ require(_addresses[i] != address(0), "provided whitelist contains
+  the zero address");                                                           
+            ⋮┆----------------------------------------
+         2118┆ require(!submittedWhitelistAddition &&                           
+  !submittedWhitelistRemoval, "whitelist operation has already been submitted");
+            ⋮┆----------------------------------------
+         2136┆ require(!isSetWhitelist, "whitelist has already been             
+  initialized");                                                                
+            ⋮┆----------------------------------------
+         2153┆ require(isSetWhitelist, "whitelist has not been initialized");
+            ⋮┆----------------------------------------
+         2155┆ require(_addresses.length > 0, "pending whitelist addition is    
+  empty");                                                                      
+            ⋮┆----------------------------------------
+         2169┆ require(submittedWhitelistAddition, "whitelist addition has not  
+  been submitted");                                                             
+            ⋮┆----------------------------------------
+         2171┆ require(_hash == calculateHash(_pendingWhitelistAddition), "hash 
+  of the pending whitelist addition do not match");                             
+            ⋮┆----------------------------------------
+         2192┆ require(submittedWhitelistAddition, "whitelist addition has not  
+  been submitted");                                                             
+            ⋮┆----------------------------------------
+         2194┆ require(_hash == calculateHash(_pendingWhitelistAddition), "hash 
+  of the pending whitelist addition does not match");                           
+            ⋮┆----------------------------------------
+         2207┆ require(isSetWhitelist, "whitelist has not been initialized");
+            ⋮┆----------------------------------------
+         2209┆ require(_addresses.length > 0, "pending whitelist removal is     
+  empty");                                                                      
+            ⋮┆----------------------------------------
+         2221┆ require(submittedWhitelistRemoval, "whitelist removal has not    
+  been submitted");                                                             
+            ⋮┆----------------------------------------
+         2223┆ require(_hash == calculateHash(_pendingWhitelistRemoval), "hash  
+  of the pending whitelist removal does not match the confirmed hash");         
+            ⋮┆----------------------------------------
+         2249┆ require(submittedWhitelistRemoval, "whitelist removal has not    
+  been submitted");                                                             
+            ⋮┆----------------------------------------
+         2251┆ require(_hash == calculateHash(_pendingWhitelistRemoval), "hash  
+  of the pending whitelist removal do not match");                              
+            ⋮┆----------------------------------------
+         2293┆ require(dl.available >= _amount, "available has to be greater or 
+  equal to use amount");                                                        
+            ⋮┆----------------------------------------
+         2301┆ require(!dl.set, "daily limit has already been set");
+            ⋮┆----------------------------------------
+         2312┆ require(dl.set, "limit has not been set");
+            ⋮┆----------------------------------------
+         2320┆ require(dl.pending == _amount, "confirmed and submitted limits   
+  dont match");                                                                 
+            ⋮┆----------------------------------------
+         2418┆ require(_MINIMUM_GAS_TOPUP_LIMIT <= _amount && _amount <=        
+  _MAXIMUM_GAS_TOPUP_LIMIT, "gas top up amount is outside the min/max range");  
+            ⋮┆----------------------------------------
+         2426┆ require(_MINIMUM_GAS_TOPUP_LIMIT <= _amount && _amount <=        
+  _MAXIMUM_GAS_TOPUP_LIMIT, "gas top up amount is outside the min/max range");  
+            ⋮┆----------------------------------------
+         2468┆ require(_MINIMUM_LOAD_LIMIT <= _amount && _amount <=             
+  _maximumLoadLimit, "card load amount is outside the min/max range");          
+            ⋮┆----------------------------------------
+         2476┆ require(_MINIMUM_LOAD_LIMIT <= _amount && _amount <=             
+  _maximumLoadLimit, "card load amount is outside the min/max range");          
+            ⋮┆----------------------------------------
+         2532┆ require(_value != 0, "provided value cannot be zero");
+            ⋮┆----------------------------------------
+         2538┆ require(msg.data.length == 0, "msg data needs to be empty");
+            ⋮┆----------------------------------------
+         2559┆ require(_to != address(0), "_to address cannot be set to 0x0");
+            ⋮┆----------------------------------------
+         2575┆ require(ERC20(_asset).transfer(_to, _amount), "ERC20 token       
+  transfer was unsuccessful");                                                  
+            ⋮┆----------------------------------------
+         2596┆ require(rate != 0, "token rate is 0");
+            ⋮┆----------------------------------------
+         2631┆ require(stablecoinMagnitude > 0, "stablecoin not set");
+            ⋮┆----------------------------------------
+         2653┆ require(_isTokenLoadable(_asset), "token not loadable");
+            ⋮┆----------------------------------------
+         2661┆ require(ERC20(_asset).approve(licenceAddress, _amount), "ERC20   
+  token approval was unsuccessful");                                            
+            ⋮┆----------------------------------------
+         2683┆ require(_data.length >= 4 + 32 + 32, "invalid transfer / approve 
+  transaction data");                                                           
+            ⋮┆----------------------------------------
+         2705┆ require(_externalCall(_destination, _value, _data.length, _data),
+  "executing transaction failed");                                              
+            ⋮┆----------------------------------------
+         2729┆ require(available, "token is not available");
+            ⋮┆----------------------------------------
+         2730┆ require(rate != 0, "token rate is 0");
+            ⋮┆----------------------------------------
+         2738┆ require(stablecoinAvailable, "token is not available");
+            ⋮┆----------------------------------------
+         2739┆ require(stablecoinRate != 0, "stablecoin rate is 0");
+            ⋮┆----------------------------------------
+         2780┆ require(_bts.length >= _from + 20, "slicing out of range");
+            ⋮┆----------------------------------------
+         2798┆ require(_bts.length >= _from + 4, "slicing out of range");
+            ⋮┆----------------------------------------
+         2818┆ require(_bts.length >= _from + 32, "slicing out of range");
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          416┆ require(1 <= _newAmount && _newAmount <= MAX_AMOUNT_SCALE,       
+  "licence amount out of range");                                               
+            ⋮┆----------------------------------------
+         1835┆ require(_tokens.length == _symbols.length && _tokens.length ==   
+  _magnitude.length && _tokens.length == _loadable.length && _tokens.length ==  
+  _loadable.length, "p ... [0m                                                  
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+         2118┆ require(!submittedWhitelistAddition &&                           
+  !submittedWhitelistRemoval, "whitelist operation has already been submitted");
+            ⋮┆----------------------------------------
+         2418┆ require(_MINIMUM_GAS_TOPUP_LIMIT <= _amount && _amount <=        
+  _MAXIMUM_GAS_TOPUP_LIMIT, "gas top up amount is outside the min/max range");  
+            ⋮┆----------------------------------------
+         2426┆ require(_MINIMUM_GAS_TOPUP_LIMIT <= _amount && _amount <=        
+  _MAXIMUM_GAS_TOPUP_LIMIT, "gas top up amount is outside the min/max range");  
+            ⋮┆----------------------------------------
+         2468┆ require(_MINIMUM_LOAD_LIMIT <= _amount && _amount <=             
+  _maximumLoadLimit, "card load amount is outside the min/max range");          
+            ⋮┆----------------------------------------
+         2476┆ require(_MINIMUM_LOAD_LIMIT <= _amount && _amount <=             
+  _maximumLoadLimit, "card load amount is outside the min/max range");          
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          872┆ if ((contentType & contentTypes) != 0 &&                         
+  record.abis[contentType].length > 0) {                                        
+          873┆     data = record.abis[contentType];
+          874┆     return;
+          875┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-decrement-not-postfix                    
+          Consider using the prefix decrement expression whenever the return    
+  value is not needed. The                                                      
+          prefix decrement expression is cheaper in terms of gas.               
+                                                                                
+          593┆ _adminCount--;
+            ⋮┆----------------------------------------
+          612┆ _controllerCount--;
+            ⋮┆----------------------------------------
+         1561┆ ptr--;
+            ⋮┆----------------------------------------
+         1877┆ _tokenAddressArray.length--;
+            ⋮┆----------------------------------------
+         2235┆ whitelistArray.length--;
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          585┆ _adminCount++;
+            ⋮┆----------------------------------------
+          604┆ _controllerCount++;
+            ⋮┆----------------------------------------
+         1200┆ for (l = 0; ptr < end; l++) {
+            ⋮┆----------------------------------------
+         1366┆ for (uint i = 1; i < length; i++) {
+            ⋮┆----------------------------------------
+         1521┆ ptr++;
+            ⋮┆----------------------------------------
+         1530┆ for (idx = 0; idx <= selflen - needlelen; idx++) {
+            ⋮┆----------------------------------------
+         1693┆ cnt++;
+            ⋮┆----------------------------------------
+         1737┆ for(uint i = 0; i < parts.length; i++)
+            ⋮┆----------------------------------------
+         1744┆ for(i = 0; i < parts.length; i++) {
+            ⋮┆----------------------------------------
+         1837┆ for (uint i = 0; i < _tokens.length; i++) {
+            ⋮┆----------------------------------------
+         1863┆ for (uint i = 0; i < _tokens.length; i++) {
+            ⋮┆----------------------------------------
+         1871┆ for (uint j = 0; j < _tokenAddressArray.length.sub(1); j++) {
+            ⋮┆----------------------------------------
+         2109┆ for (uint i = 0; i < _addresses.length; i++) {
+            ⋮┆----------------------------------------
+         2138┆ for (uint i = 0; i < _addresses.length; i++) {
+            ⋮┆----------------------------------------
+         2173┆ for (uint i = 0; i < _pendingWhitelistAddition.length; i++) {
+            ⋮┆----------------------------------------
+         2225┆ for (uint i = 0; i < _pendingWhitelistRemoval.length; i++) {
+            ⋮┆----------------------------------------
+         2229┆ for (uint j = 0; j < whitelistArray.length.sub(1); j++) {
+            ⋮┆----------------------------------------
+         2785┆ for (uint8 i = 0; i < 20; i++) {
+            ⋮┆----------------------------------------
+         2803┆ for (uint8 i = 0; i < 4; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          152┆ require(_account != address(0), "owner cannot be set to zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          228┆ require(ERC20(_asset).transfer(_to, _amount), "ERC20 token       
+  transfer was unsuccessful");                                                  
+            ⋮┆----------------------------------------
+          428┆ require(ERC20(_asset).transferFrom(msg.sender, _cryptoFloat,     
+  loadAmount), "TKN transfer from external account was unsuccessful");          
+            ⋮┆----------------------------------------
+          434┆ require(ERC20(_asset).transferFrom(msg.sender, _tokenHolder,     
+  licenceAmount), "ERC20 licenceAmount transfer from external account was       
+  unsuccessful");                                                               
+            ⋮┆----------------------------------------
+          435┆ require(ERC20(_asset).transferFrom(msg.sender, _cryptoFloat,     
+  loadAmount), "ERC20 token transfer from external account was unsuccessful");  
+            ⋮┆----------------------------------------
+          580┆ require(!_isAdmin[_account], "provided account is already an     
+  admin");                                                                      
+            ⋮┆----------------------------------------
+          581┆ require(!_isController[_account], "provided account is already a 
+  controller");                                                                 
+            ⋮┆----------------------------------------
+          582┆ require(!_isOwner(_account), "provided account is already the    
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          583┆ require(_account != address(0), "provided account is the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          599┆ require(!_isAdmin[_account], "provided account is already an     
+  admin");                                                                      
+            ⋮┆----------------------------------------
+          600┆ require(!_isController[_account], "provided account is already a 
+  controller");                                                                 
+            ⋮┆----------------------------------------
+          601┆ require(!_isOwner(_account), "provided account is already the    
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          602┆ require(_account != address(0), "provided account is the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          610┆ require(_isController[_account], "provided account is not a      
+  controller");                                                                 
+            ⋮┆----------------------------------------
+         2110┆ require(!_isOwner(_addresses[i]), "provided whitelist contains   
+  the owner address");                                                          
+            ⋮┆----------------------------------------
+         2111┆ require(_addresses[i] != address(0), "provided whitelist contains
+  the zero address");                                                           
+            ⋮┆----------------------------------------
+         2118┆ require(!submittedWhitelistAddition &&                           
+  !submittedWhitelistRemoval, "whitelist operation has already been submitted");
+            ⋮┆----------------------------------------
+         2136┆ require(!isSetWhitelist, "whitelist has already been             
+  initialized");                                                                
+            ⋮┆----------------------------------------
+         2153┆ require(isSetWhitelist, "whitelist has not been initialized");
+            ⋮┆----------------------------------------
+         2155┆ require(_addresses.length > 0, "pending whitelist addition is    
+  empty");                                                                      
+            ⋮┆----------------------------------------
+         2169┆ require(submittedWhitelistAddition, "whitelist addition has not  
+  been submitted");                                                             
+            ⋮┆----------------------------------------
+         2171┆ require(_hash == calculateHash(_pendingWhitelistAddition), "hash 
+  of the pending whitelist addition do not match");                             
+            ⋮┆----------------------------------------
+         2192┆ require(submittedWhitelistAddition, "whitelist addition has not  
+  been submitted");                                                             
+            ⋮┆----------------------------------------
+         2194┆ require(_hash == calculateHash(_pendingWhitelistAddition), "hash 
+  of the pending whitelist addition does not match");                           
+            ⋮┆----------------------------------------
+         2207┆ require(isSetWhitelist, "whitelist has not been initialized");
+            ⋮┆----------------------------------------
+         2209┆ require(_addresses.length > 0, "pending whitelist removal is     
+  empty");                                                                      
+            ⋮┆----------------------------------------
+         2221┆ require(submittedWhitelistRemoval, "whitelist removal has not    
+  been submitted");                                                             
+            ⋮┆----------------------------------------
+         2223┆ require(_hash == calculateHash(_pendingWhitelistRemoval), "hash  
+  of the pending whitelist removal does not match the confirmed hash");         
+            ⋮┆----------------------------------------
+         2249┆ require(submittedWhitelistRemoval, "whitelist removal has not    
+  been submitted");                                                             
+            ⋮┆----------------------------------------
+         2251┆ require(_hash == calculateHash(_pendingWhitelistRemoval), "hash  
+  of the pending whitelist removal do not match");                              
+            ⋮┆----------------------------------------
+         2293┆ require(dl.available >= _amount, "available has to be greater or 
+  equal to use amount");                                                        
+            ⋮┆----------------------------------------
+         2320┆ require(dl.pending == _amount, "confirmed and submitted limits   
+  dont match");                                                                 
+            ⋮┆----------------------------------------
+         2418┆ require(_MINIMUM_GAS_TOPUP_LIMIT <= _amount && _amount <=        
+  _MAXIMUM_GAS_TOPUP_LIMIT, "gas top up amount is outside the min/max range");  
+            ⋮┆----------------------------------------
+         2426┆ require(_MINIMUM_GAS_TOPUP_LIMIT <= _amount && _amount <=        
+  _MAXIMUM_GAS_TOPUP_LIMIT, "gas top up amount is outside the min/max range");  
+            ⋮┆----------------------------------------
+         2468┆ require(_MINIMUM_LOAD_LIMIT <= _amount && _amount <=             
+  _maximumLoadLimit, "card load amount is outside the min/max range");          
+            ⋮┆----------------------------------------
+         2476┆ require(_MINIMUM_LOAD_LIMIT <= _amount && _amount <=             
+  _maximumLoadLimit, "card load amount is outside the min/max range");          
+            ⋮┆----------------------------------------
+         2575┆ require(ERC20(_asset).transfer(_to, _amount), "ERC20 token       
+  transfer was unsuccessful");                                                  
+            ⋮┆----------------------------------------
+         2661┆ require(ERC20(_asset).approve(licenceAddress, _amount), "ERC20   
+  token approval was unsuccessful");                                            
+            ⋮┆----------------------------------------
+         2683┆ require(_data.length >= 4 + 32 + 32, "invalid transfer / approve 
+  transaction data");                                                           
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+Some files were skipped or only partially analyzed.
+  Partially scanned: 1 files only partially analyzed due to parsing or internal Semgrep errors
+
+Ran 48 rules on 1 file: 221 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

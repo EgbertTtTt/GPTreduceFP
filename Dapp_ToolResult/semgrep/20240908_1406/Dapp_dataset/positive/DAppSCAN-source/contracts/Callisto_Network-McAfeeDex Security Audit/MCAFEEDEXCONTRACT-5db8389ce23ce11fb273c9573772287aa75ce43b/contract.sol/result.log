@@ -1,0 +1,75 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                   
+                   
+┌─────────────────┐
+│ 5 Code Findings │
+└─────────────────┘
+                     
+    /sb/contract.sol 
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+           73┆ if (balances[msg.sender] >= _value && balances[_to] + _value >   
+  balances[_to]) {                                                              
+           74┆ //if (balances[msg.sender] >= _value && _value > 0) {
+           75┆   balances[msg.sender] -= _value;
+           76┆   balances[_to] += _value;
+           77┆   Transfer(msg.sender, _to, _value);
+           78┆   return true;
+           79┆ } else { return false; }
+            ⋮┆----------------------------------------
+           84┆ if (balances[_from] >= _value && allowed[_from][msg.sender] >=   
+  _value && balances[_to] + _value > balances[_to]) {                           
+           85┆ //if (balances[_from] >= _value && allowed[_from][msg.sender] >= 
+  _value && _value > 0) {                                                       
+           86┆   balances[_to] += _value;
+           87┆   balances[_from] -= _value;
+           88┆   allowed[_from][msg.sender] -= _value;
+           89┆   Transfer(_from, _to, _value);
+           90┆   return true;
+           91┆ } else { return false; }
+            ⋮┆----------------------------------------
+          260┆ if (!(
+          261┆   (orders[user][hash] || ecrecover(sha3("\x19Ethereum Signed     
+  Message:\n32", hash),v,r,s) == user) &&                                       
+          262┆   block.number <= expires &&
+          263┆   safeAdd(orderFills[user][hash], amount) <= amountGet
+          264┆ )) throw;
+            ⋮┆----------------------------------------
+          285┆ if (!(
+          286┆   tokens[tokenGet][sender] >= amount &&
+          287┆   availableVolume(tokenGet, amountGet, tokenGive, amountGive,    
+  expires, nonce, user, v, r, s) >= amount                                      
+          288┆ )) return false;
+            ⋮┆----------------------------------------
+          294┆ if (!(
+          295┆   (orders[user][hash] || ecrecover(sha3("\x19Ethereum Signed     
+  Message:\n32", hash),v,r,s) == user) &&                                       
+          296┆   block.number <= expires
+          297┆ )) return 0;
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 5 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

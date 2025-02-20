@@ -1,0 +1,4371 @@
+/sb/BorrowerOperations.sol
+line 547:53 extraneous input '_troveArray' expecting {',', ')'}
+line 2938:31 extraneous input 'priceFeed' expecting {';', '='}
+line 3500:52 no viable alternative at input '.call{'
+line 3500:52 missing ';' at '{'
+jar:file:/usr/local/lib/node_modules/@smartdec/smartcheck/jdeploy-bundle/smartcheck-2.0-jar-with-dependencies.jar!/solidity-rules.xmlruleId: SOLIDITY_ADDRESS_HARDCODED
+patternId: adc165
+severity: 1
+line: 855
+column: 44
+content: 0x000000000000000000636F6e736F6c652e6c6f67
+
+ruleId: SOLIDITY_ADDRESS_HARDCODED
+patternId: a91b18
+severity: 1
+line: 3050
+column: 8
+content: _owner=address(0)
+
+ruleId: SOLIDITY_DIV_MUL
+patternId: 09hhh1
+severity: 2
+line: 2932
+column: 47
+content: DECIMAL_PRECISION/1000*5
+
+ruleId: SOLIDITY_LOCKED_MONEY
+patternId: 30281d
+severity: 3
+line: 3069
+column: 0
+content: contractBorrowerOperationsisLiquityBase,Ownable,CheckContract,IBorrowerOperations{ITroveManagerpublictroveManager;addressstabilityPoolAddress;addressgasPoolAddress;ICollSurplusPoolcollSurplusPool;ILQTYStakingpubliclqtyStaking;addresspubliclqtyStakingAddress;ILUSDTokenpubliclusdToken;ISortedTrovespublicsortedTroves;structLocalVariables_adjustTrove{uintprice;uintcollChange;uintnetDebtChange;boolisCollIncrease;uintdebt;uintcoll;uintoldICR;uintnewICR;uintnewTCR;uintLUSDFee;uintnewDebt;uintnewColl;uintstake;}structLocalVariables_openTrove{uintprice;uintLUSDFee;uintnetDebt;uintcompositeDebt;uintICR;uintNICR;uintstake;uintarrayIndex;}structContractsCache{ITroveManagertroveManager;IActivePoolactivePool;ILUSDTokenlusdToken;}enumBorrowerOperation{openTrove,closeTrove,adjustTrove}eventTroveManagerAddressChanged(address_newTroveManagerAddress);eventActivePoolAddressChanged(address_activePoolAddress);eventDefaultPoolAddressChanged(address_defaultPoolAddress);eventStabilityPoolAddressChanged(address_stabilityPoolAddress);eventGasPoolAddressChanged(address_gasPoolAddress);eventCollSurplusPoolAddressChanged(address_collSurplusPoolAddress);eventPriceFeedAddressChanged(address_newPriceFeedAddress);eventSortedTrovesAddressChanged(address_sortedTrovesAddress);eventLUSDTokenAddressChanged(address_lusdTokenAddress);eventLQTYStakingAddressChanged(address_lqtyStakingAddress);eventTroveCreated(addressindexed_borrower,uintarrayIndex);eventTroveUpdated(addressindexed_borrower,uint_debt,uint_coll,uintstake,BorrowerOperationoperation);eventLUSDBorrowingFeePaid(addressindexed_borrower,uint_LUSDFee);functionsetAddresses(address_troveManagerAddress,address_activePoolAddress,address_defaultPoolAddress,address_stabilityPoolAddress,address_gasPoolAddress,address_collSurplusPoolAddress,address_priceFeedAddress,address_sortedTrovesAddress,address_lusdTokenAddress,address_lqtyStakingAddress)externaloverrideonlyOwner{assert(MIN_NET_DEBT>0);checkContract(_troveManagerAddress);checkContract(_activePoolAddress);checkContract(_defaultPoolAddress);checkContract(_stabilityPoolAddress);checkContract(_gasPoolAddress);checkContract(_collSurplusPoolAddress);checkContract(_priceFeedAddress);checkContract(_sortedTrovesAddress);checkContract(_lusdTokenAddress);checkContract(_lqtyStakingAddress);troveManager=ITroveManager(_troveManagerAddress);activePool=IActivePool(_activePoolAddress);defaultPool=IDefaultPool(_defaultPoolAddress);stabilityPoolAddress=_stabilityPoolAddress;gasPoolAddress=_gasPoolAddress;collSurplusPool=ICollSurplusPool(_collSurplusPoolAddress);priceFeed=IPriceFeed(_priceFeedAddress);sortedTroves=ISortedTroves(_sortedTrovesAddress);lusdToken=ILUSDToken(_lusdTokenAddress);lqtyStakingAddress=_lqtyStakingAddress;lqtyStaking=ILQTYStaking(_lqtyStakingAddress);emitTroveManagerAddressChanged(_troveManagerAddress);emitActivePoolAddressChanged(_activePoolAddress);emitDefaultPoolAddressChanged(_defaultPoolAddress);emitStabilityPoolAddressChanged(_stabilityPoolAddress);emitGasPoolAddressChanged(_gasPoolAddress);emitCollSurplusPoolAddressChanged(_collSurplusPoolAddress);emitPriceFeedAddressChanged(_priceFeedAddress);emitSortedTrovesAddressChanged(_sortedTrovesAddress);emitLUSDTokenAddressChanged(_lusdTokenAddress);emitLQTYStakingAddressChanged(_lqtyStakingAddress);_renounceOwnership();}functionopenTrove(uint_maxFeePercentage,uint_LUSDAmount,address_upperHint,address_lowerHint)externalpayableoverride{ContractsCachememorycontractsCache=ContractsCache(troveManager,activePool,lusdToken);LocalVariables_openTrovememoryvars;vars.price=priceFeed.fetchPrice();boolisRecoveryMode=_checkRecoveryMode(vars.price);_requireValidMaxFeePercentage(_maxFeePercentage,isRecoveryMode);_requireTroveisNotActive(contractsCache.troveManager,msg.sender);vars.LUSDFee;vars.netDebt=_LUSDAmount;if(!isRecoveryMode){vars.LUSDFee=_triggerBorrowingFee(contractsCache.troveManager,contractsCache.lusdToken,_LUSDAmount,_maxFeePercentage);vars.netDebt=vars.netDebt.add(vars.LUSDFee);}_requireAtLeastMinNetDebt(vars.netDebt);vars.compositeDebt=_getCompositeDebt(vars.netDebt);assert(vars.compositeDebt>0);vars.ICR=LiquityMath._computeCR(msg.value,vars.compositeDebt,vars.price);vars.NICR=LiquityMath._computeNominalCR(msg.value,vars.compositeDebt);if(isRecoveryMode){_requireICRisAboveCCR(vars.ICR);}else{_requireICRisAboveMCR(vars.ICR);uintnewTCR=_getNewTCRFromTroveChange(msg.value,true,vars.compositeDebt,true,vars.price);_requireNewTCRisAboveCCR(newTCR);}contractsCache.troveManager.setTroveStatus(msg.sender,1);contractsCache.troveManager.increaseTroveColl(msg.sender,msg.value);contractsCache.troveManager.increaseTroveDebt(msg.sender,vars.compositeDebt);contractsCache.troveManager.updateTroveRewardSnapshots(msg.sender);vars.stake=contractsCache.troveManager.updateStakeAndTotalStakes(msg.sender);sortedTroves.insert(msg.sender,vars.NICR,_upperHint,_lowerHint);vars.arrayIndex=contractsCache.troveManager.addTroveOwnerToArray(msg.sender);emitTroveCreated(msg.sender,vars.arrayIndex);_activePoolAddColl(contractsCache.activePool,msg.value);_withdrawLUSD(contractsCache.activePool,contractsCache.lusdToken,msg.sender,_LUSDAmount,vars.netDebt);_withdrawLUSD(contractsCache.activePool,contractsCache.lusdToken,gasPoolAddress,LUSD_GAS_COMPENSATION,LUSD_GAS_COMPENSATION);emitTroveUpdated(msg.sender,vars.compositeDebt,msg.value,vars.stake,BorrowerOperation.openTrove);emitLUSDBorrowingFeePaid(msg.sender,vars.LUSDFee);}functionaddColl(address_upperHint,address_lowerHint)externalpayableoverride{_adjustTrove(msg.sender,0,0,false,_upperHint,_lowerHint,0);}functionmoveETHGainToTrove(address_borrower,address_upperHint,address_lowerHint)externalpayableoverride{_requireCallerIsStabilityPool();_adjustTrove(_borrower,0,0,false,_upperHint,_lowerHint,0);}functionwithdrawColl(uint_collWithdrawal,address_upperHint,address_lowerHint)externaloverride{_adjustTrove(msg.sender,_collWithdrawal,0,false,_upperHint,_lowerHint,0);}functionwithdrawLUSD(uint_maxFeePercentage,uint_LUSDAmount,address_upperHint,address_lowerHint)externaloverride{_adjustTrove(msg.sender,0,_LUSDAmount,true,_upperHint,_lowerHint,_maxFeePercentage);}functionrepayLUSD(uint_LUSDAmount,address_upperHint,address_lowerHint)externaloverride{_adjustTrove(msg.sender,0,_LUSDAmount,false,_upperHint,_lowerHint,0);}functionadjustTrove(uint_maxFeePercentage,uint_collWithdrawal,uint_LUSDChange,bool_isDebtIncrease,address_upperHint,address_lowerHint)externalpayableoverride{_adjustTrove(msg.sender,_collWithdrawal,_LUSDChange,_isDebtIncrease,_upperHint,_lowerHint,_maxFeePercentage);}function_adjustTrove(address_borrower,uint_collWithdrawal,uint_LUSDChange,bool_isDebtIncrease,address_upperHint,address_lowerHint,uint_maxFeePercentage)internal{ContractsCachememorycontractsCache=ContractsCache(troveManager,activePool,lusdToken);LocalVariables_adjustTrovememoryvars;vars.price=priceFeed.fetchPrice();boolisRecoveryMode=_checkRecoveryMode(vars.price);if(_isDebtIncrease){_requireValidMaxFeePercentage(_maxFeePercentage,isRecoveryMode);_requireNonZeroDebtChange(_LUSDChange);}_requireSingularCollChange(_collWithdrawal);_requireNonZeroAdjustment(_collWithdrawal,_LUSDChange);_requireTroveisActive(contractsCache.troveManager,_borrower);assert(msg.sender==_borrower||(msg.sender==stabilityPoolAddress&&msg.value>0&&_LUSDChange==0));contractsCache.troveManager.applyPendingRewards(_borrower);(vars.collChange,vars.isCollIncrease)=_getCollChange(msg.value,_collWithdrawal);vars.netDebtChange=_LUSDChange;if(_isDebtIncrease&&!isRecoveryMode){vars.LUSDFee=_triggerBorrowingFee(contractsCache.troveManager,contractsCache.lusdToken,_LUSDChange,_maxFeePercentage);vars.netDebtChange=vars.netDebtChange.add(vars.LUSDFee);}vars.debt=contractsCache.troveManager.getTroveDebt(_borrower);vars.coll=contractsCache.troveManager.getTroveColl(_borrower);vars.oldICR=LiquityMath._computeCR(vars.coll,vars.debt,vars.price);vars.newICR=_getNewICRFromTroveChange(vars.coll,vars.debt,vars.collChange,vars.isCollIncrease,vars.netDebtChange,_isDebtIncrease,vars.price);assert(_collWithdrawal<=vars.coll);_requireValidAdjustmentInCurrentMode(isRecoveryMode,_collWithdrawal,_isDebtIncrease,vars);if(!_isDebtIncrease&&_LUSDChange>0){_requireAtLeastMinNetDebt(_getNetDebt(vars.debt).sub(vars.netDebtChange));_requireValidLUSDRepayment(vars.debt,vars.netDebtChange);_requireSufficientLUSDBalance(contractsCache.lusdToken,_borrower,vars.netDebtChange);}(vars.newColl,vars.newDebt)=_updateTroveFromAdjustment(contractsCache.troveManager,_borrower,vars.collChange,vars.isCollIncrease,vars.netDebtChange,_isDebtIncrease);vars.stake=contractsCache.troveManager.updateStakeAndTotalStakes(_borrower);uintnewNICR=_getNewNominalICRFromTroveChange(vars.coll,vars.debt,vars.collChange,vars.isCollIncrease,vars.netDebtChange,_isDebtIncrease);sortedTroves.reInsert(_borrower,newNICR,_upperHint,_lowerHint);emitTroveUpdated(_borrower,vars.newDebt,vars.newColl,vars.stake,BorrowerOperation.adjustTrove);emitLUSDBorrowingFeePaid(msg.sender,vars.LUSDFee);_moveTokensAndETHfromAdjustment(contractsCache.activePool,contractsCache.lusdToken,msg.sender,vars.collChange,vars.isCollIncrease,_LUSDChange,_isDebtIncrease,vars.netDebtChange);}functioncloseTrove()externaloverride{ITroveManagertroveManagerCached=troveManager;IActivePoolactivePoolCached=activePool;ILUSDTokenlusdTokenCached=lusdToken;_requireTroveisActive(troveManagerCached,msg.sender);uintprice=priceFeed.fetchPrice();_requireNotInRecoveryMode(price);troveManagerCached.applyPendingRewards(msg.sender);uintcoll=troveManagerCached.getTroveColl(msg.sender);uintdebt=troveManagerCached.getTroveDebt(msg.sender);_requireSufficientLUSDBalance(lusdTokenCached,msg.sender,debt.sub(LUSD_GAS_COMPENSATION));uintnewTCR=_getNewTCRFromTroveChange(coll,false,debt,false,price);_requireNewTCRisAboveCCR(newTCR);troveManagerCached.removeStake(msg.sender);troveManagerCached.closeTrove(msg.sender);emitTroveUpdated(msg.sender,0,0,0,BorrowerOperation.closeTrove);_repayLUSD(activePoolCached,lusdTokenCached,msg.sender,debt.sub(LUSD_GAS_COMPENSATION));_repayLUSD(activePoolCached,lusdTokenCached,gasPoolAddress,LUSD_GAS_COMPENSATION);activePoolCached.sendETH(msg.sender,coll);}functionclaimCollateral()externaloverride{collSurplusPool.claimColl(msg.sender);}function_triggerBorrowingFee(ITroveManager_troveManager,ILUSDToken_lusdToken,uint_LUSDAmount,uint_maxFeePercentage)internalreturns(uint){_troveManager.decayBaseRateFromBorrowing();uintLUSDFee=_troveManager.getBorrowingFee(_LUSDAmount);_requireUserAcceptsFee(LUSDFee,_LUSDAmount,_maxFeePercentage);lqtyStaking.increaseF_LUSD(LUSDFee);_lusdToken.mint(lqtyStakingAddress,LUSDFee);returnLUSDFee;}function_getUSDValue(uint_coll,uint_price)internalpurereturns(uint){uintusdValue=_price.mul(_coll).div(DECIMAL_PRECISION);returnusdValue;}function_getCollChange(uint_collReceived,uint_requestedCollWithdrawal)internalpurereturns(uintcollChange,boolisCollIncrease){if(_collReceived!=0){collChange=_collReceived;isCollIncrease=true;}else{collChange=_requestedCollWithdrawal;}}function_updateTroveFromAdjustment(ITroveManager_troveManager,address_borrower,uint_collChange,bool_isCollIncrease,uint_debtChange,bool_isDebtIncrease)internalreturns(uint,uint){uintnewColl=(_isCollIncrease)?_troveManager.increaseTroveColl(_borrower,_collChange):_troveManager.decreaseTroveColl(_borrower,_collChange);uintnewDebt=(_isDebtIncrease)?_troveManager.increaseTroveDebt(_borrower,_debtChange):_troveManager.decreaseTroveDebt(_borrower,_debtChange);return(newColl,newDebt);}function_moveTokensAndETHfromAdjustment(IActivePool_activePool,ILUSDToken_lusdToken,address_borrower,uint_collChange,bool_isCollIncrease,uint_LUSDChange,bool_isDebtIncrease,uint_netDebtChange)internal{if(_isDebtIncrease){_withdrawLUSD(_activePool,_lusdToken,_borrower,_LUSDChange,_netDebtChange);}else{_repayLUSD(_activePool,_lusdToken,_borrower,_LUSDChange);}if(_isCollIncrease){_activePoolAddColl(_activePool,_collChange);}else{_activePool.sendETH(_borrower,_collChange);}}function_activePoolAddColl(IActivePool_activePool,uint_amount)internal{(boolsuccess,)=address(_activePool).call<missing ';'>{value:_amount}("");require(success,"BorrowerOps: Sending ETH to ActivePool failed");}function_withdrawLUSD(IActivePool_activePool,ILUSDToken_lusdToken,address_account,uint_LUSDAmount,uint_netDebtIncrease)internal{_activePool.increaseLUSDDebt(_netDebtIncrease);_lusdToken.mint(_account,_LUSDAmount);}function_repayLUSD(IActivePool_activePool,ILUSDToken_lusdToken,address_account,uint_LUSD)internal{_activePool.decreaseLUSDDebt(_LUSD);_lusdToken.burn(_account,_LUSD);}function_requireSingularCollChange(uint_collWithdrawal)internalview{require(msg.value==0||_collWithdrawal==0,"BorrowerOperations: Cannot withdraw and add coll");}function_requireCallerIsBorrower(address_borrower)internalview{require(msg.sender==_borrower,"BorrowerOps: Caller must be the borrower for a withdrawal");}function_requireNonZeroAdjustment(uint_collWithdrawal,uint_LUSDChange)internalview{require(msg.value!=0||_collWithdrawal!=0||_LUSDChange!=0,"BorrowerOps: There must be either a collateral change or a debt change");}function_requireTroveisActive(ITroveManager_troveManager,address_borrower)internalview{uintstatus=_troveManager.getTroveStatus(_borrower);require(status==1,"BorrowerOps: Trove does not exist or is closed");}function_requireTroveisNotActive(ITroveManager_troveManager,address_borrower)internalview{uintstatus=_troveManager.getTroveStatus(_borrower);require(status!=1,"BorrowerOps: Trove is active");}function_requireNonZeroDebtChange(uint_LUSDChange)internalpure{require(_LUSDChange>0,"BorrowerOps: Debt increase requires non-zero debtChange");}function_requireNotInRecoveryMode(uint_price)internalview{require(!_checkRecoveryMode(_price),"BorrowerOps: Operation not permitted during Recovery Mode");}function_requireNoCollWithdrawal(uint_collWithdrawal)internalpure{require(_collWithdrawal==0,"BorrowerOps: Collateral withdrawal not permitted Recovery Mode");}function_requireValidAdjustmentInCurrentMode(bool_isRecoveryMode,uint_collWithdrawal,bool_isDebtIncrease,LocalVariables_adjustTrovememory_vars)internalview{if(_isRecoveryMode){_requireNoCollWithdrawal(_collWithdrawal);if(_isDebtIncrease){_requireICRisAboveCCR(_vars.newICR);_requireNewICRisAboveOldICR(_vars.newICR,_vars.oldICR);}}else{_requireICRisAboveMCR(_vars.newICR);_vars.newTCR=_getNewTCRFromTroveChange(_vars.collChange,_vars.isCollIncrease,_vars.netDebtChange,_isDebtIncrease,_vars.price);_requireNewTCRisAboveCCR(_vars.newTCR);}}function_requireICRisAboveMCR(uint_newICR)internalpure{require(_newICR>=MCR,"BorrowerOps: An operation that would result in ICR < MCR is not permitted");}function_requireICRisAboveCCR(uint_newICR)internalpure{require(_newICR>=CCR,"BorrowerOps: Operation must leave trove with ICR >= CCR");}function_requireNewICRisAboveOldICR(uint_newICR,uint_oldICR)internalpure{require(_newICR>=_oldICR,"BorrowerOps: Cannot decrease your Trove's ICR in Recovery Mode");}function_requireNewTCRisAboveCCR(uint_newTCR)internalpure{require(_newTCR>=CCR,"BorrowerOps: An operation that would result in TCR < CCR is not permitted");}function_requireAtLeastMinNetDebt(uint_netDebt)internalpure{require(_netDebt>=MIN_NET_DEBT,"BorrowerOps: Trove's net debt must be greater than minimum");}function_requireValidLUSDRepayment(uint_currentDebt,uint_debtRepayment)internalpure{require(_debtRepayment<=_currentDebt.sub(LUSD_GAS_COMPENSATION),"BorrowerOps: Amount repaid must not be larger than the Trove's debt");}function_requireCallerIsStabilityPool()internalview{require(msg.sender==stabilityPoolAddress,"BorrowerOps: Caller is not Stability Pool");}function_requireSufficientLUSDBalance(ILUSDToken_lusdToken,address_borrower,uint_debtRepayment)internalview{require(_lusdToken.balanceOf(_borrower)>=_debtRepayment,"BorrowerOps: Caller doesnt have enough LUSD to make repayment");}function_requireValidMaxFeePercentage(uint_maxFeePercentage,bool_isRecoveryMode)internalpure{if(_isRecoveryMode){require(_maxFeePercentage<=DECIMAL_PRECISION,"Max fee percentage must less than or equal to 100%");}else{require(_maxFeePercentage>=BORROWING_FEE_FLOOR&&_maxFeePercentage<=DECIMAL_PRECISION,"Max fee percentage must be between 0.5% and 100%");}}function_getNewNominalICRFromTroveChange(uint_coll,uint_debt,uint_collChange,bool_isCollIncrease,uint_debtChange,bool_isDebtIncrease)pureinternalreturns(uint){(uintnewColl,uintnewDebt)=_getNewTroveAmounts(_coll,_debt,_collChange,_isCollIncrease,_debtChange,_isDebtIncrease);uintnewNICR=LiquityMath._computeNominalCR(newColl,newDebt);returnnewNICR;}function_getNewICRFromTroveChange(uint_coll,uint_debt,uint_collChange,bool_isCollIncrease,uint_debtChange,bool_isDebtIncrease,uint_price)pureinternalreturns(uint){(uintnewColl,uintnewDebt)=_getNewTroveAmounts(_coll,_debt,_collChange,_isCollIncrease,_debtChange,_isDebtIncrease);uintnewICR=LiquityMath._computeCR(newColl,newDebt,_price);returnnewICR;}function_getNewTroveAmounts(uint_coll,uint_debt,uint_collChange,bool_isCollIncrease,uint_debtChange,bool_isDebtIncrease)internalpurereturns(uint,uint){uintnewColl=_coll;uintnewDebt=_debt;newColl=_isCollIncrease?_coll.add(_collChange):_coll.sub(_collChange);newDebt=_isDebtIncrease?_debt.add(_debtChange):_debt.sub(_debtChange);return(newColl,newDebt);}function_getNewTCRFromTroveChange(uint_collChange,bool_isCollIncrease,uint_debtChange,bool_isDebtIncrease,uint_price)internalviewreturns(uint){uinttotalColl=getEntireSystemColl();uinttotalDebt=getEntireSystemDebt();totalColl=_isCollIncrease?totalColl.add(_collChange):totalColl.sub(_collChange);totalDebt=_isDebtIncrease?totalDebt.add(_debtChange):totalDebt.sub(_debtChange);uintnewTCR=LiquityMath._computeCR(totalColl,totalDebt,_price);returnnewTCR;}functiongetCompositeDebt(uint_debt)externalpureoverridereturns(uint){return_getCompositeDebt(_debt);}}
+
+ruleId: SOLIDITY_MSGVALUE_EQUALS_ZERO
+patternId: 1df89a
+severity: 1
+line: 3519
+column: 16
+content: msg.value==0
+
+ruleId: SOLIDITY_OVERPOWERED_ROLE
+patternId: j83hf7
+severity: 2
+line: 3150
+column: 4
+content: functionsetAddresses(address_troveManagerAddress,address_activePoolAddress,address_defaultPoolAddress,address_stabilityPoolAddress,address_gasPoolAddress,address_collSurplusPoolAddress,address_priceFeedAddress,address_sortedTrovesAddress,address_lusdTokenAddress,address_lqtyStakingAddress)externaloverrideonlyOwner{assert(MIN_NET_DEBT>0);checkContract(_troveManagerAddress);checkContract(_activePoolAddress);checkContract(_defaultPoolAddress);checkContract(_stabilityPoolAddress);checkContract(_gasPoolAddress);checkContract(_collSurplusPoolAddress);checkContract(_priceFeedAddress);checkContract(_sortedTrovesAddress);checkContract(_lusdTokenAddress);checkContract(_lqtyStakingAddress);troveManager=ITroveManager(_troveManagerAddress);activePool=IActivePool(_activePoolAddress);defaultPool=IDefaultPool(_defaultPoolAddress);stabilityPoolAddress=_stabilityPoolAddress;gasPoolAddress=_gasPoolAddress;collSurplusPool=ICollSurplusPool(_collSurplusPoolAddress);priceFeed=IPriceFeed(_priceFeedAddress);sortedTroves=ISortedTroves(_sortedTrovesAddress);lusdToken=ILUSDToken(_lusdTokenAddress);lqtyStakingAddress=_lqtyStakingAddress;lqtyStaking=ILQTYStaking(_lqtyStakingAddress);emitTroveManagerAddressChanged(_troveManagerAddress);emitActivePoolAddressChanged(_activePoolAddress);emitDefaultPoolAddressChanged(_defaultPoolAddress);emitStabilityPoolAddressChanged(_stabilityPoolAddress);emitGasPoolAddressChanged(_gasPoolAddress);emitCollSurplusPoolAddressChanged(_collSurplusPoolAddress);emitPriceFeedAddressChanged(_priceFeedAddress);emitSortedTrovesAddressChanged(_sortedTrovesAddress);emitLUSDTokenAddressChanged(_lusdTokenAddress);emitLQTYStakingAddressChanged(_lqtyStakingAddress);_renounceOwnership();}
+
+ruleId: SOLIDITY_PRIVATE_MODIFIER_DONT_HIDE_DATA
+patternId: 5616b2
+severity: 1
+line: 3004
+column: 12
+content: private
+
+ruleId: SOLIDITY_SAFEMATH
+patternId: 837cac
+severity: 1
+line: 2758
+column: 4
+content: usingSafeMathforuint;
+
+ruleId: SOLIDITY_SAFEMATH
+patternId: 837cac
+severity: 1
+line: 2913
+column: 4
+content: usingSafeMathforuint;
+
+ruleId: SOLIDITY_SHOULD_NOT_BE_VIEW
+patternId: 189abf
+severity: 1
+line: 3059
+column: 4
+content: functioncheckContract(address_account)internalview{require(_account!=address(0),"Account cannot be zero address");uint256size;assembly{size:=extcodesize(_account)}require(size>0,"Account code size cannot be zero");}
+
+ruleId: SOLIDITY_SHOULD_RETURN_STRUCT
+patternId: 83hf3l
+severity: 1
+line: 573
+column: 75
+content: (uintdebt,uintcoll,uintpendingLUSDDebtReward,uintpendingETHReward)
+
+ruleId: SOLIDITY_SHOULD_RETURN_STRUCT
+patternId: 83hf3l
+severity: 1
+line: 688
+column: 102
+content: (address,address)
+
+ruleId: SOLIDITY_SHOULD_RETURN_STRUCT
+patternId: 83hf3l
+severity: 1
+line: 3441
+column: 15
+content: (uintcollChange,boolisCollIncrease)
+
+ruleId: SOLIDITY_SHOULD_RETURN_STRUCT
+patternId: 83hf3l
+severity: 1
+line: 3462
+column: 16
+content: (uint,uint)
+
+ruleId: SOLIDITY_SHOULD_RETURN_STRUCT
+patternId: 83hf3l
+severity: 1
+line: 3683
+column: 16
+content: (uint,uint)
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 858
+column: 37
+content: staticcall(abi.encodeWithSignature("log()"))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 861
+column: 37
+content: staticcall(abi.encodeWithSignature("log(int)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 866
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 871
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 876
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 881
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 886
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 891
+column: 37
+content: staticcall(abi.encodeWithSignature("log(byte)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 896
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes1)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 901
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes2)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 906
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes3)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 911
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes4)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 916
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes5)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 921
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes6)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 926
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes7)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 931
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes8)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 936
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes9)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 941
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes10)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 946
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes11)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 951
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes12)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 956
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes13)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 961
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes14)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 966
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes15)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 971
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes16)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 976
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes17)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 981
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes18)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 986
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes19)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 991
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes20)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 996
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes21)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1001
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes22)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1006
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes23)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1011
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes24)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1016
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes25)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1021
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes26)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1026
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes27)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1031
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes28)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1036
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes29)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1041
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes30)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1046
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes31)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1051
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bytes32)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1056
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1061
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1066
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1071
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address)",p0))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1076
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,uint)",p0,p1))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1081
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,string)",p0,p1))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1086
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,bool)",p0,p1))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1091
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,address)",p0,p1))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1096
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,uint)",p0,p1))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1101
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,string)",p0,p1))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1106
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,bool)",p0,p1))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1111
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,address)",p0,p1))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1116
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,uint)",p0,p1))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1121
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,string)",p0,p1))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1126
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,bool)",p0,p1))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1131
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,address)",p0,p1))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1136
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,uint)",p0,p1))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1141
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,string)",p0,p1))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1146
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,bool)",p0,p1))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1151
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,address)",p0,p1))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1156
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,uint,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1161
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,uint,string)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1166
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,uint,bool)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1171
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,uint,address)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1176
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,string,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1181
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,string,string)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1186
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,string,bool)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1191
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,string,address)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1196
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,bool,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1201
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,bool,string)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1206
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,bool,bool)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1211
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,bool,address)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1216
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,address,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1221
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,address,string)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1226
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,address,bool)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1231
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,address,address)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1236
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,uint,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1241
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,uint,string)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1246
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,uint,bool)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1251
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,uint,address)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1256
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,string,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1261
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,string,string)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1266
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,string,bool)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1271
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,string,address)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1276
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,bool,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1281
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,bool,string)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1286
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,bool,bool)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1291
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,bool,address)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1296
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,address,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1301
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,address,string)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1306
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,address,bool)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1311
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,address,address)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1316
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,uint,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1321
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,uint,string)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1326
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,uint,bool)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1331
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,uint,address)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1336
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,string,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1341
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,string,string)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1346
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,string,bool)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1351
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,string,address)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1356
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,bool,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1361
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,bool,string)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1366
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,bool,bool)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1371
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,bool,address)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1376
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,address,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1381
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,address,string)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1386
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,address,bool)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1391
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,address,address)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1396
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,uint,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1401
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,uint,string)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1406
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,uint,bool)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1411
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,uint,address)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1416
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,string,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1421
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,string,string)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1426
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,string,bool)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1431
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,string,address)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1436
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,bool,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1441
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,bool,string)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1446
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,bool,bool)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1451
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,bool,address)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1456
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,address,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1461
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,address,string)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1466
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,address,bool)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1471
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,address,address)",p0,p1,p2))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1476
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,uint,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1481
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,uint,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1486
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,uint,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1491
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,uint,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1496
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,uint,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1501
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,uint,string,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1506
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,uint,string,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1511
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,uint,string,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1516
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,uint,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1521
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,uint,bool,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1526
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,uint,bool,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1531
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,uint,bool,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1536
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,uint,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1541
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,uint,address,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1546
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,uint,address,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1551
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,uint,address,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1556
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,string,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1561
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,string,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1566
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,string,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1571
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,string,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1576
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,string,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1581
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,string,string,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1586
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,string,string,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1591
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,string,string,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1596
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,string,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1601
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,string,bool,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1606
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,string,bool,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1611
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,string,bool,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1616
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,string,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1621
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,string,address,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1626
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,string,address,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1631
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,string,address,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1636
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,bool,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1641
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,bool,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1646
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,bool,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1651
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,bool,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1656
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,bool,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1661
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,bool,string,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1666
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,bool,string,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1671
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,bool,string,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1676
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,bool,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1681
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,bool,bool,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1686
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,bool,bool,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1691
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,bool,bool,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1696
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,bool,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1701
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,bool,address,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1706
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,bool,address,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1711
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,bool,address,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1716
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,address,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1721
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,address,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1726
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,address,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1731
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,address,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1736
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,address,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1741
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,address,string,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1746
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,address,string,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1751
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,address,string,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1756
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,address,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1761
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,address,bool,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1766
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,address,bool,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1771
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,address,bool,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1776
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,address,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1781
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,address,address,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1786
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,address,address,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1791
+column: 37
+content: staticcall(abi.encodeWithSignature("log(uint,address,address,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1796
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,uint,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1801
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,uint,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1806
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,uint,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1811
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,uint,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1816
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,uint,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1821
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,uint,string,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1826
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,uint,string,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1831
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,uint,string,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1836
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,uint,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1841
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,uint,bool,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1846
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,uint,bool,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1851
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,uint,bool,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1856
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,uint,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1861
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,uint,address,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1866
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,uint,address,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1871
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,uint,address,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1876
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,string,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1881
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,string,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1886
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,string,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1891
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,string,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1896
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,string,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1901
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,string,string,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1906
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,string,string,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1911
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,string,string,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1916
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,string,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1921
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,string,bool,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1926
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,string,bool,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1931
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,string,bool,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1936
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,string,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1941
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,string,address,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1946
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,string,address,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1951
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,string,address,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1956
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,bool,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1961
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,bool,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1966
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,bool,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1971
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,bool,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1976
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,bool,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1981
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,bool,string,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1986
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,bool,string,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1991
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,bool,string,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 1996
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,bool,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2001
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,bool,bool,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2006
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,bool,bool,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2011
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,bool,bool,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2016
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,bool,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2021
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,bool,address,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2026
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,bool,address,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2031
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,bool,address,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2036
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,address,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2041
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,address,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2046
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,address,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2051
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,address,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2056
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,address,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2061
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,address,string,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2066
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,address,string,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2071
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,address,string,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2076
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,address,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2081
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,address,bool,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2086
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,address,bool,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2091
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,address,bool,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2096
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,address,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2101
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,address,address,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2106
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,address,address,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2111
+column: 37
+content: staticcall(abi.encodeWithSignature("log(string,address,address,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2116
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,uint,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2121
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,uint,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2126
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,uint,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2131
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,uint,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2136
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,uint,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2141
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,uint,string,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2146
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,uint,string,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2151
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,uint,string,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2156
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,uint,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2161
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,uint,bool,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2166
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,uint,bool,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2171
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,uint,bool,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2176
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,uint,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2181
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,uint,address,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2186
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,uint,address,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2191
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,uint,address,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2196
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,string,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2201
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,string,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2206
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,string,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2211
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,string,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2216
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,string,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2221
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,string,string,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2226
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,string,string,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2231
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,string,string,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2236
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,string,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2241
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,string,bool,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2246
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,string,bool,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2251
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,string,bool,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2256
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,string,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2261
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,string,address,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2266
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,string,address,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2271
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,string,address,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2276
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,bool,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2281
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,bool,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2286
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,bool,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2291
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,bool,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2296
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,bool,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2301
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,bool,string,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2306
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,bool,string,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2311
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,bool,string,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2316
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,bool,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2321
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,bool,bool,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2326
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,bool,bool,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2331
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,bool,bool,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2336
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,bool,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2341
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,bool,address,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2346
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,bool,address,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2351
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,bool,address,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2356
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,address,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2361
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,address,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2366
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,address,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2371
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,address,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2376
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,address,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2381
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,address,string,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2386
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,address,string,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2391
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,address,string,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2396
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,address,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2401
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,address,bool,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2406
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,address,bool,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2411
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,address,bool,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2416
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,address,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2421
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,address,address,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2426
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,address,address,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2431
+column: 37
+content: staticcall(abi.encodeWithSignature("log(bool,address,address,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2436
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,uint,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2441
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,uint,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2446
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,uint,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2451
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,uint,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2456
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,uint,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2461
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,uint,string,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2466
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,uint,string,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2471
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,uint,string,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2476
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,uint,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2481
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,uint,bool,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2486
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,uint,bool,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2491
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,uint,bool,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2496
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,uint,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2501
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,uint,address,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2506
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,uint,address,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2511
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,uint,address,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2516
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,string,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2521
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,string,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2526
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,string,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2531
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,string,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2536
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,string,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2541
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,string,string,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2546
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,string,string,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2551
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,string,string,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2556
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,string,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2561
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,string,bool,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2566
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,string,bool,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2571
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,string,bool,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2576
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,string,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2581
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,string,address,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2586
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,string,address,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2591
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,string,address,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2596
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,bool,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2601
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,bool,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2606
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,bool,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2611
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,bool,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2616
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,bool,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2621
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,bool,string,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2626
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,bool,string,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2631
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,bool,string,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2636
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,bool,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2641
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,bool,bool,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2646
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,bool,bool,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2651
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,bool,bool,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2656
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,bool,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2661
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,bool,address,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2666
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,bool,address,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2671
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,bool,address,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2676
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,address,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2681
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,address,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2686
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,address,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2691
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,address,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2696
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,address,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2701
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,address,string,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2706
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,address,string,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2711
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,address,string,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2716
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,address,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2721
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,address,bool,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2726
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,address,bool,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2731
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,address,bool,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2736
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,address,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2741
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,address,address,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2746
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,address,address,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 2751
+column: 37
+content: staticcall(abi.encodeWithSignature("log(address,address,address,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_UNCHECKED_CALL
+patternId: f39eed
+severity: 3
+line: 3403
+column: 25
+content: sendETH(msg.sender,coll)
+
+ruleId: SOLIDITY_VISIBILITY
+patternId: b51ce0
+severity: 1
+line: 855
+column: 1
+content: addressconstantCONSOLE_ADDRESS=address(0x000000000000000000636F6e736F6c652e6c6f67);
+
+ruleId: SOLIDITY_VISIBILITY
+patternId: b51ce0
+severity: 1
+line: 3075
+column: 4
+content: addressstabilityPoolAddress;
+
+ruleId: SOLIDITY_VISIBILITY
+patternId: b51ce0
+severity: 1
+line: 3077
+column: 4
+content: addressgasPoolAddress;
+
+ruleId: SOLIDITY_VISIBILITY
+patternId: b51ce0
+severity: 1
+line: 3079
+column: 4
+content: ICollSurplusPoolcollSurplusPool;
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 861
+column: 47
+content: (abi.encodeWithSignature("log(int)",p0))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 866
+column: 47
+content: (abi.encodeWithSignature("log(uint)",p0))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1056
+column: 47
+content: (abi.encodeWithSignature("log(uint)",p0))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1076
+column: 47
+content: (abi.encodeWithSignature("log(uint,uint)",p0,p1))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1081
+column: 47
+content: (abi.encodeWithSignature("log(uint,string)",p0,p1))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1086
+column: 47
+content: (abi.encodeWithSignature("log(uint,bool)",p0,p1))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1091
+column: 47
+content: (abi.encodeWithSignature("log(uint,address)",p0,p1))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1096
+column: 47
+content: (abi.encodeWithSignature("log(string,uint)",p0,p1))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1116
+column: 47
+content: (abi.encodeWithSignature("log(bool,uint)",p0,p1))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1136
+column: 47
+content: (abi.encodeWithSignature("log(address,uint)",p0,p1))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1156
+column: 47
+content: (abi.encodeWithSignature("log(uint,uint,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1161
+column: 47
+content: (abi.encodeWithSignature("log(uint,uint,string)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1166
+column: 47
+content: (abi.encodeWithSignature("log(uint,uint,bool)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1171
+column: 47
+content: (abi.encodeWithSignature("log(uint,uint,address)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1176
+column: 47
+content: (abi.encodeWithSignature("log(uint,string,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1181
+column: 47
+content: (abi.encodeWithSignature("log(uint,string,string)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1186
+column: 47
+content: (abi.encodeWithSignature("log(uint,string,bool)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1191
+column: 47
+content: (abi.encodeWithSignature("log(uint,string,address)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1196
+column: 47
+content: (abi.encodeWithSignature("log(uint,bool,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1201
+column: 47
+content: (abi.encodeWithSignature("log(uint,bool,string)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1206
+column: 47
+content: (abi.encodeWithSignature("log(uint,bool,bool)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1211
+column: 47
+content: (abi.encodeWithSignature("log(uint,bool,address)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1216
+column: 47
+content: (abi.encodeWithSignature("log(uint,address,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1221
+column: 47
+content: (abi.encodeWithSignature("log(uint,address,string)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1226
+column: 47
+content: (abi.encodeWithSignature("log(uint,address,bool)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1231
+column: 47
+content: (abi.encodeWithSignature("log(uint,address,address)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1236
+column: 47
+content: (abi.encodeWithSignature("log(string,uint,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1241
+column: 47
+content: (abi.encodeWithSignature("log(string,uint,string)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1246
+column: 47
+content: (abi.encodeWithSignature("log(string,uint,bool)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1251
+column: 47
+content: (abi.encodeWithSignature("log(string,uint,address)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1256
+column: 47
+content: (abi.encodeWithSignature("log(string,string,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1276
+column: 47
+content: (abi.encodeWithSignature("log(string,bool,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1296
+column: 47
+content: (abi.encodeWithSignature("log(string,address,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1316
+column: 47
+content: (abi.encodeWithSignature("log(bool,uint,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1321
+column: 47
+content: (abi.encodeWithSignature("log(bool,uint,string)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1326
+column: 47
+content: (abi.encodeWithSignature("log(bool,uint,bool)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1331
+column: 47
+content: (abi.encodeWithSignature("log(bool,uint,address)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1336
+column: 47
+content: (abi.encodeWithSignature("log(bool,string,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1356
+column: 47
+content: (abi.encodeWithSignature("log(bool,bool,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1376
+column: 47
+content: (abi.encodeWithSignature("log(bool,address,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1396
+column: 47
+content: (abi.encodeWithSignature("log(address,uint,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1401
+column: 47
+content: (abi.encodeWithSignature("log(address,uint,string)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1406
+column: 47
+content: (abi.encodeWithSignature("log(address,uint,bool)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1411
+column: 47
+content: (abi.encodeWithSignature("log(address,uint,address)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1416
+column: 47
+content: (abi.encodeWithSignature("log(address,string,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1436
+column: 47
+content: (abi.encodeWithSignature("log(address,bool,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1456
+column: 47
+content: (abi.encodeWithSignature("log(address,address,uint)",p0,p1,p2))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1476
+column: 47
+content: (abi.encodeWithSignature("log(uint,uint,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1481
+column: 47
+content: (abi.encodeWithSignature("log(uint,uint,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1486
+column: 47
+content: (abi.encodeWithSignature("log(uint,uint,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1491
+column: 47
+content: (abi.encodeWithSignature("log(uint,uint,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1496
+column: 47
+content: (abi.encodeWithSignature("log(uint,uint,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1501
+column: 47
+content: (abi.encodeWithSignature("log(uint,uint,string,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1506
+column: 47
+content: (abi.encodeWithSignature("log(uint,uint,string,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1511
+column: 47
+content: (abi.encodeWithSignature("log(uint,uint,string,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1516
+column: 47
+content: (abi.encodeWithSignature("log(uint,uint,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1521
+column: 47
+content: (abi.encodeWithSignature("log(uint,uint,bool,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1526
+column: 47
+content: (abi.encodeWithSignature("log(uint,uint,bool,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1531
+column: 47
+content: (abi.encodeWithSignature("log(uint,uint,bool,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1536
+column: 47
+content: (abi.encodeWithSignature("log(uint,uint,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1541
+column: 47
+content: (abi.encodeWithSignature("log(uint,uint,address,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1546
+column: 47
+content: (abi.encodeWithSignature("log(uint,uint,address,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1551
+column: 47
+content: (abi.encodeWithSignature("log(uint,uint,address,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1556
+column: 47
+content: (abi.encodeWithSignature("log(uint,string,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1561
+column: 47
+content: (abi.encodeWithSignature("log(uint,string,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1566
+column: 47
+content: (abi.encodeWithSignature("log(uint,string,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1571
+column: 47
+content: (abi.encodeWithSignature("log(uint,string,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1576
+column: 47
+content: (abi.encodeWithSignature("log(uint,string,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1581
+column: 47
+content: (abi.encodeWithSignature("log(uint,string,string,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1586
+column: 47
+content: (abi.encodeWithSignature("log(uint,string,string,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1591
+column: 47
+content: (abi.encodeWithSignature("log(uint,string,string,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1596
+column: 47
+content: (abi.encodeWithSignature("log(uint,string,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1601
+column: 47
+content: (abi.encodeWithSignature("log(uint,string,bool,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1606
+column: 47
+content: (abi.encodeWithSignature("log(uint,string,bool,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1611
+column: 47
+content: (abi.encodeWithSignature("log(uint,string,bool,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1616
+column: 47
+content: (abi.encodeWithSignature("log(uint,string,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1621
+column: 47
+content: (abi.encodeWithSignature("log(uint,string,address,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1626
+column: 47
+content: (abi.encodeWithSignature("log(uint,string,address,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1631
+column: 47
+content: (abi.encodeWithSignature("log(uint,string,address,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1636
+column: 47
+content: (abi.encodeWithSignature("log(uint,bool,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1641
+column: 47
+content: (abi.encodeWithSignature("log(uint,bool,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1646
+column: 47
+content: (abi.encodeWithSignature("log(uint,bool,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1651
+column: 47
+content: (abi.encodeWithSignature("log(uint,bool,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1656
+column: 47
+content: (abi.encodeWithSignature("log(uint,bool,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1661
+column: 47
+content: (abi.encodeWithSignature("log(uint,bool,string,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1666
+column: 47
+content: (abi.encodeWithSignature("log(uint,bool,string,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1671
+column: 47
+content: (abi.encodeWithSignature("log(uint,bool,string,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1676
+column: 47
+content: (abi.encodeWithSignature("log(uint,bool,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1681
+column: 47
+content: (abi.encodeWithSignature("log(uint,bool,bool,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1686
+column: 47
+content: (abi.encodeWithSignature("log(uint,bool,bool,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1691
+column: 47
+content: (abi.encodeWithSignature("log(uint,bool,bool,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1696
+column: 47
+content: (abi.encodeWithSignature("log(uint,bool,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1701
+column: 47
+content: (abi.encodeWithSignature("log(uint,bool,address,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1706
+column: 47
+content: (abi.encodeWithSignature("log(uint,bool,address,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1711
+column: 47
+content: (abi.encodeWithSignature("log(uint,bool,address,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1716
+column: 47
+content: (abi.encodeWithSignature("log(uint,address,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1721
+column: 47
+content: (abi.encodeWithSignature("log(uint,address,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1726
+column: 47
+content: (abi.encodeWithSignature("log(uint,address,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1731
+column: 47
+content: (abi.encodeWithSignature("log(uint,address,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1736
+column: 47
+content: (abi.encodeWithSignature("log(uint,address,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1741
+column: 47
+content: (abi.encodeWithSignature("log(uint,address,string,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1746
+column: 47
+content: (abi.encodeWithSignature("log(uint,address,string,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1751
+column: 47
+content: (abi.encodeWithSignature("log(uint,address,string,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1756
+column: 47
+content: (abi.encodeWithSignature("log(uint,address,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1761
+column: 47
+content: (abi.encodeWithSignature("log(uint,address,bool,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1766
+column: 47
+content: (abi.encodeWithSignature("log(uint,address,bool,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1771
+column: 47
+content: (abi.encodeWithSignature("log(uint,address,bool,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1776
+column: 47
+content: (abi.encodeWithSignature("log(uint,address,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1781
+column: 47
+content: (abi.encodeWithSignature("log(uint,address,address,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1786
+column: 47
+content: (abi.encodeWithSignature("log(uint,address,address,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1791
+column: 47
+content: (abi.encodeWithSignature("log(uint,address,address,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1796
+column: 47
+content: (abi.encodeWithSignature("log(string,uint,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1801
+column: 47
+content: (abi.encodeWithSignature("log(string,uint,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1806
+column: 47
+content: (abi.encodeWithSignature("log(string,uint,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1811
+column: 47
+content: (abi.encodeWithSignature("log(string,uint,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1816
+column: 47
+content: (abi.encodeWithSignature("log(string,uint,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1821
+column: 47
+content: (abi.encodeWithSignature("log(string,uint,string,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1826
+column: 47
+content: (abi.encodeWithSignature("log(string,uint,string,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1831
+column: 47
+content: (abi.encodeWithSignature("log(string,uint,string,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1836
+column: 47
+content: (abi.encodeWithSignature("log(string,uint,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1841
+column: 47
+content: (abi.encodeWithSignature("log(string,uint,bool,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1846
+column: 47
+content: (abi.encodeWithSignature("log(string,uint,bool,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1851
+column: 47
+content: (abi.encodeWithSignature("log(string,uint,bool,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1856
+column: 47
+content: (abi.encodeWithSignature("log(string,uint,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1861
+column: 47
+content: (abi.encodeWithSignature("log(string,uint,address,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1866
+column: 47
+content: (abi.encodeWithSignature("log(string,uint,address,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1871
+column: 47
+content: (abi.encodeWithSignature("log(string,uint,address,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1876
+column: 47
+content: (abi.encodeWithSignature("log(string,string,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1881
+column: 47
+content: (abi.encodeWithSignature("log(string,string,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1886
+column: 47
+content: (abi.encodeWithSignature("log(string,string,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1891
+column: 47
+content: (abi.encodeWithSignature("log(string,string,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1896
+column: 47
+content: (abi.encodeWithSignature("log(string,string,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1916
+column: 47
+content: (abi.encodeWithSignature("log(string,string,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1936
+column: 47
+content: (abi.encodeWithSignature("log(string,string,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1956
+column: 47
+content: (abi.encodeWithSignature("log(string,bool,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1961
+column: 47
+content: (abi.encodeWithSignature("log(string,bool,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1966
+column: 47
+content: (abi.encodeWithSignature("log(string,bool,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1971
+column: 47
+content: (abi.encodeWithSignature("log(string,bool,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1976
+column: 47
+content: (abi.encodeWithSignature("log(string,bool,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 1996
+column: 47
+content: (abi.encodeWithSignature("log(string,bool,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2016
+column: 47
+content: (abi.encodeWithSignature("log(string,bool,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2036
+column: 47
+content: (abi.encodeWithSignature("log(string,address,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2041
+column: 47
+content: (abi.encodeWithSignature("log(string,address,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2046
+column: 47
+content: (abi.encodeWithSignature("log(string,address,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2051
+column: 47
+content: (abi.encodeWithSignature("log(string,address,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2056
+column: 47
+content: (abi.encodeWithSignature("log(string,address,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2076
+column: 47
+content: (abi.encodeWithSignature("log(string,address,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2096
+column: 47
+content: (abi.encodeWithSignature("log(string,address,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2116
+column: 47
+content: (abi.encodeWithSignature("log(bool,uint,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2121
+column: 47
+content: (abi.encodeWithSignature("log(bool,uint,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2126
+column: 47
+content: (abi.encodeWithSignature("log(bool,uint,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2131
+column: 47
+content: (abi.encodeWithSignature("log(bool,uint,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2136
+column: 47
+content: (abi.encodeWithSignature("log(bool,uint,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2141
+column: 47
+content: (abi.encodeWithSignature("log(bool,uint,string,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2146
+column: 47
+content: (abi.encodeWithSignature("log(bool,uint,string,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2151
+column: 47
+content: (abi.encodeWithSignature("log(bool,uint,string,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2156
+column: 47
+content: (abi.encodeWithSignature("log(bool,uint,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2161
+column: 47
+content: (abi.encodeWithSignature("log(bool,uint,bool,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2166
+column: 47
+content: (abi.encodeWithSignature("log(bool,uint,bool,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2171
+column: 47
+content: (abi.encodeWithSignature("log(bool,uint,bool,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2176
+column: 47
+content: (abi.encodeWithSignature("log(bool,uint,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2181
+column: 47
+content: (abi.encodeWithSignature("log(bool,uint,address,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2186
+column: 47
+content: (abi.encodeWithSignature("log(bool,uint,address,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2191
+column: 47
+content: (abi.encodeWithSignature("log(bool,uint,address,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2196
+column: 47
+content: (abi.encodeWithSignature("log(bool,string,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2201
+column: 47
+content: (abi.encodeWithSignature("log(bool,string,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2206
+column: 47
+content: (abi.encodeWithSignature("log(bool,string,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2211
+column: 47
+content: (abi.encodeWithSignature("log(bool,string,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2216
+column: 47
+content: (abi.encodeWithSignature("log(bool,string,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2236
+column: 47
+content: (abi.encodeWithSignature("log(bool,string,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2256
+column: 47
+content: (abi.encodeWithSignature("log(bool,string,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2276
+column: 47
+content: (abi.encodeWithSignature("log(bool,bool,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2281
+column: 47
+content: (abi.encodeWithSignature("log(bool,bool,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2286
+column: 47
+content: (abi.encodeWithSignature("log(bool,bool,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2291
+column: 47
+content: (abi.encodeWithSignature("log(bool,bool,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2296
+column: 47
+content: (abi.encodeWithSignature("log(bool,bool,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2316
+column: 47
+content: (abi.encodeWithSignature("log(bool,bool,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2336
+column: 47
+content: (abi.encodeWithSignature("log(bool,bool,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2356
+column: 47
+content: (abi.encodeWithSignature("log(bool,address,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2361
+column: 47
+content: (abi.encodeWithSignature("log(bool,address,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2366
+column: 47
+content: (abi.encodeWithSignature("log(bool,address,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2371
+column: 47
+content: (abi.encodeWithSignature("log(bool,address,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2376
+column: 47
+content: (abi.encodeWithSignature("log(bool,address,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2396
+column: 47
+content: (abi.encodeWithSignature("log(bool,address,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2416
+column: 47
+content: (abi.encodeWithSignature("log(bool,address,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2436
+column: 47
+content: (abi.encodeWithSignature("log(address,uint,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2441
+column: 47
+content: (abi.encodeWithSignature("log(address,uint,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2446
+column: 47
+content: (abi.encodeWithSignature("log(address,uint,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2451
+column: 47
+content: (abi.encodeWithSignature("log(address,uint,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2456
+column: 47
+content: (abi.encodeWithSignature("log(address,uint,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2461
+column: 47
+content: (abi.encodeWithSignature("log(address,uint,string,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2466
+column: 47
+content: (abi.encodeWithSignature("log(address,uint,string,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2471
+column: 47
+content: (abi.encodeWithSignature("log(address,uint,string,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2476
+column: 47
+content: (abi.encodeWithSignature("log(address,uint,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2481
+column: 47
+content: (abi.encodeWithSignature("log(address,uint,bool,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2486
+column: 47
+content: (abi.encodeWithSignature("log(address,uint,bool,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2491
+column: 47
+content: (abi.encodeWithSignature("log(address,uint,bool,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2496
+column: 47
+content: (abi.encodeWithSignature("log(address,uint,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2501
+column: 47
+content: (abi.encodeWithSignature("log(address,uint,address,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2506
+column: 47
+content: (abi.encodeWithSignature("log(address,uint,address,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2511
+column: 47
+content: (abi.encodeWithSignature("log(address,uint,address,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2516
+column: 47
+content: (abi.encodeWithSignature("log(address,string,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2521
+column: 47
+content: (abi.encodeWithSignature("log(address,string,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2526
+column: 47
+content: (abi.encodeWithSignature("log(address,string,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2531
+column: 47
+content: (abi.encodeWithSignature("log(address,string,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2536
+column: 47
+content: (abi.encodeWithSignature("log(address,string,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2556
+column: 47
+content: (abi.encodeWithSignature("log(address,string,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2576
+column: 47
+content: (abi.encodeWithSignature("log(address,string,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2596
+column: 47
+content: (abi.encodeWithSignature("log(address,bool,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2601
+column: 47
+content: (abi.encodeWithSignature("log(address,bool,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2606
+column: 47
+content: (abi.encodeWithSignature("log(address,bool,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2611
+column: 47
+content: (abi.encodeWithSignature("log(address,bool,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2616
+column: 47
+content: (abi.encodeWithSignature("log(address,bool,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2636
+column: 47
+content: (abi.encodeWithSignature("log(address,bool,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2656
+column: 47
+content: (abi.encodeWithSignature("log(address,bool,address,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2676
+column: 47
+content: (abi.encodeWithSignature("log(address,address,uint,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2681
+column: 47
+content: (abi.encodeWithSignature("log(address,address,uint,string)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2686
+column: 47
+content: (abi.encodeWithSignature("log(address,address,uint,bool)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2691
+column: 47
+content: (abi.encodeWithSignature("log(address,address,uint,address)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2696
+column: 47
+content: (abi.encodeWithSignature("log(address,address,string,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2716
+column: 47
+content: (abi.encodeWithSignature("log(address,address,bool,uint)",p0,p1,p2,p3))
+
+ruleId: SOLIDITY_WRONG_SIGNATURE
+patternId: rec155
+severity: 2
+line: 2736
+column: 47
+content: (abi.encodeWithSignature("log(address,address,address,uint)",p0,p1,p2,p3))
+
+SOLIDITY_VISIBILITY :4
+SOLIDITY_MSGVALUE_EQUALS_ZERO :1
+SOLIDITY_SAFEMATH :2
+SOLIDITY_OVERPOWERED_ROLE :1
+SOLIDITY_LOCKED_MONEY :1
+SOLIDITY_PRIVATE_MODIFIER_DONT_HIDE_DATA :1
+SOLIDITY_ADDRESS_HARDCODED :2
+SOLIDITY_WRONG_SIGNATURE :222
+SOLIDITY_UNCHECKED_CALL :381
+SOLIDITY_DIV_MUL :1
+SOLIDITY_SHOULD_RETURN_STRUCT :5
+SOLIDITY_SHOULD_NOT_BE_VIEW :1

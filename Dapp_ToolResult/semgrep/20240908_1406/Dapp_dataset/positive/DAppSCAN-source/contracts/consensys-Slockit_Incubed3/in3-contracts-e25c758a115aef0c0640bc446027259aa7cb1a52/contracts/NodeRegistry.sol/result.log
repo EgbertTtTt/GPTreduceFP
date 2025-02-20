@@ -1,0 +1,209 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 41 Code Findings │
+└──────────────────┘
+                         
+    /sb/NodeRegistry.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          140┆ for (uint i = 0; i < _blockheaders.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+           34┆ constructor() public {
+           35┆     snapshot();
+           36┆ }
+            ⋮┆----------------------------------------
+          282┆ constructor(BlockhashRegistry _blockRegistry) public {
+          283┆     blockRegistry = _blockRegistry;
+          284┆ 
+          285┆     // solium-disable-next-line security/no-block-members
+          286┆     blockTimeStampDeployment = block.timestamp;  //              
+  solhint-disable-line not-rely-on-time                                         
+          287┆     registryId = keccak256(abi.encodePacked(address(this),       
+  blockhash(block.number-1)));                                                  
+          288┆     unregisterKey = msg.sender;
+          289┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+           45┆ if (blockhashMapping[i] != 0x0) {
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+           44┆ for (uint i = _startNumber; i <= (_numBlocks + _startNumber);    
+  i++) {                                                                        
+            ⋮┆----------------------------------------
+          140┆ for (uint i = 0; i < _blockheaders.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           63┆ require(currentBlockhash != 0x0, "parentBlock is not available");
+            ⋮┆----------------------------------------
+           66┆ require(calculatedHash != 0x0, "invalid headers");
+            ⋮┆----------------------------------------
+           82┆ require(bHash != 0x0, "block not available");
+            ⋮┆----------------------------------------
+          105┆ require(first > 0xf7, "invalid offset");
+            ⋮┆----------------------------------------
+          272┆ require(si.stage == Stages.Active, "address is not an            
+  in3-signer");                                                                 
+            ⋮┆----------------------------------------
+          377┆ require(_signer == signer, "not the correct signature of the     
+  signer provided");                                                            
+            ⋮┆----------------------------------------
+          400┆ require(block.timestamp < (blockTimeStampDeployment +            
+  YEAR_DEFINITION), "only in 1st year");// solhint-disable-line not-rely-on-time
+            ⋮┆----------------------------------------
+          401┆ require(msg.sender == unregisterKey, "only unregisterKey is      
+  allowed to remove nodes");                                                    
+            ⋮┆----------------------------------------
+          420┆ require(si.stage == Stages.DepositNotWithdrawn, "not in the      
+  correct state");                                                              
+            ⋮┆----------------------------------------
+          421┆ require(si.owner == msg.sender, "only owner can claim deposit");
+            ⋮┆----------------------------------------
+          424┆ require(block.timestamp > si.lockedTime, "deposit still locked");
+  // solhint-disable-line not-rely-on-time                                      
+            ⋮┆----------------------------------------
+          460┆ require(evmBlockhash != 0x0, "block not found");
+            ⋮┆----------------------------------------
+          463┆ require(evmBlockhash != _blockhash, "you try to convict with a   
+  correct hash");                                                               
+            ⋮┆----------------------------------------
+          468┆ require(block.number >= ci.blockNumberConvict + 2, "revealConvict
+  still locked");                                                               
+            ⋮┆----------------------------------------
+          469┆ require(
+          470┆     ecrecover(
+          471┆         keccak256(
+          472┆             abi.encodePacked(
+          473┆                 _blockhash,
+          474┆                 _blockNumber,
+          475┆                 registryId
+          476┆             )
+          477┆         ),
+          478┆         _v, _r, _s) == _signer,
+             [hid 1 additional lines, adjust with --max-lines-per-finding] 
+          481┆ require(
+          482┆     keccak256(
+          483┆         abi.encodePacked(
+          484┆             _blockhash, msg.sender, _v, _r, _s
+          485┆         )
+          486┆     ) == ci.convictHash, "wrong convict hash");
+            ⋮┆----------------------------------------
+          488┆ require(si.stage != Stages.Convicted, "node already convicted");
+            ⋮┆----------------------------------------
+          529┆ require(si.owner == msg.sender, "only for the in3-node owner");
+            ⋮┆----------------------------------------
+          531┆ require(_newOwner != address(0x0), "0x0 address is invalid");
+            ⋮┆----------------------------------------
+          548┆ require(si.owner == msg.sender, "only for the in3-node owner");
+            ⋮┆----------------------------------------
+          575┆ require(si.owner == msg.sender, "only for the owner");
+            ⋮┆----------------------------------------
+          588┆ require(!urlIndex[newURl].used, "url is already in use");
+            ⋮┆----------------------------------------
+          657┆ require(_deposit < MAX_ETHER_LIMIT, "Limit of 50 ETH reached");
+            ⋮┆----------------------------------------
+          659┆ require(_timeout <= YEAR_DEFINITION, "exceeded maximum timeout");
+            ⋮┆----------------------------------------
+          687┆ require(_deposit >= 10 finney, "not enough deposit");
+            ⋮┆----------------------------------------
+          695┆ require(!urlIndex[urlHash].used && signerIndex[_signer].stage == 
+  Stages.NotInUse,                                                              
+          696┆     "a node with the same url or signer is already registered");
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          695┆ require(!urlIndex[urlHash].used && signerIndex[_signer].stage == 
+  Stages.NotInUse,                                                              
+          696┆     "a node with the same url or signer is already registered");
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-decrement-not-postfix                    
+          Consider using the prefix decrement expression whenever the return    
+  value is not needed. The                                                      
+          prefix decrement expression is cheaper in terms of gas.               
+                                                                                
+          764┆ nodes.length--;
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+           44┆ for (uint i = _startNumber; i <= (_numBlocks + _startNumber);    
+  i++) {                                                                        
+            ⋮┆----------------------------------------
+          140┆ for (uint i = 0; i < _blockheaders.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          377┆ require(_signer == signer, "not the correct signature of the     
+  signer provided");                                                            
+            ⋮┆----------------------------------------
+          401┆ require(msg.sender == unregisterKey, "only unregisterKey is      
+  allowed to remove nodes");                                                    
+            ⋮┆----------------------------------------
+          463┆ require(evmBlockhash != _blockhash, "you try to convict with a   
+  correct hash");                                                               
+            ⋮┆----------------------------------------
+          469┆ require(
+          470┆     ecrecover(
+          471┆         keccak256(
+          472┆             abi.encodePacked(
+          473┆                 _blockhash,
+          474┆                 _blockNumber,
+          475┆                 registryId
+          476┆             )
+          477┆         ),
+          478┆         _v, _r, _s) == _signer,
+             [hid 1 additional lines, adjust with --max-lines-per-finding] 
+          695┆ require(!urlIndex[urlHash].used && signerIndex[_signer].stage == 
+  Stages.NotInUse,                                                              
+          696┆     "a node with the same url or signer is already registered");
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 41 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

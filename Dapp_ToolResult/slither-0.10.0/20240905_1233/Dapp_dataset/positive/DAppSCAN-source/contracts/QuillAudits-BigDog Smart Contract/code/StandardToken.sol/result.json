@@ -1,0 +1,60 @@
+{
+    "errors": [],
+    "fails": [],
+    "findings": [
+        {
+            "confidence": "Medium",
+            "contract": "StandardToken",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/QuillAudits-BigDog Smart Contract/code/StandardToken.sol",
+            "function": "_sellAndDistributeAccumulatedTKNFee",
+            "impact": "High",
+            "line": 168,
+            "line_end": 193,
+            "message": "StandardToken._sellAndDistributeAccumulatedTKNFee() (StandardToken.sol#168-193) sends eth to arbitrary user\n\tDangerous calls:\n\t- router.addLiquidityETH{value: BNBtoLiquidity}(address(this),TKNtoLiquidity,0,0,owner,block.timestamp) (StandardToken.sol#191)\n",
+            "name": "arbitrary-send-eth",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "StandardToken",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/QuillAudits-BigDog Smart Contract/code/StandardToken.sol",
+            "function": "_transfer",
+            "impact": "High",
+            "line": 137,
+            "line_end": 149,
+            "message": "Reentrancy in StandardToken._transfer(address,address,uint256) (StandardToken.sol#137-149):\n\tExternal calls:\n\t- _sellAndDistributeAccumulatedTKNFee() (StandardToken.sol#144)\n\t\t- router.swapExactTokensForETHSupportingFeeOnTransferTokens(amountToSwap,0,path,address(this),block.timestamp) (StandardToken.sol#183)\n\t\t- router.addLiquidityETH{value: BNBtoLiquidity}(address(this),TKNtoLiquidity,0,0,owner,block.timestamp) (StandardToken.sol#191)\n\tExternal calls sending eth:\n\t- _sellAndDistributeAccumulatedTKNFee() (StandardToken.sol#144)\n\t\t- router.addLiquidityETH{value: BNBtoLiquidity}(address(this),TKNtoLiquidity,0,0,owner,block.timestamp) (StandardToken.sol#191)\n\tState variables written after the call(s):\n\t- balanceOf[_from] -= tempValue (StandardToken.sol#146)\n\tStandardToken.balanceOf (StandardToken.sol#76) can be used in cross function reentrancies:\n\t- StandardToken._sellAndDistributeAccumulatedTKNFee() (StandardToken.sol#168-193)\n\t- StandardToken._substractBurn(address,uint256) (StandardToken.sol#152-158)\n\t- StandardToken._substractFees(address,uint256) (StandardToken.sol#160-166)\n\t- StandardToken._transfer(address,address,uint256) (StandardToken.sol#137-149)\n\t- StandardToken.balanceOf (StandardToken.sol#76)\n\t- StandardToken.burn(uint256) (StandardToken.sol#214-219)\n\t- StandardToken.constructor(address) (StandardToken.sol#260-281)\n\t- StandardToken.mint(address,uint256) (StandardToken.sol#220-226)\n\t- balanceOf[_to] += tempValue (StandardToken.sol#147)\n\tStandardToken.balanceOf (StandardToken.sol#76) can be used in cross function reentrancies:\n\t- StandardToken._sellAndDistributeAccumulatedTKNFee() (StandardToken.sol#168-193)\n\t- StandardToken._substractBurn(address,uint256) (StandardToken.sol#152-158)\n\t- StandardToken._substractFees(address,uint256) (StandardToken.sol#160-166)\n\t- StandardToken._transfer(address,address,uint256) (StandardToken.sol#137-149)\n\t- StandardToken.balanceOf (StandardToken.sol#76)\n\t- StandardToken.burn(uint256) (StandardToken.sol#214-219)\n\t- StandardToken.constructor(address) (StandardToken.sol#260-281)\n\t- StandardToken.mint(address,uint256) (StandardToken.sol#220-226)\n",
+            "name": "reentrancy-eth",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "StandardToken",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/QuillAudits-BigDog Smart Contract/code/StandardToken.sol",
+            "function": "_sellAndDistributeAccumulatedTKNFee",
+            "impact": "Medium",
+            "line": 168,
+            "line_end": 193,
+            "message": "StandardToken._sellAndDistributeAccumulatedTKNFee() (StandardToken.sol#168-193) ignores return value by router.addLiquidityETH{value: BNBtoLiquidity}(address(this),TKNtoLiquidity,0,0,owner,block.timestamp) (StandardToken.sol#191)\n",
+            "name": "unused-return",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "StandardToken",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/QuillAudits-BigDog Smart Contract/code/StandardToken.sol",
+            "function": "_transfer",
+            "impact": "Low",
+            "line": 137,
+            "line_end": 149,
+            "message": "Reentrancy in StandardToken._transfer(address,address,uint256) (StandardToken.sol#137-149):\n\tExternal calls:\n\t- _sellAndDistributeAccumulatedTKNFee() (StandardToken.sol#144)\n\t\t- router.swapExactTokensForETHSupportingFeeOnTransferTokens(amountToSwap,0,path,address(this),block.timestamp) (StandardToken.sol#183)\n\t\t- router.addLiquidityETH{value: BNBtoLiquidity}(address(this),TKNtoLiquidity,0,0,owner,block.timestamp) (StandardToken.sol#191)\n\tExternal calls sending eth:\n\t- _sellAndDistributeAccumulatedTKNFee() (StandardToken.sol#144)\n\t\t- router.addLiquidityETH{value: BNBtoLiquidity}(address(this),TKNtoLiquidity,0,0,owner,block.timestamp) (StandardToken.sol#191)\n\tEvent emitted after the call(s):\n\t- Transfer(_from,_to,tempValue) (StandardToken.sol#148)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        }
+    ],
+    "infos": [],
+    "parser": {
+        "id": "slither-0.10.0",
+        "mode": "solidity",
+        "version": "2024/04/30"
+    }
+}

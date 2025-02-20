@@ -1,0 +1,145 @@
+'solc --version' running
+'solc /sb/StratAlpaca.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/StratAlpaca.sol:
+Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.
+    --> /sb/StratAlpaca.sol:1430:20:
+     |
+1430 |     function pause(uint256 _flags) external onlyOwner {
+     |                    ^^^^^^^^^^^^^^
+
+Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.
+    --> /sb/StratAlpaca.sol:1440:22:
+     |
+1440 |     function unpause(uint256 _flags) external onlyOwner {
+     |                      ^^^^^^^^^^^^^^
+
+
+
+StratAlpaca._harvest(uint256) (../../sb/StratAlpaca.sol#1389-1421) uses a dangerous strict equality:
+	- lastHarvestBlock == block.number (../../sb/StratAlpaca.sol#1390)
+StratAlpaca._harvest(uint256) (../../sb/StratAlpaca.sol#1389-1421) uses a dangerous strict equality:
+	- earnedAlpacaBalance == 0 (../../sb/StratAlpaca.sol#1403)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Reentrancy in StratAlpaca._harvest(uint256) (../../sb/StratAlpaca.sol#1389-1421):
+	External calls:
+	- fairLaunch.harvest(poolId) (../../sb/StratAlpaca.sol#1400)
+	- IPancakeRouter02(uniRouterAddress).swapExactTokensForTokens(earnedAlpacaBalance,earnedAlpacaBalance.mul(priceMin).div(1e18),alpacaToWantPath,address(this),now.add(600)) (../../sb/StratAlpaca.sol#1408-1414)
+	- alpacaVault.deposit(IERC20(wantToken).balanceOf(address(this))) (../../sb/StratAlpaca.sol#1417)
+	- fairLaunch.deposit(address(this),poolId,alpacaVault.balanceOf(address(this))) (../../sb/StratAlpaca.sol#1418)
+	State variables written after the call(s):
+	- lastHarvestBlock = block.number (../../sb/StratAlpaca.sol#1420)
+	StratAlpaca.lastHarvestBlock (../../sb/StratAlpaca.sol#1258) can be used in cross function reentrancies:
+	- StratAlpaca._harvest(uint256) (../../sb/StratAlpaca.sol#1389-1421)
+	- StratAlpaca.lastHarvestBlock (../../sb/StratAlpaca.sol#1258)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+StratAlpaca._ibDeposited() (../../sb/StratAlpaca.sol#1341-1344) ignores return value by (ibBal) = fairLaunch.userInfo(poolId,address(this)) (../../sb/StratAlpaca.sol#1342)
+StratAlpaca._harvest(uint256) (../../sb/StratAlpaca.sol#1389-1421) ignores return value by IPancakeRouter02(uniRouterAddress).swapExactTokensForTokens(earnedAlpacaBalance,earnedAlpacaBalance.mul(priceMin).div(1e18),alpacaToWantPath,address(this),now.add(600)) (../../sb/StratAlpaca.sol#1408-1414)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+StratAlpaca.initialize(uint256,address,address,address,address,address,address,address) (../../sb/StratAlpaca.sol#1282-1317) should emit an event for: 
+	- vault = _vault (../../sb/StratAlpaca.sol#1316) 
+	- vault = _vault (../../sb/StratAlpaca.sol#1316) 
+StratAlpaca.setVault(address) (../../sb/StratAlpaca.sol#1447-1449) should emit an event for: 
+	- vault = _vault (../../sb/StratAlpaca.sol#1448) 
+	- vault = _vault (../../sb/StratAlpaca.sol#1448) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-access-control
+
+StratAlpaca.initialize(uint256,address,address,address,address,address,address,address) (../../sb/StratAlpaca.sol#1282-1317) should emit an event for: 
+	- poolId = _poolId (../../sb/StratAlpaca.sol#1296) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+StratAlpaca.initialize(uint256,address,address,address,address,address,address,address)._wbnbAddress (../../sb/StratAlpaca.sol#1288) lacks a zero-check on :
+		- wbnbAddress = _wbnbAddress (../../sb/StratAlpaca.sol#1302)
+StratAlpaca.initialize(uint256,address,address,address,address,address,address,address)._uniRouterAddress (../../sb/StratAlpaca.sol#1289) lacks a zero-check on :
+		- uniRouterAddress = _uniRouterAddress (../../sb/StratAlpaca.sol#1311)
+StratAlpaca.initialize(uint256,address,address,address,address,address,address,address)._vault (../../sb/StratAlpaca.sol#1290) lacks a zero-check on :
+		- vault = _vault (../../sb/StratAlpaca.sol#1316)
+StratAlpaca.setVault(address)._vault (../../sb/StratAlpaca.sol#1447) lacks a zero-check on :
+		- vault = _vault (../../sb/StratAlpaca.sol#1448)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in StratAlpaca.initialize(uint256,address,address,address,address,address,address,address) (../../sb/StratAlpaca.sol#1282-1317):
+	External calls:
+	- wantToken.safeApprove(_alpacaVault,uint256(- 1)) (../../sb/StratAlpaca.sol#1313)
+	- alpacaVault.safeApprove(_fairLaunchAddress,uint256(- 1)) (../../sb/StratAlpaca.sol#1314)
+	- alpacaToken.safeApprove(uniRouterAddress,uint256(- 1)) (../../sb/StratAlpaca.sol#1315)
+	State variables written after the call(s):
+	- vault = _vault (../../sb/StratAlpaca.sol#1316)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+StratAlpaca.alpacaVaultTotalToken() (../../sb/StratAlpaca.sol#1329-1339) uses timestamp for comparisons
+	Dangerous comparisons:
+	- now > alpacaVault.lastAccrueTime() (../../sb/StratAlpaca.sol#1332)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/StratAlpaca.sol#503-512) uses assembly
+	- INLINE ASM (../../sb/StratAlpaca.sol#510)
+Address._verifyCallResult(bool,bytes,string) (../../sb/StratAlpaca.sol#648-665) uses assembly
+	- INLINE ASM (../../sb/StratAlpaca.sol#657-660)
+UpgradeableOwnable._setOwner(address) (../../sb/StratAlpaca.sol#1132-1138) uses assembly
+	- INLINE ASM (../../sb/StratAlpaca.sol#1135-1137)
+UpgradeableOwnable.owner() (../../sb/StratAlpaca.sol#1143-1149) uses assembly
+	- INLINE ASM (../../sb/StratAlpaca.sol#1146-1148)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.functionCall(address,bytes) (../../sb/StratAlpaca.sol#556-558) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/StratAlpaca.sol#581-583) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/StratAlpaca.sol#630-632) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/StratAlpaca.sol#640-646) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/StratAlpaca.sol#606-608) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/StratAlpaca.sol#616-622) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/StratAlpaca.sol#530-536) is never used and should be removed
+Context._msgData() (../../sb/StratAlpaca.sol#63-66) is never used and should be removed
+Pausable._pause() (../../sb/StratAlpaca.sol#179-182) is never used and should be removed
+Pausable._unpause() (../../sb/StratAlpaca.sol#191-194) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/StratAlpaca.sol#703-706) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/StratAlpaca.sol#698-701) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/StratAlpaca.sol#456-459) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/StratAlpaca.sol#418-421) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/StratAlpaca.sol#476-479) is never used and should be removed
+SafeMath.sub(uint256,uint256,string) (../../sb/StratAlpaca.sol#436-439) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/StratAlpaca.sol#290-294) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/StratAlpaca.sol#326-329) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/StratAlpaca.sol#336-339) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/StratAlpaca.sol#311-319) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/StratAlpaca.sol#301-304) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.6.0 (../../sb/StratAlpaca.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/StratAlpaca.sol#530-536):
+	- (success) = recipient.call{value: amount}() (../../sb/StratAlpaca.sol#534)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/StratAlpaca.sol#591-598):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/StratAlpaca.sol#596)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/StratAlpaca.sol#616-622):
+	- (success,returndata) = target.staticcall(data) (../../sb/StratAlpaca.sol#620)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/StratAlpaca.sol#640-646):
+	- (success,returndata) = target.delegatecall(data) (../../sb/StratAlpaca.sol#644)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter StratAlpaca.initialize(uint256,address,address,address,address,address,address,address)._poolId (../../sb/StratAlpaca.sol#1283) is not in mixedCase
+Parameter StratAlpaca.initialize(uint256,address,address,address,address,address,address,address)._fairLaunchAddress (../../sb/StratAlpaca.sol#1284) is not in mixedCase
+Parameter StratAlpaca.initialize(uint256,address,address,address,address,address,address,address)._alpacaToken (../../sb/StratAlpaca.sol#1285) is not in mixedCase
+Parameter StratAlpaca.initialize(uint256,address,address,address,address,address,address,address)._alpacaVault (../../sb/StratAlpaca.sol#1286) is not in mixedCase
+Parameter StratAlpaca.initialize(uint256,address,address,address,address,address,address,address)._wantAddress (../../sb/StratAlpaca.sol#1287) is not in mixedCase
+Parameter StratAlpaca.initialize(uint256,address,address,address,address,address,address,address)._wbnbAddress (../../sb/StratAlpaca.sol#1288) is not in mixedCase
+Parameter StratAlpaca.initialize(uint256,address,address,address,address,address,address,address)._uniRouterAddress (../../sb/StratAlpaca.sol#1289) is not in mixedCase
+Parameter StratAlpaca.initialize(uint256,address,address,address,address,address,address,address)._vault (../../sb/StratAlpaca.sol#1290) is not in mixedCase
+Parameter StratAlpaca.wantAmtToIbAmount(uint256)._wantAmt (../../sb/StratAlpaca.sol#1351) is not in mixedCase
+Parameter StratAlpaca.deposit(uint256)._wantAmt (../../sb/StratAlpaca.sol#1356) is not in mixedCase
+Parameter StratAlpaca.withdraw(uint256)._wantAmt (../../sb/StratAlpaca.sol#1372) is not in mixedCase
+Parameter StratAlpaca.setVault(address)._vault (../../sb/StratAlpaca.sol#1447) is not in mixedCase
+Parameter StratAlpaca.setKeepers(address[],bool[])._keepers (../../sb/StratAlpaca.sol#1451) is not in mixedCase
+Parameter StratAlpaca.setKeepers(address[],bool[])._states (../../sb/StratAlpaca.sol#1451) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/StratAlpaca.sol#64)" inContext (../../sb/StratAlpaca.sol#58-67)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Variable IPancakeRouter01.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountADesired (../../sb/StratAlpaca.sol#772) is too similar to IPancakeRouter01.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountBDesired (../../sb/StratAlpaca.sol#773)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+/sb/StratAlpaca.sol analyzed (23 contracts with 93 detectors), 61 result(s) found

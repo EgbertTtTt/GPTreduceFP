@@ -1,0 +1,240 @@
+'solc --version' running
+'solc /sb/StakingV2.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+CoreUtility._endOfWeek(uint256) (../../sb/StakingV2.sol#676-678) performs a multiplication on the result of a division:
+	- ((timestamp.add(604800) - SETTLEMENT_TIME) / 604800) * 604800 + SETTLEMENT_TIME (../../sb/StakingV2.sol#677)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+StakingV2._checkpoint(uint256) (../../sb/StakingV2.sol#1643-1731) uses a dangerous strict equality:
+	- endTimestamp == rebalanceTimestamp (../../sb/StakingV2.sol#1686)
+StakingV2._checkpoint(uint256) (../../sb/StakingV2.sol#1643-1731) uses a dangerous strict equality:
+	- endTimestamp == endWeek (../../sb/StakingV2.sol#1709)
+StakingV2._initializeStaking() (../../sb/StakingV2.sol#1178-1182) uses a dangerous strict equality:
+	- require(bool)(_checkpointTimestamp == 0) (../../sb/StakingV2.sol#1179)
+StakingV2._userCheckpoint(address,uint256) (../../sb/StakingV2.sol#1745-1841) uses a dangerous strict equality:
+	- userIntegral == integral && oldVersion == targetVersion (../../sb/StakingV2.sol#1762)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Reentrancy in StakingV2._claim(address) (../../sb/StakingV2.sol#1635-1638):
+	External calls:
+	- chessSchedule.mint(account,_claimableRewards[account]) (../../sb/StakingV2.sol#1636)
+	State variables written after the call(s):
+	- _claimableRewards[account] = 0 (../../sb/StakingV2.sol#1637)
+	StakingV2._claimableRewards (../../sb/StakingV2.sol#1152) can be used in cross function reentrancies:
+	- StakingV2._claim(address) (../../sb/StakingV2.sol#1635-1638)
+	- StakingV2._userCheckpoint(address,uint256) (../../sb/StakingV2.sol#1745-1841)
+	- StakingV2.claimableRewards(address) (../../sb/StakingV2.sol#1462-1467)
+Reentrancy in StakingV2.deposit(uint256,uint256) (../../sb/StakingV2.sol#1387-1406):
+	External calls:
+	- tokenM.safeTransferFrom(msg.sender,address(this),amount) (../../sb/StakingV2.sol#1392)
+	- tokenA.safeTransferFrom(msg.sender,address(this),amount) (../../sb/StakingV2.sol#1394)
+	- tokenB.safeTransferFrom(msg.sender,address(this),amount) (../../sb/StakingV2.sol#1396)
+	State variables written after the call(s):
+	- _availableBalances[msg.sender][tranche] = _availableBalances[msg.sender][tranche].add(amount) (../../sb/StakingV2.sol#1398-1400)
+	StakingV2._availableBalances (../../sb/StakingV2.sol#1123) can be used in cross function reentrancies:
+	- StakingV2._updateWorkingBalance(address) (../../sb/StakingV2.sol#1848-1879)
+	- StakingV2._userCheckpoint(address,uint256) (../../sb/StakingV2.sol#1745-1841)
+	- StakingV2.availableBalanceOf(uint256,address) (../../sb/StakingV2.sol#1230-1262)
+	- StakingV2.deposit(uint256,uint256) (../../sb/StakingV2.sol#1387-1406)
+	- StakingV2.withdraw(uint256,uint256) (../../sb/StakingV2.sol#1418-1438)
+	- StakingV2.workingBalanceOf(address) (../../sb/StakingV2.sol#1320-1338)
+	- _totalSupplies[tranche] = _totalSupplies[tranche].add(amount) (../../sb/StakingV2.sol#1401)
+	StakingV2._totalSupplies (../../sb/StakingV2.sol#1117) can be used in cross function reentrancies:
+	- StakingV2._checkpoint(uint256) (../../sb/StakingV2.sol#1643-1731)
+	- StakingV2._updateWorkingBalance(address) (../../sb/StakingV2.sol#1848-1879)
+	- StakingV2.deposit(uint256,uint256) (../../sb/StakingV2.sol#1387-1406)
+	- StakingV2.totalSupply(uint256) (../../sb/StakingV2.sol#1204-1228)
+	- StakingV2.withdraw(uint256,uint256) (../../sb/StakingV2.sol#1418-1438)
+	- StakingV2.workingSupply() (../../sb/StakingV2.sol#1302-1318)
+	- _updateWorkingBalance(msg.sender) (../../sb/StakingV2.sol#1403)
+		- _workingBalances[account] = newWorkingBalance (../../sb/StakingV2.sol#1878)
+	StakingV2._workingBalances (../../sb/StakingV2.sol#1156) can be used in cross function reentrancies:
+	- StakingV2._updateWorkingBalance(address) (../../sb/StakingV2.sol#1848-1879)
+	- StakingV2._userCheckpoint(address,uint256) (../../sb/StakingV2.sol#1745-1841)
+	- StakingV2.workingBalanceOf(address) (../../sb/StakingV2.sol#1320-1338)
+	- _updateWorkingBalance(msg.sender) (../../sb/StakingV2.sol#1403)
+		- _workingSupply = _workingSupply.sub(_workingBalances[account]).add(newWorkingBalance) (../../sb/StakingV2.sol#1877)
+	StakingV2._workingSupply (../../sb/StakingV2.sol#1155) can be used in cross function reentrancies:
+	- StakingV2._checkpoint(uint256) (../../sb/StakingV2.sol#1643-1731)
+	- StakingV2._updateWorkingBalance(address) (../../sb/StakingV2.sol#1848-1879)
+	- StakingV2.workingSupply() (../../sb/StakingV2.sol#1302-1318)
+Reentrancy in StakingV2.withdraw(uint256,uint256) (../../sb/StakingV2.sol#1418-1438):
+	External calls:
+	- tokenM.safeTransfer(msg.sender,amount) (../../sb/StakingV2.sol#1428)
+	- tokenA.safeTransfer(msg.sender,amount) (../../sb/StakingV2.sol#1430)
+	- tokenB.safeTransfer(msg.sender,amount) (../../sb/StakingV2.sol#1432)
+	State variables written after the call(s):
+	- _updateWorkingBalance(msg.sender) (../../sb/StakingV2.sol#1435)
+		- _workingBalances[account] = newWorkingBalance (../../sb/StakingV2.sol#1878)
+	StakingV2._workingBalances (../../sb/StakingV2.sol#1156) can be used in cross function reentrancies:
+	- StakingV2._updateWorkingBalance(address) (../../sb/StakingV2.sol#1848-1879)
+	- StakingV2._userCheckpoint(address,uint256) (../../sb/StakingV2.sol#1745-1841)
+	- StakingV2.workingBalanceOf(address) (../../sb/StakingV2.sol#1320-1338)
+	- _updateWorkingBalance(msg.sender) (../../sb/StakingV2.sol#1435)
+		- _workingSupply = _workingSupply.sub(_workingBalances[account]).add(newWorkingBalance) (../../sb/StakingV2.sol#1877)
+	StakingV2._workingSupply (../../sb/StakingV2.sol#1155) can be used in cross function reentrancies:
+	- StakingV2._checkpoint(uint256) (../../sb/StakingV2.sol#1643-1731)
+	- StakingV2._updateWorkingBalance(address) (../../sb/StakingV2.sol#1848-1879)
+	- StakingV2.workingSupply() (../../sb/StakingV2.sol#1302-1318)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+StakingV2._fundDoRebalance(uint256,uint256,uint256,uint256) (../../sb/StakingV2.sol#1348-1363) ignores return value by fund.doRebalance(amountM,amountA,amountB,index) (../../sb/StakingV2.sol#1362)
+StakingV2._fundBatchRebalance(uint256,uint256,uint256,uint256,uint256) (../../sb/StakingV2.sol#1365-1381) ignores return value by fund.batchRebalance(amountM,amountA,amountB,fromIndex,toIndex) (../../sb/StakingV2.sol#1380)
+StakingV2.claimAndDeposit(address) (../../sb/StakingV2.sol#1410-1413) ignores return value by (createdShares) = IPrimaryMarket(primaryMarket).claim(msg.sender) (../../sb/StakingV2.sol#1411)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+StakingV2.constructor(address,address,address,address,uint256,address).quoteAssetAddress_ (../../sb/StakingV2.sol#1163) lacks a zero-check on :
+		- quoteAssetAddress = quoteAssetAddress_ (../../sb/StakingV2.sol#1173)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in StakingV2.claimAndDeposit(address) (../../sb/StakingV2.sol#1410-1413):
+	External calls:
+	- (createdShares) = IPrimaryMarket(primaryMarket).claim(msg.sender) (../../sb/StakingV2.sol#1411)
+	- deposit(TRANCHE_M,createdShares) (../../sb/StakingV2.sol#1412)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/StakingV2.sol#565)
+		- tokenM.safeTransferFrom(msg.sender,address(this),amount) (../../sb/StakingV2.sol#1392)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/StakingV2.sol#433)
+		- tokenA.safeTransferFrom(msg.sender,address(this),amount) (../../sb/StakingV2.sol#1394)
+		- tokenB.safeTransferFrom(msg.sender,address(this),amount) (../../sb/StakingV2.sol#1396)
+	External calls sending eth:
+	- deposit(TRANCHE_M,createdShares) (../../sb/StakingV2.sol#1412)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/StakingV2.sol#433)
+	Event emitted after the call(s):
+	- Deposited(tranche,msg.sender,amount) (../../sb/StakingV2.sol#1405)
+		- deposit(TRANCHE_M,createdShares) (../../sb/StakingV2.sol#1412)
+Reentrancy in StakingV2.deposit(uint256,uint256) (../../sb/StakingV2.sol#1387-1406):
+	External calls:
+	- tokenM.safeTransferFrom(msg.sender,address(this),amount) (../../sb/StakingV2.sol#1392)
+	- tokenA.safeTransferFrom(msg.sender,address(this),amount) (../../sb/StakingV2.sol#1394)
+	- tokenB.safeTransferFrom(msg.sender,address(this),amount) (../../sb/StakingV2.sol#1396)
+	Event emitted after the call(s):
+	- Deposited(tranche,msg.sender,amount) (../../sb/StakingV2.sol#1405)
+Reentrancy in StakingV2.withdraw(uint256,uint256) (../../sb/StakingV2.sol#1418-1438):
+	External calls:
+	- tokenM.safeTransfer(msg.sender,amount) (../../sb/StakingV2.sol#1428)
+	- tokenA.safeTransfer(msg.sender,amount) (../../sb/StakingV2.sol#1430)
+	- tokenB.safeTransfer(msg.sender,amount) (../../sb/StakingV2.sol#1432)
+	Event emitted after the call(s):
+	- Withdrawn(tranche,msg.sender,amount) (../../sb/StakingV2.sol#1437)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+StakingV2._initializeStaking() (../../sb/StakingV2.sol#1178-1182) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool)(_checkpointTimestamp == 0) (../../sb/StakingV2.sol#1179)
+StakingV2.claimRewards(address) (../../sb/StakingV2.sol#1471-1480) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp >= guardedLaunchStart + 1296000,Cannot claim during guarded launch) (../../sb/StakingV2.sol#1472-1475)
+StakingV2.syncWithVotingEscrow(address) (../../sb/StakingV2.sol#1485-1505) uses timestamp for comparisons
+	Dangerous comparisons:
+	- newLocked.amount != veSnapshot.veLocked.amount || newLocked.unlockTime != veSnapshot.veLocked.unlockTime || newLocked.unlockTime < block.timestamp (../../sb/StakingV2.sol#1493-1495)
+StakingV2._checkpoint(uint256) (../../sb/StakingV2.sol#1643-1731) uses timestamp for comparisons
+	Dangerous comparisons:
+	- timestamp >= block.timestamp (../../sb/StakingV2.sol#1645)
+	- i < MAX_ITERATIONS && timestamp_ < block.timestamp (../../sb/StakingV2.sol#1674)
+	- endTimestamp == rebalanceTimestamp (../../sb/StakingV2.sol#1686)
+	- endTimestamp == endWeek (../../sb/StakingV2.sol#1709)
+	- _rate != rate (../../sb/StakingV2.sol#1720)
+StakingV2._userCheckpoint(address,uint256) (../../sb/StakingV2.sol#1745-1841) uses timestamp for comparisons
+	Dangerous comparisons:
+	- userIntegral == integral && oldVersion == targetVersion (../../sb/StakingV2.sol#1762)
+StakingV2._updateWorkingBalance(address) (../../sb/StakingV2.sol#1848-1879) uses timestamp for comparisons
+	Dangerous comparisons:
+	- veProportion > 0 && _veSnapshots[account].veLocked.unlockTime > block.timestamp (../../sb/StakingV2.sol#1866)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/StakingV2.sol#340-349) uses assembly
+	- INLINE ASM (../../sb/StakingV2.sol#347)
+Address._verifyCallResult(bool,bytes,string) (../../sb/StakingV2.sol#485-502) uses assembly
+	- INLINE ASM (../../sb/StakingV2.sol#494-497)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+StakingV2._userCheckpoint(address,uint256) (../../sb/StakingV2.sol#1745-1841) has a high cyclomatic complexity (14).
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cyclomatic-complexity
+
+Address.functionCall(address,bytes) (../../sb/StakingV2.sol#393-395) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/StakingV2.sol#418-420) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/StakingV2.sol#467-469) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/StakingV2.sol#477-483) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/StakingV2.sol#443-445) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/StakingV2.sol#453-459) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/StakingV2.sol#367-373) is never used and should be removed
+ManagedPausable._initializeManagedPausable(address) (../../sb/StakingV2.sol#710-715) is never used and should be removed
+Math.average(uint256,uint256) (../../sb/StakingV2.sol#102-105) is never used and should be removed
+Math.max(uint256,uint256) (../../sb/StakingV2.sol#87-89) is never used and should be removed
+SafeDecimalMath.decimalToPreciseDecimal(uint256) (../../sb/StakingV2.sol#629-631) is never used and should be removed
+SafeDecimalMath.preciseDecimalToDecimal(uint256) (../../sb/StakingV2.sol#636-644) is never used and should be removed
+SafeDecimalMath.saturatingMul(uint256,uint256) (../../sb/StakingV2.sol#650-656) is never used and should be removed
+SafeDecimalMath.saturatingMultiplyDecimal(uint256,uint256) (../../sb/StakingV2.sol#658-661) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/StakingV2.sol#533-542) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/StakingV2.sol#549-552) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/StakingV2.sol#544-547) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/StakingV2.sol#293-296) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/StakingV2.sol#255-258) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/StakingV2.sol#313-316) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/StakingV2.sol#127-131) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/StakingV2.sol#163-166) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/StakingV2.sol#173-176) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/StakingV2.sol#148-156) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/StakingV2.sol#138-141) is never used and should be removed
+StakingV2._initializeStaking() (../../sb/StakingV2.sol#1178-1182) is never used and should be removed
+StakingV2._initializeStakingV2(address) (../../sb/StakingV2.sol#1184-1186) is never used and should be removed
+StakingV2._lock(uint256,address,uint256) (../../sb/StakingV2.sol#1568-1581) is never used and should be removed
+StakingV2._rebalanceAndClearTrade(address,uint256,uint256,uint256,uint256) (../../sb/StakingV2.sol#1524-1566) is never used and should be removed
+StakingV2._rebalanceAndUnlock(address,uint256,uint256,uint256,uint256) (../../sb/StakingV2.sol#1583-1616) is never used and should be removed
+StakingV2._tradeAvailable(uint256,address,uint256) (../../sb/StakingV2.sol#1511-1522) is never used and should be removed
+StakingV2._tradeLocked(uint256,address,uint256) (../../sb/StakingV2.sol#1618-1629) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version>=0.6.10<0.8.0 (../../sb/StakingV2.sol#1) is too complex
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/StakingV2.sol#367-373):
+	- (success) = recipient.call{value: amount}() (../../sb/StakingV2.sol#371)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/StakingV2.sol#428-435):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/StakingV2.sol#433)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/StakingV2.sol#453-459):
+	- (success,returndata) = target.staticcall(data) (../../sb/StakingV2.sol#457)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/StakingV2.sol#477-483):
+	- (success,returndata) = target.delegatecall(data) (../../sb/StakingV2.sol#481)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Constant SafeDecimalMath.highPrecisionDecimals (../../sb/StakingV2.sol#578) is not in UPPER_CASE_WITH_UNDERSCORES
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Variable StakingV2.REWARD_WEIGHT_A (../../sb/StakingV2.sol#1090) is too similar to StakingV2.REWARD_WEIGHT_B (../../sb/StakingV2.sol#1091)
+Variable StakingV2.REWARD_WEIGHT_A (../../sb/StakingV2.sol#1090) is too similar to StakingV2.REWARD_WEIGHT_M (../../sb/StakingV2.sol#1092)
+Variable StakingV2.REWARD_WEIGHT_B (../../sb/StakingV2.sol#1091) is too similar to StakingV2.REWARD_WEIGHT_M (../../sb/StakingV2.sol#1092)
+Variable StakingV2._votingEscrow (../../sb/StakingV2.sol#1154) is too similar to StakingV2.constructor(address,address,address,address,uint256,address).votingEscrow_ (../../sb/StakingV2.sol#1165)
+Variable StakingV2.totalSupply(uint256).totalSupplyA (../../sb/StakingV2.sol#1206) is too similar to StakingV2.workingSupply().totalSupplyB (../../sb/StakingV2.sol#1306)
+Variable StakingV2.workingSupply().totalSupplyA (../../sb/StakingV2.sol#1306) is too similar to StakingV2.workingSupply().totalSupplyB (../../sb/StakingV2.sol#1306)
+Variable StakingV2._checkpoint(uint256).totalSupplyA (../../sb/StakingV2.sol#1662) is too similar to StakingV2._checkpoint(uint256).totalSupplyB (../../sb/StakingV2.sol#1663)
+Variable StakingV2.totalSupply(uint256).totalSupplyA (../../sb/StakingV2.sol#1206) is too similar to StakingV2.totalSupply(uint256).totalSupplyB (../../sb/StakingV2.sol#1207)
+Variable StakingV2.totalSupply(uint256).totalSupplyA (../../sb/StakingV2.sol#1206) is too similar to StakingV2._checkpoint(uint256).totalSupplyB (../../sb/StakingV2.sol#1663)
+Variable StakingV2._checkpoint(uint256).totalSupplyA (../../sb/StakingV2.sol#1662) is too similar to StakingV2.workingSupply().totalSupplyB (../../sb/StakingV2.sol#1306)
+Variable StakingV2.totalSupply(uint256).totalSupplyA (../../sb/StakingV2.sol#1206) is too similar to StakingV2._checkpoint(uint256).totalSupplyM (../../sb/StakingV2.sol#1661)
+Variable StakingV2._checkpoint(uint256).totalSupplyA (../../sb/StakingV2.sol#1662) is too similar to StakingV2.workingSupply().totalSupplyM (../../sb/StakingV2.sol#1306)
+Variable StakingV2.totalSupply(uint256).totalSupplyA (../../sb/StakingV2.sol#1206) is too similar to StakingV2.workingSupply().totalSupplyM (../../sb/StakingV2.sol#1306)
+Variable StakingV2._checkpoint(uint256).totalSupplyA (../../sb/StakingV2.sol#1662) is too similar to StakingV2.totalSupply(uint256).totalSupplyB (../../sb/StakingV2.sol#1207)
+Variable StakingV2.workingSupply().totalSupplyA (../../sb/StakingV2.sol#1306) is too similar to StakingV2._checkpoint(uint256).totalSupplyB (../../sb/StakingV2.sol#1663)
+Variable StakingV2.workingSupply().totalSupplyA (../../sb/StakingV2.sol#1306) is too similar to StakingV2.totalSupply(uint256).totalSupplyB (../../sb/StakingV2.sol#1207)
+Variable StakingV2._checkpoint(uint256).totalSupplyB (../../sb/StakingV2.sol#1663) is too similar to StakingV2.workingSupply().totalSupplyM (../../sb/StakingV2.sol#1306)
+Variable StakingV2.totalSupply(uint256).totalSupplyB (../../sb/StakingV2.sol#1207) is too similar to StakingV2.workingSupply().totalSupplyM (../../sb/StakingV2.sol#1306)
+Variable StakingV2.totalSupply(uint256).totalSupplyA (../../sb/StakingV2.sol#1206) is too similar to StakingV2.totalSupply(uint256).totalSupplyM (../../sb/StakingV2.sol#1205)
+Variable StakingV2._checkpoint(uint256).totalSupplyA (../../sb/StakingV2.sol#1662) is too similar to StakingV2.totalSupply(uint256).totalSupplyM (../../sb/StakingV2.sol#1205)
+Variable StakingV2.workingSupply().totalSupplyA (../../sb/StakingV2.sol#1306) is too similar to StakingV2._checkpoint(uint256).totalSupplyM (../../sb/StakingV2.sol#1661)
+Variable StakingV2.workingSupply().totalSupplyA (../../sb/StakingV2.sol#1306) is too similar to StakingV2.totalSupply(uint256).totalSupplyM (../../sb/StakingV2.sol#1205)
+Variable StakingV2.workingSupply().totalSupplyA (../../sb/StakingV2.sol#1306) is too similar to StakingV2.workingSupply().totalSupplyM (../../sb/StakingV2.sol#1306)
+Variable StakingV2._checkpoint(uint256).totalSupplyA (../../sb/StakingV2.sol#1662) is too similar to StakingV2._checkpoint(uint256).totalSupplyM (../../sb/StakingV2.sol#1661)
+Variable StakingV2._checkpoint(uint256).totalSupplyB (../../sb/StakingV2.sol#1663) is too similar to StakingV2._checkpoint(uint256).totalSupplyM (../../sb/StakingV2.sol#1661)
+Variable StakingV2.totalSupply(uint256).totalSupplyB (../../sb/StakingV2.sol#1207) is too similar to StakingV2.totalSupply(uint256).totalSupplyM (../../sb/StakingV2.sol#1205)
+Variable StakingV2._checkpoint(uint256).totalSupplyB (../../sb/StakingV2.sol#1663) is too similar to StakingV2.totalSupply(uint256).totalSupplyM (../../sb/StakingV2.sol#1205)
+Variable StakingV2.workingSupply().totalSupplyB (../../sb/StakingV2.sol#1306) is too similar to StakingV2._checkpoint(uint256).totalSupplyM (../../sb/StakingV2.sol#1661)
+Variable StakingV2.workingSupply().totalSupplyB (../../sb/StakingV2.sol#1306) is too similar to StakingV2.totalSupply(uint256).totalSupplyM (../../sb/StakingV2.sol#1205)
+Variable StakingV2.workingSupply().totalSupplyB (../../sb/StakingV2.sol#1306) is too similar to StakingV2.workingSupply().totalSupplyM (../../sb/StakingV2.sol#1306)
+Variable StakingV2.totalSupply(uint256).totalSupplyB (../../sb/StakingV2.sol#1207) is too similar to StakingV2._checkpoint(uint256).totalSupplyM (../../sb/StakingV2.sol#1661)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+StakingV2._reservedSlots (../../sb/StakingV2.sol#1078) is never used in StakingV2 (../../sb/StakingV2.sol#1076-1880)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-state-variable
+/sb/StakingV2.sol analyzed (16 contracts with 93 detectors), 95 result(s) found

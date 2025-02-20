@@ -1,0 +1,381 @@
+'solc --version' running
+'solc /sb/ActionPools.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/ActionPools.sol:
+Warning: Function state mutability can be restricted to pure
+    --> /sb/ActionPools.sol:1351:5:
+     |
+1351 |     function emergencyWithdraw(uint256 _pid, address _account) internal {
+     |     ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+ActionPools.safeTokenTransfer(IERC20,address,uint256) (../../sb/ActionPools.sol#1365-1372) ignores return value by _token.transfer(_to,value) (../../sb/ActionPools.sol#1370)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+Contract locking ether found:
+	Contract ActionPools (../../sb/ActionPools.sol#1016-1373) has payable functions:
+	 - ActionPools.receive() (../../sb/ActionPools.sol#1070-1072)
+	But does not have a function to withdraw the ether
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#contracts-that-lock-ether
+
+Reentrancy in ActionPools._claim(uint256,address) (../../sb/ActionPools.sol#1325-1348):
+	External calls:
+	- updatePool(_pid) (../../sb/ActionPools.sol#1326)
+		- booToken.mint(address(this),poolReward) (../../sb/ActionPools.sol#1206)
+		- booToken.mint(boodev,poolReward.div(8)) (../../sb/ActionPools.sol#1207)
+	State variables written after the call(s):
+	- pool.lastRewardClosed = safesub(pool.lastRewardClosed,value) (../../sb/ActionPools.sol#1339)
+	ActionPools.poolInfo (../../sb/ActionPools.sol#1041) can be used in cross function reentrancies:
+	- ActionPools._claim(uint256,address) (../../sb/ActionPools.sol#1325-1348)
+	- ActionPools.add(address,uint256,address,uint256) (../../sb/ActionPools.sol#1090-1110)
+	- ActionPools.claimAll() (../../sb/ActionPools.sol#1313-1319)
+	- ActionPools.deposit(uint256,address,uint256,uint256) (../../sb/ActionPools.sol#1282-1295)
+	- ActionPools.getBlocksReward(uint256,uint256,uint256) (../../sb/ActionPools.sol#1136-1156)
+	- ActionPools.getPoolInfo(uint256) (../../sb/ActionPools.sol#1078-1083)
+	- ActionPools.massUpdatePools() (../../sb/ActionPools.sol#1182-1187)
+	- ActionPools.mintRewards(uint256) (../../sb/ActionPools.sol#1266-1279)
+	- ActionPools.onAcionClaim(uint256,address) (../../sb/ActionPools.sol#1235-1246)
+	- ActionPools.onAcionUpdate(uint256) (../../sb/ActionPools.sol#1253-1264)
+	- ActionPools.pendingRewards(uint256,address) (../../sb/ActionPools.sol#1159-1167)
+	- ActionPools.poolInfo (../../sb/ActionPools.sol#1041)
+	- ActionPools.poolLength() (../../sb/ActionPools.sol#1074-1076)
+	- ActionPools.setAutoClaim(uint256,bool) (../../sb/ActionPools.sol#1121-1123)
+	- ActionPools.setAutoUpdate(uint256,bool) (../../sb/ActionPools.sol#1117-1119)
+	- ActionPools.setRewardMaxPerBlock(uint256,uint256) (../../sb/ActionPools.sol#1113-1115)
+	- ActionPools.totalRewards(uint256,address,uint256,uint256) (../../sb/ActionPools.sol#1169-1179)
+	- ActionPools.updatePool(uint256) (../../sb/ActionPools.sol#1190-1213)
+	- ActionPools.withdraw(uint256,address,uint256,uint256) (../../sb/ActionPools.sol#1298-1311)
+	- pool.poolTotalRewards = safesub(pool.poolTotalRewards,value) (../../sb/ActionPools.sol#1340)
+	ActionPools.poolInfo (../../sb/ActionPools.sol#1041) can be used in cross function reentrancies:
+	- ActionPools._claim(uint256,address) (../../sb/ActionPools.sol#1325-1348)
+	- ActionPools.add(address,uint256,address,uint256) (../../sb/ActionPools.sol#1090-1110)
+	- ActionPools.claimAll() (../../sb/ActionPools.sol#1313-1319)
+	- ActionPools.deposit(uint256,address,uint256,uint256) (../../sb/ActionPools.sol#1282-1295)
+	- ActionPools.getBlocksReward(uint256,uint256,uint256) (../../sb/ActionPools.sol#1136-1156)
+	- ActionPools.getPoolInfo(uint256) (../../sb/ActionPools.sol#1078-1083)
+	- ActionPools.massUpdatePools() (../../sb/ActionPools.sol#1182-1187)
+	- ActionPools.mintRewards(uint256) (../../sb/ActionPools.sol#1266-1279)
+	- ActionPools.onAcionClaim(uint256,address) (../../sb/ActionPools.sol#1235-1246)
+	- ActionPools.onAcionUpdate(uint256) (../../sb/ActionPools.sol#1253-1264)
+	- ActionPools.pendingRewards(uint256,address) (../../sb/ActionPools.sol#1159-1167)
+	- ActionPools.poolInfo (../../sb/ActionPools.sol#1041)
+	- ActionPools.poolLength() (../../sb/ActionPools.sol#1074-1076)
+	- ActionPools.setAutoClaim(uint256,bool) (../../sb/ActionPools.sol#1121-1123)
+	- ActionPools.setAutoUpdate(uint256,bool) (../../sb/ActionPools.sol#1117-1119)
+	- ActionPools.setRewardMaxPerBlock(uint256,uint256) (../../sb/ActionPools.sol#1113-1115)
+	- ActionPools.totalRewards(uint256,address,uint256,uint256) (../../sb/ActionPools.sol#1169-1179)
+	- ActionPools.updatePool(uint256) (../../sb/ActionPools.sol#1190-1213)
+	- ActionPools.withdraw(uint256,address,uint256,uint256) (../../sb/ActionPools.sol#1298-1311)
+Reentrancy in ActionPools.mintRewards(uint256) (../../sb/ActionPools.sol#1266-1279):
+	External calls:
+	- updatePool(_pid) (../../sb/ActionPools.sol#1267)
+		- booToken.mint(address(this),poolReward) (../../sb/ActionPools.sol#1206)
+		- booToken.mint(boodev,poolReward.div(8)) (../../sb/ActionPools.sol#1207)
+	State variables written after the call(s):
+	- pool.poolTotalRewards = pool.poolTotalRewards.add(mint) (../../sb/ActionPools.sol#1276)
+	ActionPools.poolInfo (../../sb/ActionPools.sol#1041) can be used in cross function reentrancies:
+	- ActionPools._claim(uint256,address) (../../sb/ActionPools.sol#1325-1348)
+	- ActionPools.add(address,uint256,address,uint256) (../../sb/ActionPools.sol#1090-1110)
+	- ActionPools.claimAll() (../../sb/ActionPools.sol#1313-1319)
+	- ActionPools.deposit(uint256,address,uint256,uint256) (../../sb/ActionPools.sol#1282-1295)
+	- ActionPools.getBlocksReward(uint256,uint256,uint256) (../../sb/ActionPools.sol#1136-1156)
+	- ActionPools.getPoolInfo(uint256) (../../sb/ActionPools.sol#1078-1083)
+	- ActionPools.massUpdatePools() (../../sb/ActionPools.sol#1182-1187)
+	- ActionPools.mintRewards(uint256) (../../sb/ActionPools.sol#1266-1279)
+	- ActionPools.onAcionClaim(uint256,address) (../../sb/ActionPools.sol#1235-1246)
+	- ActionPools.onAcionUpdate(uint256) (../../sb/ActionPools.sol#1253-1264)
+	- ActionPools.pendingRewards(uint256,address) (../../sb/ActionPools.sol#1159-1167)
+	- ActionPools.poolInfo (../../sb/ActionPools.sol#1041)
+	- ActionPools.poolLength() (../../sb/ActionPools.sol#1074-1076)
+	- ActionPools.setAutoClaim(uint256,bool) (../../sb/ActionPools.sol#1121-1123)
+	- ActionPools.setAutoUpdate(uint256,bool) (../../sb/ActionPools.sol#1117-1119)
+	- ActionPools.setRewardMaxPerBlock(uint256,uint256) (../../sb/ActionPools.sol#1113-1115)
+	- ActionPools.totalRewards(uint256,address,uint256,uint256) (../../sb/ActionPools.sol#1169-1179)
+	- ActionPools.updatePool(uint256) (../../sb/ActionPools.sol#1190-1213)
+	- ActionPools.withdraw(uint256,address,uint256,uint256) (../../sb/ActionPools.sol#1298-1311)
+Reentrancy in ActionPools.updatePool(uint256) (../../sb/ActionPools.sol#1190-1213):
+	External calls:
+	- booToken.mint(address(this),poolReward) (../../sb/ActionPools.sol#1206)
+	- booToken.mint(boodev,poolReward.div(8)) (../../sb/ActionPools.sol#1207)
+	State variables written after the call(s):
+	- pool.lastRewardClosed = pool.lastRewardClosed.add(poolReward) (../../sb/ActionPools.sol#1209)
+	ActionPools.poolInfo (../../sb/ActionPools.sol#1041) can be used in cross function reentrancies:
+	- ActionPools._claim(uint256,address) (../../sb/ActionPools.sol#1325-1348)
+	- ActionPools.add(address,uint256,address,uint256) (../../sb/ActionPools.sol#1090-1110)
+	- ActionPools.claimAll() (../../sb/ActionPools.sol#1313-1319)
+	- ActionPools.deposit(uint256,address,uint256,uint256) (../../sb/ActionPools.sol#1282-1295)
+	- ActionPools.getBlocksReward(uint256,uint256,uint256) (../../sb/ActionPools.sol#1136-1156)
+	- ActionPools.getPoolInfo(uint256) (../../sb/ActionPools.sol#1078-1083)
+	- ActionPools.massUpdatePools() (../../sb/ActionPools.sol#1182-1187)
+	- ActionPools.mintRewards(uint256) (../../sb/ActionPools.sol#1266-1279)
+	- ActionPools.onAcionClaim(uint256,address) (../../sb/ActionPools.sol#1235-1246)
+	- ActionPools.onAcionUpdate(uint256) (../../sb/ActionPools.sol#1253-1264)
+	- ActionPools.pendingRewards(uint256,address) (../../sb/ActionPools.sol#1159-1167)
+	- ActionPools.poolInfo (../../sb/ActionPools.sol#1041)
+	- ActionPools.poolLength() (../../sb/ActionPools.sol#1074-1076)
+	- ActionPools.setAutoClaim(uint256,bool) (../../sb/ActionPools.sol#1121-1123)
+	- ActionPools.setAutoUpdate(uint256,bool) (../../sb/ActionPools.sol#1117-1119)
+	- ActionPools.setRewardMaxPerBlock(uint256,uint256) (../../sb/ActionPools.sol#1113-1115)
+	- ActionPools.totalRewards(uint256,address,uint256,uint256) (../../sb/ActionPools.sol#1169-1179)
+	- ActionPools.updatePool(uint256) (../../sb/ActionPools.sol#1190-1213)
+	- ActionPools.withdraw(uint256,address,uint256,uint256) (../../sb/ActionPools.sol#1298-1311)
+	- pool.accRewardPerShare = pool.accRewardPerShare.add(poolReward.mul(1e18).div(poolTotalAmount)) (../../sb/ActionPools.sol#1210)
+	ActionPools.poolInfo (../../sb/ActionPools.sol#1041) can be used in cross function reentrancies:
+	- ActionPools._claim(uint256,address) (../../sb/ActionPools.sol#1325-1348)
+	- ActionPools.add(address,uint256,address,uint256) (../../sb/ActionPools.sol#1090-1110)
+	- ActionPools.claimAll() (../../sb/ActionPools.sol#1313-1319)
+	- ActionPools.deposit(uint256,address,uint256,uint256) (../../sb/ActionPools.sol#1282-1295)
+	- ActionPools.getBlocksReward(uint256,uint256,uint256) (../../sb/ActionPools.sol#1136-1156)
+	- ActionPools.getPoolInfo(uint256) (../../sb/ActionPools.sol#1078-1083)
+	- ActionPools.massUpdatePools() (../../sb/ActionPools.sol#1182-1187)
+	- ActionPools.mintRewards(uint256) (../../sb/ActionPools.sol#1266-1279)
+	- ActionPools.onAcionClaim(uint256,address) (../../sb/ActionPools.sol#1235-1246)
+	- ActionPools.onAcionUpdate(uint256) (../../sb/ActionPools.sol#1253-1264)
+	- ActionPools.pendingRewards(uint256,address) (../../sb/ActionPools.sol#1159-1167)
+	- ActionPools.poolInfo (../../sb/ActionPools.sol#1041)
+	- ActionPools.poolLength() (../../sb/ActionPools.sol#1074-1076)
+	- ActionPools.setAutoClaim(uint256,bool) (../../sb/ActionPools.sol#1121-1123)
+	- ActionPools.setAutoUpdate(uint256,bool) (../../sb/ActionPools.sol#1117-1119)
+	- ActionPools.setRewardMaxPerBlock(uint256,uint256) (../../sb/ActionPools.sol#1113-1115)
+	- ActionPools.totalRewards(uint256,address,uint256,uint256) (../../sb/ActionPools.sol#1169-1179)
+	- ActionPools.updatePool(uint256) (../../sb/ActionPools.sol#1190-1213)
+	- ActionPools.withdraw(uint256,address,uint256,uint256) (../../sb/ActionPools.sol#1298-1311)
+	- pool.lastRewardBlock = block.number (../../sb/ActionPools.sol#1212)
+	ActionPools.poolInfo (../../sb/ActionPools.sol#1041) can be used in cross function reentrancies:
+	- ActionPools._claim(uint256,address) (../../sb/ActionPools.sol#1325-1348)
+	- ActionPools.add(address,uint256,address,uint256) (../../sb/ActionPools.sol#1090-1110)
+	- ActionPools.claimAll() (../../sb/ActionPools.sol#1313-1319)
+	- ActionPools.deposit(uint256,address,uint256,uint256) (../../sb/ActionPools.sol#1282-1295)
+	- ActionPools.getBlocksReward(uint256,uint256,uint256) (../../sb/ActionPools.sol#1136-1156)
+	- ActionPools.getPoolInfo(uint256) (../../sb/ActionPools.sol#1078-1083)
+	- ActionPools.massUpdatePools() (../../sb/ActionPools.sol#1182-1187)
+	- ActionPools.mintRewards(uint256) (../../sb/ActionPools.sol#1266-1279)
+	- ActionPools.onAcionClaim(uint256,address) (../../sb/ActionPools.sol#1235-1246)
+	- ActionPools.onAcionUpdate(uint256) (../../sb/ActionPools.sol#1253-1264)
+	- ActionPools.pendingRewards(uint256,address) (../../sb/ActionPools.sol#1159-1167)
+	- ActionPools.poolInfo (../../sb/ActionPools.sol#1041)
+	- ActionPools.poolLength() (../../sb/ActionPools.sol#1074-1076)
+	- ActionPools.setAutoClaim(uint256,bool) (../../sb/ActionPools.sol#1121-1123)
+	- ActionPools.setAutoUpdate(uint256,bool) (../../sb/ActionPools.sol#1117-1119)
+	- ActionPools.setRewardMaxPerBlock(uint256,uint256) (../../sb/ActionPools.sol#1113-1115)
+	- ActionPools.totalRewards(uint256,address,uint256,uint256) (../../sb/ActionPools.sol#1169-1179)
+	- ActionPools.updatePool(uint256) (../../sb/ActionPools.sol#1190-1213)
+	- ActionPools.withdraw(uint256,address,uint256,uint256) (../../sb/ActionPools.sol#1298-1311)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+ActionPools.constructor(address,address) (../../sb/ActionPools.sol#1062-1066) contains a tautology or contradiction:
+	- require(bool,string)(booToken.totalSupply() >= 0,booToken) (../../sb/ActionPools.sol#1064)
+ActionPools.add(address,uint256,address,uint256) (../../sb/ActionPools.sol#1090-1110) contains a tautology or contradiction:
+	- require(bool,string)(lpToken != address(0) && totalAmount >= 0,pool not right) (../../sb/ActionPools.sol#1095)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#tautology-or-contradiction
+
+ActionPools.add(address,uint256,address,uint256) (../../sb/ActionPools.sol#1090-1110) ignores return value by (lpToken,totalAmount) = IActionTrigger(_callFrom).getATPoolInfo(_callId) (../../sb/ActionPools.sol#1093-1094)
+ActionPools.pendingRewards(uint256,address) (../../sb/ActionPools.sol#1159-1167) ignores return value by (poolTotalAmount) = IActionTrigger(pool.callFrom).getATPoolInfo(pool.callId) (../../sb/ActionPools.sol#1163)
+ActionPools.updatePool(uint256) (../../sb/ActionPools.sol#1190-1213) ignores return value by (poolTotalAmount) = IActionTrigger(pool.callFrom).getATPoolInfo(pool.callId) (../../sb/ActionPools.sol#1196)
+ActionPools.deposit(uint256,address,uint256,uint256) (../../sb/ActionPools.sol#1282-1295) ignores return value by (poolTotalAmount) = IActionTrigger(pool.callFrom).getATPoolInfo(pool.callId) (../../sb/ActionPools.sol#1286)
+ActionPools.withdraw(uint256,address,uint256,uint256) (../../sb/ActionPools.sol#1298-1311) ignores return value by (poolTotalAmount) = IActionTrigger(pool.callFrom).getATPoolInfo(pool.callId) (../../sb/ActionPools.sol#1302)
+ActionPools._claim(uint256,address) (../../sb/ActionPools.sol#1325-1348) ignores return value by (poolTotalAmount) = IActionTrigger(pool.callFrom).getATPoolInfo(pool.callId) (../../sb/ActionPools.sol#1335)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+BOOToken.constructor(uint256)._totalSupply (../../sb/ActionPools.sol#991) shadows:
+	- ERC20._totalSupply (../../sb/ActionPools.sol#681) (state variable)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+ActionPools.constructor(address,address)._boodev (../../sb/ActionPools.sol#1062) lacks a zero-check on :
+		- boodev = _boodev (../../sb/ActionPools.sol#1065)
+ActionPools.setBooDev(address)._boodev (../../sb/ActionPools.sol#1130) lacks a zero-check on :
+		- boodev = _boodev (../../sb/ActionPools.sol#1132)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+ActionPools.updatePool(uint256) (../../sb/ActionPools.sol#1190-1213) has external calls inside a loop: (poolTotalAmount) = IActionTrigger(pool.callFrom).getATPoolInfo(pool.callId) (../../sb/ActionPools.sol#1196)
+ActionPools.getBlocksReward(uint256,uint256,uint256) (../../sb/ActionPools.sol#1136-1156) has external calls inside a loop: balance = pool.rewardToken.balanceOf(address(this)) (../../sb/ActionPools.sol#1139)
+ActionPools.updatePool(uint256) (../../sb/ActionPools.sol#1190-1213) has external calls inside a loop: booToken.mint(address(this),poolReward) (../../sb/ActionPools.sol#1206)
+ActionPools.updatePool(uint256) (../../sb/ActionPools.sol#1190-1213) has external calls inside a loop: booToken.mint(boodev,poolReward.div(8)) (../../sb/ActionPools.sol#1207)
+ActionPools.deposit(uint256,address,uint256,uint256) (../../sb/ActionPools.sol#1282-1295) has external calls inside a loop: (poolTotalAmount) = IActionTrigger(pool.callFrom).getATPoolInfo(pool.callId) (../../sb/ActionPools.sol#1286)
+ActionPools.withdraw(uint256,address,uint256,uint256) (../../sb/ActionPools.sol#1298-1311) has external calls inside a loop: (poolTotalAmount) = IActionTrigger(pool.callFrom).getATPoolInfo(pool.callId) (../../sb/ActionPools.sol#1302)
+ActionPools.pendingRewards(uint256,address) (../../sb/ActionPools.sol#1159-1167) has external calls inside a loop: userAmount = IActionTrigger(pool.callFrom).getATUserAmount(pool.callId,_account) (../../sb/ActionPools.sol#1162)
+ActionPools.pendingRewards(uint256,address) (../../sb/ActionPools.sol#1159-1167) has external calls inside a loop: (poolTotalAmount) = IActionTrigger(pool.callFrom).getATPoolInfo(pool.callId) (../../sb/ActionPools.sol#1163)
+ActionPools._claim(uint256,address) (../../sb/ActionPools.sol#1325-1348) has external calls inside a loop: (poolTotalAmount) = IActionTrigger(pool.callFrom).getATPoolInfo(pool.callId) (../../sb/ActionPools.sol#1335)
+ActionPools._claim(uint256,address) (../../sb/ActionPools.sol#1325-1348) has external calls inside a loop: userAmount = IActionTrigger(pool.callFrom).getATUserAmount(pool.callId,_account) (../../sb/ActionPools.sol#1336)
+ActionPools.safeTokenTransfer(IERC20,address,uint256) (../../sb/ActionPools.sol#1365-1372) has external calls inside a loop: balance = _token.balanceOf(address(this)) (../../sb/ActionPools.sol#1366)
+ActionPools.safeTokenTransfer(IERC20,address,uint256) (../../sb/ActionPools.sol#1365-1372) has external calls inside a loop: _token.transfer(_to,value) (../../sb/ActionPools.sol#1370)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in ActionPools._claim(uint256,address) (../../sb/ActionPools.sol#1325-1348):
+	External calls:
+	- updatePool(_pid) (../../sb/ActionPools.sol#1326)
+		- booToken.mint(address(this),poolReward) (../../sb/ActionPools.sol#1206)
+		- booToken.mint(boodev,poolReward.div(8)) (../../sb/ActionPools.sol#1207)
+	State variables written after the call(s):
+	- tokenTotalRewards[rewardToken] = safesub(tokenTotalRewards[rewardToken],value) (../../sb/ActionPools.sol#1342)
+	- userInfo[_pid][_account].rewardRemain = 0 (../../sb/ActionPools.sol#1330)
+	- userInfo[_pid][_account].rewardDebt = totalRewards(_pid,_account,userAmount,poolTotalAmount) (../../sb/ActionPools.sol#1337)
+Reentrancy in ActionPools.deposit(uint256,address,uint256,uint256) (../../sb/ActionPools.sol#1282-1295):
+	External calls:
+	- updatePool(_pid) (../../sb/ActionPools.sol#1283)
+		- booToken.mint(address(this),poolReward) (../../sb/ActionPools.sol#1206)
+		- booToken.mint(boodev,poolReward.div(8)) (../../sb/ActionPools.sol#1207)
+	State variables written after the call(s):
+	- user.rewardRemain = totalRewards(_pid,_account,_fromAmount,totalAmountOld).add(user.rewardRemain).sub(user.rewardDebt) (../../sb/ActionPools.sol#1289-1291)
+	- user.rewardDebt = totalRewards(_pid,_account,_toAmount,poolTotalAmount) (../../sb/ActionPools.sol#1293)
+Reentrancy in ActionPools.mintRewards(uint256) (../../sb/ActionPools.sol#1266-1279):
+	External calls:
+	- updatePool(_pid) (../../sb/ActionPools.sol#1267)
+		- booToken.mint(address(this),poolReward) (../../sb/ActionPools.sol#1206)
+		- booToken.mint(boodev,poolReward.div(8)) (../../sb/ActionPools.sol#1207)
+	State variables written after the call(s):
+	- tokenTotalRewards[rewardToken] = balance (../../sb/ActionPools.sol#1277)
+Reentrancy in ActionPools.withdraw(uint256,address,uint256,uint256) (../../sb/ActionPools.sol#1298-1311):
+	External calls:
+	- updatePool(_pid) (../../sb/ActionPools.sol#1299)
+		- booToken.mint(address(this),poolReward) (../../sb/ActionPools.sol#1206)
+		- booToken.mint(boodev,poolReward.div(8)) (../../sb/ActionPools.sol#1207)
+	State variables written after the call(s):
+	- user.rewardRemain = totalRewards(_pid,_account,_fromAmount,totalAmountOld).add(user.rewardRemain).sub(user.rewardDebt) (../../sb/ActionPools.sol#1305-1307)
+	- user.rewardDebt = totalRewards(_pid,_account,_toAmount,poolTotalAmount) (../../sb/ActionPools.sol#1309)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in ActionPools._claim(uint256,address) (../../sb/ActionPools.sol#1325-1348):
+	External calls:
+	- updatePool(_pid) (../../sb/ActionPools.sol#1326)
+		- booToken.mint(address(this),poolReward) (../../sb/ActionPools.sol#1206)
+		- booToken.mint(boodev,poolReward.div(8)) (../../sb/ActionPools.sol#1207)
+	- value = safeTokenTransfer(pool.rewardToken,_account,value) (../../sb/ActionPools.sol#1344)
+		- _token.transfer(_to,value) (../../sb/ActionPools.sol#1370)
+	Event emitted after the call(s):
+	- ActionClaim(_account,_pid,value) (../../sb/ActionPools.sol#1347)
+Reentrancy in ActionPools.deposit(uint256,address,uint256,uint256) (../../sb/ActionPools.sol#1282-1295):
+	External calls:
+	- updatePool(_pid) (../../sb/ActionPools.sol#1283)
+		- booToken.mint(address(this),poolReward) (../../sb/ActionPools.sol#1206)
+		- booToken.mint(boodev,poolReward.div(8)) (../../sb/ActionPools.sol#1207)
+	Event emitted after the call(s):
+	- ActionDeposit(_account,_pid,_fromAmount,_toAmount) (../../sb/ActionPools.sol#1294)
+Reentrancy in ActionPools.withdraw(uint256,address,uint256,uint256) (../../sb/ActionPools.sol#1298-1311):
+	External calls:
+	- updatePool(_pid) (../../sb/ActionPools.sol#1299)
+		- booToken.mint(address(this),poolReward) (../../sb/ActionPools.sol#1206)
+		- booToken.mint(boodev,poolReward.div(8)) (../../sb/ActionPools.sol#1207)
+	Event emitted after the call(s):
+	- ActionWithdraw(_account,_pid,_fromAmount,_toAmount) (../../sb/ActionPools.sol#1310)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Address.isContract(address) (../../sb/ActionPools.sol#311-320) uses assembly
+	- INLINE ASM (../../sb/ActionPools.sol#318)
+Address._verifyCallResult(bool,bytes,string) (../../sb/ActionPools.sol#456-473) uses assembly
+	- INLINE ASM (../../sb/ActionPools.sol#465-468)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+ActionPools.emergencyWithdraw(uint256,address) (../../sb/ActionPools.sol#1351-1354) is never used and should be removed
+Address._verifyCallResult(bool,bytes,string) (../../sb/ActionPools.sol#456-473) is never used and should be removed
+Address.functionCall(address,bytes) (../../sb/ActionPools.sol#364-366) is never used and should be removed
+Address.functionCall(address,bytes,string) (../../sb/ActionPools.sol#374-376) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/ActionPools.sol#389-391) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/ActionPools.sol#399-406) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/ActionPools.sol#438-440) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/ActionPools.sol#448-454) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/ActionPools.sol#414-416) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/ActionPools.sol#424-430) is never used and should be removed
+Address.isContract(address) (../../sb/ActionPools.sol#311-320) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/ActionPools.sol#338-344) is never used and should be removed
+Context._msgData() (../../sb/ActionPools.sol#559-562) is never used and should be removed
+ERC20._setupDecimals(uint8) (../../sb/ActionPools.sol#928-930) is never used and should be removed
+SafeERC20._callOptionalReturn(IERC20,bytes) (../../sb/ActionPools.sol#531-541) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/ActionPools.sol#504-513) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/ActionPools.sol#520-523) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/ActionPools.sol#515-518) is never used and should be removed
+SafeERC20.safeTransfer(IERC20,address,uint256) (../../sb/ActionPools.sol#489-491) is never used and should be removed
+SafeERC20.safeTransferFrom(IERC20,address,address,uint256) (../../sb/ActionPools.sol#493-495) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/ActionPools.sol#264-267) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/ActionPools.sol#226-229) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/ActionPools.sol#284-287) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/ActionPools.sol#98-102) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/ActionPools.sol#134-137) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/ActionPools.sol#144-147) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/ActionPools.sol#119-127) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/ActionPools.sol#109-112) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.6.12 (../../sb/ActionPools.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/ActionPools.sol#338-344):
+	- (success) = recipient.call{value: amount}() (../../sb/ActionPools.sol#342)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/ActionPools.sol#399-406):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/ActionPools.sol#404)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/ActionPools.sol#424-430):
+	- (success,returndata) = target.staticcall(data) (../../sb/ActionPools.sol#428)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/ActionPools.sol#448-454):
+	- (success,returndata) = target.delegatecall(data) (../../sb/ActionPools.sol#452)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter BOOToken.setMintWhitelist(address,bool)._account (../../sb/ActionPools.sol#997) is not in mixedCase
+Parameter BOOToken.setMintWhitelist(address,bool)._enabled (../../sb/ActionPools.sol#997) is not in mixedCase
+Parameter BOOToken.mint(address,uint256)._account (../../sb/ActionPools.sol#1001) is not in mixedCase
+Parameter BOOToken.mint(address,uint256)._amount (../../sb/ActionPools.sol#1001) is not in mixedCase
+Parameter BOOToken.burn(uint256)._amount (../../sb/ActionPools.sol#1006) is not in mixedCase
+Parameter ActionPools.getPoolInfo(uint256)._pid (../../sb/ActionPools.sol#1078) is not in mixedCase
+Parameter ActionPools.getPoolIndex(address,uint256)._callFrom (../../sb/ActionPools.sol#1085) is not in mixedCase
+Parameter ActionPools.getPoolIndex(address,uint256)._callId (../../sb/ActionPools.sol#1085) is not in mixedCase
+Parameter ActionPools.add(address,uint256,address,uint256)._callFrom (../../sb/ActionPools.sol#1090) is not in mixedCase
+Parameter ActionPools.add(address,uint256,address,uint256)._callId (../../sb/ActionPools.sol#1090) is not in mixedCase
+Parameter ActionPools.add(address,uint256,address,uint256)._rewardToken (../../sb/ActionPools.sol#1091) is not in mixedCase
+Parameter ActionPools.add(address,uint256,address,uint256)._maxPerBlock (../../sb/ActionPools.sol#1091) is not in mixedCase
+Parameter ActionPools.setRewardMaxPerBlock(uint256,uint256)._pid (../../sb/ActionPools.sol#1113) is not in mixedCase
+Parameter ActionPools.setRewardMaxPerBlock(uint256,uint256)._maxPerBlock (../../sb/ActionPools.sol#1113) is not in mixedCase
+Parameter ActionPools.setAutoUpdate(uint256,bool)._pid (../../sb/ActionPools.sol#1117) is not in mixedCase
+Parameter ActionPools.setAutoUpdate(uint256,bool)._set (../../sb/ActionPools.sol#1117) is not in mixedCase
+Parameter ActionPools.setAutoClaim(uint256,bool)._pid (../../sb/ActionPools.sol#1121) is not in mixedCase
+Parameter ActionPools.setAutoClaim(uint256,bool)._set (../../sb/ActionPools.sol#1121) is not in mixedCase
+Parameter ActionPools.setRewardRestricted(address,uint256)._hacker (../../sb/ActionPools.sol#1125) is not in mixedCase
+Parameter ActionPools.setRewardRestricted(address,uint256)._rate (../../sb/ActionPools.sol#1125) is not in mixedCase
+Parameter ActionPools.setBooDev(address)._boodev (../../sb/ActionPools.sol#1130) is not in mixedCase
+Parameter ActionPools.getBlocksReward(uint256,uint256,uint256)._pid (../../sb/ActionPools.sol#1136) is not in mixedCase
+Parameter ActionPools.getBlocksReward(uint256,uint256,uint256)._from (../../sb/ActionPools.sol#1136) is not in mixedCase
+Parameter ActionPools.getBlocksReward(uint256,uint256,uint256)._to (../../sb/ActionPools.sol#1136) is not in mixedCase
+Parameter ActionPools.pendingRewards(uint256,address)._pid (../../sb/ActionPools.sol#1159) is not in mixedCase
+Parameter ActionPools.pendingRewards(uint256,address)._account (../../sb/ActionPools.sol#1159) is not in mixedCase
+Parameter ActionPools.totalRewards(uint256,address,uint256,uint256)._pid (../../sb/ActionPools.sol#1169) is not in mixedCase
+Parameter ActionPools.totalRewards(uint256,address,uint256,uint256)._amount (../../sb/ActionPools.sol#1169) is not in mixedCase
+Parameter ActionPools.totalRewards(uint256,address,uint256,uint256)._totalAmount (../../sb/ActionPools.sol#1169) is not in mixedCase
+Parameter ActionPools.updatePool(uint256)._pid (../../sb/ActionPools.sol#1190) is not in mixedCase
+Parameter ActionPools.onAcionIn(uint256,address,uint256,uint256)._callId (../../sb/ActionPools.sol#1215) is not in mixedCase
+Parameter ActionPools.onAcionIn(uint256,address,uint256,uint256)._account (../../sb/ActionPools.sol#1215) is not in mixedCase
+Parameter ActionPools.onAcionIn(uint256,address,uint256,uint256)._fromAmount (../../sb/ActionPools.sol#1215) is not in mixedCase
+Parameter ActionPools.onAcionIn(uint256,address,uint256,uint256)._toAmount (../../sb/ActionPools.sol#1215) is not in mixedCase
+Parameter ActionPools.onAcionOut(uint256,address,uint256,uint256)._callId (../../sb/ActionPools.sol#1225) is not in mixedCase
+Parameter ActionPools.onAcionOut(uint256,address,uint256,uint256)._account (../../sb/ActionPools.sol#1225) is not in mixedCase
+Parameter ActionPools.onAcionOut(uint256,address,uint256,uint256)._fromAmount (../../sb/ActionPools.sol#1225) is not in mixedCase
+Parameter ActionPools.onAcionOut(uint256,address,uint256,uint256)._toAmount (../../sb/ActionPools.sol#1225) is not in mixedCase
+Parameter ActionPools.onAcionClaim(uint256,address)._callId (../../sb/ActionPools.sol#1235) is not in mixedCase
+Parameter ActionPools.onAcionClaim(uint256,address)._account (../../sb/ActionPools.sol#1235) is not in mixedCase
+Parameter ActionPools.onAcionUpdate(uint256)._callId (../../sb/ActionPools.sol#1253) is not in mixedCase
+Parameter ActionPools.mintRewards(uint256)._pid (../../sb/ActionPools.sol#1266) is not in mixedCase
+Parameter ActionPools.deposit(uint256,address,uint256,uint256)._pid (../../sb/ActionPools.sol#1282) is not in mixedCase
+Parameter ActionPools.deposit(uint256,address,uint256,uint256)._account (../../sb/ActionPools.sol#1282) is not in mixedCase
+Parameter ActionPools.deposit(uint256,address,uint256,uint256)._fromAmount (../../sb/ActionPools.sol#1282) is not in mixedCase
+Parameter ActionPools.deposit(uint256,address,uint256,uint256)._toAmount (../../sb/ActionPools.sol#1282) is not in mixedCase
+Parameter ActionPools.withdraw(uint256,address,uint256,uint256)._pid (../../sb/ActionPools.sol#1298) is not in mixedCase
+Parameter ActionPools.withdraw(uint256,address,uint256,uint256)._account (../../sb/ActionPools.sol#1298) is not in mixedCase
+Parameter ActionPools.withdraw(uint256,address,uint256,uint256)._fromAmount (../../sb/ActionPools.sol#1298) is not in mixedCase
+Parameter ActionPools.withdraw(uint256,address,uint256,uint256)._toAmount (../../sb/ActionPools.sol#1298) is not in mixedCase
+Parameter ActionPools.claim(uint256)._pid (../../sb/ActionPools.sol#1321) is not in mixedCase
+Parameter ActionPools.safesub(uint256,uint256)._a (../../sb/ActionPools.sol#1357) is not in mixedCase
+Parameter ActionPools.safesub(uint256,uint256)._b (../../sb/ActionPools.sol#1357) is not in mixedCase
+Parameter ActionPools.safeTokenTransfer(IERC20,address,uint256)._token (../../sb/ActionPools.sol#1365) is not in mixedCase
+Parameter ActionPools.safeTokenTransfer(IERC20,address,uint256)._to (../../sb/ActionPools.sol#1365) is not in mixedCase
+Parameter ActionPools.safeTokenTransfer(IERC20,address,uint256)._amount (../../sb/ActionPools.sol#1365) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/ActionPools.sol#560)" inContext (../../sb/ActionPools.sol#554-563)
+Redundant expression "_account (../../sb/ActionPools.sol#1171)" inActionPools (../../sb/ActionPools.sol#1016-1373)
+Redundant expression "_callId (../../sb/ActionPools.sol#1249)" inActionPools (../../sb/ActionPools.sol#1016-1373)
+Redundant expression "_account (../../sb/ActionPools.sol#1250)" inActionPools (../../sb/ActionPools.sol#1016-1373)
+Redundant expression "_pid (../../sb/ActionPools.sol#1352)" inActionPools (../../sb/ActionPools.sol#1016-1373)
+Redundant expression "_account (../../sb/ActionPools.sol#1353)" inActionPools (../../sb/ActionPools.sol#1016-1373)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+ActionPools.booToken (../../sb/ActionPools.sol#1053) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/ActionPools.sol analyzed (12 contracts with 93 detectors), 134 result(s) found

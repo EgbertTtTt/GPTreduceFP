@@ -1,0 +1,103 @@
+'solc --version' running
+'solc /sb/BsktLPPool.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+Reentrancy in BsktLPPool.exit() (../../sb/BsktLPPool.sol#426-429):
+	External calls:
+	- withdraw(balanceOf(msg.sender)) (../../sb/BsktLPPool.sol#427)
+		- BSKTASREWARD.safeTransfer(msg.sender,amount) (../../sb/BsktLPPool.sol#338)
+		- (success,returndata) = address(token).call(data) (../../sb/BsktLPPool.sol#293)
+	- getReward() (../../sb/BsktLPPool.sol#428)
+		- STAKEBSKT.safeTransfer(msg.sender,reward) (../../sb/BsktLPPool.sol#437)
+		- (success,returndata) = address(token).call(data) (../../sb/BsktLPPool.sol#293)
+	State variables written after the call(s):
+	- getReward() (../../sb/BsktLPPool.sol#428)
+		- lastUpdateTime = lastTimeRewardApplicable() (../../sb/BsktLPPool.sol#372)
+	BsktLPPool.lastUpdateTime (../../sb/BsktLPPool.sol#349) can be used in cross function reentrancies:
+	- BsktLPPool.lastUpdateTime (../../sb/BsktLPPool.sol#349)
+	- BsktLPPool.notifyRewardRate(uint256) (../../sb/BsktLPPool.sol#443-451)
+	- BsktLPPool.rewardPerToken() (../../sb/BsktLPPool.sol#384-396)
+	- BsktLPPool.updateReward(address) (../../sb/BsktLPPool.sol#370-378)
+	- getReward() (../../sb/BsktLPPool.sol#428)
+		- rewardPerTokenStored = rewardPerToken() (../../sb/BsktLPPool.sol#371)
+	BsktLPPool.rewardPerTokenStored (../../sb/BsktLPPool.sol#350) can be used in cross function reentrancies:
+	- BsktLPPool.rewardPerToken() (../../sb/BsktLPPool.sol#384-396)
+	- BsktLPPool.rewardPerTokenStored (../../sb/BsktLPPool.sol#350)
+	- BsktLPPool.updateReward(address) (../../sb/BsktLPPool.sol#370-378)
+	- getReward() (../../sb/BsktLPPool.sol#428)
+		- rewards[msg.sender] = 0 (../../sb/BsktLPPool.sol#435)
+		- rewards[account] = earned(account) (../../sb/BsktLPPool.sol#374)
+	BsktLPPool.rewards (../../sb/BsktLPPool.sol#354) can be used in cross function reentrancies:
+	- BsktLPPool.earned(address) (../../sb/BsktLPPool.sol#398-404)
+	- BsktLPPool.getReward() (../../sb/BsktLPPool.sol#431-440)
+	- BsktLPPool.rewards (../../sb/BsktLPPool.sol#354)
+	- BsktLPPool.updateReward(address) (../../sb/BsktLPPool.sol#370-378)
+	- getReward() (../../sb/BsktLPPool.sol#428)
+		- userRewardPerTokenPaid[account] = rewardPerTokenStored (../../sb/BsktLPPool.sol#375)
+	BsktLPPool.userRewardPerTokenPaid (../../sb/BsktLPPool.sol#353) can be used in cross function reentrancies:
+	- BsktLPPool.earned(address) (../../sb/BsktLPPool.sol#398-404)
+	- BsktLPPool.updateReward(address) (../../sb/BsktLPPool.sol#370-378)
+	- BsktLPPool.userRewardPerTokenPaid (../../sb/BsktLPPool.sol#353)
+Reentrancy in BsktLPPool.stake(uint256) (../../sb/BsktLPPool.sol#406-415):
+	External calls:
+	- super.stake(amount) (../../sb/BsktLPPool.sol#412)
+		- BSKTASREWARD.safeTransferFrom(msg.sender,address(this),amount) (../../sb/BsktLPPool.sol#332)
+		- (success,returndata) = address(token).call(data) (../../sb/BsktLPPool.sol#293)
+	State variables written after the call(s):
+	- minimumBsktStakingEntry[_msgSender()] = true (../../sb/BsktLPPool.sol#414)
+	BsktLPPool.minimumBsktStakingEntry (../../sb/BsktLPPool.sol#355) can be used in cross function reentrancies:
+	- BsktLPPool.minimumBsktStakingEntry (../../sb/BsktLPPool.sol#355)
+	- BsktLPPool.stake(uint256) (../../sb/BsktLPPool.sol#406-415)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+BsktLPPool.notifyRewardRate(uint256) (../../sb/BsktLPPool.sol#443-451) should emit an event for: 
+	- rewardRate = _reward.div(duration) (../../sb/BsktLPPool.sol#445) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+BsktLPPool.getReward() (../../sb/BsktLPPool.sol#431-440) uses timestamp for comparisons
+	Dangerous comparisons:
+	- reward > 0 (../../sb/BsktLPPool.sol#434)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/BsktLPPool.sol#178-187) uses assembly
+	- INLINE ASM (../../sb/BsktLPPool.sol#183-185)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.sendValue(address,uint256) (../../sb/BsktLPPool.sol#197-208) is never used and should be removed
+Address.toPayable(address) (../../sb/BsktLPPool.sol#189-195) is never used and should be removed
+Context._msgData() (../../sb/BsktLPPool.sol#96-99) is never used and should be removed
+Math.average(uint256,uint256) (../../sb/BsktLPPool.sol#21-23) is never used and should be removed
+Math.max(uint256,uint256) (../../sb/BsktLPPool.sol#13-15) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/BsktLPPool.sol#238-251) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/BsktLPPool.sol#270-288) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/BsktLPPool.sol#253-268) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/BsktLPPool.sol#75-77) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/BsktLPPool.sol#79-86) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.5.0 (../../sb/BsktLPPool.sol#1) allows old versions
+solc-0.5.17 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/BsktLPPool.sol#197-208):
+	- (success) = recipient.call.value(amount)() (../../sb/BsktLPPool.sol#203)
+Low level call in SafeERC20.callOptionalReturn(IERC20,bytes) (../../sb/BsktLPPool.sol#290-304):
+	- (success,returndata) = address(token).call(data) (../../sb/BsktLPPool.sol#293)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Variable LPTokenWrapper.BSKTASREWARD (../../sb/BsktLPPool.sol#311) is not in mixedCase
+Parameter BsktLPPool.notifyRewardRate(uint256)._reward (../../sb/BsktLPPool.sol#443) is not in mixedCase
+Parameter BsktLPPool.setDuration(uint256)._duration (../../sb/BsktLPPool.sol#454) is not in mixedCase
+Variable BsktLPPool.STAKEBSKT (../../sb/BsktLPPool.sol#343) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/BsktLPPool.sol#97)" inContext (../../sb/BsktLPPool.sol#89-100)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+BsktLPPool.rewardAmount (../../sb/BsktLPPool.sol#351) is never used in BsktLPPool (../../sb/BsktLPPool.sol#342-458)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-state-variable
+
+BsktLPPool.STAKEBSKT (../../sb/BsktLPPool.sol#343) should be constant 
+BsktLPPool.rewardAmount (../../sb/BsktLPPool.sol#351) should be constant 
+LPTokenWrapper.BSKTASREWARD (../../sb/BsktLPPool.sol#311) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+/sb/BsktLPPool.sol analyzed (9 contracts with 93 detectors), 28 result(s) found

@@ -1,0 +1,172 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 40 Code Findings │
+└──────────────────┘
+                          
+    /sb/StabilityPool.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+         2977┆ contract StabilityPool is LiquityBase, Ownable, CheckContract,   
+  IStabilityPool {                                                              
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+         2807┆ constructor () internal {
+         2808┆     _owner = msg.sender;
+         2809┆     emit OwnershipTransferred(address(0), msg.sender);
+         2810┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          506┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          560┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+         2761┆ require(feePercentage <= _maxFeePercentage, "Fee exceeded        
+  provided maximum");                                                           
+            ⋮┆----------------------------------------
+         2765┆ require(_maxFeePercentage >= 5e15 && _maxFeePercentage <=        
+  DECIMAL_PRECISION,                                                            
+         2766┆  "Max fee percentage must be between 0.5% and 100%");
+            ⋮┆----------------------------------------
+         2774┆ require(c >= a, "LiquitySafeMath128: addition overflow");
+            ⋮┆----------------------------------------
+         2780┆ require(b <= a, "LiquitySafeMath128: subtraction overflow");
+            ⋮┆----------------------------------------
+         2823┆ require(isOwner(), "Ownable: caller is not the owner");
+            ⋮┆----------------------------------------
+         2856┆ require(_account != address(0), "Account cannot be zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+         2861┆ require(size > 0, "Account code size cannot be zero");
+            ⋮┆----------------------------------------
+         3619┆ require(success, "StabilityPool: sending ETH failed");
+            ⋮┆----------------------------------------
+         3720┆ require( msg.sender == address(activePool), "StabilityPool:      
+  Caller is not ActivePool");                                                   
+            ⋮┆----------------------------------------
+         3724┆ require(msg.sender == address(troveManager), "StabilityPool:     
+  Caller is not TroveManager");                                                 
+            ⋮┆----------------------------------------
+         3731┆ require(ICR >= MCR, "StabilityPool: Cannot withdraw while there  
+  are troves with ICR < MCR");                                                  
+            ⋮┆----------------------------------------
+         3735┆ require(_initialDeposit > 0, 'StabilityPool: User must have a    
+  non-zero deposit');                                                           
+            ⋮┆----------------------------------------
+         3740┆ require(initialDeposit == 0, 'StabilityPool: User must have no   
+  deposit');                                                                    
+            ⋮┆----------------------------------------
+         3744┆ require(_amount > 0, 'StabilityPool: Amount must be non-zero');
+            ⋮┆----------------------------------------
+         3748┆ require(troveManager.getTroveStatus(_depositor) == 1,            
+  "StabilityPool: caller must have an active trove to withdraw ETHGain to");    
+            ⋮┆----------------------------------------
+         3753┆ require(ETHGain > 0, "StabilityPool: caller must have non-zero   
+  ETH Gain");                                                                   
+            ⋮┆----------------------------------------
+         3757┆ require(!frontEnds[_address].registered, "StabilityPool: must not
+  already be a registered front end");                                          
+            ⋮┆----------------------------------------
+         3761┆ require(frontEnds[_address].registered || _address == address(0),
+         3762┆     "StabilityPool: Tag must be a registered front end, or the   
+  zero address");                                                               
+            ⋮┆----------------------------------------
+         3766┆ require (_kickbackRate <= DECIMAL_PRECISION, "StabilityPool:     
+  Kickback rate must be in range [0,1]");                                       
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+         2765┆ require(_maxFeePercentage >= 5e15 && _maxFeePercentage <=        
+  DECIMAL_PRECISION,                                                            
+         2766┆  "Max fee percentage must be between 0.5% and 100%");
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          560┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+         2765┆ require(_maxFeePercentage >= 5e15 && _maxFeePercentage <=        
+  DECIMAL_PRECISION,                                                            
+         2766┆  "Max fee percentage must be between 0.5% and 100%");
+            ⋮┆----------------------------------------
+         2774┆ require(c >= a, "LiquitySafeMath128: addition overflow");
+            ⋮┆----------------------------------------
+         2780┆ require(b <= a, "LiquitySafeMath128: subtraction overflow");
+            ⋮┆----------------------------------------
+         3619┆ require(success, "StabilityPool: sending ETH failed");
+            ⋮┆----------------------------------------
+         3720┆ require( msg.sender == address(activePool), "StabilityPool:      
+  Caller is not ActivePool");                                                   
+            ⋮┆----------------------------------------
+         3724┆ require(msg.sender == address(troveManager), "StabilityPool:     
+  Caller is not TroveManager");                                                 
+            ⋮┆----------------------------------------
+         3731┆ require(ICR >= MCR, "StabilityPool: Cannot withdraw while there  
+  are troves with ICR < MCR");                                                  
+            ⋮┆----------------------------------------
+         3735┆ require(_initialDeposit > 0, 'StabilityPool: User must have a    
+  non-zero deposit');                                                           
+            ⋮┆----------------------------------------
+         3740┆ require(initialDeposit == 0, 'StabilityPool: User must have no   
+  deposit');                                                                    
+            ⋮┆----------------------------------------
+         3744┆ require(_amount > 0, 'StabilityPool: Amount must be non-zero');
+            ⋮┆----------------------------------------
+         3748┆ require(troveManager.getTroveStatus(_depositor) == 1,            
+  "StabilityPool: caller must have an active trove to withdraw ETHGain to");    
+            ⋮┆----------------------------------------
+         3753┆ require(ETHGain > 0, "StabilityPool: caller must have non-zero   
+  ETH Gain");                                                                   
+            ⋮┆----------------------------------------
+         3757┆ require(!frontEnds[_address].registered, "StabilityPool: must not
+  already be a registered front end");                                          
+            ⋮┆----------------------------------------
+         3761┆ require(frontEnds[_address].registered || _address == address(0),
+         3762┆     "StabilityPool: Tag must be a registered front end, or the   
+  zero address");                                                               
+            ⋮┆----------------------------------------
+         3766┆ require (_kickbackRate <= DECIMAL_PRECISION, "StabilityPool:     
+  Kickback rate must be in range [0,1]");                                       
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 40 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

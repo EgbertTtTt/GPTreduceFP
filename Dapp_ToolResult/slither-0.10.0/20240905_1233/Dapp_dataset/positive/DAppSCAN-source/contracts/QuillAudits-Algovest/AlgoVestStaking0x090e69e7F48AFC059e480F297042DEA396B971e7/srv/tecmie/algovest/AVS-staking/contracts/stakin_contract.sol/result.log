@@ -1,0 +1,222 @@
+'solc --version' running
+'solc /sb/stakin_contract.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/stakin_contract.sol:
+Warning: Function state mutability can be restricted to pure
+   --> /sb/stakin_contract.sol:715:5:
+    |
+715 |     function _getAVSEarnings(uint256 avsAmount, uint256 numOfDays)
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning: Function state mutability can be restricted to pure
+   --> /sb/stakin_contract.sol:745:5:
+    |
+745 |     function _getAVSEarnings_pen(uint256 avsAmount, uint256 numOfDays)
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning: Function state mutability can be restricted to pure
+   --> /sb/stakin_contract.sol:788:5:
+    |
+788 |     function min(uint256 a, uint256 b) private view returns (uint256 minimum) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+AlgoVestStaking.stakeEnd(uint256,uint256) (../../sb/stakin_contract.sol#523-628) ignores return value by avsAddress.transfer(sender,avsTokensToReturn) (../../sb/stakin_contract.sol#549)
+AlgoVestStaking.stakeEnd(uint256,uint256) (../../sb/stakin_contract.sol#523-628) ignores return value by avsAddress.transfer(sender,st.stakedAVS.add((avsTokensToReturn_scope_0.sub(st.stakedAVS)).mul(98).div(100))) (../../sb/stakin_contract.sol#581-586)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+AlgoVestStaking._getAVSEarnings(uint256,uint256) (../../sb/stakin_contract.sol#715-743) performs a multiplication on the result of a division:
+	- avsAmount + avsAmount.mul(perc).div(10000).mul(uint256(numOfDays)).div(uint256(365)) (../../sb/stakin_contract.sol#738-742)
+AlgoVestStaking._getAVSEarnings_pen(uint256,uint256) (../../sb/stakin_contract.sol#745-766) performs a multiplication on the result of a division:
+	- rew = avsAmount.mul(perc).div(10000).mul(uint256(numOfDays)).div(uint256(365)) (../../sb/stakin_contract.sol#760-763)
+AlgoVestStaking._getAVSEarnings_pen(uint256,uint256) (../../sb/stakin_contract.sol#745-766) performs a multiplication on the result of a division:
+	- rew = avsAmount.mul(perc).div(10000).mul(uint256(numOfDays)).div(uint256(365)) (../../sb/stakin_contract.sol#760-763)
+	- avsAmount + (rew * uint256(80)) / uint256(100) (../../sb/stakin_contract.sol#765)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+AlgoVestStaking.seven_days() (../../sb/stakin_contract.sol#802-836) uses a dangerous strict equality:
+	- allStakes.length == 0 (../../sb/stakin_contract.sol#803)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Reentrancy in AlgoVestStaking.AVSOwnerWithdraw(uint256) (../../sb/stakin_contract.sol#452-470):
+	External calls:
+	- require(bool,string)(avsAddress.transfer(sender,amount),StakingAVS: Could not send AVS tokens) (../../sb/stakin_contract.sol#463-466)
+	State variables written after the call(s):
+	- allAVSTokens = allAVSTokens.sub(amount) (../../sb/stakin_contract.sol#467)
+	AlgoVestStaking.allAVSTokens (../../sb/stakin_contract.sol#392) can be used in cross function reentrancies:
+	- AlgoVestStaking.AVSOwnerWithdraw(uint256) (../../sb/stakin_contract.sol#452-470)
+	- AlgoVestStaking.AVSTokenDonation(uint256) (../../sb/stakin_contract.sol#441-450)
+	- AlgoVestStaking.allAVSTokens (../../sb/stakin_contract.sol#392)
+	- AlgoVestStaking.stakeEnd(uint256,uint256) (../../sb/stakin_contract.sol#523-628)
+	- unfreezedAVSTokens = unfreezedAVSTokens.sub(amount) (../../sb/stakin_contract.sol#468)
+	AlgoVestStaking.unfreezedAVSTokens (../../sb/stakin_contract.sol#395) can be used in cross function reentrancies:
+	- AlgoVestStaking.AVSOwnerWithdraw(uint256) (../../sb/stakin_contract.sol#452-470)
+	- AlgoVestStaking.AVSTokenDonation(uint256) (../../sb/stakin_contract.sol#441-450)
+	- AlgoVestStaking.stakeEnd(uint256,uint256) (../../sb/stakin_contract.sol#523-628)
+	- AlgoVestStaking.stakeStart(uint256,uint256) (../../sb/stakin_contract.sol#472-521)
+	- AlgoVestStaking.unfreezedAVSTokens (../../sb/stakin_contract.sol#395)
+Reentrancy in AlgoVestStaking.stakeEnd(uint256,uint256) (../../sb/stakin_contract.sol#523-628):
+	External calls:
+	- avsAddress.transfer(sender,avsTokensToReturn) (../../sb/stakin_contract.sol#549)
+	State variables written after the call(s):
+	- _removeStake(stakeIndex,stakeId) (../../sb/stakin_contract.sol#562)
+		- stakeList[sender][stakeIndex] = stakeList[sender][stakeListLength - 1] (../../sb/stakin_contract.sol#782-784)
+		- stakeList[sender].pop() (../../sb/stakin_contract.sol#785)
+	AlgoVestStaking.stakeList (../../sb/stakin_contract.sol#411) can be used in cross function reentrancies:
+	- AlgoVestStaking._removeStake(uint256,uint256) (../../sb/stakin_contract.sol#772-786)
+	- AlgoVestStaking.getEndDayOfStakeInUnixTime(address,uint256,uint256) (../../sb/stakin_contract.sol#659-679)
+	- AlgoVestStaking.getStakeDivsNow(address,uint256,uint256) (../../sb/stakin_contract.sol#681-704)
+	- AlgoVestStaking.stakeEnd(uint256,uint256) (../../sb/stakin_contract.sol#523-628)
+	- AlgoVestStaking.stakeList (../../sb/stakin_contract.sol#411)
+	- AlgoVestStaking.stakeListCount(address) (../../sb/stakin_contract.sol#630-632)
+	- AlgoVestStaking.stakeStart(uint256,uint256) (../../sb/stakin_contract.sol#472-521)
+Reentrancy in AlgoVestStaking.stakeEnd(uint256,uint256) (../../sb/stakin_contract.sol#523-628):
+	External calls:
+	- avsAddress.transfer(sender,st.stakedAVS.add((avsTokensToReturn_scope_0.sub(st.stakedAVS)).mul(98).div(100))) (../../sb/stakin_contract.sol#581-586)
+	State variables written after the call(s):
+	- _removeStake(stakeIndex,stakeId) (../../sb/stakin_contract.sol#600)
+		- stakeList[sender][stakeIndex] = stakeList[sender][stakeListLength - 1] (../../sb/stakin_contract.sol#782-784)
+		- stakeList[sender].pop() (../../sb/stakin_contract.sol#785)
+	AlgoVestStaking.stakeList (../../sb/stakin_contract.sol#411) can be used in cross function reentrancies:
+	- AlgoVestStaking._removeStake(uint256,uint256) (../../sb/stakin_contract.sol#772-786)
+	- AlgoVestStaking.getEndDayOfStakeInUnixTime(address,uint256,uint256) (../../sb/stakin_contract.sol#659-679)
+	- AlgoVestStaking.getStakeDivsNow(address,uint256,uint256) (../../sb/stakin_contract.sol#681-704)
+	- AlgoVestStaking.stakeEnd(uint256,uint256) (../../sb/stakin_contract.sol#523-628)
+	- AlgoVestStaking.stakeList (../../sb/stakin_contract.sol#411)
+	- AlgoVestStaking.stakeListCount(address) (../../sb/stakin_contract.sol#630-632)
+	- AlgoVestStaking.stakeStart(uint256,uint256) (../../sb/stakin_contract.sol#472-521)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+AlgoVestStaking.stakeEnd(uint256,uint256) (../../sb/stakin_contract.sol#523-628) contains a tautology or contradiction:
+	- require(bool,string)(stakeIndex >= 0 && stakeIndex < stakeList[sender].length,StakingAVS: Wrong stakeIndex) (../../sb/stakin_contract.sol#528-531)
+AlgoVestStaking._getAVSEarnings(uint256,uint256) (../../sb/stakin_contract.sol#715-743) contains a tautology or contradiction:
+	- require(bool,string)(numOfDays >= 0 && numOfDays <= maxNumDays,StakingAVS: Wrong numOfDays) (../../sb/stakin_contract.sol#720-723)
+AlgoVestStaking._getAVSEarnings_pen(uint256,uint256) (../../sb/stakin_contract.sol#745-766) contains a tautology or contradiction:
+	- require(bool,string)(numOfDays >= 0 && numOfDays <= maxNumDays,StakingAVS: Wrong numOfDays) (../../sb/stakin_contract.sol#750-753)
+AlgoVestStaking._removeStake(uint256,uint256) (../../sb/stakin_contract.sol#772-786) contains a tautology or contradiction:
+	- require(bool,string)(stakeIndex >= 0 && stakeIndex < stakeListLength,StakingAVS: Wrong stakeIndex) (../../sb/stakin_contract.sol#775-778)
+AlgoVestStaking.seven_days() (../../sb/stakin_contract.sol#802-836) contains a tautology or contradiction:
+	- stake_day >= day_week_ago && step >= 0 (../../sb/stakin_contract.sol#817)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#tautology-or-contradiction
+
+Reentrancy in AlgoVestStaking.AVSTokenDonation(uint256) (../../sb/stakin_contract.sol#441-450):
+	External calls:
+	- require(bool,string)(avsAddress.transferFrom(sender,address(this),amount),StakingAVS: Could not get AVS tokens) (../../sb/stakin_contract.sol#443-446)
+	State variables written after the call(s):
+	- allAVSTokens = allAVSTokens.add(amount) (../../sb/stakin_contract.sol#447)
+	- unfreezedAVSTokens = unfreezedAVSTokens.add(amount) (../../sb/stakin_contract.sol#448)
+Reentrancy in AlgoVestStaking.stakeEnd(uint256,uint256) (../../sb/stakin_contract.sol#523-628):
+	External calls:
+	- avsAddress.transfer(sender,avsTokensToReturn) (../../sb/stakin_contract.sol#549)
+	State variables written after the call(s):
+	- totalStakedAVS = totalStakedAVS.sub(st.stakedAVS) (../../sb/stakin_contract.sol#566)
+	- -- totalStakers (../../sb/stakin_contract.sol#564)
+Reentrancy in AlgoVestStaking.stakeEnd(uint256,uint256) (../../sb/stakin_contract.sol#523-628):
+	External calls:
+	- avsAddress.transfer(sender,st.stakedAVS.add((avsTokensToReturn_scope_0.sub(st.stakedAVS)).mul(98).div(100))) (../../sb/stakin_contract.sol#581-586)
+	State variables written after the call(s):
+	- totalStakedAVS = totalStakedAVS.sub(st.stakedAVS) (../../sb/stakin_contract.sol#604)
+	- -- totalStakers (../../sb/stakin_contract.sol#602)
+Reentrancy in AlgoVestStaking.stakeStart(uint256,uint256) (../../sb/stakin_contract.sol#472-521):
+	External calls:
+	- require(bool,string)(avsAddress.transferFrom(sender,address(this),amount),StakingAVS: AVS token transfer failed) (../../sb/stakin_contract.sol#483-486)
+	State variables written after the call(s):
+	- allStakes.push(st) (../../sb/stakin_contract.sol#508)
+	- freezedAVSTokens = freezedAVSTokens.add(avsEarnings - amount) (../../sb/stakin_contract.sol#496)
+	- st = StakeInfo(++ stakeIdLast,currDay,numDaysStake,amount,avsEarnings - amount) (../../sb/stakin_contract.sol#499-506)
+	- stakeList[sender].push(st) (../../sb/stakin_contract.sol#507)
+	- totalStakedAVS = totalStakedAVS.add(amount) (../../sb/stakin_contract.sol#520)
+	- ++ totalStakers (../../sb/stakin_contract.sol#518)
+	- unfreezedAVSTokens = unfreezedAVSTokens.sub(avsEarnings - amount) (../../sb/stakin_contract.sol#495)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in AlgoVestStaking.AVSOwnerWithdraw(uint256) (../../sb/stakin_contract.sol#452-470):
+	External calls:
+	- require(bool,string)(avsAddress.transfer(sender,amount),StakingAVS: Could not send AVS tokens) (../../sb/stakin_contract.sol#463-466)
+	Event emitted after the call(s):
+	- AVSTokenOutcome(sender,amount,_currentDay()) (../../sb/stakin_contract.sol#469)
+Reentrancy in AlgoVestStaking.AVSTokenDonation(uint256) (../../sb/stakin_contract.sol#441-450):
+	External calls:
+	- require(bool,string)(avsAddress.transferFrom(sender,address(this),amount),StakingAVS: Could not get AVS tokens) (../../sb/stakin_contract.sol#443-446)
+	Event emitted after the call(s):
+	- AVSTokenIncome(sender,amount,_currentDay()) (../../sb/stakin_contract.sol#449)
+Reentrancy in AlgoVestStaking.stakeEnd(uint256,uint256) (../../sb/stakin_contract.sol#523-628):
+	External calls:
+	- avsAddress.transfer(sender,avsTokensToReturn) (../../sb/stakin_contract.sol#549)
+	Event emitted after the call(s):
+	- AVSTokenOutcome(sender,avsTokensToReturn - st.stakedAVS,currDay) (../../sb/stakin_contract.sol#550-554)
+	- StakeEnd(sender,st.stakeId,avsTokensToReturn - st.stakedAVS,servedNumOfDays,currDay) (../../sb/stakin_contract.sol#555-561)
+Reentrancy in AlgoVestStaking.stakeEnd(uint256,uint256) (../../sb/stakin_contract.sol#523-628):
+	External calls:
+	- avsAddress.transfer(sender,st.stakedAVS.add((avsTokensToReturn_scope_0.sub(st.stakedAVS)).mul(98).div(100))) (../../sb/stakin_contract.sol#581-586)
+	Event emitted after the call(s):
+	- AVSTokenOutcome(sender,(avsTokensToReturn_scope_0.sub(st.stakedAVS)).mul(98).div(100),currDay) (../../sb/stakin_contract.sol#587-591)
+	- StakeEnd(sender,st.stakeId,avsTokensToReturn_scope_0 - st.stakedAVS,servedNumOfDays,currDay) (../../sb/stakin_contract.sol#593-599)
+Reentrancy in AlgoVestStaking.stakeStart(uint256,uint256) (../../sb/stakin_contract.sol#472-521):
+	External calls:
+	- require(bool,string)(avsAddress.transferFrom(sender,address(this),amount),StakingAVS: AVS token transfer failed) (../../sb/stakin_contract.sol#483-486)
+	Event emitted after the call(s):
+	- AVSTokenIncome(sender,amount,currDay) (../../sb/stakin_contract.sol#488)
+	- StakeStart(sender,amount,avsEarnings - amount,numDaysStake,currDay,stakeIdLast) (../../sb/stakin_contract.sol#509-516)
+	- TokenFreezed(sender,avsEarnings - amount,currDay) (../../sb/stakin_contract.sol#497)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+AlgoVestStaking.AVSOwnerWithdraw(uint256) (../../sb/stakin_contract.sol#452-470) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(allAVSTokens >= amount,StakingAVS: Not enough value on this contract) (../../sb/stakin_contract.sol#455-458)
+	- require(bool,string)(unfreezedAVSTokens >= amount,StakingAVS: Not enough unfreezed value on this contract) (../../sb/stakin_contract.sol#459-462)
+AlgoVestStaking.stakeStart(uint256,uint256) (../../sb/stakin_contract.sol#472-521) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(unfreezedAVSTokens >= avsEarnings - amount,StakingAVS: Insufficient funds of AVS tokens to this stake) (../../sb/stakin_contract.sol#491-494)
+AlgoVestStaking.stakeEnd(uint256,uint256) (../../sb/stakin_contract.sol#523-628) uses timestamp for comparisons
+	Dangerous comparisons:
+	- servedNumOfDays < st.numDaysStake (../../sb/stakin_contract.sol#536)
+	- require(bool,string)(st.freezedRewardAVSTokens >= avsTokensToReturn - st.stakedAVS,StakingAVS: Internal error!) (../../sb/stakin_contract.sol#539-542)
+AlgoVestStaking._getServedDays(uint256,uint256,uint256) (../../sb/stakin_contract.sol#706-713) uses timestamp for comparisons
+	Dangerous comparisons:
+	- servedDays > numDaysStake (../../sb/stakin_contract.sol#712)
+AlgoVestStaking._getAVSEarnings_pen(uint256,uint256) (../../sb/stakin_contract.sol#745-766) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(numOfDays >= 0 && numOfDays <= maxNumDays,StakingAVS: Wrong numOfDays) (../../sb/stakin_contract.sol#750-753)
+	- i <= num_of_parts (../../sb/stakin_contract.sol#757)
+AlgoVestStaking.min(uint256,uint256) (../../sb/stakin_contract.sol#788-796) uses timestamp for comparisons
+	Dangerous comparisons:
+	- a > b (../../sb/stakin_contract.sol#790)
+AlgoVestStaking.seven_days() (../../sb/stakin_contract.sol#802-836) uses timestamp for comparisons
+	Dangerous comparisons:
+	- allStakes.length == 0 (../../sb/stakin_contract.sol#803)
+	- day_now >= days_in_week (../../sb/stakin_contract.sol#814)
+	- stake_day >= day_week_ago && step >= 0 (../../sb/stakin_contract.sol#817)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Context._msgData() (../../sb/stakin_contract.sol#20-23) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/stakin_contract.sol#275-278) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/stakin_contract.sol#237-240) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/stakin_contract.sol#295-298) is never used and should be removed
+SafeMath.sub(uint256,uint256,string) (../../sb/stakin_contract.sol#255-258) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/stakin_contract.sol#109-113) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/stakin_contract.sol#145-148) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/stakin_contract.sol#155-158) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/stakin_contract.sol#130-138) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/stakin_contract.sol#120-123) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.6.0 (../../sb/stakin_contract.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Function AlgoVestStaking.AVSTokenDonation(uint256) (../../sb/stakin_contract.sol#441-450) is not in mixedCase
+Function AlgoVestStaking.AVSOwnerWithdraw(uint256) (../../sb/stakin_contract.sol#452-470) is not in mixedCase
+Function AlgoVestStaking._getAVSEarnings_pen(uint256,uint256) (../../sb/stakin_contract.sol#745-766) is not in mixedCase
+Function AlgoVestStaking.length_stakes() (../../sb/stakin_contract.sol#798-800) is not in mixedCase
+Function AlgoVestStaking.seven_days() (../../sb/stakin_contract.sol#802-836) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/stakin_contract.sol#21)" inContext (../../sb/stakin_contract.sol#15-24)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+AlgoVestStaking.avsAddress (../../sb/stakin_contract.sol#380) should be immutable 
+AlgoVestStaking.dayDurationSec (../../sb/stakin_contract.sol#382) should be immutable 
+AlgoVestStaking.zeroDayStartTime (../../sb/stakin_contract.sol#381) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/stakin_contract.sol analyzed (5 contracts with 93 detectors), 51 result(s) found

@@ -1,0 +1,133 @@
+'solc --version' running
+'solc /sb/Market.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+Reentrancy in Market.changeCumulativeToken(address,address) (../../sb/Market.sol#1343-1347):
+	External calls:
+	- withdraw(recipient) (../../sb/Market.sol#1344)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/Market.sol#856)
+		- cumulative.safeTransfer(recipient,balance) (../../sb/Market.sol#1539)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/Market.sol#724)
+	External calls sending eth:
+	- withdraw(recipient) (../../sb/Market.sol#1344)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/Market.sol#724)
+	State variables written after the call(s):
+	- cumulative = ERC20(newToken) (../../sb/Market.sol#1345)
+	Market.cumulative (../../sb/Market.sol#1261) can be used in cross function reentrancies:
+	- Market._path(address) (../../sb/Market.sol#1445-1459)
+	- Market.buy(address,uint256) (../../sb/Market.sol#1479-1501)
+	- Market.buyFromETH() (../../sb/Market.sol#1507-1529)
+	- Market.changeCumulativeToken(address,address) (../../sb/Market.sol#1343-1347)
+	- Market.constructor(address,address,address,address,address) (../../sb/Market.sol#1306-1318)
+	- Market.cumulative (../../sb/Market.sol#1261)
+	- Market.price(address,uint256) (../../sb/Market.sol#1421-1439)
+	- Market.withdraw(address) (../../sb/Market.sol#1535-1542)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities
+
+Market.price(address,uint256) (../../sb/Market.sol#1421-1439) performs a multiplication on the result of a division:
+	- reward = product.mul(10 ** REWARD_DECIMALS).div(productTokenBalance).mul(rewardTokenBalance).div(10 ** REWARD_DECIMALS) (../../sb/Market.sol#1437)
+Market.price(address,uint256) (../../sb/Market.sol#1421-1439) performs a multiplication on the result of a division:
+	- product = tokenPrice.mul(10 ** PRICE_DECIMALS).div(cumulativePrice).mul(payment).div(10 ** PRICE_DECIMALS).mul(10 ** productDecimals.sub(tokenDecimals)) (../../sb/Market.sol#1431)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+Market.buy(address,uint256) (../../sb/Market.sol#1479-1501) ignores return value by uniswapRouter.swapExactTokensForTokens(payment,amountOut,_path(currency),address(this),block.timestamp) (../../sb/Market.sol#1491)
+Market.buyFromETH() (../../sb/Market.sol#1507-1529) ignores return value by uniswapRouter.swapExactETHForTokens{value: payment}(amountOut,_path(currency),address(this),block.timestamp) (../../sb/Market.sol#1519)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+OwnablePausable.changePauser(address).newPauser (../../sb/Market.sol#1028) lacks a zero-check on :
+		- pauser = newPauser (../../sb/Market.sol#1029)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in Market.buy(address,uint256) (../../sb/Market.sol#1479-1501):
+	External calls:
+	- ERC20(currency).safeTransferFrom(_msgSender(),address(this),payment) (../../sb/Market.sol#1484)
+	- ERC20(currency).safeApprove(address(uniswapRouter),payment) (../../sb/Market.sol#1490)
+	- uniswapRouter.swapExactTokensForTokens(payment,amountOut,_path(currency),address(this),block.timestamp) (../../sb/Market.sol#1491)
+	- productToken.safeTransfer(_msgSender(),product) (../../sb/Market.sol#1494)
+	- rewardToken.safeTransfer(_msgSender(),reward) (../../sb/Market.sol#1496)
+	Event emitted after the call(s):
+	- Buy(_msgSender(),currency,payment,product,reward) (../../sb/Market.sol#1498)
+Reentrancy in Market.buyFromETH() (../../sb/Market.sol#1507-1529):
+	External calls:
+	- uniswapRouter.swapExactETHForTokens{value: payment}(amountOut,_path(currency),address(this),block.timestamp) (../../sb/Market.sol#1519)
+	- productToken.safeTransfer(_msgSender(),product) (../../sb/Market.sol#1522)
+	- rewardToken.safeTransfer(_msgSender(),reward) (../../sb/Market.sol#1524)
+	External calls sending eth:
+	- uniswapRouter.swapExactETHForTokens{value: payment}(amountOut,_path(currency),address(this),block.timestamp) (../../sb/Market.sol#1519)
+	Event emitted after the call(s):
+	- Buy(_msgSender(),currency,payment,product,reward) (../../sb/Market.sol#1526)
+Reentrancy in Market.changeCumulativeToken(address,address) (../../sb/Market.sol#1343-1347):
+	External calls:
+	- withdraw(recipient) (../../sb/Market.sol#1344)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/Market.sol#856)
+		- cumulative.safeTransfer(recipient,balance) (../../sb/Market.sol#1539)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/Market.sol#724)
+	External calls sending eth:
+	- withdraw(recipient) (../../sb/Market.sol#1344)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/Market.sol#724)
+	Event emitted after the call(s):
+	- CumulativeChanged(newToken) (../../sb/Market.sol#1346)
+Reentrancy in Market.withdraw(address) (../../sb/Market.sol#1535-1542):
+	External calls:
+	- cumulative.safeTransfer(recipient,balance) (../../sb/Market.sol#1539)
+	Event emitted after the call(s):
+	- Withdrawal(recipient,address(cumulative),balance) (../../sb/Market.sol#1541)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Address.isContract(address) (../../sb/Market.sol#631-640) uses assembly
+	- INLINE ASM (../../sb/Market.sol#638)
+Address._verifyCallResult(bool,bytes,string) (../../sb/Market.sol#776-793) uses assembly
+	- INLINE ASM (../../sb/Market.sol#785-788)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.functionCall(address,bytes) (../../sb/Market.sol#684-686) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/Market.sol#709-711) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/Market.sol#758-760) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/Market.sol#768-774) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/Market.sol#734-736) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/Market.sol#744-750) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/Market.sol#658-664) is never used and should be removed
+Context._msgData() (../../sb/Market.sol#231-234) is never used and should be removed
+ERC20._burn(address,uint256) (../../sb/Market.sol#551-559) is never used and should be removed
+ERC20._mint(address,uint256) (../../sb/Market.sol#530-538) is never used and should be removed
+ERC20._setupDecimals(uint8) (../../sb/Market.sol#589-591) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/Market.sol#840-843) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/Market.sol#835-838) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/Market.sol#190-193) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/Market.sol#152-155) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/Market.sol#210-213) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/Market.sol#24-28) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/Market.sol#60-63) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/Market.sol#70-73) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/Market.sol#45-53) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/Market.sol#35-38) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.6.0 (../../sb/Market.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/Market.sol#658-664):
+	- (success) = recipient.call{value: amount}() (../../sb/Market.sol#662)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/Market.sol#719-726):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/Market.sol#724)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/Market.sol#744-750):
+	- (success,returndata) = target.staticcall(data) (../../sb/Market.sol#748)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/Market.sol#768-774):
+	- (success,returndata) = target.delegatecall(data) (../../sb/Market.sol#772)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Function IUniswapV2Router02.WETH() (../../sb/Market.sol#1053) is not in mixedCase
+Parameter Market.changeUniswapRouter(address)._uniswapRouter (../../sb/Market.sol#1324) is not in mixedCase
+Parameter Market.changePriceOracle(address)._priceOracle (../../sb/Market.sol#1333) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/Market.sol#232)" inContext (../../sb/Market.sol#226-235)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Variable IUniswapV2Router02.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountADesired (../../sb/Market.sol#1058) is too similar to IUniswapV2Router02.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountBDesired (../../sb/Market.sol#1059)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+Market.productToken (../../sb/Market.sol#1264) should be immutable 
+Market.rewardToken (../../sb/Market.sol#1267) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/Market.sol analyzed (12 contracts with 93 detectors), 46 result(s) found

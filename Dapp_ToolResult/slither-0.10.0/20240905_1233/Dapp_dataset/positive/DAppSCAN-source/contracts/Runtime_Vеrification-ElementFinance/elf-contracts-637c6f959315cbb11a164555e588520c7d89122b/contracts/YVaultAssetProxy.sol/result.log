@@ -1,0 +1,141 @@
+'solc --version' running
+'solc /sb/YVaultAssetProxy.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/sb' running
+
+WrappedPosition.deposit(address,uint256) (../../sb/YVaultAssetProxy.sol#366-378) ignores return value by token.transferFrom(msg.sender,address(this),_amount) (../../sb/YVaultAssetProxy.sol#372)
+YVaultAssetProxy.reserveDeposit(uint256) (../../sb/YVaultAssetProxy.sol#514-545) ignores return value by token.transferFrom(msg.sender,address(this),_amount) (../../sb/YVaultAssetProxy.sol#517)
+YVaultAssetProxy.reserveWithdraw(uint256) (../../sb/YVaultAssetProxy.sol#549-574) ignores return value by token.transfer(msg.sender,freedUnderlying + userUnderlying) (../../sb/YVaultAssetProxy.sol#573)
+YVaultAssetProxy._withdraw(uint256,address,uint256) (../../sb/YVaultAssetProxy.sol#613-647) ignores return value by token.transfer(_destination,needed) (../../sb/YVaultAssetProxy.sol#631)
+YVaultAssetProxy._withdraw(uint256,address,uint256) (../../sb/YVaultAssetProxy.sol#613-647) ignores return value by token.transfer(_destination,needed) (../../sb/YVaultAssetProxy.sol#644)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+YVaultAssetProxy._withdraw(uint256,address,uint256) (../../sb/YVaultAssetProxy.sol#613-647) uses a dangerous strict equality:
+	- _underlyingPerShare == 0 (../../sb/YVaultAssetProxy.sol#619)
+YVaultAssetProxy.reserveDeposit(uint256) (../../sb/YVaultAssetProxy.sol#514-545) uses a dangerous strict equality:
+	- localUnderlying == 0 && localShares == 0 (../../sb/YVaultAssetProxy.sol#537)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Reentrancy in YVaultAssetProxy._deposit() (../../sb/YVaultAssetProxy.sol#579-607):
+	External calls:
+	- shares = vault.deposit(localUnderlying + amount,address(this)) (../../sb/YVaultAssetProxy.sol#602)
+	State variables written after the call(s):
+	- _setReserves(0,shares - neededShares) (../../sb/YVaultAssetProxy.sol#604)
+		- reserveShares = uint128(_newReserveShares) (../../sb/YVaultAssetProxy.sol#689)
+	YVaultAssetProxy.reserveShares (../../sb/YVaultAssetProxy.sol#487) can be used in cross function reentrancies:
+	- YVaultAssetProxy._getReserves() (../../sb/YVaultAssetProxy.sol#677-679)
+	- YVaultAssetProxy._setReserves(uint256,uint256) (../../sb/YVaultAssetProxy.sol#684-690)
+	- YVaultAssetProxy.reserveShares (../../sb/YVaultAssetProxy.sol#487)
+	- _setReserves(0,shares - neededShares) (../../sb/YVaultAssetProxy.sol#604)
+		- reserveUnderlying = uint128(_newReserveUnderlying) (../../sb/YVaultAssetProxy.sol#688)
+	YVaultAssetProxy.reserveUnderlying (../../sb/YVaultAssetProxy.sol#486) can be used in cross function reentrancies:
+	- YVaultAssetProxy._getReserves() (../../sb/YVaultAssetProxy.sol#677-679)
+	- YVaultAssetProxy._setReserves(uint256,uint256) (../../sb/YVaultAssetProxy.sol#684-690)
+	- YVaultAssetProxy.reserveUnderlying (../../sb/YVaultAssetProxy.sol#486)
+Reentrancy in YVaultAssetProxy._withdraw(uint256,address,uint256) (../../sb/YVaultAssetProxy.sol#613-647):
+	External calls:
+	- amountReceived = vault.withdraw(_shares + localShares,address(this),1) (../../sb/YVaultAssetProxy.sol#637-641)
+	State variables written after the call(s):
+	- _setReserves(amountReceived - needed,0) (../../sb/YVaultAssetProxy.sol#642)
+		- reserveShares = uint128(_newReserveShares) (../../sb/YVaultAssetProxy.sol#689)
+	YVaultAssetProxy.reserveShares (../../sb/YVaultAssetProxy.sol#487) can be used in cross function reentrancies:
+	- YVaultAssetProxy._getReserves() (../../sb/YVaultAssetProxy.sol#677-679)
+	- YVaultAssetProxy._setReserves(uint256,uint256) (../../sb/YVaultAssetProxy.sol#684-690)
+	- YVaultAssetProxy.reserveShares (../../sb/YVaultAssetProxy.sol#487)
+	- _setReserves(amountReceived - needed,0) (../../sb/YVaultAssetProxy.sol#642)
+		- reserveUnderlying = uint128(_newReserveUnderlying) (../../sb/YVaultAssetProxy.sol#688)
+	YVaultAssetProxy.reserveUnderlying (../../sb/YVaultAssetProxy.sol#486) can be used in cross function reentrancies:
+	- YVaultAssetProxy._getReserves() (../../sb/YVaultAssetProxy.sol#677-679)
+	- YVaultAssetProxy._setReserves(uint256,uint256) (../../sb/YVaultAssetProxy.sol#684-690)
+	- YVaultAssetProxy.reserveUnderlying (../../sb/YVaultAssetProxy.sol#486)
+Reentrancy in YVaultAssetProxy.reserveWithdraw(uint256) (../../sb/YVaultAssetProxy.sol#549-574):
+	External calls:
+	- freedUnderlying = vault.withdraw(userShares,address(this),0) (../../sb/YVaultAssetProxy.sol#558)
+	State variables written after the call(s):
+	- _setReserves(localUnderlying - userUnderlying,localShares - userShares) (../../sb/YVaultAssetProxy.sol#564-567)
+		- reserveShares = uint128(_newReserveShares) (../../sb/YVaultAssetProxy.sol#689)
+	YVaultAssetProxy.reserveShares (../../sb/YVaultAssetProxy.sol#487) can be used in cross function reentrancies:
+	- YVaultAssetProxy._getReserves() (../../sb/YVaultAssetProxy.sol#677-679)
+	- YVaultAssetProxy._setReserves(uint256,uint256) (../../sb/YVaultAssetProxy.sol#684-690)
+	- YVaultAssetProxy.reserveShares (../../sb/YVaultAssetProxy.sol#487)
+	- reserveSupply = localReserveSupply - _amount (../../sb/YVaultAssetProxy.sol#569)
+	YVaultAssetProxy.reserveSupply (../../sb/YVaultAssetProxy.sol#489) can be used in cross function reentrancies:
+	- YVaultAssetProxy.reserveDeposit(uint256) (../../sb/YVaultAssetProxy.sol#514-545)
+	- YVaultAssetProxy.reserveSupply (../../sb/YVaultAssetProxy.sol#489)
+	- YVaultAssetProxy.reserveWithdraw(uint256) (../../sb/YVaultAssetProxy.sol#549-574)
+	- _setReserves(localUnderlying - userUnderlying,localShares - userShares) (../../sb/YVaultAssetProxy.sol#564-567)
+		- reserveUnderlying = uint128(_newReserveUnderlying) (../../sb/YVaultAssetProxy.sol#688)
+	YVaultAssetProxy.reserveUnderlying (../../sb/YVaultAssetProxy.sol#486) can be used in cross function reentrancies:
+	- YVaultAssetProxy._getReserves() (../../sb/YVaultAssetProxy.sol#677-679)
+	- YVaultAssetProxy._setReserves(uint256,uint256) (../../sb/YVaultAssetProxy.sol#684-690)
+	- YVaultAssetProxy.reserveUnderlying (../../sb/YVaultAssetProxy.sol#486)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+YVaultAssetProxy.constructor(address,IERC20,string,string) (../../sb/YVaultAssetProxy.sol#497-506) ignores return value by _token.approve(vault_,type()(uint256).max) (../../sb/YVaultAssetProxy.sol#504)
+YVaultAssetProxy.approve() (../../sb/YVaultAssetProxy.sol#670-673) ignores return value by token.approve(address(vault),0) (../../sb/YVaultAssetProxy.sol#671)
+YVaultAssetProxy.approve() (../../sb/YVaultAssetProxy.sol#670-673) ignores return value by token.approve(address(vault),type()(uint256).max) (../../sb/YVaultAssetProxy.sol#672)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+Reentrancy in WrappedPosition.deposit(address,uint256) (../../sb/YVaultAssetProxy.sol#366-378):
+	External calls:
+	- token.transferFrom(msg.sender,address(this),_amount) (../../sb/YVaultAssetProxy.sol#372)
+	State variables written after the call(s):
+	- _mint(_destination,shares) (../../sb/YVaultAssetProxy.sol#376)
+		- balanceOf[account] = balanceOf[account] + amount (../../sb/YVaultAssetProxy.sol#225)
+Reentrancy in YVaultAssetProxy.reserveDeposit(uint256) (../../sb/YVaultAssetProxy.sol#514-545):
+	External calls:
+	- token.transferFrom(msg.sender,address(this),_amount) (../../sb/YVaultAssetProxy.sol#517)
+	State variables written after the call(s):
+	- reserveBalances[msg.sender] += mintAmount (../../sb/YVaultAssetProxy.sol#543)
+	- _setReserves(localUnderlying + _amount,localShares) (../../sb/YVaultAssetProxy.sol#541)
+		- reserveShares = uint128(_newReserveShares) (../../sb/YVaultAssetProxy.sol#689)
+	- reserveSupply = localReserveSupply + mintAmount (../../sb/YVaultAssetProxy.sol#544)
+	- _setReserves(localUnderlying + _amount,localShares) (../../sb/YVaultAssetProxy.sol#541)
+		- reserveUnderlying = uint128(_newReserveUnderlying) (../../sb/YVaultAssetProxy.sol#688)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in WrappedPosition.deposit(address,uint256) (../../sb/YVaultAssetProxy.sol#366-378):
+	External calls:
+	- token.transferFrom(msg.sender,address(this),_amount) (../../sb/YVaultAssetProxy.sol#372)
+	Event emitted after the call(s):
+	- Transfer(address(0),account,amount) (../../sb/YVaultAssetProxy.sol#226)
+		- _mint(_destination,shares) (../../sb/YVaultAssetProxy.sol#376)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+ERC20.permit(address,address,uint256,uint256,uint8,bytes32,bytes32) (../../sb/YVaultAssetProxy.sol#246-281) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(deadline == 0 || block.timestamp <= deadline,ERC20: permit-expired) (../../sb/YVaultAssetProxy.sol#274-277)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+ERC20._getChainId() (../../sb/YVaultAssetProxy.sol#287-293) uses assembly
+	- INLINE ASM (../../sb/YVaultAssetProxy.sol#290-292)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Pragma version^0.8.0 (../../sb/YVaultAssetProxy.sol#1) allows old versions
+solc-0.8.27 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Function IERC20Permit.DOMAIN_SEPARATOR() (../../sb/YVaultAssetProxy.sol#122) is not in mixedCase
+Variable ERC20.DOMAIN_SEPARATOR (../../sb/YVaultAssetProxy.sol#170) is not in mixedCase
+Parameter WrappedPosition.balanceOfUnderlying(address)._who (../../sb/YVaultAssetProxy.sol#339) is not in mixedCase
+Parameter WrappedPosition.getSharesToUnderlying(uint256)._shares (../../sb/YVaultAssetProxy.sol#351) is not in mixedCase
+Parameter WrappedPosition.deposit(address,uint256)._destination (../../sb/YVaultAssetProxy.sol#366) is not in mixedCase
+Parameter WrappedPosition.deposit(address,uint256)._amount (../../sb/YVaultAssetProxy.sol#366) is not in mixedCase
+Parameter WrappedPosition.prefundedDeposit(address)._destination (../../sb/YVaultAssetProxy.sol#385) is not in mixedCase
+Parameter WrappedPosition.withdraw(address,uint256,uint256)._destination (../../sb/YVaultAssetProxy.sol#410) is not in mixedCase
+Parameter WrappedPosition.withdraw(address,uint256,uint256)._shares (../../sb/YVaultAssetProxy.sol#411) is not in mixedCase
+Parameter WrappedPosition.withdraw(address,uint256,uint256)._minUnderlying (../../sb/YVaultAssetProxy.sol#412) is not in mixedCase
+Parameter WrappedPosition.withdrawUnderlying(address,uint256,uint256)._destination (../../sb/YVaultAssetProxy.sol#424) is not in mixedCase
+Parameter WrappedPosition.withdrawUnderlying(address,uint256,uint256)._amount (../../sb/YVaultAssetProxy.sol#425) is not in mixedCase
+Parameter WrappedPosition.withdrawUnderlying(address,uint256,uint256)._minUnderlying (../../sb/YVaultAssetProxy.sol#426) is not in mixedCase
+Parameter YVaultAssetProxy.reserveDeposit(uint256)._amount (../../sb/YVaultAssetProxy.sol#514) is not in mixedCase
+Parameter YVaultAssetProxy.reserveWithdraw(uint256)._amount (../../sb/YVaultAssetProxy.sol#549) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/YVaultAssetProxy.sol#288)" inERC20 (../../sb/YVaultAssetProxy.sol#158-294)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Variable WrappedPosition.prefundedDeposit(address).usedUnderlying (../../sb/YVaultAssetProxy.sol#395) is too similar to YVaultAssetProxy.reserveWithdraw(uint256).userUnderlying (../../sb/YVaultAssetProxy.sol#560-561)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+ERC20.DOMAIN_SEPARATOR (../../sb/YVaultAssetProxy.sol#170) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/YVaultAssetProxy.sol analyzed (8 contracts with 93 detectors), 38 result(s) found

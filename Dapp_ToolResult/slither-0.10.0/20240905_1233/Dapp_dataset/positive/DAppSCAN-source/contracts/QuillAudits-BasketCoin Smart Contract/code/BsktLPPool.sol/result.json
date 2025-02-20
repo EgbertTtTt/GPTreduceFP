@@ -1,0 +1,69 @@
+{
+    "errors": [],
+    "fails": [],
+    "findings": [
+        {
+            "confidence": "Medium",
+            "contract": "BsktLPPool",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/QuillAudits-BasketCoin Smart Contract/code/BsktLPPool.sol",
+            "function": "exit",
+            "impact": "Medium",
+            "line": 426,
+            "line_end": 429,
+            "message": "Reentrancy in BsktLPPool.exit() (BsktLPPool.sol#426-429):\n\tExternal calls:\n\t- withdraw(balanceOf(msg.sender)) (BsktLPPool.sol#427)\n\t\t- BSKTASREWARD.safeTransfer(msg.sender,amount) (BsktLPPool.sol#338)\n\t\t- (success,returndata) = address(token).call(data) (BsktLPPool.sol#293)\n\t- getReward() (BsktLPPool.sol#428)\n\t\t- STAKEBSKT.safeTransfer(msg.sender,reward) (BsktLPPool.sol#437)\n\t\t- (success,returndata) = address(token).call(data) (BsktLPPool.sol#293)\n\tState variables written after the call(s):\n\t- getReward() (BsktLPPool.sol#428)\n\t\t- lastUpdateTime = lastTimeRewardApplicable() (BsktLPPool.sol#372)\n\tBsktLPPool.lastUpdateTime (BsktLPPool.sol#349) can be used in cross function reentrancies:\n\t- BsktLPPool.lastUpdateTime (BsktLPPool.sol#349)\n\t- BsktLPPool.notifyRewardRate(uint256) (BsktLPPool.sol#443-451)\n\t- BsktLPPool.rewardPerToken() (BsktLPPool.sol#384-396)\n\t- BsktLPPool.updateReward(address) (BsktLPPool.sol#370-378)\n\t- getReward() (BsktLPPool.sol#428)\n\t\t- rewardPerTokenStored = rewardPerToken() (BsktLPPool.sol#371)\n\tBsktLPPool.rewardPerTokenStored (BsktLPPool.sol#350) can be used in cross function reentrancies:\n\t- BsktLPPool.rewardPerToken() (BsktLPPool.sol#384-396)\n\t- BsktLPPool.rewardPerTokenStored (BsktLPPool.sol#350)\n\t- BsktLPPool.updateReward(address) (BsktLPPool.sol#370-378)\n\t- getReward() (BsktLPPool.sol#428)\n\t\t- rewards[msg.sender] = 0 (BsktLPPool.sol#435)\n\t\t- rewards[account] = earned(account) (BsktLPPool.sol#374)\n\tBsktLPPool.rewards (BsktLPPool.sol#354) can be used in cross function reentrancies:\n\t- BsktLPPool.earned(address) (BsktLPPool.sol#398-404)\n\t- BsktLPPool.getReward() (BsktLPPool.sol#431-440)\n\t- BsktLPPool.rewards (BsktLPPool.sol#354)\n\t- BsktLPPool.updateReward(address) (BsktLPPool.sol#370-378)\n\t- getReward() (BsktLPPool.sol#428)\n\t\t- userRewardPerTokenPaid[account] = rewardPerTokenStored (BsktLPPool.sol#375)\n\tBsktLPPool.userRewardPerTokenPaid (BsktLPPool.sol#353) can be used in cross function reentrancies:\n\t- BsktLPPool.earned(address) (BsktLPPool.sol#398-404)\n\t- BsktLPPool.updateReward(address) (BsktLPPool.sol#370-378)\n\t- BsktLPPool.userRewardPerTokenPaid (BsktLPPool.sol#353)\n",
+            "name": "reentrancy-no-eth",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "BsktLPPool",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/QuillAudits-BasketCoin Smart Contract/code/BsktLPPool.sol",
+            "function": "stake",
+            "impact": "Medium",
+            "line": 406,
+            "line_end": 415,
+            "message": "Reentrancy in BsktLPPool.stake(uint256) (BsktLPPool.sol#406-415):\n\tExternal calls:\n\t- super.stake(amount) (BsktLPPool.sol#412)\n\t\t- BSKTASREWARD.safeTransferFrom(msg.sender,address(this),amount) (BsktLPPool.sol#332)\n\t\t- (success,returndata) = address(token).call(data) (BsktLPPool.sol#293)\n\tState variables written after the call(s):\n\t- minimumBsktStakingEntry[_msgSender()] = true (BsktLPPool.sol#414)\n\tBsktLPPool.minimumBsktStakingEntry (BsktLPPool.sol#355) can be used in cross function reentrancies:\n\t- BsktLPPool.minimumBsktStakingEntry (BsktLPPool.sol#355)\n\t- BsktLPPool.stake(uint256) (BsktLPPool.sol#406-415)\n",
+            "name": "reentrancy-no-eth",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "BsktLPPool",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/QuillAudits-BasketCoin Smart Contract/code/BsktLPPool.sol",
+            "function": "notifyRewardRate",
+            "impact": "Low",
+            "line": 443,
+            "line_end": 451,
+            "message": "BsktLPPool.notifyRewardRate(uint256) (BsktLPPool.sol#443-451) should emit an event for: \n\t- rewardRate = _reward.div(duration) (BsktLPPool.sol#445) \n",
+            "name": "events-maths",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "BsktLPPool",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/QuillAudits-BasketCoin Smart Contract/code/BsktLPPool.sol",
+            "function": "getReward",
+            "impact": "Low",
+            "line": 431,
+            "line_end": 440,
+            "message": "BsktLPPool.getReward() (BsktLPPool.sol#431-440) uses timestamp for comparisons\n\tDangerous comparisons:\n\t- reward > 0 (BsktLPPool.sol#434)\n",
+            "name": "timestamp",
+            "check": "TP"
+        },
+        {
+            "confidence": "High",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/QuillAudits-BasketCoin Smart Contract/code/BsktLPPool.sol",
+            "impact": "Informational",
+            "line": 351,
+            "message": "BsktLPPool.rewardAmount (BsktLPPool.sol#351) is never used in BsktLPPool (BsktLPPool.sol#342-458)\n",
+            "name": "unused-state",
+            "check": "FP"
+        }
+    ],
+    "infos": [],
+    "parser": {
+        "id": "slither-0.10.0",
+        "mode": "solidity",
+        "version": "2024/04/30"
+    }
+}

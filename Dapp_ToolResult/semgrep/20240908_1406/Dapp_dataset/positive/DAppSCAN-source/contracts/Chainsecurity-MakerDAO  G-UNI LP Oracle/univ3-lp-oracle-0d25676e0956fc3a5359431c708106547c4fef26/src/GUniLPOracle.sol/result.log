@@ -1,0 +1,162 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 37 Code Findings │
+└──────────────────┘
+                         
+    /sb/GUniLPOracle.sol 
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          184┆ constructor (address _src, bytes32 _wat, address _orb0, address  
+  _orb1) public {                                                               
+          185┆     require(_src  != address(0),                                 
+  "GUniLPOracle/invalid-src-address");                                          
+          186┆     require(_orb0 != address(0) && _orb1 != address(0),          
+  "GUniLPOracle/invalid-oracle-address");                                       
+          187┆     wards[msg.sender] = 1;
+          188┆     emit Rely(msg.sender);
+          189┆     src  = _src;
+          190┆     wat  = _wat;
+          191┆     uint256 dec0 =                                               
+  uint256(ERC20Like(GUNILike(_src).token0()).decimals());                       
+          192┆     require(dec0 <= 18, "GUniLPOracle/token0-dec-gt-18");
+          193┆     UNIT_0 = 10 ** dec0;
+             [hid 8 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          352┆ bud[_a[i]] = 1;
+            ⋮┆----------------------------------------
+          364┆ bud[_a[i]] = 0;
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          350┆ for(uint256 i = 0; i < _a.length; i++) {
+            ⋮┆----------------------------------------
+          363┆ for(uint256 i = 0; i < _a.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           95┆ require(wards[msg.sender] == 1, "GUniLPOracle/not-authorized");
+            ⋮┆----------------------------------------
+          111┆ modifier toll { require(bud[msg.sender] == 1,                    
+  "GUniLPOracle/contract-not-whitelisted"); _; }                                
+            ⋮┆----------------------------------------
+          135┆ require((z = _x + _y) >= _x, "GUniLPOracle/add-overflow");
+            ⋮┆----------------------------------------
+          138┆ require((z = _x - _y) <= _x, "GUniLPOracle/sub-underflow");
+            ⋮┆----------------------------------------
+          141┆ require(_y == 0 || (z = _x * _y) / _y == _x,                     
+  "GUniLPOracle/mul-overflow");                                                 
+            ⋮┆----------------------------------------
+          144┆ require((z = uint160(x)) == x, "GUniLPOracle/uint160-overflow");
+            ⋮┆----------------------------------------
+          185┆ require(_src  != address(0),                                     
+  "GUniLPOracle/invalid-src-address");                                          
+            ⋮┆----------------------------------------
+          186┆ require(_orb0 != address(0) && _orb1 != address(0),              
+  "GUniLPOracle/invalid-oracle-address");                                       
+            ⋮┆----------------------------------------
+          192┆ require(dec0 <= 18, "GUniLPOracle/token0-dec-gt-18");
+            ⋮┆----------------------------------------
+          196┆ require(dec1 <= 18, "GUniLPOracle/token1-dec-gt-18");
+            ⋮┆----------------------------------------
+          217┆ require(_hop <= uint16(-1), "GUniLPOracle/invalid-hop");
+            ⋮┆----------------------------------------
+          223┆ require(_orb != address(0), "GUniLPOracle/no-contract-0");
+            ⋮┆----------------------------------------
+          229┆ revert("GUniLPOracle/invalid-id");
+            ⋮┆----------------------------------------
+          247┆ require(p0 != 0, "GUniLPOracle/invalid-oracle-0-price");
+            ⋮┆----------------------------------------
+          249┆ require(p1 != 0, "GUniLPOracle/invalid-oracle-1-price");
+            ⋮┆----------------------------------------
+          254┆ require(r0 > 0 || r1 > 0, "GUniLPOracle/invalid-balances");
+            ⋮┆----------------------------------------
+          256┆ require(totalSupply >= 1e9,                                      
+  "GUniLPOracle/total-supply-too-small"); // Protect against precision errors   
+  with dust-levels of collateral                                                
+            ⋮┆----------------------------------------
+          263┆ require(preq < 2 ** 128, "GUniLPOracle/quote-overflow");
+            ⋮┆----------------------------------------
+          284┆ require(stopped_ == 0, "GUniLPOracle/is-stopped");
+            ⋮┆----------------------------------------
+          289┆ require(block.timestamp >= zph_, "GUniLPOracle/not-passed");
+            ⋮┆----------------------------------------
+          293┆ require(val != 0, "GUniLPOracle/invalid-price");
+            ⋮┆----------------------------------------
+          339┆ require(cur.has == 1, "GUniLPOracle/no-current-value");
+            ⋮┆----------------------------------------
+          344┆ require(_a != address(0), "GUniLPOracle/no-contract-0");
+            ⋮┆----------------------------------------
+          351┆ require(_a[i] != address(0), "GUniLPOracle/no-contract-0");
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          186┆ require(_orb0 != address(0) && _orb1 != address(0),              
+  "GUniLPOracle/invalid-oracle-address");                                       
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          350┆ for(uint256 i = 0; i < _a.length; i++) {
+            ⋮┆----------------------------------------
+          363┆ for(uint256 i = 0; i < _a.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          111┆ modifier toll { require(bud[msg.sender] == 1,                    
+  "GUniLPOracle/contract-not-whitelisted"); _; }                                
+            ⋮┆----------------------------------------
+          186┆ require(_orb0 != address(0) && _orb1 != address(0),              
+  "GUniLPOracle/invalid-oracle-address");                                       
+            ⋮┆----------------------------------------
+          247┆ require(p0 != 0, "GUniLPOracle/invalid-oracle-0-price");
+            ⋮┆----------------------------------------
+          249┆ require(p1 != 0, "GUniLPOracle/invalid-oracle-1-price");
+            ⋮┆----------------------------------------
+          256┆ require(totalSupply >= 1e9,                                      
+  "GUniLPOracle/total-supply-too-small"); // Protect against precision errors   
+  with dust-levels of collateral                                                
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 37 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

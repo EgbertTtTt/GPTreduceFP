@@ -1,0 +1,86 @@
+'solc --version' running
+'solc /sb/BaseParaSwapSellAdapter.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+BaseParaSwapAdapter._pullAToken(address,address,address,uint256,BaseParaSwapAdapter.PermitSignature) (../../sb/BaseParaSwapSellAdapter.sol#1023-1048) uses arbitrary from in transferFrom in combination with permit: IERC20(reserveAToken).safeTransferFrom(user,address(this),amount) (../../sb/BaseParaSwapSellAdapter.sol#1043)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#arbitrary-from-in-transferfrom-used-with-permit
+
+BaseParaSwapAdapter.rescueTokens(IERC20) (../../sb/BaseParaSwapSellAdapter.sol#1066-1068) ignores return value by token.transfer(owner(),token.balanceOf(address(this))) (../../sb/BaseParaSwapSellAdapter.sol#1067)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+BaseParaSwapSellAdapter._sellOnParaSwap(uint256,bytes,address,address,address,uint256,uint256) (../../sb/BaseParaSwapSellAdapter.sol#1241-1296) uses a dangerous strict equality:
+	- require(bool,string)(IERC20(assetToSwapFrom).balanceOf(address(this)) == balanceBeforeAssetFrom - amountToSwap,WRONG_BALANCE_AFTER_SWAP) (../../sb/BaseParaSwapSellAdapter.sol#1291)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+BaseParaSwapAdapter._pullAToken(address,address,address,uint256,BaseParaSwapAdapter.PermitSignature) (../../sb/BaseParaSwapSellAdapter.sol#1023-1048) ignores return value by LENDING_POOL.withdraw(reserve,amount,address(this)) (../../sb/BaseParaSwapSellAdapter.sol#1047)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+Reentrancy in BaseParaSwapSellAdapter._sellOnParaSwap(uint256,bytes,address,address,address,uint256,uint256) (../../sb/BaseParaSwapSellAdapter.sol#1241-1296):
+	External calls:
+	- IERC20(assetToSwapFrom).safeApprove(tokenTransferProxy,0) (../../sb/BaseParaSwapSellAdapter.sol#1272)
+	- IERC20(assetToSwapFrom).safeApprove(tokenTransferProxy,amountToSwap) (../../sb/BaseParaSwapSellAdapter.sol#1273)
+	- (success) = augustus.call(swapCalldata) (../../sb/BaseParaSwapSellAdapter.sol#1283)
+	Event emitted after the call(s):
+	- Swapped(assetToSwapFrom,assetToSwapTo,amountToSwap,amountReceived) (../../sb/BaseParaSwapSellAdapter.sol#1295)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Address.isContract(address) (../../sb/BaseParaSwapSellAdapter.sol#254-265) uses assembly
+	- INLINE ASM (../../sb/BaseParaSwapSellAdapter.sol#261-263)
+BaseParaSwapSellAdapter._sellOnParaSwap(uint256,bytes,address,address,address,uint256,uint256) (../../sb/BaseParaSwapSellAdapter.sol#1241-1296) uses assembly
+	- INLINE ASM (../../sb/BaseParaSwapSellAdapter.sol#1279-1281)
+	- INLINE ASM (../../sb/BaseParaSwapSellAdapter.sol#1286-1289)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.isContract(address) (../../sb/BaseParaSwapSellAdapter.sol#254-265) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/BaseParaSwapSellAdapter.sol#283-289) is never used and should be removed
+BaseParaSwapAdapter._getDecimals(address) (../../sb/BaseParaSwapSellAdapter.sol#1002-1004) is never used and should be removed
+BaseParaSwapAdapter._getPrice(address) (../../sb/BaseParaSwapSellAdapter.sol#994-996) is never used and should be removed
+BaseParaSwapAdapter._getReserveData(address) (../../sb/BaseParaSwapSellAdapter.sol#1010-1012) is never used and should be removed
+BaseParaSwapAdapter._pullAToken(address,address,address,uint256,BaseParaSwapAdapter.PermitSignature) (../../sb/BaseParaSwapSellAdapter.sol#1023-1048) is never used and should be removed
+BaseParaSwapAdapter._usePermit(BaseParaSwapAdapter.PermitSignature) (../../sb/BaseParaSwapSellAdapter.sol#1056-1059) is never used and should be removed
+BaseParaSwapSellAdapter._sellOnParaSwap(uint256,bytes,address,address,address,uint256,uint256) (../../sb/BaseParaSwapSellAdapter.sol#1241-1296) is never used and should be removed
+Context._msgData() (../../sb/BaseParaSwapSellAdapter.sol#356-359) is never used and should be removed
+PercentageMath.percentDiv(uint256,uint256) (../../sb/BaseParaSwapSellAdapter.sol#1199-1209) is never used and should be removed
+PercentageMath.percentMul(uint256,uint256) (../../sb/BaseParaSwapSellAdapter.sol#1180-1191) is never used and should be removed
+SafeERC20.callOptionalReturn(IERC20,bytes) (../../sb/BaseParaSwapSellAdapter.sol#325-337) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/BaseParaSwapSellAdapter.sol#313-323) is never used and should be removed
+SafeERC20.safeTransfer(IERC20,address,uint256) (../../sb/BaseParaSwapSellAdapter.sol#296-302) is never used and should be removed
+SafeERC20.safeTransferFrom(IERC20,address,address,uint256) (../../sb/BaseParaSwapSellAdapter.sol#304-311) is never used and should be removed
+SafeMath.add(uint256,uint256) (../../sb/BaseParaSwapSellAdapter.sol#15-20) is never used and should be removed
+SafeMath.div(uint256,uint256) (../../sb/BaseParaSwapSellAdapter.sol#89-91) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/BaseParaSwapSellAdapter.sol#104-115) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/BaseParaSwapSellAdapter.sol#128-130) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/BaseParaSwapSellAdapter.sol#143-150) is never used and should be removed
+SafeMath.mul(uint256,uint256) (../../sb/BaseParaSwapSellAdapter.sol#64-76) is never used and should be removed
+SafeMath.sub(uint256,uint256) (../../sb/BaseParaSwapSellAdapter.sol#31-33) is never used and should be removed
+SafeMath.sub(uint256,uint256,string) (../../sb/BaseParaSwapSellAdapter.sol#44-53) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.6.12 (../../sb/BaseParaSwapSellAdapter.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/BaseParaSwapSellAdapter.sol#283-289):
+	- (success) = recipient.call{value: amount}() (../../sb/BaseParaSwapSellAdapter.sol#287)
+Low level call in SafeERC20.callOptionalReturn(IERC20,bytes) (../../sb/BaseParaSwapSellAdapter.sol#325-337):
+	- (success,returndata) = address(token).call(data) (../../sb/BaseParaSwapSellAdapter.sol#329)
+Low level call in BaseParaSwapSellAdapter._sellOnParaSwap(uint256,bytes,address,address,address,uint256,uint256) (../../sb/BaseParaSwapSellAdapter.sol#1241-1296):
+	- (success) = augustus.call(swapCalldata) (../../sb/BaseParaSwapSellAdapter.sol#1283)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Function IFlashLoanReceiver.ADDRESSES_PROVIDER() (../../sb/BaseParaSwapSellAdapter.sol#946) is not in mixedCase
+Function IFlashLoanReceiver.LENDING_POOL() (../../sb/BaseParaSwapSellAdapter.sol#948) is not in mixedCase
+Variable FlashLoanReceiverBase.ADDRESSES_PROVIDER (../../sb/BaseParaSwapSellAdapter.sol#955) is not in mixedCase
+Variable FlashLoanReceiverBase.LENDING_POOL (../../sb/BaseParaSwapSellAdapter.sol#956) is not in mixedCase
+Variable BaseParaSwapAdapter.ORACLE (../../sb/BaseParaSwapSellAdapter.sol#979) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/BaseParaSwapSellAdapter.sol#357)" inContext (../../sb/BaseParaSwapSellAdapter.sol#351-360)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Variable Errors.LP_INCONSISTENT_FLASHLOAN_PARAMS (../../sb/BaseParaSwapSellAdapter.sol#1104) is too similar to Errors.VL_INCONSISTENT_FLASHLOAN_PARAMS (../../sb/BaseParaSwapSellAdapter.sol#1149)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+BaseParaSwapSellAdapter (../../sb/BaseParaSwapSellAdapter.sol#1221-1297) does not implement functions:
+	- IFlashLoanReceiver.executeOperation(address[],uint256[],uint256[],address,bytes) (../../sb/BaseParaSwapSellAdapter.sol#938-944)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unimplemented-functions
+/sb/BaseParaSwapSellAdapter.sol analyzed (19 contracts with 93 detectors), 43 result(s) found

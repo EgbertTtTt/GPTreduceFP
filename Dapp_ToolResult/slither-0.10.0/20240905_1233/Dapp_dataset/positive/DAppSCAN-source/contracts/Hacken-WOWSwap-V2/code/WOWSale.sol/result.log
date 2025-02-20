@@ -1,0 +1,118 @@
+'solc --version' running
+'solc /sb/WOWSale.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/WOWSale.sol:
+Warning: SPDX license identifier not provided in source file. Before publishing, consider adding a comment containing "SPDX-License-Identifier: <SPDX-License>" to each source file. Use "SPDX-License-Identifier: UNLICENSED" for non-open-source code. Please see https://spdx.org for more information.
+--> /sb/WOWSale.sol
+
+Warning: This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> /sb/WOWSale.sol:209:1:
+    |
+209 | contract WOWSale is Owned {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> /sb/WOWSale.sol:289:5:
+    |
+289 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+WOWSale.buyTokens() (../../sb/WOWSale.sol#246-267) ignores return value by token.transfer(msg.sender,buyAmount) (../../sb/WOWSale.sol#264)
+WOWSale.close() (../../sb/WOWSale.sol#269-286) ignores return value by token.transfer(msg.sender,tokensLeft) (../../sb/WOWSale.sol#275)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+WOWSale.buyTokens() (../../sb/WOWSale.sol#246-267) performs a multiplication on the result of a division:
+	- tokenPriceInBNB = rate.mul(DEC).div(tokenPrice) (../../sb/WOWSale.sol#251)
+	- buyAmount = value.mul(tokenPriceInBNB).div(DEC) (../../sb/WOWSale.sol#263)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+WOWSale.close() (../../sb/WOWSale.sol#269-286) uses a dangerous strict equality:
+	- require(bool,string)(block.timestamp >= endSale || tokensLeft == 0,Close requirements are not met) (../../sb/WOWSale.sol#271)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Owned.transferOwnership(address) (../../sb/WOWSale.sol#179-181) should emit an event for: 
+	- owner = newOwner (../../sb/WOWSale.sol#180) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-access-control
+
+WOWSale.changeEndSale(uint256) (../../sb/WOWSale.sol#238-241) should emit an event for: 
+	- endSale = newEndSale (../../sb/WOWSale.sol#239) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+Owned.transferOwnership(address).newOwner (../../sb/WOWSale.sol#179) lacks a zero-check on :
+		- owner = newOwner (../../sb/WOWSale.sol#180)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in WOWSale.buyTokens() (../../sb/WOWSale.sol#246-267):
+	External calls:
+	- token.transfer(msg.sender,buyAmount) (../../sb/WOWSale.sol#264)
+	External calls sending eth:
+	- address(msg.sender).transfer(payBack) (../../sb/WOWSale.sol#259)
+	Event emitted after the call(s):
+	- Sold(msg.sender,buyAmount) (../../sb/WOWSale.sol#265)
+Reentrancy in WOWSale.close() (../../sb/WOWSale.sol#269-286):
+	External calls:
+	- token.transfer(msg.sender,tokensLeft) (../../sb/WOWSale.sol#275)
+	External calls sending eth:
+	- address(msg.sender).transfer(collectedBNB) (../../sb/WOWSale.sol#281)
+	Event emitted after the call(s):
+	- CloseSale() (../../sb/WOWSale.sol#284)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+WOWSale.buyTokens() (../../sb/WOWSale.sol#246-267) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)((block.timestamp >= startSale && block.timestamp < endSale),Crowdsale is over) (../../sb/WOWSale.sol#247)
+WOWSale.close() (../../sb/WOWSale.sol#269-286) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp >= endSale || tokensLeft == 0,Close requirements are not met) (../../sb/WOWSale.sol#271)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+SafeMath.mod(uint256,uint256) (../../sb/WOWSale.sol#144-146) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/WOWSale.sol#161-164) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+WOWToken.DEC (../../sb/WOWSale.sol#300) is set pre-construction with a non-constant function or state variable:
+	- 10 ** uint256(decimals)
+WOWToken._totalSupply (../../sb/WOWSale.sol#301) is set pre-construction with a non-constant function or state variable:
+	- 1000000 * DEC
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#function-initializing-state
+
+Pragma version0.7.5 (../../sb/WOWSale.sol#1) allows old versions
+solc-0.7.5 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Variable WOWSale.DEC (../../sb/WOWSale.sol#221) is not in mixedCase
+Variable WOWToken.DEC (../../sb/WOWSale.sol#300) is not in mixedCase
+Variable WOWToken._totalSupply (../../sb/WOWSale.sol#301) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Reentrancy in WOWSale.buyTokens() (../../sb/WOWSale.sol#246-267):
+	External calls:
+	- address(msg.sender).transfer(payBack) (../../sb/WOWSale.sol#259)
+	Event emitted after the call(s):
+	- Sold(msg.sender,buyAmount) (../../sb/WOWSale.sol#265)
+Reentrancy in WOWSale.close() (../../sb/WOWSale.sol#269-286):
+	External calls:
+	- address(msg.sender).transfer(collectedBNB) (../../sb/WOWSale.sol#281)
+	Event emitted after the call(s):
+	- CloseSale() (../../sb/WOWSale.sol#284)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-4
+
+WOWToken.slitherConstructorVariables() (../../sb/WOWSale.sol#294-357) uses literals with too many digits:
+	- _totalSupply = 1000000 * DEC (../../sb/WOWSale.sol#301)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+WOWSale.maxBNB (../../sb/WOWSale.sol#219) should be constant 
+WOWSale.startSale (../../sb/WOWSale.sol#217) should be constant 
+WOWSale.tokenPrice (../../sb/WOWSale.sol#216) should be constant 
+WOWSale.totalSold (../../sb/WOWSale.sol#214) should be constant 
+WOWToken.decimals (../../sb/WOWSale.sol#299) should be constant 
+WOWToken.name (../../sb/WOWSale.sol#298) should be constant 
+WOWToken.symbol (../../sb/WOWSale.sol#297) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+
+WOWSale.DEC (../../sb/WOWSale.sol#221) should be immutable 
+WOWSale.token (../../sb/WOWSale.sol#212) should be immutable 
+WOWToken.DEC (../../sb/WOWSale.sol#300) should be immutable 
+WOWToken._totalSupply (../../sb/WOWSale.sol#301) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/WOWSale.sol analyzed (6 contracts with 93 detectors), 34 result(s) found

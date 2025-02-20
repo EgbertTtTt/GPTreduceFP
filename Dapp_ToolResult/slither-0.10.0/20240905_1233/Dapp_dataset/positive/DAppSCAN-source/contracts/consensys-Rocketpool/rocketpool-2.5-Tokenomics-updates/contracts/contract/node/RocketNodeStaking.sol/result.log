@@ -1,0 +1,154 @@
+'solc --version' running
+'solc /sb/RocketNodeStaking.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+RocketNodeStaking.stakeRPL(uint256) (../../sb/RocketNodeStaking.sol#682-700) ignores return value by rocketVault.depositToken(rocketNodeStaking,rplTokenAddress,_amount) (../../sb/RocketNodeStaking.sol#693)
+RocketNodeStaking.withdrawRPL(uint256) (../../sb/RocketNodeStaking.sol#704-723) ignores return value by rocketVault.withdrawToken(msg.sender,getContractAddress(rocketTokenRPL),_amount) (../../sb/RocketNodeStaking.sol#717)
+RocketNodeStaking.slashRPL(address,uint256) (../../sb/RocketNodeStaking.sol#727-744) ignores return value by rocketVault.transferToken(rocketAuctionManager,getContractAddress(rocketTokenRPL),rplSlashAmount) (../../sb/RocketNodeStaking.sol#738)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+Reentrancy in RocketNodeStaking.slashRPL(address,uint256) (../../sb/RocketNodeStaking.sol#727-744):
+	External calls:
+	- rocketVault.transferToken(rocketAuctionManager,getContractAddress(rocketTokenRPL),rplSlashAmount) (../../sb/RocketNodeStaking.sol#738)
+	- decreaseTotalRPLStake(rplSlashAmount) (../../sb/RocketNodeStaking.sol#740)
+		- rocketStorage.setUint(keccak256(bytes)(abi.encodePacked(_key)),_value) (../../sb/RocketNodeStaking.sol#457)
+	- decreaseNodeRPLStake(_nodeAddress,rplSlashAmount) (../../sb/RocketNodeStaking.sol#741)
+		- rocketStorage.setUint(_key,_value) (../../sb/RocketNodeStaking.sol#450)
+	Event emitted after the call(s):
+	- RPLSlashed(_nodeAddress,rplSlashAmount,_ethSlashAmount,block.timestamp) (../../sb/RocketNodeStaking.sol#743)
+Reentrancy in RocketNodeStaking.stakeRPL(uint256) (../../sb/RocketNodeStaking.sol#682-700):
+	External calls:
+	- require(bool,string)(rplToken.transferFrom(msg.sender,address(this),_amount),Could not transfer RPL to staking contract) (../../sb/RocketNodeStaking.sol#689)
+	- require(bool,string)(rplToken.approve(rocketVaultAddress,_amount),Could not approve vault RPL deposit) (../../sb/RocketNodeStaking.sol#691)
+	- rocketVault.depositToken(rocketNodeStaking,rplTokenAddress,_amount) (../../sb/RocketNodeStaking.sol#693)
+	- increaseTotalRPLStake(_amount) (../../sb/RocketNodeStaking.sol#695)
+		- rocketStorage.setUint(keccak256(bytes)(abi.encodePacked(_key)),_value) (../../sb/RocketNodeStaking.sol#457)
+	- increaseNodeRPLStake(msg.sender,_amount) (../../sb/RocketNodeStaking.sol#696)
+		- rocketStorage.setUint(_key,_value) (../../sb/RocketNodeStaking.sol#450)
+	- setNodeRPLStakedBlock(msg.sender,block.number) (../../sb/RocketNodeStaking.sol#697)
+		- rocketStorage.setUint(_key,_value) (../../sb/RocketNodeStaking.sol#450)
+	Event emitted after the call(s):
+	- RPLStaked(msg.sender,_amount,block.timestamp) (../../sb/RocketNodeStaking.sol#699)
+Reentrancy in RocketNodeStaking.withdrawRPL(uint256) (../../sb/RocketNodeStaking.sol#704-723):
+	External calls:
+	- rocketVault.withdrawToken(msg.sender,getContractAddress(rocketTokenRPL),_amount) (../../sb/RocketNodeStaking.sol#717)
+	- decreaseTotalRPLStake(_amount) (../../sb/RocketNodeStaking.sol#719)
+		- rocketStorage.setUint(keccak256(bytes)(abi.encodePacked(_key)),_value) (../../sb/RocketNodeStaking.sol#457)
+	- decreaseNodeRPLStake(msg.sender,_amount) (../../sb/RocketNodeStaking.sol#720)
+		- rocketStorage.setUint(_key,_value) (../../sb/RocketNodeStaking.sol#450)
+	Event emitted after the call(s):
+	- RPLWithdrawn(msg.sender,_amount,block.timestamp) (../../sb/RocketNodeStaking.sol#722)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+RocketBase.getRevertMsg(bytes) (../../sb/RocketNodeStaking.sol#418-426) uses assembly
+	- INLINE ASM (../../sb/RocketNodeStaking.sol#421-424)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+RocketBase.deleteAddress(bytes32) (../../sb/RocketNodeStaking.sol#462) is never used and should be removed
+RocketBase.deleteBool(bytes32) (../../sb/RocketNodeStaking.sol#466) is never used and should be removed
+RocketBase.deleteBytes(bytes32) (../../sb/RocketNodeStaking.sol#465) is never used and should be removed
+RocketBase.deleteBytes32(bytes32) (../../sb/RocketNodeStaking.sol#468) is never used and should be removed
+RocketBase.deleteInt(bytes32) (../../sb/RocketNodeStaking.sol#467) is never used and should be removed
+RocketBase.deleteString(bytes32) (../../sb/RocketNodeStaking.sol#464) is never used and should be removed
+RocketBase.deleteUint(bytes32) (../../sb/RocketNodeStaking.sol#463) is never used and should be removed
+RocketBase.getAddressS(string) (../../sb/RocketNodeStaking.sol#442) is never used and should be removed
+RocketBase.getBoolS(string) (../../sb/RocketNodeStaking.sol#445) is never used and should be removed
+RocketBase.getBytes(bytes32) (../../sb/RocketNodeStaking.sol#438) is never used and should be removed
+RocketBase.getBytes32(bytes32) (../../sb/RocketNodeStaking.sol#441) is never used and should be removed
+RocketBase.getBytesS(string) (../../sb/RocketNodeStaking.sol#444) is never used and should be removed
+RocketBase.getContractName(address) (../../sb/RocketNodeStaking.sol#408-415) is never used and should be removed
+RocketBase.getInt(bytes32) (../../sb/RocketNodeStaking.sol#440) is never used and should be removed
+RocketBase.getRevertMsg(bytes) (../../sb/RocketNodeStaking.sol#418-426) is never used and should be removed
+RocketBase.getString(bytes32) (../../sb/RocketNodeStaking.sol#437) is never used and should be removed
+RocketBase.setAddress(bytes32,address) (../../sb/RocketNodeStaking.sol#449) is never used and should be removed
+RocketBase.setAddressS(string,address) (../../sb/RocketNodeStaking.sol#456) is never used and should be removed
+RocketBase.setBool(bytes32,bool) (../../sb/RocketNodeStaking.sol#453) is never used and should be removed
+RocketBase.setBoolS(string,bool) (../../sb/RocketNodeStaking.sol#459) is never used and should be removed
+RocketBase.setBytes(bytes32,bytes) (../../sb/RocketNodeStaking.sol#452) is never used and should be removed
+RocketBase.setBytes32(bytes32,bytes32) (../../sb/RocketNodeStaking.sol#455) is never used and should be removed
+RocketBase.setBytesS(string,bytes) (../../sb/RocketNodeStaking.sol#458) is never used and should be removed
+RocketBase.setInt(bytes32,int256) (../../sb/RocketNodeStaking.sol#454) is never used and should be removed
+RocketBase.setString(bytes32,string) (../../sb/RocketNodeStaking.sol#451) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/RocketNodeStaking.sol#190-193) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/RocketNodeStaking.sol#152-155) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/RocketNodeStaking.sol#210-213) is never used and should be removed
+SafeMath.sub(uint256,uint256,string) (../../sb/RocketNodeStaking.sol#170-173) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/RocketNodeStaking.sol#24-28) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/RocketNodeStaking.sol#60-63) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/RocketNodeStaking.sol#70-73) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/RocketNodeStaking.sol#45-53) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/RocketNodeStaking.sol#35-38) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.7.6 (../../sb/RocketNodeStaking.sol#1) allows old versions
+solc-0.7.6 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Parameter RocketBase.getContractAddress(string)._contractName (../../sb/RocketNodeStaking.sol#397) is not in mixedCase
+Parameter RocketBase.getContractName(address)._contractAddress (../../sb/RocketNodeStaking.sol#408) is not in mixedCase
+Parameter RocketBase.getRevertMsg(bytes)._returnData (../../sb/RocketNodeStaking.sol#418) is not in mixedCase
+Parameter RocketBase.getAddress(bytes32)._key (../../sb/RocketNodeStaking.sol#435) is not in mixedCase
+Parameter RocketBase.getUint(bytes32)._key (../../sb/RocketNodeStaking.sol#436) is not in mixedCase
+Parameter RocketBase.getString(bytes32)._key (../../sb/RocketNodeStaking.sol#437) is not in mixedCase
+Parameter RocketBase.getBytes(bytes32)._key (../../sb/RocketNodeStaking.sol#438) is not in mixedCase
+Parameter RocketBase.getBool(bytes32)._key (../../sb/RocketNodeStaking.sol#439) is not in mixedCase
+Parameter RocketBase.getInt(bytes32)._key (../../sb/RocketNodeStaking.sol#440) is not in mixedCase
+Parameter RocketBase.getBytes32(bytes32)._key (../../sb/RocketNodeStaking.sol#441) is not in mixedCase
+Parameter RocketBase.getAddressS(string)._key (../../sb/RocketNodeStaking.sol#442) is not in mixedCase
+Parameter RocketBase.getUintS(string)._key (../../sb/RocketNodeStaking.sol#443) is not in mixedCase
+Parameter RocketBase.getBytesS(string)._key (../../sb/RocketNodeStaking.sol#444) is not in mixedCase
+Parameter RocketBase.getBoolS(string)._key (../../sb/RocketNodeStaking.sol#445) is not in mixedCase
+Parameter RocketBase.setAddress(bytes32,address)._key (../../sb/RocketNodeStaking.sol#449) is not in mixedCase
+Parameter RocketBase.setAddress(bytes32,address)._value (../../sb/RocketNodeStaking.sol#449) is not in mixedCase
+Parameter RocketBase.setUint(bytes32,uint256)._key (../../sb/RocketNodeStaking.sol#450) is not in mixedCase
+Parameter RocketBase.setUint(bytes32,uint256)._value (../../sb/RocketNodeStaking.sol#450) is not in mixedCase
+Parameter RocketBase.setString(bytes32,string)._key (../../sb/RocketNodeStaking.sol#451) is not in mixedCase
+Parameter RocketBase.setString(bytes32,string)._value (../../sb/RocketNodeStaking.sol#451) is not in mixedCase
+Parameter RocketBase.setBytes(bytes32,bytes)._key (../../sb/RocketNodeStaking.sol#452) is not in mixedCase
+Parameter RocketBase.setBytes(bytes32,bytes)._value (../../sb/RocketNodeStaking.sol#452) is not in mixedCase
+Parameter RocketBase.setBool(bytes32,bool)._key (../../sb/RocketNodeStaking.sol#453) is not in mixedCase
+Parameter RocketBase.setBool(bytes32,bool)._value (../../sb/RocketNodeStaking.sol#453) is not in mixedCase
+Parameter RocketBase.setInt(bytes32,int256)._key (../../sb/RocketNodeStaking.sol#454) is not in mixedCase
+Parameter RocketBase.setInt(bytes32,int256)._value (../../sb/RocketNodeStaking.sol#454) is not in mixedCase
+Parameter RocketBase.setBytes32(bytes32,bytes32)._key (../../sb/RocketNodeStaking.sol#455) is not in mixedCase
+Parameter RocketBase.setBytes32(bytes32,bytes32)._value (../../sb/RocketNodeStaking.sol#455) is not in mixedCase
+Parameter RocketBase.setAddressS(string,address)._key (../../sb/RocketNodeStaking.sol#456) is not in mixedCase
+Parameter RocketBase.setAddressS(string,address)._value (../../sb/RocketNodeStaking.sol#456) is not in mixedCase
+Parameter RocketBase.setUintS(string,uint256)._key (../../sb/RocketNodeStaking.sol#457) is not in mixedCase
+Parameter RocketBase.setUintS(string,uint256)._value (../../sb/RocketNodeStaking.sol#457) is not in mixedCase
+Parameter RocketBase.setBytesS(string,bytes)._key (../../sb/RocketNodeStaking.sol#458) is not in mixedCase
+Parameter RocketBase.setBytesS(string,bytes)._value (../../sb/RocketNodeStaking.sol#458) is not in mixedCase
+Parameter RocketBase.setBoolS(string,bool)._key (../../sb/RocketNodeStaking.sol#459) is not in mixedCase
+Parameter RocketBase.setBoolS(string,bool)._value (../../sb/RocketNodeStaking.sol#459) is not in mixedCase
+Parameter RocketBase.deleteAddress(bytes32)._key (../../sb/RocketNodeStaking.sol#462) is not in mixedCase
+Parameter RocketBase.deleteUint(bytes32)._key (../../sb/RocketNodeStaking.sol#463) is not in mixedCase
+Parameter RocketBase.deleteString(bytes32)._key (../../sb/RocketNodeStaking.sol#464) is not in mixedCase
+Parameter RocketBase.deleteBytes(bytes32)._key (../../sb/RocketNodeStaking.sol#465) is not in mixedCase
+Parameter RocketBase.deleteBool(bytes32)._key (../../sb/RocketNodeStaking.sol#466) is not in mixedCase
+Parameter RocketBase.deleteInt(bytes32)._key (../../sb/RocketNodeStaking.sol#467) is not in mixedCase
+Parameter RocketBase.deleteBytes32(bytes32)._key (../../sb/RocketNodeStaking.sol#468) is not in mixedCase
+Parameter RocketNodeStaking.setTotalRPLStake(uint256)._amount (../../sb/RocketNodeStaking.sol#581) is not in mixedCase
+Parameter RocketNodeStaking.increaseTotalRPLStake(uint256)._amount (../../sb/RocketNodeStaking.sol#584) is not in mixedCase
+Parameter RocketNodeStaking.decreaseTotalRPLStake(uint256)._amount (../../sb/RocketNodeStaking.sol#587) is not in mixedCase
+Parameter RocketNodeStaking.getNodeRPLStake(address)._nodeAddress (../../sb/RocketNodeStaking.sol#592) is not in mixedCase
+Parameter RocketNodeStaking.setNodeRPLStake(address,uint256)._nodeAddress (../../sb/RocketNodeStaking.sol#595) is not in mixedCase
+Parameter RocketNodeStaking.setNodeRPLStake(address,uint256)._amount (../../sb/RocketNodeStaking.sol#595) is not in mixedCase
+Parameter RocketNodeStaking.increaseNodeRPLStake(address,uint256)._nodeAddress (../../sb/RocketNodeStaking.sol#598) is not in mixedCase
+Parameter RocketNodeStaking.increaseNodeRPLStake(address,uint256)._amount (../../sb/RocketNodeStaking.sol#598) is not in mixedCase
+Parameter RocketNodeStaking.decreaseNodeRPLStake(address,uint256)._nodeAddress (../../sb/RocketNodeStaking.sol#601) is not in mixedCase
+Parameter RocketNodeStaking.decreaseNodeRPLStake(address,uint256)._amount (../../sb/RocketNodeStaking.sol#601) is not in mixedCase
+Parameter RocketNodeStaking.getNodeRPLStakedBlock(address)._nodeAddress (../../sb/RocketNodeStaking.sol#606) is not in mixedCase
+Parameter RocketNodeStaking.setNodeRPLStakedBlock(address,uint256)._nodeAddress (../../sb/RocketNodeStaking.sol#609) is not in mixedCase
+Parameter RocketNodeStaking.setNodeRPLStakedBlock(address,uint256)._block (../../sb/RocketNodeStaking.sol#609) is not in mixedCase
+Parameter RocketNodeStaking.getNodeEffectiveRPLStake(address)._nodeAddress (../../sb/RocketNodeStaking.sol#633) is not in mixedCase
+Parameter RocketNodeStaking.getNodeMinimumRPLStake(address)._nodeAddress (../../sb/RocketNodeStaking.sol#652) is not in mixedCase
+Parameter RocketNodeStaking.getNodeMinipoolLimit(address)._nodeAddress (../../sb/RocketNodeStaking.sol#666) is not in mixedCase
+Parameter RocketNodeStaking.stakeRPL(uint256)._amount (../../sb/RocketNodeStaking.sol#682) is not in mixedCase
+Parameter RocketNodeStaking.withdrawRPL(uint256)._amount (../../sb/RocketNodeStaking.sol#704) is not in mixedCase
+Parameter RocketNodeStaking.slashRPL(address,uint256)._nodeAddress (../../sb/RocketNodeStaking.sol#727) is not in mixedCase
+Parameter RocketNodeStaking.slashRPL(address,uint256)._ethSlashAmount (../../sb/RocketNodeStaking.sol#727) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+RocketBase.rocketStorage (../../sb/RocketNodeStaking.sol#330) should be immutable 
+RocketBase.version (../../sb/RocketNodeStaking.sol#327) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/RocketNodeStaking.sol analyzed (12 contracts with 93 detectors), 108 result(s) found

@@ -1,0 +1,246 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 52 Code Findings │
+└──────────────────┘
+                        
+    /sb/SpaceMonkey.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          314┆ contract SpaceMonkeyStorage is Context, Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          553┆ for (uint256 i = 0; i < _excluded.length; i++) {
+            ⋮┆----------------------------------------
+          555┆ _excluded[i] = _excluded[_excluded.length - 1];
+            ⋮┆----------------------------------------
+          886┆ for (uint256 i = 0; i < _excluded.length; i++) {
+            ⋮┆----------------------------------------
+         1045┆ for (uint256 i = 0; i < _confirmedSnipers.length; i++) {
+            ⋮┆----------------------------------------
+         1047┆ _confirmedSnipers[i] = _confirmedSnipers[_confirmedSnipers.length
+  - 1];                                                                         
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+          352┆ uint256 public _burnFee = 0;
+            ⋮┆----------------------------------------
+          365┆ bool tradingOpen = false;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+           83┆ constructor ()  {
+           84┆     address msgSender = _msgSender();
+           85┆     _owner = msgSender;
+           86┆     emit OwnershipTransferred(address(0), msgSender);
+           87┆ }
+            ⋮┆----------------------------------------
+          382┆ constructor() {
+          383┆   _tTotal = 0;
+          384┆   _name= "";
+          385┆   _symbol="";
+          386┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          553┆ for (uint256 i = 0; i < _excluded.length; i++) {
+            ⋮┆----------------------------------------
+          886┆ for (uint256 i = 0; i < _excluded.length; i++) {
+            ⋮┆----------------------------------------
+         1045┆ for (uint256 i = 0; i < _confirmedSnipers.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           94┆ require(_owner == _msgSender(), "Ownable: caller is not the      
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          104┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          426┆ require(_msgSender() != address(0), "ERC20: transfer from the    
+  zero address");                                                               
+            ⋮┆----------------------------------------
+          427┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          499┆ require(
+          500┆   !_isExcluded[sender],
+          501┆   'Excluded addresses cannot call this function'
+          502┆ );
+            ⋮┆----------------------------------------
+          526┆ require(tAmount <= _tTotal, 'Amount must be less than supply');
+            ⋮┆----------------------------------------
+          537┆ require(rAmount <= _rTotal, 'Amount must be less than total      
+  reflections');                                                                
+            ⋮┆----------------------------------------
+          543┆ require(!_isExcluded[account], 'Account is already excluded');
+            ⋮┆----------------------------------------
+          552┆ require(_isExcluded[account], 'Account is already excluded');
+            ⋮┆----------------------------------------
+          570┆ require(owner != address(0), 'ERC20: approve from the zero       
+  address');                                                                    
+            ⋮┆----------------------------------------
+          571┆ require(spender != address(0), 'ERC20: approve to the zero       
+  address');                                                                    
+            ⋮┆----------------------------------------
+          572┆ require(!_isBlacklisted[_msgSender()], 'You have no power        
+  here!');                                                                      
+            ⋮┆----------------------------------------
+          583┆ require(from != address(0), 'ERC20: transfer from the zero       
+  address');                                                                    
+            ⋮┆----------------------------------------
+          584┆ require(to != address(0), 'ERC20: transfer to the zero address');
+            ⋮┆----------------------------------------
+          585┆ require(amount > 0, 'Transfer amount must be greater than zero');
+            ⋮┆----------------------------------------
+          586┆ require(!_isBlacklisted[_msgSender()], 'You have no power        
+  here!');                                                                      
+            ⋮┆----------------------------------------
+         1003┆ require(selfLiquidityFee + marketingLiquidityFee == 1000, "Fee   
+  split must add up to 1000 (100.0%)");                                         
+            ⋮┆----------------------------------------
+         1038┆ require(!_isBlacklisted[account], 'Account is already            
+  blacklisted');                                                                
+            ⋮┆----------------------------------------
+         1044┆ require(_isBlacklisted[account], 'Account is not blacklisted');
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          612┆ if (_isExcluded[sender] && !_isExcluded[recipient]) {
+          613┆   _transferFromExcluded(sender, recipient, amount);
+          614┆ } else if (!_isExcluded[sender] && _isExcluded[recipient]) {
+          615┆   _transferToExcluded(sender, recipient, amount);
+          616┆ } else if (_isExcluded[sender] && _isExcluded[recipient]) {
+          617┆   _transferBothExcluded(sender, recipient, amount);
+          618┆ } else {
+          619┆   _transferStandard(sender, recipient, amount);
+          620┆ }
+            ⋮┆----------------------------------------
+          614┆ } else if (!_isExcluded[sender] && _isExcluded[recipient]) {
+          615┆   _transferToExcluded(sender, recipient, amount);
+          616┆ } else if (_isExcluded[sender] && _isExcluded[recipient]) {
+          617┆   _transferBothExcluded(sender, recipient, amount);
+          618┆ } else {
+          619┆   _transferStandard(sender, recipient, amount);
+          620┆ }
+            ⋮┆----------------------------------------
+          616┆ } else if (_isExcluded[sender] && _isExcluded[recipient]) {
+          617┆   _transferBothExcluded(sender, recipient, amount);
+          618┆ } else {
+          619┆   _transferStandard(sender, recipient, amount);
+          620┆ }
+            ⋮┆----------------------------------------
+          905┆ if (_isExcluded[marketingAddress] && tOurShare > 0) {
+          906┆   _tOwned[marketingAddress] += tOurShare;
+          907┆   emit Transfer(sender, marketingAddress, tOurShare);
+          908┆ } else if(rOurShare > 0) {
+          909┆   emit Transfer(sender, marketingAddress,                        
+  tokenFromReflection(rOurShare));                                              
+          910┆ }
+            ⋮┆----------------------------------------
+          913┆ if (_isExcluded[teamAddress] && tTeamShare > 0) {
+          914┆   emit Transfer(sender, teamAddress, tTeamShare);
+          915┆   _tOwned[teamAddress] += tTeamShare;
+          916┆ } else if(rTeamShare > 0) {
+          917┆   emit Transfer(sender, teamAddress,                             
+  tokenFromReflection(rTeamShare));                                             
+          918┆ }
+            ⋮┆----------------------------------------
+          938┆ if (_taxFee == 0 && _liquidityFee == 0) return;
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          553┆ for (uint256 i = 0; i < _excluded.length; i++) {
+            ⋮┆----------------------------------------
+          886┆ for (uint256 i = 0; i < _excluded.length; i++) {
+            ⋮┆----------------------------------------
+         1045┆ for (uint256 i = 0; i < _confirmedSnipers.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          104┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          426┆ require(_msgSender() != address(0), "ERC20: transfer from the    
+  zero address");                                                               
+            ⋮┆----------------------------------------
+          427┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          499┆ require(
+          500┆   !_isExcluded[sender],
+          501┆   'Excluded addresses cannot call this function'
+          502┆ );
+            ⋮┆----------------------------------------
+          537┆ require(rAmount <= _rTotal, 'Amount must be less than total      
+  reflections');                                                                
+            ⋮┆----------------------------------------
+          570┆ require(owner != address(0), 'ERC20: approve from the zero       
+  address');                                                                    
+            ⋮┆----------------------------------------
+          571┆ require(spender != address(0), 'ERC20: approve to the zero       
+  address');                                                                    
+            ⋮┆----------------------------------------
+          583┆ require(from != address(0), 'ERC20: transfer from the zero       
+  address');                                                                    
+            ⋮┆----------------------------------------
+          584┆ require(to != address(0), 'ERC20: transfer to the zero address');
+            ⋮┆----------------------------------------
+          585┆ require(amount > 0, 'Transfer amount must be greater than zero');
+            ⋮┆----------------------------------------
+         1003┆ require(selfLiquidityFee + marketingLiquidityFee == 1000, "Fee   
+  split must add up to 1000 (100.0%)");                                         
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 52 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

@@ -1,0 +1,147 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 29 Code Findings │
+└──────────────────┘
+                      
+    /sb/Crowdsale.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          564┆ contract Pausable is Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          111┆ for(uint256 i = 0; i < owners.length; i++) {
+            ⋮┆----------------------------------------
+          116┆ for(uint256 j = 0; j < _owners.length; j++) {
+            ⋮┆----------------------------------------
+          504┆ for(uint256 i = 0; i < walletTokens[msg.sender].length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+          226┆ bool public allowTransfers = false;
+            ⋮┆----------------------------------------
+          227┆ bool public issuanceFinished = false;
+            ⋮┆----------------------------------------
+          568┆ bool public paused = false;
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          111┆ for(uint256 i = 0; i < owners.length; i++) {
+            ⋮┆----------------------------------------
+          112┆ ownerByAddress[owners[i]] = false;
+            ⋮┆----------------------------------------
+          112┆ ownerByAddress[owners[i]] = false;
+            ⋮┆----------------------------------------
+          117┆ ownerByAddress[_owners[j]] = true;
+            ⋮┆----------------------------------------
+          504┆ for(uint256 i = 0; i < walletTokens[msg.sender].length; i++) {
+            ⋮┆----------------------------------------
+          505┆ if(!walletTokens[msg.sender][i].released && now >=               
+  walletTokens[msg.sender][i].lockEndTime) {                                    
+            ⋮┆----------------------------------------
+          505┆ if(!walletTokens[msg.sender][i].released && now >=               
+  walletTokens[msg.sender][i].lockEndTime) {                                    
+            ⋮┆----------------------------------------
+          506┆ walletTokens[msg.sender][i].released = true;
+            ⋮┆----------------------------------------
+          507┆ token.transfer(msg.sender, walletTokens[msg.sender][i].amount);
+            ⋮┆----------------------------------------
+          507┆ token.transfer(msg.sender, walletTokens[msg.sender][i].amount);
+            ⋮┆----------------------------------------
+          508┆ TokensUnlocked(msg.sender, walletTokens[msg.sender][i].amount);
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          111┆ for(uint256 i = 0; i < owners.length; i++) {
+            ⋮┆----------------------------------------
+          116┆ for(uint256 j = 0; j < _owners.length; j++) {
+            ⋮┆----------------------------------------
+          504┆ for(uint256 i = 0; i < walletTokens[msg.sender].length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          182┆ require(balances[_from] >= _value && allowed[_from][msg.sender]  
+  >= _value);                                                                   
+            ⋮┆----------------------------------------
+          400┆ require(now >= limitEndDate || !isLimitEnabled ||                
+  (!limitedWallets[_from] && !limitedWallets[_to]));                            
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          281┆ if(hasListener() && success) {
+          282┆     eventListener.onTokenTransfer(msg.sender, _to, _value);
+          283┆ }
+            ⋮┆----------------------------------------
+          289┆ if(hasListener() && success) {
+          290┆     eventListener.onTokenTransfer(_from, _to, _value);
+          291┆ }
+            ⋮┆----------------------------------------
+          505┆ if(!walletTokens[msg.sender][i].released && now >=               
+  walletTokens[msg.sender][i].lockEndTime) {                                    
+          506┆     walletTokens[msg.sender][i].released = true;
+          507┆     token.transfer(msg.sender,                                   
+  walletTokens[msg.sender][i].amount);                                          
+          508┆     TokensUnlocked(msg.sender,                                   
+  walletTokens[msg.sender][i].amount);                                          
+          509┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          111┆ for(uint256 i = 0; i < owners.length; i++) {
+            ⋮┆----------------------------------------
+          116┆ for(uint256 j = 0; j < _owners.length; j++) {
+            ⋮┆----------------------------------------
+          504┆ for(uint256 i = 0; i < walletTokens[msg.sender].length; i++) {
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 29 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

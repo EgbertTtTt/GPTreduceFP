@@ -1,0 +1,136 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 19 Code Findings │
+└──────────────────┘
+                    
+    /sb/Vesting.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          167┆ contract Vesting is Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          188┆ constructor() {}
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          269┆ for (uint256 i = 0; i < numberOfAccounts; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          137┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          158┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          212┆ require(
+          213┆     vestingWeeks > 0 &&
+          214┆     vestingWeeks >= cliffWeeks &&
+          215┆     amount > 0,
+          216┆     "Vesting: invalid vesting params"
+          217┆ );
+            ⋮┆----------------------------------------
+          222┆ require(
+          223┆     IERC20(asset).balanceOf(address(this)) >= currentLocked +    
+  amount,                                                                       
+          224┆     "Vesting: Not enough tokens"
+          225┆ );
+            ⋮┆----------------------------------------
+          265┆ require(
+          266┆     amount.length == numberOfAccounts,
+          267┆     "Vesting: Array lengths differ"
+          268┆ );
+            ⋮┆----------------------------------------
+          288┆ require(
+          289┆     schedule.cliffTime <= block.timestamp,
+          290┆     "Vesting: cliff not reached"
+          291┆ );
+            ⋮┆----------------------------------------
+          292┆ require(schedule.totalAmount > 0, "Vesting: not claimable");
+            ⋮┆----------------------------------------
+          307┆ require(IERC20(schedule.asset).transfer(msg.sender,              
+  amountToTransfer), "Vesting: transfer failed");                               
+            ⋮┆----------------------------------------
+          319┆ require(!schedule.isFixed, "Vesting: Account is fixed");
+            ⋮┆----------------------------------------
+          322┆ require(outstandingAmount != 0, "Vesting: no outstanding         
+  tokens");                                                                     
+            ⋮┆----------------------------------------
+          325┆ require(IERC20(schedule.asset).transfer(owner(),                 
+  outstandingAmount), "Vesting: transfer failed");                              
+            ⋮┆----------------------------------------
+          359┆ require(
+          360┆     token.balanceOf(address(this)) - locked[asset] >= amount,
+          361┆     "Vesting: Can't withdraw"
+          362┆ );
+            ⋮┆----------------------------------------
+          363┆ require(token.transfer(owner(), amount), "Vesting: withdraw      
+  failed");                                                                     
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          212┆ require(
+          213┆     vestingWeeks > 0 &&
+          214┆     vestingWeeks >= cliffWeeks &&
+          215┆     amount > 0,
+          216┆     "Vesting: invalid vesting params"
+          217┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          269┆ for (uint256 i = 0; i < numberOfAccounts; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          158┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 19 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

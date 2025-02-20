@@ -1,0 +1,138 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 29 Code Findings │
+└──────────────────┘
+                               
+    /sb/BridgeExecutorBase.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          350┆ for (uint256 i = 0; i < actionsSet.targets.length; i++) {
+            ⋮┆----------------------------------------
+          373┆ for (uint256 i = 0; i < actionsSet.targets.length; i++) {
+            ⋮┆----------------------------------------
+          482┆ for (uint256 i = 0; i < targets.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          496┆ _queuedActions[actionHash] = true;
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          350┆ for (uint256 i = 0; i < actionsSet.targets.length; i++) {
+            ⋮┆----------------------------------------
+          373┆ for (uint256 i = 0; i < actionsSet.targets.length; i++) {
+            ⋮┆----------------------------------------
+          482┆ for (uint256 i = 0; i < targets.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           31┆ require(c >= a, 'SafeMath: addition overflow');
+            ⋮┆----------------------------------------
+           87┆ require(c / a == b, 'SafeMath: multiplication overflow');
+            ⋮┆----------------------------------------
+          316┆ require(msg.sender == _guardian, 'ONLY_BY_GUARDIAN');
+            ⋮┆----------------------------------------
+          327┆ require(delay >= minimumDelay, 'DELAY_SHORTER_THAN_MINIMUM');
+            ⋮┆----------------------------------------
+          328┆ require(delay <= maximumDelay, 'DELAY_LONGER_THAN_MAXIMUM');
+            ⋮┆----------------------------------------
+          344┆ require(getActionsSetState(actionsSetId) ==                      
+  ActionsSetState.Queued, 'ONLY_QUEUED_ACTIONS');                               
+            ⋮┆----------------------------------------
+          347┆ require(block.timestamp >= actionsSet.executionTime,             
+  'TIMELOCK_NOT_FINISHED');                                                     
+            ⋮┆----------------------------------------
+          369┆ require(state == ActionsSetState.Queued, 'ONLY_BEFORE_EXECUTED');
+            ⋮┆----------------------------------------
+          418┆ require(_actionsSetCounter >= actionsSetId, 'INVALID_ACTION_ID');
+            ⋮┆----------------------------------------
+          469┆ require(targets.length != 0, 'INVALID_EMPTY_TARGETS');
+            ⋮┆----------------------------------------
+          470┆ require(
+          471┆   targets.length == values.length &&
+          472┆     targets.length == signatures.length &&
+          473┆     targets.length == calldatas.length &&
+          474┆     targets.length == withDelegatecalls.length,
+          475┆   'INCONSISTENT_PARAMS_LENGTH'
+          476┆ );
+            ⋮┆----------------------------------------
+          494┆ require(!isActionQueued(actionHash), 'DUPLICATED_ACTION');
+            ⋮┆----------------------------------------
+          543┆ require(msg.value >= value, 'NOT_ENOUGH_MSG_VALUE');
+            ⋮┆----------------------------------------
+          551┆ require(success, 'FAILED_ACTION_EXECUTION');
+            ⋮┆----------------------------------------
+          569┆ require(delay >= MINIMUM_DELAY, 'DELAY_SHORTER_THAN_MINIMUM');
+            ⋮┆----------------------------------------
+          570┆ require(delay <= MAXIMUM_DELAY, 'DELAY_LONGER_THAN_MAXIMUM');
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          470┆ require(
+          471┆   targets.length == values.length &&
+          472┆     targets.length == signatures.length &&
+          473┆     targets.length == calldatas.length &&
+          474┆     targets.length == withDelegatecalls.length,
+          475┆   'INCONSISTENT_PARAMS_LENGTH'
+          476┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          350┆ for (uint256 i = 0; i < actionsSet.targets.length; i++) {
+            ⋮┆----------------------------------------
+          373┆ for (uint256 i = 0; i < actionsSet.targets.length; i++) {
+            ⋮┆----------------------------------------
+          480┆ _actionsSetCounter++;
+            ⋮┆----------------------------------------
+          482┆ for (uint256 i = 0; i < targets.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           87┆ require(c / a == b, 'SafeMath: multiplication overflow');
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 29 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

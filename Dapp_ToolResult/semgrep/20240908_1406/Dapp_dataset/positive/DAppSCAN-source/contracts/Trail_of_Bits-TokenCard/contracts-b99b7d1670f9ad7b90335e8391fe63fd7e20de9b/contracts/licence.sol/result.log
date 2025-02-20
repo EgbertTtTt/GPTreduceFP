@@ -1,0 +1,141 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 25 Code Findings │
+└──────────────────┘
+                    
+    /sb/licence.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          261┆ contract Licence is Claimable, Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          129┆ constructor(address _account_, bool _transferable_) internal {
+          130┆     _owner = _account_;
+          131┆     _isTransferable = _transferable_;
+          132┆     // Emit the LockedOwnership event if no longer transferable.
+          133┆     if (!_isTransferable) {
+          134┆         emit LockedOwnership(_account_);
+          135┆     }
+          136┆     emit TransferredOwnership(address(0), _account_);
+          137┆ }
+            ⋮┆----------------------------------------
+          312┆ constructor(address _owner_, bool _transferable_, uint _licence_,
+  address _float_, address _holder_, address _tknAddress_) Ownable(_owner_,     
+  _transferable_) publ ... [0m                                                  
+          313┆     _licenceAmountScaled = _licence_;
+          314┆     _cryptoFloat = _float_;
+          315┆     _tokenHolder = _holder_;
+          316┆     if (_tknAddress_ != address(0)) {
+          317┆         _tknContractAddress = _tknAddress_;
+          318┆     }
+          319┆ }
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          141┆ require(_isOwner(msg.sender), "sender is not an owner");
+            ⋮┆----------------------------------------
+          150┆ require(_isTransferable, "ownership is not transferable");
+            ⋮┆----------------------------------------
+          152┆ require(_account != address(0), "owner cannot be set to zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          176┆ require(_isTransferable, "ownership is not transferable");
+            ⋮┆----------------------------------------
+          228┆ require(ERC20(_asset).transfer(_to, _amount), "ERC20 token       
+  transfer was unsuccessful");                                                  
+            ⋮┆----------------------------------------
+          302┆ require(msg.sender == _licenceDAO, "the sender isn't the DAO");
+            ⋮┆----------------------------------------
+          323┆ require(msg.data.length == 0, "msg data length should be 0");
+            ⋮┆----------------------------------------
+          384┆ require(!floatLocked(), "float is locked");
+            ⋮┆----------------------------------------
+          392┆ require(!holderLocked(), "holder contract is locked");
+            ⋮┆----------------------------------------
+          400┆ require(!licenceDAOLocked(), "DAO is locked");
+            ⋮┆----------------------------------------
+          408┆ require(!tknContractAddressLocked(), "TKN is locked");
+            ⋮┆----------------------------------------
+          416┆ require(1 <= _newAmount && _newAmount <= MAX_AMOUNT_SCALE,       
+  "licence amount out of range");                                               
+            ⋮┆----------------------------------------
+          428┆ require(ERC20(_asset).transferFrom(msg.sender, _cryptoFloat,     
+  loadAmount), "TKN transfer from external account was unsuccessful");          
+            ⋮┆----------------------------------------
+          434┆ require(ERC20(_asset).transferFrom(msg.sender, _tokenHolder,     
+  licenceAmount), "ERC20 licenceAmount transfer from external account was       
+  unsuccessful");                                                               
+            ⋮┆----------------------------------------
+          435┆ require(ERC20(_asset).transferFrom(msg.sender, _cryptoFloat,     
+  loadAmount), "ERC20 token transfer from external account was unsuccessful");  
+            ⋮┆----------------------------------------
+          437┆ require(msg.value == _amount, "ETH sent is not equal to amount");
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          416┆ require(1 <= _newAmount && _newAmount <= MAX_AMOUNT_SCALE,       
+  "licence amount out of range");                                               
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          152┆ require(_account != address(0), "owner cannot be set to zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          228┆ require(ERC20(_asset).transfer(_to, _amount), "ERC20 token       
+  transfer was unsuccessful");                                                  
+            ⋮┆----------------------------------------
+          428┆ require(ERC20(_asset).transferFrom(msg.sender, _cryptoFloat,     
+  loadAmount), "TKN transfer from external account was unsuccessful");          
+            ⋮┆----------------------------------------
+          434┆ require(ERC20(_asset).transferFrom(msg.sender, _tokenHolder,     
+  licenceAmount), "ERC20 licenceAmount transfer from external account was       
+  unsuccessful");                                                               
+            ⋮┆----------------------------------------
+          435┆ require(ERC20(_asset).transferFrom(msg.sender, _cryptoFloat,     
+  loadAmount), "ERC20 token transfer from external account was unsuccessful");  
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 25 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

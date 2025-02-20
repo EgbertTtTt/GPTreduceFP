@@ -1,0 +1,221 @@
+'solc --version' running
+'solc /sb/aq.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/aq.sol:
+Warning: SPDX license identifier not provided in source file. Before publishing, consider adding a comment containing "SPDX-License-Identifier: <SPDX-License>" to each source file. Use "SPDX-License-Identifier: UNLICENSED" for non-open-source code. Please see https://spdx.org for more information.
+--> /sb/aq.sol
+
+Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> /sb/aq.sol:433:150:
+    |
+433 |  ... int256 _amount)  external returns (string memory aqarid){
+    |                                         ^^^^^^^^^^^^^^^^^^^^
+
+Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> /sb/aq.sol:473:154:
+    |
+473 |  ... int256 _amount)  external returns (string memory aqarid){
+    |                                         ^^^^^^^^^^^^^^^^^^^^
+
+Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> /sb/aq.sol:513:153:
+    |
+513 |  ... int256 _amount)  external returns (string memory aqarid){
+    |                                         ^^^^^^^^^^^^^^^^^^^^
+
+Warning: Contract code size exceeds 24576 bytes (a limit introduced in Spurious Dragon). This contract may not be deployable on mainnet. Consider enabling the optimizer (with a low "runs" value!), turning off revert strings, or using libraries.
+   --> /sb/aq.sol:340:1:
+    |
+340 | contract aqarchain is Ownable {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+aqarchain.seedusdt(string,string,string,string,uint256) (../../sb/aq.sol#433-450) ignores return value by usdt.transferFrom(msg.sender,address(this),_amount) (../../sb/aq.sol#440)
+aqarchain.privateusdt(string,string,string,string,uint256) (../../sb/aq.sol#473-490) ignores return value by usdt.transferFrom(msg.sender,address(this),_amount) (../../sb/aq.sol#482)
+aqarchain.publicusdt(string,string,string,string,uint256) (../../sb/aq.sol#513-531) ignores return value by usdt.transferFrom(msg.sender,address(this),_amount) (../../sb/aq.sol#523)
+aqarchain.claim() (../../sb/aq.sol#554-564) ignores return value by token.transfer(msg.sender,claimamount) (../../sb/aq.sol#559)
+aqarchain.fundsWithdrawal(IERC20,uint256) (../../sb/aq.sol#599-607) ignores return value by _token.transfer(msg.sender,value) (../../sb/aq.sol#605)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+Reentrancy in aqarchain.claim() (../../sb/aq.sol#554-564):
+	External calls:
+	- token.transfer(msg.sender,claimamount) (../../sb/aq.sol#559)
+	State variables written after the call(s):
+	- claimamount = 0 (../../sb/aq.sol#563)
+	aqarchain.claimamount (../../sb/aq.sol#389) can be used in cross function reentrancies:
+	- aqarchain.claim() (../../sb/aq.sol#554-564)
+	- usermapprivate[msg.sender].amount = 0 (../../sb/aq.sol#561)
+	aqarchain.usermapprivate (../../sb/aq.sol#377) can be used in cross function reentrancies:
+	- aqarchain.claim() (../../sb/aq.sol#554-564)
+	- aqarchain.privatebnb(string,string,string,string) (../../sb/aq.sol#491-511)
+	- aqarchain.privateusdt(string,string,string,string,uint256) (../../sb/aq.sol#473-490)
+	- aqarchain.usermapprivate (../../sb/aq.sol#377)
+	- usermappublic[msg.sender].amount = 0 (../../sb/aq.sol#560)
+	aqarchain.usermappublic (../../sb/aq.sol#378) can be used in cross function reentrancies:
+	- aqarchain.claim() (../../sb/aq.sol#554-564)
+	- aqarchain.publicbnb(string,string,string,string) (../../sb/aq.sol#532-553)
+	- aqarchain.publicusdt(string,string,string,string,uint256) (../../sb/aq.sol#513-531)
+	- aqarchain.usermappublic (../../sb/aq.sol#378)
+	- usermapseed[msg.sender].amount = 0 (../../sb/aq.sol#562)
+	aqarchain.usermapseed (../../sb/aq.sol#376) can be used in cross function reentrancies:
+	- aqarchain.claim() (../../sb/aq.sol#554-564)
+	- aqarchain.privatemap(string,string,string,address,uint256,string) (../../sb/aq.sol#566-569)
+	- aqarchain.seedbnb(string,string,string,string) (../../sb/aq.sol#452-472)
+	- aqarchain.seedusdt(string,string,string,string,uint256) (../../sb/aq.sol#433-450)
+	- aqarchain.usermapseed (../../sb/aq.sol#376)
+Reentrancy in aqarchain.privateusdt(string,string,string,string,uint256) (../../sb/aq.sol#473-490):
+	External calls:
+	- usdt.transferFrom(msg.sender,address(this),_amount) (../../sb/aq.sol#482)
+	State variables written after the call(s):
+	- privateamount = privateamount.add(_amount.mul(privateprice).div(1000)) (../../sb/aq.sol#483)
+	aqarchain.privateamount (../../sb/aq.sol#398) can be used in cross function reentrancies:
+	- aqarchain.privateamount (../../sb/aq.sol#398)
+	- aqarchain.privatebnb(string,string,string,string) (../../sb/aq.sol#491-511)
+	- aqarchain.privateusdt(string,string,string,string,uint256) (../../sb/aq.sol#473-490)
+	- aqarchain.publicbnb(string,string,string,string) (../../sb/aq.sol#532-553)
+Reentrancy in aqarchain.publicusdt(string,string,string,string,uint256) (../../sb/aq.sol#513-531):
+	External calls:
+	- usdt.transferFrom(msg.sender,address(this),_amount) (../../sb/aq.sol#523)
+	State variables written after the call(s):
+	- publicamount = publicamount.add(_amount.mul(publicprice).div(10)) (../../sb/aq.sol#524)
+	aqarchain.publicamount (../../sb/aq.sol#399) can be used in cross function reentrancies:
+	- aqarchain.publicamount (../../sb/aq.sol#399)
+	- aqarchain.publicbnb(string,string,string,string) (../../sb/aq.sol#532-553)
+	- aqarchain.publicusdt(string,string,string,string,uint256) (../../sb/aq.sol#513-531)
+Reentrancy in aqarchain.seedusdt(string,string,string,string,uint256) (../../sb/aq.sol#433-450):
+	External calls:
+	- usdt.transferFrom(msg.sender,address(this),_amount) (../../sb/aq.sol#440)
+	State variables written after the call(s):
+	- seedamount = seedamount.add(_amount.mul(seedprice)) (../../sb/aq.sol#443)
+	aqarchain.seedamount (../../sb/aq.sol#397) can be used in cross function reentrancies:
+	- aqarchain.seedamount (../../sb/aq.sol#397)
+	- aqarchain.seedbnb(string,string,string,string) (../../sb/aq.sol#452-472)
+	- aqarchain.seedusdt(string,string,string,string,uint256) (../../sb/aq.sol#433-450)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+Reentrancy in aqarchain.privateusdt(string,string,string,string,uint256) (../../sb/aq.sol#473-490):
+	External calls:
+	- usdt.transferFrom(msg.sender,address(this),_amount) (../../sb/aq.sol#482)
+	State variables written after the call(s):
+	- i ++ (../../sb/aq.sol#484)
+	- usersarr.push(msg.sender) (../../sb/aq.sol#485)
+Reentrancy in aqarchain.publicusdt(string,string,string,string,uint256) (../../sb/aq.sol#513-531):
+	External calls:
+	- usdt.transferFrom(msg.sender,address(this),_amount) (../../sb/aq.sol#523)
+	State variables written after the call(s):
+	- i ++ (../../sb/aq.sol#525)
+	- usersarr.push(msg.sender) (../../sb/aq.sol#526)
+Reentrancy in aqarchain.seedusdt(string,string,string,string,uint256) (../../sb/aq.sol#433-450):
+	External calls:
+	- usdt.transferFrom(msg.sender,address(this),_amount) (../../sb/aq.sol#440)
+	State variables written after the call(s):
+	- amountmaptouserseed[_id] = amountmaptouserseed[_id].add(_amount.mul(seedprice)) (../../sb/aq.sol#442)
+	- i ++ (../../sb/aq.sol#444)
+	- usermapseed[msg.sender] = seedUserInfo({firstname:_first,lastname:_last,country:_country,amount:usermapseed[msg.sender].amount.add(_amount.mul(seedprice)),phase:seedprice,aqarid:_id,modeofpayment:USDT}) (../../sb/aq.sol#441)
+	- usersarr.push(msg.sender) (../../sb/aq.sol#445)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Context._msgData() (../../sb/aq.sol#276-279) is never used and should be removed
+SafeMath.sub(uint256,uint256) (../../sb/aq.sol#195-198) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.6.0 (../../sb/aq.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Function IUniswapV2Router01.WETH() (../../sb/aq.sol#7) is not in mixedCase
+Contract aqarchain (../../sb/aq.sol#340-610) is not in CapWords
+Struct aqarchain.seedUserInfo (../../sb/aq.sol#345-353) is not in CapWords
+Struct aqarchain.privateUserInfo (../../sb/aq.sol#354-362) is not in CapWords
+Struct aqarchain.publicUserInfo (../../sb/aq.sol#363-371) is not in CapWords
+Parameter aqarchain.settoken(address)._token (../../sb/aq.sol#430) is not in mixedCase
+Parameter aqarchain.seedusdt(string,string,string,string,uint256)._first (../../sb/aq.sol#433) is not in mixedCase
+Parameter aqarchain.seedusdt(string,string,string,string,uint256)._last (../../sb/aq.sol#433) is not in mixedCase
+Parameter aqarchain.seedusdt(string,string,string,string,uint256)._country (../../sb/aq.sol#433) is not in mixedCase
+Parameter aqarchain.seedusdt(string,string,string,string,uint256)._id (../../sb/aq.sol#433) is not in mixedCase
+Parameter aqarchain.seedusdt(string,string,string,string,uint256)._amount (../../sb/aq.sol#433) is not in mixedCase
+Parameter aqarchain.seedbnb(string,string,string,string)._first (../../sb/aq.sol#452) is not in mixedCase
+Parameter aqarchain.seedbnb(string,string,string,string)._last (../../sb/aq.sol#452) is not in mixedCase
+Parameter aqarchain.seedbnb(string,string,string,string)._country (../../sb/aq.sol#452) is not in mixedCase
+Parameter aqarchain.seedbnb(string,string,string,string)._id (../../sb/aq.sol#452) is not in mixedCase
+Parameter aqarchain.privateusdt(string,string,string,string,uint256)._first (../../sb/aq.sol#473) is not in mixedCase
+Parameter aqarchain.privateusdt(string,string,string,string,uint256)._last (../../sb/aq.sol#473) is not in mixedCase
+Parameter aqarchain.privateusdt(string,string,string,string,uint256)._country (../../sb/aq.sol#473) is not in mixedCase
+Parameter aqarchain.privateusdt(string,string,string,string,uint256)._id (../../sb/aq.sol#473) is not in mixedCase
+Parameter aqarchain.privateusdt(string,string,string,string,uint256)._amount (../../sb/aq.sol#473) is not in mixedCase
+Parameter aqarchain.privatebnb(string,string,string,string)._first (../../sb/aq.sol#491) is not in mixedCase
+Parameter aqarchain.privatebnb(string,string,string,string)._last (../../sb/aq.sol#491) is not in mixedCase
+Parameter aqarchain.privatebnb(string,string,string,string)._country (../../sb/aq.sol#491) is not in mixedCase
+Parameter aqarchain.privatebnb(string,string,string,string)._id (../../sb/aq.sol#491) is not in mixedCase
+Parameter aqarchain.publicusdt(string,string,string,string,uint256)._first (../../sb/aq.sol#513) is not in mixedCase
+Parameter aqarchain.publicusdt(string,string,string,string,uint256)._last (../../sb/aq.sol#513) is not in mixedCase
+Parameter aqarchain.publicusdt(string,string,string,string,uint256)._country (../../sb/aq.sol#513) is not in mixedCase
+Parameter aqarchain.publicusdt(string,string,string,string,uint256)._id (../../sb/aq.sol#513) is not in mixedCase
+Parameter aqarchain.publicusdt(string,string,string,string,uint256)._amount (../../sb/aq.sol#513) is not in mixedCase
+Parameter aqarchain.publicbnb(string,string,string,string)._first (../../sb/aq.sol#532) is not in mixedCase
+Parameter aqarchain.publicbnb(string,string,string,string)._last (../../sb/aq.sol#532) is not in mixedCase
+Parameter aqarchain.publicbnb(string,string,string,string)._country (../../sb/aq.sol#532) is not in mixedCase
+Parameter aqarchain.publicbnb(string,string,string,string)._id (../../sb/aq.sol#532) is not in mixedCase
+Parameter aqarchain.privatemap(string,string,string,address,uint256,string)._first (../../sb/aq.sol#566) is not in mixedCase
+Parameter aqarchain.privatemap(string,string,string,address,uint256,string)._last (../../sb/aq.sol#566) is not in mixedCase
+Parameter aqarchain.privatemap(string,string,string,address,uint256,string)._country (../../sb/aq.sol#566) is not in mixedCase
+Parameter aqarchain.privatemap(string,string,string,address,uint256,string)._address (../../sb/aq.sol#566) is not in mixedCase
+Parameter aqarchain.privatemap(string,string,string,address,uint256,string)._amount (../../sb/aq.sol#566) is not in mixedCase
+Parameter aqarchain.privatemap(string,string,string,address,uint256,string)._aqarid (../../sb/aq.sol#566) is not in mixedCase
+Parameter aqarchain.getContractTokenBalance(IERC20)._token (../../sb/aq.sol#591) is not in mixedCase
+Parameter aqarchain.fundsWithdrawal(IERC20,uint256)._token (../../sb/aq.sol#599) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/aq.sol#277)" inContext (../../sb/aq.sol#271-280)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Variable IUniswapV2Router01.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountADesired (../../sb/aq.sol#12) is too similar to IUniswapV2Router01.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountBDesired (../../sb/aq.sol#13)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+aqarchain.seedusdt(string,string,string,string,uint256) (../../sb/aq.sol#433-450) uses literals with too many digits:
+	- require(bool,string)(_amount >= 100000000000000000000,Enter amount greater than 100 usd) (../../sb/aq.sol#434)
+aqarchain.seedusdt(string,string,string,string,uint256) (../../sb/aq.sol#433-450) uses literals with too many digits:
+	- require(bool,string)(seedamount <= 7000000000000000000000000,seed round token sale completed) (../../sb/aq.sol#435)
+aqarchain.seedusdt(string,string,string,string,uint256) (../../sb/aq.sol#433-450) uses literals with too many digits:
+	- seedamount.add(_amount.mul(seedprice)) <= 7000000000000000000000000 (../../sb/aq.sol#439)
+aqarchain.seedbnb(string,string,string,string) (../../sb/aq.sol#452-472) uses literals with too many digits:
+	- require(bool,string)(msg.value.mul(getBnbRate()).div(1e18) >= 100000000000000000000,the input bnb amount should be greater than hundred) (../../sb/aq.sol#454-457)
+aqarchain.seedbnb(string,string,string,string) (../../sb/aq.sol#452-472) uses literals with too many digits:
+	- require(bool,string)(seedamount <= 7000000000000000000000000,seed round token sale completed) (../../sb/aq.sol#458)
+aqarchain.seedbnb(string,string,string,string) (../../sb/aq.sol#452-472) uses literals with too many digits:
+	- seedamount.add(msg.value.mul(getBnbRate()).mul(seedprice).div(1e18)) <= 7000000000000000000000000 (../../sb/aq.sol#462)
+aqarchain.privateusdt(string,string,string,string,uint256) (../../sb/aq.sol#473-490) uses literals with too many digits:
+	- require(bool,string)(_amount >= 100000000000000000000,Enter amount greter than 100 usd) (../../sb/aq.sol#474)
+aqarchain.privateusdt(string,string,string,string,uint256) (../../sb/aq.sol#473-490) uses literals with too many digits:
+	- require(bool,string)(privateamount <= 12000000000000000000000000,private round token sale completed) (../../sb/aq.sol#475)
+aqarchain.privateusdt(string,string,string,string,uint256) (../../sb/aq.sol#473-490) uses literals with too many digits:
+	- privateamount.add(_amount.mul(privateprice).div(1000)) <= 12000000000000000000000000 (../../sb/aq.sol#479)
+aqarchain.privatebnb(string,string,string,string) (../../sb/aq.sol#491-511) uses literals with too many digits:
+	- require(bool,string)(msg.value.mul(getBnbRate()).div(1e18) >= 100000000000000000000,the input bnb amount should be greater than hundred usd) (../../sb/aq.sol#493-496)
+aqarchain.privatebnb(string,string,string,string) (../../sb/aq.sol#491-511) uses literals with too many digits:
+	- require(bool,string)(privateamount <= 12000000000000000000000000,private round token sale completed) (../../sb/aq.sol#499)
+aqarchain.privatebnb(string,string,string,string) (../../sb/aq.sol#491-511) uses literals with too many digits:
+	- privateamount.add(msg.value.mul(getBnbRate()).mul(privateprice).div(1e18).div(1000)) <= 12000000000000000000000000 (../../sb/aq.sol#501)
+aqarchain.publicusdt(string,string,string,string,uint256) (../../sb/aq.sol#513-531) uses literals with too many digits:
+	- require(bool,string)(_amount >= 100000000000000000000,Enter amount more than 100 usd) (../../sb/aq.sol#514)
+aqarchain.publicusdt(string,string,string,string,uint256) (../../sb/aq.sol#513-531) uses literals with too many digits:
+	- require(bool,string)(publicamount <= 1000000000000000000000000,public round token sale completed) (../../sb/aq.sol#516)
+aqarchain.publicusdt(string,string,string,string,uint256) (../../sb/aq.sol#513-531) uses literals with too many digits:
+	- publicamount.add(_amount.mul(publicprice).div(10)) <= 1000000000000000000000000 (../../sb/aq.sol#520)
+aqarchain.publicbnb(string,string,string,string) (../../sb/aq.sol#532-553) uses literals with too many digits:
+	- require(bool,string)(msg.value.mul(getBnbRate()).div(1e18) >= 100000000000000000000,the input bnb amount should be greater than hundred and less than sfivethousand) (../../sb/aq.sol#534-537)
+aqarchain.publicbnb(string,string,string,string) (../../sb/aq.sol#532-553) uses literals with too many digits:
+	- require(bool,string)(privateamount <= 1000000000000000000000000,private round token sale completed) (../../sb/aq.sol#541)
+aqarchain.publicbnb(string,string,string,string) (../../sb/aq.sol#532-553) uses literals with too many digits:
+	- publicamount.add(msg.value.mul(getBnbRate()).mul(publicprice).div(1e18).div(10)) <= 1000000000000000000000000 (../../sb/aq.sol#543)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+aqarchain.privateprice (../../sb/aq.sol#393) should be constant 
+aqarchain.publicprice (../../sb/aq.sol#394) should be constant 
+aqarchain.seedprice (../../sb/aq.sol#392) should be constant 
+aqarchain.usdt (../../sb/aq.sol#411) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+
+aqarchain.pancakerouter1 (../../sb/aq.sol#414) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/aq.sol analyzed (6 contracts with 93 detectors), 82 result(s) found

@@ -1,0 +1,221 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 49 Code Findings │
+└──────────────────┘
+                               
+    /sb/BorrowerOperations.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+         3069┆ contract BorrowerOperations is LiquityBase, Ownable,             
+  CheckContract, IBorrowerOperations {                                          
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+         3011┆ constructor () internal {
+         3012┆     _owner = msg.sender;
+         3013┆     emit OwnershipTransferred(address(0), msg.sender);
+         3014┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          723┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          777┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+         2987┆ require(feePercentage <= _maxFeePercentage, "Fee exceeded        
+  provided maximum");                                                           
+            ⋮┆----------------------------------------
+         3027┆ require(isOwner(), "Ownable: caller is not the owner");
+            ⋮┆----------------------------------------
+         3060┆ require(_account != address(0), "Account cannot be zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+         3065┆ require(size > 0, "Account code size cannot be zero");
+            ⋮┆----------------------------------------
+         3501┆ require(success, "BorrowerOps: Sending ETH to ActivePool         
+  failed");                                                                     
+            ⋮┆----------------------------------------
+         3519┆ require(msg.value == 0 || _collWithdrawal == 0,                  
+  "BorrowerOperations: Cannot withdraw and add coll");                          
+            ⋮┆----------------------------------------
+         3523┆ require(msg.sender == _borrower, "BorrowerOps: Caller must be the
+  borrower for a withdrawal");                                                  
+            ⋮┆----------------------------------------
+         3527┆ require(msg.value != 0 || _collWithdrawal != 0 || _LUSDChange != 
+  0, "BorrowerOps: There must be either a collateral change or a debt change"); 
+            ⋮┆----------------------------------------
+         3532┆ require(status == 1, "BorrowerOps: Trove does not exist or is    
+  closed");                                                                     
+            ⋮┆----------------------------------------
+         3537┆ require(status != 1, "BorrowerOps: Trove is active");
+            ⋮┆----------------------------------------
+         3541┆ require(_LUSDChange > 0, "BorrowerOps: Debt increase requires    
+  non-zero debtChange");                                                        
+            ⋮┆----------------------------------------
+         3545┆ require(!_checkRecoveryMode(_price), "BorrowerOps: Operation not 
+  permitted during Recovery Mode");                                             
+            ⋮┆----------------------------------------
+         3549┆ require(_collWithdrawal == 0, "BorrowerOps: Collateral withdrawal
+  not permitted Recovery Mode");                                                
+            ⋮┆----------------------------------------
+         3589┆ require(_newICR >= MCR, "BorrowerOps: An operation that would    
+  result in ICR < MCR is not permitted");                                       
+            ⋮┆----------------------------------------
+         3593┆ require(_newICR >= CCR, "BorrowerOps: Operation must leave trove 
+  with ICR >= CCR");                                                            
+            ⋮┆----------------------------------------
+         3597┆ require(_newICR >= _oldICR, "BorrowerOps: Cannot decrease your   
+  Trove's ICR in Recovery Mode");                                               
+            ⋮┆----------------------------------------
+         3601┆ require(_newTCR >= CCR, "BorrowerOps: An operation that would    
+  result in TCR < CCR is not permitted");                                       
+            ⋮┆----------------------------------------
+         3605┆ require (_netDebt >= MIN_NET_DEBT, "BorrowerOps: Trove's net debt
+  must be greater than minimum");                                               
+            ⋮┆----------------------------------------
+         3609┆ require(_debtRepayment <=                                        
+  _currentDebt.sub(LUSD_GAS_COMPENSATION), "BorrowerOps: Amount repaid must not 
+  be larger than the Trove's debt");                                            
+            ⋮┆----------------------------------------
+         3613┆ require(msg.sender == stabilityPoolAddress, "BorrowerOps: Caller 
+  is not Stability Pool");                                                      
+            ⋮┆----------------------------------------
+         3617┆ require(_lusdToken.balanceOf(_borrower) >= _debtRepayment,       
+  "BorrowerOps: Caller doesnt have enough LUSD to make repayment");             
+            ⋮┆----------------------------------------
+         3622┆ require(_maxFeePercentage <= DECIMAL_PRECISION,
+         3623┆     "Max fee percentage must less than or equal to 100%");
+            ⋮┆----------------------------------------
+         3625┆ require(_maxFeePercentage >= BORROWING_FEE_FLOOR &&              
+  _maxFeePercentage <= DECIMAL_PRECISION,                                       
+         3626┆     "Max fee percentage must be between 0.5% and 100%");
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+         3625┆ require(_maxFeePercentage >= BORROWING_FEE_FLOOR &&              
+  _maxFeePercentage <= DECIMAL_PRECISION,                                       
+         3626┆     "Max fee percentage must be between 0.5% and 100%");
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         3327┆ if (_isDebtIncrease && !isRecoveryMode) {
+         3328┆     vars.LUSDFee =                                               
+  _triggerBorrowingFee(contractsCache.troveManager, contractsCache.lusdToken,   
+  _LUSDChange, _maxFeePercentage);                                              
+         3329┆     vars.netDebtChange = vars.netDebtChange.add(vars.LUSDFee); //
+  The raw debt change includes the fee                                          
+         3330┆ }
+            ⋮┆----------------------------------------
+         3344┆ if (!_isDebtIncrease && _LUSDChange > 0) {
+         3345┆                                                                  
+  _requireAtLeastMinNetDebt(_getNetDebt(vars.debt).sub(vars.netDebtChange));    
+         3346┆     _requireValidLUSDRepayment(vars.debt, vars.netDebtChange);
+         3347┆     _requireSufficientLUSDBalance(contractsCache.lusdToken,      
+  _borrower, vars.netDebtChange);                                               
+         3348┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          777┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+         3501┆ require(success, "BorrowerOps: Sending ETH to ActivePool         
+  failed");                                                                     
+            ⋮┆----------------------------------------
+         3519┆ require(msg.value == 0 || _collWithdrawal == 0,                  
+  "BorrowerOperations: Cannot withdraw and add coll");                          
+            ⋮┆----------------------------------------
+         3523┆ require(msg.sender == _borrower, "BorrowerOps: Caller must be the
+  borrower for a withdrawal");                                                  
+            ⋮┆----------------------------------------
+         3527┆ require(msg.value != 0 || _collWithdrawal != 0 || _LUSDChange != 
+  0, "BorrowerOps: There must be either a collateral change or a debt change"); 
+            ⋮┆----------------------------------------
+         3532┆ require(status == 1, "BorrowerOps: Trove does not exist or is    
+  closed");                                                                     
+            ⋮┆----------------------------------------
+         3541┆ require(_LUSDChange > 0, "BorrowerOps: Debt increase requires    
+  non-zero debtChange");                                                        
+            ⋮┆----------------------------------------
+         3545┆ require(!_checkRecoveryMode(_price), "BorrowerOps: Operation not 
+  permitted during Recovery Mode");                                             
+            ⋮┆----------------------------------------
+         3549┆ require(_collWithdrawal == 0, "BorrowerOps: Collateral withdrawal
+  not permitted Recovery Mode");                                                
+            ⋮┆----------------------------------------
+         3589┆ require(_newICR >= MCR, "BorrowerOps: An operation that would    
+  result in ICR < MCR is not permitted");                                       
+            ⋮┆----------------------------------------
+         3593┆ require(_newICR >= CCR, "BorrowerOps: Operation must leave trove 
+  with ICR >= CCR");                                                            
+            ⋮┆----------------------------------------
+         3597┆ require(_newICR >= _oldICR, "BorrowerOps: Cannot decrease your   
+  Trove's ICR in Recovery Mode");                                               
+            ⋮┆----------------------------------------
+         3601┆ require(_newTCR >= CCR, "BorrowerOps: An operation that would    
+  result in TCR < CCR is not permitted");                                       
+            ⋮┆----------------------------------------
+         3605┆ require (_netDebt >= MIN_NET_DEBT, "BorrowerOps: Trove's net debt
+  must be greater than minimum");                                               
+            ⋮┆----------------------------------------
+         3609┆ require(_debtRepayment <=                                        
+  _currentDebt.sub(LUSD_GAS_COMPENSATION), "BorrowerOps: Amount repaid must not 
+  be larger than the Trove's debt");                                            
+            ⋮┆----------------------------------------
+         3613┆ require(msg.sender == stabilityPoolAddress, "BorrowerOps: Caller 
+  is not Stability Pool");                                                      
+            ⋮┆----------------------------------------
+         3617┆ require(_lusdToken.balanceOf(_borrower) >= _debtRepayment,       
+  "BorrowerOps: Caller doesnt have enough LUSD to make repayment");             
+            ⋮┆----------------------------------------
+         3622┆ require(_maxFeePercentage <= DECIMAL_PRECISION,
+         3623┆     "Max fee percentage must less than or equal to 100%");
+            ⋮┆----------------------------------------
+         3625┆ require(_maxFeePercentage >= BORROWING_FEE_FLOOR &&              
+  _maxFeePercentage <= DECIMAL_PRECISION,                                       
+         3626┆     "Max fee percentage must be between 0.5% and 100%");
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 49 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

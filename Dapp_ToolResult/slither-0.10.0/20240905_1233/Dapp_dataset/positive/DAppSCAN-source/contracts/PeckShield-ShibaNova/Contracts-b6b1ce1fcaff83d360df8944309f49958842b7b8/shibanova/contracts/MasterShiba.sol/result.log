@@ -1,0 +1,535 @@
+'solc --version' running
+'solc /sb/MasterShiba.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+MasterShiba.pendingNova(uint256,address) (../../sb/MasterShiba.sol#1145-1161) performs a multiplication on the result of a division:
+	- NovaReward = multiplier.mul(NovaPerBlock).mul(pool.allocPoint).div(totalAllocPoint) (../../sb/MasterShiba.sol#1152)
+	- accNovaPerShare = accNovaPerShare.add(NovaReward.mul(1e12).div(lpSupply)) (../../sb/MasterShiba.sol#1153)
+MasterShiba.updatePool(uint256) (../../sb/MasterShiba.sol#1202-1225) performs a multiplication on the result of a division:
+	- NovaReward = multiplier.mul(NovaPerBlock).mul(pool.allocPoint).div(totalAllocPoint) (../../sb/MasterShiba.sol#1214)
+	- pool.accNovaPerShare = pool.accNovaPerShare.add(NovaReward.mul(1e12).div(lpSupply)) (../../sb/MasterShiba.sol#1223)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+Reentrancy in MasterShiba.add(uint256,IBEP20,uint256,bool,bool) (../../sb/MasterShiba.sol#1111-1127):
+	External calls:
+	- massUpdatePools() (../../sb/MasterShiba.sol#1114)
+		- Nova.mint(devaddr,devMintAmount) (../../sb/MasterShiba.sol#1216)
+		- sNova.mint(address(this),NovaReward) (../../sb/MasterShiba.sol#1218)
+		- Nova.mint(address(this),NovaReward) (../../sb/MasterShiba.sol#1221)
+	State variables written after the call(s):
+	- poolInfo.push(PoolInfo({lpToken:_lpToken,lpSupply:0,allocPoint:_allocPoint,lastRewardBlock:lastRewardBlock,accNovaPerShare:0,depositFeeBP:_depositFeeBP,isSNovaRewards:_isSNovaRewards})) (../../sb/MasterShiba.sol#1118-1126)
+	MasterShiba.poolInfo (../../sb/MasterShiba.sol#1032) can be used in cross function reentrancies:
+	- MasterShiba.add(uint256,IBEP20,uint256,bool,bool) (../../sb/MasterShiba.sol#1111-1127)
+	- MasterShiba.constructor(ShibaBEP20,ShibaBEP20,ShibaBonusAggregator,address,address,uint256,uint256) (../../sb/MasterShiba.sol#1056-1085)
+	- MasterShiba.deposit(uint256,uint256) (../../sb/MasterShiba.sol#1250-1288)
+	- MasterShiba.emergencyWithdraw(uint256) (../../sb/MasterShiba.sol#1319-1329)
+	- MasterShiba.getPoolInfo(uint256) (../../sb/MasterShiba.sol#1331-1342)
+	- MasterShiba.massUpdatePools() (../../sb/MasterShiba.sol#1194-1199)
+	- MasterShiba.pendingNova(uint256,address) (../../sb/MasterShiba.sol#1145-1161)
+	- MasterShiba.poolInfo (../../sb/MasterShiba.sol#1032)
+	- MasterShiba.poolLength() (../../sb/MasterShiba.sol#1097-1099)
+	- MasterShiba.set(uint256,uint256,uint256,bool,bool) (../../sb/MasterShiba.sol#1130-1142)
+	- MasterShiba.updatePool(uint256) (../../sb/MasterShiba.sol#1202-1225)
+	- MasterShiba.updateUserBonus(address,uint256,uint256) (../../sb/MasterShiba.sol#1228-1247)
+	- MasterShiba.validatePool(uint256) (../../sb/MasterShiba.sol#1087-1090)
+	- MasterShiba.withdraw(uint256,uint256) (../../sb/MasterShiba.sol#1291-1316)
+	- totalAllocPoint = totalAllocPoint.add(_allocPoint) (../../sb/MasterShiba.sol#1117)
+	MasterShiba.totalAllocPoint (../../sb/MasterShiba.sol#1036) can be used in cross function reentrancies:
+	- MasterShiba.add(uint256,IBEP20,uint256,bool,bool) (../../sb/MasterShiba.sol#1111-1127)
+	- MasterShiba.constructor(ShibaBEP20,ShibaBEP20,ShibaBonusAggregator,address,address,uint256,uint256) (../../sb/MasterShiba.sol#1056-1085)
+	- MasterShiba.pendingNova(uint256,address) (../../sb/MasterShiba.sol#1145-1161)
+	- MasterShiba.set(uint256,uint256,uint256,bool,bool) (../../sb/MasterShiba.sol#1130-1142)
+	- MasterShiba.totalAllocPoint (../../sb/MasterShiba.sol#1036)
+	- MasterShiba.updatePool(uint256) (../../sb/MasterShiba.sol#1202-1225)
+Reentrancy in MasterShiba.deposit(uint256,uint256) (../../sb/MasterShiba.sol#1250-1288):
+	External calls:
+	- updatePool(_pid) (../../sb/MasterShiba.sol#1254)
+		- Nova.mint(devaddr,devMintAmount) (../../sb/MasterShiba.sol#1216)
+		- sNova.mint(address(this),NovaReward) (../../sb/MasterShiba.sol#1218)
+		- Nova.mint(address(this),NovaReward) (../../sb/MasterShiba.sol#1221)
+	- safeSNovaTransfer(_user,pending) (../../sb/MasterShiba.sol#1259)
+		- transferSuccess = sNova.transfer(_to,sNovaBal) (../../sb/MasterShiba.sol#1361)
+		- transferSuccess = sNova.transfer(_to,_amount) (../../sb/MasterShiba.sol#1363)
+	- safeNovaTransfer(_user,pending) (../../sb/MasterShiba.sol#1262)
+		- transferSuccess = Nova.transfer(_to,NovaBal) (../../sb/MasterShiba.sol#1349)
+		- transferSuccess = Nova.transfer(_to,_amount) (../../sb/MasterShiba.sol#1351)
+	- pool.lpToken.safeTransferFrom(address(_user),address(this),_amount) (../../sb/MasterShiba.sol#1267)
+	- pool.lpToken.safeTransfer(feeAddress,depositFee) (../../sb/MasterShiba.sol#1274)
+	State variables written after the call(s):
+	- pool.lpSupply = pool.lpSupply.add(_bonusAmount) (../../sb/MasterShiba.sol#1278)
+	MasterShiba.poolInfo (../../sb/MasterShiba.sol#1032) can be used in cross function reentrancies:
+	- MasterShiba.add(uint256,IBEP20,uint256,bool,bool) (../../sb/MasterShiba.sol#1111-1127)
+	- MasterShiba.constructor(ShibaBEP20,ShibaBEP20,ShibaBonusAggregator,address,address,uint256,uint256) (../../sb/MasterShiba.sol#1056-1085)
+	- MasterShiba.deposit(uint256,uint256) (../../sb/MasterShiba.sol#1250-1288)
+	- MasterShiba.emergencyWithdraw(uint256) (../../sb/MasterShiba.sol#1319-1329)
+	- MasterShiba.getPoolInfo(uint256) (../../sb/MasterShiba.sol#1331-1342)
+	- MasterShiba.massUpdatePools() (../../sb/MasterShiba.sol#1194-1199)
+	- MasterShiba.pendingNova(uint256,address) (../../sb/MasterShiba.sol#1145-1161)
+	- MasterShiba.poolInfo (../../sb/MasterShiba.sol#1032)
+	- MasterShiba.poolLength() (../../sb/MasterShiba.sol#1097-1099)
+	- MasterShiba.set(uint256,uint256,uint256,bool,bool) (../../sb/MasterShiba.sol#1130-1142)
+	- MasterShiba.updatePool(uint256) (../../sb/MasterShiba.sol#1202-1225)
+	- MasterShiba.updateUserBonus(address,uint256,uint256) (../../sb/MasterShiba.sol#1228-1247)
+	- MasterShiba.validatePool(uint256) (../../sb/MasterShiba.sol#1087-1090)
+	- MasterShiba.withdraw(uint256,uint256) (../../sb/MasterShiba.sol#1291-1316)
+	- user.amount = user.amount.add(_amount).sub(depositFee) (../../sb/MasterShiba.sol#1275)
+	MasterShiba.userInfo (../../sb/MasterShiba.sol#1034) can be used in cross function reentrancies:
+	- MasterShiba.deposit(uint256,uint256) (../../sb/MasterShiba.sol#1250-1288)
+	- MasterShiba.emergencyWithdraw(uint256) (../../sb/MasterShiba.sol#1319-1329)
+	- MasterShiba.pendingNova(uint256,address) (../../sb/MasterShiba.sol#1145-1161)
+	- MasterShiba.updateUserBonus(address,uint256,uint256) (../../sb/MasterShiba.sol#1228-1247)
+	- MasterShiba.userInfo (../../sb/MasterShiba.sol#1034)
+	- MasterShiba.withdraw(uint256,uint256) (../../sb/MasterShiba.sol#1291-1316)
+	- user.amountWithBonus = user.amountWithBonus.add(_bonusAmount) (../../sb/MasterShiba.sol#1277)
+	MasterShiba.userInfo (../../sb/MasterShiba.sol#1034) can be used in cross function reentrancies:
+	- MasterShiba.deposit(uint256,uint256) (../../sb/MasterShiba.sol#1250-1288)
+	- MasterShiba.emergencyWithdraw(uint256) (../../sb/MasterShiba.sol#1319-1329)
+	- MasterShiba.pendingNova(uint256,address) (../../sb/MasterShiba.sol#1145-1161)
+	- MasterShiba.updateUserBonus(address,uint256,uint256) (../../sb/MasterShiba.sol#1228-1247)
+	- MasterShiba.userInfo (../../sb/MasterShiba.sol#1034)
+	- MasterShiba.withdraw(uint256,uint256) (../../sb/MasterShiba.sol#1291-1316)
+Reentrancy in MasterShiba.deposit(uint256,uint256) (../../sb/MasterShiba.sol#1250-1288):
+	External calls:
+	- updatePool(_pid) (../../sb/MasterShiba.sol#1254)
+		- Nova.mint(devaddr,devMintAmount) (../../sb/MasterShiba.sol#1216)
+		- sNova.mint(address(this),NovaReward) (../../sb/MasterShiba.sol#1218)
+		- Nova.mint(address(this),NovaReward) (../../sb/MasterShiba.sol#1221)
+	- safeSNovaTransfer(_user,pending) (../../sb/MasterShiba.sol#1259)
+		- transferSuccess = sNova.transfer(_to,sNovaBal) (../../sb/MasterShiba.sol#1361)
+		- transferSuccess = sNova.transfer(_to,_amount) (../../sb/MasterShiba.sol#1363)
+	- safeNovaTransfer(_user,pending) (../../sb/MasterShiba.sol#1262)
+		- transferSuccess = Nova.transfer(_to,NovaBal) (../../sb/MasterShiba.sol#1349)
+		- transferSuccess = Nova.transfer(_to,_amount) (../../sb/MasterShiba.sol#1351)
+	- pool.lpToken.safeTransferFrom(address(_user),address(this),_amount) (../../sb/MasterShiba.sol#1267)
+	State variables written after the call(s):
+	- pool.lpSupply = pool.lpSupply.add(_bonusAmount_scope_0) (../../sb/MasterShiba.sol#1283)
+	MasterShiba.poolInfo (../../sb/MasterShiba.sol#1032) can be used in cross function reentrancies:
+	- MasterShiba.add(uint256,IBEP20,uint256,bool,bool) (../../sb/MasterShiba.sol#1111-1127)
+	- MasterShiba.constructor(ShibaBEP20,ShibaBEP20,ShibaBonusAggregator,address,address,uint256,uint256) (../../sb/MasterShiba.sol#1056-1085)
+	- MasterShiba.deposit(uint256,uint256) (../../sb/MasterShiba.sol#1250-1288)
+	- MasterShiba.emergencyWithdraw(uint256) (../../sb/MasterShiba.sol#1319-1329)
+	- MasterShiba.getPoolInfo(uint256) (../../sb/MasterShiba.sol#1331-1342)
+	- MasterShiba.massUpdatePools() (../../sb/MasterShiba.sol#1194-1199)
+	- MasterShiba.pendingNova(uint256,address) (../../sb/MasterShiba.sol#1145-1161)
+	- MasterShiba.poolInfo (../../sb/MasterShiba.sol#1032)
+	- MasterShiba.poolLength() (../../sb/MasterShiba.sol#1097-1099)
+	- MasterShiba.set(uint256,uint256,uint256,bool,bool) (../../sb/MasterShiba.sol#1130-1142)
+	- MasterShiba.updatePool(uint256) (../../sb/MasterShiba.sol#1202-1225)
+	- MasterShiba.updateUserBonus(address,uint256,uint256) (../../sb/MasterShiba.sol#1228-1247)
+	- MasterShiba.validatePool(uint256) (../../sb/MasterShiba.sol#1087-1090)
+	- MasterShiba.withdraw(uint256,uint256) (../../sb/MasterShiba.sol#1291-1316)
+	- user.amount = user.amount.add(_amount) (../../sb/MasterShiba.sol#1280)
+	MasterShiba.userInfo (../../sb/MasterShiba.sol#1034) can be used in cross function reentrancies:
+	- MasterShiba.deposit(uint256,uint256) (../../sb/MasterShiba.sol#1250-1288)
+	- MasterShiba.emergencyWithdraw(uint256) (../../sb/MasterShiba.sol#1319-1329)
+	- MasterShiba.pendingNova(uint256,address) (../../sb/MasterShiba.sol#1145-1161)
+	- MasterShiba.updateUserBonus(address,uint256,uint256) (../../sb/MasterShiba.sol#1228-1247)
+	- MasterShiba.userInfo (../../sb/MasterShiba.sol#1034)
+	- MasterShiba.withdraw(uint256,uint256) (../../sb/MasterShiba.sol#1291-1316)
+	- user.amountWithBonus = user.amountWithBonus.add(_bonusAmount_scope_0) (../../sb/MasterShiba.sol#1282)
+	MasterShiba.userInfo (../../sb/MasterShiba.sol#1034) can be used in cross function reentrancies:
+	- MasterShiba.deposit(uint256,uint256) (../../sb/MasterShiba.sol#1250-1288)
+	- MasterShiba.emergencyWithdraw(uint256) (../../sb/MasterShiba.sol#1319-1329)
+	- MasterShiba.pendingNova(uint256,address) (../../sb/MasterShiba.sol#1145-1161)
+	- MasterShiba.updateUserBonus(address,uint256,uint256) (../../sb/MasterShiba.sol#1228-1247)
+	- MasterShiba.userInfo (../../sb/MasterShiba.sol#1034)
+	- MasterShiba.withdraw(uint256,uint256) (../../sb/MasterShiba.sol#1291-1316)
+Reentrancy in MasterShiba.set(uint256,uint256,uint256,bool,bool) (../../sb/MasterShiba.sol#1130-1142):
+	External calls:
+	- massUpdatePools() (../../sb/MasterShiba.sol#1133)
+		- Nova.mint(devaddr,devMintAmount) (../../sb/MasterShiba.sol#1216)
+		- sNova.mint(address(this),NovaReward) (../../sb/MasterShiba.sol#1218)
+		- Nova.mint(address(this),NovaReward) (../../sb/MasterShiba.sol#1221)
+	State variables written after the call(s):
+	- poolInfo[_pid].allocPoint = _allocPoint (../../sb/MasterShiba.sol#1136)
+	MasterShiba.poolInfo (../../sb/MasterShiba.sol#1032) can be used in cross function reentrancies:
+	- MasterShiba.add(uint256,IBEP20,uint256,bool,bool) (../../sb/MasterShiba.sol#1111-1127)
+	- MasterShiba.constructor(ShibaBEP20,ShibaBEP20,ShibaBonusAggregator,address,address,uint256,uint256) (../../sb/MasterShiba.sol#1056-1085)
+	- MasterShiba.deposit(uint256,uint256) (../../sb/MasterShiba.sol#1250-1288)
+	- MasterShiba.emergencyWithdraw(uint256) (../../sb/MasterShiba.sol#1319-1329)
+	- MasterShiba.getPoolInfo(uint256) (../../sb/MasterShiba.sol#1331-1342)
+	- MasterShiba.massUpdatePools() (../../sb/MasterShiba.sol#1194-1199)
+	- MasterShiba.pendingNova(uint256,address) (../../sb/MasterShiba.sol#1145-1161)
+	- MasterShiba.poolInfo (../../sb/MasterShiba.sol#1032)
+	- MasterShiba.poolLength() (../../sb/MasterShiba.sol#1097-1099)
+	- MasterShiba.set(uint256,uint256,uint256,bool,bool) (../../sb/MasterShiba.sol#1130-1142)
+	- MasterShiba.updatePool(uint256) (../../sb/MasterShiba.sol#1202-1225)
+	- MasterShiba.updateUserBonus(address,uint256,uint256) (../../sb/MasterShiba.sol#1228-1247)
+	- MasterShiba.validatePool(uint256) (../../sb/MasterShiba.sol#1087-1090)
+	- MasterShiba.withdraw(uint256,uint256) (../../sb/MasterShiba.sol#1291-1316)
+	- poolInfo[_pid].depositFeeBP = _depositFeeBP (../../sb/MasterShiba.sol#1137)
+	MasterShiba.poolInfo (../../sb/MasterShiba.sol#1032) can be used in cross function reentrancies:
+	- MasterShiba.add(uint256,IBEP20,uint256,bool,bool) (../../sb/MasterShiba.sol#1111-1127)
+	- MasterShiba.constructor(ShibaBEP20,ShibaBEP20,ShibaBonusAggregator,address,address,uint256,uint256) (../../sb/MasterShiba.sol#1056-1085)
+	- MasterShiba.deposit(uint256,uint256) (../../sb/MasterShiba.sol#1250-1288)
+	- MasterShiba.emergencyWithdraw(uint256) (../../sb/MasterShiba.sol#1319-1329)
+	- MasterShiba.getPoolInfo(uint256) (../../sb/MasterShiba.sol#1331-1342)
+	- MasterShiba.massUpdatePools() (../../sb/MasterShiba.sol#1194-1199)
+	- MasterShiba.pendingNova(uint256,address) (../../sb/MasterShiba.sol#1145-1161)
+	- MasterShiba.poolInfo (../../sb/MasterShiba.sol#1032)
+	- MasterShiba.poolLength() (../../sb/MasterShiba.sol#1097-1099)
+	- MasterShiba.set(uint256,uint256,uint256,bool,bool) (../../sb/MasterShiba.sol#1130-1142)
+	- MasterShiba.updatePool(uint256) (../../sb/MasterShiba.sol#1202-1225)
+	- MasterShiba.updateUserBonus(address,uint256,uint256) (../../sb/MasterShiba.sol#1228-1247)
+	- MasterShiba.validatePool(uint256) (../../sb/MasterShiba.sol#1087-1090)
+	- MasterShiba.withdraw(uint256,uint256) (../../sb/MasterShiba.sol#1291-1316)
+	- poolInfo[_pid].isSNovaRewards = _isSNovaRewards (../../sb/MasterShiba.sol#1138)
+	MasterShiba.poolInfo (../../sb/MasterShiba.sol#1032) can be used in cross function reentrancies:
+	- MasterShiba.add(uint256,IBEP20,uint256,bool,bool) (../../sb/MasterShiba.sol#1111-1127)
+	- MasterShiba.constructor(ShibaBEP20,ShibaBEP20,ShibaBonusAggregator,address,address,uint256,uint256) (../../sb/MasterShiba.sol#1056-1085)
+	- MasterShiba.deposit(uint256,uint256) (../../sb/MasterShiba.sol#1250-1288)
+	- MasterShiba.emergencyWithdraw(uint256) (../../sb/MasterShiba.sol#1319-1329)
+	- MasterShiba.getPoolInfo(uint256) (../../sb/MasterShiba.sol#1331-1342)
+	- MasterShiba.massUpdatePools() (../../sb/MasterShiba.sol#1194-1199)
+	- MasterShiba.pendingNova(uint256,address) (../../sb/MasterShiba.sol#1145-1161)
+	- MasterShiba.poolInfo (../../sb/MasterShiba.sol#1032)
+	- MasterShiba.poolLength() (../../sb/MasterShiba.sol#1097-1099)
+	- MasterShiba.set(uint256,uint256,uint256,bool,bool) (../../sb/MasterShiba.sol#1130-1142)
+	- MasterShiba.updatePool(uint256) (../../sb/MasterShiba.sol#1202-1225)
+	- MasterShiba.updateUserBonus(address,uint256,uint256) (../../sb/MasterShiba.sol#1228-1247)
+	- MasterShiba.validatePool(uint256) (../../sb/MasterShiba.sol#1087-1090)
+	- MasterShiba.withdraw(uint256,uint256) (../../sb/MasterShiba.sol#1291-1316)
+	- totalAllocPoint = totalAllocPoint.sub(prevAllocPoint).add(_allocPoint) (../../sb/MasterShiba.sol#1140)
+	MasterShiba.totalAllocPoint (../../sb/MasterShiba.sol#1036) can be used in cross function reentrancies:
+	- MasterShiba.add(uint256,IBEP20,uint256,bool,bool) (../../sb/MasterShiba.sol#1111-1127)
+	- MasterShiba.constructor(ShibaBEP20,ShibaBEP20,ShibaBonusAggregator,address,address,uint256,uint256) (../../sb/MasterShiba.sol#1056-1085)
+	- MasterShiba.pendingNova(uint256,address) (../../sb/MasterShiba.sol#1145-1161)
+	- MasterShiba.set(uint256,uint256,uint256,bool,bool) (../../sb/MasterShiba.sol#1130-1142)
+	- MasterShiba.totalAllocPoint (../../sb/MasterShiba.sol#1036)
+	- MasterShiba.updatePool(uint256) (../../sb/MasterShiba.sol#1202-1225)
+Reentrancy in MasterShiba.updatePool(uint256) (../../sb/MasterShiba.sol#1202-1225):
+	External calls:
+	- Nova.mint(devaddr,devMintAmount) (../../sb/MasterShiba.sol#1216)
+	- sNova.mint(address(this),NovaReward) (../../sb/MasterShiba.sol#1218)
+	- Nova.mint(address(this),NovaReward) (../../sb/MasterShiba.sol#1221)
+	State variables written after the call(s):
+	- pool.accNovaPerShare = pool.accNovaPerShare.add(NovaReward.mul(1e12).div(lpSupply)) (../../sb/MasterShiba.sol#1223)
+	MasterShiba.poolInfo (../../sb/MasterShiba.sol#1032) can be used in cross function reentrancies:
+	- MasterShiba.add(uint256,IBEP20,uint256,bool,bool) (../../sb/MasterShiba.sol#1111-1127)
+	- MasterShiba.constructor(ShibaBEP20,ShibaBEP20,ShibaBonusAggregator,address,address,uint256,uint256) (../../sb/MasterShiba.sol#1056-1085)
+	- MasterShiba.deposit(uint256,uint256) (../../sb/MasterShiba.sol#1250-1288)
+	- MasterShiba.emergencyWithdraw(uint256) (../../sb/MasterShiba.sol#1319-1329)
+	- MasterShiba.getPoolInfo(uint256) (../../sb/MasterShiba.sol#1331-1342)
+	- MasterShiba.massUpdatePools() (../../sb/MasterShiba.sol#1194-1199)
+	- MasterShiba.pendingNova(uint256,address) (../../sb/MasterShiba.sol#1145-1161)
+	- MasterShiba.poolInfo (../../sb/MasterShiba.sol#1032)
+	- MasterShiba.poolLength() (../../sb/MasterShiba.sol#1097-1099)
+	- MasterShiba.set(uint256,uint256,uint256,bool,bool) (../../sb/MasterShiba.sol#1130-1142)
+	- MasterShiba.updatePool(uint256) (../../sb/MasterShiba.sol#1202-1225)
+	- MasterShiba.updateUserBonus(address,uint256,uint256) (../../sb/MasterShiba.sol#1228-1247)
+	- MasterShiba.validatePool(uint256) (../../sb/MasterShiba.sol#1087-1090)
+	- MasterShiba.withdraw(uint256,uint256) (../../sb/MasterShiba.sol#1291-1316)
+	- pool.lastRewardBlock = block.number (../../sb/MasterShiba.sol#1224)
+	MasterShiba.poolInfo (../../sb/MasterShiba.sol#1032) can be used in cross function reentrancies:
+	- MasterShiba.add(uint256,IBEP20,uint256,bool,bool) (../../sb/MasterShiba.sol#1111-1127)
+	- MasterShiba.constructor(ShibaBEP20,ShibaBEP20,ShibaBonusAggregator,address,address,uint256,uint256) (../../sb/MasterShiba.sol#1056-1085)
+	- MasterShiba.deposit(uint256,uint256) (../../sb/MasterShiba.sol#1250-1288)
+	- MasterShiba.emergencyWithdraw(uint256) (../../sb/MasterShiba.sol#1319-1329)
+	- MasterShiba.getPoolInfo(uint256) (../../sb/MasterShiba.sol#1331-1342)
+	- MasterShiba.massUpdatePools() (../../sb/MasterShiba.sol#1194-1199)
+	- MasterShiba.pendingNova(uint256,address) (../../sb/MasterShiba.sol#1145-1161)
+	- MasterShiba.poolInfo (../../sb/MasterShiba.sol#1032)
+	- MasterShiba.poolLength() (../../sb/MasterShiba.sol#1097-1099)
+	- MasterShiba.set(uint256,uint256,uint256,bool,bool) (../../sb/MasterShiba.sol#1130-1142)
+	- MasterShiba.updatePool(uint256) (../../sb/MasterShiba.sol#1202-1225)
+	- MasterShiba.updateUserBonus(address,uint256,uint256) (../../sb/MasterShiba.sol#1228-1247)
+	- MasterShiba.validatePool(uint256) (../../sb/MasterShiba.sol#1087-1090)
+	- MasterShiba.withdraw(uint256,uint256) (../../sb/MasterShiba.sol#1291-1316)
+Reentrancy in MasterShiba.updateUserBonus(address,uint256,uint256) (../../sb/MasterShiba.sol#1228-1247):
+	External calls:
+	- updatePool(_pid) (../../sb/MasterShiba.sol#1231)
+		- Nova.mint(devaddr,devMintAmount) (../../sb/MasterShiba.sol#1216)
+		- sNova.mint(address(this),NovaReward) (../../sb/MasterShiba.sol#1218)
+		- Nova.mint(address(this),NovaReward) (../../sb/MasterShiba.sol#1221)
+	- safeSNovaTransfer(_user,pending) (../../sb/MasterShiba.sol#1236)
+		- transferSuccess = sNova.transfer(_to,sNovaBal) (../../sb/MasterShiba.sol#1361)
+		- transferSuccess = sNova.transfer(_to,_amount) (../../sb/MasterShiba.sol#1363)
+	- safeNovaTransfer(_user,pending) (../../sb/MasterShiba.sol#1239)
+		- transferSuccess = Nova.transfer(_to,NovaBal) (../../sb/MasterShiba.sol#1349)
+		- transferSuccess = Nova.transfer(_to,_amount) (../../sb/MasterShiba.sol#1351)
+	State variables written after the call(s):
+	- pool.lpSupply = pool.lpSupply.sub(user.amountWithBonus) (../../sb/MasterShiba.sol#1243)
+	MasterShiba.poolInfo (../../sb/MasterShiba.sol#1032) can be used in cross function reentrancies:
+	- MasterShiba.add(uint256,IBEP20,uint256,bool,bool) (../../sb/MasterShiba.sol#1111-1127)
+	- MasterShiba.constructor(ShibaBEP20,ShibaBEP20,ShibaBonusAggregator,address,address,uint256,uint256) (../../sb/MasterShiba.sol#1056-1085)
+	- MasterShiba.deposit(uint256,uint256) (../../sb/MasterShiba.sol#1250-1288)
+	- MasterShiba.emergencyWithdraw(uint256) (../../sb/MasterShiba.sol#1319-1329)
+	- MasterShiba.getPoolInfo(uint256) (../../sb/MasterShiba.sol#1331-1342)
+	- MasterShiba.massUpdatePools() (../../sb/MasterShiba.sol#1194-1199)
+	- MasterShiba.pendingNova(uint256,address) (../../sb/MasterShiba.sol#1145-1161)
+	- MasterShiba.poolInfo (../../sb/MasterShiba.sol#1032)
+	- MasterShiba.poolLength() (../../sb/MasterShiba.sol#1097-1099)
+	- MasterShiba.set(uint256,uint256,uint256,bool,bool) (../../sb/MasterShiba.sol#1130-1142)
+	- MasterShiba.updatePool(uint256) (../../sb/MasterShiba.sol#1202-1225)
+	- MasterShiba.updateUserBonus(address,uint256,uint256) (../../sb/MasterShiba.sol#1228-1247)
+	- MasterShiba.validatePool(uint256) (../../sb/MasterShiba.sol#1087-1090)
+	- MasterShiba.withdraw(uint256,uint256) (../../sb/MasterShiba.sol#1291-1316)
+	- pool.lpSupply = pool.lpSupply.add(user.amountWithBonus) (../../sb/MasterShiba.sol#1245)
+	MasterShiba.poolInfo (../../sb/MasterShiba.sol#1032) can be used in cross function reentrancies:
+	- MasterShiba.add(uint256,IBEP20,uint256,bool,bool) (../../sb/MasterShiba.sol#1111-1127)
+	- MasterShiba.constructor(ShibaBEP20,ShibaBEP20,ShibaBonusAggregator,address,address,uint256,uint256) (../../sb/MasterShiba.sol#1056-1085)
+	- MasterShiba.deposit(uint256,uint256) (../../sb/MasterShiba.sol#1250-1288)
+	- MasterShiba.emergencyWithdraw(uint256) (../../sb/MasterShiba.sol#1319-1329)
+	- MasterShiba.getPoolInfo(uint256) (../../sb/MasterShiba.sol#1331-1342)
+	- MasterShiba.massUpdatePools() (../../sb/MasterShiba.sol#1194-1199)
+	- MasterShiba.pendingNova(uint256,address) (../../sb/MasterShiba.sol#1145-1161)
+	- MasterShiba.poolInfo (../../sb/MasterShiba.sol#1032)
+	- MasterShiba.poolLength() (../../sb/MasterShiba.sol#1097-1099)
+	- MasterShiba.set(uint256,uint256,uint256,bool,bool) (../../sb/MasterShiba.sol#1130-1142)
+	- MasterShiba.updatePool(uint256) (../../sb/MasterShiba.sol#1202-1225)
+	- MasterShiba.updateUserBonus(address,uint256,uint256) (../../sb/MasterShiba.sol#1228-1247)
+	- MasterShiba.validatePool(uint256) (../../sb/MasterShiba.sol#1087-1090)
+	- MasterShiba.withdraw(uint256,uint256) (../../sb/MasterShiba.sol#1291-1316)
+	- user.amountWithBonus = user.amount.mul(bonus.add(10000)).div(10000) (../../sb/MasterShiba.sol#1244)
+	MasterShiba.userInfo (../../sb/MasterShiba.sol#1034) can be used in cross function reentrancies:
+	- MasterShiba.deposit(uint256,uint256) (../../sb/MasterShiba.sol#1250-1288)
+	- MasterShiba.emergencyWithdraw(uint256) (../../sb/MasterShiba.sol#1319-1329)
+	- MasterShiba.pendingNova(uint256,address) (../../sb/MasterShiba.sol#1145-1161)
+	- MasterShiba.updateUserBonus(address,uint256,uint256) (../../sb/MasterShiba.sol#1228-1247)
+	- MasterShiba.userInfo (../../sb/MasterShiba.sol#1034)
+	- MasterShiba.withdraw(uint256,uint256) (../../sb/MasterShiba.sol#1291-1316)
+	- user.rewardDebt = user.amountWithBonus.mul(pool.accNovaPerShare).div(1e12) (../../sb/MasterShiba.sol#1246)
+	MasterShiba.userInfo (../../sb/MasterShiba.sol#1034) can be used in cross function reentrancies:
+	- MasterShiba.deposit(uint256,uint256) (../../sb/MasterShiba.sol#1250-1288)
+	- MasterShiba.emergencyWithdraw(uint256) (../../sb/MasterShiba.sol#1319-1329)
+	- MasterShiba.pendingNova(uint256,address) (../../sb/MasterShiba.sol#1145-1161)
+	- MasterShiba.updateUserBonus(address,uint256,uint256) (../../sb/MasterShiba.sol#1228-1247)
+	- MasterShiba.userInfo (../../sb/MasterShiba.sol#1034)
+	- MasterShiba.withdraw(uint256,uint256) (../../sb/MasterShiba.sol#1291-1316)
+Reentrancy in MasterShiba.withdraw(uint256,uint256) (../../sb/MasterShiba.sol#1291-1316):
+	External calls:
+	- updatePool(_pid) (../../sb/MasterShiba.sol#1296)
+		- Nova.mint(devaddr,devMintAmount) (../../sb/MasterShiba.sol#1216)
+		- sNova.mint(address(this),NovaReward) (../../sb/MasterShiba.sol#1218)
+		- Nova.mint(address(this),NovaReward) (../../sb/MasterShiba.sol#1221)
+	- safeSNovaTransfer(msg.sender,pending) (../../sb/MasterShiba.sol#1300)
+		- transferSuccess = sNova.transfer(_to,sNovaBal) (../../sb/MasterShiba.sol#1361)
+		- transferSuccess = sNova.transfer(_to,_amount) (../../sb/MasterShiba.sol#1363)
+	- safeNovaTransfer(msg.sender,pending) (../../sb/MasterShiba.sol#1303)
+		- transferSuccess = Nova.transfer(_to,NovaBal) (../../sb/MasterShiba.sol#1349)
+		- transferSuccess = Nova.transfer(_to,_amount) (../../sb/MasterShiba.sol#1351)
+	State variables written after the call(s):
+	- user.amount = user.amount.sub(_amount) (../../sb/MasterShiba.sol#1307)
+	MasterShiba.userInfo (../../sb/MasterShiba.sol#1034) can be used in cross function reentrancies:
+	- MasterShiba.deposit(uint256,uint256) (../../sb/MasterShiba.sol#1250-1288)
+	- MasterShiba.emergencyWithdraw(uint256) (../../sb/MasterShiba.sol#1319-1329)
+	- MasterShiba.pendingNova(uint256,address) (../../sb/MasterShiba.sol#1145-1161)
+	- MasterShiba.updateUserBonus(address,uint256,uint256) (../../sb/MasterShiba.sol#1228-1247)
+	- MasterShiba.userInfo (../../sb/MasterShiba.sol#1034)
+	- MasterShiba.withdraw(uint256,uint256) (../../sb/MasterShiba.sol#1291-1316)
+	- user.amountWithBonus = user.amountWithBonus.sub(_bonusAmount) (../../sb/MasterShiba.sol#1309)
+	MasterShiba.userInfo (../../sb/MasterShiba.sol#1034) can be used in cross function reentrancies:
+	- MasterShiba.deposit(uint256,uint256) (../../sb/MasterShiba.sol#1250-1288)
+	- MasterShiba.emergencyWithdraw(uint256) (../../sb/MasterShiba.sol#1319-1329)
+	- MasterShiba.pendingNova(uint256,address) (../../sb/MasterShiba.sol#1145-1161)
+	- MasterShiba.updateUserBonus(address,uint256,uint256) (../../sb/MasterShiba.sol#1228-1247)
+	- MasterShiba.userInfo (../../sb/MasterShiba.sol#1034)
+	- MasterShiba.withdraw(uint256,uint256) (../../sb/MasterShiba.sol#1291-1316)
+Reentrancy in MasterShiba.withdraw(uint256,uint256) (../../sb/MasterShiba.sol#1291-1316):
+	External calls:
+	- updatePool(_pid) (../../sb/MasterShiba.sol#1296)
+		- Nova.mint(devaddr,devMintAmount) (../../sb/MasterShiba.sol#1216)
+		- sNova.mint(address(this),NovaReward) (../../sb/MasterShiba.sol#1218)
+		- Nova.mint(address(this),NovaReward) (../../sb/MasterShiba.sol#1221)
+	- safeSNovaTransfer(msg.sender,pending) (../../sb/MasterShiba.sol#1300)
+		- transferSuccess = sNova.transfer(_to,sNovaBal) (../../sb/MasterShiba.sol#1361)
+		- transferSuccess = sNova.transfer(_to,_amount) (../../sb/MasterShiba.sol#1363)
+	- safeNovaTransfer(msg.sender,pending) (../../sb/MasterShiba.sol#1303)
+		- transferSuccess = Nova.transfer(_to,NovaBal) (../../sb/MasterShiba.sol#1349)
+		- transferSuccess = Nova.transfer(_to,_amount) (../../sb/MasterShiba.sol#1351)
+	- pool.lpToken.safeTransfer(address(msg.sender),_amount) (../../sb/MasterShiba.sol#1311)
+	State variables written after the call(s):
+	- pool.lpSupply = pool.lpSupply.sub(_bonusAmount) (../../sb/MasterShiba.sol#1312)
+	MasterShiba.poolInfo (../../sb/MasterShiba.sol#1032) can be used in cross function reentrancies:
+	- MasterShiba.add(uint256,IBEP20,uint256,bool,bool) (../../sb/MasterShiba.sol#1111-1127)
+	- MasterShiba.constructor(ShibaBEP20,ShibaBEP20,ShibaBonusAggregator,address,address,uint256,uint256) (../../sb/MasterShiba.sol#1056-1085)
+	- MasterShiba.deposit(uint256,uint256) (../../sb/MasterShiba.sol#1250-1288)
+	- MasterShiba.emergencyWithdraw(uint256) (../../sb/MasterShiba.sol#1319-1329)
+	- MasterShiba.getPoolInfo(uint256) (../../sb/MasterShiba.sol#1331-1342)
+	- MasterShiba.massUpdatePools() (../../sb/MasterShiba.sol#1194-1199)
+	- MasterShiba.pendingNova(uint256,address) (../../sb/MasterShiba.sol#1145-1161)
+	- MasterShiba.poolInfo (../../sb/MasterShiba.sol#1032)
+	- MasterShiba.poolLength() (../../sb/MasterShiba.sol#1097-1099)
+	- MasterShiba.set(uint256,uint256,uint256,bool,bool) (../../sb/MasterShiba.sol#1130-1142)
+	- MasterShiba.updatePool(uint256) (../../sb/MasterShiba.sol#1202-1225)
+	- MasterShiba.updateUserBonus(address,uint256,uint256) (../../sb/MasterShiba.sol#1228-1247)
+	- MasterShiba.validatePool(uint256) (../../sb/MasterShiba.sol#1087-1090)
+	- MasterShiba.withdraw(uint256,uint256) (../../sb/MasterShiba.sol#1291-1316)
+	- user.rewardDebt = user.amountWithBonus.mul(pool.accNovaPerShare).div(1e12) (../../sb/MasterShiba.sol#1314)
+	MasterShiba.userInfo (../../sb/MasterShiba.sol#1034) can be used in cross function reentrancies:
+	- MasterShiba.deposit(uint256,uint256) (../../sb/MasterShiba.sol#1250-1288)
+	- MasterShiba.emergencyWithdraw(uint256) (../../sb/MasterShiba.sol#1319-1329)
+	- MasterShiba.pendingNova(uint256,address) (../../sb/MasterShiba.sol#1145-1161)
+	- MasterShiba.updateUserBonus(address,uint256,uint256) (../../sb/MasterShiba.sol#1228-1247)
+	- MasterShiba.userInfo (../../sb/MasterShiba.sol#1034)
+	- MasterShiba.withdraw(uint256,uint256) (../../sb/MasterShiba.sol#1291-1316)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+ShibaBEP20.constructor(string,string).name (../../sb/MasterShiba.sol#722) shadows:
+	- ShibaBEP20.name() (../../sb/MasterShiba.sol#738-740) (function)
+	- IBEP20.name() (../../sb/MasterShiba.sol#210) (function)
+ShibaBEP20.constructor(string,string).symbol (../../sb/MasterShiba.sol#722) shadows:
+	- ShibaBEP20.symbol() (../../sb/MasterShiba.sol#752-754) (function)
+	- IBEP20.symbol() (../../sb/MasterShiba.sol#205) (function)
+ShibaBEP20.allowance(address,address).owner (../../sb/MasterShiba.sol#793) shadows:
+	- Ownable.owner() (../../sb/MasterShiba.sol#592-594) (function)
+ShibaBEP20._approve(address,address,uint256).owner (../../sb/MasterShiba.sol#956) shadows:
+	- Ownable.owner() (../../sb/MasterShiba.sol#592-594) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+MasterShiba.add(uint256,IBEP20,uint256,bool,bool) (../../sb/MasterShiba.sol#1111-1127) should emit an event for: 
+	- totalAllocPoint = totalAllocPoint.add(_allocPoint) (../../sb/MasterShiba.sol#1117) 
+MasterShiba.set(uint256,uint256,uint256,bool,bool) (../../sb/MasterShiba.sol#1130-1142) should emit an event for: 
+	- totalAllocPoint = totalAllocPoint.sub(prevAllocPoint).add(_allocPoint) (../../sb/MasterShiba.sol#1140) 
+MasterShiba.updateMinimumEmissionRate(uint256) (../../sb/MasterShiba.sol#1378-1384) should emit an event for: 
+	- minimumEmissionRate = _minimumEmissionRate (../../sb/MasterShiba.sol#1380) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+MasterShiba.constructor(ShibaBEP20,ShibaBEP20,ShibaBonusAggregator,address,address,uint256,uint256)._devaddr (../../sb/MasterShiba.sol#1060) lacks a zero-check on :
+		- devaddr = _devaddr (../../sb/MasterShiba.sol#1068)
+MasterShiba.constructor(ShibaBEP20,ShibaBEP20,ShibaBonusAggregator,address,address,uint256,uint256)._feeAddress (../../sb/MasterShiba.sol#1061) lacks a zero-check on :
+		- feeAddress = _feeAddress (../../sb/MasterShiba.sol#1069)
+MasterShiba.dev(address)._devaddr (../../sb/MasterShiba.sol#1369) lacks a zero-check on :
+		- devaddr = _devaddr (../../sb/MasterShiba.sol#1371)
+MasterShiba.setFeeAddress(address)._feeAddress (../../sb/MasterShiba.sol#1374) lacks a zero-check on :
+		- feeAddress = _feeAddress (../../sb/MasterShiba.sol#1375)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+MasterShiba.updatePool(uint256) (../../sb/MasterShiba.sol#1202-1225) has external calls inside a loop: Nova.mint(devaddr,devMintAmount) (../../sb/MasterShiba.sol#1216)
+MasterShiba.updatePool(uint256) (../../sb/MasterShiba.sol#1202-1225) has external calls inside a loop: sNova.mint(address(this),NovaReward) (../../sb/MasterShiba.sol#1218)
+MasterShiba.updatePool(uint256) (../../sb/MasterShiba.sol#1202-1225) has external calls inside a loop: Nova.mint(address(this),NovaReward) (../../sb/MasterShiba.sol#1221)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in MasterShiba.deposit(uint256,uint256) (../../sb/MasterShiba.sol#1250-1288):
+	External calls:
+	- updatePool(_pid) (../../sb/MasterShiba.sol#1254)
+		- Nova.mint(devaddr,devMintAmount) (../../sb/MasterShiba.sol#1216)
+		- sNova.mint(address(this),NovaReward) (../../sb/MasterShiba.sol#1218)
+		- Nova.mint(address(this),NovaReward) (../../sb/MasterShiba.sol#1221)
+	- safeSNovaTransfer(_user,pending) (../../sb/MasterShiba.sol#1259)
+		- transferSuccess = sNova.transfer(_to,sNovaBal) (../../sb/MasterShiba.sol#1361)
+		- transferSuccess = sNova.transfer(_to,_amount) (../../sb/MasterShiba.sol#1363)
+	- safeNovaTransfer(_user,pending) (../../sb/MasterShiba.sol#1262)
+		- transferSuccess = Nova.transfer(_to,NovaBal) (../../sb/MasterShiba.sol#1349)
+		- transferSuccess = Nova.transfer(_to,_amount) (../../sb/MasterShiba.sol#1351)
+	- pool.lpToken.safeTransferFrom(address(_user),address(this),_amount) (../../sb/MasterShiba.sol#1267)
+	- pool.lpToken.safeTransfer(feeAddress,depositFee) (../../sb/MasterShiba.sol#1274)
+	Event emitted after the call(s):
+	- Deposit(_user,_pid,_amount) (../../sb/MasterShiba.sol#1287)
+Reentrancy in MasterShiba.emergencyWithdraw(uint256) (../../sb/MasterShiba.sol#1319-1329):
+	External calls:
+	- pool.lpToken.safeTransfer(address(msg.sender),amount) (../../sb/MasterShiba.sol#1327)
+	Event emitted after the call(s):
+	- EmergencyWithdraw(msg.sender,_pid,amount) (../../sb/MasterShiba.sol#1328)
+Reentrancy in MasterShiba.withdraw(uint256,uint256) (../../sb/MasterShiba.sol#1291-1316):
+	External calls:
+	- updatePool(_pid) (../../sb/MasterShiba.sol#1296)
+		- Nova.mint(devaddr,devMintAmount) (../../sb/MasterShiba.sol#1216)
+		- sNova.mint(address(this),NovaReward) (../../sb/MasterShiba.sol#1218)
+		- Nova.mint(address(this),NovaReward) (../../sb/MasterShiba.sol#1221)
+	- safeSNovaTransfer(msg.sender,pending) (../../sb/MasterShiba.sol#1300)
+		- transferSuccess = sNova.transfer(_to,sNovaBal) (../../sb/MasterShiba.sol#1361)
+		- transferSuccess = sNova.transfer(_to,_amount) (../../sb/MasterShiba.sol#1363)
+	- safeNovaTransfer(msg.sender,pending) (../../sb/MasterShiba.sol#1303)
+		- transferSuccess = Nova.transfer(_to,NovaBal) (../../sb/MasterShiba.sol#1349)
+		- transferSuccess = Nova.transfer(_to,_amount) (../../sb/MasterShiba.sol#1351)
+	- pool.lpToken.safeTransfer(address(msg.sender),_amount) (../../sb/MasterShiba.sol#1311)
+	Event emitted after the call(s):
+	- Withdraw(msg.sender,_pid,_amount) (../../sb/MasterShiba.sol#1315)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Address.isContract(address) (../../sb/MasterShiba.sol#307-318) uses assembly
+	- INLINE ASM (../../sb/MasterShiba.sol#314-316)
+Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/MasterShiba.sol#415-441) uses assembly
+	- INLINE ASM (../../sb/MasterShiba.sol#433-436)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+MasterShiba.updateEmissionRate() (../../sb/MasterShiba.sol#1164-1191) has costly operations inside a loop:
+	- lastReductionPeriodIndex = currentIndex (../../sb/MasterShiba.sol#1187)
+MasterShiba.updateEmissionRate() (../../sb/MasterShiba.sol#1164-1191) has costly operations inside a loop:
+	- NovaPerBlock = newEmissionRate (../../sb/MasterShiba.sol#1189)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#costly-operations-inside-a-loop
+
+Address.functionCall(address,bytes) (../../sb/MasterShiba.sol#362-364) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/MasterShiba.sol#391-397) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/MasterShiba.sol#405-413) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/MasterShiba.sol#336-342) is never used and should be removed
+Context._msgData() (../../sb/MasterShiba.sol#557-560) is never used and should be removed
+SafeBEP20.safeApprove(IBEP20,address,uint256) (../../sb/MasterShiba.sol#481-495) is never used and should be removed
+SafeBEP20.safeDecreaseAllowance(IBEP20,address,uint256) (../../sb/MasterShiba.sol#506-516) is never used and should be removed
+SafeBEP20.safeIncreaseAllowance(IBEP20,address,uint256) (../../sb/MasterShiba.sol#497-504) is never used and should be removed
+SafeMath.min(uint256,uint256) (../../sb/MasterShiba.sol#172-174) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/MasterShiba.sol#147-149) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/MasterShiba.sol#163-170) is never used and should be removed
+SafeMath.sqrt(uint256) (../../sb/MasterShiba.sol#177-188) is never used and should be removed
+ShibaBEP20._burn(address,uint256) (../../sb/MasterShiba.sol#933-940) is never used and should be removed
+ShibaBEP20._burnFrom(address,uint256) (../../sb/MasterShiba.sol#973-980) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.6.12 (../../sb/MasterShiba.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/MasterShiba.sol#336-342):
+	- (success) = recipient.call{value: amount}() (../../sb/MasterShiba.sol#340)
+Low level call in Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/MasterShiba.sol#415-441):
+	- (success,returndata) = target.call{value: weiValue}(data) (../../sb/MasterShiba.sol#424)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter ShibaBonusAggregator.setupMaster(IMasterBonus)._master (../../sb/MasterShiba.sol#666) is not in mixedCase
+Parameter ShibaBonusAggregator.addOrRemoveContractBonusSource(address,bool)._contract (../../sb/MasterShiba.sol#670) is not in mixedCase
+Parameter ShibaBonusAggregator.addOrRemoveContractBonusSource(address,bool)._add (../../sb/MasterShiba.sol#670) is not in mixedCase
+Parameter ShibaBonusAggregator.addUserBonusOnFarm(address,uint256,uint256)._user (../../sb/MasterShiba.sol#674) is not in mixedCase
+Parameter ShibaBonusAggregator.addUserBonusOnFarm(address,uint256,uint256)._percent (../../sb/MasterShiba.sol#674) is not in mixedCase
+Parameter ShibaBonusAggregator.addUserBonusOnFarm(address,uint256,uint256)._pid (../../sb/MasterShiba.sol#674) is not in mixedCase
+Parameter ShibaBonusAggregator.removeUserBonusOnFarm(address,uint256,uint256)._user (../../sb/MasterShiba.sol#680) is not in mixedCase
+Parameter ShibaBonusAggregator.removeUserBonusOnFarm(address,uint256,uint256)._percent (../../sb/MasterShiba.sol#680) is not in mixedCase
+Parameter ShibaBonusAggregator.removeUserBonusOnFarm(address,uint256,uint256)._pid (../../sb/MasterShiba.sol#680) is not in mixedCase
+Parameter ShibaBonusAggregator.getBonusOnFarmsForUser(address,uint256)._user (../../sb/MasterShiba.sol#685) is not in mixedCase
+Parameter ShibaBonusAggregator.getBonusOnFarmsForUser(address,uint256)._pid (../../sb/MasterShiba.sol#685) is not in mixedCase
+Parameter ShibaBEP20.mint(address,uint256)._to (../../sb/MasterShiba.sol#902) is not in mixedCase
+Parameter ShibaBEP20.mint(address,uint256)._amount (../../sb/MasterShiba.sol#902) is not in mixedCase
+Parameter MasterShiba.userBonus(uint256,address)._pid (../../sb/MasterShiba.sol#1101) is not in mixedCase
+Parameter MasterShiba.userBonus(uint256,address)._user (../../sb/MasterShiba.sol#1101) is not in mixedCase
+Parameter MasterShiba.getMultiplier(uint256,uint256)._from (../../sb/MasterShiba.sol#1106) is not in mixedCase
+Parameter MasterShiba.getMultiplier(uint256,uint256)._to (../../sb/MasterShiba.sol#1106) is not in mixedCase
+Parameter MasterShiba.add(uint256,IBEP20,uint256,bool,bool)._allocPoint (../../sb/MasterShiba.sol#1111) is not in mixedCase
+Parameter MasterShiba.add(uint256,IBEP20,uint256,bool,bool)._lpToken (../../sb/MasterShiba.sol#1111) is not in mixedCase
+Parameter MasterShiba.add(uint256,IBEP20,uint256,bool,bool)._depositFeeBP (../../sb/MasterShiba.sol#1111) is not in mixedCase
+Parameter MasterShiba.add(uint256,IBEP20,uint256,bool,bool)._isSNovaRewards (../../sb/MasterShiba.sol#1111) is not in mixedCase
+Parameter MasterShiba.add(uint256,IBEP20,uint256,bool,bool)._withUpdate (../../sb/MasterShiba.sol#1111) is not in mixedCase
+Parameter MasterShiba.set(uint256,uint256,uint256,bool,bool)._pid (../../sb/MasterShiba.sol#1130) is not in mixedCase
+Parameter MasterShiba.set(uint256,uint256,uint256,bool,bool)._allocPoint (../../sb/MasterShiba.sol#1130) is not in mixedCase
+Parameter MasterShiba.set(uint256,uint256,uint256,bool,bool)._depositFeeBP (../../sb/MasterShiba.sol#1130) is not in mixedCase
+Parameter MasterShiba.set(uint256,uint256,uint256,bool,bool)._isSNovaRewards (../../sb/MasterShiba.sol#1130) is not in mixedCase
+Parameter MasterShiba.set(uint256,uint256,uint256,bool,bool)._withUpdate (../../sb/MasterShiba.sol#1130) is not in mixedCase
+Parameter MasterShiba.pendingNova(uint256,address)._pid (../../sb/MasterShiba.sol#1145) is not in mixedCase
+Parameter MasterShiba.pendingNova(uint256,address)._user (../../sb/MasterShiba.sol#1145) is not in mixedCase
+Parameter MasterShiba.updatePool(uint256)._pid (../../sb/MasterShiba.sol#1202) is not in mixedCase
+Parameter MasterShiba.updateUserBonus(address,uint256,uint256)._user (../../sb/MasterShiba.sol#1228) is not in mixedCase
+Parameter MasterShiba.updateUserBonus(address,uint256,uint256)._pid (../../sb/MasterShiba.sol#1228) is not in mixedCase
+Parameter MasterShiba.deposit(uint256,uint256)._pid (../../sb/MasterShiba.sol#1250) is not in mixedCase
+Parameter MasterShiba.deposit(uint256,uint256)._amount (../../sb/MasterShiba.sol#1250) is not in mixedCase
+Parameter MasterShiba.withdraw(uint256,uint256)._pid (../../sb/MasterShiba.sol#1291) is not in mixedCase
+Parameter MasterShiba.withdraw(uint256,uint256)._amount (../../sb/MasterShiba.sol#1291) is not in mixedCase
+Parameter MasterShiba.emergencyWithdraw(uint256)._pid (../../sb/MasterShiba.sol#1319) is not in mixedCase
+Parameter MasterShiba.getPoolInfo(uint256)._pid (../../sb/MasterShiba.sol#1331) is not in mixedCase
+Parameter MasterShiba.safeNovaTransfer(address,uint256)._to (../../sb/MasterShiba.sol#1345) is not in mixedCase
+Parameter MasterShiba.safeNovaTransfer(address,uint256)._amount (../../sb/MasterShiba.sol#1345) is not in mixedCase
+Parameter MasterShiba.safeSNovaTransfer(address,uint256)._to (../../sb/MasterShiba.sol#1357) is not in mixedCase
+Parameter MasterShiba.safeSNovaTransfer(address,uint256)._amount (../../sb/MasterShiba.sol#1357) is not in mixedCase
+Parameter MasterShiba.dev(address)._devaddr (../../sb/MasterShiba.sol#1369) is not in mixedCase
+Parameter MasterShiba.setFeeAddress(address)._feeAddress (../../sb/MasterShiba.sol#1374) is not in mixedCase
+Parameter MasterShiba.updateMinimumEmissionRate(uint256)._minimumEmissionRate (../../sb/MasterShiba.sol#1378) is not in mixedCase
+Variable MasterShiba.Nova (../../sb/MasterShiba.sol#1021) is not in mixedCase
+Variable MasterShiba.NovaPerBlock (../../sb/MasterShiba.sol#1027) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/MasterShiba.sol#558)" inContext (../../sb/MasterShiba.sol#548-561)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+MasterShiba.Nova (../../sb/MasterShiba.sol#1021) should be immutable 
+MasterShiba.bonusAggregator (../../sb/MasterShiba.sol#1019) should be immutable 
+MasterShiba.sNova (../../sb/MasterShiba.sol#1023) should be immutable 
+ShibaBEP20._decimals (../../sb/MasterShiba.sol#711) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/MasterShiba.sol analyzed (11 contracts with 93 detectors), 101 result(s) found

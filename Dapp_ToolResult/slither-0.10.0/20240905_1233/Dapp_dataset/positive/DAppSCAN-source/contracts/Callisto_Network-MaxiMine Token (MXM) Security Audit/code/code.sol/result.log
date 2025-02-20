@@ -1,0 +1,52 @@
+'solc --version' running
+'solc /sb/code.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/code.sol:
+/sb/code.sol:35:5: Warning: Defining constructors as functions with the same name as the contract is deprecated. Use "constructor(...) { ... }" instead.
+    function TokenERC20(
+    ^ (Relevant source part starts here and spans across multiple lines).
+/sb/code.sol:7:28: Warning: Functions in interfaces should be declared external.
+interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
+                           ^-----------------------------------------------------------------------------------------------^
+/sb/code.sol:63:9: Warning: Invoking events without "emit" prefix is deprecated.
+        Transfer(_from, _to, _value);
+        ^--------------------------^
+/sb/code.sol:166:9: Warning: Invoking events without "emit" prefix is deprecated.
+        Burn(msg.sender, _value);
+        ^----------------------^
+/sb/code.sol:185:9: Warning: Invoking events without "emit" prefix is deprecated.
+        Burn(_from, _value);
+        ^-----------------^
+
+
+TokenERC20 (../../sb/code.sol#9-188) has incorrect ERC20 function interface:TokenERC20.transfer(address,uint256) (../../sb/code.sol#77-80)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-erc20-interface
+
+Pragma version^0.4.16 (../../sb/code.sol#1) allows old versions
+solc-0.4.26 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Contract tokenRecipient (../../sb/code.sol#7) is not in CapWords
+Parameter TokenERC20.transfer(address,uint256)._to (../../sb/code.sol#77) is not in mixedCase
+Parameter TokenERC20.transfer(address,uint256)._value (../../sb/code.sol#77) is not in mixedCase
+Parameter TokenERC20.transferFrom(address,address,uint256)._from (../../sb/code.sol#111) is not in mixedCase
+Parameter TokenERC20.transferFrom(address,address,uint256)._to (../../sb/code.sol#111) is not in mixedCase
+Parameter TokenERC20.transferFrom(address,address,uint256)._value (../../sb/code.sol#111) is not in mixedCase
+Parameter TokenERC20.approve(address,uint256)._spender (../../sb/code.sol#127) is not in mixedCase
+Parameter TokenERC20.approve(address,uint256)._value (../../sb/code.sol#127) is not in mixedCase
+Parameter TokenERC20.approveAndCall(address,uint256,bytes)._spender (../../sb/code.sol#143) is not in mixedCase
+Parameter TokenERC20.approveAndCall(address,uint256,bytes)._value (../../sb/code.sol#143) is not in mixedCase
+Parameter TokenERC20.approveAndCall(address,uint256,bytes)._extraData (../../sb/code.sol#143) is not in mixedCase
+Parameter TokenERC20.burn(uint256)._value (../../sb/code.sol#161) is not in mixedCase
+Parameter TokenERC20.burnFrom(address,uint256)._from (../../sb/code.sol#178) is not in mixedCase
+Parameter TokenERC20.burnFrom(address,uint256)._value (../../sb/code.sol#178) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+TokenERC20.decimals (../../sb/code.sol#13) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+
+receiveApproval(address,uint256,address,bytes) should be declared external:
+	- tokenRecipient.receiveApproval(address,uint256,address,bytes) (../../sb/code.sol#7)
+approveAndCall(address,uint256,bytes) should be declared external:
+	- TokenERC20.approveAndCall(address,uint256,bytes) (../../sb/code.sol#143-152)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#public-function-that-could-be-declared-external
+/sb/code.sol analyzed (2 contracts with 93 detectors), 20 result(s) found

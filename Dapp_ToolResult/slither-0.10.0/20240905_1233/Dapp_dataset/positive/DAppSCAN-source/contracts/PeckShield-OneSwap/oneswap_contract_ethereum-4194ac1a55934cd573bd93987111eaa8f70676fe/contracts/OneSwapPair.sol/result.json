@@ -1,0 +1,218 @@
+{
+    "errors": [],
+    "fails": [],
+    "findings": [
+        {
+            "confidence": "Medium",
+            "contract": "OneSwapPair",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/PeckShield-OneSwap/oneswap_contract_ethereum-4194ac1a55934cd573bd93987111eaa8f70676fe/contracts/OneSwapPair.sol",
+            "function": "addMarketOrder",
+            "impact": "High",
+            "line": 1142,
+            "line_end": 1164,
+            "message": "Reentrancy in OneSwapPair.addMarketOrder(address,address,uint112,bool) (OneSwapPair.sol#1142-1164):\n\tExternal calls:\n\t- _checkRemainAmount(ctx,isBuy) (OneSwapPair.sol#1153)\n\t\t- IWETH(_immuWETH).deposit{value: msg.value}() (OneSwapPair.sol#1170)\n\t- _addOrder(ctx,isBuy,price) (OneSwapPair.sol#1163)\n\t\t- (success) = to.call{value: value}(new bytes(0)) (OneSwapPair.sol#560)\n\t\t- IWETH(_immuWETH).withdraw(amount) (OneSwapPair.sol#553)\n\t\t- (success,data) = token.call(abi.encodeWithSelector(_SELECTOR,to,value)) (OneSwapPair.sol#545)\n\tExternal calls sending eth:\n\t- _checkRemainAmount(ctx,isBuy) (OneSwapPair.sol#1153)\n\t\t- IWETH(_immuWETH).deposit{value: msg.value}() (OneSwapPair.sol#1170)\n\t- _addOrder(ctx,isBuy,price) (OneSwapPair.sol#1163)\n\t\t- (success) = to.call{value: value}(new bytes(0)) (OneSwapPair.sol#560)\n\tState variables written after the call(s):\n\t- _addOrder(ctx,isBuy,price) (OneSwapPair.sol#1163)\n\t\t- _bookedStockAndMoneyAndFirstBuyID = (uint256(firstBuyID) << 224) | (moneyAmount << 112) | stockAmount (OneSwapPair.sol#540)\n\tOneSwapPool._bookedStockAndMoneyAndFirstBuyID (OneSwapPair.sol#493) can be used in cross function reentrancies:\n\t- OneSwapPool._setBooked(uint256,uint256,uint32) (OneSwapPair.sol#538-541)\n\t- OneSwapPool.getBooked() (OneSwapPair.sol#532-537)\n\t- OneSwapPair.getOrderList(bool,uint32,uint32) (OneSwapPair.sol#1018-1062)\n\t- OneSwapPair.getPrices() (OneSwapPair.sol#988-1015)\n\t- OneSwapPool.internalStatus() (OneSwapPair.sol#508-512)\n\t- _addOrder(ctx,isBuy,price) (OneSwapPair.sol#1163)\n\t\t- _reserveStockAndMoneyAndFirstSellID = temp (OneSwapPair.sol#530)\n\tOneSwapPool._reserveStockAndMoneyAndFirstSellID (OneSwapPair.sol#491) can be used in cross function reentrancies:\n\t- OneSwapPool._setReserves(uint256,uint256,uint32) (OneSwapPair.sol#525-531)\n\t- OneSwapPair.getOrderList(bool,uint32,uint32) (OneSwapPair.sol#1018-1062)\n\t- OneSwapPool.getReserves() (OneSwapPair.sol#519-524)\n\t- OneSwapPool.internalStatus() (OneSwapPair.sol#508-512)\n",
+            "name": "reentrancy-eth",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "OneSwapPair",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/PeckShield-OneSwap/oneswap_contract_ethereum-4194ac1a55934cd573bd93987111eaa8f70676fe/contracts/OneSwapPair.sol",
+            "function": "removeOrder",
+            "impact": "High",
+            "line": 855,
+            "line_end": 874,
+            "message": "Reentrancy in OneSwapPair.removeOrder(bool,uint32,uint72) (OneSwapPair.sol#855-874):\n\tExternal calls:\n\t- _transferToken(_immuMoneyToken,order.sender,moneyAmount,true) (OneSwapPair.sol#868)\n\t\t- (success) = to.call{value: value}(new bytes(0)) (OneSwapPair.sol#560)\n\t\t- IWETH(_immuWETH).withdraw(amount) (OneSwapPair.sol#553)\n\t\t- (success,data) = token.call(abi.encodeWithSelector(_SELECTOR,to,value)) (OneSwapPair.sol#545)\n\t- _transferToken(_immuStockToken,order.sender,stockAmount,true) (OneSwapPair.sol#871)\n\t\t- (success) = to.call{value: value}(new bytes(0)) (OneSwapPair.sol#560)\n\t\t- IWETH(_immuWETH).withdraw(amount) (OneSwapPair.sol#553)\n\t\t- (success,data) = token.call(abi.encodeWithSelector(_SELECTOR,to,value)) (OneSwapPair.sol#545)\n\tExternal calls sending eth:\n\t- _transferToken(_immuMoneyToken,order.sender,moneyAmount,true) (OneSwapPair.sol#868)\n\t\t- (success) = to.call{value: value}(new bytes(0)) (OneSwapPair.sol#560)\n\t- _transferToken(_immuStockToken,order.sender,stockAmount,true) (OneSwapPair.sol#871)\n\t\t- (success) = to.call{value: value}(new bytes(0)) (OneSwapPair.sol#560)\n\tState variables written after the call(s):\n\t- _setBooked(ctx.bookedStock,ctx.bookedMoney,ctx.firstBuyID) (OneSwapPair.sol#873)\n\t\t- _bookedStockAndMoneyAndFirstBuyID = (uint256(firstBuyID) << 224) | (moneyAmount << 112) | stockAmount (OneSwapPair.sol#540)\n\tOneSwapPool._bookedStockAndMoneyAndFirstBuyID (OneSwapPair.sol#493) can be used in cross function reentrancies:\n\t- OneSwapPool._setBooked(uint256,uint256,uint32) (OneSwapPair.sol#538-541)\n\t- OneSwapPool.getBooked() (OneSwapPair.sol#532-537)\n\t- OneSwapPair.getOrderList(bool,uint32,uint32) (OneSwapPair.sol#1018-1062)\n\t- OneSwapPair.getPrices() (OneSwapPair.sol#988-1015)\n\t- OneSwapPool.internalStatus() (OneSwapPair.sol#508-512)\n",
+            "name": "reentrancy-eth",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "OneSwapPair",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/PeckShield-OneSwap/oneswap_contract_ethereum-4194ac1a55934cd573bd93987111eaa8f70676fe/contracts/OneSwapPair.sol",
+            "function": "_addOrder",
+            "impact": "High",
+            "line": 1196,
+            "line_end": 1250,
+            "message": "Reentrancy in OneSwapPair._addOrder(Context,bool,RatPrice) (OneSwapPair.sol#1196-1250):\n\tExternal calls:\n\t- _dealInOrderBook(ctx,isBuy,currID,orderInBook,priceInBook) (OneSwapPair.sol#1213)\n\t\t- (success) = to.call{value: value}(new bytes(0)) (OneSwapPair.sol#560)\n\t\t- IWETH(_immuWETH).withdraw(amount) (OneSwapPair.sol#553)\n\t\t- (success,data) = token.call(abi.encodeWithSelector(_SELECTOR,to,value)) (OneSwapPair.sol#545)\n\t- amountToTaker = _dealWithPoolAndCollectFee(ctx,isBuy) (OneSwapPair.sol#1236)\n\t\t- (success) = to.call{value: value}(new bytes(0)) (OneSwapPair.sol#560)\n\t\t- IWETH(_immuWETH).withdraw(amount) (OneSwapPair.sol#553)\n\t\t- (success,data) = token.call(abi.encodeWithSelector(_SELECTOR,to,value)) (OneSwapPair.sol#545)\n\tExternal calls sending eth:\n\t- _dealInOrderBook(ctx,isBuy,currID,orderInBook,priceInBook) (OneSwapPair.sol#1213)\n\t\t- (success) = to.call{value: value}(new bytes(0)) (OneSwapPair.sol#560)\n\t- amountToTaker = _dealWithPoolAndCollectFee(ctx,isBuy) (OneSwapPair.sol#1236)\n\t\t- (success) = to.call{value: value}(new bytes(0)) (OneSwapPair.sol#560)\n\tState variables written after the call(s):\n\t- _insertOrderToBook(ctx,isBuy,price) (OneSwapPair.sol#1239)\n\t\t- _buyOrders[id] = _order2uint(order) (OneSwapPair.sol#825)\n\tOneSwapPair._buyOrders (OneSwapPair.sol#686) can be used in cross function reentrancies:\n\t- OneSwapPair._deleteOrder(bool,uint32) (OneSwapPair.sol#832-838)\n\t- OneSwapPair._getOrder(bool,uint32) (OneSwapPair.sol#812-820)\n\t- OneSwapPair._hasOrder(bool,uint32) (OneSwapPair.sol#803-809)\n\t- OneSwapPair._setOrder(bool,uint32,Order) (OneSwapPair.sol#823-829)\n\t- OneSwapPair.getOrderList(bool,uint32,uint32) (OneSwapPair.sol#1018-1062)\n\t- OneSwapPair.getPrices() (OneSwapPair.sol#988-1015)\n\t- _insertOrderToBook(ctx,isBuy,price) (OneSwapPair.sol#1239)\n\t\t- _sellOrders[id] = _order2uint(order) (OneSwapPair.sol#827)\n\tOneSwapPair._sellOrders (OneSwapPair.sol#685) can be used in cross function reentrancies:\n\t- OneSwapPair._deleteOrder(bool,uint32) (OneSwapPair.sol#832-838)\n\t- OneSwapPair._getOrder(bool,uint32) (OneSwapPair.sol#812-820)\n\t- OneSwapPair._hasOrder(bool,uint32) (OneSwapPair.sol#803-809)\n\t- OneSwapPair._setOrder(bool,uint32,Order) (OneSwapPair.sol#823-829)\n\t- OneSwapPair.getOrderList(bool,uint32,uint32) (OneSwapPair.sol#1018-1062)\n\t- OneSwapPair.getPrices() (OneSwapPair.sol#988-1015)\n",
+            "name": "reentrancy-eth",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "OneSwapPair",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/PeckShield-OneSwap/oneswap_contract_ethereum-4194ac1a55934cd573bd93987111eaa8f70676fe/contracts/OneSwapPair.sol",
+            "function": "addLimitOrder",
+            "impact": "High",
+            "line": 1089,
+            "line_end": 1140,
+            "message": "Reentrancy in OneSwapPair.addLimitOrder(bool,address,uint64,uint32,uint32,uint72) (OneSwapPair.sol#1089-1140):\n\tExternal calls:\n\t- _checkRemainAmount(ctx,isBuy) (OneSwapPair.sol#1121)\n\t\t- IWETH(_immuWETH).deposit{value: msg.value}() (OneSwapPair.sol#1170)\n\tState variables written after the call(s):\n\t- _setBooked(ctx.bookedStock,ctx.bookedMoney,ctx.firstBuyID) (OneSwapPair.sol#1131)\n\t\t- _bookedStockAndMoneyAndFirstBuyID = (uint256(firstBuyID) << 224) | (moneyAmount << 112) | stockAmount (OneSwapPair.sol#540)\n\tOneSwapPool._bookedStockAndMoneyAndFirstBuyID (OneSwapPair.sol#493) can be used in cross function reentrancies:\n\t- OneSwapPool._setBooked(uint256,uint256,uint32) (OneSwapPair.sol#538-541)\n\t- OneSwapPool.getBooked() (OneSwapPair.sol#532-537)\n\t- OneSwapPair.getOrderList(bool,uint32,uint32) (OneSwapPair.sol#1018-1062)\n\t- OneSwapPair.getPrices() (OneSwapPair.sol#988-1015)\n\t- OneSwapPool.internalStatus() (OneSwapPair.sol#508-512)\n\t- inserted = _insertOrderFromGivenPos(isBuy,ctx.order,ctx.newOrderID,prevKey) (OneSwapPair.sol#1123)\n\t\t- _buyOrders[id] = _order2uint(order) (OneSwapPair.sol#825)\n\tOneSwapPair._buyOrders (OneSwapPair.sol#686) can be used in cross function reentrancies:\n\t- OneSwapPair._deleteOrder(bool,uint32) (OneSwapPair.sol#832-838)\n\t- OneSwapPair._getOrder(bool,uint32) (OneSwapPair.sol#812-820)\n\t- OneSwapPair._hasOrder(bool,uint32) (OneSwapPair.sol#803-809)\n\t- OneSwapPair._setOrder(bool,uint32,Order) (OneSwapPair.sol#823-829)\n\t- OneSwapPair.getOrderList(bool,uint32,uint32) (OneSwapPair.sol#1018-1062)\n\t- OneSwapPair.getPrices() (OneSwapPair.sol#988-1015)\n\t- _setReserves(ctx.reserveStock,ctx.reserveMoney,ctx.firstSellID) (OneSwapPair.sol#1133)\n\t\t- _reserveStockAndMoneyAndFirstSellID = temp (OneSwapPair.sol#530)\n\tOneSwapPool._reserveStockAndMoneyAndFirstSellID (OneSwapPair.sol#491) can be used in cross function reentrancies:\n\t- OneSwapPool._setReserves(uint256,uint256,uint32) (OneSwapPair.sol#525-531)\n\t- OneSwapPair.getOrderList(bool,uint32,uint32) (OneSwapPair.sol#1018-1062)\n\t- OneSwapPool.getReserves() (OneSwapPair.sol#519-524)\n\t- OneSwapPool.internalStatus() (OneSwapPair.sol#508-512)\n\t- inserted = _insertOrderFromGivenPos(isBuy,ctx.order,ctx.newOrderID,prevKey) (OneSwapPair.sol#1123)\n\t\t- _sellOrders[id] = _order2uint(order) (OneSwapPair.sol#827)\n\tOneSwapPair._sellOrders (OneSwapPair.sol#685) can be used in cross function reentrancies:\n\t- OneSwapPair._deleteOrder(bool,uint32) (OneSwapPair.sol#832-838)\n\t- OneSwapPair._getOrder(bool,uint32) (OneSwapPair.sol#812-820)\n\t- OneSwapPair._hasOrder(bool,uint32) (OneSwapPair.sol#803-809)\n\t- OneSwapPair._setOrder(bool,uint32,Order) (OneSwapPair.sol#823-829)\n\t- OneSwapPair.getOrderList(bool,uint32,uint32) (OneSwapPair.sol#1018-1062)\n\t- OneSwapPair.getPrices() (OneSwapPair.sol#988-1015)\n",
+            "name": "reentrancy-eth",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "OneSwapPair",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/PeckShield-OneSwap/oneswap_contract_ethereum-4194ac1a55934cd573bd93987111eaa8f70676fe/contracts/OneSwapPair.sol",
+            "function": "addLimitOrder",
+            "impact": "High",
+            "line": 1089,
+            "line_end": 1140,
+            "message": "Reentrancy in OneSwapPair.addLimitOrder(bool,address,uint64,uint32,uint32,uint72) (OneSwapPair.sol#1089-1140):\n\tExternal calls:\n\t- _checkRemainAmount(ctx,isBuy) (OneSwapPair.sol#1121)\n\t\t- IWETH(_immuWETH).deposit{value: msg.value}() (OneSwapPair.sol#1170)\n\t- _addOrder(ctx,isBuy,price) (OneSwapPair.sol#1139)\n\t\t- (success) = to.call{value: value}(new bytes(0)) (OneSwapPair.sol#560)\n\t\t- IWETH(_immuWETH).withdraw(amount) (OneSwapPair.sol#553)\n\t\t- (success,data) = token.call(abi.encodeWithSelector(_SELECTOR,to,value)) (OneSwapPair.sol#545)\n\tExternal calls sending eth:\n\t- _checkRemainAmount(ctx,isBuy) (OneSwapPair.sol#1121)\n\t\t- IWETH(_immuWETH).deposit{value: msg.value}() (OneSwapPair.sol#1170)\n\t- _addOrder(ctx,isBuy,price) (OneSwapPair.sol#1139)\n\t\t- (success) = to.call{value: value}(new bytes(0)) (OneSwapPair.sol#560)\n\tState variables written after the call(s):\n\t- _addOrder(ctx,isBuy,price) (OneSwapPair.sol#1139)\n\t\t- _bookedStockAndMoneyAndFirstBuyID = (uint256(firstBuyID) << 224) | (moneyAmount << 112) | stockAmount (OneSwapPair.sol#540)\n\tOneSwapPool._bookedStockAndMoneyAndFirstBuyID (OneSwapPair.sol#493) can be used in cross function reentrancies:\n\t- OneSwapPool._setBooked(uint256,uint256,uint32) (OneSwapPair.sol#538-541)\n\t- OneSwapPool.getBooked() (OneSwapPair.sol#532-537)\n\t- OneSwapPair.getOrderList(bool,uint32,uint32) (OneSwapPair.sol#1018-1062)\n\t- OneSwapPair.getPrices() (OneSwapPair.sol#988-1015)\n\t- OneSwapPool.internalStatus() (OneSwapPair.sol#508-512)\n\t- _addOrder(ctx,isBuy,price) (OneSwapPair.sol#1139)\n\t\t- _buyOrders[id] = _order2uint(order) (OneSwapPair.sol#825)\n\t\t- delete _buyOrders[id] (OneSwapPair.sol#834)\n\tOneSwapPair._buyOrders (OneSwapPair.sol#686) can be used in cross function reentrancies:\n\t- OneSwapPair._deleteOrder(bool,uint32) (OneSwapPair.sol#832-838)\n\t- OneSwapPair._getOrder(bool,uint32) (OneSwapPair.sol#812-820)\n\t- OneSwapPair._hasOrder(bool,uint32) (OneSwapPair.sol#803-809)\n\t- OneSwapPair._setOrder(bool,uint32,Order) (OneSwapPair.sol#823-829)\n\t- OneSwapPair.getOrderList(bool,uint32,uint32) (OneSwapPair.sol#1018-1062)\n\t- OneSwapPair.getPrices() (OneSwapPair.sol#988-1015)\n\t- _addOrder(ctx,isBuy,price) (OneSwapPair.sol#1139)\n\t\t- _reserveStockAndMoneyAndFirstSellID = temp (OneSwapPair.sol#530)\n\tOneSwapPool._reserveStockAndMoneyAndFirstSellID (OneSwapPair.sol#491) can be used in cross function reentrancies:\n\t- OneSwapPool._setReserves(uint256,uint256,uint32) (OneSwapPair.sol#525-531)\n\t- OneSwapPair.getOrderList(bool,uint32,uint32) (OneSwapPair.sol#1018-1062)\n\t- OneSwapPool.getReserves() (OneSwapPair.sol#519-524)\n\t- OneSwapPool.internalStatus() (OneSwapPair.sol#508-512)\n\t- _addOrder(ctx,isBuy,price) (OneSwapPair.sol#1139)\n\t\t- _sellOrders[id] = _order2uint(order) (OneSwapPair.sol#827)\n\t\t- delete _sellOrders[id] (OneSwapPair.sol#836)\n\tOneSwapPair._sellOrders (OneSwapPair.sol#685) can be used in cross function reentrancies:\n\t- OneSwapPair._deleteOrder(bool,uint32) (OneSwapPair.sol#832-838)\n\t- OneSwapPair._getOrder(bool,uint32) (OneSwapPair.sol#812-820)\n\t- OneSwapPair._hasOrder(bool,uint32) (OneSwapPair.sol#803-809)\n\t- OneSwapPair._setOrder(bool,uint32,Order) (OneSwapPair.sol#823-829)\n\t- OneSwapPair.getOrderList(bool,uint32,uint32) (OneSwapPair.sol#1018-1062)\n\t- OneSwapPair.getPrices() (OneSwapPair.sol#988-1015)\n",
+            "name": "reentrancy-eth",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "OneSwapPair",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/PeckShield-OneSwap/oneswap_contract_ethereum-4194ac1a55934cd573bd93987111eaa8f70676fe/contracts/OneSwapPair.sol",
+            "function": "_addOrder",
+            "impact": "High",
+            "line": 1196,
+            "line_end": 1250,
+            "message": "Reentrancy in OneSwapPair._addOrder(Context,bool,RatPrice) (OneSwapPair.sol#1196-1250):\n\tExternal calls:\n\t- _dealInOrderBook(ctx,isBuy,currID,orderInBook,priceInBook) (OneSwapPair.sol#1213)\n\t\t- (success) = to.call{value: value}(new bytes(0)) (OneSwapPair.sol#560)\n\t\t- IWETH(_immuWETH).withdraw(amount) (OneSwapPair.sol#553)\n\t\t- (success,data) = token.call(abi.encodeWithSelector(_SELECTOR,to,value)) (OneSwapPair.sol#545)\n\tExternal calls sending eth:\n\t- _dealInOrderBook(ctx,isBuy,currID,orderInBook,priceInBook) (OneSwapPair.sol#1213)\n\t\t- (success) = to.call{value: value}(new bytes(0)) (OneSwapPair.sol#560)\n\tState variables written after the call(s):\n\t- _setOrder(! isBuy,currID,orderInBook) (OneSwapPair.sol#1217)\n\t\t- _buyOrders[id] = _order2uint(order) (OneSwapPair.sol#825)\n\tOneSwapPair._buyOrders (OneSwapPair.sol#686) can be used in cross function reentrancies:\n\t- OneSwapPair._deleteOrder(bool,uint32) (OneSwapPair.sol#832-838)\n\t- OneSwapPair._getOrder(bool,uint32) (OneSwapPair.sol#812-820)\n\t- OneSwapPair._hasOrder(bool,uint32) (OneSwapPair.sol#803-809)\n\t- OneSwapPair._setOrder(bool,uint32,Order) (OneSwapPair.sol#823-829)\n\t- OneSwapPair.getOrderList(bool,uint32,uint32) (OneSwapPair.sol#1018-1062)\n\t- OneSwapPair.getPrices() (OneSwapPair.sol#988-1015)\n\t- _deleteOrder(! isBuy,currID) (OneSwapPair.sol#1221)\n\t\t- delete _buyOrders[id] (OneSwapPair.sol#834)\n\tOneSwapPair._buyOrders (OneSwapPair.sol#686) can be used in cross function reentrancies:\n\t- OneSwapPair._deleteOrder(bool,uint32) (OneSwapPair.sol#832-838)\n\t- OneSwapPair._getOrder(bool,uint32) (OneSwapPair.sol#812-820)\n\t- OneSwapPair._hasOrder(bool,uint32) (OneSwapPair.sol#803-809)\n\t- OneSwapPair._setOrder(bool,uint32,Order) (OneSwapPair.sol#823-829)\n\t- OneSwapPair.getOrderList(bool,uint32,uint32) (OneSwapPair.sol#1018-1062)\n\t- OneSwapPair.getPrices() (OneSwapPair.sol#988-1015)\n\t- _setOrder(! isBuy,currID,orderInBook) (OneSwapPair.sol#1217)\n\t\t- _sellOrders[id] = _order2uint(order) (OneSwapPair.sol#827)\n\tOneSwapPair._sellOrders (OneSwapPair.sol#685) can be used in cross function reentrancies:\n\t- OneSwapPair._deleteOrder(bool,uint32) (OneSwapPair.sol#832-838)\n\t- OneSwapPair._getOrder(bool,uint32) (OneSwapPair.sol#812-820)\n\t- OneSwapPair._hasOrder(bool,uint32) (OneSwapPair.sol#803-809)\n\t- OneSwapPair._setOrder(bool,uint32,Order) (OneSwapPair.sol#823-829)\n\t- OneSwapPair.getOrderList(bool,uint32,uint32) (OneSwapPair.sol#1018-1062)\n\t- OneSwapPair.getPrices() (OneSwapPair.sol#988-1015)\n\t- _deleteOrder(! isBuy,currID) (OneSwapPair.sol#1221)\n\t\t- delete _sellOrders[id] (OneSwapPair.sol#836)\n\tOneSwapPair._sellOrders (OneSwapPair.sol#685) can be used in cross function reentrancies:\n\t- OneSwapPair._deleteOrder(bool,uint32) (OneSwapPair.sol#832-838)\n\t- OneSwapPair._getOrder(bool,uint32) (OneSwapPair.sol#812-820)\n\t- OneSwapPair._hasOrder(bool,uint32) (OneSwapPair.sol#803-809)\n\t- OneSwapPair._setOrder(bool,uint32,Order) (OneSwapPair.sol#823-829)\n\t- OneSwapPair.getOrderList(bool,uint32,uint32) (OneSwapPair.sol#1018-1062)\n\t- OneSwapPair.getPrices() (OneSwapPair.sol#988-1015)\n",
+            "name": "reentrancy-eth",
+            "check": "FP"
+        },
+        {
+            "confidence": "High",
+            "contract": "OneSwapFactoryTEST",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/PeckShield-OneSwap/oneswap_contract_ethereum-4194ac1a55934cd573bd93987111eaa8f70676fe/contracts/OneSwapPair.sol",
+            "function": "createPair",
+            "impact": "High",
+            "line": 1432,
+            "message": "OneSwapFactoryTEST.weth (OneSwapPair.sol#1432) is never initialized. It is used in:\n\t- OneSwapFactoryTEST.createPair(address,address) (OneSwapPair.sol#1439-1452)\n",
+            "name": "uninitialized-state",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "OneSwapPool",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/PeckShield-OneSwap/oneswap_contract_ethereum-4194ac1a55934cd573bd93987111eaa8f70676fe/contracts/OneSwapPair.sol",
+            "function": "burn",
+            "impact": "Medium",
+            "line": 620,
+            "line_end": 647,
+            "message": "Reentrancy in OneSwapPool.burn(address) (OneSwapPair.sol#620-647):\n\tExternal calls:\n\t- _safeTransfer(_immuStockToken,to,stockAmount) (OneSwapPair.sol#639)\n\t\t- (success,data) = token.call(abi.encodeWithSelector(_SELECTOR,to,value)) (OneSwapPair.sol#545)\n\t- _safeTransfer(_immuMoneyToken,to,moneyAmount) (OneSwapPair.sol#640)\n\t\t- (success,data) = token.call(abi.encodeWithSelector(_SELECTOR,to,value)) (OneSwapPair.sol#545)\n\tState variables written after the call(s):\n\t- _kLast = stockBalance.mul(moneyBalance) (OneSwapPair.sol#645)\n\tOneSwapPool._kLast (OneSwapPair.sol#495) can be used in cross function reentrancies:\n\t- OneSwapPool._mintFee(uint112,uint112) (OneSwapPair.sol#565-584)\n\t- OneSwapPool.burn(address) (OneSwapPair.sol#620-647)\n\t- OneSwapPool.internalStatus() (OneSwapPair.sol#508-512)\n\t- OneSwapPool.mint(address) (OneSwapPair.sol#587-617)\n\t- _setReserves(stockBalance,moneyBalance,firstSellID) (OneSwapPair.sol#644)\n\t\t- _reserveStockAndMoneyAndFirstSellID = temp (OneSwapPair.sol#530)\n\tOneSwapPool._reserveStockAndMoneyAndFirstSellID (OneSwapPair.sol#491) can be used in cross function reentrancies:\n\t- OneSwapPool._setReserves(uint256,uint256,uint32) (OneSwapPair.sol#525-531)\n\t- OneSwapPool.getReserves() (OneSwapPair.sol#519-524)\n\t- OneSwapPool.internalStatus() (OneSwapPair.sol#508-512)\n",
+            "name": "reentrancy-no-eth",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "OneSwapPair",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/PeckShield-OneSwap/oneswap_contract_ethereum-4194ac1a55934cd573bd93987111eaa8f70676fe/contracts/OneSwapPair.sol",
+            "function": "_addOrder",
+            "impact": "Low",
+            "line": 1196,
+            "line_end": 1250,
+            "message": "Reentrancy in OneSwapPair._addOrder(Context,bool,RatPrice) (OneSwapPair.sol#1196-1250):\n\tExternal calls:\n\t- _dealInOrderBook(ctx,isBuy,currID,orderInBook,priceInBook) (OneSwapPair.sol#1213)\n\t\t- (success) = to.call{value: value}(new bytes(0)) (OneSwapPair.sol#560)\n\t\t- IWETH(_immuWETH).withdraw(amount) (OneSwapPair.sol#553)\n\t\t- (success,data) = token.call(abi.encodeWithSelector(_SELECTOR,to,value)) (OneSwapPair.sol#545)\n\t- amountToTaker = _dealWithPoolAndCollectFee(ctx,isBuy) (OneSwapPair.sol#1236)\n\t\t- (success) = to.call{value: value}(new bytes(0)) (OneSwapPair.sol#560)\n\t\t- IWETH(_immuWETH).withdraw(amount) (OneSwapPair.sol#553)\n\t\t- (success,data) = token.call(abi.encodeWithSelector(_SELECTOR,to,value)) (OneSwapPair.sol#545)\n\tExternal calls sending eth:\n\t- _dealInOrderBook(ctx,isBuy,currID,orderInBook,priceInBook) (OneSwapPair.sol#1213)\n\t\t- (success) = to.call{value: value}(new bytes(0)) (OneSwapPair.sol#560)\n\t- amountToTaker = _dealWithPoolAndCollectFee(ctx,isBuy) (OneSwapPair.sol#1236)\n\t\t- (success) = to.call{value: value}(new bytes(0)) (OneSwapPair.sol#560)\n\tState variables written after the call(s):\n\t- _setBooked(ctx.bookedStock,ctx.bookedMoney,ctx.firstBuyID) (OneSwapPair.sol#1247)\n\t\t- _bookedStockAndMoneyAndFirstBuyID = (uint256(firstBuyID) << 224) | (moneyAmount << 112) | stockAmount (OneSwapPair.sol#540)\n\t- _setReserves(ctx.reserveStock,ctx.reserveMoney,ctx.firstSellID) (OneSwapPair.sol#1248)\n\t\t- _reserveStockAndMoneyAndFirstSellID = temp (OneSwapPair.sol#530)\n",
+            "name": "reentrancy-benign",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "OneSwapPair",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/PeckShield-OneSwap/oneswap_contract_ethereum-4194ac1a55934cd573bd93987111eaa8f70676fe/contracts/OneSwapPair.sol",
+            "function": "addMarketOrder",
+            "impact": "Low",
+            "line": 1142,
+            "line_end": 1164,
+            "message": "Reentrancy in OneSwapPair.addMarketOrder(address,address,uint112,bool) (OneSwapPair.sol#1142-1164):\n\tExternal calls:\n\t- _checkRemainAmount(ctx,isBuy) (OneSwapPair.sol#1153)\n\t\t- IWETH(_immuWETH).deposit{value: msg.value}() (OneSwapPair.sol#1170)\n\t- _addOrder(ctx,isBuy,price) (OneSwapPair.sol#1163)\n\t\t- (success) = to.call{value: value}(new bytes(0)) (OneSwapPair.sol#560)\n\t\t- IWETH(_immuWETH).withdraw(amount) (OneSwapPair.sol#553)\n\t\t- (success,data) = token.call(abi.encodeWithSelector(_SELECTOR,to,value)) (OneSwapPair.sol#545)\n\tExternal calls sending eth:\n\t- _checkRemainAmount(ctx,isBuy) (OneSwapPair.sol#1153)\n\t\t- IWETH(_immuWETH).deposit{value: msg.value}() (OneSwapPair.sol#1170)\n\t- _addOrder(ctx,isBuy,price) (OneSwapPair.sol#1163)\n\t\t- (success) = to.call{value: value}(new bytes(0)) (OneSwapPair.sol#560)\n\tEvent emitted after the call(s):\n\t- DealWithPool(data) (OneSwapPair.sol#766)\n\t\t- _addOrder(ctx,isBuy,price) (OneSwapPair.sol#1163)\n\t- NewLimitOrder(data) (OneSwapPair.sol#729)\n\t\t- _addOrder(ctx,isBuy,price) (OneSwapPair.sol#1163)\n\t- OrderChanged(data) (OneSwapPair.sol#754)\n\t\t- _addOrder(ctx,isBuy,price) (OneSwapPair.sol#1163)\n\t- Sync(temp) (OneSwapPair.sol#528)\n\t\t- _addOrder(ctx,isBuy,price) (OneSwapPair.sol#1163)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "OneSwapPool",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/PeckShield-OneSwap/oneswap_contract_ethereum-4194ac1a55934cd573bd93987111eaa8f70676fe/contracts/OneSwapPair.sol",
+            "function": "burn",
+            "impact": "Low",
+            "line": 620,
+            "line_end": 647,
+            "message": "Reentrancy in OneSwapPool.burn(address) (OneSwapPair.sol#620-647):\n\tExternal calls:\n\t- _safeTransfer(_immuStockToken,to,stockAmount) (OneSwapPair.sol#639)\n\t\t- (success,data) = token.call(abi.encodeWithSelector(_SELECTOR,to,value)) (OneSwapPair.sol#545)\n\t- _safeTransfer(_immuMoneyToken,to,moneyAmount) (OneSwapPair.sol#640)\n\t\t- (success,data) = token.call(abi.encodeWithSelector(_SELECTOR,to,value)) (OneSwapPair.sol#545)\n\tEvent emitted after the call(s):\n\t- Burn(msg.sender,(moneyAmount << 112) | stockAmount,to) (OneSwapPair.sol#646)\n\t- Sync(temp) (OneSwapPair.sol#528)\n\t\t- _setReserves(stockBalance,moneyBalance,firstSellID) (OneSwapPair.sol#644)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "OneSwapPair",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/PeckShield-OneSwap/oneswap_contract_ethereum-4194ac1a55934cd573bd93987111eaa8f70676fe/contracts/OneSwapPair.sol",
+            "function": "addLimitOrder",
+            "impact": "Low",
+            "line": 1089,
+            "line_end": 1140,
+            "message": "Reentrancy in OneSwapPair.addLimitOrder(bool,address,uint64,uint32,uint32,uint72) (OneSwapPair.sol#1089-1140):\n\tExternal calls:\n\t- _checkRemainAmount(ctx,isBuy) (OneSwapPair.sol#1121)\n\t\t- IWETH(_immuWETH).deposit{value: msg.value}() (OneSwapPair.sol#1170)\n\t- _addOrder(ctx,isBuy,price) (OneSwapPair.sol#1139)\n\t\t- (success) = to.call{value: value}(new bytes(0)) (OneSwapPair.sol#560)\n\t\t- IWETH(_immuWETH).withdraw(amount) (OneSwapPair.sol#553)\n\t\t- (success,data) = token.call(abi.encodeWithSelector(_SELECTOR,to,value)) (OneSwapPair.sol#545)\n\tExternal calls sending eth:\n\t- _checkRemainAmount(ctx,isBuy) (OneSwapPair.sol#1121)\n\t\t- IWETH(_immuWETH).deposit{value: msg.value}() (OneSwapPair.sol#1170)\n\t- _addOrder(ctx,isBuy,price) (OneSwapPair.sol#1139)\n\t\t- (success) = to.call{value: value}(new bytes(0)) (OneSwapPair.sol#560)\n\tEvent emitted after the call(s):\n\t- DealWithPool(data) (OneSwapPair.sol#766)\n\t\t- _addOrder(ctx,isBuy,price) (OneSwapPair.sol#1139)\n\t- NewLimitOrder(data) (OneSwapPair.sol#729)\n\t\t- _addOrder(ctx,isBuy,price) (OneSwapPair.sol#1139)\n\t- OrderChanged(data) (OneSwapPair.sol#754)\n\t\t- _addOrder(ctx,isBuy,price) (OneSwapPair.sol#1139)\n\t- Sync(temp) (OneSwapPair.sol#528)\n\t\t- _addOrder(ctx,isBuy,price) (OneSwapPair.sol#1139)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "OneSwapPair",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/PeckShield-OneSwap/oneswap_contract_ethereum-4194ac1a55934cd573bd93987111eaa8f70676fe/contracts/OneSwapPair.sol",
+            "function": "addLimitOrder",
+            "impact": "Low",
+            "line": 1089,
+            "line_end": 1140,
+            "message": "Reentrancy in OneSwapPair.addLimitOrder(bool,address,uint64,uint32,uint32,uint72) (OneSwapPair.sol#1089-1140):\n\tExternal calls:\n\t- _checkRemainAmount(ctx,isBuy) (OneSwapPair.sol#1121)\n\t\t- IWETH(_immuWETH).deposit{value: msg.value}() (OneSwapPair.sol#1170)\n\tEvent emitted after the call(s):\n\t- NewLimitOrder(data) (OneSwapPair.sol#729)\n\t\t- _emitNewLimitOrder(uint64(ctx.order.sender),amount,amount,price32,ctx.newOrderID,isBuy) (OneSwapPair.sol#1125)\n\t- Sync(temp) (OneSwapPair.sol#528)\n\t\t- _setReserves(ctx.reserveStock,ctx.reserveMoney,ctx.firstSellID) (OneSwapPair.sol#1133)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "OneSwapPair",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/PeckShield-OneSwap/oneswap_contract_ethereum-4194ac1a55934cd573bd93987111eaa8f70676fe/contracts/OneSwapPair.sol",
+            "function": "_addOrder",
+            "impact": "Low",
+            "line": 1196,
+            "line_end": 1250,
+            "message": "Reentrancy in OneSwapPair._addOrder(Context,bool,RatPrice) (OneSwapPair.sol#1196-1250):\n\tExternal calls:\n\t- _dealInOrderBook(ctx,isBuy,currID,orderInBook,priceInBook) (OneSwapPair.sol#1213)\n\t\t- (success) = to.call{value: value}(new bytes(0)) (OneSwapPair.sol#560)\n\t\t- IWETH(_immuWETH).withdraw(amount) (OneSwapPair.sol#553)\n\t\t- (success,data) = token.call(abi.encodeWithSelector(_SELECTOR,to,value)) (OneSwapPair.sol#545)\n\t- amountToTaker = _dealWithPoolAndCollectFee(ctx,isBuy) (OneSwapPair.sol#1236)\n\t\t- (success) = to.call{value: value}(new bytes(0)) (OneSwapPair.sol#560)\n\t\t- IWETH(_immuWETH).withdraw(amount) (OneSwapPair.sol#553)\n\t\t- (success,data) = token.call(abi.encodeWithSelector(_SELECTOR,to,value)) (OneSwapPair.sol#545)\n\tExternal calls sending eth:\n\t- _dealInOrderBook(ctx,isBuy,currID,orderInBook,priceInBook) (OneSwapPair.sol#1213)\n\t\t- (success) = to.call{value: value}(new bytes(0)) (OneSwapPair.sol#560)\n\t- amountToTaker = _dealWithPoolAndCollectFee(ctx,isBuy) (OneSwapPair.sol#1236)\n\t\t- (success) = to.call{value: value}(new bytes(0)) (OneSwapPair.sol#560)\n\tEvent emitted after the call(s):\n\t- DealWithPool(data) (OneSwapPair.sol#766)\n\t\t- amountToTaker = _dealWithPoolAndCollectFee(ctx,isBuy) (OneSwapPair.sol#1236)\n\t- NewLimitOrder(data) (OneSwapPair.sol#729)\n\t\t- _insertOrderToBook(ctx,isBuy,price) (OneSwapPair.sol#1239)\n\t- Sync(temp) (OneSwapPair.sol#528)\n\t\t- _setReserves(ctx.reserveStock,ctx.reserveMoney,ctx.firstSellID) (OneSwapPair.sol#1248)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "OneSwapPair",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/PeckShield-OneSwap/oneswap_contract_ethereum-4194ac1a55934cd573bd93987111eaa8f70676fe/contracts/OneSwapPair.sol",
+            "function": "addMarketOrder",
+            "impact": "Low",
+            "line": 1142,
+            "line_end": 1164,
+            "message": "Reentrancy in OneSwapPair.addMarketOrder(address,address,uint112,bool) (OneSwapPair.sol#1142-1164):\n\tExternal calls:\n\t- _checkRemainAmount(ctx,isBuy) (OneSwapPair.sol#1153)\n\t\t- IWETH(_immuWETH).deposit{value: msg.value}() (OneSwapPair.sol#1170)\n\tEvent emitted after the call(s):\n\t- NewMarketOrder(data) (OneSwapPair.sol#741)\n\t\t- _emitNewMarketOrder(uint136(ctx.order.sender),inAmount,isBuy) (OneSwapPair.sol#1162)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        },
+        {
+            "confidence": "High",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/PeckShield-OneSwap/oneswap_contract_ethereum-4194ac1a55934cd573bd93987111eaa8f70676fe/contracts/OneSwapPair.sol",
+            "impact": "Informational",
+            "line": 196,
+            "message": "DecFloat32.MantissaMask (OneSwapPair.sol#196) is never used in DecFloat32 (OneSwapPair.sol#195-270)\n",
+            "name": "unused-state",
+            "check": "FP"
+        },
+        {
+            "confidence": "High",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/PeckShield-OneSwap/oneswap_contract_ethereum-4194ac1a55934cd573bd93987111eaa8f70676fe/contracts/OneSwapPair.sol",
+            "impact": "Informational",
+            "line": 199,
+            "message": "DecFloat32.MinPrice (OneSwapPair.sol#199) is never used in DecFloat32 (OneSwapPair.sol#195-270)\n",
+            "name": "unused-state",
+            "check": "FP"
+        },
+        {
+            "confidence": "High",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/PeckShield-OneSwap/oneswap_contract_ethereum-4194ac1a55934cd573bd93987111eaa8f70676fe/contracts/OneSwapPair.sol",
+            "impact": "Informational",
+            "line": 200,
+            "message": "DecFloat32.MaxPrice (OneSwapPair.sol#200) is never used in DecFloat32 (OneSwapPair.sol#195-270)\n",
+            "name": "unused-state",
+            "check": "FP"
+        }
+    ],
+    "infos": [],
+    "parser": {
+        "id": "slither-0.10.0",
+        "mode": "solidity",
+        "version": "2024/04/30"
+    }
+}

@@ -1,0 +1,86 @@
+'solc --version' running
+'solc /sb/WstETH.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+WstETH.wrap(uint256) (../../sb/WstETH.sol#1004-1011) ignores return value by stETH.transferFrom(msg.sender,address(this),_stETHAmount) (../../sb/WstETH.sol#1009)
+WstETH.unwrap(uint256) (../../sb/WstETH.sol#1021-1028) ignores return value by stETH.transfer(msg.sender,stETHAmount) (../../sb/WstETH.sol#1026)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+ERC20Permit.constructor(string).name (../../sb/WstETH.sol#904) shadows:
+	- ERC20.name() (../../sb/WstETH.sol#366-368) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+Reentrancy in WstETH.receive() (../../sb/WstETH.sol#1033-1036):
+	External calls:
+	- shares = stETH.submit{value: msg.value}(address(0)) (../../sb/WstETH.sol#1034)
+	State variables written after the call(s):
+	- _mint(msg.sender,shares) (../../sb/WstETH.sol#1035)
+		- _balances[account] = _balances[account].add(amount) (../../sb/WstETH.sol#536)
+	- _mint(msg.sender,shares) (../../sb/WstETH.sol#1035)
+		- _totalSupply = _totalSupply.add(amount) (../../sb/WstETH.sol#535)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in WstETH.receive() (../../sb/WstETH.sol#1033-1036):
+	External calls:
+	- shares = stETH.submit{value: msg.value}(address(0)) (../../sb/WstETH.sol#1034)
+	Event emitted after the call(s):
+	- Transfer(address(0),account,amount) (../../sb/WstETH.sol#537)
+		- _mint(msg.sender,shares) (../../sb/WstETH.sol#1035)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+ERC20Permit.permit(address,address,uint256,uint256,uint8,bytes32,bytes32) (../../sb/WstETH.sol#910-932) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp <= deadline,ERC20Permit: expired deadline) (../../sb/WstETH.sol#912)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+ECDSA.recover(bytes32,bytes) (../../sb/WstETH.sol#679-700) uses assembly
+	- INLINE ASM (../../sb/WstETH.sol#693-697)
+EIP712._getChainId() (../../sb/WstETH.sol#872-878) uses assembly
+	- INLINE ASM (../../sb/WstETH.sol#875-877)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Context._msgData() (../../sb/WstETH.sol#20-23) is never used and should be removed
+Counters.decrement(Counters.Counter) (../../sb/WstETH.sol#771-773) is never used and should be removed
+ECDSA.recover(bytes32,bytes) (../../sb/WstETH.sol#679-700) is never used and should be removed
+ECDSA.toEthSignedMessageHash(bytes32) (../../sb/WstETH.sol#734-738) is never used and should be removed
+ERC20._setupDecimals(uint8) (../../sb/WstETH.sol#589-591) is never used and should be removed
+SafeMath.div(uint256,uint256) (../../sb/WstETH.sol#230-233) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/WstETH.sol#285-288) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/WstETH.sol#247-250) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/WstETH.sol#305-308) is never used and should be removed
+SafeMath.mul(uint256,uint256) (../../sb/WstETH.sol#211-216) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/WstETH.sol#119-123) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/WstETH.sol#155-158) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/WstETH.sol#165-168) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/WstETH.sol#140-148) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/WstETH.sol#130-133) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.6.12 (../../sb/WstETH.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Function IERC20Permit.DOMAIN_SEPARATOR() (../../sb/WstETH.sol#655) is not in mixedCase
+Variable EIP712._CACHED_DOMAIN_SEPARATOR (../../sb/WstETH.sol#799) is not in mixedCase
+Variable EIP712._CACHED_CHAIN_ID (../../sb/WstETH.sol#800) is not in mixedCase
+Variable EIP712._HASHED_NAME (../../sb/WstETH.sol#802) is not in mixedCase
+Variable EIP712._HASHED_VERSION (../../sb/WstETH.sol#803) is not in mixedCase
+Variable EIP712._TYPE_HASH (../../sb/WstETH.sol#804) is not in mixedCase
+Function ERC20Permit.DOMAIN_SEPARATOR() (../../sb/WstETH.sol#945-947) is not in mixedCase
+Variable ERC20Permit._PERMIT_TYPEHASH (../../sb/WstETH.sol#897) is not in mixedCase
+Parameter WstETH.wrap(uint256)._stETHAmount (../../sb/WstETH.sol#1004) is not in mixedCase
+Parameter WstETH.unwrap(uint256)._wstETHAmount (../../sb/WstETH.sol#1021) is not in mixedCase
+Parameter WstETH.getWstETHByStETH(uint256)._stETHAmount (../../sb/WstETH.sol#1043) is not in mixedCase
+Parameter WstETH.getStETHByWstETH(uint256)._wstETHAmount (../../sb/WstETH.sol#1052) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/WstETH.sol#21)" inContext (../../sb/WstETH.sol#15-24)
+Redundant expression "this (../../sb/WstETH.sol#873)" inEIP712 (../../sb/WstETH.sol#795-879)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Variable WstETH.wrap(uint256)._stETHAmount (../../sb/WstETH.sol#1004) is too similar to WstETH.wrap(uint256).wstETHAmount (../../sb/WstETH.sol#1006)
+Variable WstETH.getWstETHByStETH(uint256)._stETHAmount (../../sb/WstETH.sol#1043) is too similar to WstETH.wrap(uint256).wstETHAmount (../../sb/WstETH.sol#1006)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+WstETH.stETH (../../sb/WstETH.sol#980) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/WstETH.sol analyzed (11 contracts with 93 detectors), 42 result(s) found

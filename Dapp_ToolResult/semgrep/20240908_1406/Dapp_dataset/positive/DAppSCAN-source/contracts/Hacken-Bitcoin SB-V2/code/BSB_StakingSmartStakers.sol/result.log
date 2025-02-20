@@ -1,0 +1,263 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 60 Code Findings │
+└──────────────────┘
+                                    
+    /sb/BSB_StakingSmartStakers.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          296┆ contract BSB_StakingSmartStakers is Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          391┆ for(uint i = 0; i < holders.length(); i = i.add(1)){
+            ⋮┆----------------------------------------
+          414┆ for(uint i = 0; i < holders.length(); i = i.add(1)){
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+          345┆ uint public totalClaimedRewards = 0;
+            ⋮┆----------------------------------------
+          346┆ uint public totalDeposited = 0; // usar esta variable que no se  
+  usa!                                                                          
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          266┆ constructor()  {
+          267┆   owner = msg.sender;
+          268┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          391┆ for(uint i = 0; i < holders.length(); i = i.add(1)){
+            ⋮┆----------------------------------------
+          392┆ _aux = holders.at(i);
+            ⋮┆----------------------------------------
+          393┆ rewardEnded[_aux] = getPendingRewards(_aux);
+            ⋮┆----------------------------------------
+          394┆ unclaimed[_aux] = 0;
+            ⋮┆----------------------------------------
+          395┆ stakingTime[_aux] = block.timestamp;
+            ⋮┆----------------------------------------
+          396┆ progressiveTime[_aux] = block.timestamp;
+            ⋮┆----------------------------------------
+          397┆ alreadyProgUnstaked[_aux] = 0;
+            ⋮┆----------------------------------------
+          398┆ amountPerInterval[_aux] =                                        
+  depositedTokens[_aux].div(number_intervals);                                  
+            ⋮┆----------------------------------------
+          398┆ amountPerInterval[_aux] =                                        
+  depositedTokens[_aux].div(number_intervals);                                  
+            ⋮┆----------------------------------------
+          398┆ amountPerInterval[_aux] =                                        
+  depositedTokens[_aux].div(number_intervals);                                  
+            ⋮┆----------------------------------------
+          414┆ for(uint i = 0; i < holders.length(); i = i.add(1)){
+            ⋮┆----------------------------------------
+          415┆ totalPending =                                                   
+  totalPending.add(getPendingRewards(holders.at(i)));                           
+            ⋮┆----------------------------------------
+          726┆ for(uint i = 1; i <= number_intervals; i = i.add(1)){
+            ⋮┆----------------------------------------
+          727┆ if(block.timestamp < _time.add(duration_interval.mul(i))){
+            ⋮┆----------------------------------------
+          728┆ _res = _time.add(duration_interval.mul(i)).sub(block.timestamp);
+            ⋮┆----------------------------------------
+          764┆ address staker = holders.at(i);
+            ⋮┆----------------------------------------
+          767┆ _stakingTimestamps[listIndex] = stakingTime[staker];
+            ⋮┆----------------------------------------
+          768┆ _lastClaimedTimeStamps[listIndex] = lastClaimedTime[staker];
+            ⋮┆----------------------------------------
+          769┆ _stakedTokens[listIndex] = depositedTokens[staker];
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          136┆ require(set._values.length > index, "EnumerableSet: index out of 
+  bounds");                                                                     
+            ⋮┆----------------------------------------
+          388┆ require(!ended, "Staking already ended");
+            ⋮┆----------------------------------------
+          449┆ require(Token(tokenDepositAddress).transfer(account, toSend),    
+  "Could not transfer tokens.");                                                
+            ⋮┆----------------------------------------
+          457┆ require(pendingDivs <= availablePoolSize, "No spot available");
+            ⋮┆----------------------------------------
+          493┆ require(Token(tokenDepositAddress).transfer(account, toSend),    
+  "Could not transfer tokens.");                                                
+            ⋮┆----------------------------------------
+          566┆ require(!ended, "Staking has ended");
+            ⋮┆----------------------------------------
+          567┆ require(getRewardsLeft() > 0, "No rewards left");
+            ⋮┆----------------------------------------
+          568┆ require(amountToStake > 0, "Cannot deposit 0 Tokens");
+            ⋮┆----------------------------------------
+          570┆ require(Token(tokenDepositAddress).transferFrom(msg.sender,      
+  address(this), amountToStake), "Insufficient Token Allowance");               
+            ⋮┆----------------------------------------
+          573┆ require(updateAccount(msg.sender, true, false), "Error updating  
+  account");                                                                    
+            ⋮┆----------------------------------------
+          577┆ require(amountAfterFee <= availablePoolSize, "No space           
+  available");                                                                  
+            ⋮┆----------------------------------------
+          578┆ require(Token(tokenDepositAddress).transfer(owner, fee), "Could  
+  not transfer deposit fee.");                                                  
+            ⋮┆----------------------------------------
+          657┆ require(holders.contains(msg.sender), "Not a staker");
+            ⋮┆----------------------------------------
+          658┆ require(amountToWithdraw <= getMaxAmountWithdrawable(msg.sender),
+  "Maximum reached");                                                           
+            ⋮┆----------------------------------------
+          659┆ require(alreadyProgUnstaked[msg.sender] > 0 || ended, "Use       
+  withdraw first");                                                             
+            ⋮┆----------------------------------------
+          668┆ require(Token(tokenDepositAddress).transfer(owner, fee), "Could  
+  not transfer withdraw fee.");                                                 
+            ⋮┆----------------------------------------
+          669┆ require(Token(tokenDepositAddress).transfer(msg.sender,          
+  amountAfterFee), "Could not transfer tokens.");                               
+            ⋮┆----------------------------------------
+          686┆ require(holders.contains(msg.sender), "Not a staker");
+            ⋮┆----------------------------------------
+          687┆ require(alreadyProgUnstaked[msg.sender] == 0 && !ended , "Use    
+  withdraw2 function");                                                         
+            ⋮┆----------------------------------------
+          689┆ require(depositedTokens[msg.sender].div(number_intervals) >=     
+  amountToWithdraw, "Invalid amount to withdraw");                              
+            ⋮┆----------------------------------------
+          691┆ require(block.timestamp.sub(stakingTime[msg.sender]) >           
+  unstakeTime || ended, "You recently staked, please wait before withdrawing.");
+            ⋮┆----------------------------------------
+          700┆ require(Token(tokenDepositAddress).transfer(owner, fee), "Could  
+  not transfer withdraw fee.");                                                 
+            ⋮┆----------------------------------------
+          701┆ require(Token(tokenDepositAddress).transfer(msg.sender,          
+  amountAfterFee), "Could not transfer tokens.");                               
+            ⋮┆----------------------------------------
+          748┆ require(holders.contains(msg.sender), "Not a staker");
+            ⋮┆----------------------------------------
+          749┆ require(block.timestamp.sub(lastClaimedTime[msg.sender]) >       
+  claimTime, "Not yet");                                                        
+            ⋮┆----------------------------------------
+          779┆ require (_tokenAddr != tokenDepositAddress, "Cannot Transfer Out 
+  this token");                                                                 
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          687┆ require(alreadyProgUnstaked[msg.sender] == 0 && !ended , "Use    
+  withdraw2 function");                                                         
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          505┆ if(block.timestamp.sub(firstTime[_staker]) > unstakeTime &&      
+  alreadyProgUnstaked[_staker] == 0 && !ended){                                 
+          506┆     apy = apy.add(extraAPY);
+          507┆ }
+            ⋮┆----------------------------------------
+          513┆ if (depositedTokens[_holder] == 0 && unclaimed[_holder] == 0 &&  
+  !ended) return 0;                                                             
+            ⋮┆----------------------------------------
+          610┆ if(block.timestamp.sub(stakingTime[msg.sender]) < unstakeTime && 
+  !ended && alreadyProgUnstaked[_staker] == 0){                                 
+          611┆     _res = 0;
+          612┆ }else if(alreadyProgUnstaked[_staker] == 0 && !ended){
+          613┆ 
+          614┆     if(block.timestamp.sub(stakingTime[msg.sender]) >            
+  unstakeTime){                                                                 
+          615┆         _res = depositedTokens[_staker].div(number_intervals);
+          616┆     }
+          617┆ 
+          618┆ }else{
+          619┆     uint _time = progressiveTime[_staker];
+             [hid 29 additional lines, adjust with --max-lines-per-finding] 
+          612┆ }else if(alreadyProgUnstaked[_staker] == 0 && !ended){
+          613┆ 
+          614┆     if(block.timestamp.sub(stakingTime[msg.sender]) >            
+  unstakeTime){                                                                 
+          615┆         _res = depositedTokens[_staker].div(number_intervals);
+          616┆     }
+          617┆ 
+          618┆ }else{
+          619┆     uint _time = progressiveTime[_staker];
+          620┆ 
+          621┆     if(block.timestamp < _time.add(duration_interval)){
+             [hid 27 additional lines, adjust with --max-lines-per-finding] 
+          675┆ if (holders.contains(msg.sender) && depositedTokens[msg.sender]  
+  == 0 && getPendingRewards(msg.sender) == 0) {                                 
+          676┆     holders.remove(msg.sender);
+          677┆     firstTime[msg.sender] = 0;
+          678┆ }
+            ⋮┆----------------------------------------
+          717┆ if(alreadyProgUnstaked[_staker] == 0 && !ended ){
+          718┆ 
+          719┆     if(block.timestamp <= _time.add(unstakeTime)){
+          720┆         _res = _time.add(unstakeTime).sub(block.timestamp);
+          721┆     }
+          722┆ 
+          723┆ }else{
+          724┆     _time = progressiveTime[_staker];
+          725┆ 
+          726┆     for(uint i = 1; i <= number_intervals; i = i.add(1)){
+             [hid 7 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          136┆ require(set._values.length > index, "EnumerableSet: index out of 
+  bounds");                                                                     
+            ⋮┆----------------------------------------
+          691┆ require(block.timestamp.sub(stakingTime[msg.sender]) >           
+  unstakeTime || ended, "You recently staked, please wait before withdrawing.");
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 60 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

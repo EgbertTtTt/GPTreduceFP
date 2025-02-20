@@ -1,0 +1,181 @@
+'solc --version' running
+'solc /sb/VCTreasuryV1.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/VCTreasuryV1.sol:
+Warning: Contract code size exceeds 24576 bytes (a limit introduced in Spurious Dragon). This contract may not be deployable on mainnet. Consider enabling the optimizer (with a low "runs" value!), turning off revert strings, or using libraries.
+   --> /sb/VCTreasuryV1.sol:935:1:
+    |
+935 | contract VCTreasuryV1 is ERC20, ReentrancyGuard {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+VCTreasuryV1.startFund() (../../sb/VCTreasuryV1.sol#1087-1100) performs a multiplication on the result of a division:
+	- maxInvestment = msg.value.div(max).mul(investmentCap) (../../sb/VCTreasuryV1.sol#1097)
+VCTreasuryV1.killQuorumRequirement() (../../sb/VCTreasuryV1.sol#1305-1307) performs a multiplication on the result of a division:
+	- totalSupply().div(max).mul(killQuorum) (../../sb/VCTreasuryV1.sol#1306)
+VCTreasuryV1.pauseQuorumRequirement() (../../sb/VCTreasuryV1.sol#1309-1311) performs a multiplication on the result of a division:
+	- totalSupply().div(max).mul(pauseQuorum) (../../sb/VCTreasuryV1.sol#1310)
+VCTreasuryV1._assessFee() (../../sb/VCTreasuryV1.sol#1338-1344) performs a multiplication on the result of a division:
+	- _stackAmount = totalSupply().div(max).mul(stackFee) (../../sb/VCTreasuryV1.sol#1339)
+VCTreasuryV1._assessFee() (../../sb/VCTreasuryV1.sol#1338-1344) performs a multiplication on the result of a division:
+	- _councilAmount = totalSupply().div(max).mul(councilFee) (../../sb/VCTreasuryV1.sol#1340)
+VCTreasuryV1.claim(address[]) (../../sb/VCTreasuryV1.sol#1347-1379) performs a multiplication on the result of a division:
+	- _proportionE18 = _balance.mul(1e18).div(totalSupply()) (../../sb/VCTreasuryV1.sol#1360)
+	- _proportionToken = address(this).balance.mul(_proportionE18).div(1e18) (../../sb/VCTreasuryV1.sol#1365)
+VCTreasuryV1.claim(address[]) (../../sb/VCTreasuryV1.sol#1347-1379) performs a multiplication on the result of a division:
+	- _proportionE18 = _balance.mul(1e18).div(totalSupply()) (../../sb/VCTreasuryV1.sol#1360)
+	- _proportionToken = IERC20(_tokens[i]).balanceOf(address(this)).mul(_proportionE18).div(1e18) (../../sb/VCTreasuryV1.sol#1376)
+VCTreasuryV1.getUtilization(uint256) (../../sb/VCTreasuryV1.sol#1391-1401) performs a multiplication on the result of a division:
+	- _depreciateUtilization = currentInvestmentUtilization.div(THIRTY_DAYS).mul(THIRTY_DAYS.sub(_lastInvestTimeDiff)) (../../sb/VCTreasuryV1.sol#1398)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+VCTreasuryV1.devestExecute(uint256) (../../sb/VCTreasuryV1.sol#1202-1223) uses a dangerous strict equality:
+	- IERC20(_sell.tokenSell).balanceOf(address(this)) == 0 (../../sb/VCTreasuryV1.sol#1220)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+VCTreasuryV1.devestExecute(uint256)._reset (../../sb/VCTreasuryV1.sol#1213) is a local variable never initialized
+VCTreasuryV1.investPropose(address,uint256,uint256,address)._buy (../../sb/VCTreasuryV1.sol#1111) is a local variable never initialized
+VCTreasuryV1.investRevoke(uint256)._reset (../../sb/VCTreasuryV1.sol#1134) is a local variable never initialized
+VCTreasuryV1.devestRevoke(uint256)._reset (../../sb/VCTreasuryV1.sol#1195) is a local variable never initialized
+VCTreasuryV1.devestPropose(address,uint256,uint256,address)._sell (../../sb/VCTreasuryV1.sol#1173) is a local variable never initialized
+VCTreasuryV1.investExecute(uint256,uint256)._reset (../../sb/VCTreasuryV1.sol#1152) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+VCTreasuryV1.startFund() (../../sb/VCTreasuryV1.sol#1087-1100) should emit an event for: 
+	- maxInvestment = msg.value.div(max).mul(investmentCap) (../../sb/VCTreasuryV1.sol#1097) 
+VCTreasuryV1.stakeToPause(uint256) (../../sb/VCTreasuryV1.sol#1228-1239) should emit an event for: 
+	- totalStakedToPause = totalStakedToPause.add(_amount) (../../sb/VCTreasuryV1.sol#1236) 
+VCTreasuryV1.stakeToKill(uint256) (../../sb/VCTreasuryV1.sol#1243-1254) should emit an event for: 
+	- totalStakedToKill = totalStakedToKill.add(_amount) (../../sb/VCTreasuryV1.sol#1251) 
+VCTreasuryV1.unstakeToPause(uint256) (../../sb/VCTreasuryV1.sol#1256-1267) should emit an event for: 
+	- totalStakedToPause = totalStakedToPause.sub(_amount) (../../sb/VCTreasuryV1.sol#1264) 
+VCTreasuryV1.unstakeToKill(uint256) (../../sb/VCTreasuryV1.sol#1269-1280) should emit an event for: 
+	- totalStakedToKill = totalStakedToKill.sub(_amount) (../../sb/VCTreasuryV1.sol#1277) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+VCTreasuryV1.constructor(address,address)._multisig (../../sb/VCTreasuryV1.sol#1016) lacks a zero-check on :
+		- councilMultisig = _multisig (../../sb/VCTreasuryV1.sol#1018)
+VCTreasuryV1.constructor(address,address)._treasury (../../sb/VCTreasuryV1.sol#1016) lacks a zero-check on :
+		- treasury = _treasury (../../sb/VCTreasuryV1.sol#1019)
+VCTreasuryV1.setCouncilMultisig(address)._new (../../sb/VCTreasuryV1.sol#1032) lacks a zero-check on :
+		- councilMultisig = _new (../../sb/VCTreasuryV1.sol#1034)
+VCTreasuryV1.setDeployer(address)._new (../../sb/VCTreasuryV1.sol#1038) lacks a zero-check on :
+		- deployer = _new (../../sb/VCTreasuryV1.sol#1040)
+VCTreasuryV1.setTreasury(address)._new (../../sb/VCTreasuryV1.sol#1043) lacks a zero-check on :
+		- treasury = _new (../../sb/VCTreasuryV1.sol#1045)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+VCTreasuryV1.claim(address[]) (../../sb/VCTreasuryV1.sol#1347-1379) has external calls inside a loop: _proportionToken = IERC20(_tokens[i]).balanceOf(address(this)).mul(_proportionE18).div(1e18) (../../sb/VCTreasuryV1.sol#1376)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in VCTreasuryV1.devestExecute(uint256) (../../sb/VCTreasuryV1.sol#1202-1223):
+	External calls:
+	- IERC20(_sell.tokenSell).safeTransfer(msg.sender,_sell.amountOut) (../../sb/VCTreasuryV1.sol#1217)
+	State variables written after the call(s):
+	- boughtTokens[_sell.tokenSell] = false (../../sb/VCTreasuryV1.sol#1221)
+Reentrancy in VCTreasuryV1.investExecute(uint256,uint256) (../../sb/VCTreasuryV1.sol#1141-1165):
+	External calls:
+	- IERC20(_buy.tokenAccept).safeTransferFrom(msg.sender,address(this),_amount) (../../sb/VCTreasuryV1.sol#1156)
+	State variables written after the call(s):
+	- boughtTokens[_buy.tokenAccept] = true (../../sb/VCTreasuryV1.sol#1160)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+VCTreasuryV1.investExecute(uint256,uint256) (../../sb/VCTreasuryV1.sol#1141-1165) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp <= _buy.maxTime,TREASURYV1: time > maxTime) (../../sb/VCTreasuryV1.sol#1150)
+VCTreasuryV1.devestExecute(uint256) (../../sb/VCTreasuryV1.sol#1202-1223) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp > _sell.vetoTime,TREASURYV1: time < vetoTime) (../../sb/VCTreasuryV1.sol#1210)
+	- require(bool,string)(block.timestamp <= _sell.maxTime,TREASURYV1: time > maxTime) (../../sb/VCTreasuryV1.sol#1211)
+VCTreasuryV1._checkCloseTime() (../../sb/VCTreasuryV1.sol#1318-1322) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp >= fundCloseTime && currentState != FundStates.setup (../../sb/VCTreasuryV1.sol#1319)
+VCTreasuryV1._updateInvestmentUtilization(uint256) (../../sb/VCTreasuryV1.sol#1382-1388) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(proposedUtilization <= maxInvestment,TREASURYV1: utilization > maxInvestment) (../../sb/VCTreasuryV1.sol#1384)
+VCTreasuryV1.getUtilization(uint256) (../../sb/VCTreasuryV1.sol#1391-1401) uses timestamp for comparisons
+	Dangerous comparisons:
+	- _lastInvestTimeDiff >= THIRTY_DAYS (../../sb/VCTreasuryV1.sol#1393)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/VCTreasuryV1.sol#632-641) uses assembly
+	- INLINE ASM (../../sb/VCTreasuryV1.sol#639)
+Address._verifyCallResult(bool,bytes,string) (../../sb/VCTreasuryV1.sol#777-794) uses assembly
+	- INLINE ASM (../../sb/VCTreasuryV1.sol#786-789)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+ERC20._mint(address,uint256) (../../sb/VCTreasuryV1.sol#531-539) has costly operations inside a loop:
+	- _totalSupply = _totalSupply.add(amount) (../../sb/VCTreasuryV1.sol#536)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#costly-operations-inside-a-loop
+
+Address.functionCall(address,bytes) (../../sb/VCTreasuryV1.sol#685-687) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/VCTreasuryV1.sol#710-712) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/VCTreasuryV1.sol#759-761) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/VCTreasuryV1.sol#769-775) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/VCTreasuryV1.sol#735-737) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/VCTreasuryV1.sol#745-751) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/VCTreasuryV1.sol#659-665) is never used and should be removed
+Context._msgData() (../../sb/VCTreasuryV1.sol#21-24) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/VCTreasuryV1.sol#825-834) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/VCTreasuryV1.sol#841-844) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/VCTreasuryV1.sol#836-839) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/VCTreasuryV1.sol#286-289) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/VCTreasuryV1.sol#248-251) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/VCTreasuryV1.sol#306-309) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/VCTreasuryV1.sol#120-124) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/VCTreasuryV1.sol#156-159) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/VCTreasuryV1.sol#166-169) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/VCTreasuryV1.sol#141-149) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/VCTreasuryV1.sol#131-134) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.6.11 (../../sb/VCTreasuryV1.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/VCTreasuryV1.sol#659-665):
+	- (success) = recipient.call{value: amount}() (../../sb/VCTreasuryV1.sol#663)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/VCTreasuryV1.sol#720-727):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/VCTreasuryV1.sol#725)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/VCTreasuryV1.sol#745-751):
+	- (success,returndata) = target.staticcall(data) (../../sb/VCTreasuryV1.sol#749)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/VCTreasuryV1.sol#769-775):
+	- (success,returndata) = target.delegatecall(data) (../../sb/VCTreasuryV1.sol#773)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter VCTreasuryV1.setCouncilMultisig(address)._new (../../sb/VCTreasuryV1.sol#1032) is not in mixedCase
+Parameter VCTreasuryV1.setDeployer(address)._new (../../sb/VCTreasuryV1.sol#1038) is not in mixedCase
+Parameter VCTreasuryV1.setTreasury(address)._new (../../sb/VCTreasuryV1.sol#1043) is not in mixedCase
+Parameter VCTreasuryV1.setBoughtToken(address)._new (../../sb/VCTreasuryV1.sol#1049) is not in mixedCase
+Parameter VCTreasuryV1.getBoughtToken(address)._token (../../sb/VCTreasuryV1.sol#1056) is not in mixedCase
+Parameter VCTreasuryV1.getStakedToPause(address)._user (../../sb/VCTreasuryV1.sol#1060) is not in mixedCase
+Parameter VCTreasuryV1.getStakedToKill(address)._user (../../sb/VCTreasuryV1.sol#1064) is not in mixedCase
+Parameter VCTreasuryV1.getSellProposal(uint256)._sellId (../../sb/VCTreasuryV1.sol#1068) is not in mixedCase
+Parameter VCTreasuryV1.issueTokens(address[],uint256[])._user (../../sb/VCTreasuryV1.sol#1075) is not in mixedCase
+Parameter VCTreasuryV1.issueTokens(address[],uint256[])._amount (../../sb/VCTreasuryV1.sol#1075) is not in mixedCase
+Parameter VCTreasuryV1.investPropose(address,uint256,uint256,address)._tokenAccept (../../sb/VCTreasuryV1.sol#1103) is not in mixedCase
+Parameter VCTreasuryV1.investPropose(address,uint256,uint256,address)._amountInMin (../../sb/VCTreasuryV1.sol#1103) is not in mixedCase
+Parameter VCTreasuryV1.investPropose(address,uint256,uint256,address)._ethOut (../../sb/VCTreasuryV1.sol#1103) is not in mixedCase
+Parameter VCTreasuryV1.investPropose(address,uint256,uint256,address)._taker (../../sb/VCTreasuryV1.sol#1103) is not in mixedCase
+Parameter VCTreasuryV1.investRevoke(uint256)._buyId (../../sb/VCTreasuryV1.sol#1126) is not in mixedCase
+Parameter VCTreasuryV1.investExecute(uint256,uint256)._buyId (../../sb/VCTreasuryV1.sol#1141) is not in mixedCase
+Parameter VCTreasuryV1.investExecute(uint256,uint256)._amount (../../sb/VCTreasuryV1.sol#1141) is not in mixedCase
+Parameter VCTreasuryV1.devestPropose(address,uint256,uint256,address)._tokenSell (../../sb/VCTreasuryV1.sol#1168) is not in mixedCase
+Parameter VCTreasuryV1.devestPropose(address,uint256,uint256,address)._ethInMin (../../sb/VCTreasuryV1.sol#1168) is not in mixedCase
+Parameter VCTreasuryV1.devestPropose(address,uint256,uint256,address)._amountOut (../../sb/VCTreasuryV1.sol#1168) is not in mixedCase
+Parameter VCTreasuryV1.devestPropose(address,uint256,uint256,address)._taker (../../sb/VCTreasuryV1.sol#1168) is not in mixedCase
+Parameter VCTreasuryV1.devestRevoke(uint256)._sellId (../../sb/VCTreasuryV1.sol#1189) is not in mixedCase
+Parameter VCTreasuryV1.devestExecute(uint256)._sellId (../../sb/VCTreasuryV1.sol#1202) is not in mixedCase
+Parameter VCTreasuryV1.stakeToPause(uint256)._amount (../../sb/VCTreasuryV1.sol#1228) is not in mixedCase
+Parameter VCTreasuryV1.stakeToKill(uint256)._amount (../../sb/VCTreasuryV1.sol#1243) is not in mixedCase
+Parameter VCTreasuryV1.unstakeToPause(uint256)._amount (../../sb/VCTreasuryV1.sol#1256) is not in mixedCase
+Parameter VCTreasuryV1.unstakeToKill(uint256)._amount (../../sb/VCTreasuryV1.sol#1269) is not in mixedCase
+Parameter VCTreasuryV1.claim(address[])._tokens (../../sb/VCTreasuryV1.sol#1347) is not in mixedCase
+Parameter VCTreasuryV1.getUtilization(uint256)._newInvestment (../../sb/VCTreasuryV1.sol#1391) is not in mixedCase
+Parameter VCTreasuryV1.emergencyEscape(address,uint256)._tokenContract (../../sb/VCTreasuryV1.sol#1411) is not in mixedCase
+Parameter VCTreasuryV1.emergencyEscape(address,uint256)._amount (../../sb/VCTreasuryV1.sol#1411) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/VCTreasuryV1.sol#22)" inContext (../../sb/VCTreasuryV1.sol#16-25)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+/sb/VCTreasuryV1.sol analyzed (9 contracts with 93 detectors), 93 result(s) found

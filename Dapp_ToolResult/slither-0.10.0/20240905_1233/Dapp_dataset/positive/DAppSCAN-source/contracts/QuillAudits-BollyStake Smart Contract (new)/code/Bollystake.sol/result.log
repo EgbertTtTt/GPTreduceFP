@@ -1,0 +1,144 @@
+'solc --version' running
+'solc /sb/Bollystake.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/sb' running
+
+Bollystake.enter_stake(uint256,uint256) (../../sb/Bollystake.sol#948-980) ignores return value by BOLLY.transferFrom(msg.sender,address(this),_amount) (../../sb/Bollystake.sol#977)
+Bollystake.remove_stake() (../../sb/Bollystake.sol#1020-1034) ignores return value by BOLLY.transfer(msg.sender,expired_amount) (../../sb/Bollystake.sol#1032)
+Bollystake.emergency_remove_stake(address) (../../sb/Bollystake.sol#1036-1048) ignores return value by BOLLY.transfer(_user,locked_amount) (../../sb/Bollystake.sol#1046)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+Bollystake.user_stake (../../sb/Bollystake.sol#812) is never initialized. It is used in:
+	- Bollystake.get_all_user_stakes() (../../sb/Bollystake.sol#916-933)
+	- Bollystake.expired_stakes(address) (../../sb/Bollystake.sol#935-945)
+	- Bollystake.enter_stake(uint256,uint256) (../../sb/Bollystake.sol#948-980)
+	- Bollystake.relock_stake(uint256) (../../sb/Bollystake.sol#982-1016)
+	- Bollystake.remove_stake() (../../sb/Bollystake.sol#1020-1034)
+	- Bollystake.emergency_remove_stake(address) (../../sb/Bollystake.sol#1036-1048)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-state-variables
+
+Reentrancy in Bollystake.enter_stake(uint256,uint256) (../../sb/Bollystake.sol#948-980):
+	External calls:
+	- BOLLY.transferFrom(msg.sender,address(this),_amount) (../../sb/Bollystake.sol#977)
+	State variables written after the call(s):
+	- _mint(msg.sender,_amount) (../../sb/Bollystake.sol#978)
+		- _balances[account] += amount (../../sb/Bollystake.sol#685)
+	- _mint(msg.sender,_amount) (../../sb/Bollystake.sol#978)
+		- _totalSupply += amount (../../sb/Bollystake.sol#684)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in Bollystake.emergency_remove_stake(address) (../../sb/Bollystake.sol#1036-1048):
+	External calls:
+	- BOLLY.transfer(_user,locked_amount) (../../sb/Bollystake.sol#1046)
+	Event emitted after the call(s):
+	- _remove_stake(locked_amount,_user) (../../sb/Bollystake.sol#1047)
+Reentrancy in Bollystake.enter_stake(uint256,uint256) (../../sb/Bollystake.sol#948-980):
+	External calls:
+	- BOLLY.transferFrom(msg.sender,address(this),_amount) (../../sb/Bollystake.sol#977)
+	Event emitted after the call(s):
+	- Transfer(address(0),account,amount) (../../sb/Bollystake.sol#686)
+		- _mint(msg.sender,_amount) (../../sb/Bollystake.sol#978)
+	- _enter_stake(_amount,msg.sender,_days) (../../sb/Bollystake.sol#979)
+Reentrancy in Bollystake.remove_stake() (../../sb/Bollystake.sol#1020-1034):
+	External calls:
+	- BOLLY.transfer(msg.sender,expired_amount) (../../sb/Bollystake.sol#1032)
+	Event emitted after the call(s):
+	- _remove_stake(expired_amount,msg.sender) (../../sb/Bollystake.sol#1033)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Bollystake.get_all_user_stakes() (../../sb/Bollystake.sol#916-933) uses timestamp for comparisons
+	Dangerous comparisons:
+	- user_stake[stakeholders[s]][k].expire > block.timestamp (../../sb/Bollystake.sol#925)
+Bollystake.expired_stakes(address) (../../sb/Bollystake.sol#935-945) uses timestamp for comparisons
+	Dangerous comparisons:
+	- user_stake_info[s].expire < block.timestamp (../../sb/Bollystake.sol#940)
+Bollystake.relock_stake(uint256) (../../sb/Bollystake.sol#982-1016) uses timestamp for comparisons
+	Dangerous comparisons:
+	- user_stake_info[s].expire < block.timestamp (../../sb/Bollystake.sol#989)
+Bollystake.remove_stake() (../../sb/Bollystake.sol#1020-1034) uses timestamp for comparisons
+	Dangerous comparisons:
+	- user_stake_info[s].expire < block.timestamp (../../sb/Bollystake.sol#1026)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Bollystake.relock_stake(uint256) (../../sb/Bollystake.sol#982-1016) compares to a boolean constant:
+	-require(bool,string)(_isStakeholder == true,only current stakeholders can relock stake) (../../sb/Bollystake.sol#984)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#boolean-equality
+
+Different versions of Solidity are used:
+	- Version used: ['^0.8.0', '^0.8.7']
+	- ^0.8.0 (../../sb/Bollystake.sol#1)
+	- ^0.8.0 (../../sb/Bollystake.sol#2)
+	- ^0.8.0 (../../sb/Bollystake.sol#3)
+	- ^0.8.0 (../../sb/Bollystake.sol#4)
+	- ^0.8.0 (../../sb/Bollystake.sol#5)
+	- ^0.8.0 (../../sb/Bollystake.sol#6)
+	- ^0.8.7 (../../sb/Bollystake.sol#7)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+
+Context._msgData() (../../sb/Bollystake.sol#254-256) is never used and should be removed
+SafeMath.div(uint256,uint256) (../../sb/Bollystake.sol#143-145) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/Bollystake.sol#199-208) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/Bollystake.sol#159-161) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/Bollystake.sol#225-234) is never used and should be removed
+SafeMath.mul(uint256,uint256) (../../sb/Bollystake.sol#129-131) is never used and should be removed
+SafeMath.sub(uint256,uint256,string) (../../sb/Bollystake.sol#176-185) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/Bollystake.sol#30-36) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/Bollystake.sol#72-77) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/Bollystake.sol#84-89) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/Bollystake.sol#55-65) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/Bollystake.sol#43-48) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.8.0 (../../sb/Bollystake.sol#1) allows old versions
+Pragma version^0.8.0 (../../sb/Bollystake.sol#2) allows old versions
+Pragma version^0.8.0 (../../sb/Bollystake.sol#3) allows old versions
+Pragma version^0.8.0 (../../sb/Bollystake.sol#4) allows old versions
+Pragma version^0.8.0 (../../sb/Bollystake.sol#5) allows old versions
+Pragma version^0.8.0 (../../sb/Bollystake.sol#6) allows old versions
+Pragma version^0.8.7 (../../sb/Bollystake.sol#7) allows old versions
+solc-0.8.27 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Struct Bollystake.locked (../../sb/Bollystake.sol#807-810) is not in CapWords
+Event Bollystake._set_owner(address,address) (../../sb/Bollystake.sol#1051) is not in CapWords
+Event Bollystake._enter_stake(uint256,address,uint256) (../../sb/Bollystake.sol#1052) is not in CapWords
+Event Bollystake._relock_stake(address,uint256,uint256) (../../sb/Bollystake.sol#1053) is not in CapWords
+Event Bollystake._remove_stake(uint256,address) (../../sb/Bollystake.sol#1054) is not in CapWords
+Parameter Bollystake.isStakeholder(address)._address (../../sb/Bollystake.sol#820) is not in mixedCase
+Parameter Bollystake.addStakeholder(address)._stakeholder (../../sb/Bollystake.sol#835) is not in mixedCase
+Parameter Bollystake.removeStakeholder(address)._stakeholder (../../sb/Bollystake.sol#846) is not in mixedCase
+Parameter Bollystake.stakeOf(address)._stakeholder (../../sb/Bollystake.sol#863) is not in mixedCase
+Function Bollystake.total_eligible_Stakes() (../../sb/Bollystake.sol#887-901) is not in mixedCase
+Function Bollystake.Eligible_stakes() (../../sb/Bollystake.sol#903-914) is not in mixedCase
+Function Bollystake.get_all_user_stakes() (../../sb/Bollystake.sol#916-933) is not in mixedCase
+Function Bollystake.expired_stakes(address) (../../sb/Bollystake.sol#935-945) is not in mixedCase
+Parameter Bollystake.expired_stakes(address)._stakeholder (../../sb/Bollystake.sol#935) is not in mixedCase
+Function Bollystake.enter_stake(uint256,uint256) (../../sb/Bollystake.sol#948-980) is not in mixedCase
+Parameter Bollystake.enter_stake(uint256,uint256)._amount (../../sb/Bollystake.sol#948) is not in mixedCase
+Parameter Bollystake.enter_stake(uint256,uint256)._days (../../sb/Bollystake.sol#948) is not in mixedCase
+Function Bollystake.relock_stake(uint256) (../../sb/Bollystake.sol#982-1016) is not in mixedCase
+Parameter Bollystake.relock_stake(uint256)._days (../../sb/Bollystake.sol#982) is not in mixedCase
+Function Bollystake.remove_stake() (../../sb/Bollystake.sol#1020-1034) is not in mixedCase
+Function Bollystake.emergency_remove_stake(address) (../../sb/Bollystake.sol#1036-1048) is not in mixedCase
+Parameter Bollystake.emergency_remove_stake(address)._user (../../sb/Bollystake.sol#1036) is not in mixedCase
+Variable Bollystake.BOLLY (../../sb/Bollystake.sol#791) is not in mixedCase
+Variable Bollystake.user_stake (../../sb/Bollystake.sol#812) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Variable Bollystake._TIMELOCK_30 (../../sb/Bollystake.sol#797) is too similar to Bollystake._TIMELOCK_60 (../../sb/Bollystake.sol#798)
+Variable Bollystake._TIMELOCK_30 (../../sb/Bollystake.sol#797) is too similar to Bollystake._TIMELOCK_90 (../../sb/Bollystake.sol#799)
+Variable Bollystake._TIMELOCK_60 (../../sb/Bollystake.sol#798) is too similar to Bollystake._TIMELOCK_90 (../../sb/Bollystake.sol#799)
+Variable Bollystake.expired_stakes(address)._stakeholder (../../sb/Bollystake.sol#935) is too similar to Bollystake.stakeholders (../../sb/Bollystake.sol#813)
+Variable Bollystake.stakeOf(address)._stakeholder (../../sb/Bollystake.sol#863) is too similar to Bollystake.stakeholders (../../sb/Bollystake.sol#813)
+Variable Bollystake.removeStakeholder(address)._stakeholder (../../sb/Bollystake.sol#846) is too similar to Bollystake.stakeholders (../../sb/Bollystake.sol#813)
+Variable Bollystake.addStakeholder(address)._stakeholder (../../sb/Bollystake.sol#835) is too similar to Bollystake.stakeholders (../../sb/Bollystake.sol#813)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+Bollystake.users (../../sb/Bollystake.sol#811) is never used in Bollystake (../../sb/Bollystake.sol#788-1055)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-state-variable
+
+Loop condition s < stakeholders.length (../../sb/Bollystake.sol#908) should use cached array length instead of referencing `length` member of the storage array.
+ Loop condition s < stakeholders.length (../../sb/Bollystake.sol#921) should use cached array length instead of referencing `length` member of the storage array.
+ Loop condition s < stakeholders.length (../../sb/Bollystake.sol#825) should use cached array length instead of referencing `length` member of the storage array.
+ Loop condition s < stakeholders.length (../../sb/Bollystake.sol#881) should use cached array length instead of referencing `length` member of the storage array.
+ Loop condition s < stakeholders.length (../../sb/Bollystake.sol#895) should use cached array length instead of referencing `length` member of the storage array.
+ Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cache-array-length
+/sb/Bollystake.sol analyzed (7 contracts with 93 detectors), 71 result(s) found

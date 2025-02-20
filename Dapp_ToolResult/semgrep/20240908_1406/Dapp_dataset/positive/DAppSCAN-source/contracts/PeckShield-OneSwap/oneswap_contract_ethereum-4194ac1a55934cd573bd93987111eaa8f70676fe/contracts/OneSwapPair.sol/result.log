@@ -1,0 +1,234 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 57 Code Findings │
+└──────────────────┘
+                        
+    /sb/OneSwapPair.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          545┆ (bool success, bytes memory data) =                              
+  token.call(abi.encodeWithSelector(_SELECTOR, to, value));                     
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          693┆ constructor(address weth, address stockToken, address moneyToken,
+  bool isOnlySwap, uint64 stockUnit, uint64 priceMul, uint64 priceDiv) public   
+          694┆ OneSwapPool(weth, stockToken, moneyToken, isOnlySwap) {
+          695┆     _immuStockUnit = stockUnit;
+          696┆     _immuPriceMul = priceMul;
+          697┆     _immuPriceDiv = priceDiv;
+          698┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+         1069┆ for(uint32 i = 0; i < 100 && id <= _MAX_ID; i++) { //try 100     
+  times                                                                         
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           38┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+           93┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          265┆ require(DecFloat32.MinMantissa <= m && m <=                      
+  DecFloat32.MaxMantissa, "Invalid Price");                                     
+            ⋮┆----------------------------------------
+          502┆ require(_unlocked == 1, "OneSwap: LOCKED");
+            ⋮┆----------------------------------------
+          526┆ require(stockAmount < uint(1<<112) && moneyAmount < uint(1<<112),
+  "OneSwap: OVERFLOW");                                                         
+            ⋮┆----------------------------------------
+          539┆ require(stockAmount < uint(1<<112) && moneyAmount < uint(1<<112),
+  "OneSwap: OVERFLOW");                                                         
+            ⋮┆----------------------------------------
+          546┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), "OneSwap: TRANSFER_FAILED");                                        
+            ⋮┆----------------------------------------
+          561┆ require(success, "OneSwap: ETH_TRANSFER_FAILED");
+            ⋮┆----------------------------------------
+          592┆ require(stockBalance >= uint(bookedStock) + uint(reserveStock) &&
+          593┆         moneyBalance >= uint(bookedMoney) + uint(reserveMoney),  
+  "OneSwap: INVALID_BALANCE");                                                  
+            ⋮┆----------------------------------------
+          611┆ require(liquidity > 0, "OneSwap: INSUFFICIENT_MINTED");
+            ⋮┆----------------------------------------
+          625┆ require(stockBalance >= uint(reserveStock) && moneyBalance >=    
+  uint(reserveMoney), "OneSwap: INVALID_BALANCE");                              
+            ⋮┆----------------------------------------
+          632┆ require(stockAmount > 0 && moneyAmount > 0, "OneSwap:            
+  INSUFFICIENT_BURNED");                                                        
+            ⋮┆----------------------------------------
+          657┆ require(balanceStock >= uint(bookedStock) + uint(reserveStock) &&
+          658┆         balanceMoney >= uint(bookedMoney) + uint(reserveMoney),  
+  "OneSwap: INVALID_BALANCE");                                                  
+            ⋮┆----------------------------------------
+          669┆ require(balanceStock >= bookedStock && balanceMoney >=           
+  bookedMoney, "OneSwap: INVALID_BALANCE");                                     
+            ⋮┆----------------------------------------
+          862┆ require(msg.sender == order.sender, "OneSwap: NOT_OWNER");
+            ⋮┆----------------------------------------
+          880┆ require(ok, "OneSwap: NO_SUCH_ORDER");
+            ⋮┆----------------------------------------
+          883┆ require(id == firstID, "OneSwap: NOT_FIRST");
+            ⋮┆----------------------------------------
+          890┆ require(findIt, "OneSwap: INVALID_POSITION");
+            ⋮┆----------------------------------------
+          893┆ require(currID != 0, "OneSwap: REACH_END");
+            ⋮┆----------------------------------------
+         1054┆ require(order!=0, "OneSwap: INCONSISTENT_BOOK");
+            ⋮┆----------------------------------------
+         1075┆ require(false, "OneSwap: CANNOT_FIND_VALID_ID");
+            ⋮┆----------------------------------------
+         1091┆ require(_immuIsOnlySwap == false, "OneSwap:                      
+  LIMIT_ORDER_NOT_SUPPORTED");                                                  
+            ⋮┆----------------------------------------
+         1104┆ require((amount >> 42) == 0, "OneSwap: INVALID_AMOUNT");
+            ⋮┆----------------------------------------
+         1106┆ require(DecFloat32.MinMantissa <= m && m <=                      
+  DecFloat32.MaxMantissa, "OneSwap: INVALID_PRICE");                            
+            ⋮┆----------------------------------------
+         1118┆ require(ctx.remainAmount < uint(1<<112), "OneSwap: OVERFLOW");
+            ⋮┆----------------------------------------
+         1144┆ require(inputToken == _immuMoneyToken || inputToken ==           
+  _immuStockToken, "OneSwap: INVALID_TOKEN");                                   
+            ⋮┆----------------------------------------
+         1176┆ require(balance >= ctx.bookedMoney + ctx.reserveMoney, "OneSwap: 
+  MONEY_MISMATCH");                                                             
+            ⋮┆----------------------------------------
+         1184┆ require(balance >= ctx.bookedStock + ctx.reserveStock, "OneSwap: 
+  STOCK_MISMATCH");                                                             
+            ⋮┆----------------------------------------
+         1191┆ require(ctx.remainAmount <= diff, "OneSwap: DEPOSIT_NOT_ENOUGH");
+            ⋮┆----------------------------------------
+         1285┆ require(currTokenCanTrade < uint(1<<112), "OneSwap:              
+  CURR_TOKEN_TOO_LARGE");                                                       
+            ⋮┆----------------------------------------
+         1319┆ require(stockAmount < (1<<42), "OneSwap: STOCK_TOO_LARGE");
+            ⋮┆----------------------------------------
+         1360┆ require(amountToTaker < uint(1<<112), "OneSwap:                  
+  AMOUNT_TOO_LARGE");                                                           
+            ⋮┆----------------------------------------
+         1440┆ require(stock != money, "OneSwap: IDENTICAL_ADDRESSES");
+            ⋮┆----------------------------------------
+         1441┆ require(stock != address(0) && money != address(0), "OneSwap:    
+  ZERO_ADDRESS");                                                               
+            ⋮┆----------------------------------------
+         1442┆ require(pairs[stock][money] == address(0), "OneSwap:             
+  PAIR_EXISTS"); // single check is sufficient                                  
+            ⋮┆----------------------------------------
+         1444┆ require(25 >= dec && dec >= 6, "OneSwap:                         
+  DECIMALS_NOT_SUPPORTED");                                                     
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          265┆ require(DecFloat32.MinMantissa <= m && m <=                      
+  DecFloat32.MaxMantissa, "Invalid Price");                                     
+            ⋮┆----------------------------------------
+          526┆ require(stockAmount < uint(1<<112) && moneyAmount < uint(1<<112),
+  "OneSwap: OVERFLOW");                                                         
+            ⋮┆----------------------------------------
+          539┆ require(stockAmount < uint(1<<112) && moneyAmount < uint(1<<112),
+  "OneSwap: OVERFLOW");                                                         
+            ⋮┆----------------------------------------
+          546┆ require(success && (data.length == 0 || abi.decode(data,         
+  (bool))), "OneSwap: TRANSFER_FAILED");                                        
+            ⋮┆----------------------------------------
+          592┆ require(stockBalance >= uint(bookedStock) + uint(reserveStock) &&
+          593┆         moneyBalance >= uint(bookedMoney) + uint(reserveMoney),  
+  "OneSwap: INVALID_BALANCE");                                                  
+            ⋮┆----------------------------------------
+          625┆ require(stockBalance >= uint(reserveStock) && moneyBalance >=    
+  uint(reserveMoney), "OneSwap: INVALID_BALANCE");                              
+            ⋮┆----------------------------------------
+          632┆ require(stockAmount > 0 && moneyAmount > 0, "OneSwap:            
+  INSUFFICIENT_BURNED");                                                        
+            ⋮┆----------------------------------------
+          657┆ require(balanceStock >= uint(bookedStock) + uint(reserveStock) &&
+          658┆         balanceMoney >= uint(bookedMoney) + uint(reserveMoney),  
+  "OneSwap: INVALID_BALANCE");                                                  
+            ⋮┆----------------------------------------
+          669┆ require(balanceStock >= bookedStock && balanceMoney >=           
+  bookedMoney, "OneSwap: INVALID_BALANCE");                                     
+            ⋮┆----------------------------------------
+         1106┆ require(DecFloat32.MinMantissa <= m && m <=                      
+  DecFloat32.MaxMantissa, "OneSwap: INVALID_PRICE");                            
+            ⋮┆----------------------------------------
+         1441┆ require(stock != address(0) && money != address(0), "OneSwap:    
+  ZERO_ADDRESS");                                                               
+            ⋮┆----------------------------------------
+         1444┆ require(25 >= dec && dec >= 6, "OneSwap:                         
+  DECIMALS_NOT_SUPPORTED");                                                     
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          552┆ if (token == _immuWETH && isLastPath) {
+          553┆     IWETH(_immuWETH).withdraw(amount);
+          554┆     _safeTransferETH(to, amount);
+          555┆ } else {
+          556┆     _safeTransfer(token, to, amount);
+          557┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+         1051┆ count++;
+            ⋮┆----------------------------------------
+         1069┆ for(uint32 i = 0; i < 100 && id <= _MAX_ID; i++) { //try 100     
+  times                                                                         
+            ⋮┆----------------------------------------
+         1073┆ id++;
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           93┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+         1091┆ require(_immuIsOnlySwap == false, "OneSwap:                      
+  LIMIT_ORDER_NOT_SUPPORTED");                                                  
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 57 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

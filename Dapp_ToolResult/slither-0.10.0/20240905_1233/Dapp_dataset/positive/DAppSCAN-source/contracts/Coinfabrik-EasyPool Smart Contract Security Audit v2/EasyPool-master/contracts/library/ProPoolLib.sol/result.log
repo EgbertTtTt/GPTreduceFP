@@ -1,0 +1,207 @@
+'solc --version' running
+'solc /sb/ProPoolLib.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/ProPoolLib.sol:
+/sb/ProPoolLib.sol:926:9: Warning: Uninitialized storage pointer.
+        Group storage group;
+        ^-----------------^
+/sb/ProPoolLib.sol:982:9: Warning: Uninitialized storage pointer.
+        Group storage group;
+        ^-----------------^
+/sb/ProPoolLib.sol:1033:9: Warning: Uninitialized storage pointer.
+        Group storage group;
+        ^-----------------^
+/sb/ProPoolLib.sol:1165:9: Warning: Uninitialized storage pointer.
+        QuotaLib.Storage storage quota;
+        ^----------------------------^
+/sb/ProPoolLib.sol:1272:9: Warning: Uninitialized storage pointer.
+        Participant storage participant;        
+        ^-----------------------------^
+/sb/ProPoolLib.sol:1350:9: Warning: Uninitialized storage pointer.
+        Participant storage participant;         
+        ^-----------------------------^
+/sb/ProPoolLib.sol:1522:9: Warning: Uninitialized storage pointer.
+        Group storage group;
+        ^-----------------^
+/sb/ProPoolLib.sol:1551:9: Warning: Uninitialized storage pointer.
+        Group storage group;
+        ^-----------------^
+
+
+ProPoolLib.addressTransfer(address,uint256) (../../sb/ProPoolLib.sol#1431-1437) sends eth to arbitrary user
+	Dangerous calls:
+	- destination.transfer(etherAmount) (../../sb/ProPoolLib.sol#1436)
+ProPoolLib.addressCall(address,uint256,uint256,bytes) (../../sb/ProPoolLib.sol#1449-1462) sends eth to arbitrary user
+	Dangerous calls:
+	- require(bool)(destination.call.gas(gasAmount).value(etherAmount)(data)) (../../sb/ProPoolLib.sol#1456-1461)
+	- require(bool)(destination.call.gas(gasleft()()).value(etherAmount)(data)) (../../sb/ProPoolLib.sol#1456-1461)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#functions-that-send-ether-to-arbitrary-destinations
+
+ProPoolLib (../../sb/ProPoolLib.sol#163-1764) contract sets array length with a user-controlled value:
+	- pool.tokenAddresses.push(tokenAddress) (../../sb/ProPoolLib.sol#495)
+ProPoolLib (../../sb/ProPoolLib.sol#163-1764) contract sets array length with a user-controlled value:
+	- pool.participants.push(admin) (../../sb/ProPoolLib.sol#1422)
+ProPoolLib (../../sb/ProPoolLib.sol#163-1764) contract sets array length with a user-controlled value:
+	- pool.participants.push(include[i]) (../../sb/ProPoolLib.sol#1300)
+ProPoolLib (../../sb/ProPoolLib.sol#163-1764) contract sets array length with a user-controlled value:
+	- pool.admins.push(admin) (../../sb/ProPoolLib.sol#1423)
+ProPoolLib (../../sb/ProPoolLib.sol#163-1764) contract sets array length with a user-controlled value:
+	- pool.participants.push(msg.sender) (../../sb/ProPoolLib.sol#619)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#array-length-assignment
+
+ProPoolLib.withdrawAllContribution(ProPoolLib.Pool).amount (../../sb/ProPoolLib.sol#929) is a local variable never initialized
+ProPoolLib.withdrawAllRemaining1(ProPoolLib.Pool).amount (../../sb/ProPoolLib.sol#984) is a local variable never initialized
+ProPoolLib.withdrawAllRemaining2(ProPoolLib.Pool).sumRemaining (../../sb/ProPoolLib.sol#1034) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+QuotaLib.claimShare(QuotaLib.Storage,address,uint256,uint256[2]).share (../../sb/ProPoolLib.sol#122) shadows:
+	- QuotaLib.share(uint256,uint256[2]) (../../sb/ProPoolLib.sol#153-155) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+ProPoolLib.getPoolDetails2(ProPoolLib.Pool) (../../sb/ProPoolLib.sol#792-813) has external calls inside a loop: tokenBalances[i] = IERC20Base(tokenAddresses[i]).balanceOf(address(this)) (../../sb/ProPoolLib.sol#810)
+ProPoolLib.getParticipantShares(ProPoolLib.Pool,address) (../../sb/ProPoolLib.sol#847-882) has external calls inside a loop: tokenShare[i] = pool.tokenQuota[pool.tokenAddresses[i]].calcShare(addr,IERC20Base(pool.tokenAddresses[i]).balanceOf(address(this)),(netPartContribution,netPoolContribution)) (../../sb/ProPoolLib.sol#874-878)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in ProPoolLib.confirmTokenAddress(ProPoolLib.Pool,address) (../../sb/ProPoolLib.sol#472-501):
+	External calls:
+	- balance = ERC20.balanceOf(address(this)) (../../sb/ProPoolLib.sol#483)
+	Event emitted after the call(s):
+	- StateChanged(uint256(pool.state),uint256(state)) (../../sb/ProPoolLib.sol#1405-1408)
+		- changeState(pool,State.Distribution) (../../sb/ProPoolLib.sol#490)
+Reentrancy in ProPoolLib.confirmTokenAddress(ProPoolLib.Pool,address) (../../sb/ProPoolLib.sol#472-501):
+	External calls:
+	- balance = ERC20.balanceOf(address(this)) (../../sb/ProPoolLib.sol#483)
+	- sendFees(pool) (../../sb/ProPoolLib.sol#491)
+		- pool.feeService.sendFee.value(svcFee)(creator) (../../sb/ProPoolLib.sol#1332)
+	External calls sending eth:
+	- sendFees(pool) (../../sb/ProPoolLib.sol#491)
+		- destination.transfer(etherAmount) (../../sb/ProPoolLib.sol#1436)
+		- pool.feeService.sendFee.value(svcFee)(creator) (../../sb/ProPoolLib.sol#1332)
+	Event emitted after the call(s):
+	- AddressTransfer(destination,etherAmount) (../../sb/ProPoolLib.sol#1432-1435)
+		- sendFees(pool) (../../sb/ProPoolLib.sol#491)
+	- FeesDistributed(ctorFee,svcFee) (../../sb/ProPoolLib.sol#1335-1338)
+		- sendFees(pool) (../../sb/ProPoolLib.sol#491)
+	- TokenAddressConfirmed(tokenAddress,balance) (../../sb/ProPoolLib.sol#497-500)
+Reentrancy in ProPoolLib.init(ProPoolLib.Pool,uint256,uint256,uint256,uint256,bool,address,address,address,address[],address[]) (../../sb/ProPoolLib.sol#337-392):
+	External calls:
+	- pool.svcFeePerEther = pool.feeService.getFeePerEther() (../../sb/ProPoolLib.sol#362)
+	Event emitted after the call(s):
+	- AdminAdded(admin) (../../sb/ProPoolLib.sol#1425)
+		- addAdmin(pool,creatorAddress) (../../sb/ProPoolLib.sol#371)
+	- AdminAdded(admin) (../../sb/ProPoolLib.sol#1425)
+		- addAdmin(pool,admins[i]) (../../sb/ProPoolLib.sol#373)
+	- ExcludedFromWhitelist(exclude[i],idx) (../../sb/ProPoolLib.sol#1286-1289)
+		- modifyWhitelistCore(pool,0,whitelist,new address[](0)) (../../sb/ProPoolLib.sol#390)
+	- FeeServiceAttached(feeServiceAddr,pool.svcFeePerEther) (../../sb/ProPoolLib.sol#364-367)
+	- GroupSettingsChanged(idx,maxBalance,minContribution,maxContribution,ctorFeePerEther,isRestricted) (../../sb/ProPoolLib.sol#1253-1260)
+		- setGroupSettingsCore(pool,0,maxBalance,minContribution,maxContribution,ctorFeePerEther,isRestricted) (../../sb/ProPoolLib.sol#377-385)
+	- IncludedInWhitelist(include[i],idx) (../../sb/ProPoolLib.sol#1306-1309)
+		- modifyWhitelistCore(pool,0,whitelist,new address[](0)) (../../sb/ProPoolLib.sol#390)
+	- WhitelistEnabled(idx) (../../sb/ProPoolLib.sol#1278)
+		- modifyWhitelistCore(pool,0,whitelist,new address[](0)) (../../sb/ProPoolLib.sol#390)
+Reentrancy in ProPoolLib.sendFees(ProPoolLib.Pool) (../../sb/ProPoolLib.sol#1318-1339):
+	External calls:
+	- pool.feeService.sendFee.value(svcFee)(creator) (../../sb/ProPoolLib.sol#1332)
+	External calls sending eth:
+	- addressTransfer(msg.sender,ctorFee) (../../sb/ProPoolLib.sol#1325)
+		- destination.transfer(etherAmount) (../../sb/ProPoolLib.sol#1436)
+	- pool.feeService.sendFee.value(svcFee)(creator) (../../sb/ProPoolLib.sol#1332)
+	Event emitted after the call(s):
+	- FeesDistributed(ctorFee,svcFee) (../../sb/ProPoolLib.sol#1335-1338)
+Reentrancy in ProPoolLib.withdrawTokens(ProPoolLib.Pool,uint256,uint256) (../../sb/ProPoolLib.sol#1153-1201):
+	External calls:
+	- tokenBalance = tokenContract.balanceOf(address(this)) (../../sb/ProPoolLib.sol#1174)
+	- succeeded = tokenContract.transfer(msg.sender,tokenAmount) (../../sb/ProPoolLib.sol#1187)
+	Event emitted after the call(s):
+	- TokenWithdrawal(tokenAddress,msg.sender,tokenBalance,tokenAmount,succeeded) (../../sb/ProPoolLib.sol#1191-1197)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+ProPoolLib.addressCall(address,uint256,uint256,bytes) (../../sb/ProPoolLib.sol#1449-1462) tries to limit the gas of an external call that controls implicit decoding
+	require(bool)(destination.call.gas(gasAmount).value(etherAmount)(data)) (../../sb/ProPoolLib.sol#1456-1461)
+	require(bool)(destination.call.gas(gasleft()()).value(etherAmount)(data)) (../../sb/ProPoolLib.sol#1456-1461)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#return-bomb
+
+Math.average(uint256,uint256) (../../sb/ProPoolLib.sol#33-36) is never used and should be removed
+Math.max(uint256,uint256) (../../sb/ProPoolLib.sol#25-27) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/ProPoolLib.sol#97-100) is never used and should be removed
+SafeMath.sub(uint256,uint256) (../../sb/ProPoolLib.sol#76-81) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.4.24 (../../sb/ProPoolLib.sol#1) allows old versions
+solc-0.4.26 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in ProPoolLib.addressCall(address,uint256,uint256,bytes) (../../sb/ProPoolLib.sol#1449-1462):
+	- require(bool)(destination.call.gas(gasAmount).value(etherAmount)(data)) (../../sb/ProPoolLib.sol#1456-1461)
+	- require(bool)(destination.call.gas(gasleft()()).value(etherAmount)(data)) (../../sb/ProPoolLib.sol#1456-1461)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter Math.max(uint256,uint256)._a (../../sb/ProPoolLib.sol#25) is not in mixedCase
+Parameter Math.max(uint256,uint256)._b (../../sb/ProPoolLib.sol#25) is not in mixedCase
+Parameter Math.min(uint256,uint256)._a (../../sb/ProPoolLib.sol#29) is not in mixedCase
+Parameter Math.min(uint256,uint256)._b (../../sb/ProPoolLib.sol#29) is not in mixedCase
+Parameter Math.average(uint256,uint256)._a (../../sb/ProPoolLib.sol#33) is not in mixedCase
+Parameter Math.average(uint256,uint256)._b (../../sb/ProPoolLib.sol#33) is not in mixedCase
+Parameter SafeMath.mul(uint256,uint256)._a (../../sb/ProPoolLib.sol#48) is not in mixedCase
+Parameter SafeMath.mul(uint256,uint256)._b (../../sb/ProPoolLib.sol#48) is not in mixedCase
+Parameter SafeMath.div(uint256,uint256)._a (../../sb/ProPoolLib.sol#65) is not in mixedCase
+Parameter SafeMath.div(uint256,uint256)._b (../../sb/ProPoolLib.sol#65) is not in mixedCase
+Parameter SafeMath.sub(uint256,uint256)._a (../../sb/ProPoolLib.sol#76) is not in mixedCase
+Parameter SafeMath.sub(uint256,uint256)._b (../../sb/ProPoolLib.sol#76) is not in mixedCase
+Parameter SafeMath.add(uint256,uint256)._a (../../sb/ProPoolLib.sol#86) is not in mixedCase
+Parameter SafeMath.add(uint256,uint256)._b (../../sb/ProPoolLib.sol#86) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Reentrancy in ProPoolLib.confirmTokenAddress(ProPoolLib.Pool,address) (../../sb/ProPoolLib.sol#472-501):
+	External calls:
+	- sendFees(pool) (../../sb/ProPoolLib.sol#491)
+		- destination.transfer(etherAmount) (../../sb/ProPoolLib.sol#1436)
+	External calls sending eth:
+	- sendFees(pool) (../../sb/ProPoolLib.sol#491)
+		- destination.transfer(etherAmount) (../../sb/ProPoolLib.sol#1436)
+		- pool.feeService.sendFee.value(svcFee)(creator) (../../sb/ProPoolLib.sol#1332)
+	Event emitted after the call(s):
+	- TokenAddressConfirmed(tokenAddress,balance) (../../sb/ProPoolLib.sol#497-500)
+Reentrancy in ProPoolLib.sendFees(ProPoolLib.Pool) (../../sb/ProPoolLib.sol#1318-1339):
+	External calls:
+	- addressTransfer(msg.sender,ctorFee) (../../sb/ProPoolLib.sol#1325)
+		- destination.transfer(etherAmount) (../../sb/ProPoolLib.sol#1436)
+	External calls sending eth:
+	- addressTransfer(msg.sender,ctorFee) (../../sb/ProPoolLib.sol#1325)
+		- destination.transfer(etherAmount) (../../sb/ProPoolLib.sol#1436)
+	- pool.feeService.sendFee.value(svcFee)(creator) (../../sb/ProPoolLib.sol#1332)
+	Event emitted after the call(s):
+	- FeesDistributed(ctorFee,svcFee) (../../sb/ProPoolLib.sol#1335-1338)
+Reentrancy in ProPoolLib.withdrawAmount(ProPoolLib.Pool,uint256,uint256) (../../sb/ProPoolLib.sol#645-701):
+	External calls:
+	- addressTransfer(msg.sender,finalAmount) (../../sb/ProPoolLib.sol#690)
+		- destination.transfer(etherAmount) (../../sb/ProPoolLib.sol#1436)
+	Event emitted after the call(s):
+	- Withdrawal(msg.sender,finalAmount,participant.contribution[idx],0,group.contribution,group.remaining,idx) (../../sb/ProPoolLib.sol#692-700)
+Reentrancy in ProPoolLib.withdrawRefundAndTokens(ProPoolLib.Pool) (../../sb/ProPoolLib.sol#1080-1116):
+	External calls:
+	- (poolContribution,poolRemaining,poolCtorFee,partContribution,partCtorFee) = withdrawAllRemaining2(pool) (../../sb/ProPoolLib.sol#1088-1093)
+		- destination.transfer(etherAmount) (../../sb/ProPoolLib.sol#1436)
+	- withdrawRefundShare(pool,poolRemaining,netPoolContribution,netPartContribution) (../../sb/ProPoolLib.sol#1101)
+		- destination.transfer(etherAmount) (../../sb/ProPoolLib.sol#1436)
+	Event emitted after the call(s):
+	- AddressTransfer(destination,etherAmount) (../../sb/ProPoolLib.sol#1432-1435)
+		- withdrawRefundShare(pool,poolRemaining,netPoolContribution,netPartContribution) (../../sb/ProPoolLib.sol#1101)
+	- RefundWithdrawal(msg.sender,address(this).balance,poolRemaining,amount) (../../sb/ProPoolLib.sol#1140-1145)
+		- withdrawRefundShare(pool,poolRemaining,netPoolContribution,netPartContribution) (../../sb/ProPoolLib.sol#1101)
+	- TokenWithdrawal(tokenAddress,msg.sender,tokenBalance,tokenAmount,succeeded) (../../sb/ProPoolLib.sol#1191-1197)
+		- withdrawTokens(pool,netPoolContribution,netPartContribution) (../../sb/ProPoolLib.sol#1114)
+Reentrancy in ProPoolLib.withdrawRefundShare(ProPoolLib.Pool,uint256,uint256,uint256) (../../sb/ProPoolLib.sol#1121-1148):
+	External calls:
+	- addressTransfer(msg.sender,amount) (../../sb/ProPoolLib.sol#1139)
+		- destination.transfer(etherAmount) (../../sb/ProPoolLib.sol#1436)
+	Event emitted after the call(s):
+	- RefundWithdrawal(msg.sender,address(this).balance,poolRemaining,amount) (../../sb/ProPoolLib.sol#1140-1145)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-4
+
+modifyWhitelist(ProPoolLib.Pool,uint256,address[],address[]) should be declared external:
+	- ProPoolLib.modifyWhitelist(ProPoolLib.Pool,uint256,address[],address[]) (../../sb/ProPoolLib.sol#434-443)
+tokenFallback(ProPoolLib.Pool,address,uint256,bytes) should be declared external:
+	- ProPoolLib.tokenFallback(ProPoolLib.Pool,address,uint256,bytes) (../../sb/ProPoolLib.sol#733-743)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#public-function-that-could-be-declared-external
+/sb/ProPoolLib.sol analyzed (6 contracts with 93 detectors), 47 result(s) found

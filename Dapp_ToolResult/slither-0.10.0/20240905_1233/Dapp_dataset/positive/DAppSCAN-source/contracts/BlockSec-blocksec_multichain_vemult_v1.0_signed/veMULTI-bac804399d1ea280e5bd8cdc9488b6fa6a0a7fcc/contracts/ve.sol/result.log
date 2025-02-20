@@ -1,0 +1,284 @@
+'solc --version' running
+'solc /sb/ve.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/ve.sol:
+Warning: Contract code size is 25933 bytes and exceeds 24576 bytes (a limit introduced in Spurious Dragon). This contract may not be deployable on mainnet. Consider enabling the optimizer (with a low "runs" value!), turning off revert strings, or using libraries.
+   --> /sb/ve.sol:334:1:
+    |
+334 | contract ve is IERC721, IERC721Metadata {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+ve.toString(uint256) (../../sb/ve.sol#1310-1330) uses a weak PRNG: "buffer[digits] = bytes1(uint8(48 + uint256(value % 10))) (../../sb/ve.sol#1326)" 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#weak-PRNG
+
+Base64.encode(bytes) (../../sb/ve.sol#35-85) performs a multiplication on the result of a division:
+	- encodedLen = 4 * ((len + 2) / 3) (../../sb/ve.sol#40)
+ve._checkpoint(uint256,LockedBalance,LockedBalance) (../../sb/ve.sol#771-906) performs a multiplication on the result of a division:
+	- t_i = (last_checkpoint / WEEK) * WEEK (../../sb/ve.sol#825)
+ve._create_lock(uint256,uint256,address) (../../sb/ve.sol#1018-1031) performs a multiplication on the result of a division:
+	- unlock_time = (block.timestamp + _lock_duration) / WEEK * WEEK (../../sb/ve.sol#1019)
+ve.increase_unlock_time(uint256,uint256) (../../sb/ve.sol#1064-1076) performs a multiplication on the result of a division:
+	- unlock_time = (block.timestamp + _lock_duration) / WEEK * WEEK (../../sb/ve.sol#1068)
+ve._supply_at(Point,uint256) (../../sb/ve.sol#1237-1260) performs a multiplication on the result of a division:
+	- t_i = (last_point.ts / WEEK) * WEEK (../../sb/ve.sol#1239)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+ve._checkpoint(uint256,LockedBalance,LockedBalance) (../../sb/ve.sol#771-906) uses a dangerous strict equality:
+	- new_locked.end == old_locked.end (../../sb/ve.sol#799)
+ve._checkpoint(uint256,LockedBalance,LockedBalance) (../../sb/ve.sol#771-906) uses a dangerous strict equality:
+	- t_i == block.timestamp (../../sb/ve.sol#850)
+ve._checkpoint(uint256,LockedBalance,LockedBalance) (../../sb/ve.sol#771-906) uses a dangerous strict equality:
+	- new_locked.end == old_locked.end (../../sb/ve.sol#885)
+ve._supply_at(Point,uint256) (../../sb/ve.sol#1237-1260) uses a dangerous strict equality:
+	- t_i == t (../../sb/ve.sol#1249)
+ve.balanceOfNFT(uint256) (../../sb/ve.sol#1166-1169) uses a dangerous strict equality:
+	- ownership_change[_tokenId] == block.number (../../sb/ve.sol#1167)
+ve.toString(uint256) (../../sb/ve.sol#1310-1330) uses a dangerous strict equality:
+	- value == 0 (../../sb/ve.sol#1314)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Reentrancy in ve.withdraw(uint256) (../../sb/ve.sol#1080-1104):
+	External calls:
+	- assert(bool)(IERC20(token).transfer(msg.sender,value)) (../../sb/ve.sol#1097)
+	State variables written after the call(s):
+	- _burn(_tokenId) (../../sb/ve.sol#1100)
+		- idToApprovals[_tokenId] = _approved (../../sb/ve.sol#735)
+	ve.idToApprovals (../../sb/ve.sol#388) can be used in cross function reentrancies:
+	- ve._clearApproval(address,uint256) (../../sb/ve.sol#597-604)
+	- ve._isApprovedOrOwner(address,uint256) (../../sb/ve.sol#517-523)
+	- ve.approve(address,uint256) (../../sb/ve.sol#724-737)
+	- ve.getApproved(uint256) (../../sb/ve.sol#497-499)
+	- _burn(_tokenId) (../../sb/ve.sol#1100)
+		- idToOwner[_tokenId] = address(0) (../../sb/ve.sol#588)
+	ve.idToOwner (../../sb/ve.sol#385) can be used in cross function reentrancies:
+	- ve._addTokenTo(address,uint256) (../../sb/ve.sol#571-580)
+	- ve._clearApproval(address,uint256) (../../sb/ve.sol#597-604)
+	- ve._isApprovedOrOwner(address,uint256) (../../sb/ve.sol#517-523)
+	- ve._removeTokenFrom(address,uint256) (../../sb/ve.sol#584-593)
+	- ve.approve(address,uint256) (../../sb/ve.sol#724-737)
+	- ve.ownerOf(uint256) (../../sb/ve.sol#491-493)
+	- ve.tokenURI(uint256) (../../sb/ve.sol#1154-1164)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+ve._checkpoint(uint256,LockedBalance,LockedBalance).u_new (../../sb/ve.sol#777) is a local variable never initialized
+ve._checkpoint(uint256,LockedBalance,LockedBalance).u_old (../../sb/ve.sol#776) is a local variable never initialized
+ve._deposit_for(uint256,uint256,uint256,LockedBalance,ve.DepositType).old_locked (../../sb/ve.sol#925) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+ve.safeTransferFrom(address,address,uint256,bytes) (../../sb/ve.sol#675-697) ignores return value by IERC721Receiver(_to).onERC721Received(msg.sender,_from,_tokenId,_data) (../../sb/ve.sol#685-695)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+ve._tokenURI(uint256,uint256,uint256,uint256).output (../../sb/ve.sol#1299) is written in both
+	output = string(abi.encodePacked(output,value ,toString(_value),</text></svg>)) (../../sb/ve.sol#1304)
+	output = string(abi.encodePacked(data:application/json;base64,,json)) (../../sb/ve.sol#1307)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#write-after-write
+
+ve.constructor(address).token_addr (../../sb/ve.sol#428) lacks a zero-check on :
+		- token = token_addr (../../sb/ve.sol#430)
+ve.setVoter(address)._voter (../../sb/ve.sol#949) lacks a zero-check on :
+		- voter = _voter (../../sb/ve.sol#951)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in ve.withdraw(uint256) (../../sb/ve.sol#1080-1104):
+	External calls:
+	- assert(bool)(IERC20(token).transfer(msg.sender,value)) (../../sb/ve.sol#1097)
+	State variables written after the call(s):
+	- _burn(_tokenId) (../../sb/ve.sol#1100)
+		- ownerToNFTokenCount[_from] -= 1 (../../sb/ve.sol#592)
+	- _burn(_tokenId) (../../sb/ve.sol#1100)
+		- ownerToNFTokenIdList[_from][current_count] = 0 (../../sb/ve.sol#549)
+		- ownerToNFTokenIdList[_from][current_index] = lastTokenId (../../sb/ve.sol#557)
+		- ownerToNFTokenIdList[_from][current_count] = 0 (../../sb/ve.sol#563)
+	- _burn(_tokenId) (../../sb/ve.sol#1100)
+		- tokenToOwnerIndex[_tokenId] = 0 (../../sb/ve.sol#551)
+		- tokenToOwnerIndex[lastTokenId] = current_index (../../sb/ve.sol#559)
+		- tokenToOwnerIndex[_tokenId] = 0 (../../sb/ve.sol#565)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in ve._deposit_for(uint256,uint256,uint256,LockedBalance,ve.DepositType) (../../sb/ve.sol#914-947):
+	External calls:
+	- assert(bool)(IERC20(token).transferFrom(from,address(this),_value)) (../../sb/ve.sol#942)
+	Event emitted after the call(s):
+	- Deposit(from,_tokenId,_value,_locked.end,deposit_type,block.timestamp) (../../sb/ve.sol#945)
+	- Supply(supply_before,supply_before + _value) (../../sb/ve.sol#946)
+Reentrancy in ve.withdraw(uint256) (../../sb/ve.sol#1080-1104):
+	External calls:
+	- assert(bool)(IERC20(token).transfer(msg.sender,value)) (../../sb/ve.sol#1097)
+	Event emitted after the call(s):
+	- Approval(owner,_approved,_tokenId) (../../sb/ve.sol#736)
+		- _burn(_tokenId) (../../sb/ve.sol#1100)
+	- Supply(supply_before,supply_before - value) (../../sb/ve.sol#1103)
+	- Transfer(owner,address(0),_tokenId) (../../sb/ve.sol#1341)
+		- _burn(_tokenId) (../../sb/ve.sol#1100)
+	- Withdraw(msg.sender,_tokenId,value,block.timestamp) (../../sb/ve.sol#1102)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+ve._checkpoint(uint256,LockedBalance,LockedBalance) (../../sb/ve.sol#771-906) uses timestamp for comparisons
+	Dangerous comparisons:
+	- old_locked.end > block.timestamp && old_locked.amount > 0 (../../sb/ve.sol#785)
+	- new_locked.end > block.timestamp && new_locked.amount > 0 (../../sb/ve.sol#789)
+	- new_locked.end != 0 (../../sb/ve.sol#798)
+	- new_locked.end == old_locked.end (../../sb/ve.sol#799)
+	- block.timestamp > last_point.ts (../../sb/ve.sol#817)
+	- t_i > block.timestamp (../../sb/ve.sol#831)
+	- last_point.bias < 0 (../../sb/ve.sol#838)
+	- last_point.slope < 0 (../../sb/ve.sol#842)
+	- t_i == block.timestamp (../../sb/ve.sol#850)
+	- last_point.slope < 0 (../../sb/ve.sol#867)
+	- last_point.bias < 0 (../../sb/ve.sol#870)
+	- old_locked.end > block.timestamp (../../sb/ve.sol#882)
+	- new_locked.end == old_locked.end (../../sb/ve.sol#885)
+	- new_locked.end > block.timestamp (../../sb/ve.sol#891)
+	- new_locked.end > old_locked.end (../../sb/ve.sol#892)
+ve._deposit_for(uint256,uint256,uint256,LockedBalance,ve.DepositType) (../../sb/ve.sol#914-947) uses timestamp for comparisons
+	Dangerous comparisons:
+	- unlock_time != 0 (../../sb/ve.sol#929)
+ve.deposit_for(uint256,uint256) (../../sb/ve.sol#1005-1012) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(_locked.end > block.timestamp,Cannot add to expired lock. Withdraw) (../../sb/ve.sol#1010)
+ve._create_lock(uint256,uint256,address) (../../sb/ve.sol#1018-1031) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(unlock_time > block.timestamp,Can only lock until time in the future) (../../sb/ve.sol#1022)
+	- require(bool,string)(unlock_time <= block.timestamp + MAXTIME,Voting lock can be 4 years max) (../../sb/ve.sol#1023)
+ve.increase_amount(uint256,uint256) (../../sb/ve.sol#1050-1060) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(_locked.end > block.timestamp,Cannot add to expired lock. Withdraw) (../../sb/ve.sol#1057)
+ve.increase_unlock_time(uint256,uint256) (../../sb/ve.sol#1064-1076) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(_locked.end > block.timestamp,Lock expired) (../../sb/ve.sol#1070)
+	- require(bool,string)(unlock_time > _locked.end,Can only increase lock duration) (../../sb/ve.sol#1072)
+	- require(bool,string)(unlock_time <= block.timestamp + MAXTIME,Voting lock can be 4 years max) (../../sb/ve.sol#1073)
+ve.withdraw(uint256) (../../sb/ve.sol#1080-1104) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp >= _locked.end,The lock didn't expire) (../../sb/ve.sol#1085)
+ve._find_block_epoch(uint256,uint256) (../../sb/ve.sol#1114-1131) uses timestamp for comparisons
+	Dangerous comparisons:
+	- point_history[_mid].blk <= _block (../../sb/ve.sol#1124)
+ve._balanceOfNFT(uint256,uint256) (../../sb/ve.sol#1138-1150) uses timestamp for comparisons
+	Dangerous comparisons:
+	- last_point.bias < 0 (../../sb/ve.sol#1145)
+ve._balanceOfAtNFT(uint256,uint256) (../../sb/ve.sol#1180-1227) uses timestamp for comparisons
+	Dangerous comparisons:
+	- d_block != 0 (../../sb/ve.sol#1217)
+	- upoint.bias >= 0 (../../sb/ve.sol#1222)
+ve._supply_at(Point,uint256) (../../sb/ve.sol#1237-1260) uses timestamp for comparisons
+	Dangerous comparisons:
+	- t_i > t (../../sb/ve.sol#1243)
+	- t_i == t (../../sb/ve.sol#1249)
+	- last_point.bias < 0 (../../sb/ve.sol#1256)
+ve.totalSupplyAt(uint256) (../../sb/ve.sol#1278-1297) uses timestamp for comparisons
+	Dangerous comparisons:
+	- point.blk != point_next.blk (../../sb/ve.sol#1287)
+	- point.blk != block.number (../../sb/ve.sol#1291)
+ve.toString(uint256) (../../sb/ve.sol#1310-1330) uses timestamp for comparisons
+	Dangerous comparisons:
+	- value == 0 (../../sb/ve.sol#1314)
+	- temp != 0 (../../sb/ve.sol#1319)
+	- value != 0 (../../sb/ve.sol#1324)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Base64.encode(bytes) (../../sb/ve.sol#35-85) uses assembly
+	- INLINE ASM (../../sb/ve.sol#47-82)
+ve._isContract(address) (../../sb/ve.sol#651-660) uses assembly
+	- INLINE ASM (../../sb/ve.sol#656-658)
+ve.safeTransferFrom(address,address,uint256,bytes) (../../sb/ve.sol#675-697) uses assembly
+	- INLINE ASM (../../sb/ve.sol#691-693)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+ve._checkpoint(uint256,LockedBalance,LockedBalance) (../../sb/ve.sol#771-906) has a high cyclomatic complexity (21).
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cyclomatic-complexity
+
+Pragma version0.8.11 (../../sb/ve.sol#1) allows old versions
+solc-0.8.11 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Contract ve (../../sb/ve.sol#334-1343) is not in CapWords
+Parameter ve.supportsInterface(bytes4)._interfaceID (../../sb/ve.sol#447) is not in mixedCase
+Function ve.get_last_user_slope(uint256) (../../sb/ve.sol#454-457) is not in mixedCase
+Parameter ve.get_last_user_slope(uint256)._tokenId (../../sb/ve.sol#454) is not in mixedCase
+Function ve.user_point_history__ts(uint256,uint256) (../../sb/ve.sol#463-465) is not in mixedCase
+Parameter ve.user_point_history__ts(uint256,uint256)._tokenId (../../sb/ve.sol#463) is not in mixedCase
+Parameter ve.user_point_history__ts(uint256,uint256)._idx (../../sb/ve.sol#463) is not in mixedCase
+Function ve.locked__end(uint256) (../../sb/ve.sol#470-472) is not in mixedCase
+Parameter ve.locked__end(uint256)._tokenId (../../sb/ve.sol#470) is not in mixedCase
+Parameter ve.balanceOf(address)._owner (../../sb/ve.sol#484) is not in mixedCase
+Parameter ve.ownerOf(uint256)._tokenId (../../sb/ve.sol#491) is not in mixedCase
+Parameter ve.getApproved(uint256)._tokenId (../../sb/ve.sol#497) is not in mixedCase
+Parameter ve.isApprovedForAll(address,address)._owner (../../sb/ve.sol#504) is not in mixedCase
+Parameter ve.isApprovedForAll(address,address)._operator (../../sb/ve.sol#504) is not in mixedCase
+Parameter ve.tokenOfOwnerByIndex(address,uint256)._owner (../../sb/ve.sol#509) is not in mixedCase
+Parameter ve.tokenOfOwnerByIndex(address,uint256)._tokenIndex (../../sb/ve.sol#509) is not in mixedCase
+Parameter ve.isApprovedOrOwner(address,uint256)._spender (../../sb/ve.sol#525) is not in mixedCase
+Parameter ve.isApprovedOrOwner(address,uint256)._tokenId (../../sb/ve.sol#525) is not in mixedCase
+Parameter ve.transferFrom(address,address,uint256)._from (../../sb/ve.sol#644) is not in mixedCase
+Parameter ve.transferFrom(address,address,uint256)._to (../../sb/ve.sol#645) is not in mixedCase
+Parameter ve.transferFrom(address,address,uint256)._tokenId (../../sb/ve.sol#646) is not in mixedCase
+Parameter ve.safeTransferFrom(address,address,uint256,bytes)._from (../../sb/ve.sol#676) is not in mixedCase
+Parameter ve.safeTransferFrom(address,address,uint256,bytes)._to (../../sb/ve.sol#677) is not in mixedCase
+Parameter ve.safeTransferFrom(address,address,uint256,bytes)._tokenId (../../sb/ve.sol#678) is not in mixedCase
+Parameter ve.safeTransferFrom(address,address,uint256,bytes)._data (../../sb/ve.sol#679) is not in mixedCase
+Parameter ve.safeTransferFrom(address,address,uint256)._from (../../sb/ve.sol#711) is not in mixedCase
+Parameter ve.safeTransferFrom(address,address,uint256)._to (../../sb/ve.sol#712) is not in mixedCase
+Parameter ve.safeTransferFrom(address,address,uint256)._tokenId (../../sb/ve.sol#713) is not in mixedCase
+Parameter ve.approve(address,uint256)._approved (../../sb/ve.sol#724) is not in mixedCase
+Parameter ve.approve(address,uint256)._tokenId (../../sb/ve.sol#724) is not in mixedCase
+Parameter ve.setApprovalForAll(address,bool)._operator (../../sb/ve.sol#745) is not in mixedCase
+Parameter ve.setApprovalForAll(address,bool)._approved (../../sb/ve.sol#745) is not in mixedCase
+Function ve._deposit_for(uint256,uint256,uint256,LockedBalance,ve.DepositType) (../../sb/ve.sol#914-947) is not in mixedCase
+Parameter ve._deposit_for(uint256,uint256,uint256,LockedBalance,ve.DepositType)._tokenId (../../sb/ve.sol#915) is not in mixedCase
+Parameter ve._deposit_for(uint256,uint256,uint256,LockedBalance,ve.DepositType)._value (../../sb/ve.sol#916) is not in mixedCase
+Parameter ve._deposit_for(uint256,uint256,uint256,LockedBalance,ve.DepositType).unlock_time (../../sb/ve.sol#917) is not in mixedCase
+Parameter ve._deposit_for(uint256,uint256,uint256,LockedBalance,ve.DepositType).locked_balance (../../sb/ve.sol#918) is not in mixedCase
+Parameter ve._deposit_for(uint256,uint256,uint256,LockedBalance,ve.DepositType).deposit_type (../../sb/ve.sol#919) is not in mixedCase
+Parameter ve.setVoter(address)._voter (../../sb/ve.sol#949) is not in mixedCase
+Parameter ve.voting(uint256)._tokenId (../../sb/ve.sol#954) is not in mixedCase
+Parameter ve.abstain(uint256)._tokenId (../../sb/ve.sol#959) is not in mixedCase
+Parameter ve.attach(uint256)._tokenId (../../sb/ve.sol#964) is not in mixedCase
+Parameter ve.detach(uint256)._tokenId (../../sb/ve.sol#969) is not in mixedCase
+Parameter ve.merge(uint256,uint256)._from (../../sb/ve.sol#974) is not in mixedCase
+Parameter ve.merge(uint256,uint256)._to (../../sb/ve.sol#974) is not in mixedCase
+Function ve.block_number() (../../sb/ve.sol#991-993) is not in mixedCase
+Function ve.deposit_for(uint256,uint256) (../../sb/ve.sol#1005-1012) is not in mixedCase
+Parameter ve.deposit_for(uint256,uint256)._tokenId (../../sb/ve.sol#1005) is not in mixedCase
+Parameter ve.deposit_for(uint256,uint256)._value (../../sb/ve.sol#1005) is not in mixedCase
+Function ve._create_lock(uint256,uint256,address) (../../sb/ve.sol#1018-1031) is not in mixedCase
+Parameter ve._create_lock(uint256,uint256,address)._value (../../sb/ve.sol#1018) is not in mixedCase
+Parameter ve._create_lock(uint256,uint256,address)._lock_duration (../../sb/ve.sol#1018) is not in mixedCase
+Parameter ve._create_lock(uint256,uint256,address)._to (../../sb/ve.sol#1018) is not in mixedCase
+Function ve.create_lock_for(uint256,uint256,address) (../../sb/ve.sol#1037-1039) is not in mixedCase
+Parameter ve.create_lock_for(uint256,uint256,address)._value (../../sb/ve.sol#1037) is not in mixedCase
+Parameter ve.create_lock_for(uint256,uint256,address)._lock_duration (../../sb/ve.sol#1037) is not in mixedCase
+Parameter ve.create_lock_for(uint256,uint256,address)._to (../../sb/ve.sol#1037) is not in mixedCase
+Function ve.create_lock(uint256,uint256) (../../sb/ve.sol#1044-1046) is not in mixedCase
+Parameter ve.create_lock(uint256,uint256)._value (../../sb/ve.sol#1044) is not in mixedCase
+Parameter ve.create_lock(uint256,uint256)._lock_duration (../../sb/ve.sol#1044) is not in mixedCase
+Function ve.increase_amount(uint256,uint256) (../../sb/ve.sol#1050-1060) is not in mixedCase
+Parameter ve.increase_amount(uint256,uint256)._tokenId (../../sb/ve.sol#1050) is not in mixedCase
+Parameter ve.increase_amount(uint256,uint256)._value (../../sb/ve.sol#1050) is not in mixedCase
+Function ve.increase_unlock_time(uint256,uint256) (../../sb/ve.sol#1064-1076) is not in mixedCase
+Parameter ve.increase_unlock_time(uint256,uint256)._tokenId (../../sb/ve.sol#1064) is not in mixedCase
+Parameter ve.increase_unlock_time(uint256,uint256)._lock_duration (../../sb/ve.sol#1064) is not in mixedCase
+Parameter ve.withdraw(uint256)._tokenId (../../sb/ve.sol#1080) is not in mixedCase
+Function ve._find_block_epoch(uint256,uint256) (../../sb/ve.sol#1114-1131) is not in mixedCase
+Parameter ve._find_block_epoch(uint256,uint256)._block (../../sb/ve.sol#1114) is not in mixedCase
+Parameter ve._find_block_epoch(uint256,uint256).max_epoch (../../sb/ve.sol#1114) is not in mixedCase
+Parameter ve.tokenURI(uint256)._tokenId (../../sb/ve.sol#1154) is not in mixedCase
+Parameter ve.balanceOfNFT(uint256)._tokenId (../../sb/ve.sol#1166) is not in mixedCase
+Parameter ve.balanceOfNFTAt(uint256,uint256)._tokenId (../../sb/ve.sol#1171) is not in mixedCase
+Parameter ve.balanceOfNFTAt(uint256,uint256)._t (../../sb/ve.sol#1171) is not in mixedCase
+Parameter ve.balanceOfAtNFT(uint256,uint256)._tokenId (../../sb/ve.sol#1229) is not in mixedCase
+Parameter ve.balanceOfAtNFT(uint256,uint256)._block (../../sb/ve.sol#1229) is not in mixedCase
+Function ve._supply_at(Point,uint256) (../../sb/ve.sol#1237-1260) is not in mixedCase
+Parameter ve.totalSupplyAt(uint256)._block (../../sb/ve.sol#1278) is not in mixedCase
+Constant ve.iMAXTIME (../../sb/ve.sol#356) is not in UPPER_CASE_WITH_UNDERSCORES
+Variable ve.ownership_change (../../sb/ve.sol#363) is not in mixedCase
+Variable ve.point_history (../../sb/ve.sol#366) is not in mixedCase
+Variable ve.user_point_history (../../sb/ve.sol#367) is not in mixedCase
+Variable ve.user_point_epoch (../../sb/ve.sol#369) is not in mixedCase
+Variable ve.slope_changes (../../sb/ve.sol#370) is not in mixedCase
+Constant ve._not_entered (../../sb/ve.sol#415) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant ve._entered (../../sb/ve.sol#416) is not in UPPER_CASE_WITH_UNDERSCORES
+Variable ve._entered_state (../../sb/ve.sol#417) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+/sb/ve.sol analyzed (7 contracts with 93 detectors), 129 result(s) found

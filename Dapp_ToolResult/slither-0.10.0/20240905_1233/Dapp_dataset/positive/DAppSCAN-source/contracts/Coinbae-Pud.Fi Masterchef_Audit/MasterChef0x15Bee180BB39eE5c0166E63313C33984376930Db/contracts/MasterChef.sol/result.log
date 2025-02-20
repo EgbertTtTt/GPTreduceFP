@@ -1,0 +1,370 @@
+'solc --version' running
+'solc /sb/MasterChef.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+MasterChef.safePudTransfer(address,uint256) (../../sb/MasterChef.sol#1444-1451) ignores return value by pud.transfer(_to,pudBal) (../../sb/MasterChef.sol#1447)
+MasterChef.safePudTransfer(address,uint256) (../../sb/MasterChef.sol#1444-1451) ignores return value by pud.transfer(_to,_amount) (../../sb/MasterChef.sol#1449)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+MasterChef.pendingPud(uint256,address) (../../sb/MasterChef.sol#1275-1298) performs a multiplication on the result of a division:
+	- pudReward = multiplier.mul(pudPerBlock).mul(pool.allocPoint).div(totalAllocPoint) (../../sb/MasterChef.sol#1288-1291)
+	- accPudPerShare = accPudPerShare.add(pudReward.mul(1e12).div(lpSupply)) (../../sb/MasterChef.sol#1292-1294)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+Reentrancy in MasterChef.add(uint256,IERC20,bool,address) (../../sb/MasterChef.sol#1216-1238):
+	External calls:
+	- massUpdatePools() (../../sb/MasterChef.sol#1223)
+		- pud.mint(devaddr,pudReward.div(devFundDivRate)) (../../sb/MasterChef.sol#1328)
+		- pud.mint(address(this),pudReward) (../../sb/MasterChef.sol#1329)
+	State variables written after the call(s):
+	- poolInfo.push(PoolInfo({lpToken:_lpToken,allocPoint:_allocPoint,lastRewardBlock:lastRewardBlock,accPudPerShare:0,strategy:_strategy,totalShares:0})) (../../sb/MasterChef.sol#1228-1237)
+	MasterChef.poolInfo (../../sb/MasterChef.sol#1175) can be used in cross function reentrancies:
+	- MasterChef.add(uint256,IERC20,bool,address) (../../sb/MasterChef.sol#1216-1238)
+	- MasterChef.balance(uint256) (../../sb/MasterChef.sol#1489-1492)
+	- MasterChef.deposit(uint256,uint256) (../../sb/MasterChef.sol#1340-1379)
+	- MasterChef.emergencyWithdraw(uint256) (../../sb/MasterChef.sol#1421-1440)
+	- MasterChef.massUpdatePools() (../../sb/MasterChef.sol#1301-1306)
+	- MasterChef.pendingPud(uint256,address) (../../sb/MasterChef.sol#1275-1298)
+	- MasterChef.poolInfo (../../sb/MasterChef.sol#1175)
+	- MasterChef.poolLength() (../../sb/MasterChef.sol#1209-1211)
+	- MasterChef.set(uint256,uint256,bool) (../../sb/MasterChef.sol#1242-1254)
+	- MasterChef.setPoolStrategy(uint256,address) (../../sb/MasterChef.sol#1495-1500)
+	- MasterChef.setStartBlock(uint256) (../../sb/MasterChef.sol#1470-1477)
+	- MasterChef.updatePool(uint256) (../../sb/MasterChef.sol#1309-1336)
+	- MasterChef.withdraw(uint256,uint256) (../../sb/MasterChef.sol#1383-1417)
+	- totalAllocPoint = totalAllocPoint.add(_allocPoint) (../../sb/MasterChef.sol#1227)
+	MasterChef.totalAllocPoint (../../sb/MasterChef.sol#1179) can be used in cross function reentrancies:
+	- MasterChef.add(uint256,IERC20,bool,address) (../../sb/MasterChef.sol#1216-1238)
+	- MasterChef.pendingPud(uint256,address) (../../sb/MasterChef.sol#1275-1298)
+	- MasterChef.set(uint256,uint256,bool) (../../sb/MasterChef.sol#1242-1254)
+	- MasterChef.totalAllocPoint (../../sb/MasterChef.sol#1179)
+	- MasterChef.updatePool(uint256) (../../sb/MasterChef.sol#1309-1336)
+Reentrancy in MasterChef.deposit(uint256,uint256) (../../sb/MasterChef.sol#1340-1379):
+	External calls:
+	- updatePool(_pid) (../../sb/MasterChef.sol#1344)
+		- pud.mint(devaddr,pudReward.div(devFundDivRate)) (../../sb/MasterChef.sol#1328)
+		- pud.mint(address(this),pudReward) (../../sb/MasterChef.sol#1329)
+	- safePudTransfer(msg.sender,pending) (../../sb/MasterChef.sol#1350)
+		- pud.transfer(_to,pudBal) (../../sb/MasterChef.sol#1447)
+		- pud.transfer(_to,_amount) (../../sb/MasterChef.sol#1449)
+	- pool.lpToken.safeTransferFrom(address(msg.sender),pool.strategy,_amount) (../../sb/MasterChef.sol#1358-1362)
+	State variables written after the call(s):
+	- pool.totalShares = pool.totalShares.add(shares) (../../sb/MasterChef.sol#1376)
+	MasterChef.poolInfo (../../sb/MasterChef.sol#1175) can be used in cross function reentrancies:
+	- MasterChef.add(uint256,IERC20,bool,address) (../../sb/MasterChef.sol#1216-1238)
+	- MasterChef.balance(uint256) (../../sb/MasterChef.sol#1489-1492)
+	- MasterChef.deposit(uint256,uint256) (../../sb/MasterChef.sol#1340-1379)
+	- MasterChef.emergencyWithdraw(uint256) (../../sb/MasterChef.sol#1421-1440)
+	- MasterChef.massUpdatePools() (../../sb/MasterChef.sol#1301-1306)
+	- MasterChef.pendingPud(uint256,address) (../../sb/MasterChef.sol#1275-1298)
+	- MasterChef.poolInfo (../../sb/MasterChef.sol#1175)
+	- MasterChef.poolLength() (../../sb/MasterChef.sol#1209-1211)
+	- MasterChef.set(uint256,uint256,bool) (../../sb/MasterChef.sol#1242-1254)
+	- MasterChef.setPoolStrategy(uint256,address) (../../sb/MasterChef.sol#1495-1500)
+	- MasterChef.setStartBlock(uint256) (../../sb/MasterChef.sol#1470-1477)
+	- MasterChef.updatePool(uint256) (../../sb/MasterChef.sol#1309-1336)
+	- MasterChef.withdraw(uint256,uint256) (../../sb/MasterChef.sol#1383-1417)
+	- user.shares = user.shares.add(shares) (../../sb/MasterChef.sol#1374)
+	MasterChef.userInfo (../../sb/MasterChef.sol#1177) can be used in cross function reentrancies:
+	- MasterChef.deposit(uint256,uint256) (../../sb/MasterChef.sol#1340-1379)
+	- MasterChef.emergencyWithdraw(uint256) (../../sb/MasterChef.sol#1421-1440)
+	- MasterChef.pendingPud(uint256,address) (../../sb/MasterChef.sol#1275-1298)
+	- MasterChef.userInfo (../../sb/MasterChef.sol#1177)
+	- MasterChef.withdraw(uint256,uint256) (../../sb/MasterChef.sol#1383-1417)
+	- user.rewardDebt = user.shares.mul(pool.accPudPerShare).div(1e12) (../../sb/MasterChef.sol#1375)
+	MasterChef.userInfo (../../sb/MasterChef.sol#1177) can be used in cross function reentrancies:
+	- MasterChef.deposit(uint256,uint256) (../../sb/MasterChef.sol#1340-1379)
+	- MasterChef.emergencyWithdraw(uint256) (../../sb/MasterChef.sol#1421-1440)
+	- MasterChef.pendingPud(uint256,address) (../../sb/MasterChef.sol#1275-1298)
+	- MasterChef.userInfo (../../sb/MasterChef.sol#1177)
+	- MasterChef.withdraw(uint256,uint256) (../../sb/MasterChef.sol#1383-1417)
+Reentrancy in MasterChef.emergencyWithdraw(uint256) (../../sb/MasterChef.sol#1421-1440):
+	External calls:
+	- IStrategy(pool.strategy).withdraw(r) (../../sb/MasterChef.sol#1429)
+	- pool.lpToken.safeTransfer(address(msg.sender),r) (../../sb/MasterChef.sol#1436)
+	State variables written after the call(s):
+	- user.shares = 0 (../../sb/MasterChef.sol#1438)
+	MasterChef.userInfo (../../sb/MasterChef.sol#1177) can be used in cross function reentrancies:
+	- MasterChef.deposit(uint256,uint256) (../../sb/MasterChef.sol#1340-1379)
+	- MasterChef.emergencyWithdraw(uint256) (../../sb/MasterChef.sol#1421-1440)
+	- MasterChef.pendingPud(uint256,address) (../../sb/MasterChef.sol#1275-1298)
+	- MasterChef.userInfo (../../sb/MasterChef.sol#1177)
+	- MasterChef.withdraw(uint256,uint256) (../../sb/MasterChef.sol#1383-1417)
+	- user.rewardDebt = 0 (../../sb/MasterChef.sol#1439)
+	MasterChef.userInfo (../../sb/MasterChef.sol#1177) can be used in cross function reentrancies:
+	- MasterChef.deposit(uint256,uint256) (../../sb/MasterChef.sol#1340-1379)
+	- MasterChef.emergencyWithdraw(uint256) (../../sb/MasterChef.sol#1421-1440)
+	- MasterChef.pendingPud(uint256,address) (../../sb/MasterChef.sol#1275-1298)
+	- MasterChef.userInfo (../../sb/MasterChef.sol#1177)
+	- MasterChef.withdraw(uint256,uint256) (../../sb/MasterChef.sol#1383-1417)
+Reentrancy in MasterChef.set(uint256,uint256,bool) (../../sb/MasterChef.sol#1242-1254):
+	External calls:
+	- massUpdatePools() (../../sb/MasterChef.sol#1248)
+		- pud.mint(devaddr,pudReward.div(devFundDivRate)) (../../sb/MasterChef.sol#1328)
+		- pud.mint(address(this),pudReward) (../../sb/MasterChef.sol#1329)
+	State variables written after the call(s):
+	- poolInfo[_pid].allocPoint = _allocPoint (../../sb/MasterChef.sol#1253)
+	MasterChef.poolInfo (../../sb/MasterChef.sol#1175) can be used in cross function reentrancies:
+	- MasterChef.add(uint256,IERC20,bool,address) (../../sb/MasterChef.sol#1216-1238)
+	- MasterChef.balance(uint256) (../../sb/MasterChef.sol#1489-1492)
+	- MasterChef.deposit(uint256,uint256) (../../sb/MasterChef.sol#1340-1379)
+	- MasterChef.emergencyWithdraw(uint256) (../../sb/MasterChef.sol#1421-1440)
+	- MasterChef.massUpdatePools() (../../sb/MasterChef.sol#1301-1306)
+	- MasterChef.pendingPud(uint256,address) (../../sb/MasterChef.sol#1275-1298)
+	- MasterChef.poolInfo (../../sb/MasterChef.sol#1175)
+	- MasterChef.poolLength() (../../sb/MasterChef.sol#1209-1211)
+	- MasterChef.set(uint256,uint256,bool) (../../sb/MasterChef.sol#1242-1254)
+	- MasterChef.setPoolStrategy(uint256,address) (../../sb/MasterChef.sol#1495-1500)
+	- MasterChef.setStartBlock(uint256) (../../sb/MasterChef.sol#1470-1477)
+	- MasterChef.updatePool(uint256) (../../sb/MasterChef.sol#1309-1336)
+	- MasterChef.withdraw(uint256,uint256) (../../sb/MasterChef.sol#1383-1417)
+	- totalAllocPoint = totalAllocPoint.sub(poolInfo[_pid].allocPoint).add(_allocPoint) (../../sb/MasterChef.sol#1250-1252)
+	MasterChef.totalAllocPoint (../../sb/MasterChef.sol#1179) can be used in cross function reentrancies:
+	- MasterChef.add(uint256,IERC20,bool,address) (../../sb/MasterChef.sol#1216-1238)
+	- MasterChef.pendingPud(uint256,address) (../../sb/MasterChef.sol#1275-1298)
+	- MasterChef.set(uint256,uint256,bool) (../../sb/MasterChef.sol#1242-1254)
+	- MasterChef.totalAllocPoint (../../sb/MasterChef.sol#1179)
+	- MasterChef.updatePool(uint256) (../../sb/MasterChef.sol#1309-1336)
+Reentrancy in MasterChef.setPoolStrategy(uint256,address) (../../sb/MasterChef.sol#1495-1500):
+	External calls:
+	- IStrategy(pool.strategy).harvest() (../../sb/MasterChef.sol#1497)
+	- IStrategy(pool.strategy).withdrawAll(_strategy) (../../sb/MasterChef.sol#1498)
+	State variables written after the call(s):
+	- pool.strategy = _strategy (../../sb/MasterChef.sol#1499)
+	MasterChef.poolInfo (../../sb/MasterChef.sol#1175) can be used in cross function reentrancies:
+	- MasterChef.add(uint256,IERC20,bool,address) (../../sb/MasterChef.sol#1216-1238)
+	- MasterChef.balance(uint256) (../../sb/MasterChef.sol#1489-1492)
+	- MasterChef.deposit(uint256,uint256) (../../sb/MasterChef.sol#1340-1379)
+	- MasterChef.emergencyWithdraw(uint256) (../../sb/MasterChef.sol#1421-1440)
+	- MasterChef.massUpdatePools() (../../sb/MasterChef.sol#1301-1306)
+	- MasterChef.pendingPud(uint256,address) (../../sb/MasterChef.sol#1275-1298)
+	- MasterChef.poolInfo (../../sb/MasterChef.sol#1175)
+	- MasterChef.poolLength() (../../sb/MasterChef.sol#1209-1211)
+	- MasterChef.set(uint256,uint256,bool) (../../sb/MasterChef.sol#1242-1254)
+	- MasterChef.setPoolStrategy(uint256,address) (../../sb/MasterChef.sol#1495-1500)
+	- MasterChef.setStartBlock(uint256) (../../sb/MasterChef.sol#1470-1477)
+	- MasterChef.updatePool(uint256) (../../sb/MasterChef.sol#1309-1336)
+	- MasterChef.withdraw(uint256,uint256) (../../sb/MasterChef.sol#1383-1417)
+Reentrancy in MasterChef.updatePool(uint256) (../../sb/MasterChef.sol#1309-1336):
+	External calls:
+	- pud.mint(devaddr,pudReward.div(devFundDivRate)) (../../sb/MasterChef.sol#1328)
+	- pud.mint(address(this),pudReward) (../../sb/MasterChef.sol#1329)
+	State variables written after the call(s):
+	- pool.accPudPerShare = pool.accPudPerShare.add(pudReward.mul(1e12).div(lpSupply)) (../../sb/MasterChef.sol#1332-1334)
+	MasterChef.poolInfo (../../sb/MasterChef.sol#1175) can be used in cross function reentrancies:
+	- MasterChef.add(uint256,IERC20,bool,address) (../../sb/MasterChef.sol#1216-1238)
+	- MasterChef.balance(uint256) (../../sb/MasterChef.sol#1489-1492)
+	- MasterChef.deposit(uint256,uint256) (../../sb/MasterChef.sol#1340-1379)
+	- MasterChef.emergencyWithdraw(uint256) (../../sb/MasterChef.sol#1421-1440)
+	- MasterChef.massUpdatePools() (../../sb/MasterChef.sol#1301-1306)
+	- MasterChef.pendingPud(uint256,address) (../../sb/MasterChef.sol#1275-1298)
+	- MasterChef.poolInfo (../../sb/MasterChef.sol#1175)
+	- MasterChef.poolLength() (../../sb/MasterChef.sol#1209-1211)
+	- MasterChef.set(uint256,uint256,bool) (../../sb/MasterChef.sol#1242-1254)
+	- MasterChef.setPoolStrategy(uint256,address) (../../sb/MasterChef.sol#1495-1500)
+	- MasterChef.setStartBlock(uint256) (../../sb/MasterChef.sol#1470-1477)
+	- MasterChef.updatePool(uint256) (../../sb/MasterChef.sol#1309-1336)
+	- MasterChef.withdraw(uint256,uint256) (../../sb/MasterChef.sol#1383-1417)
+	- pool.lastRewardBlock = block.number (../../sb/MasterChef.sol#1335)
+	MasterChef.poolInfo (../../sb/MasterChef.sol#1175) can be used in cross function reentrancies:
+	- MasterChef.add(uint256,IERC20,bool,address) (../../sb/MasterChef.sol#1216-1238)
+	- MasterChef.balance(uint256) (../../sb/MasterChef.sol#1489-1492)
+	- MasterChef.deposit(uint256,uint256) (../../sb/MasterChef.sol#1340-1379)
+	- MasterChef.emergencyWithdraw(uint256) (../../sb/MasterChef.sol#1421-1440)
+	- MasterChef.massUpdatePools() (../../sb/MasterChef.sol#1301-1306)
+	- MasterChef.pendingPud(uint256,address) (../../sb/MasterChef.sol#1275-1298)
+	- MasterChef.poolInfo (../../sb/MasterChef.sol#1175)
+	- MasterChef.poolLength() (../../sb/MasterChef.sol#1209-1211)
+	- MasterChef.set(uint256,uint256,bool) (../../sb/MasterChef.sol#1242-1254)
+	- MasterChef.setPoolStrategy(uint256,address) (../../sb/MasterChef.sol#1495-1500)
+	- MasterChef.setStartBlock(uint256) (../../sb/MasterChef.sol#1470-1477)
+	- MasterChef.updatePool(uint256) (../../sb/MasterChef.sol#1309-1336)
+	- MasterChef.withdraw(uint256,uint256) (../../sb/MasterChef.sol#1383-1417)
+Reentrancy in MasterChef.withdraw(uint256,uint256) (../../sb/MasterChef.sol#1383-1417):
+	External calls:
+	- updatePool(_pid) (../../sb/MasterChef.sol#1388)
+		- pud.mint(devaddr,pudReward.div(devFundDivRate)) (../../sb/MasterChef.sol#1328)
+		- pud.mint(address(this),pudReward) (../../sb/MasterChef.sol#1329)
+	- safePudTransfer(msg.sender,pending) (../../sb/MasterChef.sol#1396)
+		- pud.transfer(_to,pudBal) (../../sb/MasterChef.sol#1447)
+		- pud.transfer(_to,_amount) (../../sb/MasterChef.sol#1449)
+	State variables written after the call(s):
+	- pool.totalShares = pool.totalShares.sub(_shares) (../../sb/MasterChef.sol#1399)
+	MasterChef.poolInfo (../../sb/MasterChef.sol#1175) can be used in cross function reentrancies:
+	- MasterChef.add(uint256,IERC20,bool,address) (../../sb/MasterChef.sol#1216-1238)
+	- MasterChef.balance(uint256) (../../sb/MasterChef.sol#1489-1492)
+	- MasterChef.deposit(uint256,uint256) (../../sb/MasterChef.sol#1340-1379)
+	- MasterChef.emergencyWithdraw(uint256) (../../sb/MasterChef.sol#1421-1440)
+	- MasterChef.massUpdatePools() (../../sb/MasterChef.sol#1301-1306)
+	- MasterChef.pendingPud(uint256,address) (../../sb/MasterChef.sol#1275-1298)
+	- MasterChef.poolInfo (../../sb/MasterChef.sol#1175)
+	- MasterChef.poolLength() (../../sb/MasterChef.sol#1209-1211)
+	- MasterChef.set(uint256,uint256,bool) (../../sb/MasterChef.sol#1242-1254)
+	- MasterChef.setPoolStrategy(uint256,address) (../../sb/MasterChef.sol#1495-1500)
+	- MasterChef.setStartBlock(uint256) (../../sb/MasterChef.sol#1470-1477)
+	- MasterChef.updatePool(uint256) (../../sb/MasterChef.sol#1309-1336)
+	- MasterChef.withdraw(uint256,uint256) (../../sb/MasterChef.sol#1383-1417)
+	- user.shares = user.shares.sub(_shares) (../../sb/MasterChef.sol#1397)
+	MasterChef.userInfo (../../sb/MasterChef.sol#1177) can be used in cross function reentrancies:
+	- MasterChef.deposit(uint256,uint256) (../../sb/MasterChef.sol#1340-1379)
+	- MasterChef.emergencyWithdraw(uint256) (../../sb/MasterChef.sol#1421-1440)
+	- MasterChef.pendingPud(uint256,address) (../../sb/MasterChef.sol#1275-1298)
+	- MasterChef.userInfo (../../sb/MasterChef.sol#1177)
+	- MasterChef.withdraw(uint256,uint256) (../../sb/MasterChef.sol#1383-1417)
+	- user.rewardDebt = user.shares.mul(pool.accPudPerShare).div(1e12) (../../sb/MasterChef.sol#1398)
+	MasterChef.userInfo (../../sb/MasterChef.sol#1177) can be used in cross function reentrancies:
+	- MasterChef.deposit(uint256,uint256) (../../sb/MasterChef.sol#1340-1379)
+	- MasterChef.emergencyWithdraw(uint256) (../../sb/MasterChef.sol#1421-1440)
+	- MasterChef.pendingPud(uint256,address) (../../sb/MasterChef.sol#1275-1298)
+	- MasterChef.userInfo (../../sb/MasterChef.sol#1177)
+	- MasterChef.withdraw(uint256,uint256) (../../sb/MasterChef.sol#1383-1417)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+MasterChef.setPoolStrategy(uint256,address) (../../sb/MasterChef.sol#1495-1500) ignores return value by IStrategy(pool.strategy).withdrawAll(_strategy) (../../sb/MasterChef.sol#1498)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+ERC20.constructor(string,string).name (../../sb/MasterChef.sol#685) shadows:
+	- ERC20.name() (../../sb/MasterChef.sol#696-698) (function)
+ERC20.constructor(string,string).symbol (../../sb/MasterChef.sol#685) shadows:
+	- ERC20.symbol() (../../sb/MasterChef.sol#704-706) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+MasterChef.add(uint256,IERC20,bool,address) (../../sb/MasterChef.sol#1216-1238) should emit an event for: 
+	- totalAllocPoint = totalAllocPoint.add(_allocPoint) (../../sb/MasterChef.sol#1227) 
+MasterChef.set(uint256,uint256,bool) (../../sb/MasterChef.sol#1242-1254) should emit an event for: 
+	- totalAllocPoint = totalAllocPoint.sub(poolInfo[_pid].allocPoint).add(_allocPoint) (../../sb/MasterChef.sol#1250-1252) 
+MasterChef.setPudPerBlock(uint256) (../../sb/MasterChef.sol#1464-1468) should emit an event for: 
+	- pudPerBlock = _pudPerBlock (../../sb/MasterChef.sol#1467) 
+MasterChef.setBonusEndBlock(uint256) (../../sb/MasterChef.sol#1479-1481) should emit an event for: 
+	- bonusEndBlock = _bonusEndBlock (../../sb/MasterChef.sol#1480) 
+MasterChef.setDevFundDivRate(uint256) (../../sb/MasterChef.sol#1483-1486) should emit an event for: 
+	- devFundDivRate = _devFundDivRate (../../sb/MasterChef.sol#1485) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+MasterChef.constructor(PudToken,address,address,uint256,uint256,uint256)._devaddr (../../sb/MasterChef.sol#1195) lacks a zero-check on :
+		- devaddr = _devaddr (../../sb/MasterChef.sol#1202)
+MasterChef.constructor(PudToken,address,address,uint256,uint256,uint256)._treasury (../../sb/MasterChef.sol#1196) lacks a zero-check on :
+		- treasury = _treasury (../../sb/MasterChef.sol#1203)
+MasterChef.dev(address)._devaddr (../../sb/MasterChef.sol#1454) lacks a zero-check on :
+		- devaddr = _devaddr (../../sb/MasterChef.sol#1456)
+MasterChef.setTreasury(address)._treasury (../../sb/MasterChef.sol#1460) lacks a zero-check on :
+		- treasury = _treasury (../../sb/MasterChef.sol#1461)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+MasterChef.updatePool(uint256) (../../sb/MasterChef.sol#1309-1336) has external calls inside a loop: pud.mint(devaddr,pudReward.div(devFundDivRate)) (../../sb/MasterChef.sol#1328)
+MasterChef.updatePool(uint256) (../../sb/MasterChef.sol#1309-1336) has external calls inside a loop: pud.mint(address(this),pudReward) (../../sb/MasterChef.sol#1329)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in MasterChef.deposit(uint256,uint256) (../../sb/MasterChef.sol#1340-1379):
+	External calls:
+	- updatePool(_pid) (../../sb/MasterChef.sol#1344)
+		- pud.mint(devaddr,pudReward.div(devFundDivRate)) (../../sb/MasterChef.sol#1328)
+		- pud.mint(address(this),pudReward) (../../sb/MasterChef.sol#1329)
+	- safePudTransfer(msg.sender,pending) (../../sb/MasterChef.sol#1350)
+		- pud.transfer(_to,pudBal) (../../sb/MasterChef.sol#1447)
+		- pud.transfer(_to,_amount) (../../sb/MasterChef.sol#1449)
+	- pool.lpToken.safeTransferFrom(address(msg.sender),pool.strategy,_amount) (../../sb/MasterChef.sol#1358-1362)
+	Event emitted after the call(s):
+	- Deposit(msg.sender,_pid,_amount) (../../sb/MasterChef.sol#1378)
+Reentrancy in MasterChef.emergencyWithdraw(uint256) (../../sb/MasterChef.sol#1421-1440):
+	External calls:
+	- IStrategy(pool.strategy).withdraw(r) (../../sb/MasterChef.sol#1429)
+	- pool.lpToken.safeTransfer(address(msg.sender),r) (../../sb/MasterChef.sol#1436)
+	Event emitted after the call(s):
+	- EmergencyWithdraw(msg.sender,_pid,user.shares) (../../sb/MasterChef.sol#1437)
+Reentrancy in MasterChef.withdraw(uint256,uint256) (../../sb/MasterChef.sol#1383-1417):
+	External calls:
+	- updatePool(_pid) (../../sb/MasterChef.sol#1388)
+		- pud.mint(devaddr,pudReward.div(devFundDivRate)) (../../sb/MasterChef.sol#1328)
+		- pud.mint(address(this),pudReward) (../../sb/MasterChef.sol#1329)
+	- safePudTransfer(msg.sender,pending) (../../sb/MasterChef.sol#1396)
+		- pud.transfer(_to,pudBal) (../../sb/MasterChef.sol#1447)
+		- pud.transfer(_to,_amount) (../../sb/MasterChef.sol#1449)
+	- IStrategy(pool.strategy).withdraw(r) (../../sb/MasterChef.sol#1405)
+	- pool.lpToken.safeTransfer(address(msg.sender),r) (../../sb/MasterChef.sol#1412)
+	Event emitted after the call(s):
+	- Withdraw(msg.sender,_pid,r) (../../sb/MasterChef.sol#1416)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Address.isContract(address) (../../sb/MasterChef.sol#520-529) uses assembly
+	- INLINE ASM (../../sb/MasterChef.sol#527)
+Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/MasterChef.sol#613-634) uses assembly
+	- INLINE ASM (../../sb/MasterChef.sol#626-629)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.functionCall(address,bytes) (../../sb/MasterChef.sol#573-575) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/MasterChef.sol#598-600) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/MasterChef.sol#608-611) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/MasterChef.sol#547-553) is never used and should be removed
+Context._msgData() (../../sb/MasterChef.sol#416-419) is never used and should be removed
+ERC20._burn(address,uint256) (../../sb/MasterChef.sol#880-888) is never used and should be removed
+ERC20._setupDecimals(uint8) (../../sb/MasterChef.sol#918-920) is never used and should be removed
+EnumerableSet._add(EnumerableSet.Set,bytes32) (../../sb/MasterChef.sol#54-64) is never used and should be removed
+EnumerableSet._at(EnumerableSet.Set,uint256) (../../sb/MasterChef.sol#130-133) is never used and should be removed
+EnumerableSet._contains(EnumerableSet.Set,bytes32) (../../sb/MasterChef.sol#109-111) is never used and should be removed
+EnumerableSet._length(EnumerableSet.Set) (../../sb/MasterChef.sol#116-118) is never used and should be removed
+EnumerableSet._remove(EnumerableSet.Set,bytes32) (../../sb/MasterChef.sol#72-104) is never used and should be removed
+EnumerableSet.add(EnumerableSet.AddressSet,address) (../../sb/MasterChef.sol#147-149) is never used and should be removed
+EnumerableSet.add(EnumerableSet.UintSet,uint256) (../../sb/MasterChef.sol#202-204) is never used and should be removed
+EnumerableSet.at(EnumerableSet.AddressSet,uint256) (../../sb/MasterChef.sol#185-187) is never used and should be removed
+EnumerableSet.at(EnumerableSet.UintSet,uint256) (../../sb/MasterChef.sol#240-242) is never used and should be removed
+EnumerableSet.contains(EnumerableSet.AddressSet,address) (../../sb/MasterChef.sol#164-166) is never used and should be removed
+EnumerableSet.contains(EnumerableSet.UintSet,uint256) (../../sb/MasterChef.sol#219-221) is never used and should be removed
+EnumerableSet.length(EnumerableSet.AddressSet) (../../sb/MasterChef.sol#171-173) is never used and should be removed
+EnumerableSet.length(EnumerableSet.UintSet) (../../sb/MasterChef.sol#226-228) is never used and should be removed
+EnumerableSet.remove(EnumerableSet.AddressSet,address) (../../sb/MasterChef.sol#157-159) is never used and should be removed
+EnumerableSet.remove(EnumerableSet.UintSet,uint256) (../../sb/MasterChef.sol#212-214) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/MasterChef.sol#967-976) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/MasterChef.sol#983-986) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/MasterChef.sol#978-981) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/MasterChef.sol#379-381) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/MasterChef.sol#395-398) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.6.7 (../../sb/MasterChef.sol#1) allows old versions
+solc-0.6.7 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/MasterChef.sol#547-553):
+	- (success) = recipient.call{value: amount}() (../../sb/MasterChef.sol#551)
+Low level call in Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/MasterChef.sol#613-634):
+	- (success,returndata) = target.call{value: weiValue}(data) (../../sb/MasterChef.sol#617)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter PudToken.mint(address,uint256)._to (../../sb/MasterChef.sol#1116) is not in mixedCase
+Parameter PudToken.mint(address,uint256)._amount (../../sb/MasterChef.sol#1116) is not in mixedCase
+Parameter MasterChef.add(uint256,IERC20,bool,address)._allocPoint (../../sb/MasterChef.sol#1217) is not in mixedCase
+Parameter MasterChef.add(uint256,IERC20,bool,address)._lpToken (../../sb/MasterChef.sol#1218) is not in mixedCase
+Parameter MasterChef.add(uint256,IERC20,bool,address)._withUpdate (../../sb/MasterChef.sol#1219) is not in mixedCase
+Parameter MasterChef.add(uint256,IERC20,bool,address)._strategy (../../sb/MasterChef.sol#1220) is not in mixedCase
+Parameter MasterChef.set(uint256,uint256,bool)._pid (../../sb/MasterChef.sol#1243) is not in mixedCase
+Parameter MasterChef.set(uint256,uint256,bool)._allocPoint (../../sb/MasterChef.sol#1244) is not in mixedCase
+Parameter MasterChef.set(uint256,uint256,bool)._withUpdate (../../sb/MasterChef.sol#1245) is not in mixedCase
+Parameter MasterChef.getMultiplier(uint256,uint256)._from (../../sb/MasterChef.sol#1257) is not in mixedCase
+Parameter MasterChef.getMultiplier(uint256,uint256)._to (../../sb/MasterChef.sol#1257) is not in mixedCase
+Parameter MasterChef.pendingPud(uint256,address)._pid (../../sb/MasterChef.sol#1275) is not in mixedCase
+Parameter MasterChef.pendingPud(uint256,address)._user (../../sb/MasterChef.sol#1275) is not in mixedCase
+Parameter MasterChef.updatePool(uint256)._pid (../../sb/MasterChef.sol#1309) is not in mixedCase
+Parameter MasterChef.deposit(uint256,uint256)._pid (../../sb/MasterChef.sol#1340) is not in mixedCase
+Parameter MasterChef.deposit(uint256,uint256)._amount (../../sb/MasterChef.sol#1340) is not in mixedCase
+Parameter MasterChef.withdraw(uint256,uint256)._pid (../../sb/MasterChef.sol#1383) is not in mixedCase
+Parameter MasterChef.withdraw(uint256,uint256)._shares (../../sb/MasterChef.sol#1383) is not in mixedCase
+Parameter MasterChef.emergencyWithdraw(uint256)._pid (../../sb/MasterChef.sol#1421) is not in mixedCase
+Parameter MasterChef.safePudTransfer(address,uint256)._to (../../sb/MasterChef.sol#1444) is not in mixedCase
+Parameter MasterChef.safePudTransfer(address,uint256)._amount (../../sb/MasterChef.sol#1444) is not in mixedCase
+Parameter MasterChef.dev(address)._devaddr (../../sb/MasterChef.sol#1454) is not in mixedCase
+Parameter MasterChef.setTreasury(address)._treasury (../../sb/MasterChef.sol#1460) is not in mixedCase
+Parameter MasterChef.setPudPerBlock(uint256)._pudPerBlock (../../sb/MasterChef.sol#1464) is not in mixedCase
+Parameter MasterChef.setStartBlock(uint256)._startBlock (../../sb/MasterChef.sol#1470) is not in mixedCase
+Parameter MasterChef.setBonusEndBlock(uint256)._bonusEndBlock (../../sb/MasterChef.sol#1479) is not in mixedCase
+Parameter MasterChef.setDevFundDivRate(uint256)._devFundDivRate (../../sb/MasterChef.sol#1483) is not in mixedCase
+Parameter MasterChef.balance(uint256)._pid (../../sb/MasterChef.sol#1489) is not in mixedCase
+Parameter MasterChef.setPoolStrategy(uint256,address)._pid (../../sb/MasterChef.sol#1495) is not in mixedCase
+Parameter MasterChef.setPoolStrategy(uint256,address)._strategy (../../sb/MasterChef.sol#1495) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/MasterChef.sol#417)" inContext (../../sb/MasterChef.sol#411-420)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+MasterChef.pud (../../sb/MasterChef.sol#1160) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/MasterChef.sol analyzed (11 contracts with 93 detectors), 92 result(s) found

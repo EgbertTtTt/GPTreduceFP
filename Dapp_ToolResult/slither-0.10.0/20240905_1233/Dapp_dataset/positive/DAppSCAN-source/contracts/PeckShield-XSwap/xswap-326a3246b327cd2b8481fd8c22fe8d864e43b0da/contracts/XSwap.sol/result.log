@@ -1,0 +1,92 @@
+'solc --version' running
+'solc /sb/XSwap.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+XSwap.trade(address,address,uint256,address) (../../sb/XSwap.sol#171-200) performs a multiplication on the result of a division:
+	- _tokenAmount = normalizeToken(_input,_inputAmount).mul(prices[_input][_output]).div(OFFSET) (../../sb/XSwap.sol#186)
+	- _fee = _tokenAmount.mul(fee[_input][_output]).div(OFFSET) (../../sb/XSwap.sol#187)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+NonStandardIERC20Token (../../sb/XSwap.sol#99-105) has incorrect ERC20 function interface:NonStandardIERC20Token.transfer(address,uint256) (../../sb/XSwap.sol#102)
+NonStandardIERC20Token (../../sb/XSwap.sol#99-105) has incorrect ERC20 function interface:NonStandardIERC20Token.transferFrom(address,address,uint256) (../../sb/XSwap.sol#103)
+NonStandardIERC20Token (../../sb/XSwap.sol#99-105) has incorrect ERC20 function interface:NonStandardIERC20Token.approve(address,uint256) (../../sb/XSwap.sol#104)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-erc20-interface
+
+XSwap.trade(address,address,uint256,address) (../../sb/XSwap.sol#171-200) ignores return value by ILendFMe(lendFMe).supply(chai,IERC20Token(chai).balanceOf(address(this))) (../../sb/XSwap.sol#181)
+XSwap.trade(address,address,uint256,address) (../../sb/XSwap.sol#171-200) ignores return value by ILendFMe(lendFMe).supply(_input,_inputAmount) (../../sb/XSwap.sol#184)
+XSwap.trade(address,address,uint256,address) (../../sb/XSwap.sol#171-200) ignores return value by ILendFMe(lendFMe).withdraw(chai,_amountToUser) (../../sb/XSwap.sol#192)
+XSwap.trade(address,address,uint256,address) (../../sb/XSwap.sol#171-200) ignores return value by ILendFMe(lendFMe).withdraw(_output,denormalizedToken(_output,_amountToUser)) (../../sb/XSwap.sol#196)
+XSwap.enableLending(address) (../../sb/XSwap.sol#212-234) ignores return value by IERC20Token(_token).approve(chai,uint256(- 1)) (../../sb/XSwap.sol#217)
+XSwap.enableLending(address) (../../sb/XSwap.sol#212-234) ignores return value by IERC20Token(chai).approve(lendFMe,uint256(- 1)) (../../sb/XSwap.sol#218)
+XSwap.enableLending(address) (../../sb/XSwap.sol#212-234) ignores return value by ILendFMe(lendFMe).supply(chai,IERC20Token(chai).balanceOf(address(this))) (../../sb/XSwap.sol#228)
+XSwap.enableLending(address) (../../sb/XSwap.sol#212-234) ignores return value by ILendFMe(lendFMe).supply(_token,_balance) (../../sb/XSwap.sol#231)
+XSwap.disableLending(address) (../../sb/XSwap.sol#236-248) ignores return value by ILendFMe(lendFMe).withdraw(chai,uint256(- 1)) (../../sb/XSwap.sol#241)
+XSwap.disableLending(address) (../../sb/XSwap.sol#236-248) ignores return value by ILendFMe(lendFMe).withdraw(_token,uint256(- 1)) (../../sb/XSwap.sol#245)
+XSwap.transferOut(address,address,uint256) (../../sb/XSwap.sol#285-300) ignores return value by ILendFMe(lendFMe).withdraw(chai,_amount) (../../sb/XSwap.sol#288)
+XSwap.transferOut(address,address,uint256) (../../sb/XSwap.sol#285-300) ignores return value by ILendFMe(lendFMe).withdraw(_token,_amount) (../../sb/XSwap.sol#292)
+XSwap.transferOutALL(address,address) (../../sb/XSwap.sol#302-317) ignores return value by ILendFMe(lendFMe).withdraw(chai,uint256(- 1)) (../../sb/XSwap.sol#305)
+XSwap.transferOutALL(address,address) (../../sb/XSwap.sol#302-317) ignores return value by ILendFMe(lendFMe).withdraw(_token,uint256(- 1)) (../../sb/XSwap.sol#309)
+XSwap.transferIn(address,uint256) (../../sb/XSwap.sol#319-330) ignores return value by ILendFMe(lendFMe).supply(chai,IERC20Token(chai).balanceOf(address(this))) (../../sb/XSwap.sol#324)
+XSwap.transferIn(address,uint256) (../../sb/XSwap.sol#319-330) ignores return value by ILendFMe(lendFMe).supply(_token,NonStandardIERC20Token(_token).balanceOf(address(this))) (../../sb/XSwap.sol#327)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+XSwap.active(address)._lendFMe (../../sb/XSwap.sol#158) lacks a zero-check on :
+		- lendFMe = _lendFMe (../../sb/XSwap.sol#162)
+XSwap.setLendFMe(address)._lendFMe (../../sb/XSwap.sol#207) lacks a zero-check on :
+		- lendFMe = _lendFMe (../../sb/XSwap.sol#208)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+XSwap.active(address) (../../sb/XSwap.sol#158-164) compares to a boolean constant:
+	-require(bool,string)(actived == false,already actived.) (../../sb/XSwap.sol#159)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#boolean-equality
+
+Pragma version^0.5.4 (../../sb/XSwap.sol#1) allows old versions
+solc-0.5.17 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Parameter XSwap.active(address)._lendFMe (../../sb/XSwap.sol#158) is not in mixedCase
+Parameter XSwap.trade(address,address,uint256)._input (../../sb/XSwap.sol#167) is not in mixedCase
+Parameter XSwap.trade(address,address,uint256)._output (../../sb/XSwap.sol#167) is not in mixedCase
+Parameter XSwap.trade(address,address,uint256)._inputAmount (../../sb/XSwap.sol#167) is not in mixedCase
+Parameter XSwap.trade(address,address,uint256,address)._input (../../sb/XSwap.sol#171) is not in mixedCase
+Parameter XSwap.trade(address,address,uint256,address)._output (../../sb/XSwap.sol#171) is not in mixedCase
+Parameter XSwap.trade(address,address,uint256,address)._inputAmount (../../sb/XSwap.sol#171) is not in mixedCase
+Parameter XSwap.trade(address,address,uint256,address)._receiver (../../sb/XSwap.sol#171) is not in mixedCase
+Parameter XSwap.getTokenLiquidation(address)._token (../../sb/XSwap.sol#202) is not in mixedCase
+Parameter XSwap.setLendFMe(address)._lendFMe (../../sb/XSwap.sol#207) is not in mixedCase
+Parameter XSwap.enableLending(address)._token (../../sb/XSwap.sol#212) is not in mixedCase
+Parameter XSwap.disableLending(address)._token (../../sb/XSwap.sol#236) is not in mixedCase
+Parameter XSwap.createPair(address,address,uint256,uint256,uint256)._input (../../sb/XSwap.sol#251) is not in mixedCase
+Parameter XSwap.createPair(address,address,uint256,uint256,uint256)._output (../../sb/XSwap.sol#251) is not in mixedCase
+Parameter XSwap.createPair(address,address,uint256,uint256,uint256)._priceInOut (../../sb/XSwap.sol#251) is not in mixedCase
+Parameter XSwap.createPair(address,address,uint256,uint256,uint256)._priceOutIn (../../sb/XSwap.sol#251) is not in mixedCase
+Parameter XSwap.createPair(address,address,uint256,uint256,uint256)._fee (../../sb/XSwap.sol#251) is not in mixedCase
+Parameter XSwap.setPrices(address,address,uint256,uint256)._input (../../sb/XSwap.sol#257) is not in mixedCase
+Parameter XSwap.setPrices(address,address,uint256,uint256)._output (../../sb/XSwap.sol#257) is not in mixedCase
+Parameter XSwap.setPrices(address,address,uint256,uint256)._priceInOut (../../sb/XSwap.sol#257) is not in mixedCase
+Parameter XSwap.setPrices(address,address,uint256,uint256)._priceOutIn (../../sb/XSwap.sol#257) is not in mixedCase
+Parameter XSwap.setPrices(address,address,uint256)._input (../../sb/XSwap.sol#263) is not in mixedCase
+Parameter XSwap.setPrices(address,address,uint256)._output (../../sb/XSwap.sol#263) is not in mixedCase
+Parameter XSwap.setPrices(address,address,uint256)._price (../../sb/XSwap.sol#263) is not in mixedCase
+Parameter XSwap.setFee(address,address,uint256)._input (../../sb/XSwap.sol#268) is not in mixedCase
+Parameter XSwap.setFee(address,address,uint256)._output (../../sb/XSwap.sol#268) is not in mixedCase
+Parameter XSwap.setFee(address,address,uint256)._fee (../../sb/XSwap.sol#268) is not in mixedCase
+Parameter XSwap.setTokenDecimals(address,uint256)._token (../../sb/XSwap.sol#274) is not in mixedCase
+Parameter XSwap.setTokenDecimals(address,uint256)._decimals (../../sb/XSwap.sol#274) is not in mixedCase
+Parameter XSwap.emergencyStop(bool)._open (../../sb/XSwap.sol#280) is not in mixedCase
+Parameter XSwap.transferOut(address,address,uint256)._token (../../sb/XSwap.sol#285) is not in mixedCase
+Parameter XSwap.transferOut(address,address,uint256)._receiver (../../sb/XSwap.sol#285) is not in mixedCase
+Parameter XSwap.transferOut(address,address,uint256)._amount (../../sb/XSwap.sol#285) is not in mixedCase
+Parameter XSwap.transferOutALL(address,address)._token (../../sb/XSwap.sol#302) is not in mixedCase
+Parameter XSwap.transferOutALL(address,address)._receiver (../../sb/XSwap.sol#302) is not in mixedCase
+Parameter XSwap.transferIn(address,uint256)._token (../../sb/XSwap.sol#319) is not in mixedCase
+Parameter XSwap.transferIn(address,uint256)._amount (../../sb/XSwap.sol#319) is not in mixedCase
+Parameter XSwap.normalizeToken(address,uint256)._token (../../sb/XSwap.sol#332) is not in mixedCase
+Parameter XSwap.normalizeToken(address,uint256)._amount (../../sb/XSwap.sol#332) is not in mixedCase
+Parameter XSwap.denormalizedToken(address,uint256)._token (../../sb/XSwap.sol#337) is not in mixedCase
+Parameter XSwap.denormalizedToken(address,uint256)._amount (../../sb/XSwap.sol#337) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+XSwap.chai (../../sb/XSwap.sol#144) should be constant 
+XSwap.dai (../../sb/XSwap.sol#145) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+/sb/XSwap.sol analyzed (9 contracts with 93 detectors), 68 result(s) found

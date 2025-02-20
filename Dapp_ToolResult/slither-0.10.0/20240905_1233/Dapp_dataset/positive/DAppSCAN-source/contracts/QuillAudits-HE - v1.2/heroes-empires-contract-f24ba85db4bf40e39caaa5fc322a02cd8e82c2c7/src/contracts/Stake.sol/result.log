@@ -1,0 +1,175 @@
+'solc --version' running
+'solc /sb/Stake.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/Stake.sol:
+Warning: SPDX license identifier not provided in source file. Before publishing, consider adding a comment containing "SPDX-License-Identifier: <SPDX-License>" to each source file. Use "SPDX-License-Identifier: UNLICENSED" for non-open-source code. Please see https://spdx.org for more information.
+--> /sb/Stake.sol
+
+Warning: Visibility for constructor is ignored. If you want the contract to be non-deployable, making it "abstract" is sufficient.
+   --> /sb/Stake.sol:270:5:
+    |
+270 |     constructor( // SWC-111-Use of Deprecated Solidity Functions: L263
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+Stake.pendingToken(uint256,address) (../../sb/Stake.sol#366-379) performs a multiplication on the result of a division:
+	- heReward = multiplier.mul(rewardThisBlock).mul(pool.allocPoint).div(totalAllocPoint) (../../sb/Stake.sol#374)
+	- accHePerShare = accHePerShare.add(heReward.mul(1e18).div(lpSupply)) (../../sb/Stake.sol#375)
+Stake.updatePool(uint256) (../../sb/Stake.sol#389-404) performs a multiplication on the result of a division:
+	- heReward = multiplier.mul(rewardThisBlock).mul(pool.allocPoint).div(totalAllocPoint) (../../sb/Stake.sol#401)
+	- pool.accHePerShare = pool.accHePerShare.add(heReward.mul(1e18).div(lpSupply)) (../../sb/Stake.sol#402)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+Reentrancy in Stake.deposit(uint256,uint256) (../../sb/Stake.sol#406-425):
+	External calls:
+	- pool.heToken.safeTransferFrom(address(msg.sender),address(this),_amount) (../../sb/Stake.sol#419)
+	State variables written after the call(s):
+	- pool.balancePool = pool.balancePool.add(_amount) (../../sb/Stake.sol#420)
+	Stake.poolInfo (../../sb/Stake.sol#254) can be used in cross function reentrancies:
+	- Stake.add(uint256,IBEP20,bool) (../../sb/Stake.sol#309-324)
+	- Stake.deposit(uint256,uint256) (../../sb/Stake.sol#406-425)
+	- Stake.emergencyWithdraw(uint256) (../../sb/Stake.sol#499-508)
+	- Stake.massUpdatePools() (../../sb/Stake.sol#381-386)
+	- Stake.pendingClaim(uint256,uint256) (../../sb/Stake.sol#458-469)
+	- Stake.pendingToken(uint256,address) (../../sb/Stake.sol#366-379)
+	- Stake.pendingWithdraw(uint256,uint256) (../../sb/Stake.sol#428-443)
+	- Stake.poolInfo (../../sb/Stake.sol#254)
+	- Stake.poolLength() (../../sb/Stake.sol#286-288)
+	- Stake.reInvestment(uint256,uint256) (../../sb/Stake.sol#482-497)
+	- Stake.set(uint256,uint256,bool) (../../sb/Stake.sol#325-332)
+	- Stake.updatePool(uint256) (../../sb/Stake.sol#389-404)
+	- Stake.withdraw(uint256,uint256) (../../sb/Stake.sol#445-457)
+	- user.amount = user.amount.add(_amount) (../../sb/Stake.sol#421)
+	Stake.userInfo (../../sb/Stake.sol#256) can be used in cross function reentrancies:
+	- Stake.deposit(uint256,uint256) (../../sb/Stake.sol#406-425)
+	- Stake.emergencyWithdraw(uint256) (../../sb/Stake.sol#499-508)
+	- Stake.getViewWallet(uint256,address) (../../sb/Stake.sol#339-344)
+	- Stake.pendingClaim(uint256,uint256) (../../sb/Stake.sol#458-469)
+	- Stake.pendingToken(uint256,address) (../../sb/Stake.sol#366-379)
+	- Stake.pendingWithdraw(uint256,uint256) (../../sb/Stake.sol#428-443)
+	- Stake.reInvestment(uint256,uint256) (../../sb/Stake.sol#482-497)
+	- Stake.userInfo (../../sb/Stake.sol#256)
+	- user.rewardDebt = user.amount.mul(pool.accHePerShare).div(1e18) (../../sb/Stake.sol#423)
+	Stake.userInfo (../../sb/Stake.sol#256) can be used in cross function reentrancies:
+	- Stake.deposit(uint256,uint256) (../../sb/Stake.sol#406-425)
+	- Stake.emergencyWithdraw(uint256) (../../sb/Stake.sol#499-508)
+	- Stake.getViewWallet(uint256,address) (../../sb/Stake.sol#339-344)
+	- Stake.pendingClaim(uint256,uint256) (../../sb/Stake.sol#458-469)
+	- Stake.pendingToken(uint256,address) (../../sb/Stake.sol#366-379)
+	- Stake.pendingWithdraw(uint256,uint256) (../../sb/Stake.sol#428-443)
+	- Stake.reInvestment(uint256,uint256) (../../sb/Stake.sol#482-497)
+	- Stake.userInfo (../../sb/Stake.sol#256)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+Stake.withdraw(uint256,uint256) (../../sb/Stake.sol#445-457) contains a tautology or contradiction:
+	- require(bool,string)(amount >= 0,withdraw: not good) (../../sb/Stake.sol#452)
+Stake.pendingClaim(uint256,uint256) (../../sb/Stake.sol#458-469) contains a tautology or contradiction:
+	- require(bool,string)(user.amount >= 0,withdraw: not good) (../../sb/Stake.sol#461)
+Stake.claim(uint256,uint256) (../../sb/Stake.sol#470-481) contains a tautology or contradiction:
+	- require(bool,string)(amount >= 0,withdraw: not good) (../../sb/Stake.sol#475)
+Stake.reInvestment(uint256,uint256) (../../sb/Stake.sol#482-497) contains a tautology or contradiction:
+	- require(bool,string)(user.amount >= 0,amount: not good) (../../sb/Stake.sol#485)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#tautology-or-contradiction
+
+Reentrancy in Stake.claim(uint256,uint256) (../../sb/Stake.sol#470-481):
+	External calls:
+	- RE.transferToken(HE,address(msg.sender),amount) (../../sb/Stake.sol#479)
+	Event emitted after the call(s):
+	- Claim(msg.sender,_pid,amount,block.timestamp) (../../sb/Stake.sol#480)
+Reentrancy in Stake.deposit(uint256,uint256) (../../sb/Stake.sol#406-425):
+	External calls:
+	- pool.heToken.safeTransferFrom(address(msg.sender),address(this),_amount) (../../sb/Stake.sol#419)
+	Event emitted after the call(s):
+	- Deposit(msg.sender,_pid,_amount,block.timestamp) (../../sb/Stake.sol#424)
+Reentrancy in Stake.reInvestment(uint256,uint256) (../../sb/Stake.sol#482-497):
+	External calls:
+	- RE.transferToken(HE,address(this),_amount) (../../sb/Stake.sol#494)
+	Event emitted after the call(s):
+	- ReInvestment(msg.sender,_pid,_amount,block.timestamp) (../../sb/Stake.sol#495)
+Reentrancy in Stake.withdraw(uint256,uint256) (../../sb/Stake.sol#445-457):
+	External calls:
+	- pool.heToken.safeTransfer(address(msg.sender),amount) (../../sb/Stake.sol#455)
+	Event emitted after the call(s):
+	- Withdraw(msg.sender,_pid,amount,block.timestamp) (../../sb/Stake.sol#456)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Stake.withdraw(uint256,uint256) (../../sb/Stake.sol#445-457) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)((block.timestamp - timeWithdraw) > timeLockWithdraw,you are still in lock) (../../sb/Stake.sol#453)
+Stake.claim(uint256,uint256) (../../sb/Stake.sol#470-481) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)((block.timestamp - timeWithdraw) > timeLockClaim,you are still in lock) (../../sb/Stake.sol#476)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/Stake.sol#98-102) uses assembly
+	- INLINE ASM (../../sb/Stake.sol#100)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+AccessControl._setRoleAdmin(bytes32,bytes32) (../../sb/Stake.sol#195-198) is never used and should be removed
+Context._msgData() (../../sb/Stake.sol#134-137) is never used and should be removed
+Math.average(uint256,uint256) (../../sb/Stake.sol#12-14) is never used and should be removed
+Math.max(uint256,uint256) (../../sb/Stake.sol#6-8) is never used and should be removed
+Math.min(uint256,uint256) (../../sb/Stake.sol#9-11) is never used and should be removed
+SafeBEP20.safeApprove(IBEP20,address,uint256) (../../sb/Stake.sol#41-46) is never used and should be removed
+SafeBEP20.safeDecreaseAllowance(IBEP20,address,uint256) (../../sb/Stake.sol#51-55) is never used and should be removed
+SafeBEP20.safeIncreaseAllowance(IBEP20,address,uint256) (../../sb/Stake.sol#47-50) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/Stake.sol#91-94) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.8.0 (../../sb/Stake.sol#1) allows old versions
+solc-0.8.27 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in SafeBEP20.callOptionalReturn(IBEP20,bytes) (../../sb/Stake.sol#56-63):
+	- (success,returndata) = address(token).call(data) (../../sb/Stake.sol#58)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter Stake.changeTimeLockWithdraw(uint256)._timeLock (../../sb/Stake.sol#290) is not in mixedCase
+Parameter Stake.changeTimeLockClaim(uint256)._timeLock (../../sb/Stake.sol#294) is not in mixedCase
+Parameter Stake.changeHePerBlock(uint256)._hePerBlock (../../sb/Stake.sol#298) is not in mixedCase
+Parameter Stake.getWithdrawByAddress(uint256,address)._pid (../../sb/Stake.sol#303) is not in mixedCase
+Parameter Stake.getWithdrawByAddress(uint256,address)._address (../../sb/Stake.sol#303) is not in mixedCase
+Parameter Stake.getClaimByAddress(uint256,address)._pid (../../sb/Stake.sol#306) is not in mixedCase
+Parameter Stake.getClaimByAddress(uint256,address)._address (../../sb/Stake.sol#306) is not in mixedCase
+Parameter Stake.add(uint256,IBEP20,bool)._allocPoint (../../sb/Stake.sol#309) is not in mixedCase
+Parameter Stake.add(uint256,IBEP20,bool)._heToken (../../sb/Stake.sol#309) is not in mixedCase
+Parameter Stake.add(uint256,IBEP20,bool)._withUpdate (../../sb/Stake.sol#309) is not in mixedCase
+Parameter Stake.set(uint256,uint256,bool)._pid (../../sb/Stake.sol#325) is not in mixedCase
+Parameter Stake.set(uint256,uint256,bool)._allocPoint (../../sb/Stake.sol#325) is not in mixedCase
+Parameter Stake.set(uint256,uint256,bool)._withUpdate (../../sb/Stake.sol#325) is not in mixedCase
+Parameter Stake.addViewWallet(uint256,address)._pid (../../sb/Stake.sol#333) is not in mixedCase
+Parameter Stake.addViewWallet(uint256,address)._receive (../../sb/Stake.sol#333) is not in mixedCase
+Parameter Stake.getViewWallet(uint256,address)._pid (../../sb/Stake.sol#339) is not in mixedCase
+Parameter Stake.getViewWallet(uint256,address)._receive (../../sb/Stake.sol#339) is not in mixedCase
+Parameter Stake.getMultiplier(uint256,uint256)._from (../../sb/Stake.sol#346) is not in mixedCase
+Parameter Stake.getMultiplier(uint256,uint256)._to (../../sb/Stake.sol#346) is not in mixedCase
+Parameter Stake.pendingToken(uint256,address)._pid (../../sb/Stake.sol#366) is not in mixedCase
+Parameter Stake.pendingToken(uint256,address)._user (../../sb/Stake.sol#366) is not in mixedCase
+Parameter Stake.updatePool(uint256)._pid (../../sb/Stake.sol#389) is not in mixedCase
+Parameter Stake.deposit(uint256,uint256)._pid (../../sb/Stake.sol#406) is not in mixedCase
+Parameter Stake.deposit(uint256,uint256)._amount (../../sb/Stake.sol#406) is not in mixedCase
+Parameter Stake.pendingWithdraw(uint256,uint256)._pid (../../sb/Stake.sol#428) is not in mixedCase
+Parameter Stake.pendingWithdraw(uint256,uint256)._amount (../../sb/Stake.sol#428) is not in mixedCase
+Parameter Stake.withdraw(uint256,uint256)._pid (../../sb/Stake.sol#445) is not in mixedCase
+Parameter Stake.withdraw(uint256,uint256)._id (../../sb/Stake.sol#445) is not in mixedCase
+Parameter Stake.pendingClaim(uint256,uint256)._pid (../../sb/Stake.sol#458) is not in mixedCase
+Parameter Stake.pendingClaim(uint256,uint256)._amount (../../sb/Stake.sol#458) is not in mixedCase
+Parameter Stake.claim(uint256,uint256)._pid (../../sb/Stake.sol#470) is not in mixedCase
+Parameter Stake.claim(uint256,uint256)._id (../../sb/Stake.sol#470) is not in mixedCase
+Parameter Stake.reInvestment(uint256,uint256)._pid (../../sb/Stake.sol#482) is not in mixedCase
+Parameter Stake.reInvestment(uint256,uint256)._amount (../../sb/Stake.sol#482) is not in mixedCase
+Parameter Stake.emergencyWithdraw(uint256)._pid (../../sb/Stake.sol#499) is not in mixedCase
+Variable Stake.HE (../../sb/Stake.sol#220) is not in mixedCase
+Variable Stake.RE (../../sb/Stake.sol#221) is not in mixedCase
+Variable Stake.HePerBlock (../../sb/Stake.sol#251) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/Stake.sol#135)" inContext (../../sb/Stake.sol#132-138)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Stake.HE (../../sb/Stake.sol#220) should be immutable 
+Stake.RE (../../sb/Stake.sol#221) should be immutable 
+Stake.bonusEndBlock (../../sb/Stake.sol#232) should be immutable 
+Stake.startBlock (../../sb/Stake.sol#262) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/Stake.sol analyzed (13 contracts with 93 detectors), 69 result(s) found

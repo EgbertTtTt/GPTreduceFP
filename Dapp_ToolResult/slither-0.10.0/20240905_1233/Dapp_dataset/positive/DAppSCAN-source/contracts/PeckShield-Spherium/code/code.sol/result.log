@@ -1,0 +1,88 @@
+'solc --version' running
+'solc /sb/code.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+Reentrancy in SphrVestingStatic.claim() (../../sb/code.sol#690-705):
+	External calls:
+	- _token.safeTransfer(msg.sender,vestedAmount_) (../../sb/code.sol#702)
+	State variables written after the call(s):
+	- _releaseAmount[msg.sender] += vestedAmount_ (../../sb/code.sol#703)
+	SphrVestingStatic._releaseAmount (../../sb/code.sol#657) can be used in cross function reentrancies:
+	- SphrVestingStatic.claim() (../../sb/code.sol#690-705)
+	- SphrVestingStatic.vestedAmount() (../../sb/code.sol#675-688)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+SphrVestingStatic.vestedAmount().vestedAmount_ (../../sb/code.sol#678) is a local variable never initialized
+SphrVestingStatic.claim().vestedAmount_ (../../sb/code.sol#693) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+SphrVestingStatic.vestedAmount() (../../sb/code.sol#675-688) uses timestamp for comparisons
+	Dangerous comparisons:
+	- vestingSchedules_[i].schedule < block.timestamp (../../sb/code.sol#680)
+SphrVestingStatic.claim() (../../sb/code.sol#690-705) uses timestamp for comparisons
+	Dangerous comparisons:
+	- vestingSchedules_[i].schedule < block.timestamp (../../sb/code.sol#695)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/code.sol#410-419) uses assembly
+	- INLINE ASM (../../sb/code.sol#417)
+Address._verifyCallResult(bool,bytes,string) (../../sb/code.sol#555-572) uses assembly
+	- INLINE ASM (../../sb/code.sol#564-567)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.functionCall(address,bytes) (../../sb/code.sol#463-465) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/code.sol#488-490) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/code.sol#537-539) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/code.sol#547-553) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/code.sol#513-515) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/code.sol#523-529) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/code.sol#437-443) is never used and should be removed
+Context._msgData() (../../sb/code.sol#30-33) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/code.sol#604-613) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/code.sol#620-623) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/code.sol#615-618) is never used and should be removed
+SafeERC20.safeTransferFrom(IERC20,address,address,uint256) (../../sb/code.sol#593-595) is never used and should be removed
+SafeMath.add(uint256,uint256) (../../sb/code.sol#182-186) is never used and should be removed
+SafeMath.div(uint256,uint256) (../../sb/code.sol#232-235) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/code.sol#287-290) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/code.sol#249-252) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/code.sol#307-310) is never used and should be removed
+SafeMath.mul(uint256,uint256) (../../sb/code.sol#213-218) is never used and should be removed
+SafeMath.sub(uint256,uint256) (../../sb/code.sol#198-201) is never used and should be removed
+SafeMath.sub(uint256,uint256,string) (../../sb/code.sol#267-270) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/code.sol#121-125) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/code.sol#157-160) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/code.sol#167-170) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/code.sol#142-150) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/code.sol#132-135) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.6.12 (../../sb/code.sol#1) allows old versions
+Pragma version0.6.12 (../../sb/code.sol#2) allows old versions
+Pragma version0.6.12 (../../sb/code.sol#3) allows old versions
+Pragma version0.6.12 (../../sb/code.sol#4) allows old versions
+Pragma version0.6.12 (../../sb/code.sol#5) allows old versions
+Pragma version0.6.12 (../../sb/code.sol#6) allows old versions
+Pragma version0.6.12 (../../sb/code.sol#7) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/code.sol#437-443):
+	- (success) = recipient.call{value: amount}() (../../sb/code.sol#441)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/code.sol#498-505):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/code.sol#503)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/code.sol#523-529):
+	- (success,returndata) = target.staticcall(data) (../../sb/code.sol#527)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/code.sol#547-553):
+	- (success,returndata) = target.delegatecall(data) (../../sb/code.sol#551)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Redundant expression "this (../../sb/code.sol#31)" inContext (../../sb/code.sol#25-34)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Variable SphrVestingStatic._vestingSchedules (../../sb/code.sol#656) is too similar to SphrVestingStatic.claim().vestingSchedules_ (../../sb/code.sol#691)
+Variable SphrVestingStatic._vestingSchedules (../../sb/code.sol#656) is too similar to SphrVestingStatic.vestedAmount().vestingSchedules_ (../../sb/code.sol#676)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+SphrVestingStatic._token (../../sb/code.sol#655) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/code.sol analyzed (7 contracts with 93 detectors), 48 result(s) found

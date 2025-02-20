@@ -1,0 +1,133 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 25 Code Findings │
+└──────────────────┘
+                
+    /sb/PRA.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          324┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          328┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          339┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          344┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          349┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          426┆ constructor(address _ACL, address _gov, uint256 _line) public {
+          427┆     ACL = _ACL;
+          428┆     gov = _gov;
+          429┆     line = _line;
+          430┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          107┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          161┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          336┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          337┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          338┆ );
+            ⋮┆----------------------------------------
+          367┆ require(address(token).isContract(), "SafeERC20: call to         
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          371┆ require(success, "SafeERC20: low-level call failed");
+            ⋮┆----------------------------------------
+          375┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          414┆ require(
+          415┆     _ACL.accessible(msg.sender, address(this), msg.sig),
+          416┆     "PRA: access unauthorized"
+          417┆ );
+            ⋮┆----------------------------------------
+          422┆ require(msg.sender == ACL, "require ACL");
+            ⋮┆----------------------------------------
+          440┆ require(deposits[who].amount == 0, "sender already locked");
+            ⋮┆----------------------------------------
+          441┆ require(
+          442┆     IERC20(gov).allowance(who, address(this)) >= line,
+          443┆     "insufficient allowance to lock"
+          444┆ );
+            ⋮┆----------------------------------------
+          445┆ require(
+          446┆     IERC20(gov).balanceOf(who) >= line,
+          447┆     "insufficient balance to lock"
+          448┆ );
+            ⋮┆----------------------------------------
+          455┆ require(deposits[who].amount >= line, "insufficient deposit      
+  token");                                                                      
+            ⋮┆----------------------------------------
+          458┆ require(
+          459┆     !raters[who],
+          460┆     "set account already is a professional rater"
+          461┆ );
+            ⋮┆----------------------------------------
+          470┆ require(!raters[who], "raters is not broken");
+            ⋮┆----------------------------------------
+          471┆ require(deposits[who].reviewed, "not submitted for review");
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          161┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          336┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          337┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          338┆ );
+            ⋮┆----------------------------------------
+          375┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          458┆ require(
+          459┆     !raters[who],
+          460┆     "set account already is a professional rater"
+          461┆ );
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 25 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

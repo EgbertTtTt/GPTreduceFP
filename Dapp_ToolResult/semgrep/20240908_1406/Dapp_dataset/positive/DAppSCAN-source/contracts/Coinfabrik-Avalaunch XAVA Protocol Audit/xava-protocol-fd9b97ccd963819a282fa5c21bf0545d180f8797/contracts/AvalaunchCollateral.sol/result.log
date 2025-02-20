@@ -1,0 +1,219 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 59 Code Findings │
+└──────────────────┘
+                                
+    /sb/AvalaunchCollateral.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          573┆ for(uint i = 0; i < _admins.length; i++) {
+            ⋮┆----------------------------------------
+          607┆ if(i == admins.length) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          572┆ constructor (address [] memory _admins) public {
+          573┆     for(uint i = 0; i < _admins.length; i++) {
+          574┆         admins.push(_admins[i]);
+          575┆         isAdmin[_admins[i]] = true;
+          576┆     }
+          577┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          574┆ admins.push(_admins[i]);
+            ⋮┆----------------------------------------
+          575┆ isAdmin[_admins[i]] = true;
+            ⋮┆----------------------------------------
+          606┆ while(admins[i] != _adminAddress) {
+            ⋮┆----------------------------------------
+          607┆ if(i == admins.length) {
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          573┆ for(uint i = 0; i < _admins.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           54┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+           58┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          115┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          116┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          140┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          164┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          220┆ require(_initializing || _isConstructor() || !_initialized,      
+  "Initializable: contract is already initialized");                            
+            ⋮┆----------------------------------------
+          265┆ revert("ECDSA: invalid signature length");
+            ⋮┆----------------------------------------
+          299┆ require(uint256(s) <=                                            
+  0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0, "ECDSA:   
+  invalid signature 's' value");                                                
+            ⋮┆----------------------------------------
+          300┆ require(v == 27 || v == 28, "ECDSA: invalid signature 'v'        
+  value");                                                                      
+            ⋮┆----------------------------------------
+          304┆ require(signer != address(0), "ECDSA: invalid signature");
+            ⋮┆----------------------------------------
+          406┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          421┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          438┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          455┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          472┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          567┆ require(isAdmin[msg.sender], "Only admin can call.");
+            ⋮┆----------------------------------------
+          586┆ require(_adminAddress != address(0x0), "[RBAC] : Admin must be !=
+  than 0x0 address");                                                           
+            ⋮┆----------------------------------------
+          588┆ require(!isAdmin[_adminAddress], "[RBAC] : Admin already         
+  exists.");                                                                    
+            ⋮┆----------------------------------------
+          603┆ require(admins.length > 1, "Can not remove all admins since      
+  contract becomes unusable.");                                                 
+            ⋮┆----------------------------------------
+          608┆ revert("Passed admin address does not exist");
+            ⋮┆----------------------------------------
+          674┆ require(admin.isAdmin(msg.sender), "Only admin.");
+            ⋮┆----------------------------------------
+          679┆ require(msg.sender == moderator, "Only moderator.");
+            ⋮┆----------------------------------------
+          691┆ require(_moderator != address(0x0), "Moderator can not be 0x0.");
+            ⋮┆----------------------------------------
+          692┆ require(_admin != address(0x0), "Admin can not be 0x0.");
+            ⋮┆----------------------------------------
+          734┆ require(userBalance[msg.sender] >= _amount, "Not enough funds.");
+            ⋮┆----------------------------------------
+          774┆ require(isSaleApprovedByModerator[saleAddress], "Sale contract   
+  not approved by moderator.");                                                 
+            ⋮┆----------------------------------------
+          776┆ require(!isSignatureUsed[permitSignature], "Signature already    
+  used.");                                                                      
+            ⋮┆----------------------------------------
+          780┆ require(!saleAutoBuyers[saleAddress][user], "User autoBuy already
+  active.");                                                                    
+            ⋮┆----------------------------------------
+          784┆ require(verifyAutoBuySignature(user, saleAddress,                
+  permitSignature), "AutoBuy signature invalid.");                              
+            ⋮┆----------------------------------------
+          786┆ require(amountAVAX.add(participationFeeAVAX) <=                  
+  userBalance[user], "Not enough collateral.");                                 
+            ⋮┆----------------------------------------
+          831┆ require(isSaleApprovedByModerator[saleAddress], "Sale contract   
+  not approved by moderator.");                                                 
+            ⋮┆----------------------------------------
+          833┆ require(amountAVAX.add(boostFeeAVAX) <= userBalance[user], "Not  
+  enough collateral.");                                                         
+            ⋮┆----------------------------------------
+          837┆ require(!isSignatureUsed[permitSignature], "Signature already    
+  used.");                                                                      
+            ⋮┆----------------------------------------
+          841┆ require(verifyBoostSignature(user, saleAddress, permitSignature),
+  "Boost signature invalid.");                                                  
+            ⋮┆----------------------------------------
+          858┆ require(_moderator != address(0x0), "Moderator can not be 0x0");
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          573┆ for(uint i = 0; i < _admins.length; i++) {
+            ⋮┆----------------------------------------
+          610┆ i++;
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           58┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          115┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          140┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          164┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          220┆ require(_initializing || _isConstructor() || !_initialized,      
+  "Initializable: contract is already initialized");                            
+            ⋮┆----------------------------------------
+          299┆ require(uint256(s) <=                                            
+  0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0, "ECDSA:   
+  invalid signature 's' value");                                                
+            ⋮┆----------------------------------------
+          300┆ require(v == 27 || v == 28, "ECDSA: invalid signature 'v'        
+  value");                                                                      
+            ⋮┆----------------------------------------
+          438┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          586┆ require(_adminAddress != address(0x0), "[RBAC] : Admin must be !=
+  than 0x0 address");                                                           
+            ⋮┆----------------------------------------
+          603┆ require(admins.length > 1, "Can not remove all admins since      
+  contract becomes unusable.");                                                 
+            ⋮┆----------------------------------------
+          608┆ revert("Passed admin address does not exist");
+            ⋮┆----------------------------------------
+          774┆ require(isSaleApprovedByModerator[saleAddress], "Sale contract   
+  not approved by moderator.");                                                 
+            ⋮┆----------------------------------------
+          831┆ require(isSaleApprovedByModerator[saleAddress], "Sale contract   
+  not approved by moderator.");                                                 
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 59 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

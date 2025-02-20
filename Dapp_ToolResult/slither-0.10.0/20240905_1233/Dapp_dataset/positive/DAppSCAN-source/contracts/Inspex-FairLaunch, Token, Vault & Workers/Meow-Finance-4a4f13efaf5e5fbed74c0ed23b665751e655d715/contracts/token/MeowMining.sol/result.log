@@ -1,0 +1,516 @@
+'solc --version' running
+'solc /sb/MeowMining.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+Reentrancy in DevelopmentFund.lock(uint256) (../../sb/MeowMining.sol#1289-1296):
+	External calls:
+	- Meow.safeTransferFrom(msg.sender,address(this),_amount) (../../sb/MeowMining.sol#1290)
+	- unlock() (../../sb/MeowMining.sol#1291)
+		- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (../../sb/MeowMining.sol#536)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/MeowMining.sol#404)
+		- Meow.safeTransfer(devaddr,amount) (../../sb/MeowMining.sol#1318)
+	External calls sending eth:
+	- unlock() (../../sb/MeowMining.sol#1291)
+		- (success,returndata) = target.call{value: value}(data) (../../sb/MeowMining.sol#404)
+	State variables written after the call(s):
+	- lockTo = block.timestamp.add(lockPeriod) (../../sb/MeowMining.sol#1294)
+	DevelopmentFund.lockTo (../../sb/MeowMining.sol#1275) can be used in cross function reentrancies:
+	- DevelopmentFund.availableUnlock() (../../sb/MeowMining.sol#1299-1307)
+	- DevelopmentFund.lock(uint256) (../../sb/MeowMining.sol#1289-1296)
+	- DevelopmentFund.lockTo (../../sb/MeowMining.sol#1275)
+	- lockedAmount = lockedAmount.add(_amount) (../../sb/MeowMining.sol#1293)
+	DevelopmentFund.lockedAmount (../../sb/MeowMining.sol#1271) can be used in cross function reentrancies:
+	- DevelopmentFund.availableUnlock() (../../sb/MeowMining.sol#1299-1307)
+	- DevelopmentFund.lock(uint256) (../../sb/MeowMining.sol#1289-1296)
+	- DevelopmentFund.lockedAmount (../../sb/MeowMining.sol#1271)
+	- DevelopmentFund.unlock() (../../sb/MeowMining.sol#1310-1320)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities
+
+MeowMining.pendingMeow(uint256,address) (../../sb/MeowMining.sol#1460-1471) performs a multiplication on the result of a division:
+	- meowReward = time.mul(meowPerSecond).mul(pool.allocPoint).div(totalAllocPoint) (../../sb/MeowMining.sol#1467)
+	- accMeowPerShare = accMeowPerShare.add(meowReward.mul(ACC_MEOW_PRECISION).div(stakeTokenSupply)) (../../sb/MeowMining.sol#1468)
+MeowMining.updatePool(uint256) (../../sb/MeowMining.sol#1482-1499) performs a multiplication on the result of a division:
+	- meowReward = time.mul(meowPerSecond).mul(pool.allocPoint).div(totalAllocPoint) (../../sb/MeowMining.sol#1488)
+	- devfund = meowReward.mul(10000).div(114286) (../../sb/MeowMining.sol#1490)
+MeowMining.updatePool(uint256) (../../sb/MeowMining.sol#1482-1499) performs a multiplication on the result of a division:
+	- devfund = meowReward.mul(10000).div(114286) (../../sb/MeowMining.sol#1490)
+	- safeMeowTransfer(devaddr,devfund.mul(preShare).div(10000)) (../../sb/MeowMining.sol#1493)
+MeowMining.updatePool(uint256) (../../sb/MeowMining.sol#1482-1499) performs a multiplication on the result of a division:
+	- devfund = meowReward.mul(10000).div(114286) (../../sb/MeowMining.sol#1490)
+	- developmentFund.lock(devfund.mul(lockShare).div(10000)) (../../sb/MeowMining.sol#1494)
+MeowMining.updatePool(uint256) (../../sb/MeowMining.sol#1482-1499) performs a multiplication on the result of a division:
+	- meowReward = time.mul(meowPerSecond).mul(pool.allocPoint).div(totalAllocPoint) (../../sb/MeowMining.sol#1488)
+	- pool.accMeowPerShare = pool.accMeowPerShare.add(meowReward.mul(ACC_MEOW_PRECISION).div(stakeTokenSupply)) (../../sb/MeowMining.sol#1495)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+MeowToken._writeCheckpoint(address,uint32,uint256,uint256) (../../sb/MeowMining.sol#1228-1244) uses a dangerous strict equality:
+	- nCheckpoints > 0 && checkpoints[delegatee][nCheckpoints - 1].fromBlock == blockNumber (../../sb/MeowMining.sol#1236)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Reentrancy in MeowMining._withdraw(address,uint256,uint256) (../../sb/MeowMining.sol#1533-1551):
+	External calls:
+	- updatePool(_pid) (../../sb/MeowMining.sol#1542)
+		- require(bool,string)(meow.transfer(_to,meowBal),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1639)
+		- require(bool,string)(meow.transfer(_to,_amount),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1641)
+		- meow.mint(address(this),devfund) (../../sb/MeowMining.sol#1491)
+		- meow.mint(address(this),meowReward) (../../sb/MeowMining.sol#1492)
+		- developmentFund.lock(devfund.mul(lockShare).div(10000)) (../../sb/MeowMining.sol#1494)
+	- _harvest(_for,_pid) (../../sb/MeowMining.sol#1543)
+		- require(bool,string)(meow.transfer(_to,meowBal),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1639)
+		- require(bool,string)(meow.transfer(_to,_amount),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1641)
+	State variables written after the call(s):
+	- _harvest(_for,_pid) (../../sb/MeowMining.sol#1543)
+		- user.lastUnlockTime = block.timestamp (../../sb/MeowMining.sol#1610)
+		- user.lockedAmount = user.lockedAmount.add(_amount) (../../sb/MeowMining.sol#1584)
+		- user.lockTo = block.timestamp.add(lockPeriod) (../../sb/MeowMining.sol#1585)
+		- user.lockedAmount = user.lockedAmount.sub(amount) (../../sb/MeowMining.sol#1616)
+	MeowMining.userInfo (../../sb/MeowMining.sol#1370) can be used in cross function reentrancies:
+	- MeowMining.availableUnlock(uint256,address) (../../sb/MeowMining.sol#1592-1601)
+	- MeowMining.pendingMeow(uint256,address) (../../sb/MeowMining.sol#1460-1471)
+	- MeowMining.unlock(uint256,address) (../../sb/MeowMining.sol#1608-1621)
+	- MeowMining.userInfo (../../sb/MeowMining.sol#1370)
+	- user.amount = user.amount.sub(_amount) (../../sb/MeowMining.sol#1544)
+	MeowMining.userInfo (../../sb/MeowMining.sol#1370) can be used in cross function reentrancies:
+	- MeowMining.availableUnlock(uint256,address) (../../sb/MeowMining.sol#1592-1601)
+	- MeowMining.pendingMeow(uint256,address) (../../sb/MeowMining.sol#1460-1471)
+	- MeowMining.unlock(uint256,address) (../../sb/MeowMining.sol#1608-1621)
+	- MeowMining.userInfo (../../sb/MeowMining.sol#1370)
+	- user.rewardDebt = user.amount.mul(pool.accMeowPerShare).div(ACC_MEOW_PRECISION) (../../sb/MeowMining.sol#1545)
+	MeowMining.userInfo (../../sb/MeowMining.sol#1370) can be used in cross function reentrancies:
+	- MeowMining.availableUnlock(uint256,address) (../../sb/MeowMining.sol#1592-1601)
+	- MeowMining.pendingMeow(uint256,address) (../../sb/MeowMining.sol#1460-1471)
+	- MeowMining.unlock(uint256,address) (../../sb/MeowMining.sol#1608-1621)
+	- MeowMining.userInfo (../../sb/MeowMining.sol#1370)
+	- user.fundedBy = address(0) (../../sb/MeowMining.sol#1546)
+	MeowMining.userInfo (../../sb/MeowMining.sol#1370) can be used in cross function reentrancies:
+	- MeowMining.availableUnlock(uint256,address) (../../sb/MeowMining.sol#1592-1601)
+	- MeowMining.pendingMeow(uint256,address) (../../sb/MeowMining.sol#1460-1471)
+	- MeowMining.unlock(uint256,address) (../../sb/MeowMining.sol#1608-1621)
+	- MeowMining.userInfo (../../sb/MeowMining.sol#1370)
+Reentrancy in MeowMining.addPool(uint256,address) (../../sb/MeowMining.sol#1427-1437):
+	External calls:
+	- massUpdatePools() (../../sb/MeowMining.sol#1428)
+		- require(bool,string)(meow.transfer(_to,meowBal),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1639)
+		- require(bool,string)(meow.transfer(_to,_amount),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1641)
+		- meow.mint(address(this),devfund) (../../sb/MeowMining.sol#1491)
+		- meow.mint(address(this),meowReward) (../../sb/MeowMining.sol#1492)
+		- developmentFund.lock(devfund.mul(lockShare).div(10000)) (../../sb/MeowMining.sol#1494)
+	State variables written after the call(s):
+	- poolInfo.push(PoolInfo({stakeToken:_stakeToken,allocPoint:_allocPoint,lastRewardTime:lastRewardTime,accMeowPerShare:0})) (../../sb/MeowMining.sol#1433-1435)
+	MeowMining.poolInfo (../../sb/MeowMining.sol#1368) can be used in cross function reentrancies:
+	- MeowMining.addPool(uint256,address) (../../sb/MeowMining.sol#1427-1437)
+	- MeowMining.massUpdatePools() (../../sb/MeowMining.sol#1474-1479)
+	- MeowMining.pendingMeow(uint256,address) (../../sb/MeowMining.sol#1460-1471)
+	- MeowMining.poolInfo (../../sb/MeowMining.sol#1368)
+	- MeowMining.poolLength() (../../sb/MeowMining.sol#1446-1448)
+	- MeowMining.setPool(uint256,uint256) (../../sb/MeowMining.sol#1440-1444)
+	- MeowMining.updatePool(uint256) (../../sb/MeowMining.sol#1482-1499)
+	- totalAllocPoint = totalAllocPoint.add(_allocPoint) (../../sb/MeowMining.sol#1432)
+	MeowMining.totalAllocPoint (../../sb/MeowMining.sol#1374) can be used in cross function reentrancies:
+	- MeowMining.addPool(uint256,address) (../../sb/MeowMining.sol#1427-1437)
+	- MeowMining.constructor(MeowToken,uint256,uint256,uint256,uint256,address,DevelopmentFund) (../../sb/MeowMining.sol#1395-1413)
+	- MeowMining.pendingMeow(uint256,address) (../../sb/MeowMining.sol#1460-1471)
+	- MeowMining.setPool(uint256,uint256) (../../sb/MeowMining.sol#1440-1444)
+	- MeowMining.totalAllocPoint (../../sb/MeowMining.sol#1374)
+	- MeowMining.updatePool(uint256) (../../sb/MeowMining.sol#1482-1499)
+Reentrancy in MeowMining.deposit(address,uint256,uint256) (../../sb/MeowMining.sol#1502-1518):
+	External calls:
+	- updatePool(_pid) (../../sb/MeowMining.sol#1511)
+		- require(bool,string)(meow.transfer(_to,meowBal),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1639)
+		- require(bool,string)(meow.transfer(_to,_amount),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1641)
+		- meow.mint(address(this),devfund) (../../sb/MeowMining.sol#1491)
+		- meow.mint(address(this),meowReward) (../../sb/MeowMining.sol#1492)
+		- developmentFund.lock(devfund.mul(lockShare).div(10000)) (../../sb/MeowMining.sol#1494)
+	- _harvest(_for,_pid) (../../sb/MeowMining.sol#1512)
+		- require(bool,string)(meow.transfer(_to,meowBal),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1639)
+		- require(bool,string)(meow.transfer(_to,_amount),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1641)
+	State variables written after the call(s):
+	- _harvest(_for,_pid) (../../sb/MeowMining.sol#1512)
+		- user.lastUnlockTime = block.timestamp (../../sb/MeowMining.sol#1610)
+		- user.lockedAmount = user.lockedAmount.add(_amount) (../../sb/MeowMining.sol#1584)
+		- user.lockTo = block.timestamp.add(lockPeriod) (../../sb/MeowMining.sol#1585)
+		- user.lockedAmount = user.lockedAmount.sub(amount) (../../sb/MeowMining.sol#1616)
+	MeowMining.userInfo (../../sb/MeowMining.sol#1370) can be used in cross function reentrancies:
+	- MeowMining.availableUnlock(uint256,address) (../../sb/MeowMining.sol#1592-1601)
+	- MeowMining.pendingMeow(uint256,address) (../../sb/MeowMining.sol#1460-1471)
+	- MeowMining.unlock(uint256,address) (../../sb/MeowMining.sol#1608-1621)
+	- MeowMining.userInfo (../../sb/MeowMining.sol#1370)
+	- user.fundedBy = msg.sender (../../sb/MeowMining.sol#1513)
+	MeowMining.userInfo (../../sb/MeowMining.sol#1370) can be used in cross function reentrancies:
+	- MeowMining.availableUnlock(uint256,address) (../../sb/MeowMining.sol#1592-1601)
+	- MeowMining.pendingMeow(uint256,address) (../../sb/MeowMining.sol#1460-1471)
+	- MeowMining.unlock(uint256,address) (../../sb/MeowMining.sol#1608-1621)
+	- MeowMining.userInfo (../../sb/MeowMining.sol#1370)
+Reentrancy in MeowMining.deposit(address,uint256,uint256) (../../sb/MeowMining.sol#1502-1518):
+	External calls:
+	- updatePool(_pid) (../../sb/MeowMining.sol#1511)
+		- require(bool,string)(meow.transfer(_to,meowBal),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1639)
+		- require(bool,string)(meow.transfer(_to,_amount),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1641)
+		- meow.mint(address(this),devfund) (../../sb/MeowMining.sol#1491)
+		- meow.mint(address(this),meowReward) (../../sb/MeowMining.sol#1492)
+		- developmentFund.lock(devfund.mul(lockShare).div(10000)) (../../sb/MeowMining.sol#1494)
+	- _harvest(_for,_pid) (../../sb/MeowMining.sol#1512)
+		- require(bool,string)(meow.transfer(_to,meowBal),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1639)
+		- require(bool,string)(meow.transfer(_to,_amount),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1641)
+	- IERC20(pool.stakeToken).safeTransferFrom(address(msg.sender),address(this),_amount) (../../sb/MeowMining.sol#1514)
+	State variables written after the call(s):
+	- user.amount = user.amount.add(_amount) (../../sb/MeowMining.sol#1515)
+	MeowMining.userInfo (../../sb/MeowMining.sol#1370) can be used in cross function reentrancies:
+	- MeowMining.availableUnlock(uint256,address) (../../sb/MeowMining.sol#1592-1601)
+	- MeowMining.pendingMeow(uint256,address) (../../sb/MeowMining.sol#1460-1471)
+	- MeowMining.unlock(uint256,address) (../../sb/MeowMining.sol#1608-1621)
+	- MeowMining.userInfo (../../sb/MeowMining.sol#1370)
+	- user.rewardDebt = user.amount.mul(pool.accMeowPerShare).div(ACC_MEOW_PRECISION) (../../sb/MeowMining.sol#1516)
+	MeowMining.userInfo (../../sb/MeowMining.sol#1370) can be used in cross function reentrancies:
+	- MeowMining.availableUnlock(uint256,address) (../../sb/MeowMining.sol#1592-1601)
+	- MeowMining.pendingMeow(uint256,address) (../../sb/MeowMining.sol#1460-1471)
+	- MeowMining.unlock(uint256,address) (../../sb/MeowMining.sol#1608-1621)
+	- MeowMining.userInfo (../../sb/MeowMining.sol#1370)
+Reentrancy in MeowMining.emergencyWithdraw(uint256) (../../sb/MeowMining.sol#1624-1633):
+	External calls:
+	- IERC20(pool.stakeToken).safeTransfer(address(msg.sender),user.amount) (../../sb/MeowMining.sol#1628)
+	State variables written after the call(s):
+	- user.amount = 0 (../../sb/MeowMining.sol#1630)
+	MeowMining.userInfo (../../sb/MeowMining.sol#1370) can be used in cross function reentrancies:
+	- MeowMining.availableUnlock(uint256,address) (../../sb/MeowMining.sol#1592-1601)
+	- MeowMining.pendingMeow(uint256,address) (../../sb/MeowMining.sol#1460-1471)
+	- MeowMining.unlock(uint256,address) (../../sb/MeowMining.sol#1608-1621)
+	- MeowMining.userInfo (../../sb/MeowMining.sol#1370)
+	- user.rewardDebt = 0 (../../sb/MeowMining.sol#1631)
+	MeowMining.userInfo (../../sb/MeowMining.sol#1370) can be used in cross function reentrancies:
+	- MeowMining.availableUnlock(uint256,address) (../../sb/MeowMining.sol#1592-1601)
+	- MeowMining.pendingMeow(uint256,address) (../../sb/MeowMining.sol#1460-1471)
+	- MeowMining.unlock(uint256,address) (../../sb/MeowMining.sol#1608-1621)
+	- MeowMining.userInfo (../../sb/MeowMining.sol#1370)
+	- user.fundedBy = address(0) (../../sb/MeowMining.sol#1632)
+	MeowMining.userInfo (../../sb/MeowMining.sol#1370) can be used in cross function reentrancies:
+	- MeowMining.availableUnlock(uint256,address) (../../sb/MeowMining.sol#1592-1601)
+	- MeowMining.pendingMeow(uint256,address) (../../sb/MeowMining.sol#1460-1471)
+	- MeowMining.unlock(uint256,address) (../../sb/MeowMining.sol#1608-1621)
+	- MeowMining.userInfo (../../sb/MeowMining.sol#1370)
+Reentrancy in MeowMining.harvest(uint256) (../../sb/MeowMining.sol#1554-1560):
+	External calls:
+	- updatePool(_pid) (../../sb/MeowMining.sol#1557)
+		- require(bool,string)(meow.transfer(_to,meowBal),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1639)
+		- require(bool,string)(meow.transfer(_to,_amount),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1641)
+		- meow.mint(address(this),devfund) (../../sb/MeowMining.sol#1491)
+		- meow.mint(address(this),meowReward) (../../sb/MeowMining.sol#1492)
+		- developmentFund.lock(devfund.mul(lockShare).div(10000)) (../../sb/MeowMining.sol#1494)
+	- _harvest(msg.sender,_pid) (../../sb/MeowMining.sol#1558)
+		- require(bool,string)(meow.transfer(_to,meowBal),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1639)
+		- require(bool,string)(meow.transfer(_to,_amount),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1641)
+	State variables written after the call(s):
+	- _harvest(msg.sender,_pid) (../../sb/MeowMining.sol#1558)
+		- user.lastUnlockTime = block.timestamp (../../sb/MeowMining.sol#1610)
+		- user.lockedAmount = user.lockedAmount.add(_amount) (../../sb/MeowMining.sol#1584)
+		- user.lockTo = block.timestamp.add(lockPeriod) (../../sb/MeowMining.sol#1585)
+		- user.lockedAmount = user.lockedAmount.sub(amount) (../../sb/MeowMining.sol#1616)
+	MeowMining.userInfo (../../sb/MeowMining.sol#1370) can be used in cross function reentrancies:
+	- MeowMining.availableUnlock(uint256,address) (../../sb/MeowMining.sol#1592-1601)
+	- MeowMining.pendingMeow(uint256,address) (../../sb/MeowMining.sol#1460-1471)
+	- MeowMining.unlock(uint256,address) (../../sb/MeowMining.sol#1608-1621)
+	- MeowMining.userInfo (../../sb/MeowMining.sol#1370)
+	- user.rewardDebt = user.amount.mul(pool.accMeowPerShare).div(ACC_MEOW_PRECISION) (../../sb/MeowMining.sol#1559)
+	MeowMining.userInfo (../../sb/MeowMining.sol#1370) can be used in cross function reentrancies:
+	- MeowMining.availableUnlock(uint256,address) (../../sb/MeowMining.sol#1592-1601)
+	- MeowMining.pendingMeow(uint256,address) (../../sb/MeowMining.sol#1460-1471)
+	- MeowMining.unlock(uint256,address) (../../sb/MeowMining.sol#1608-1621)
+	- MeowMining.userInfo (../../sb/MeowMining.sol#1370)
+Reentrancy in MeowMining.lock(uint256,address,uint256) (../../sb/MeowMining.sol#1576-1589):
+	External calls:
+	- unlock(_pid,_holder) (../../sb/MeowMining.sol#1581)
+		- require(bool,string)(meow.transfer(_to,meowBal),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1639)
+		- require(bool,string)(meow.transfer(_to,_amount),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1641)
+	State variables written after the call(s):
+	- totalLock = totalLock.add(_amount) (../../sb/MeowMining.sol#1586)
+	MeowMining.totalLock (../../sb/MeowMining.sol#1380) can be used in cross function reentrancies:
+	- MeowMining.totalLock (../../sb/MeowMining.sol#1380)
+	- MeowMining.unlock(uint256,address) (../../sb/MeowMining.sol#1608-1621)
+	- user.lockedAmount = user.lockedAmount.add(_amount) (../../sb/MeowMining.sol#1584)
+	MeowMining.userInfo (../../sb/MeowMining.sol#1370) can be used in cross function reentrancies:
+	- MeowMining.availableUnlock(uint256,address) (../../sb/MeowMining.sol#1592-1601)
+	- MeowMining.pendingMeow(uint256,address) (../../sb/MeowMining.sol#1460-1471)
+	- MeowMining.unlock(uint256,address) (../../sb/MeowMining.sol#1608-1621)
+	- MeowMining.userInfo (../../sb/MeowMining.sol#1370)
+	- user.lockTo = block.timestamp.add(lockPeriod) (../../sb/MeowMining.sol#1585)
+	MeowMining.userInfo (../../sb/MeowMining.sol#1370) can be used in cross function reentrancies:
+	- MeowMining.availableUnlock(uint256,address) (../../sb/MeowMining.sol#1592-1601)
+	- MeowMining.pendingMeow(uint256,address) (../../sb/MeowMining.sol#1460-1471)
+	- MeowMining.unlock(uint256,address) (../../sb/MeowMining.sol#1608-1621)
+	- MeowMining.userInfo (../../sb/MeowMining.sol#1370)
+Reentrancy in MeowMining.setMeowPerSecond(uint256) (../../sb/MeowMining.sol#1421-1424):
+	External calls:
+	- massUpdatePools() (../../sb/MeowMining.sol#1422)
+		- require(bool,string)(meow.transfer(_to,meowBal),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1639)
+		- require(bool,string)(meow.transfer(_to,_amount),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1641)
+		- meow.mint(address(this),devfund) (../../sb/MeowMining.sol#1491)
+		- meow.mint(address(this),meowReward) (../../sb/MeowMining.sol#1492)
+		- developmentFund.lock(devfund.mul(lockShare).div(10000)) (../../sb/MeowMining.sol#1494)
+	State variables written after the call(s):
+	- meowPerSecond = _meowPerSecond (../../sb/MeowMining.sol#1423)
+	MeowMining.meowPerSecond (../../sb/MeowMining.sol#1365) can be used in cross function reentrancies:
+	- MeowMining.constructor(MeowToken,uint256,uint256,uint256,uint256,address,DevelopmentFund) (../../sb/MeowMining.sol#1395-1413)
+	- MeowMining.meowPerSecond (../../sb/MeowMining.sol#1365)
+	- MeowMining.pendingMeow(uint256,address) (../../sb/MeowMining.sol#1460-1471)
+	- MeowMining.setMeowPerSecond(uint256) (../../sb/MeowMining.sol#1421-1424)
+	- MeowMining.updatePool(uint256) (../../sb/MeowMining.sol#1482-1499)
+Reentrancy in MeowMining.setPool(uint256,uint256) (../../sb/MeowMining.sol#1440-1444):
+	External calls:
+	- massUpdatePools() (../../sb/MeowMining.sol#1441)
+		- require(bool,string)(meow.transfer(_to,meowBal),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1639)
+		- require(bool,string)(meow.transfer(_to,_amount),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1641)
+		- meow.mint(address(this),devfund) (../../sb/MeowMining.sol#1491)
+		- meow.mint(address(this),meowReward) (../../sb/MeowMining.sol#1492)
+		- developmentFund.lock(devfund.mul(lockShare).div(10000)) (../../sb/MeowMining.sol#1494)
+	State variables written after the call(s):
+	- poolInfo[_pid].allocPoint = _allocPoint (../../sb/MeowMining.sol#1443)
+	MeowMining.poolInfo (../../sb/MeowMining.sol#1368) can be used in cross function reentrancies:
+	- MeowMining.addPool(uint256,address) (../../sb/MeowMining.sol#1427-1437)
+	- MeowMining.massUpdatePools() (../../sb/MeowMining.sol#1474-1479)
+	- MeowMining.pendingMeow(uint256,address) (../../sb/MeowMining.sol#1460-1471)
+	- MeowMining.poolInfo (../../sb/MeowMining.sol#1368)
+	- MeowMining.poolLength() (../../sb/MeowMining.sol#1446-1448)
+	- MeowMining.setPool(uint256,uint256) (../../sb/MeowMining.sol#1440-1444)
+	- MeowMining.updatePool(uint256) (../../sb/MeowMining.sol#1482-1499)
+	- totalAllocPoint = totalAllocPoint.sub(poolInfo[_pid].allocPoint).add(_allocPoint) (../../sb/MeowMining.sol#1442)
+	MeowMining.totalAllocPoint (../../sb/MeowMining.sol#1374) can be used in cross function reentrancies:
+	- MeowMining.addPool(uint256,address) (../../sb/MeowMining.sol#1427-1437)
+	- MeowMining.constructor(MeowToken,uint256,uint256,uint256,uint256,address,DevelopmentFund) (../../sb/MeowMining.sol#1395-1413)
+	- MeowMining.pendingMeow(uint256,address) (../../sb/MeowMining.sol#1460-1471)
+	- MeowMining.setPool(uint256,uint256) (../../sb/MeowMining.sol#1440-1444)
+	- MeowMining.totalAllocPoint (../../sb/MeowMining.sol#1374)
+	- MeowMining.updatePool(uint256) (../../sb/MeowMining.sol#1482-1499)
+Reentrancy in MeowMining.updatePool(uint256) (../../sb/MeowMining.sol#1482-1499):
+	External calls:
+	- meow.mint(address(this),devfund) (../../sb/MeowMining.sol#1491)
+	- meow.mint(address(this),meowReward) (../../sb/MeowMining.sol#1492)
+	- safeMeowTransfer(devaddr,devfund.mul(preShare).div(10000)) (../../sb/MeowMining.sol#1493)
+		- require(bool,string)(meow.transfer(_to,meowBal),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1639)
+		- require(bool,string)(meow.transfer(_to,_amount),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1641)
+	- developmentFund.lock(devfund.mul(lockShare).div(10000)) (../../sb/MeowMining.sol#1494)
+	State variables written after the call(s):
+	- pool.accMeowPerShare = pool.accMeowPerShare.add(meowReward.mul(ACC_MEOW_PRECISION).div(stakeTokenSupply)) (../../sb/MeowMining.sol#1495)
+	MeowMining.poolInfo (../../sb/MeowMining.sol#1368) can be used in cross function reentrancies:
+	- MeowMining.addPool(uint256,address) (../../sb/MeowMining.sol#1427-1437)
+	- MeowMining.massUpdatePools() (../../sb/MeowMining.sol#1474-1479)
+	- MeowMining.pendingMeow(uint256,address) (../../sb/MeowMining.sol#1460-1471)
+	- MeowMining.poolInfo (../../sb/MeowMining.sol#1368)
+	- MeowMining.poolLength() (../../sb/MeowMining.sol#1446-1448)
+	- MeowMining.setPool(uint256,uint256) (../../sb/MeowMining.sol#1440-1444)
+	- MeowMining.updatePool(uint256) (../../sb/MeowMining.sol#1482-1499)
+	- pool.lastRewardTime = block.timestamp (../../sb/MeowMining.sol#1497)
+	MeowMining.poolInfo (../../sb/MeowMining.sol#1368) can be used in cross function reentrancies:
+	- MeowMining.addPool(uint256,address) (../../sb/MeowMining.sol#1427-1437)
+	- MeowMining.massUpdatePools() (../../sb/MeowMining.sol#1474-1479)
+	- MeowMining.pendingMeow(uint256,address) (../../sb/MeowMining.sol#1460-1471)
+	- MeowMining.poolInfo (../../sb/MeowMining.sol#1368)
+	- MeowMining.poolLength() (../../sb/MeowMining.sol#1446-1448)
+	- MeowMining.setPool(uint256,uint256) (../../sb/MeowMining.sol#1440-1444)
+	- MeowMining.updatePool(uint256) (../../sb/MeowMining.sol#1482-1499)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+MeowMining.constructor(MeowToken,uint256,uint256,uint256,uint256,address,DevelopmentFund) (../../sb/MeowMining.sol#1395-1413) ignores return value by meow.approve(address(_developmentFund),uint256(- 1)) (../../sb/MeowMining.sol#1412)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+MeowMining.setMeowPerSecond(uint256) (../../sb/MeowMining.sol#1421-1424) should emit an event for: 
+	- meowPerSecond = _meowPerSecond (../../sb/MeowMining.sol#1423) 
+MeowMining.addPool(uint256,address) (../../sb/MeowMining.sol#1427-1437) should emit an event for: 
+	- totalAllocPoint = totalAllocPoint.add(_allocPoint) (../../sb/MeowMining.sol#1432) 
+MeowMining.setPool(uint256,uint256) (../../sb/MeowMining.sol#1440-1444) should emit an event for: 
+	- totalAllocPoint = totalAllocPoint.sub(poolInfo[_pid].allocPoint).add(_allocPoint) (../../sb/MeowMining.sol#1442) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+DevelopmentFund.setDev(address)._devaddr (../../sb/MeowMining.sol#1283) lacks a zero-check on :
+		- devaddr = _devaddr (../../sb/MeowMining.sol#1285)
+MeowMining.constructor(MeowToken,uint256,uint256,uint256,uint256,address,DevelopmentFund)._devaddr (../../sb/MeowMining.sol#1401) lacks a zero-check on :
+		- devaddr = _devaddr (../../sb/MeowMining.sol#1410)
+MeowMining.setDev(address)._devaddr (../../sb/MeowMining.sol#1416) lacks a zero-check on :
+		- devaddr = _devaddr (../../sb/MeowMining.sol#1418)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+MeowMining.updatePool(uint256) (../../sb/MeowMining.sol#1482-1499) has external calls inside a loop: stakeTokenSupply = IERC20(pool.stakeToken).balanceOf(address(this)) (../../sb/MeowMining.sol#1485)
+MeowMining.updatePool(uint256) (../../sb/MeowMining.sol#1482-1499) has external calls inside a loop: meow.mint(address(this),devfund) (../../sb/MeowMining.sol#1491)
+MeowMining.updatePool(uint256) (../../sb/MeowMining.sol#1482-1499) has external calls inside a loop: meow.mint(address(this),meowReward) (../../sb/MeowMining.sol#1492)
+MeowMining.safeMeowTransfer(address,uint256) (../../sb/MeowMining.sol#1636-1643) has external calls inside a loop: meowBal = meow.balanceOf(address(this)) (../../sb/MeowMining.sol#1637)
+MeowMining.safeMeowTransfer(address,uint256) (../../sb/MeowMining.sol#1636-1643) has external calls inside a loop: require(bool,string)(meow.transfer(_to,meowBal),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1639)
+MeowMining.safeMeowTransfer(address,uint256) (../../sb/MeowMining.sol#1636-1643) has external calls inside a loop: require(bool,string)(meow.transfer(_to,_amount),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1641)
+MeowMining.updatePool(uint256) (../../sb/MeowMining.sol#1482-1499) has external calls inside a loop: developmentFund.lock(devfund.mul(lockShare).div(10000)) (../../sb/MeowMining.sol#1494)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in MeowMining.addPool(uint256,address) (../../sb/MeowMining.sol#1427-1437):
+	External calls:
+	- massUpdatePools() (../../sb/MeowMining.sol#1428)
+		- require(bool,string)(meow.transfer(_to,meowBal),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1639)
+		- require(bool,string)(meow.transfer(_to,_amount),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1641)
+		- meow.mint(address(this),devfund) (../../sb/MeowMining.sol#1491)
+		- meow.mint(address(this),meowReward) (../../sb/MeowMining.sol#1492)
+		- developmentFund.lock(devfund.mul(lockShare).div(10000)) (../../sb/MeowMining.sol#1494)
+	State variables written after the call(s):
+	- isPoolExist[_stakeToken] = true (../../sb/MeowMining.sol#1436)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in MeowMining.unlock(uint256,address) (../../sb/MeowMining.sol#1608-1621):
+	External calls:
+	- safeMeowTransfer(_holder,amount) (../../sb/MeowMining.sol#1618)
+		- require(bool,string)(meow.transfer(_to,meowBal),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1639)
+		- require(bool,string)(meow.transfer(_to,_amount),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1641)
+	Event emitted after the call(s):
+	- Unlock(_holder,_pid,amount) (../../sb/MeowMining.sol#1619)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+MeowToken.manualMint(address,uint256) (../../sb/MeowMining.sol#1021-1027) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp >= manualMintAllowedAfter,MeowToken::manualMint:: manualMint not allowed yet.) (../../sb/MeowMining.sol#1022)
+MeowToken.delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32) (../../sb/MeowMining.sol#1120-1141) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(now <= expiry,MEOW::delegateBySig: signature expired) (../../sb/MeowMining.sol#1139)
+DevelopmentFund.availableUnlock() (../../sb/MeowMining.sol#1299-1307) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp >= lockTo (../../sb/MeowMining.sol#1300)
+DevelopmentFund.unlock() (../../sb/MeowMining.sol#1310-1320) uses timestamp for comparisons
+	Dangerous comparisons:
+	- amount > 0 (../../sb/MeowMining.sol#1313)
+	- amount > Meow.balanceOf(address(this)) (../../sb/MeowMining.sol#1314)
+MeowMining.constructor(MeowToken,uint256,uint256,uint256,uint256,address,DevelopmentFund) (../../sb/MeowMining.sol#1395-1413) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp > _startTime (../../sb/MeowMining.sol#1407)
+MeowMining.addPool(uint256,address) (../../sb/MeowMining.sol#1427-1437) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp > startTime (../../sb/MeowMining.sol#1431)
+MeowMining.pendingMeow(uint256,address) (../../sb/MeowMining.sol#1460-1471) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp > pool.lastRewardTime && stakeTokenSupply > 0 && totalAllocPoint > 0 (../../sb/MeowMining.sol#1465)
+MeowMining.massUpdatePools() (../../sb/MeowMining.sol#1474-1479) uses timestamp for comparisons
+	Dangerous comparisons:
+	- pid < length (../../sb/MeowMining.sol#1476)
+MeowMining.updatePool(uint256) (../../sb/MeowMining.sol#1482-1499) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp > pool.lastRewardTime (../../sb/MeowMining.sol#1484)
+	- stakeTokenSupply > 0 && totalAllocPoint > 0 (../../sb/MeowMining.sol#1486)
+MeowMining.availableUnlock(uint256,address) (../../sb/MeowMining.sol#1592-1601) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp >= user.lockTo (../../sb/MeowMining.sol#1594)
+MeowMining.unlock(uint256,address) (../../sb/MeowMining.sol#1608-1621) uses timestamp for comparisons
+	Dangerous comparisons:
+	- amount > 0 (../../sb/MeowMining.sol#1612)
+	- amount > meow.balanceOf(address(this)) (../../sb/MeowMining.sol#1613)
+MeowMining.safeMeowTransfer(address,uint256) (../../sb/MeowMining.sol#1636-1643) uses timestamp for comparisons
+	Dangerous comparisons:
+	- _amount > meowBal (../../sb/MeowMining.sol#1638)
+	- require(bool,string)(meow.transfer(_to,_amount),MeowMining::safeMeowTransfer:: failed to transfer MEOW.) (../../sb/MeowMining.sol#1641)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/MeowMining.sol#311-320) uses assembly
+	- INLINE ASM (../../sb/MeowMining.sol#318)
+Address._verifyCallResult(bool,bytes,string) (../../sb/MeowMining.sol#456-473) uses assembly
+	- INLINE ASM (../../sb/MeowMining.sol#465-468)
+MeowToken.getChainId() (../../sb/MeowMining.sol#1251-1257) uses assembly
+	- INLINE ASM (../../sb/MeowMining.sol#1253-1255)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.functionCall(address,bytes) (../../sb/MeowMining.sol#364-366) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/MeowMining.sol#389-391) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/MeowMining.sol#438-440) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/MeowMining.sol#448-454) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/MeowMining.sol#414-416) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/MeowMining.sol#424-430) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/MeowMining.sol#338-344) is never used and should be removed
+Context._msgData() (../../sb/MeowMining.sol#618-621) is never used and should be removed
+ERC20._setupDecimals(uint8) (../../sb/MeowMining.sol#966-968) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/MeowMining.sol#504-513) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/MeowMining.sol#520-523) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/MeowMining.sol#515-518) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/MeowMining.sol#264-267) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/MeowMining.sol#226-229) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/MeowMining.sol#284-287) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/MeowMining.sol#98-102) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/MeowMining.sol#134-137) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/MeowMining.sol#144-147) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/MeowMining.sol#119-127) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/MeowMining.sol#109-112) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.6.6 (../../sb/MeowMining.sol#1) allows old versions
+solc-0.6.6 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/MeowMining.sol#338-344):
+	- (success) = recipient.call{value: amount}() (../../sb/MeowMining.sol#342)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/MeowMining.sol#399-406):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/MeowMining.sol#404)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/MeowMining.sol#424-430):
+	- (success,returndata) = target.staticcall(data) (../../sb/MeowMining.sol#428)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/MeowMining.sol#448-454):
+	- (success,returndata) = target.delegatecall(data) (../../sb/MeowMining.sol#452)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter MeowToken.mint(address,uint256)._to (../../sb/MeowMining.sol#1008) is not in mixedCase
+Parameter MeowToken.mint(address,uint256)._amount (../../sb/MeowMining.sol#1008) is not in mixedCase
+Parameter MeowToken.manualMint(address,uint256)._to (../../sb/MeowMining.sol#1021) is not in mixedCase
+Parameter MeowToken.manualMint(address,uint256)._amount (../../sb/MeowMining.sol#1021) is not in mixedCase
+Parameter MeowToken.burnFrom(address,uint256)._account (../../sb/MeowMining.sol#1029) is not in mixedCase
+Parameter MeowToken.burnFrom(address,uint256)._amount (../../sb/MeowMining.sol#1029) is not in mixedCase
+Parameter MeowToken.burn(uint256)._amount (../../sb/MeowMining.sol#1033) is not in mixedCase
+Parameter DevelopmentFund.setDev(address)._devaddr (../../sb/MeowMining.sol#1283) is not in mixedCase
+Parameter DevelopmentFund.lock(uint256)._amount (../../sb/MeowMining.sol#1289) is not in mixedCase
+Variable DevelopmentFund.Meow (../../sb/MeowMining.sol#1265) is not in mixedCase
+Parameter MeowMining.setDev(address)._devaddr (../../sb/MeowMining.sol#1416) is not in mixedCase
+Parameter MeowMining.setMeowPerSecond(uint256)._meowPerSecond (../../sb/MeowMining.sol#1421) is not in mixedCase
+Parameter MeowMining.addPool(uint256,address)._allocPoint (../../sb/MeowMining.sol#1427) is not in mixedCase
+Parameter MeowMining.addPool(uint256,address)._stakeToken (../../sb/MeowMining.sol#1427) is not in mixedCase
+Parameter MeowMining.setPool(uint256,uint256)._pid (../../sb/MeowMining.sol#1440) is not in mixedCase
+Parameter MeowMining.setPool(uint256,uint256)._allocPoint (../../sb/MeowMining.sol#1440) is not in mixedCase
+Parameter MeowMining.manualMint(address,uint256)._to (../../sb/MeowMining.sol#1454) is not in mixedCase
+Parameter MeowMining.manualMint(address,uint256)._amount (../../sb/MeowMining.sol#1454) is not in mixedCase
+Parameter MeowMining.pendingMeow(uint256,address)._pid (../../sb/MeowMining.sol#1460) is not in mixedCase
+Parameter MeowMining.pendingMeow(uint256,address)._user (../../sb/MeowMining.sol#1460) is not in mixedCase
+Parameter MeowMining.updatePool(uint256)._pid (../../sb/MeowMining.sol#1482) is not in mixedCase
+Parameter MeowMining.deposit(address,uint256,uint256)._for (../../sb/MeowMining.sol#1503) is not in mixedCase
+Parameter MeowMining.deposit(address,uint256,uint256)._pid (../../sb/MeowMining.sol#1504) is not in mixedCase
+Parameter MeowMining.deposit(address,uint256,uint256)._amount (../../sb/MeowMining.sol#1505) is not in mixedCase
+Parameter MeowMining.withdraw(address,uint256,uint256)._for (../../sb/MeowMining.sol#1522) is not in mixedCase
+Parameter MeowMining.withdraw(address,uint256,uint256)._pid (../../sb/MeowMining.sol#1523) is not in mixedCase
+Parameter MeowMining.withdraw(address,uint256,uint256)._amount (../../sb/MeowMining.sol#1524) is not in mixedCase
+Parameter MeowMining.withdrawAll(address,uint256)._for (../../sb/MeowMining.sol#1529) is not in mixedCase
+Parameter MeowMining.withdrawAll(address,uint256)._pid (../../sb/MeowMining.sol#1529) is not in mixedCase
+Parameter MeowMining.harvest(uint256)._pid (../../sb/MeowMining.sol#1554) is not in mixedCase
+Parameter MeowMining.lock(uint256,address,uint256)._pid (../../sb/MeowMining.sol#1577) is not in mixedCase
+Parameter MeowMining.lock(uint256,address,uint256)._holder (../../sb/MeowMining.sol#1578) is not in mixedCase
+Parameter MeowMining.lock(uint256,address,uint256)._amount (../../sb/MeowMining.sol#1579) is not in mixedCase
+Parameter MeowMining.availableUnlock(uint256,address)._pid (../../sb/MeowMining.sol#1592) is not in mixedCase
+Parameter MeowMining.availableUnlock(uint256,address)._holder (../../sb/MeowMining.sol#1592) is not in mixedCase
+Parameter MeowMining.unlock(uint256)._pid (../../sb/MeowMining.sol#1604) is not in mixedCase
+Parameter MeowMining.unlock(uint256,address)._pid (../../sb/MeowMining.sol#1608) is not in mixedCase
+Parameter MeowMining.unlock(uint256,address)._holder (../../sb/MeowMining.sol#1608) is not in mixedCase
+Parameter MeowMining.emergencyWithdraw(uint256)._pid (../../sb/MeowMining.sol#1624) is not in mixedCase
+Parameter MeowMining.safeMeowTransfer(address,uint256)._to (../../sb/MeowMining.sol#1636) is not in mixedCase
+Parameter MeowMining.safeMeowTransfer(address,uint256)._amount (../../sb/MeowMining.sol#1636) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/MeowMining.sol#619)" inContext (../../sb/MeowMining.sol#613-622)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+MeowToken.canManualMint() (../../sb/MeowMining.sol#1014-1019) uses literals with too many digits:
+	- (uint256(200000000e18).sub((miningMinted).sub(devFund))).div(5) (../../sb/MeowMining.sol#1018)
+MeowToken.slitherConstructorVariables() (../../sb/MeowMining.sol#988-1258) uses literals with too many digits:
+	- meowMining = 200000000e18 (../../sb/MeowMining.sol#992)
+MeowToken.slitherConstructorVariables() (../../sb/MeowMining.sol#988-1258) uses literals with too many digits:
+	- reserve = 32500000e18 (../../sb/MeowMining.sol#994)
+MeowToken.slitherConstructorConstantVariables() (../../sb/MeowMining.sol#988-1258) uses literals with too many digits:
+	- CAP = 250000000e18 (../../sb/MeowMining.sol#990)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+DevelopmentFund.lockPeriod (../../sb/MeowMining.sol#1269) should be constant 
+MeowMining.lockPeriod (../../sb/MeowMining.sol#1378) should be constant 
+MeowToken.meowMining (../../sb/MeowMining.sol#992) should be constant 
+MeowToken.minimumTimeBetweenManualMint (../../sb/MeowMining.sol#1002) should be constant 
+MeowToken.reserve (../../sb/MeowMining.sol#994) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+
+DevelopmentFund.Meow (../../sb/MeowMining.sol#1265) should be immutable 
+MeowMining.developmentFund (../../sb/MeowMining.sol#1386) should be immutable 
+MeowMining.lockShare (../../sb/MeowMining.sol#1384) should be immutable 
+MeowMining.meow (../../sb/MeowMining.sol#1361) should be immutable 
+MeowMining.preShare (../../sb/MeowMining.sol#1382) should be immutable 
+MeowMining.startTime (../../sb/MeowMining.sol#1376) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/MeowMining.sol analyzed (11 contracts with 93 detectors), 131 result(s) found

@@ -1,0 +1,72 @@
+{
+    "errors": [],
+    "fails": [],
+    "findings": [
+        {
+            "confidence": "Medium",
+            "contract": "StakingRewards",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/QuillAudits-Dfyn Smart Contract/dual-farm-f44a4dcbeb41f38a9c02cb877a8c95b92685f972/contracts/StakingRewards.sol",
+            "function": "exit",
+            "impact": "High",
+            "line": 1007,
+            "line_end": 1010,
+            "message": "Reentrancy in StakingRewards.exit() (StakingRewards.sol#1007-1010):\n\tExternal calls:\n\t- withdraw(_balances[_msgSender()]) (StakingRewards.sol#1008)\n\t\t- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (StakingRewards.sol#564)\n\t\t- stakingToken.safeTransfer(_msgSender(),amount) (StakingRewards.sol#987)\n\t\t- (success,returndata) = target.call{value: value}(data) (StakingRewards.sol#432)\n\t- getReward() (StakingRewards.sol#1009)\n\t\t- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (StakingRewards.sol#564)\n\t\t- (success,returndata) = target.call{value: value}(data) (StakingRewards.sol#432)\n\t\t- IERC20(rewardTokens[i]).safeTransfer(_msgSender(),reward) (StakingRewards.sol#1001)\n\tExternal calls sending eth:\n\t- withdraw(_balances[_msgSender()]) (StakingRewards.sol#1008)\n\t\t- (success,returndata) = target.call{value: value}(data) (StakingRewards.sol#432)\n\t- getReward() (StakingRewards.sol#1009)\n\t\t- (success,returndata) = target.call{value: value}(data) (StakingRewards.sol#432)\n\tState variables written after the call(s):\n\t- getReward() (StakingRewards.sol#1009)\n\t\t- _status = _ENTERED (StakingRewards.sol#621)\n\t\t- _status = _NOT_ENTERED (StakingRewards.sol#627)\n\tReentrancyGuard._status (StakingRewards.sol#603) can be used in cross function reentrancies:\n\t- ReentrancyGuard.nonReentrant() (StakingRewards.sol#616-628)\n\t- getReward() (StakingRewards.sol#1009)\n\t\t- rewardLastUpdatedTime[rewardTokens[i]] = lastTimeRewardApplicable() (StakingRewards.sol#1069)\n\tStakingRewards.rewardLastUpdatedTime (StakingRewards.sol#837) can be used in cross function reentrancies:\n\t- StakingRewards.notifyRewardAmount(address,uint256) (StakingRewards.sol#1014-1046)\n\t- StakingRewards.rewardLastUpdatedTime (StakingRewards.sol#837)\n\t- StakingRewards.rewardPerToken(address) (StakingRewards.sol#889-906)\n\t- StakingRewards.updateReward(address) (StakingRewards.sol#1064-1081)\n\t- getReward() (StakingRewards.sol#1009)\n\t\t- rewards[_msgSender()][rewardTokens[i]] = 0 (StakingRewards.sol#1000)\n\t\t- rewards[account][rewardTokens[i]] = earned(account,rewardTokens[i]) (StakingRewards.sol#1071-1074)\n\tStakingRewards.rewards (StakingRewards.sol#840) can be used in cross function reentrancies:\n\t- StakingRewards.earned(address,address) (StakingRewards.sol#908-923)\n\t- StakingRewards.getReward() (StakingRewards.sol#991-1005)\n\t- StakingRewards.rewards (StakingRewards.sol#840)\n\t- StakingRewards.updateReward(address) (StakingRewards.sol#1064-1081)\n\t- getReward() (StakingRewards.sol#1009)\n\t\t- rewardsPerTokenMap[rewardTokens[i]] = rewardPerToken(rewardTokens[i]) (StakingRewards.sol#1066-1068)\n\tStakingRewards.rewardsPerTokenMap (StakingRewards.sol#834) can be used in cross function reentrancies:\n\t- StakingRewards.rewardPerToken(address) (StakingRewards.sol#889-906)\n\t- StakingRewards.rewardsPerTokenMap (StakingRewards.sol#834)\n\t- StakingRewards.updateReward(address) (StakingRewards.sol#1064-1081)\n\t- getReward() (StakingRewards.sol#1009)\n\t\t- userRewardPerTokenPaid[account][rewardTokens[i]] = rewardsPerTokenMap[rewardTokens[i]] (StakingRewards.sol#1075-1077)\n\tStakingRewards.userRewardPerTokenPaid (StakingRewards.sol#838-839) can be used in cross function reentrancies:\n\t- StakingRewards.earned(address,address) (StakingRewards.sol#908-923)\n\t- StakingRewards.updateReward(address) (StakingRewards.sol#1064-1081)\n\t- StakingRewards.userRewardPerTokenPaid (StakingRewards.sol#838-839)\n",
+            "name": "reentrancy-eth",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "StakingRewards",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/QuillAudits-Dfyn Smart Contract/dual-farm-f44a4dcbeb41f38a9c02cb877a8c95b92685f972/contracts/StakingRewards.sol",
+            "function": "rescueFunds",
+            "impact": "High",
+            "line": 1048,
+            "line_end": 1060,
+            "message": "StakingRewards.rescueFunds(address,address) (StakingRewards.sol#1048-1060) ignores return value by IERC20(tokenAddress).transfer(receiver,IERC20(tokenAddress).balanceOf(address(this))) (StakingRewards.sol#1056-1059)\n",
+            "name": "unchecked-transfer",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "StakingRewards",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/QuillAudits-Dfyn Smart Contract/dual-farm-f44a4dcbeb41f38a9c02cb877a8c95b92685f972/contracts/StakingRewards.sol",
+            "function": "getReward",
+            "impact": "Medium",
+            "line": 991,
+            "line_end": 1005,
+            "message": "Reentrancy in StakingRewards.getReward() (StakingRewards.sol#991-1005):\n\tExternal calls:\n\t- IERC20(rewardTokens[i]).safeTransfer(_msgSender(),reward) (StakingRewards.sol#1001)\n\tState variables written after the call(s):\n\t- rewards[_msgSender()][rewardTokens[i]] = 0 (StakingRewards.sol#1000)\n\tStakingRewards.rewards (StakingRewards.sol#840) can be used in cross function reentrancies:\n\t- StakingRewards.earned(address,address) (StakingRewards.sol#908-923)\n\t- StakingRewards.getReward() (StakingRewards.sol#991-1005)\n\t- StakingRewards.rewards (StakingRewards.sol#840)\n\t- StakingRewards.updateReward(address) (StakingRewards.sol#1064-1081)\n",
+            "name": "reentrancy-no-eth",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "StakingRewards",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/QuillAudits-Dfyn Smart Contract/dual-farm-f44a4dcbeb41f38a9c02cb877a8c95b92685f972/contracts/StakingRewards.sol",
+            "function": "exit",
+            "impact": "Low",
+            "line": 1007,
+            "line_end": 1010,
+            "message": "Reentrancy in StakingRewards.exit() (StakingRewards.sol#1007-1010):\n\tExternal calls:\n\t- withdraw(_balances[_msgSender()]) (StakingRewards.sol#1008)\n\t\t- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (StakingRewards.sol#564)\n\t\t- stakingToken.safeTransfer(_msgSender(),amount) (StakingRewards.sol#987)\n\t\t- (success,returndata) = target.call{value: value}(data) (StakingRewards.sol#432)\n\t- getReward() (StakingRewards.sol#1009)\n\t\t- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (StakingRewards.sol#564)\n\t\t- (success,returndata) = target.call{value: value}(data) (StakingRewards.sol#432)\n\t\t- IERC20(rewardTokens[i]).safeTransfer(_msgSender(),reward) (StakingRewards.sol#1001)\n\tExternal calls sending eth:\n\t- withdraw(_balances[_msgSender()]) (StakingRewards.sol#1008)\n\t\t- (success,returndata) = target.call{value: value}(data) (StakingRewards.sol#432)\n\t- getReward() (StakingRewards.sol#1009)\n\t\t- (success,returndata) = target.call{value: value}(data) (StakingRewards.sol#432)\n\tEvent emitted after the call(s):\n\t- RewardPaid(_msgSender(),reward) (StakingRewards.sol#1002)\n\t\t- getReward() (StakingRewards.sol#1009)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "StakingRewards",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/QuillAudits-Dfyn Smart Contract/dual-farm-f44a4dcbeb41f38a9c02cb877a8c95b92685f972/contracts/StakingRewards.sol",
+            "function": "notifyRewardAmount",
+            "impact": "Low",
+            "line": 1014,
+            "line_end": 1046,
+            "message": "StakingRewards.notifyRewardAmount(address,uint256) (StakingRewards.sol#1014-1046) uses timestamp for comparisons\n\tDangerous comparisons:\n\t- block.timestamp >= periodFinish (StakingRewards.sol#1022)\n\t- require(bool,string)(rewardRate <= balance.div(periodFinish.sub(block.timestamp)),Provided reward too high) (StakingRewards.sol#1037-1040)\n",
+            "name": "timestamp",
+            "check": "FP"
+        }
+    ],
+    "infos": [],
+    "parser": {
+        "id": "slither-0.10.0",
+        "mode": "solidity",
+        "version": "2024/04/30"
+    }
+}

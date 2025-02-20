@@ -1,0 +1,43 @@
+'solc --version' running
+'solc /sb/VVET9.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/sb' running
+
+VVET9.claimVTHO(address,uint256) (../../sb/VVET9.sol#182-186) ignores return value by IEnergy(energyContractAddress).transfer(to,amount) (../../sb/VVET9.sol#184)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+StakingModel.calculateVTHO(uint48,uint48,uint104) (../../sb/VVET9.sol#88-96) performs a multiplication on the result of a division:
+	- ((vetAmount * 5) / (10 ** 9)) * (t2 - t1) (../../sb/VVET9.sol#95)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+StakingModel._update(address) (../../sb/VVET9.sol#68-80) uses timestamp for comparisons
+	Dangerous comparisons:
+	- assert(bool)(users[addr].lastUpdatedTime <= currentTime) (../../sb/VVET9.sol#71)
+StakingModel.calculateVTHO(uint48,uint48,uint104) (../../sb/VVET9.sol#88-96) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(t1 <= t2,t1 should be <= t2) (../../sb/VVET9.sol#93)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+StakingModel.addVTHO(address,uint256) (../../sb/VVET9.sol#48-51) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.8.0 (../../sb/VVET9.sol#1) allows old versions
+solc-0.8.27 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+VVET9 (../../sb/VVET9.sol#108-187) should inherit from IEnergy (../../sb/VVET9.sol#99-102)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-inheritance
+
+Constant VVET9.energyContractAddress (../../sb/VVET9.sol#179) is not in UPPER_CASE_WITH_UNDERSCORES
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Reentrancy in VVET9.withdraw(uint256) (../../sb/VVET9.sol#130-135):
+	External calls:
+	- address(msg.sender).transfer(wad) (../../sb/VVET9.sol#133)
+	Event emitted after the call(s):
+	- Withdrawal(msg.sender,wad) (../../sb/VVET9.sol#134)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-4
+
+VVET9.decimals (../../sb/VVET9.sol#111) should be constant 
+VVET9.name (../../sb/VVET9.sol#109) should be constant 
+VVET9.symbol (../../sb/VVET9.sol#110) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+/sb/VVET9.sol analyzed (5 contracts with 93 detectors), 13 result(s) found

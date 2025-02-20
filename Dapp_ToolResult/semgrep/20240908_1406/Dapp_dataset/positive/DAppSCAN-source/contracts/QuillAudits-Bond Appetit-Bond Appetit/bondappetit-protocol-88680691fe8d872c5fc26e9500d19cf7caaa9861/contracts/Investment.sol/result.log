@@ -1,0 +1,391 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 97 Code Findings │
+└──────────────────┘
+                       
+    /sb/Investment.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          810┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          814┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          832┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          837┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          842┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+         1013┆ contract OwnablePausable is Ownable, Pausable {
+            ⋮┆----------------------------------------
+         1542┆ contract GovernanceToken is IERC20, Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          357┆ constructor (string memory name_, string memory symbol_) public {
+          358┆     _name = name_;
+          359┆     _symbol = symbol_;
+          360┆     _decimals = 18;
+          361┆ }
+            ⋮┆----------------------------------------
+         1020┆ constructor() internal {
+         1021┆     pauser = owner();
+         1022┆ }
+            ⋮┆----------------------------------------
+         1616┆ constructor(address account) public {
+         1617┆     balances[account] = uint96(totalSupply);
+         1618┆     emit Transfer(address(0), account, totalSupply);
+         1619┆ }
+            ⋮┆----------------------------------------
+         2025┆ constructor(
+         2026┆     address _cumulative,
+         2027┆     address _governanceToken,
+         2028┆     uint256 _governanceTokenLockDate,
+         2029┆     address _uniswapRouter
+         2030┆ ) public {
+         2031┆     cumulative = ERC20(_cumulative);
+         2032┆     governanceToken = GovernanceToken(_governanceToken);
+         2033┆     governanceTokenLockDate = _governanceTokenLockDate;
+         2034┆     uniswapRouter = IUniswapV2Router02(_uniswapRouter);
+             [hid 1 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+         1821┆ Checkpoint memory cp = checkpoints[account][center];
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          182┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          197┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          214┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          231┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          248┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          511┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          512┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          531┆ require(account != address(0), "ERC20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+          552┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          575┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          576┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          659┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          663┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          720┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          721┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          745┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          769┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          829┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          830┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          831┆ );
+            ⋮┆----------------------------------------
+          859┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          901┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          922┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          972┆ require(!paused(), "Pausable: paused");
+            ⋮┆----------------------------------------
+          984┆ require(paused(), "Pausable: not paused");
+            ⋮┆----------------------------------------
+         1037┆ require(pauser == _msgSender() || owner() == _msgSender(),       
+  "OwnablePausable::pause: only pauser and owner must pause contract");         
+            ⋮┆----------------------------------------
+         1045┆ require(pauser == _msgSender() || owner() == _msgSender(),       
+  "OwnablePausable::unpause: only pauser and owner must unpause contract");     
+            ⋮┆----------------------------------------
+         1374┆ require(set._values.length > index, "EnumerableSet: index out of 
+  bounds");                                                                     
+            ⋮┆----------------------------------------
+         1718┆ require(lockingAllowed.contains(msg.sender),                     
+  "GovernanceToken::transferLock: access is denied");                           
+            ⋮┆----------------------------------------
+         1719┆ require(locking[dst].date == 0 || locking[dst].date == date,     
+  "GovernanceToken::transferLock: lock date cannot be changed");                
+            ⋮┆----------------------------------------
+         1776┆ require(signatory != address(0), "GovernanceToken::delegateBySig:
+  invalid signature");                                                          
+            ⋮┆----------------------------------------
+         1777┆ require(nonce == nonces[signatory]++,                            
+  "GovernanceToken::delegateBySig: invalid nonce");                             
+            ⋮┆----------------------------------------
+         1778┆ require(now <= expiry, "GovernanceToken::delegateBySig: signature
+  expired");                                                                    
+            ⋮┆----------------------------------------
+         1800┆ require(blockNumber < block.number,                              
+  "GovernanceToken::getPriorVotes: not yet determined");                        
+            ⋮┆----------------------------------------
+         1848┆ require(src != address(0), "GovernanceToken::_transferTokens:    
+  cannot transfer from the zero address");                                      
+            ⋮┆----------------------------------------
+         1849┆ require(dst != address(0), "GovernanceToken::_transferTokens:    
+  cannot transfer to the zero address");                                        
+            ⋮┆----------------------------------------
+         1853┆ revert("GovernanceToken::_transferTokens: amount are locked");
+            ⋮┆----------------------------------------
+         1911┆ require(account != address(0), "GovernanceToken::_mint: mint to  
+  the zero address");                                                           
+            ⋮┆----------------------------------------
+         1931┆ require(account != address(0), "GovernanceToken::_burn: burn from
+  the zero address");                                                           
+            ⋮┆----------------------------------------
+         2069┆ require(newPrice > 0, "Investment::changeGovernanceTokenPrice:   
+  invalid new governance token price");                                         
+            ⋮┆----------------------------------------
+         2102┆ require(amountsOut.length != 0, "Investment::_amountOut: invalid 
+  amounts out length");                                                         
+            ⋮┆----------------------------------------
+         2124┆ require(investmentTokens[token], "Investment::price: invalid     
+  investable token");                                                           
+            ⋮┆----------------------------------------
+         2140┆ require(investmentTokens[token], "Investment::invest: invalid    
+  investable token");                                                           
+            ⋮┆----------------------------------------
+         2147┆ require(amountOut != 0, "Investment::invest: liquidity pool is   
+  empty");                                                                      
+            ⋮┆----------------------------------------
+         2165┆ require(investmentTokens[token], "Investment::investETH: invalid 
+  investable token");                                                           
+            ⋮┆----------------------------------------
+         2170┆ require(amountOut != 0, "Investment::invest: liquidity pool is   
+  empty");                                                                      
+            ⋮┆----------------------------------------
+         2187┆ require(recipient != address(0), "Investment::withdraw: cannot   
+  transfer to the zero address");                                               
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         1690┆ if (spender != src && spenderAllowance != uint96(-1)) {
+         1691┆     uint96 newAllowance = sub96(spenderAllowance, amount,        
+  "GovernanceToken::transferFrom: transfer amount exceeds spender allowance");  
+         1692┆     allowances[src][spender] = newAllowance;
+         1693┆ 
+         1694┆     emit Approval(src, spender, newAllowance);
+         1695┆ }
+            ⋮┆----------------------------------------
+         1852┆ if (locking[src].date > block.timestamp && locking[src].amount > 
+  0 && balances[src] < locking[src].amount) {                                   
+         1853┆     revert("GovernanceToken::_transferTokens: amount are         
+  locked");                                                                     
+         1854┆ }
+            ⋮┆----------------------------------------
+         1866┆ if (srcRep != dstRep && amount > 0) {
+         1867┆     if (srcRep != address(0)) {
+         1868┆         uint32 srcRepNum = numCheckpoints[srcRep];
+         1869┆         uint96 srcRepOld = srcRepNum > 0 ?                       
+  checkpoints[srcRep][srcRepNum - 1].votes : 0;                                 
+         1870┆         uint96 srcRepNew = sub96(srcRepOld, amount,              
+  "GovernanceToken::_moveVotes: vote amount underflows");                       
+         1871┆         _writeCheckpoint(srcRep, srcRepNum, srcRepOld,           
+  srcRepNew);                                                                   
+         1872┆     }
+         1873┆ 
+         1874┆     if (dstRep != address(0)) {
+         1875┆         uint32 dstRepNum = numCheckpoints[dstRep];
+             [hid 5 additional lines, adjust with --max-lines-per-finding] 
+         1891┆ if (nCheckpoints > 0 && checkpoints[delegatee][nCheckpoints -    
+  1].fromBlock == blockNumber) {                                                
+         1892┆     checkpoints[delegatee][nCheckpoints - 1].votes = newVotes;
+         1893┆ } else {
+         1894┆     checkpoints[delegatee][nCheckpoints] =                       
+  Checkpoint(blockNumber, newVotes);                                            
+         1895┆     numCheckpoints[delegatee] = nCheckpoints + 1;
+         1896┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+         1777┆ require(nonce == nonces[signatory]++,                            
+  "GovernanceToken::delegateBySig: invalid nonce");                             
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          214┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          511┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          512┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          552┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          575┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          576┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          663┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          720┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          745┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          769┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          829┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          830┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          831┆ );
+            ⋮┆----------------------------------------
+          859┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          922┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1037┆ require(pauser == _msgSender() || owner() == _msgSender(),       
+  "OwnablePausable::pause: only pauser and owner must pause contract");         
+            ⋮┆----------------------------------------
+         1045┆ require(pauser == _msgSender() || owner() == _msgSender(),       
+  "OwnablePausable::unpause: only pauser and owner must unpause contract");     
+            ⋮┆----------------------------------------
+         1374┆ require(set._values.length > index, "EnumerableSet: index out of 
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 97 findings.
+  bounds");                                                                     
+            ⋮┆----------------------------------------
+         1718┆ require(lockingAllowed.contains(msg.sender),                     
+  "GovernanceToken::transferLock: access is denied");                           
+            ⋮┆----------------------------------------
+         1719┆ require(locking[dst].date == 0 || locking[dst].date == date,     
+  "GovernanceToken::transferLock: lock date cannot be changed");                
+            ⋮┆----------------------------------------
+         1776┆ require(signatory != address(0), "GovernanceToken::delegateBySig:
+  invalid signature");                                                          
+            ⋮┆----------------------------------------
+         1777┆ require(nonce == nonces[signatory]++,                            
+  "GovernanceToken::delegateBySig: invalid nonce");                             
+            ⋮┆----------------------------------------
+         1778┆ require(now <= expiry, "GovernanceToken::delegateBySig: signature
+  expired");                                                                    
+            ⋮┆----------------------------------------
+         1800┆ require(blockNumber < block.number,                              
+  "GovernanceToken::getPriorVotes: not yet determined");                        
+            ⋮┆----------------------------------------
+         1848┆ require(src != address(0), "GovernanceToken::_transferTokens:    
+  cannot transfer from the zero address");                                      
+            ⋮┆----------------------------------------
+         1849┆ require(dst != address(0), "GovernanceToken::_transferTokens:    
+  cannot transfer to the zero address");                                        
+            ⋮┆----------------------------------------
+         1853┆ revert("GovernanceToken::_transferTokens: amount are locked");
+            ⋮┆----------------------------------------
+         1911┆ require(account != address(0), "GovernanceToken::_mint: mint to  
+  the zero address");                                                           
+            ⋮┆----------------------------------------
+         1931┆ require(account != address(0), "GovernanceToken::_burn: burn from
+  the zero address");                                                           
+            ⋮┆----------------------------------------
+         2069┆ require(newPrice > 0, "Investment::changeGovernanceTokenPrice:   
+  invalid new governance token price");                                         
+            ⋮┆----------------------------------------
+         2102┆ require(amountsOut.length != 0, "Investment::_amountOut: invalid 
+  amounts out length");                                                         
+            ⋮┆----------------------------------------
+         2124┆ require(investmentTokens[token], "Investment::price: invalid     
+  investable token");                                                           
+            ⋮┆----------------------------------------
+         2140┆ require(investmentTokens[token], "Investment::invest: invalid    
+  investable token");                                                           
+            ⋮┆----------------------------------------
+         2147┆ require(amountOut != 0, "Investment::invest: liquidity pool is   
+  empty");                                                                      
+            ⋮┆----------------------------------------
+         2165┆ require(investmentTokens[token], "Investment::investETH: invalid 
+  investable token");                                                           
+            ⋮┆----------------------------------------
+         2170┆ require(amountOut != 0, "Investment::invest: liquidity pool is   
+  empty");                                                                      
+            ⋮┆----------------------------------------
+         2187┆ require(recipient != address(0), "Investment::withdraw: cannot   
+  transfer to the zero address");                                               
+
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

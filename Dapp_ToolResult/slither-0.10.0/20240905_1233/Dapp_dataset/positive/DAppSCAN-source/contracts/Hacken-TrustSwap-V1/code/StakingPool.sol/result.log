@@ -1,0 +1,79 @@
+'solc --version' running
+'solc /sb/StakingPool.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+StakingPool (../../sb/StakingPool.sol#72-368) contract sets array length with a user-controlled value:
+	- userStaking[msg.sender].push(newStake) (../../sb/StakingPool.sol#146)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#array-length-assignment
+
+StakingPool.ownerSetPoolRewards(uint256) (../../sb/StakingPool.sol#120-134) ignores return value by rewardToken.transferFrom(msg.sender,this,_rewardAmount) (../../sb/StakingPool.sol#132)
+StakingPool.stake(uint256) (../../sb/StakingPool.sol#137-153) ignores return value by tswap.transferFrom(msg.sender,this,amount) (../../sb/StakingPool.sol#151)
+StakingPool.withdrawStaking(uint256) (../../sb/StakingPool.sol#207-267) ignores return value by rewardToken.transfer(msg.sender,rewardAmount) (../../sb/StakingPool.sol#262)
+StakingPool.withdrawStaking(uint256) (../../sb/StakingPool.sol#207-267) ignores return value by tswap.transfer(msg.sender,amount) (../../sb/StakingPool.sol#263)
+StakingPool.withdrawRewardsOnly() (../../sb/StakingPool.sol#270-313) ignores return value by rewardToken.transfer(msg.sender,rewardAmount) (../../sb/StakingPool.sol#311)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+StakingPool.computeNewReward(uint256,uint256,uint256) (../../sb/StakingPool.sol#156-171) performs a multiplication on the result of a division:
+	- rewardPerSecForEachTokenStaked = rewardPerSecond.div(totalStaked) (../../sb/StakingPool.sol#163)
+	- userRewards = rewardPerSecForEachTokenStaked.mul(_stakedAmount).mul(_stakeTimeSec) (../../sb/StakingPool.sol#164)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+Reentrancy in StakingPool.ownerSetPoolRewards(uint256) (../../sb/StakingPool.sol#120-134):
+	External calls:
+	- rewardToken.transferFrom(msg.sender,this,_rewardAmount) (../../sb/StakingPool.sol#132)
+	Event emitted after the call(s):
+	- OwnerSetReward(_rewardAmount) (../../sb/StakingPool.sol#133)
+Reentrancy in StakingPool.stake(uint256) (../../sb/StakingPool.sol#137-153):
+	External calls:
+	- tswap.transferFrom(msg.sender,this,amount) (../../sb/StakingPool.sol#151)
+	Event emitted after the call(s):
+	- Staked(msg.sender,amount) (../../sb/StakingPool.sol#152)
+Reentrancy in StakingPool.withdrawRewardsOnly() (../../sb/StakingPool.sol#270-313):
+	External calls:
+	- rewardToken.transfer(msg.sender,rewardAmount) (../../sb/StakingPool.sol#311)
+	Event emitted after the call(s):
+	- RewardWithdrawal(msg.sender,rewardAmount) (../../sb/StakingPool.sol#312)
+Reentrancy in StakingPool.withdrawStaking(uint256) (../../sb/StakingPool.sol#207-267):
+	External calls:
+	- rewardToken.transfer(msg.sender,rewardAmount) (../../sb/StakingPool.sol#262)
+	- tswap.transfer(msg.sender,amount) (../../sb/StakingPool.sol#263)
+	Event emitted after the call(s):
+	- RewardWithdrawal(msg.sender,rewardAmount) (../../sb/StakingPool.sol#265)
+	- StakingWithdrawal(msg.sender,amount) (../../sb/StakingPool.sol#266)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+StakingPool.ownerSetPoolRewards(uint256) (../../sb/StakingPool.sol#120-134) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(poolStartTime == 0,Pool rewards already set) (../../sb/StakingPool.sol#121)
+StakingPool.stake(uint256) (../../sb/StakingPool.sol#137-153) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(now < poolEndTime,Staking pool is closed) (../../sb/StakingPool.sol#139)
+StakingPool.calculateReward(address) (../../sb/StakingPool.sol#174-204) uses timestamp for comparisons
+	Dangerous comparisons:
+	- now > poolEndTime (../../sb/StakingPool.sol#186)
+StakingPool.withdrawStaking(uint256) (../../sb/StakingPool.sol#207-267) uses timestamp for comparisons
+	Dangerous comparisons:
+	- now > poolEndTime (../../sb/StakingPool.sol#221)
+StakingPool.withdrawRewardsOnly() (../../sb/StakingPool.sol#270-313) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(_rwdAmount > 0,You do not have enough rewards) (../../sb/StakingPool.sol#272)
+	- now > poolEndTime (../../sb/StakingPool.sol#285)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+SafeMath.ceil(uint256,uint256) (../../sb/StakingPool.sol#45-49) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.4.25 (../../sb/StakingPool.sol#1) allows old versions
+solc-0.4.25 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Parameter StakingPool.ownerSetPoolRewards(uint256)._rewardAmount (../../sb/StakingPool.sol#120) is not in mixedCase
+Parameter StakingPool.computeNewReward(uint256,uint256,uint256)._rewardAmount (../../sb/StakingPool.sol#156) is not in mixedCase
+Parameter StakingPool.computeNewReward(uint256,uint256,uint256)._stakedAmount (../../sb/StakingPool.sol#156) is not in mixedCase
+Parameter StakingPool.computeNewReward(uint256,uint256,uint256)._stakeTimeSec (../../sb/StakingPool.sol#156) is not in mixedCase
+Parameter StakingPool.calculateReward(address)._userAddress (../../sb/StakingPool.sol#174) is not in mixedCase
+Parameter StakingPool.getStakingAmount(address)._userAddress (../../sb/StakingPool.sol#316) is not in mixedCase
+Parameter StakingPool.setPoolDuration(uint256)._poolDuration (../../sb/StakingPool.sol#347) is not in mixedCase
+Parameter StakingPool.setTswapAddress(address)._address (../../sb/StakingPool.sol#359) is not in mixedCase
+Parameter StakingPool.setRewardTokenAddress(address)._address (../../sb/StakingPool.sol#364) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+/sb/StakingPool.sol analyzed (4 contracts with 93 detectors), 28 result(s) found

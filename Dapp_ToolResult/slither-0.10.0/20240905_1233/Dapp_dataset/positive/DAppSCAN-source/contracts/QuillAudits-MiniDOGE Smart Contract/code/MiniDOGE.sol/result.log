@@ -1,0 +1,605 @@
+'solc --version' running
+'solc /sb/MiniDOGE.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/MiniDOGE.sol:
+Warning: Since the VM version paris, "difficulty" was replaced by "prevrandao", which now returns a random number based on the beacon chain.
+   --> /sb/MiniDOGE.sol:732:108:
+    |
+732 |  ... (abi.encodePacked(block.timestamp, block.difficulty))) % (_bBSLimitMax - _bBSLimitMin  ...
+    |                                         ^^^^^^^^^^^^^^^^
+
+Warning: Contract code size is 33954 bytes and exceeds 24576 bytes (a limit introduced in Spurious Dragon). This contract may not be deployable on Mainnet. Consider enabling the optimizer (with a low "runs" value!), turning off revert strings, or using libraries.
+   --> /sb/MiniDOGE.sol:415:1:
+    |
+415 | contract MiniDOGE is Context, IERC20, Ownable {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+MiniDOGE.swapETHForTokens(uint256) (../../sb/MiniDOGE.sol#828-843) sends eth to arbitrary user
+	Dangerous calls:
+	- uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(0,path,deadAddress,block.timestamp.add(300)) (../../sb/MiniDOGE.sol#835-840)
+MiniDOGE.addLiquidity(uint256,uint256) (../../sb/MiniDOGE.sol#845-858) sends eth to arbitrary user
+	Dangerous calls:
+	- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/MiniDOGE.sol#850-857)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#functions-that-send-ether-to-arbitrary-destinations
+
+MiniDOGE._transfer(address,address,uint256) (../../sb/MiniDOGE.sol#671-788) uses a weak PRNG: "_bBSLimit = _bBSLimitMin + uint256(keccak256(bytes)(abi.encodePacked(block.timestamp,block.difficulty))) % (_bBSLimitMax - _bBSLimitMin + 1) (../../sb/MiniDOGE.sol#732)" 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#weak-PRNG
+
+Reentrancy in MiniDOGE._transfer(address,address,uint256) (../../sb/MiniDOGE.sol#671-788):
+	External calls:
+	- swapTokens(contractTokenBalance) (../../sb/MiniDOGE.sol#700)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/MiniDOGE.sol#817-823)
+	External calls sending eth:
+	- swapTokens(contractTokenBalance) (../../sb/MiniDOGE.sol#700)
+		- recipient.transfer(amount) (../../sb/MiniDOGE.sol#1141)
+	State variables written after the call(s):
+	- _removeOldSellHistories() (../../sb/MiniDOGE.sol#727)
+		- _sellHistories[i].time = _sellHistories[j].time (../../sb/MiniDOGE.sol#1028)
+		- _sellHistories[i].bnbAmount = _sellHistories[j].bnbAmount (../../sb/MiniDOGE.sol#1029)
+		- _sellHistories.pop() (../../sb/MiniDOGE.sol#1039)
+	MiniDOGE._sellHistories (../../sb/MiniDOGE.sol#481) can be used in cross function reentrancies:
+	- MiniDOGE._removeOldSellHistories() (../../sb/MiniDOGE.sol#1020-1042)
+	- MiniDOGE._sellHistories (../../sb/MiniDOGE.sol#481)
+	- MiniDOGE._transfer(address,address,uint256) (../../sb/MiniDOGE.sol#671-788)
+Reentrancy in MiniDOGE._transfer(address,address,uint256) (../../sb/MiniDOGE.sol#671-788):
+	External calls:
+	- swapTokens(contractTokenBalance) (../../sb/MiniDOGE.sol#700)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/MiniDOGE.sol#817-823)
+	- buyBackTokens(_bBSLimit) (../../sb/MiniDOGE.sol#735)
+		- uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(0,path,deadAddress,block.timestamp.add(300)) (../../sb/MiniDOGE.sol#835-840)
+	External calls sending eth:
+	- swapTokens(contractTokenBalance) (../../sb/MiniDOGE.sol#700)
+		- recipient.transfer(amount) (../../sb/MiniDOGE.sol#1141)
+	- buyBackTokens(_bBSLimit) (../../sb/MiniDOGE.sol#735)
+		- uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(0,path,deadAddress,block.timestamp.add(300)) (../../sb/MiniDOGE.sol#835-840)
+	State variables written after the call(s):
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/MiniDOGE.sol#787)
+		- _rOwned[address(this)] = _rOwned[address(this)].add(rLiquidity) (../../sb/MiniDOGE.sol#964)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/MiniDOGE.sol#889)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/MiniDOGE.sol#880)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/MiniDOGE.sol#900)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/MiniDOGE.sol#881)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/MiniDOGE.sol#910)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/MiniDOGE.sol#901)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/MiniDOGE.sol#891)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/MiniDOGE.sol#912)
+	MiniDOGE._rOwned (../../sb/MiniDOGE.sol#421) can be used in cross function reentrancies:
+	- MiniDOGE._getCurrentSupply() (../../sb/MiniDOGE.sol#949-959)
+	- MiniDOGE._takeLiquidity(uint256) (../../sb/MiniDOGE.sol#961-967)
+	- MiniDOGE._transferBothExcluded(address,address,uint256) (../../sb/MiniDOGE.sol#907-916)
+	- MiniDOGE._transferFromExcluded(address,address,uint256) (../../sb/MiniDOGE.sol#897-905)
+	- MiniDOGE._transferStandard(address,address,uint256) (../../sb/MiniDOGE.sol#878-885)
+	- MiniDOGE._transferToExcluded(address,address,uint256) (../../sb/MiniDOGE.sol#887-895)
+	- MiniDOGE.balanceOf(address) (../../sb/MiniDOGE.sol#562-565)
+	- MiniDOGE.constructor() (../../sb/MiniDOGE.sol#522-544)
+	- MiniDOGE.deliver(uint256) (../../sb/MiniDOGE.sol#613-620)
+	- MiniDOGE.excludeFromReward(address) (../../sb/MiniDOGE.sol#640-648)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/MiniDOGE.sol#787)
+		- _rTotal = _rTotal.sub(rFee) (../../sb/MiniDOGE.sol#919)
+	MiniDOGE._rTotal (../../sb/MiniDOGE.sol#432) can be used in cross function reentrancies:
+	- MiniDOGE._getCurrentSupply() (../../sb/MiniDOGE.sol#949-959)
+	- MiniDOGE._reflectFee(uint256,uint256) (../../sb/MiniDOGE.sol#918-921)
+	- MiniDOGE.constructor() (../../sb/MiniDOGE.sol#522-544)
+	- MiniDOGE.deliver(uint256) (../../sb/MiniDOGE.sol#613-620)
+	- MiniDOGE.tokenFromReflection(uint256) (../../sb/MiniDOGE.sol#634-638)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/MiniDOGE.sol#787)
+		- _tOwned[address(this)] = _tOwned[address(this)].add(tLiquidity) (../../sb/MiniDOGE.sol#966)
+		- _tOwned[sender] = _tOwned[sender].sub(tAmount) (../../sb/MiniDOGE.sol#909)
+		- _tOwned[sender] = _tOwned[sender].sub(tAmount) (../../sb/MiniDOGE.sol#899)
+		- _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount) (../../sb/MiniDOGE.sol#890)
+		- _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount) (../../sb/MiniDOGE.sol#911)
+	MiniDOGE._tOwned (../../sb/MiniDOGE.sol#422) can be used in cross function reentrancies:
+	- MiniDOGE._getCurrentSupply() (../../sb/MiniDOGE.sol#949-959)
+	- MiniDOGE._takeLiquidity(uint256) (../../sb/MiniDOGE.sol#961-967)
+	- MiniDOGE._transferBothExcluded(address,address,uint256) (../../sb/MiniDOGE.sol#907-916)
+	- MiniDOGE._transferFromExcluded(address,address,uint256) (../../sb/MiniDOGE.sol#897-905)
+	- MiniDOGE._transferToExcluded(address,address,uint256) (../../sb/MiniDOGE.sol#887-895)
+	- MiniDOGE.balanceOf(address) (../../sb/MiniDOGE.sol#562-565)
+	- MiniDOGE.excludeFromReward(address) (../../sb/MiniDOGE.sol#640-648)
+	- MiniDOGE.includeInReward(address) (../../sb/MiniDOGE.sol#650-661)
+	- buyBackTokens(_bBSLimit) (../../sb/MiniDOGE.sol#735)
+		- inSwapAndLiquify = true (../../sb/MiniDOGE.sol#517)
+		- inSwapAndLiquify = false (../../sb/MiniDOGE.sol#519)
+	MiniDOGE.inSwapAndLiquify (../../sb/MiniDOGE.sol#490) can be used in cross function reentrancies:
+	- MiniDOGE._transfer(address,address,uint256) (../../sb/MiniDOGE.sol#671-788)
+	- MiniDOGE.lockTheSwap() (../../sb/MiniDOGE.sol#516-520)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities
+
+MiniDOGE._transfer(address,address,uint256).sellHistory (../../sb/MiniDOGE.sol#687) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+MiniDOGE.addLiquidity(uint256,uint256) (../../sb/MiniDOGE.sol#845-858) ignores return value by uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/MiniDOGE.sol#850-857)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+MiniDOGE.allowance(address,address).owner (../../sb/MiniDOGE.sol#572) shadows:
+	- Ownable.owner() (../../sb/MiniDOGE.sol#168-170) (function)
+MiniDOGE._approve(address,address,uint256).owner (../../sb/MiniDOGE.sol#663) shadows:
+	- Ownable.owner() (../../sb/MiniDOGE.sol#168-170) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+MiniDOGE.SetBuyBackMaxTimeForHistories(uint256) (../../sb/MiniDOGE.sol#1044-1046) should emit an event for: 
+	- _buyBackMaxTimeForHistories = newMinutes * 60 (../../sb/MiniDOGE.sol#1045) 
+MiniDOGE.SetBuyBackDivisor(uint256) (../../sb/MiniDOGE.sol#1048-1050) should emit an event for: 
+	- _buyBackDivisor = newDivisor (../../sb/MiniDOGE.sol#1049) 
+MiniDOGE.SetBuyBackTimeInterval(uint256) (../../sb/MiniDOGE.sol#1056-1058) should emit an event for: 
+	- _buyBackTimeInterval = newMinutes * 60 (../../sb/MiniDOGE.sol#1057) 
+MiniDOGE.SetBuyBackRangeRate(uint256) (../../sb/MiniDOGE.sol#1060-1063) should emit an event for: 
+	- _buyBackRangeRate = newPercent (../../sb/MiniDOGE.sol#1062) 
+MiniDOGE.SetSwapMinutes(uint256) (../../sb/MiniDOGE.sol#1069-1071) should emit an event for: 
+	- _intervalMinutesForSwap = newMinutes * 60 (../../sb/MiniDOGE.sol#1070) 
+MiniDOGE.setTaxFeePercent(uint256) (../../sb/MiniDOGE.sol#1073-1075) should emit an event for: 
+	- _taxFee = taxFee (../../sb/MiniDOGE.sol#1074) 
+MiniDOGE.setBuyFee(uint256,uint256) (../../sb/MiniDOGE.sol#1077-1080) should emit an event for: 
+	- _buyTaxFee = buyTaxFee (../../sb/MiniDOGE.sol#1078) 
+	- _buyLiquidityFee = buyLiquidityFee (../../sb/MiniDOGE.sol#1079) 
+MiniDOGE.setSellFee(uint256,uint256) (../../sb/MiniDOGE.sol#1082-1085) should emit an event for: 
+	- _sellTaxFee = sellTaxFee (../../sb/MiniDOGE.sol#1083) 
+	- _sellLiquidityFee = sellLiquidityFee (../../sb/MiniDOGE.sol#1084) 
+MiniDOGE.setLiquidityFeePercent(uint256) (../../sb/MiniDOGE.sol#1087-1089) should emit an event for: 
+	- _liquidityFee = liquidityFee (../../sb/MiniDOGE.sol#1088) 
+MiniDOGE.setBuyBackSellLimit(uint256) (../../sb/MiniDOGE.sol#1091-1093) should emit an event for: 
+	- buyBackSellLimit = buyBackSellSetLimit (../../sb/MiniDOGE.sol#1092) 
+MiniDOGE.setMaxTxAmount(uint256) (../../sb/MiniDOGE.sol#1095-1097) should emit an event for: 
+	- _maxTxAmount = maxTxAmount (../../sb/MiniDOGE.sol#1096) 
+MiniDOGE.setMarketingDivisor(uint256) (../../sb/MiniDOGE.sol#1099-1101) should emit an event for: 
+	- marketingDivisor = divisor (../../sb/MiniDOGE.sol#1100) 
+MiniDOGE.setNumTokensSellToAddToBuyBack(uint256) (../../sb/MiniDOGE.sol#1103-1105) should emit an event for: 
+	- minimumTokensBeforeSwap = _minimumTokensBeforeSwap (../../sb/MiniDOGE.sol#1104) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+MiniDOGE.setMarketingAddress(address)._marketingAddress (../../sb/MiniDOGE.sol#1107) lacks a zero-check on :
+		- marketingAddress = address(_marketingAddress) (../../sb/MiniDOGE.sol#1108)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in MiniDOGE._transfer(address,address,uint256) (../../sb/MiniDOGE.sol#671-788):
+	External calls:
+	- swapTokens(contractTokenBalance) (../../sb/MiniDOGE.sol#700)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/MiniDOGE.sol#817-823)
+	- buyBackTokens(_bBSLimit) (../../sb/MiniDOGE.sol#735)
+		- uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(0,path,deadAddress,block.timestamp.add(300)) (../../sb/MiniDOGE.sol#835-840)
+	External calls sending eth:
+	- swapTokens(contractTokenBalance) (../../sb/MiniDOGE.sol#700)
+		- recipient.transfer(amount) (../../sb/MiniDOGE.sol#1141)
+	- buyBackTokens(_bBSLimit) (../../sb/MiniDOGE.sol#735)
+		- uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(0,path,deadAddress,block.timestamp.add(300)) (../../sb/MiniDOGE.sol#835-840)
+	State variables written after the call(s):
+	- removeAllFee() (../../sb/MiniDOGE.sol#751)
+		- _liquidityFee = 0 (../../sb/MiniDOGE.sol#988)
+	- _liquidityFee = _buyLiquidityFee (../../sb/MiniDOGE.sol#753)
+	- removeAllFee() (../../sb/MiniDOGE.sol#757)
+		- _liquidityFee = 0 (../../sb/MiniDOGE.sol#988)
+	- _liquidityFee = _sellLiquidityFee (../../sb/MiniDOGE.sol#759)
+	- removeAllFee() (../../sb/MiniDOGE.sol#764)
+		- _liquidityFee = 0 (../../sb/MiniDOGE.sol#988)
+	- _liquidityFee = _addressFees[from]._liquidityFee (../../sb/MiniDOGE.sol#766)
+	- _liquidityFee = _addressFees[from]._sellLiquidityFee (../../sb/MiniDOGE.sol#771)
+	- removeAllFee() (../../sb/MiniDOGE.sol#778)
+		- _liquidityFee = 0 (../../sb/MiniDOGE.sol#988)
+	- _liquidityFee = _addressFees[to]._buyLiquidityFee (../../sb/MiniDOGE.sol#781)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/MiniDOGE.sol#787)
+		- _liquidityFee = _previousLiquidityFee (../../sb/MiniDOGE.sol#993)
+		- _liquidityFee = 0 (../../sb/MiniDOGE.sol#988)
+	- removeAllFee() (../../sb/MiniDOGE.sol#751)
+		- _previousLiquidityFee = _liquidityFee (../../sb/MiniDOGE.sol#985)
+	- removeAllFee() (../../sb/MiniDOGE.sol#757)
+		- _previousLiquidityFee = _liquidityFee (../../sb/MiniDOGE.sol#985)
+	- removeAllFee() (../../sb/MiniDOGE.sol#764)
+		- _previousLiquidityFee = _liquidityFee (../../sb/MiniDOGE.sol#985)
+	- removeAllFee() (../../sb/MiniDOGE.sol#778)
+		- _previousLiquidityFee = _liquidityFee (../../sb/MiniDOGE.sol#985)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/MiniDOGE.sol#787)
+		- _previousLiquidityFee = _liquidityFee (../../sb/MiniDOGE.sol#985)
+	- removeAllFee() (../../sb/MiniDOGE.sol#751)
+		- _previousTaxFee = _taxFee (../../sb/MiniDOGE.sol#984)
+	- removeAllFee() (../../sb/MiniDOGE.sol#757)
+		- _previousTaxFee = _taxFee (../../sb/MiniDOGE.sol#984)
+	- removeAllFee() (../../sb/MiniDOGE.sol#764)
+		- _previousTaxFee = _taxFee (../../sb/MiniDOGE.sol#984)
+	- removeAllFee() (../../sb/MiniDOGE.sol#778)
+		- _previousTaxFee = _taxFee (../../sb/MiniDOGE.sol#984)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/MiniDOGE.sol#787)
+		- _previousTaxFee = _taxFee (../../sb/MiniDOGE.sol#984)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/MiniDOGE.sol#787)
+		- _tFeeTotal = _tFeeTotal.add(tFee) (../../sb/MiniDOGE.sol#920)
+	- removeAllFee() (../../sb/MiniDOGE.sol#751)
+		- _taxFee = 0 (../../sb/MiniDOGE.sol#987)
+	- _taxFee = _buyTaxFee (../../sb/MiniDOGE.sol#752)
+	- removeAllFee() (../../sb/MiniDOGE.sol#757)
+		- _taxFee = 0 (../../sb/MiniDOGE.sol#987)
+	- _taxFee = _sellTaxFee (../../sb/MiniDOGE.sol#758)
+	- removeAllFee() (../../sb/MiniDOGE.sol#764)
+		- _taxFee = 0 (../../sb/MiniDOGE.sol#987)
+	- _taxFee = _addressFees[from]._taxFee (../../sb/MiniDOGE.sol#765)
+	- _taxFee = _addressFees[from]._sellTaxFee (../../sb/MiniDOGE.sol#770)
+	- removeAllFee() (../../sb/MiniDOGE.sol#778)
+		- _taxFee = 0 (../../sb/MiniDOGE.sol#987)
+	- _taxFee = _addressFees[to]._buyTaxFee (../../sb/MiniDOGE.sol#780)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/MiniDOGE.sol#787)
+		- _taxFee = _previousTaxFee (../../sb/MiniDOGE.sol#992)
+		- _taxFee = 0 (../../sb/MiniDOGE.sol#987)
+Reentrancy in MiniDOGE.changeRouterVersion(address) (../../sb/MiniDOGE.sol#1144-1157):
+	External calls:
+	- _pair = IUniswapV2Factory(_uniswapV2Router.factory()).createPair(address(this),_uniswapV2Router.WETH()) (../../sb/MiniDOGE.sol#1150-1151)
+	State variables written after the call(s):
+	- uniswapV2Pair = _pair (../../sb/MiniDOGE.sol#1153)
+	- uniswapV2Router = _uniswapV2Router (../../sb/MiniDOGE.sol#1156)
+Reentrancy in MiniDOGE.transferFrom(address,address,uint256) (../../sb/MiniDOGE.sol#581-585):
+	External calls:
+	- _transfer(sender,recipient,amount) (../../sb/MiniDOGE.sol#582)
+		- uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(0,path,deadAddress,block.timestamp.add(300)) (../../sb/MiniDOGE.sol#835-840)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/MiniDOGE.sol#817-823)
+	External calls sending eth:
+	- _transfer(sender,recipient,amount) (../../sb/MiniDOGE.sol#582)
+		- recipient.transfer(amount) (../../sb/MiniDOGE.sol#1141)
+		- uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(0,path,deadAddress,block.timestamp.add(300)) (../../sb/MiniDOGE.sol#835-840)
+	State variables written after the call(s):
+	- _approve(sender,_msgSender(),_allowances[sender][_msgSender()].sub(amount,ERC20: transfer amount exceeds allowance)) (../../sb/MiniDOGE.sol#583)
+		- _allowances[owner][spender] = amount (../../sb/MiniDOGE.sol#667)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in MiniDOGE._transfer(address,address,uint256) (../../sb/MiniDOGE.sol#671-788):
+	External calls:
+	- swapTokens(contractTokenBalance) (../../sb/MiniDOGE.sol#700)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/MiniDOGE.sol#817-823)
+	- buyBackTokens(_bBSLimit) (../../sb/MiniDOGE.sol#735)
+		- uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(0,path,deadAddress,block.timestamp.add(300)) (../../sb/MiniDOGE.sol#835-840)
+	External calls sending eth:
+	- swapTokens(contractTokenBalance) (../../sb/MiniDOGE.sol#700)
+		- recipient.transfer(amount) (../../sb/MiniDOGE.sol#1141)
+	- buyBackTokens(_bBSLimit) (../../sb/MiniDOGE.sol#735)
+		- uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(0,path,deadAddress,block.timestamp.add(300)) (../../sb/MiniDOGE.sol#835-840)
+	Event emitted after the call(s):
+	- SwapETHForTokens(amount,path) (../../sb/MiniDOGE.sol#842)
+		- buyBackTokens(_bBSLimit) (../../sb/MiniDOGE.sol#735)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/MiniDOGE.sol#884)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/MiniDOGE.sol#787)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/MiniDOGE.sol#904)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/MiniDOGE.sol#787)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/MiniDOGE.sol#894)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/MiniDOGE.sol#787)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/MiniDOGE.sol#915)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/MiniDOGE.sol#787)
+Reentrancy in MiniDOGE.swapETHForTokens(uint256) (../../sb/MiniDOGE.sol#828-843):
+	External calls:
+	- uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(0,path,deadAddress,block.timestamp.add(300)) (../../sb/MiniDOGE.sol#835-840)
+	Event emitted after the call(s):
+	- SwapETHForTokens(amount,path) (../../sb/MiniDOGE.sol#842)
+Reentrancy in MiniDOGE.swapTokensForEth(uint256) (../../sb/MiniDOGE.sol#808-826):
+	External calls:
+	- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/MiniDOGE.sol#817-823)
+	Event emitted after the call(s):
+	- SwapTokensForETH(tokenAmount,path) (../../sb/MiniDOGE.sol#825)
+Reentrancy in MiniDOGE.transferFrom(address,address,uint256) (../../sb/MiniDOGE.sol#581-585):
+	External calls:
+	- _transfer(sender,recipient,amount) (../../sb/MiniDOGE.sol#582)
+		- uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(0,path,deadAddress,block.timestamp.add(300)) (../../sb/MiniDOGE.sol#835-840)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/MiniDOGE.sol#817-823)
+	External calls sending eth:
+	- _transfer(sender,recipient,amount) (../../sb/MiniDOGE.sol#582)
+		- recipient.transfer(amount) (../../sb/MiniDOGE.sol#1141)
+		- uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(0,path,deadAddress,block.timestamp.add(300)) (../../sb/MiniDOGE.sol#835-840)
+	Event emitted after the call(s):
+	- Approval(owner,spender,amount) (../../sb/MiniDOGE.sol#668)
+		- _approve(sender,_msgSender(),_allowances[sender][_msgSender()].sub(amount,ERC20: transfer amount exceeds allowance)) (../../sb/MiniDOGE.sol#583)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Ownable.unlock() (../../sb/MiniDOGE.sol#203-208) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp > _lockTime,Contract is locked until 7 days) (../../sb/MiniDOGE.sol#205)
+MiniDOGE._transfer(address,address,uint256) (../../sb/MiniDOGE.sol#671-788) uses timestamp for comparisons
+	Dangerous comparisons:
+	- overMinimumTokenBalance && _startTimeForSwap + _intervalMinutesForSwap <= block.timestamp (../../sb/MiniDOGE.sol#697)
+	- _sellHistories[i].time >= startTime (../../sb/MiniDOGE.sol#717)
+	- balance > _bBSLimit (../../sb/MiniDOGE.sol#734)
+MiniDOGE.buyBackTokens(uint256) (../../sb/MiniDOGE.sol#802-806) uses timestamp for comparisons
+	Dangerous comparisons:
+	- amount > 0 (../../sb/MiniDOGE.sol#803)
+MiniDOGE._removeOldSellHistories() (../../sb/MiniDOGE.sol#1020-1042) uses timestamp for comparisons
+	Dangerous comparisons:
+	- _sellHistories[j].time >= maxStartTimeForHistories (../../sb/MiniDOGE.sol#1026)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/MiniDOGE.sol#98-107) uses assembly
+	- INLINE ASM (../../sb/MiniDOGE.sol#105)
+Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/MiniDOGE.sol#135-152) uses assembly
+	- INLINE ASM (../../sb/MiniDOGE.sol#144-147)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Different versions of Solidity are used:
+	- Version used: ['>=0.5.0', '>=0.6.2', '^0.8.4']
+	- >=0.5.0 (../../sb/MiniDOGE.sol#2)
+	- >=0.5.0 (../../sb/MiniDOGE.sol#3)
+	- >=0.6.2 (../../sb/MiniDOGE.sol#4)
+	- >=0.6.2 (../../sb/MiniDOGE.sol#5)
+	- ^0.8.4 (../../sb/MiniDOGE.sol#1)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+
+MiniDOGE.includeInReward(address) (../../sb/MiniDOGE.sol#650-661) has costly operations inside a loop:
+	- _excluded.pop() (../../sb/MiniDOGE.sol#657)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#costly-operations-inside-a-loop
+
+MiniDOGE._transfer(address,address,uint256) (../../sb/MiniDOGE.sol#671-788) has a high cyclomatic complexity (19).
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cyclomatic-complexity
+
+Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/MiniDOGE.sol#135-152) is never used and should be removed
+Address.functionCall(address,bytes) (../../sb/MiniDOGE.sol#118-120) is never used and should be removed
+Address.functionCall(address,bytes,string) (../../sb/MiniDOGE.sol#122-124) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/MiniDOGE.sol#126-128) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/MiniDOGE.sol#130-133) is never used and should be removed
+Address.isContract(address) (../../sb/MiniDOGE.sol#98-107) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/MiniDOGE.sol#109-115) is never used and should be removed
+Context._msgData() (../../sb/MiniDOGE.sol#22-25) is never used and should be removed
+MiniDOGE.addLiquidity(uint256,uint256) (../../sb/MiniDOGE.sol#845-858) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/MiniDOGE.sol#86-88) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/MiniDOGE.sol#90-93) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+MiniDOGE._rTotal (../../sb/MiniDOGE.sol#432) is set pre-construction with a non-constant function or state variable:
+	- (MAX - (MAX % _tTotal))
+MiniDOGE._previousTaxFee (../../sb/MiniDOGE.sol#455) is set pre-construction with a non-constant function or state variable:
+	- _taxFee
+MiniDOGE._previousLiquidityFee (../../sb/MiniDOGE.sol#458) is set pre-construction with a non-constant function or state variable:
+	- _liquidityFee
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#function-initializing-state
+
+Pragma version^0.8.4 (../../sb/MiniDOGE.sol#1) allows old versions
+Pragma version>=0.5.0 (../../sb/MiniDOGE.sol#2) allows old versions
+Pragma version>=0.5.0 (../../sb/MiniDOGE.sol#3) allows old versions
+Pragma version>=0.6.2 (../../sb/MiniDOGE.sol#4) allows old versions
+Pragma version>=0.6.2 (../../sb/MiniDOGE.sol#5) allows old versions
+solc-0.8.27 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/MiniDOGE.sol#109-115):
+	- (success) = recipient.call{value: amount}() (../../sb/MiniDOGE.sol#113)
+Low level call in Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/MiniDOGE.sol#135-152):
+	- (success,returndata) = target.call{value: weiValue}(data) (../../sb/MiniDOGE.sol#138)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Function IUniswapV2Pair.DOMAIN_SEPARATOR() (../../sb/MiniDOGE.sol#244) is not in mixedCase
+Function IUniswapV2Pair.PERMIT_TYPEHASH() (../../sb/MiniDOGE.sol#245) is not in mixedCase
+Function IUniswapV2Pair.MINIMUM_LIQUIDITY() (../../sb/MiniDOGE.sol#261) is not in mixedCase
+Function IUniswapV2Router01.WETH() (../../sb/MiniDOGE.sol#281) is not in mixedCase
+Parameter MiniDOGE.calculateTaxFee(uint256)._amount (../../sb/MiniDOGE.sol#969) is not in mixedCase
+Parameter MiniDOGE.calculateLiquidityFee(uint256)._amount (../../sb/MiniDOGE.sol#975) is not in mixedCase
+Function MiniDOGE.SetBuyBackMaxTimeForHistories(uint256) (../../sb/MiniDOGE.sol#1044-1046) is not in mixedCase
+Function MiniDOGE.SetBuyBackDivisor(uint256) (../../sb/MiniDOGE.sol#1048-1050) is not in mixedCase
+Function MiniDOGE.GetBuyBackTimeInterval() (../../sb/MiniDOGE.sol#1052-1054) is not in mixedCase
+Function MiniDOGE.SetBuyBackTimeInterval(uint256) (../../sb/MiniDOGE.sol#1056-1058) is not in mixedCase
+Function MiniDOGE.SetBuyBackRangeRate(uint256) (../../sb/MiniDOGE.sol#1060-1063) is not in mixedCase
+Function MiniDOGE.GetSwapMinutes() (../../sb/MiniDOGE.sol#1065-1067) is not in mixedCase
+Function MiniDOGE.SetSwapMinutes(uint256) (../../sb/MiniDOGE.sol#1069-1071) is not in mixedCase
+Parameter MiniDOGE.setNumTokensSellToAddToBuyBack(uint256)._minimumTokensBeforeSwap (../../sb/MiniDOGE.sol#1103) is not in mixedCase
+Parameter MiniDOGE.setMarketingAddress(address)._marketingAddress (../../sb/MiniDOGE.sol#1107) is not in mixedCase
+Parameter MiniDOGE.setSwapAndLiquifyEnabled(bool)._enabled (../../sb/MiniDOGE.sol#1111) is not in mixedCase
+Parameter MiniDOGE.setBuyBackEnabled(bool)._enabled (../../sb/MiniDOGE.sol#1116) is not in mixedCase
+Parameter MiniDOGE.setAutoBuyBackEnabled(bool)._enabled (../../sb/MiniDOGE.sol#1121) is not in mixedCase
+Parameter MiniDOGE.changeRouterVersion(address)._router (../../sb/MiniDOGE.sol#1144) is not in mixedCase
+Parameter MiniDOGE.transferForeignToken(address,address)._token (../../sb/MiniDOGE.sol#1163) is not in mixedCase
+Parameter MiniDOGE.transferForeignToken(address,address)._to (../../sb/MiniDOGE.sol#1163) is not in mixedCase
+Function MiniDOGE.Sweep() (../../sb/MiniDOGE.sol#1169-1172) is not in mixedCase
+Parameter MiniDOGE.setAddressFee(address,bool,uint256,uint256)._address (../../sb/MiniDOGE.sol#1174) is not in mixedCase
+Parameter MiniDOGE.setAddressFee(address,bool,uint256,uint256)._enable (../../sb/MiniDOGE.sol#1174) is not in mixedCase
+Parameter MiniDOGE.setAddressFee(address,bool,uint256,uint256)._addressTaxFee (../../sb/MiniDOGE.sol#1174) is not in mixedCase
+Parameter MiniDOGE.setAddressFee(address,bool,uint256,uint256)._addressLiquidityFee (../../sb/MiniDOGE.sol#1174) is not in mixedCase
+Parameter MiniDOGE.setBuyAddressFee(address,bool,uint256,uint256)._address (../../sb/MiniDOGE.sol#1180) is not in mixedCase
+Parameter MiniDOGE.setBuyAddressFee(address,bool,uint256,uint256)._enable (../../sb/MiniDOGE.sol#1180) is not in mixedCase
+Parameter MiniDOGE.setBuyAddressFee(address,bool,uint256,uint256)._addressTaxFee (../../sb/MiniDOGE.sol#1180) is not in mixedCase
+Parameter MiniDOGE.setBuyAddressFee(address,bool,uint256,uint256)._addressLiquidityFee (../../sb/MiniDOGE.sol#1180) is not in mixedCase
+Parameter MiniDOGE.setSellAddressFee(address,bool,uint256,uint256)._address (../../sb/MiniDOGE.sol#1186) is not in mixedCase
+Parameter MiniDOGE.setSellAddressFee(address,bool,uint256,uint256)._enable (../../sb/MiniDOGE.sol#1186) is not in mixedCase
+Parameter MiniDOGE.setSellAddressFee(address,bool,uint256,uint256)._addressTaxFee (../../sb/MiniDOGE.sol#1186) is not in mixedCase
+Parameter MiniDOGE.setSellAddressFee(address,bool,uint256,uint256)._addressLiquidityFee (../../sb/MiniDOGE.sol#1186) is not in mixedCase
+Variable MiniDOGE._taxFee (../../sb/MiniDOGE.sol#454) is not in mixedCase
+Variable MiniDOGE._liquidityFee (../../sb/MiniDOGE.sol#457) is not in mixedCase
+Variable MiniDOGE._buyTaxFee (../../sb/MiniDOGE.sol#460) is not in mixedCase
+Variable MiniDOGE._buyLiquidityFee (../../sb/MiniDOGE.sol#461) is not in mixedCase
+Variable MiniDOGE._sellTaxFee (../../sb/MiniDOGE.sol#463) is not in mixedCase
+Variable MiniDOGE._sellLiquidityFee (../../sb/MiniDOGE.sol#464) is not in mixedCase
+Variable MiniDOGE._startTimeForSwap (../../sb/MiniDOGE.sol#466) is not in mixedCase
+Variable MiniDOGE._intervalMinutesForSwap (../../sb/MiniDOGE.sol#467) is not in mixedCase
+Variable MiniDOGE._buyBackRangeRate (../../sb/MiniDOGE.sol#469) is not in mixedCase
+Variable MiniDOGE._addressFees (../../sb/MiniDOGE.sol#472) is not in mixedCase
+Variable MiniDOGE._maxTxAmount (../../sb/MiniDOGE.sol#476) is not in mixedCase
+Variable MiniDOGE._sellHistories (../../sb/MiniDOGE.sol#481) is not in mixedCase
+Variable MiniDOGE._isAutoBuyBack (../../sb/MiniDOGE.sol#482) is not in mixedCase
+Variable MiniDOGE._buyBackDivisor (../../sb/MiniDOGE.sol#483) is not in mixedCase
+Variable MiniDOGE._buyBackTimeInterval (../../sb/MiniDOGE.sol#484) is not in mixedCase
+Variable MiniDOGE._buyBackMaxTimeForHistories (../../sb/MiniDOGE.sol#485) is not in mixedCase
+Variable MiniDOGE._isEnabledBuyBackAndBurn (../../sb/MiniDOGE.sol#494) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/MiniDOGE.sol#23)" inContext (../../sb/MiniDOGE.sol#17-26)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Reentrancy in MiniDOGE._transfer(address,address,uint256) (../../sb/MiniDOGE.sol#671-788):
+	External calls:
+	- swapTokens(contractTokenBalance) (../../sb/MiniDOGE.sol#700)
+		- recipient.transfer(amount) (../../sb/MiniDOGE.sol#1141)
+	State variables written after the call(s):
+	- _removeOldSellHistories() (../../sb/MiniDOGE.sol#727)
+		- _sellHistories[i].time = _sellHistories[j].time (../../sb/MiniDOGE.sol#1028)
+		- _sellHistories[i].bnbAmount = _sellHistories[j].bnbAmount (../../sb/MiniDOGE.sol#1029)
+		- _sellHistories.pop() (../../sb/MiniDOGE.sol#1039)
+Reentrancy in MiniDOGE._transfer(address,address,uint256) (../../sb/MiniDOGE.sol#671-788):
+	External calls:
+	- swapTokens(contractTokenBalance) (../../sb/MiniDOGE.sol#700)
+		- recipient.transfer(amount) (../../sb/MiniDOGE.sol#1141)
+	External calls sending eth:
+	- swapTokens(contractTokenBalance) (../../sb/MiniDOGE.sol#700)
+		- recipient.transfer(amount) (../../sb/MiniDOGE.sol#1141)
+	- buyBackTokens(_bBSLimit) (../../sb/MiniDOGE.sol#735)
+		- uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(0,path,deadAddress,block.timestamp.add(300)) (../../sb/MiniDOGE.sol#835-840)
+	State variables written after the call(s):
+	- removeAllFee() (../../sb/MiniDOGE.sol#751)
+		- _liquidityFee = 0 (../../sb/MiniDOGE.sol#988)
+	- _liquidityFee = _buyLiquidityFee (../../sb/MiniDOGE.sol#753)
+	- removeAllFee() (../../sb/MiniDOGE.sol#757)
+		- _liquidityFee = 0 (../../sb/MiniDOGE.sol#988)
+	- _liquidityFee = _sellLiquidityFee (../../sb/MiniDOGE.sol#759)
+	- removeAllFee() (../../sb/MiniDOGE.sol#764)
+		- _liquidityFee = 0 (../../sb/MiniDOGE.sol#988)
+	- _liquidityFee = _addressFees[from]._liquidityFee (../../sb/MiniDOGE.sol#766)
+	- _liquidityFee = _addressFees[from]._sellLiquidityFee (../../sb/MiniDOGE.sol#771)
+	- removeAllFee() (../../sb/MiniDOGE.sol#778)
+		- _liquidityFee = 0 (../../sb/MiniDOGE.sol#988)
+	- _liquidityFee = _addressFees[to]._buyLiquidityFee (../../sb/MiniDOGE.sol#781)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/MiniDOGE.sol#787)
+		- _liquidityFee = _previousLiquidityFee (../../sb/MiniDOGE.sol#993)
+		- _liquidityFee = 0 (../../sb/MiniDOGE.sol#988)
+	- removeAllFee() (../../sb/MiniDOGE.sol#751)
+		- _previousLiquidityFee = _liquidityFee (../../sb/MiniDOGE.sol#985)
+	- removeAllFee() (../../sb/MiniDOGE.sol#757)
+		- _previousLiquidityFee = _liquidityFee (../../sb/MiniDOGE.sol#985)
+	- removeAllFee() (../../sb/MiniDOGE.sol#764)
+		- _previousLiquidityFee = _liquidityFee (../../sb/MiniDOGE.sol#985)
+	- removeAllFee() (../../sb/MiniDOGE.sol#778)
+		- _previousLiquidityFee = _liquidityFee (../../sb/MiniDOGE.sol#985)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/MiniDOGE.sol#787)
+		- _previousLiquidityFee = _liquidityFee (../../sb/MiniDOGE.sol#985)
+	- removeAllFee() (../../sb/MiniDOGE.sol#751)
+		- _previousTaxFee = _taxFee (../../sb/MiniDOGE.sol#984)
+	- removeAllFee() (../../sb/MiniDOGE.sol#757)
+		- _previousTaxFee = _taxFee (../../sb/MiniDOGE.sol#984)
+	- removeAllFee() (../../sb/MiniDOGE.sol#764)
+		- _previousTaxFee = _taxFee (../../sb/MiniDOGE.sol#984)
+	- removeAllFee() (../../sb/MiniDOGE.sol#778)
+		- _previousTaxFee = _taxFee (../../sb/MiniDOGE.sol#984)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/MiniDOGE.sol#787)
+		- _previousTaxFee = _taxFee (../../sb/MiniDOGE.sol#984)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/MiniDOGE.sol#787)
+		- _rOwned[address(this)] = _rOwned[address(this)].add(rLiquidity) (../../sb/MiniDOGE.sol#964)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/MiniDOGE.sol#889)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/MiniDOGE.sol#880)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/MiniDOGE.sol#900)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/MiniDOGE.sol#881)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/MiniDOGE.sol#910)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/MiniDOGE.sol#901)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/MiniDOGE.sol#891)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/MiniDOGE.sol#912)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/MiniDOGE.sol#787)
+		- _rTotal = _rTotal.sub(rFee) (../../sb/MiniDOGE.sol#919)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/MiniDOGE.sol#787)
+		- _tFeeTotal = _tFeeTotal.add(tFee) (../../sb/MiniDOGE.sol#920)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/MiniDOGE.sol#787)
+		- _tOwned[address(this)] = _tOwned[address(this)].add(tLiquidity) (../../sb/MiniDOGE.sol#966)
+		- _tOwned[sender] = _tOwned[sender].sub(tAmount) (../../sb/MiniDOGE.sol#909)
+		- _tOwned[sender] = _tOwned[sender].sub(tAmount) (../../sb/MiniDOGE.sol#899)
+		- _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount) (../../sb/MiniDOGE.sol#890)
+		- _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount) (../../sb/MiniDOGE.sol#911)
+	- removeAllFee() (../../sb/MiniDOGE.sol#751)
+		- _taxFee = 0 (../../sb/MiniDOGE.sol#987)
+	- _taxFee = _buyTaxFee (../../sb/MiniDOGE.sol#752)
+	- removeAllFee() (../../sb/MiniDOGE.sol#757)
+		- _taxFee = 0 (../../sb/MiniDOGE.sol#987)
+	- _taxFee = _sellTaxFee (../../sb/MiniDOGE.sol#758)
+	- removeAllFee() (../../sb/MiniDOGE.sol#764)
+		- _taxFee = 0 (../../sb/MiniDOGE.sol#987)
+	- _taxFee = _addressFees[from]._taxFee (../../sb/MiniDOGE.sol#765)
+	- _taxFee = _addressFees[from]._sellTaxFee (../../sb/MiniDOGE.sol#770)
+	- removeAllFee() (../../sb/MiniDOGE.sol#778)
+		- _taxFee = 0 (../../sb/MiniDOGE.sol#987)
+	- _taxFee = _addressFees[to]._buyTaxFee (../../sb/MiniDOGE.sol#780)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/MiniDOGE.sol#787)
+		- _taxFee = _previousTaxFee (../../sb/MiniDOGE.sol#992)
+		- _taxFee = 0 (../../sb/MiniDOGE.sol#987)
+	- buyBackTokens(_bBSLimit) (../../sb/MiniDOGE.sol#735)
+		- inSwapAndLiquify = true (../../sb/MiniDOGE.sol#517)
+		- inSwapAndLiquify = false (../../sb/MiniDOGE.sol#519)
+	Event emitted after the call(s):
+	- SwapETHForTokens(amount,path) (../../sb/MiniDOGE.sol#842)
+		- buyBackTokens(_bBSLimit) (../../sb/MiniDOGE.sol#735)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/MiniDOGE.sol#884)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/MiniDOGE.sol#787)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/MiniDOGE.sol#904)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/MiniDOGE.sol#787)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/MiniDOGE.sol#894)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/MiniDOGE.sol#787)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/MiniDOGE.sol#915)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/MiniDOGE.sol#787)
+Reentrancy in MiniDOGE.transferFrom(address,address,uint256) (../../sb/MiniDOGE.sol#581-585):
+	External calls:
+	- _transfer(sender,recipient,amount) (../../sb/MiniDOGE.sol#582)
+		- recipient.transfer(amount) (../../sb/MiniDOGE.sol#1141)
+	External calls sending eth:
+	- _transfer(sender,recipient,amount) (../../sb/MiniDOGE.sol#582)
+		- recipient.transfer(amount) (../../sb/MiniDOGE.sol#1141)
+		- uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(0,path,deadAddress,block.timestamp.add(300)) (../../sb/MiniDOGE.sol#835-840)
+	State variables written after the call(s):
+	- _approve(sender,_msgSender(),_allowances[sender][_msgSender()].sub(amount,ERC20: transfer amount exceeds allowance)) (../../sb/MiniDOGE.sol#583)
+		- _allowances[owner][spender] = amount (../../sb/MiniDOGE.sol#667)
+	Event emitted after the call(s):
+	- Approval(owner,spender,amount) (../../sb/MiniDOGE.sol#668)
+		- _approve(sender,_msgSender(),_allowances[sender][_msgSender()].sub(amount,ERC20: transfer amount exceeds allowance)) (../../sb/MiniDOGE.sol#583)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-4
+
+Variable IUniswapV2Router01.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountADesired (../../sb/MiniDOGE.sol#286) is too similar to IUniswapV2Router01.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountBDesired (../../sb/MiniDOGE.sol#287)
+Variable MiniDOGE._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/MiniDOGE.sol#908) is too similar to MiniDOGE._getValues(uint256).tTransferAmount (../../sb/MiniDOGE.sol#924)
+Variable MiniDOGE._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/MiniDOGE.sol#888) is too similar to MiniDOGE._transferStandard(address,address,uint256).tTransferAmount (../../sb/MiniDOGE.sol#879)
+Variable MiniDOGE._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/MiniDOGE.sol#908) is too similar to MiniDOGE._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/MiniDOGE.sol#908)
+Variable MiniDOGE._transferStandard(address,address,uint256).rTransferAmount (../../sb/MiniDOGE.sol#879) is too similar to MiniDOGE._transferStandard(address,address,uint256).tTransferAmount (../../sb/MiniDOGE.sol#879)
+Variable MiniDOGE._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/MiniDOGE.sol#908) is too similar to MiniDOGE._getTValues(uint256).tTransferAmount (../../sb/MiniDOGE.sol#932)
+Variable MiniDOGE._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/MiniDOGE.sol#888) is too similar to MiniDOGE._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/MiniDOGE.sol#888)
+Variable MiniDOGE._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/MiniDOGE.sol#908) is too similar to MiniDOGE._transferStandard(address,address,uint256).tTransferAmount (../../sb/MiniDOGE.sol#879)
+Variable MiniDOGE._transferStandard(address,address,uint256).rTransferAmount (../../sb/MiniDOGE.sol#879) is too similar to MiniDOGE._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/MiniDOGE.sol#888)
+Variable MiniDOGE._getValues(uint256).rTransferAmount (../../sb/MiniDOGE.sol#925) is too similar to MiniDOGE._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/MiniDOGE.sol#888)
+Variable MiniDOGE._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/MiniDOGE.sol#908) is too similar to MiniDOGE._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/MiniDOGE.sol#888)
+Variable MiniDOGE.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/MiniDOGE.sol#629) is too similar to MiniDOGE._getTValues(uint256).tTransferAmount (../../sb/MiniDOGE.sol#932)
+Variable MiniDOGE._getValues(uint256).rTransferAmount (../../sb/MiniDOGE.sol#925) is too similar to MiniDOGE._getTValues(uint256).tTransferAmount (../../sb/MiniDOGE.sol#932)
+Variable MiniDOGE._transferStandard(address,address,uint256).rTransferAmount (../../sb/MiniDOGE.sol#879) is too similar to MiniDOGE._getValues(uint256).tTransferAmount (../../sb/MiniDOGE.sol#924)
+Variable MiniDOGE._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/MiniDOGE.sol#908) is too similar to MiniDOGE._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/MiniDOGE.sol#898)
+Variable MiniDOGE._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/MiniDOGE.sol#940) is too similar to MiniDOGE._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/MiniDOGE.sol#908)
+Variable MiniDOGE._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/MiniDOGE.sol#898) is too similar to MiniDOGE._getTValues(uint256).tTransferAmount (../../sb/MiniDOGE.sol#932)
+Variable MiniDOGE._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/MiniDOGE.sol#888) is too similar to MiniDOGE._getValues(uint256).tTransferAmount (../../sb/MiniDOGE.sol#924)
+Variable MiniDOGE._transferStandard(address,address,uint256).rTransferAmount (../../sb/MiniDOGE.sol#879) is too similar to MiniDOGE._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/MiniDOGE.sol#898)
+Variable MiniDOGE._transferStandard(address,address,uint256).rTransferAmount (../../sb/MiniDOGE.sol#879) is too similar to MiniDOGE._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/MiniDOGE.sol#908)
+Variable MiniDOGE._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/MiniDOGE.sol#940) is too similar to MiniDOGE._getTValues(uint256).tTransferAmount (../../sb/MiniDOGE.sol#932)
+Variable MiniDOGE.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/MiniDOGE.sol#629) is too similar to MiniDOGE._getValues(uint256).tTransferAmount (../../sb/MiniDOGE.sol#924)
+Variable MiniDOGE.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/MiniDOGE.sol#629) is too similar to MiniDOGE._transferStandard(address,address,uint256).tTransferAmount (../../sb/MiniDOGE.sol#879)
+Variable MiniDOGE._getValues(uint256).rTransferAmount (../../sb/MiniDOGE.sol#925) is too similar to MiniDOGE._getValues(uint256).tTransferAmount (../../sb/MiniDOGE.sol#924)
+Variable MiniDOGE._getValues(uint256).rTransferAmount (../../sb/MiniDOGE.sol#925) is too similar to MiniDOGE._transferStandard(address,address,uint256).tTransferAmount (../../sb/MiniDOGE.sol#879)
+Variable MiniDOGE._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/MiniDOGE.sol#888) is too similar to MiniDOGE._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/MiniDOGE.sol#898)
+Variable MiniDOGE._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/MiniDOGE.sol#888) is too similar to MiniDOGE._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/MiniDOGE.sol#908)
+Variable MiniDOGE._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/MiniDOGE.sol#898) is too similar to MiniDOGE._getValues(uint256).tTransferAmount (../../sb/MiniDOGE.sol#924)
+Variable MiniDOGE._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/MiniDOGE.sol#898) is too similar to MiniDOGE._transferStandard(address,address,uint256).tTransferAmount (../../sb/MiniDOGE.sol#879)
+Variable MiniDOGE.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/MiniDOGE.sol#629) is too similar to MiniDOGE._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/MiniDOGE.sol#888)
+Variable MiniDOGE.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/MiniDOGE.sol#629) is too similar to MiniDOGE._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/MiniDOGE.sol#908)
+Variable MiniDOGE.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/MiniDOGE.sol#629) is too similar to MiniDOGE._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/MiniDOGE.sol#898)
+Variable MiniDOGE._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/MiniDOGE.sol#940) is too similar to MiniDOGE._getValues(uint256).tTransferAmount (../../sb/MiniDOGE.sol#924)
+Variable MiniDOGE._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/MiniDOGE.sol#940) is too similar to MiniDOGE._transferStandard(address,address,uint256).tTransferAmount (../../sb/MiniDOGE.sol#879)
+Variable MiniDOGE._getValues(uint256).rTransferAmount (../../sb/MiniDOGE.sol#925) is too similar to MiniDOGE._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/MiniDOGE.sol#908)
+Variable MiniDOGE._transferStandard(address,address,uint256).rTransferAmount (../../sb/MiniDOGE.sol#879) is too similar to MiniDOGE._getTValues(uint256).tTransferAmount (../../sb/MiniDOGE.sol#932)
+Variable MiniDOGE._getValues(uint256).rTransferAmount (../../sb/MiniDOGE.sol#925) is too similar to MiniDOGE._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/MiniDOGE.sol#898)
+Variable MiniDOGE._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/MiniDOGE.sol#898) is too similar to MiniDOGE._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/MiniDOGE.sol#888)
+Variable MiniDOGE._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/MiniDOGE.sol#898) is too similar to MiniDOGE._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/MiniDOGE.sol#898)
+Variable MiniDOGE._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/MiniDOGE.sol#898) is too similar to MiniDOGE._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/MiniDOGE.sol#908)
+Variable MiniDOGE._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/MiniDOGE.sol#888) is too similar to MiniDOGE._getTValues(uint256).tTransferAmount (../../sb/MiniDOGE.sol#932)
+Variable MiniDOGE._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/MiniDOGE.sol#940) is too similar to MiniDOGE._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/MiniDOGE.sol#888)
+Variable MiniDOGE._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/MiniDOGE.sol#940) is too similar to MiniDOGE._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/MiniDOGE.sol#898)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+MiniDOGE.prepareForPreSale() (../../sb/MiniDOGE.sol#1126-1131) uses literals with too many digits:
+	- _maxTxAmount = 1000000000 * 10 ** 6 * 10 ** 9 (../../sb/MiniDOGE.sol#1130)
+MiniDOGE.afterPreSale() (../../sb/MiniDOGE.sol#1133-1138) uses literals with too many digits:
+	- _maxTxAmount = 3000000 * 10 ** 6 * 10 ** 9 (../../sb/MiniDOGE.sol#1137)
+MiniDOGE.slitherConstructorVariables() (../../sb/MiniDOGE.sol#415-1192) uses literals with too many digits:
+	- _tTotal = 1000000000 * 10 ** 6 * 10 ** 9 (../../sb/MiniDOGE.sol#431)
+MiniDOGE.slitherConstructorVariables() (../../sb/MiniDOGE.sol#415-1192) uses literals with too many digits:
+	- _maxTxAmount = 3000000 * 10 ** 6 * 10 ** 9 (../../sb/MiniDOGE.sol#476)
+MiniDOGE.slitherConstructorVariables() (../../sb/MiniDOGE.sol#415-1192) uses literals with too many digits:
+	- minimumTokensBeforeSwap = 200000 * 10 ** 6 * 10 ** 9 (../../sb/MiniDOGE.sol#477)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+Loop condition i < _excluded.length (../../sb/MiniDOGE.sol#952) should use cached array length instead of referencing `length` member of the storage array.
+ Loop condition i < _sellHistories.length (../../sb/MiniDOGE.sol#715) should use cached array length instead of referencing `length` member of the storage array.
+ Loop condition j < _sellHistories.length (../../sb/MiniDOGE.sol#1024) should use cached array length instead of referencing `length` member of the storage array.
+ Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cache-array-length
+
+MiniDOGE._decimals (../../sb/MiniDOGE.sol#437) should be constant 
+MiniDOGE._isEnabledBuyBackAndBurn (../../sb/MiniDOGE.sol#494) should be constant 
+MiniDOGE._name (../../sb/MiniDOGE.sol#435) should be constant 
+MiniDOGE._symbol (../../sb/MiniDOGE.sol#436) should be constant 
+MiniDOGE._tTotal (../../sb/MiniDOGE.sol#431) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+/sb/MiniDOGE.sol analyzed (10 contracts with 93 detectors), 172 result(s) found

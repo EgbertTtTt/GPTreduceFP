@@ -1,0 +1,120 @@
+'solc --version' running
+'solc /sb/BPool.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+Reentrancy in BPool.exitPool(uint256,uint256[]) (../../sb/BPool.sol#1004-1032):
+	External calls:
+	- _pushUnderlying(t,msg.sender,tokenAmountOut) (../../sb/BPool.sol#1029)
+		- xfer = IERC20(erc20).transfer(to,amount) (../../sb/BPool.sol#1317)
+	State variables written after the call(s):
+	- _records[t].balance = bsub(_records[t].balance,tokenAmountOut) (../../sb/BPool.sol#1027)
+	BPool._records (../../sb/BPool.sol#694) can be used in cross function reentrancies:
+	- BPool.bind(address,uint256,uint256) (../../sb/BPool.sol#852-871)
+	- BPool.exitPool(uint256,uint256[]) (../../sb/BPool.sol#1004-1032)
+	- BPool.exitswapExternAmountOut(address,uint256,uint256) (../../sb/BPool.sol#1265-1300)
+	- BPool.exitswapPoolAmountIn(uint256,address,uint256) (../../sb/BPool.sol#1228-1263)
+	- BPool.getBalance(address) (../../sb/BPool.sol#778-786)
+	- BPool.getDenormalizedWeight(address) (../../sb/BPool.sol#749-757)
+	- BPool.getNormalizedWeight(address) (../../sb/BPool.sol#767-776)
+	- BPool.getSpotPrice(address,address) (../../sb/BPool.sol#955-965)
+	- BPool.getSpotPriceSansFee(address,address) (../../sb/BPool.sol#967-977)
+	- BPool.gulp(address) (../../sb/BPool.sol#946-953)
+	- BPool.isBound(address) (../../sb/BPool.sol#719-724)
+	- BPool.joinPool(uint256,uint256[]) (../../sb/BPool.sol#979-1002)
+	- BPool.joinswapExternAmountIn(address,uint256,uint256) (../../sb/BPool.sol#1161-1193)
+	- BPool.joinswapPoolAmountOut(uint256,address,uint256) (../../sb/BPool.sol#1195-1226)
+	- BPool.rebind(address,uint256,uint256) (../../sb/BPool.sol#873-910)
+	- BPool.swapExactAmountIn(address,uint256,address,uint256,uint256) (../../sb/BPool.sol#1035-1096)
+	- BPool.swapExactAmountOut(address,uint256,address,uint256,uint256) (../../sb/BPool.sol#1098-1158)
+	- BPool.unbind(address) (../../sb/BPool.sol#912-943)
+Reentrancy in BPool.joinPool(uint256,uint256[]) (../../sb/BPool.sol#979-1002):
+	External calls:
+	- _pullUnderlying(t,msg.sender,tokenAmountIn) (../../sb/BPool.sol#998)
+		- xfer = IERC20(erc20).transferFrom(from,address(this),amount) (../../sb/BPool.sol#1310)
+	State variables written after the call(s):
+	- _records[t].balance = badd(_records[t].balance,tokenAmountIn) (../../sb/BPool.sol#996)
+	BPool._records (../../sb/BPool.sol#694) can be used in cross function reentrancies:
+	- BPool.bind(address,uint256,uint256) (../../sb/BPool.sol#852-871)
+	- BPool.exitPool(uint256,uint256[]) (../../sb/BPool.sol#1004-1032)
+	- BPool.exitswapExternAmountOut(address,uint256,uint256) (../../sb/BPool.sol#1265-1300)
+	- BPool.exitswapPoolAmountIn(uint256,address,uint256) (../../sb/BPool.sol#1228-1263)
+	- BPool.getBalance(address) (../../sb/BPool.sol#778-786)
+	- BPool.getDenormalizedWeight(address) (../../sb/BPool.sol#749-757)
+	- BPool.getNormalizedWeight(address) (../../sb/BPool.sol#767-776)
+	- BPool.getSpotPrice(address,address) (../../sb/BPool.sol#955-965)
+	- BPool.getSpotPriceSansFee(address,address) (../../sb/BPool.sol#967-977)
+	- BPool.gulp(address) (../../sb/BPool.sol#946-953)
+	- BPool.isBound(address) (../../sb/BPool.sol#719-724)
+	- BPool.joinPool(uint256,uint256[]) (../../sb/BPool.sol#979-1002)
+	- BPool.joinswapExternAmountIn(address,uint256,uint256) (../../sb/BPool.sol#1161-1193)
+	- BPool.joinswapPoolAmountOut(uint256,address,uint256) (../../sb/BPool.sol#1195-1226)
+	- BPool.rebind(address,uint256,uint256) (../../sb/BPool.sol#873-910)
+	- BPool.swapExactAmountIn(address,uint256,address,uint256,uint256) (../../sb/BPool.sol#1035-1096)
+	- BPool.swapExactAmountOut(address,uint256,address,uint256,uint256) (../../sb/BPool.sol#1098-1158)
+	- BPool.unbind(address) (../../sb/BPool.sol#912-943)
+	- _mintPoolShare(poolAmountOut) (../../sb/BPool.sol#1000)
+		- _totalSupply = badd(_totalSupply,amt) (../../sb/BPool.sol#258)
+	BTokenBase._totalSupply (../../sb/BPool.sol#251) can be used in cross function reentrancies:
+	- BTokenBase._burn(uint256) (../../sb/BPool.sol#262-267)
+	- BTokenBase._mint(uint256) (../../sb/BPool.sol#256-260)
+	- BPool.exitswapExternAmountOut(address,uint256,uint256) (../../sb/BPool.sol#1265-1300)
+	- BPool.exitswapPoolAmountIn(uint256,address,uint256) (../../sb/BPool.sol#1228-1263)
+	- BPool.joinswapExternAmountIn(address,uint256,uint256) (../../sb/BPool.sol#1161-1193)
+	- BPool.joinswapPoolAmountOut(uint256,address,uint256) (../../sb/BPool.sol#1195-1226)
+	- BToken.totalSupply() (../../sb/BPool.sol#311-313)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+BPool.setSwapFee(uint256) (../../sb/BPool.sol#804-814) should emit an event for: 
+	- _swapFee = swapFee (../../sb/BPool.sol#813) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+BPool.setController(address).manager (../../sb/BPool.sol#816) lacks a zero-check on :
+		- _controller = manager (../../sb/BPool.sol#822)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+BPool._pullUnderlying(address,address,uint256) (../../sb/BPool.sol#1307-1312) has external calls inside a loop: xfer = IERC20(erc20).transferFrom(from,address(this),amount) (../../sb/BPool.sol#1310)
+BPool._pushUnderlying(address,address,uint256) (../../sb/BPool.sol#1314-1319) has external calls inside a loop: xfer = IERC20(erc20).transfer(to,amount) (../../sb/BPool.sol#1317)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in BPool.joinPool(uint256,uint256[]) (../../sb/BPool.sol#979-1002):
+	External calls:
+	- _pullUnderlying(t,msg.sender,tokenAmountIn) (../../sb/BPool.sol#998)
+		- xfer = IERC20(erc20).transferFrom(from,address(this),amount) (../../sb/BPool.sol#1310)
+	State variables written after the call(s):
+	- _mintPoolShare(poolAmountOut) (../../sb/BPool.sol#1000)
+		- _balance[address(this)] = badd(_balance[address(this)],amt) (../../sb/BPool.sol#257)
+	- _pushPoolShare(msg.sender,poolAmountOut) (../../sb/BPool.sol#1001)
+		- _balance[src] = bsub(_balance[src],amt) (../../sb/BPool.sol#271)
+		- _balance[dst] = badd(_balance[dst],amt) (../../sb/BPool.sol#272)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in BPool.exitPool(uint256,uint256[]) (../../sb/BPool.sol#1004-1032):
+	External calls:
+	- _pushUnderlying(t,msg.sender,tokenAmountOut) (../../sb/BPool.sol#1029)
+		- xfer = IERC20(erc20).transfer(to,amount) (../../sb/BPool.sol#1317)
+	Event emitted after the call(s):
+	- LOG_EXIT(msg.sender,t,tokenAmountOut) (../../sb/BPool.sol#1028)
+Reentrancy in BPool.joinPool(uint256,uint256[]) (../../sb/BPool.sol#979-1002):
+	External calls:
+	- _pullUnderlying(t,msg.sender,tokenAmountIn) (../../sb/BPool.sol#998)
+		- xfer = IERC20(erc20).transferFrom(from,address(this),amount) (../../sb/BPool.sol#1310)
+	Event emitted after the call(s):
+	- LOG_JOIN(msg.sender,t,tokenAmountIn) (../../sb/BPool.sol#997)
+	- Transfer(address(0),address(this),amt) (../../sb/BPool.sol#259)
+		- _mintPoolShare(poolAmountOut) (../../sb/BPool.sol#1000)
+	- Transfer(src,dst,amt) (../../sb/BPool.sol#273)
+		- _pushPoolShare(msg.sender,poolAmountOut) (../../sb/BPool.sol#1001)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Pragma version0.5.12 (../../sb/BPool.sol#1) allows old versions
+solc-0.5.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Event BPool.LOG_SWAP(address,address,address,uint256,uint256) (../../sb/BPool.sol#639-645) is not in CapWords
+Event BPool.LOG_JOIN(address,address,uint256) (../../sb/BPool.sol#647-651) is not in CapWords
+Event BPool.LOG_EXIT(address,address,uint256) (../../sb/BPool.sol#653-657) is not in CapWords
+Event BPool.LOG_CALL(bytes4,address,bytes) (../../sb/BPool.sol#659-663) is not in CapWords
+Modifier BPool._logs_() (../../sb/BPool.sol#665-668) is not in mixedCase
+Modifier BPool._lock_() (../../sb/BPool.sol#670-675) is not in mixedCase
+Modifier BPool._viewlock_() (../../sb/BPool.sol#677-680) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+/sb/BPool.sol analyzed (9 contracts with 93 detectors), 18 result(s) found

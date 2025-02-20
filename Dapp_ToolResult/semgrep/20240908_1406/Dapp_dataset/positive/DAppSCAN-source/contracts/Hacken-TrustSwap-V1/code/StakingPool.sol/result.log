@@ -1,0 +1,123 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 26 Code Findings │
+└──────────────────┘
+                        
+    /sb/StakingPool.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          218┆ Stake storage lastStake = accountStakes[accountStakes.length -   
+  1];                                                                           
+            ⋮┆----------------------------------------
+          237┆ accountStakes.length--;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+           56┆ constructor() public {
+           57┆     owner = msg.sender;
+           58┆ }
+            ⋮┆----------------------------------------
+          113┆ constructor() public {
+          114┆     tswap = Ierc20(0xf823eA01D48F7Fb36b4b319f21dae404Ac86Bb8d);
+          115┆     rewardToken =                                                
+  Ierc20(0xdE55ea8232e0B1615d762eFCB17Cb2D7df164727);                           
+          116┆     poolDuration = 1 hours;
+          117┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          186┆ if (now > poolEndTime) {
+            ⋮┆----------------------------------------
+          187┆ stakeTimeSec = poolEndTime.sub(userStake.stakingTime);
+            ⋮┆----------------------------------------
+          189┆ stakeTimeSec = poolEndTime.sub(userStake.lastWithdrawTime);
+            ⋮┆----------------------------------------
+          221┆ if (now > poolEndTime) {
+            ⋮┆----------------------------------------
+          222┆ stakeTimeSec = poolEndTime.sub(lastStake.stakingTime);
+            ⋮┆----------------------------------------
+          224┆ stakeTimeSec = poolEndTime.sub(lastStake.lastWithdrawTime);
+            ⋮┆----------------------------------------
+          285┆ if (now > poolEndTime) {
+            ⋮┆----------------------------------------
+          286┆ stakeTimeSec = poolEndTime.sub(userStake.stakingTime);
+            ⋮┆----------------------------------------
+          288┆ stakeTimeSec = poolEndTime.sub(userStake.lastWithdrawTime);
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           66┆ require(newOwner != address(0), "New owner is the zero address");
+            ⋮┆----------------------------------------
+          121┆ require(poolStartTime == 0, "Pool rewards already set");
+            ⋮┆----------------------------------------
+          122┆ require(_rewardAmount > 0, "Cannot create pool with zero         
+  amount");                                                                     
+            ⋮┆----------------------------------------
+          138┆ require(amount > 0, "Cannot stake 0");
+            ⋮┆----------------------------------------
+          139┆ require(now < poolEndTime, "Staking pool is closed"); //staking  
+  pool is closed for staking                                                    
+            ⋮┆----------------------------------------
+          208┆ require(amount > 0, "Amount can not be zero");
+            ⋮┆----------------------------------------
+          209┆ require(userTotalStaking[msg.sender].totalStaking >= amount, "You
+  are trying to withdaw more than your stake");                                 
+            ⋮┆----------------------------------------
+          272┆ require(_rwdAmount > 0, "You do not have enough rewards");
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-decrement-not-postfix                    
+          Consider using the prefix decrement expression whenever the return    
+  value is not needed. The                                                      
+          prefix decrement expression is cheaper in terms of gas.               
+                                                                                
+          200┆ i--;
+            ⋮┆----------------------------------------
+          237┆ accountStakes.length--;
+            ⋮┆----------------------------------------
+          300┆ i--;
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          122┆ require(_rewardAmount > 0, "Cannot create pool with zero         
+  amount");                                                                     
+            ⋮┆----------------------------------------
+          209┆ require(userTotalStaking[msg.sender].totalStaking >= amount, "You
+  are trying to withdaw more than your stake");                                 
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 26 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

@@ -1,0 +1,199 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 39 Code Findings │
+└──────────────────┘
+                    
+    /sb/Genesis.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+         1424┆ contract Genesis is ERC20, Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          673┆ constructor(string memory name_, string memory symbol_) {
+          674┆     _name = name_;
+          675┆     _symbol = symbol_;
+          676┆     _decimals = 18;
+          677┆ }
+            ⋮┆----------------------------------------
+         1504┆ constructor(
+         1505┆     IWETH __WETH,
+         1506┆     IARTH __ARTH,
+         1507┆     IARTHX __ARTHX,
+         1508┆     IERC20Mintable __MAHA,
+         1509┆     IUniswapV2Router02 __ROUTER,
+         1510┆     IChainlinkOracle _ethGmuOracle,
+         1511┆     IBondingCurveOracle _curveOracle,
+         1512┆     uint256 _hardCap,
+         1513┆     uint256 _startTime,
+             [hid 15 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          237┆ require(
+          238┆     address(this).balance >= amount,
+          239┆     'Address: insufficient balance'
+          240┆ );
+            ⋮┆----------------------------------------
+          244┆ require(
+          245┆     success,
+          246┆     'Address: unable to send value, recipient may have reverted'
+          247┆ );
+            ⋮┆----------------------------------------
+          326┆ require(
+          327┆     address(this).balance >= value,
+          328┆     'Address: insufficient balance for call'
+          329┆ );
+            ⋮┆----------------------------------------
+          330┆ require(isContract(target), 'Address: call to non-contract');
+            ⋮┆----------------------------------------
+          368┆ require(isContract(target), 'Address: static call to             
+  non-contract');                                                               
+            ⋮┆----------------------------------------
+          404┆ require(isContract(target), 'Address: delegate call to           
+  non-contract');                                                               
+            ⋮┆----------------------------------------
+          876┆ require(sender != address(0), 'ERC20: transfer from the zero     
+  address');                                                                    
+            ⋮┆----------------------------------------
+          877┆ require(recipient != address(0), 'ERC20: transfer to the zero    
+  address');                                                                    
+            ⋮┆----------------------------------------
+          899┆ require(account != address(0), 'ERC20: mint to the zero          
+  address');                                                                    
+            ⋮┆----------------------------------------
+          951┆ require(account != address(0), 'ERC20: burn from the zero        
+  address');                                                                    
+            ⋮┆----------------------------------------
+          981┆ require(owner != address(0), 'ERC20: approve from the zero       
+  address');                                                                    
+            ⋮┆----------------------------------------
+          982┆ require(spender != address(0), 'ERC20: approve to the zero       
+  address');                                                                    
+            ⋮┆----------------------------------------
+         1135┆ require(owner() == _msgSender(), 'Ownable: caller is not the     
+  owner');                                                                      
+            ⋮┆----------------------------------------
+         1156┆ require(
+         1157┆     newOwner != address(0),
+         1158┆     'Ownable: new owner is the zero address'
+         1159┆ );
+            ⋮┆----------------------------------------
+         1480┆ require(block.timestamp >= startTime, 'Genesis: not started');
+            ⋮┆----------------------------------------
+         1485┆ require(
+         1486┆     block.timestamp >= startTime &&
+         1487┆         block.timestamp <= startTime.add(duration),
+         1488┆     'Genesis: not active'
+         1489┆ );
+            ⋮┆----------------------------------------
+         1494┆ require(
+         1495┆     block.timestamp >= startTime.add(duration),
+         1496┆     'Genesis: still active'
+         1497┆ );
+            ⋮┆----------------------------------------
+         1596┆ require(amount > 0, 'Genesis: amount = 0');
+            ⋮┆----------------------------------------
+         1597┆ require(msg.value == amount, 'Genesis: INVALID INPUT');
+            ⋮┆----------------------------------------
+         1696┆ require(tokenAddress != address(0), 'Genesis: invalid address');
+            ⋮┆----------------------------------------
+         1709┆ require(liquidity > 0, 'Genesis: distribute pair failed');
+            ⋮┆----------------------------------------
+         1710┆ require(amountETH > 0, 'Genesis: distribute pair failed');
+            ⋮┆----------------------------------------
+         1711┆ require(amountToken > 0, 'Genesis: distribute pair failed');
+            ⋮┆----------------------------------------
+         1717┆ require(balanceOf(msg.sender) >= amount, 'Genesis: balance <     
+  amount');                                                                     
+            ⋮┆----------------------------------------
+         1726┆ require(balanceOf(msg.sender) >= amount, 'Genesis: balance <     
+  amount');                                                                     
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+         1485┆ require(
+         1486┆     block.timestamp >= startTime &&
+         1487┆         block.timestamp <= startTime.add(duration),
+         1488┆     'Genesis: not active'
+         1489┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          244┆ require(
+          245┆     success,
+          246┆     'Address: unable to send value, recipient may have reverted'
+          247┆ );
+            ⋮┆----------------------------------------
+          326┆ require(
+          327┆     address(this).balance >= value,
+          328┆     'Address: insufficient balance for call'
+          329┆ );
+            ⋮┆----------------------------------------
+          368┆ require(isContract(target), 'Address: static call to             
+  non-contract');                                                               
+            ⋮┆----------------------------------------
+          404┆ require(isContract(target), 'Address: delegate call to           
+  non-contract');                                                               
+            ⋮┆----------------------------------------
+          876┆ require(sender != address(0), 'ERC20: transfer from the zero     
+  address');                                                                    
+            ⋮┆----------------------------------------
+          877┆ require(recipient != address(0), 'ERC20: transfer to the zero    
+  address');                                                                    
+            ⋮┆----------------------------------------
+          951┆ require(account != address(0), 'ERC20: burn from the zero        
+  address');                                                                    
+            ⋮┆----------------------------------------
+          981┆ require(owner != address(0), 'ERC20: approve from the zero       
+  address');                                                                    
+            ⋮┆----------------------------------------
+          982┆ require(spender != address(0), 'ERC20: approve to the zero       
+  address');                                                                    
+            ⋮┆----------------------------------------
+         1156┆ require(
+         1157┆     newOwner != address(0),
+         1158┆     'Ownable: new owner is the zero address'
+         1159┆ );
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 39 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

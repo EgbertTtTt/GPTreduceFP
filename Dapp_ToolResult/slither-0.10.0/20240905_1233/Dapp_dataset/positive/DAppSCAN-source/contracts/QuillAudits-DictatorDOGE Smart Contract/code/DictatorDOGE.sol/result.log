@@ -1,0 +1,605 @@
+'solc --version' running
+'solc /sb/DictatorDOGE.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/DictatorDOGE.sol:
+Warning: Since the VM version paris, "difficulty" was replaced by "prevrandao", which now returns a random number based on the beacon chain.
+   --> /sb/DictatorDOGE.sol:729:108:
+    |
+729 |  ... (abi.encodePacked(block.timestamp, block.difficulty))) % (_bBSLimitMax - _bBSLimitMin  ...
+    |                                         ^^^^^^^^^^^^^^^^
+
+Warning: Contract code size is 33967 bytes and exceeds 24576 bytes (a limit introduced in Spurious Dragon). This contract may not be deployable on Mainnet. Consider enabling the optimizer (with a low "runs" value!), turning off revert strings, or using libraries.
+   --> /sb/DictatorDOGE.sol:410:1:
+    |
+410 | contract DictatorDOGE is Context, IERC20, Ownable {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+DictatorDOGE.swapETHForTokens(uint256) (../../sb/DictatorDOGE.sol#825-840) sends eth to arbitrary user
+	Dangerous calls:
+	- uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(0,path,deadAddress,block.timestamp.add(300)) (../../sb/DictatorDOGE.sol#832-837)
+DictatorDOGE.addLiquidity(uint256,uint256) (../../sb/DictatorDOGE.sol#842-855) sends eth to arbitrary user
+	Dangerous calls:
+	- uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/DictatorDOGE.sol#847-854)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#functions-that-send-ether-to-arbitrary-destinations
+
+DictatorDOGE._transfer(address,address,uint256) (../../sb/DictatorDOGE.sol#668-785) uses a weak PRNG: "_bBSLimit = _bBSLimitMin + uint256(keccak256(bytes)(abi.encodePacked(block.timestamp,block.difficulty))) % (_bBSLimitMax - _bBSLimitMin + 1) (../../sb/DictatorDOGE.sol#729)" 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#weak-PRNG
+
+Reentrancy in DictatorDOGE._transfer(address,address,uint256) (../../sb/DictatorDOGE.sol#668-785):
+	External calls:
+	- swapTokens(contractTokenBalance) (../../sb/DictatorDOGE.sol#697)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/DictatorDOGE.sol#814-820)
+	External calls sending eth:
+	- swapTokens(contractTokenBalance) (../../sb/DictatorDOGE.sol#697)
+		- recipient.transfer(amount) (../../sb/DictatorDOGE.sol#1138)
+	State variables written after the call(s):
+	- _removeOldSellHistories() (../../sb/DictatorDOGE.sol#724)
+		- _sellHistories[i].time = _sellHistories[j].time (../../sb/DictatorDOGE.sol#1025)
+		- _sellHistories[i].bnbAmount = _sellHistories[j].bnbAmount (../../sb/DictatorDOGE.sol#1026)
+		- _sellHistories.pop() (../../sb/DictatorDOGE.sol#1036)
+	DictatorDOGE._sellHistories (../../sb/DictatorDOGE.sol#476) can be used in cross function reentrancies:
+	- DictatorDOGE._removeOldSellHistories() (../../sb/DictatorDOGE.sol#1017-1039)
+	- DictatorDOGE._sellHistories (../../sb/DictatorDOGE.sol#476)
+	- DictatorDOGE._transfer(address,address,uint256) (../../sb/DictatorDOGE.sol#668-785)
+Reentrancy in DictatorDOGE._transfer(address,address,uint256) (../../sb/DictatorDOGE.sol#668-785):
+	External calls:
+	- swapTokens(contractTokenBalance) (../../sb/DictatorDOGE.sol#697)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/DictatorDOGE.sol#814-820)
+	- buyBackTokens(_bBSLimit) (../../sb/DictatorDOGE.sol#732)
+		- uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(0,path,deadAddress,block.timestamp.add(300)) (../../sb/DictatorDOGE.sol#832-837)
+	External calls sending eth:
+	- swapTokens(contractTokenBalance) (../../sb/DictatorDOGE.sol#697)
+		- recipient.transfer(amount) (../../sb/DictatorDOGE.sol#1138)
+	- buyBackTokens(_bBSLimit) (../../sb/DictatorDOGE.sol#732)
+		- uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(0,path,deadAddress,block.timestamp.add(300)) (../../sb/DictatorDOGE.sol#832-837)
+	State variables written after the call(s):
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/DictatorDOGE.sol#784)
+		- _rOwned[address(this)] = _rOwned[address(this)].add(rLiquidity) (../../sb/DictatorDOGE.sol#961)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/DictatorDOGE.sol#877)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/DictatorDOGE.sol#886)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/DictatorDOGE.sol#897)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/DictatorDOGE.sol#907)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/DictatorDOGE.sol#878)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/DictatorDOGE.sol#898)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/DictatorDOGE.sol#888)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/DictatorDOGE.sol#909)
+	DictatorDOGE._rOwned (../../sb/DictatorDOGE.sol#416) can be used in cross function reentrancies:
+	- DictatorDOGE._getCurrentSupply() (../../sb/DictatorDOGE.sol#946-956)
+	- DictatorDOGE._takeLiquidity(uint256) (../../sb/DictatorDOGE.sol#958-964)
+	- DictatorDOGE._transferBothExcluded(address,address,uint256) (../../sb/DictatorDOGE.sol#904-913)
+	- DictatorDOGE._transferFromExcluded(address,address,uint256) (../../sb/DictatorDOGE.sol#894-902)
+	- DictatorDOGE._transferStandard(address,address,uint256) (../../sb/DictatorDOGE.sol#875-882)
+	- DictatorDOGE._transferToExcluded(address,address,uint256) (../../sb/DictatorDOGE.sol#884-892)
+	- DictatorDOGE.balanceOf(address) (../../sb/DictatorDOGE.sol#555-558)
+	- DictatorDOGE.constructor() (../../sb/DictatorDOGE.sol#517-537)
+	- DictatorDOGE.deliver(uint256) (../../sb/DictatorDOGE.sol#606-613)
+	- DictatorDOGE.excludeFromReward(address) (../../sb/DictatorDOGE.sol#633-641)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/DictatorDOGE.sol#784)
+		- _rTotal = _rTotal.sub(rFee) (../../sb/DictatorDOGE.sol#916)
+	DictatorDOGE._rTotal (../../sb/DictatorDOGE.sol#427) can be used in cross function reentrancies:
+	- DictatorDOGE._getCurrentSupply() (../../sb/DictatorDOGE.sol#946-956)
+	- DictatorDOGE._reflectFee(uint256,uint256) (../../sb/DictatorDOGE.sol#915-918)
+	- DictatorDOGE.constructor() (../../sb/DictatorDOGE.sol#517-537)
+	- DictatorDOGE.deliver(uint256) (../../sb/DictatorDOGE.sol#606-613)
+	- DictatorDOGE.tokenFromReflection(uint256) (../../sb/DictatorDOGE.sol#627-631)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/DictatorDOGE.sol#784)
+		- _tOwned[address(this)] = _tOwned[address(this)].add(tLiquidity) (../../sb/DictatorDOGE.sol#963)
+		- _tOwned[sender] = _tOwned[sender].sub(tAmount) (../../sb/DictatorDOGE.sol#906)
+		- _tOwned[sender] = _tOwned[sender].sub(tAmount) (../../sb/DictatorDOGE.sol#896)
+		- _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount) (../../sb/DictatorDOGE.sol#887)
+		- _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount) (../../sb/DictatorDOGE.sol#908)
+	DictatorDOGE._tOwned (../../sb/DictatorDOGE.sol#417) can be used in cross function reentrancies:
+	- DictatorDOGE._getCurrentSupply() (../../sb/DictatorDOGE.sol#946-956)
+	- DictatorDOGE._takeLiquidity(uint256) (../../sb/DictatorDOGE.sol#958-964)
+	- DictatorDOGE._transferBothExcluded(address,address,uint256) (../../sb/DictatorDOGE.sol#904-913)
+	- DictatorDOGE._transferFromExcluded(address,address,uint256) (../../sb/DictatorDOGE.sol#894-902)
+	- DictatorDOGE._transferToExcluded(address,address,uint256) (../../sb/DictatorDOGE.sol#884-892)
+	- DictatorDOGE.balanceOf(address) (../../sb/DictatorDOGE.sol#555-558)
+	- DictatorDOGE.excludeFromReward(address) (../../sb/DictatorDOGE.sol#633-641)
+	- DictatorDOGE.includeInReward(address) (../../sb/DictatorDOGE.sol#643-654)
+	- buyBackTokens(_bBSLimit) (../../sb/DictatorDOGE.sol#732)
+		- inSwapAndLiquify = true (../../sb/DictatorDOGE.sol#512)
+		- inSwapAndLiquify = false (../../sb/DictatorDOGE.sol#514)
+	DictatorDOGE.inSwapAndLiquify (../../sb/DictatorDOGE.sol#485) can be used in cross function reentrancies:
+	- DictatorDOGE._transfer(address,address,uint256) (../../sb/DictatorDOGE.sol#668-785)
+	- DictatorDOGE.lockTheSwap() (../../sb/DictatorDOGE.sol#511-515)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities
+
+DictatorDOGE._transfer(address,address,uint256).sellHistory (../../sb/DictatorDOGE.sol#684) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+DictatorDOGE.addLiquidity(uint256,uint256) (../../sb/DictatorDOGE.sol#842-855) ignores return value by uniswapV2Router.addLiquidityETH{value: ethAmount}(address(this),tokenAmount,0,0,owner(),block.timestamp) (../../sb/DictatorDOGE.sol#847-854)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+DictatorDOGE.allowance(address,address).owner (../../sb/DictatorDOGE.sol#565) shadows:
+	- Ownable.owner() (../../sb/DictatorDOGE.sol#163-165) (function)
+DictatorDOGE._approve(address,address,uint256).owner (../../sb/DictatorDOGE.sol#660) shadows:
+	- Ownable.owner() (../../sb/DictatorDOGE.sol#163-165) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+DictatorDOGE.SetBuyBackMaxTimeForHistories(uint256) (../../sb/DictatorDOGE.sol#1041-1043) should emit an event for: 
+	- _buyBackMaxTimeForHistories = newMinutes * 60 (../../sb/DictatorDOGE.sol#1042) 
+DictatorDOGE.SetBuyBackDivisor(uint256) (../../sb/DictatorDOGE.sol#1045-1047) should emit an event for: 
+	- _buyBackDivisor = newDivisor (../../sb/DictatorDOGE.sol#1046) 
+DictatorDOGE.SetBuyBackTimeInterval(uint256) (../../sb/DictatorDOGE.sol#1053-1055) should emit an event for: 
+	- _buyBackTimeInterval = newMinutes * 60 (../../sb/DictatorDOGE.sol#1054) 
+DictatorDOGE.SetBuyBackRangeRate(uint256) (../../sb/DictatorDOGE.sol#1057-1060) should emit an event for: 
+	- _buyBackRangeRate = newPercent (../../sb/DictatorDOGE.sol#1059) 
+DictatorDOGE.SetSwapMinutes(uint256) (../../sb/DictatorDOGE.sol#1066-1068) should emit an event for: 
+	- _intervalMinutesForSwap = newMinutes * 60 (../../sb/DictatorDOGE.sol#1067) 
+DictatorDOGE.setTaxFeePercent(uint256) (../../sb/DictatorDOGE.sol#1070-1072) should emit an event for: 
+	- _taxFee = taxFee (../../sb/DictatorDOGE.sol#1071) 
+DictatorDOGE.setBuyFee(uint256,uint256) (../../sb/DictatorDOGE.sol#1074-1077) should emit an event for: 
+	- _buyTaxFee = buyTaxFee (../../sb/DictatorDOGE.sol#1075) 
+	- _buyLiquidityFee = buyLiquidityFee (../../sb/DictatorDOGE.sol#1076) 
+DictatorDOGE.setSellFee(uint256,uint256) (../../sb/DictatorDOGE.sol#1079-1082) should emit an event for: 
+	- _sellTaxFee = sellTaxFee (../../sb/DictatorDOGE.sol#1080) 
+	- _sellLiquidityFee = sellLiquidityFee (../../sb/DictatorDOGE.sol#1081) 
+DictatorDOGE.setLiquidityFeePercent(uint256) (../../sb/DictatorDOGE.sol#1084-1086) should emit an event for: 
+	- _liquidityFee = liquidityFee (../../sb/DictatorDOGE.sol#1085) 
+DictatorDOGE.setBuyBackSellLimit(uint256) (../../sb/DictatorDOGE.sol#1088-1090) should emit an event for: 
+	- buyBackSellLimit = buyBackSellSetLimit (../../sb/DictatorDOGE.sol#1089) 
+DictatorDOGE.setMaxTxAmount(uint256) (../../sb/DictatorDOGE.sol#1092-1094) should emit an event for: 
+	- _maxTxAmount = maxTxAmount (../../sb/DictatorDOGE.sol#1093) 
+DictatorDOGE.setMarketingDivisor(uint256) (../../sb/DictatorDOGE.sol#1096-1098) should emit an event for: 
+	- marketingDivisor = divisor (../../sb/DictatorDOGE.sol#1097) 
+DictatorDOGE.setNumTokensSellToAddToBuyBack(uint256) (../../sb/DictatorDOGE.sol#1100-1102) should emit an event for: 
+	- minimumTokensBeforeSwap = _minimumTokensBeforeSwap (../../sb/DictatorDOGE.sol#1101) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+DictatorDOGE.setMarketingAddress(address)._marketingAddress (../../sb/DictatorDOGE.sol#1104) lacks a zero-check on :
+		- marketingAddress = address(_marketingAddress) (../../sb/DictatorDOGE.sol#1105)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in DictatorDOGE._transfer(address,address,uint256) (../../sb/DictatorDOGE.sol#668-785):
+	External calls:
+	- swapTokens(contractTokenBalance) (../../sb/DictatorDOGE.sol#697)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/DictatorDOGE.sol#814-820)
+	- buyBackTokens(_bBSLimit) (../../sb/DictatorDOGE.sol#732)
+		- uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(0,path,deadAddress,block.timestamp.add(300)) (../../sb/DictatorDOGE.sol#832-837)
+	External calls sending eth:
+	- swapTokens(contractTokenBalance) (../../sb/DictatorDOGE.sol#697)
+		- recipient.transfer(amount) (../../sb/DictatorDOGE.sol#1138)
+	- buyBackTokens(_bBSLimit) (../../sb/DictatorDOGE.sol#732)
+		- uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(0,path,deadAddress,block.timestamp.add(300)) (../../sb/DictatorDOGE.sol#832-837)
+	State variables written after the call(s):
+	- removeAllFee() (../../sb/DictatorDOGE.sol#748)
+		- _liquidityFee = 0 (../../sb/DictatorDOGE.sol#985)
+	- _liquidityFee = _buyLiquidityFee (../../sb/DictatorDOGE.sol#750)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#754)
+		- _liquidityFee = 0 (../../sb/DictatorDOGE.sol#985)
+	- _liquidityFee = _sellLiquidityFee (../../sb/DictatorDOGE.sol#756)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#761)
+		- _liquidityFee = 0 (../../sb/DictatorDOGE.sol#985)
+	- _liquidityFee = _addressFees[from]._liquidityFee (../../sb/DictatorDOGE.sol#763)
+	- _liquidityFee = _addressFees[from]._sellLiquidityFee (../../sb/DictatorDOGE.sol#768)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#775)
+		- _liquidityFee = 0 (../../sb/DictatorDOGE.sol#985)
+	- _liquidityFee = _addressFees[to]._buyLiquidityFee (../../sb/DictatorDOGE.sol#778)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/DictatorDOGE.sol#784)
+		- _liquidityFee = _previousLiquidityFee (../../sb/DictatorDOGE.sol#990)
+		- _liquidityFee = 0 (../../sb/DictatorDOGE.sol#985)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#748)
+		- _previousLiquidityFee = _liquidityFee (../../sb/DictatorDOGE.sol#982)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#754)
+		- _previousLiquidityFee = _liquidityFee (../../sb/DictatorDOGE.sol#982)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#761)
+		- _previousLiquidityFee = _liquidityFee (../../sb/DictatorDOGE.sol#982)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#775)
+		- _previousLiquidityFee = _liquidityFee (../../sb/DictatorDOGE.sol#982)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/DictatorDOGE.sol#784)
+		- _previousLiquidityFee = _liquidityFee (../../sb/DictatorDOGE.sol#982)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#748)
+		- _previousTaxFee = _taxFee (../../sb/DictatorDOGE.sol#981)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#754)
+		- _previousTaxFee = _taxFee (../../sb/DictatorDOGE.sol#981)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#761)
+		- _previousTaxFee = _taxFee (../../sb/DictatorDOGE.sol#981)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#775)
+		- _previousTaxFee = _taxFee (../../sb/DictatorDOGE.sol#981)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/DictatorDOGE.sol#784)
+		- _previousTaxFee = _taxFee (../../sb/DictatorDOGE.sol#981)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/DictatorDOGE.sol#784)
+		- _tFeeTotal = _tFeeTotal.add(tFee) (../../sb/DictatorDOGE.sol#917)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#748)
+		- _taxFee = 0 (../../sb/DictatorDOGE.sol#984)
+	- _taxFee = _buyTaxFee (../../sb/DictatorDOGE.sol#749)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#754)
+		- _taxFee = 0 (../../sb/DictatorDOGE.sol#984)
+	- _taxFee = _sellTaxFee (../../sb/DictatorDOGE.sol#755)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#761)
+		- _taxFee = 0 (../../sb/DictatorDOGE.sol#984)
+	- _taxFee = _addressFees[from]._taxFee (../../sb/DictatorDOGE.sol#762)
+	- _taxFee = _addressFees[from]._sellTaxFee (../../sb/DictatorDOGE.sol#767)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#775)
+		- _taxFee = 0 (../../sb/DictatorDOGE.sol#984)
+	- _taxFee = _addressFees[to]._buyTaxFee (../../sb/DictatorDOGE.sol#777)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/DictatorDOGE.sol#784)
+		- _taxFee = _previousTaxFee (../../sb/DictatorDOGE.sol#989)
+		- _taxFee = 0 (../../sb/DictatorDOGE.sol#984)
+Reentrancy in DictatorDOGE.changeRouterVersion(address) (../../sb/DictatorDOGE.sol#1141-1154):
+	External calls:
+	- _pair = IUniswapV2Factory(_uniswapV2Router.factory()).createPair(address(this),_uniswapV2Router.WETH()) (../../sb/DictatorDOGE.sol#1147-1148)
+	State variables written after the call(s):
+	- uniswapV2Pair = _pair (../../sb/DictatorDOGE.sol#1150)
+	- uniswapV2Router = _uniswapV2Router (../../sb/DictatorDOGE.sol#1153)
+Reentrancy in DictatorDOGE.transferFrom(address,address,uint256) (../../sb/DictatorDOGE.sol#574-578):
+	External calls:
+	- _transfer(sender,recipient,amount) (../../sb/DictatorDOGE.sol#575)
+		- uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(0,path,deadAddress,block.timestamp.add(300)) (../../sb/DictatorDOGE.sol#832-837)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/DictatorDOGE.sol#814-820)
+	External calls sending eth:
+	- _transfer(sender,recipient,amount) (../../sb/DictatorDOGE.sol#575)
+		- recipient.transfer(amount) (../../sb/DictatorDOGE.sol#1138)
+		- uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(0,path,deadAddress,block.timestamp.add(300)) (../../sb/DictatorDOGE.sol#832-837)
+	State variables written after the call(s):
+	- _approve(sender,_msgSender(),_allowances[sender][_msgSender()].sub(amount,ERC20: transfer amount exceeds allowance)) (../../sb/DictatorDOGE.sol#576)
+		- _allowances[owner][spender] = amount (../../sb/DictatorDOGE.sol#664)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in DictatorDOGE._transfer(address,address,uint256) (../../sb/DictatorDOGE.sol#668-785):
+	External calls:
+	- swapTokens(contractTokenBalance) (../../sb/DictatorDOGE.sol#697)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/DictatorDOGE.sol#814-820)
+	- buyBackTokens(_bBSLimit) (../../sb/DictatorDOGE.sol#732)
+		- uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(0,path,deadAddress,block.timestamp.add(300)) (../../sb/DictatorDOGE.sol#832-837)
+	External calls sending eth:
+	- swapTokens(contractTokenBalance) (../../sb/DictatorDOGE.sol#697)
+		- recipient.transfer(amount) (../../sb/DictatorDOGE.sol#1138)
+	- buyBackTokens(_bBSLimit) (../../sb/DictatorDOGE.sol#732)
+		- uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(0,path,deadAddress,block.timestamp.add(300)) (../../sb/DictatorDOGE.sol#832-837)
+	Event emitted after the call(s):
+	- SwapETHForTokens(amount,path) (../../sb/DictatorDOGE.sol#839)
+		- buyBackTokens(_bBSLimit) (../../sb/DictatorDOGE.sol#732)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/DictatorDOGE.sol#881)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/DictatorDOGE.sol#784)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/DictatorDOGE.sol#901)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/DictatorDOGE.sol#784)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/DictatorDOGE.sol#891)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/DictatorDOGE.sol#784)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/DictatorDOGE.sol#912)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/DictatorDOGE.sol#784)
+Reentrancy in DictatorDOGE.swapETHForTokens(uint256) (../../sb/DictatorDOGE.sol#825-840):
+	External calls:
+	- uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(0,path,deadAddress,block.timestamp.add(300)) (../../sb/DictatorDOGE.sol#832-837)
+	Event emitted after the call(s):
+	- SwapETHForTokens(amount,path) (../../sb/DictatorDOGE.sol#839)
+Reentrancy in DictatorDOGE.swapTokensForEth(uint256) (../../sb/DictatorDOGE.sol#805-823):
+	External calls:
+	- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/DictatorDOGE.sol#814-820)
+	Event emitted after the call(s):
+	- SwapTokensForETH(tokenAmount,path) (../../sb/DictatorDOGE.sol#822)
+Reentrancy in DictatorDOGE.transferFrom(address,address,uint256) (../../sb/DictatorDOGE.sol#574-578):
+	External calls:
+	- _transfer(sender,recipient,amount) (../../sb/DictatorDOGE.sol#575)
+		- uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(0,path,deadAddress,block.timestamp.add(300)) (../../sb/DictatorDOGE.sol#832-837)
+		- uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(tokenAmount,0,path,address(this),block.timestamp) (../../sb/DictatorDOGE.sol#814-820)
+	External calls sending eth:
+	- _transfer(sender,recipient,amount) (../../sb/DictatorDOGE.sol#575)
+		- recipient.transfer(amount) (../../sb/DictatorDOGE.sol#1138)
+		- uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(0,path,deadAddress,block.timestamp.add(300)) (../../sb/DictatorDOGE.sol#832-837)
+	Event emitted after the call(s):
+	- Approval(owner,spender,amount) (../../sb/DictatorDOGE.sol#665)
+		- _approve(sender,_msgSender(),_allowances[sender][_msgSender()].sub(amount,ERC20: transfer amount exceeds allowance)) (../../sb/DictatorDOGE.sol#576)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Ownable.unlock() (../../sb/DictatorDOGE.sol#198-203) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp > _lockTime,Contract is locked until 7 days) (../../sb/DictatorDOGE.sol#200)
+DictatorDOGE._transfer(address,address,uint256) (../../sb/DictatorDOGE.sol#668-785) uses timestamp for comparisons
+	Dangerous comparisons:
+	- overMinimumTokenBalance && _startTimeForSwap + _intervalMinutesForSwap <= block.timestamp (../../sb/DictatorDOGE.sol#694)
+	- _sellHistories[i].time >= startTime (../../sb/DictatorDOGE.sol#714)
+	- balance > _bBSLimit (../../sb/DictatorDOGE.sol#731)
+DictatorDOGE.buyBackTokens(uint256) (../../sb/DictatorDOGE.sol#799-803) uses timestamp for comparisons
+	Dangerous comparisons:
+	- amount > 0 (../../sb/DictatorDOGE.sol#800)
+DictatorDOGE._removeOldSellHistories() (../../sb/DictatorDOGE.sol#1017-1039) uses timestamp for comparisons
+	Dangerous comparisons:
+	- _sellHistories[j].time >= maxStartTimeForHistories (../../sb/DictatorDOGE.sol#1023)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/DictatorDOGE.sol#93-102) uses assembly
+	- INLINE ASM (../../sb/DictatorDOGE.sol#100)
+Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/DictatorDOGE.sol#130-147) uses assembly
+	- INLINE ASM (../../sb/DictatorDOGE.sol#139-142)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Different versions of Solidity are used:
+	- Version used: ['>=0.5.0', '>=0.6.2', '^0.8.4']
+	- >=0.5.0 (../../sb/DictatorDOGE.sol#2)
+	- >=0.5.0 (../../sb/DictatorDOGE.sol#3)
+	- >=0.6.2 (../../sb/DictatorDOGE.sol#4)
+	- >=0.6.2 (../../sb/DictatorDOGE.sol#5)
+	- ^0.8.4 (../../sb/DictatorDOGE.sol#1)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+
+DictatorDOGE.includeInReward(address) (../../sb/DictatorDOGE.sol#643-654) has costly operations inside a loop:
+	- _excluded.pop() (../../sb/DictatorDOGE.sol#650)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#costly-operations-inside-a-loop
+
+DictatorDOGE._transfer(address,address,uint256) (../../sb/DictatorDOGE.sol#668-785) has a high cyclomatic complexity (19).
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cyclomatic-complexity
+
+Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/DictatorDOGE.sol#130-147) is never used and should be removed
+Address.functionCall(address,bytes) (../../sb/DictatorDOGE.sol#113-115) is never used and should be removed
+Address.functionCall(address,bytes,string) (../../sb/DictatorDOGE.sol#117-119) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/DictatorDOGE.sol#121-123) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/DictatorDOGE.sol#125-128) is never used and should be removed
+Address.isContract(address) (../../sb/DictatorDOGE.sol#93-102) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/DictatorDOGE.sol#104-110) is never used and should be removed
+Context._msgData() (../../sb/DictatorDOGE.sol#17-20) is never used and should be removed
+DictatorDOGE.addLiquidity(uint256,uint256) (../../sb/DictatorDOGE.sol#842-855) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/DictatorDOGE.sol#81-83) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/DictatorDOGE.sol#85-88) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+DictatorDOGE._rTotal (../../sb/DictatorDOGE.sol#427) is set pre-construction with a non-constant function or state variable:
+	- (MAX - (MAX % _tTotal))
+DictatorDOGE._previousTaxFee (../../sb/DictatorDOGE.sol#450) is set pre-construction with a non-constant function or state variable:
+	- _taxFee
+DictatorDOGE._previousLiquidityFee (../../sb/DictatorDOGE.sol#453) is set pre-construction with a non-constant function or state variable:
+	- _liquidityFee
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#function-initializing-state
+
+Pragma version^0.8.4 (../../sb/DictatorDOGE.sol#1) allows old versions
+Pragma version>=0.5.0 (../../sb/DictatorDOGE.sol#2) allows old versions
+Pragma version>=0.5.0 (../../sb/DictatorDOGE.sol#3) allows old versions
+Pragma version>=0.6.2 (../../sb/DictatorDOGE.sol#4) allows old versions
+Pragma version>=0.6.2 (../../sb/DictatorDOGE.sol#5) allows old versions
+solc-0.8.27 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/DictatorDOGE.sol#104-110):
+	- (success) = recipient.call{value: amount}() (../../sb/DictatorDOGE.sol#108)
+Low level call in Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/DictatorDOGE.sol#130-147):
+	- (success,returndata) = target.call{value: weiValue}(data) (../../sb/DictatorDOGE.sol#133)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Function IUniswapV2Pair.DOMAIN_SEPARATOR() (../../sb/DictatorDOGE.sol#239) is not in mixedCase
+Function IUniswapV2Pair.PERMIT_TYPEHASH() (../../sb/DictatorDOGE.sol#240) is not in mixedCase
+Function IUniswapV2Pair.MINIMUM_LIQUIDITY() (../../sb/DictatorDOGE.sol#256) is not in mixedCase
+Function IUniswapV2Router01.WETH() (../../sb/DictatorDOGE.sol#276) is not in mixedCase
+Parameter DictatorDOGE.calculateTaxFee(uint256)._amount (../../sb/DictatorDOGE.sol#966) is not in mixedCase
+Parameter DictatorDOGE.calculateLiquidityFee(uint256)._amount (../../sb/DictatorDOGE.sol#972) is not in mixedCase
+Function DictatorDOGE.SetBuyBackMaxTimeForHistories(uint256) (../../sb/DictatorDOGE.sol#1041-1043) is not in mixedCase
+Function DictatorDOGE.SetBuyBackDivisor(uint256) (../../sb/DictatorDOGE.sol#1045-1047) is not in mixedCase
+Function DictatorDOGE.GetBuyBackTimeInterval() (../../sb/DictatorDOGE.sol#1049-1051) is not in mixedCase
+Function DictatorDOGE.SetBuyBackTimeInterval(uint256) (../../sb/DictatorDOGE.sol#1053-1055) is not in mixedCase
+Function DictatorDOGE.SetBuyBackRangeRate(uint256) (../../sb/DictatorDOGE.sol#1057-1060) is not in mixedCase
+Function DictatorDOGE.GetSwapMinutes() (../../sb/DictatorDOGE.sol#1062-1064) is not in mixedCase
+Function DictatorDOGE.SetSwapMinutes(uint256) (../../sb/DictatorDOGE.sol#1066-1068) is not in mixedCase
+Parameter DictatorDOGE.setNumTokensSellToAddToBuyBack(uint256)._minimumTokensBeforeSwap (../../sb/DictatorDOGE.sol#1100) is not in mixedCase
+Parameter DictatorDOGE.setMarketingAddress(address)._marketingAddress (../../sb/DictatorDOGE.sol#1104) is not in mixedCase
+Parameter DictatorDOGE.setSwapAndLiquifyEnabled(bool)._enabled (../../sb/DictatorDOGE.sol#1108) is not in mixedCase
+Parameter DictatorDOGE.setBuyBackEnabled(bool)._enabled (../../sb/DictatorDOGE.sol#1113) is not in mixedCase
+Parameter DictatorDOGE.setAutoBuyBackEnabled(bool)._enabled (../../sb/DictatorDOGE.sol#1118) is not in mixedCase
+Parameter DictatorDOGE.changeRouterVersion(address)._router (../../sb/DictatorDOGE.sol#1141) is not in mixedCase
+Parameter DictatorDOGE.transferForeignToken(address,address)._token (../../sb/DictatorDOGE.sol#1160) is not in mixedCase
+Parameter DictatorDOGE.transferForeignToken(address,address)._to (../../sb/DictatorDOGE.sol#1160) is not in mixedCase
+Function DictatorDOGE.Sweep() (../../sb/DictatorDOGE.sol#1165-1168) is not in mixedCase
+Parameter DictatorDOGE.setAddressFee(address,bool,uint256,uint256)._address (../../sb/DictatorDOGE.sol#1170) is not in mixedCase
+Parameter DictatorDOGE.setAddressFee(address,bool,uint256,uint256)._enable (../../sb/DictatorDOGE.sol#1170) is not in mixedCase
+Parameter DictatorDOGE.setAddressFee(address,bool,uint256,uint256)._addressTaxFee (../../sb/DictatorDOGE.sol#1170) is not in mixedCase
+Parameter DictatorDOGE.setAddressFee(address,bool,uint256,uint256)._addressLiquidityFee (../../sb/DictatorDOGE.sol#1170) is not in mixedCase
+Parameter DictatorDOGE.setBuyAddressFee(address,bool,uint256,uint256)._address (../../sb/DictatorDOGE.sol#1176) is not in mixedCase
+Parameter DictatorDOGE.setBuyAddressFee(address,bool,uint256,uint256)._enable (../../sb/DictatorDOGE.sol#1176) is not in mixedCase
+Parameter DictatorDOGE.setBuyAddressFee(address,bool,uint256,uint256)._addressTaxFee (../../sb/DictatorDOGE.sol#1176) is not in mixedCase
+Parameter DictatorDOGE.setBuyAddressFee(address,bool,uint256,uint256)._addressLiquidityFee (../../sb/DictatorDOGE.sol#1176) is not in mixedCase
+Parameter DictatorDOGE.setSellAddressFee(address,bool,uint256,uint256)._address (../../sb/DictatorDOGE.sol#1182) is not in mixedCase
+Parameter DictatorDOGE.setSellAddressFee(address,bool,uint256,uint256)._enable (../../sb/DictatorDOGE.sol#1182) is not in mixedCase
+Parameter DictatorDOGE.setSellAddressFee(address,bool,uint256,uint256)._addressTaxFee (../../sb/DictatorDOGE.sol#1182) is not in mixedCase
+Parameter DictatorDOGE.setSellAddressFee(address,bool,uint256,uint256)._addressLiquidityFee (../../sb/DictatorDOGE.sol#1182) is not in mixedCase
+Variable DictatorDOGE._taxFee (../../sb/DictatorDOGE.sol#449) is not in mixedCase
+Variable DictatorDOGE._liquidityFee (../../sb/DictatorDOGE.sol#452) is not in mixedCase
+Variable DictatorDOGE._buyTaxFee (../../sb/DictatorDOGE.sol#455) is not in mixedCase
+Variable DictatorDOGE._buyLiquidityFee (../../sb/DictatorDOGE.sol#456) is not in mixedCase
+Variable DictatorDOGE._sellTaxFee (../../sb/DictatorDOGE.sol#458) is not in mixedCase
+Variable DictatorDOGE._sellLiquidityFee (../../sb/DictatorDOGE.sol#459) is not in mixedCase
+Variable DictatorDOGE._startTimeForSwap (../../sb/DictatorDOGE.sol#461) is not in mixedCase
+Variable DictatorDOGE._intervalMinutesForSwap (../../sb/DictatorDOGE.sol#462) is not in mixedCase
+Variable DictatorDOGE._buyBackRangeRate (../../sb/DictatorDOGE.sol#464) is not in mixedCase
+Variable DictatorDOGE._addressFees (../../sb/DictatorDOGE.sol#467) is not in mixedCase
+Variable DictatorDOGE._maxTxAmount (../../sb/DictatorDOGE.sol#471) is not in mixedCase
+Variable DictatorDOGE._sellHistories (../../sb/DictatorDOGE.sol#476) is not in mixedCase
+Variable DictatorDOGE._isAutoBuyBack (../../sb/DictatorDOGE.sol#477) is not in mixedCase
+Variable DictatorDOGE._buyBackDivisor (../../sb/DictatorDOGE.sol#478) is not in mixedCase
+Variable DictatorDOGE._buyBackTimeInterval (../../sb/DictatorDOGE.sol#479) is not in mixedCase
+Variable DictatorDOGE._buyBackMaxTimeForHistories (../../sb/DictatorDOGE.sol#480) is not in mixedCase
+Variable DictatorDOGE._isEnabledBuyBackAndBurn (../../sb/DictatorDOGE.sol#489) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/DictatorDOGE.sol#18)" inContext (../../sb/DictatorDOGE.sol#12-21)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Reentrancy in DictatorDOGE._transfer(address,address,uint256) (../../sb/DictatorDOGE.sol#668-785):
+	External calls:
+	- swapTokens(contractTokenBalance) (../../sb/DictatorDOGE.sol#697)
+		- recipient.transfer(amount) (../../sb/DictatorDOGE.sol#1138)
+	State variables written after the call(s):
+	- _removeOldSellHistories() (../../sb/DictatorDOGE.sol#724)
+		- _sellHistories[i].time = _sellHistories[j].time (../../sb/DictatorDOGE.sol#1025)
+		- _sellHistories[i].bnbAmount = _sellHistories[j].bnbAmount (../../sb/DictatorDOGE.sol#1026)
+		- _sellHistories.pop() (../../sb/DictatorDOGE.sol#1036)
+Reentrancy in DictatorDOGE._transfer(address,address,uint256) (../../sb/DictatorDOGE.sol#668-785):
+	External calls:
+	- swapTokens(contractTokenBalance) (../../sb/DictatorDOGE.sol#697)
+		- recipient.transfer(amount) (../../sb/DictatorDOGE.sol#1138)
+	External calls sending eth:
+	- swapTokens(contractTokenBalance) (../../sb/DictatorDOGE.sol#697)
+		- recipient.transfer(amount) (../../sb/DictatorDOGE.sol#1138)
+	- buyBackTokens(_bBSLimit) (../../sb/DictatorDOGE.sol#732)
+		- uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(0,path,deadAddress,block.timestamp.add(300)) (../../sb/DictatorDOGE.sol#832-837)
+	State variables written after the call(s):
+	- removeAllFee() (../../sb/DictatorDOGE.sol#748)
+		- _liquidityFee = 0 (../../sb/DictatorDOGE.sol#985)
+	- _liquidityFee = _buyLiquidityFee (../../sb/DictatorDOGE.sol#750)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#754)
+		- _liquidityFee = 0 (../../sb/DictatorDOGE.sol#985)
+	- _liquidityFee = _sellLiquidityFee (../../sb/DictatorDOGE.sol#756)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#761)
+		- _liquidityFee = 0 (../../sb/DictatorDOGE.sol#985)
+	- _liquidityFee = _addressFees[from]._liquidityFee (../../sb/DictatorDOGE.sol#763)
+	- _liquidityFee = _addressFees[from]._sellLiquidityFee (../../sb/DictatorDOGE.sol#768)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#775)
+		- _liquidityFee = 0 (../../sb/DictatorDOGE.sol#985)
+	- _liquidityFee = _addressFees[to]._buyLiquidityFee (../../sb/DictatorDOGE.sol#778)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/DictatorDOGE.sol#784)
+		- _liquidityFee = _previousLiquidityFee (../../sb/DictatorDOGE.sol#990)
+		- _liquidityFee = 0 (../../sb/DictatorDOGE.sol#985)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#748)
+		- _previousLiquidityFee = _liquidityFee (../../sb/DictatorDOGE.sol#982)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#754)
+		- _previousLiquidityFee = _liquidityFee (../../sb/DictatorDOGE.sol#982)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#761)
+		- _previousLiquidityFee = _liquidityFee (../../sb/DictatorDOGE.sol#982)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#775)
+		- _previousLiquidityFee = _liquidityFee (../../sb/DictatorDOGE.sol#982)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/DictatorDOGE.sol#784)
+		- _previousLiquidityFee = _liquidityFee (../../sb/DictatorDOGE.sol#982)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#748)
+		- _previousTaxFee = _taxFee (../../sb/DictatorDOGE.sol#981)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#754)
+		- _previousTaxFee = _taxFee (../../sb/DictatorDOGE.sol#981)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#761)
+		- _previousTaxFee = _taxFee (../../sb/DictatorDOGE.sol#981)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#775)
+		- _previousTaxFee = _taxFee (../../sb/DictatorDOGE.sol#981)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/DictatorDOGE.sol#784)
+		- _previousTaxFee = _taxFee (../../sb/DictatorDOGE.sol#981)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/DictatorDOGE.sol#784)
+		- _rOwned[address(this)] = _rOwned[address(this)].add(rLiquidity) (../../sb/DictatorDOGE.sol#961)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/DictatorDOGE.sol#877)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/DictatorDOGE.sol#886)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/DictatorDOGE.sol#897)
+		- _rOwned[sender] = _rOwned[sender].sub(rAmount) (../../sb/DictatorDOGE.sol#907)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/DictatorDOGE.sol#878)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/DictatorDOGE.sol#898)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/DictatorDOGE.sol#888)
+		- _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount) (../../sb/DictatorDOGE.sol#909)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/DictatorDOGE.sol#784)
+		- _rTotal = _rTotal.sub(rFee) (../../sb/DictatorDOGE.sol#916)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/DictatorDOGE.sol#784)
+		- _tFeeTotal = _tFeeTotal.add(tFee) (../../sb/DictatorDOGE.sol#917)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/DictatorDOGE.sol#784)
+		- _tOwned[address(this)] = _tOwned[address(this)].add(tLiquidity) (../../sb/DictatorDOGE.sol#963)
+		- _tOwned[sender] = _tOwned[sender].sub(tAmount) (../../sb/DictatorDOGE.sol#906)
+		- _tOwned[sender] = _tOwned[sender].sub(tAmount) (../../sb/DictatorDOGE.sol#896)
+		- _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount) (../../sb/DictatorDOGE.sol#887)
+		- _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount) (../../sb/DictatorDOGE.sol#908)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#748)
+		- _taxFee = 0 (../../sb/DictatorDOGE.sol#984)
+	- _taxFee = _buyTaxFee (../../sb/DictatorDOGE.sol#749)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#754)
+		- _taxFee = 0 (../../sb/DictatorDOGE.sol#984)
+	- _taxFee = _sellTaxFee (../../sb/DictatorDOGE.sol#755)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#761)
+		- _taxFee = 0 (../../sb/DictatorDOGE.sol#984)
+	- _taxFee = _addressFees[from]._taxFee (../../sb/DictatorDOGE.sol#762)
+	- _taxFee = _addressFees[from]._sellTaxFee (../../sb/DictatorDOGE.sol#767)
+	- removeAllFee() (../../sb/DictatorDOGE.sol#775)
+		- _taxFee = 0 (../../sb/DictatorDOGE.sol#984)
+	- _taxFee = _addressFees[to]._buyTaxFee (../../sb/DictatorDOGE.sol#777)
+	- _tokenTransfer(from,to,amount,takeFee) (../../sb/DictatorDOGE.sol#784)
+		- _taxFee = _previousTaxFee (../../sb/DictatorDOGE.sol#989)
+		- _taxFee = 0 (../../sb/DictatorDOGE.sol#984)
+	- buyBackTokens(_bBSLimit) (../../sb/DictatorDOGE.sol#732)
+		- inSwapAndLiquify = true (../../sb/DictatorDOGE.sol#512)
+		- inSwapAndLiquify = false (../../sb/DictatorDOGE.sol#514)
+	Event emitted after the call(s):
+	- SwapETHForTokens(amount,path) (../../sb/DictatorDOGE.sol#839)
+		- buyBackTokens(_bBSLimit) (../../sb/DictatorDOGE.sol#732)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/DictatorDOGE.sol#881)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/DictatorDOGE.sol#784)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/DictatorDOGE.sol#901)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/DictatorDOGE.sol#784)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/DictatorDOGE.sol#891)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/DictatorDOGE.sol#784)
+	- Transfer(sender,recipient,tTransferAmount) (../../sb/DictatorDOGE.sol#912)
+		- _tokenTransfer(from,to,amount,takeFee) (../../sb/DictatorDOGE.sol#784)
+Reentrancy in DictatorDOGE.transferFrom(address,address,uint256) (../../sb/DictatorDOGE.sol#574-578):
+	External calls:
+	- _transfer(sender,recipient,amount) (../../sb/DictatorDOGE.sol#575)
+		- recipient.transfer(amount) (../../sb/DictatorDOGE.sol#1138)
+	External calls sending eth:
+	- _transfer(sender,recipient,amount) (../../sb/DictatorDOGE.sol#575)
+		- recipient.transfer(amount) (../../sb/DictatorDOGE.sol#1138)
+		- uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(0,path,deadAddress,block.timestamp.add(300)) (../../sb/DictatorDOGE.sol#832-837)
+	State variables written after the call(s):
+	- _approve(sender,_msgSender(),_allowances[sender][_msgSender()].sub(amount,ERC20: transfer amount exceeds allowance)) (../../sb/DictatorDOGE.sol#576)
+		- _allowances[owner][spender] = amount (../../sb/DictatorDOGE.sol#664)
+	Event emitted after the call(s):
+	- Approval(owner,spender,amount) (../../sb/DictatorDOGE.sol#665)
+		- _approve(sender,_msgSender(),_allowances[sender][_msgSender()].sub(amount,ERC20: transfer amount exceeds allowance)) (../../sb/DictatorDOGE.sol#576)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-4
+
+Variable IUniswapV2Router01.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountADesired (../../sb/DictatorDOGE.sol#281) is too similar to IUniswapV2Router01.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountBDesired (../../sb/DictatorDOGE.sol#282)
+Variable DictatorDOGE._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#905) is too similar to DictatorDOGE._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/DictatorDOGE.sol#905)
+Variable DictatorDOGE.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/DictatorDOGE.sol#622) is too similar to DictatorDOGE._getTValues(uint256).tTransferAmount (../../sb/DictatorDOGE.sol#929)
+Variable DictatorDOGE._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#885) is too similar to DictatorDOGE._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/DictatorDOGE.sol#905)
+Variable DictatorDOGE._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#905) is too similar to DictatorDOGE._getTValues(uint256).tTransferAmount (../../sb/DictatorDOGE.sol#929)
+Variable DictatorDOGE._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#885) is too similar to DictatorDOGE._getTValues(uint256).tTransferAmount (../../sb/DictatorDOGE.sol#929)
+Variable DictatorDOGE._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#937) is too similar to DictatorDOGE._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/DictatorDOGE.sol#895)
+Variable DictatorDOGE._transferStandard(address,address,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#876) is too similar to DictatorDOGE._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/DictatorDOGE.sol#895)
+Variable DictatorDOGE._transferStandard(address,address,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#876) is too similar to DictatorDOGE._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/DictatorDOGE.sol#885)
+Variable DictatorDOGE._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#895) is too similar to DictatorDOGE._getTValues(uint256).tTransferAmount (../../sb/DictatorDOGE.sol#929)
+Variable DictatorDOGE._getValues(uint256).rTransferAmount (../../sb/DictatorDOGE.sol#922) is too similar to DictatorDOGE._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/DictatorDOGE.sol#895)
+Variable DictatorDOGE._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#895) is too similar to DictatorDOGE._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/DictatorDOGE.sol#895)
+Variable DictatorDOGE.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/DictatorDOGE.sol#622) is too similar to DictatorDOGE._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/DictatorDOGE.sol#895)
+Variable DictatorDOGE._transferStandard(address,address,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#876) is too similar to DictatorDOGE._transferStandard(address,address,uint256).tTransferAmount (../../sb/DictatorDOGE.sol#876)
+Variable DictatorDOGE.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/DictatorDOGE.sol#622) is too similar to DictatorDOGE._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/DictatorDOGE.sol#885)
+Variable DictatorDOGE._getValues(uint256).rTransferAmount (../../sb/DictatorDOGE.sol#922) is too similar to DictatorDOGE._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/DictatorDOGE.sol#885)
+Variable DictatorDOGE._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#885) is too similar to DictatorDOGE._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/DictatorDOGE.sol#895)
+Variable DictatorDOGE._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#937) is too similar to DictatorDOGE._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/DictatorDOGE.sol#905)
+Variable DictatorDOGE.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/DictatorDOGE.sol#622) is too similar to DictatorDOGE._transferStandard(address,address,uint256).tTransferAmount (../../sb/DictatorDOGE.sol#876)
+Variable DictatorDOGE._getValues(uint256).rTransferAmount (../../sb/DictatorDOGE.sol#922) is too similar to DictatorDOGE._transferStandard(address,address,uint256).tTransferAmount (../../sb/DictatorDOGE.sol#876)
+Variable DictatorDOGE._transferStandard(address,address,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#876) is too similar to DictatorDOGE._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/DictatorDOGE.sol#905)
+Variable DictatorDOGE._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#937) is too similar to DictatorDOGE._getTValues(uint256).tTransferAmount (../../sb/DictatorDOGE.sol#929)
+Variable DictatorDOGE._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#885) is too similar to DictatorDOGE._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/DictatorDOGE.sol#885)
+Variable DictatorDOGE._transferStandard(address,address,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#876) is too similar to DictatorDOGE._getTValues(uint256).tTransferAmount (../../sb/DictatorDOGE.sol#929)
+Variable DictatorDOGE._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#895) is too similar to DictatorDOGE._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/DictatorDOGE.sol#905)
+Variable DictatorDOGE.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/DictatorDOGE.sol#622) is too similar to DictatorDOGE._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/DictatorDOGE.sol#905)
+Variable DictatorDOGE._getValues(uint256).rTransferAmount (../../sb/DictatorDOGE.sol#922) is too similar to DictatorDOGE._transferBothExcluded(address,address,uint256).tTransferAmount (../../sb/DictatorDOGE.sol#905)
+Variable DictatorDOGE._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#885) is too similar to DictatorDOGE._transferStandard(address,address,uint256).tTransferAmount (../../sb/DictatorDOGE.sol#876)
+Variable DictatorDOGE._getValues(uint256).rTransferAmount (../../sb/DictatorDOGE.sol#922) is too similar to DictatorDOGE._getTValues(uint256).tTransferAmount (../../sb/DictatorDOGE.sol#929)
+Variable DictatorDOGE._transferStandard(address,address,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#876) is too similar to DictatorDOGE._getValues(uint256).tTransferAmount (../../sb/DictatorDOGE.sol#921)
+Variable DictatorDOGE.reflectionFromToken(uint256,bool).rTransferAmount (../../sb/DictatorDOGE.sol#622) is too similar to DictatorDOGE._getValues(uint256).tTransferAmount (../../sb/DictatorDOGE.sol#921)
+Variable DictatorDOGE._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#905) is too similar to DictatorDOGE._transferStandard(address,address,uint256).tTransferAmount (../../sb/DictatorDOGE.sol#876)
+Variable DictatorDOGE._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#937) is too similar to DictatorDOGE._transferStandard(address,address,uint256).tTransferAmount (../../sb/DictatorDOGE.sol#876)
+Variable DictatorDOGE._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#905) is too similar to DictatorDOGE._getValues(uint256).tTransferAmount (../../sb/DictatorDOGE.sol#921)
+Variable DictatorDOGE._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#937) is too similar to DictatorDOGE._getValues(uint256).tTransferAmount (../../sb/DictatorDOGE.sol#921)
+Variable DictatorDOGE._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#895) is too similar to DictatorDOGE._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/DictatorDOGE.sol#885)
+Variable DictatorDOGE._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#905) is too similar to DictatorDOGE._transferFromExcluded(address,address,uint256).tTransferAmount (../../sb/DictatorDOGE.sol#895)
+Variable DictatorDOGE._getValues(uint256).rTransferAmount (../../sb/DictatorDOGE.sol#922) is too similar to DictatorDOGE._getValues(uint256).tTransferAmount (../../sb/DictatorDOGE.sol#921)
+Variable DictatorDOGE._transferBothExcluded(address,address,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#905) is too similar to DictatorDOGE._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/DictatorDOGE.sol#885)
+Variable DictatorDOGE._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#895) is too similar to DictatorDOGE._transferStandard(address,address,uint256).tTransferAmount (../../sb/DictatorDOGE.sol#876)
+Variable DictatorDOGE._getRValues(uint256,uint256,uint256,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#937) is too similar to DictatorDOGE._transferToExcluded(address,address,uint256).tTransferAmount (../../sb/DictatorDOGE.sol#885)
+Variable DictatorDOGE._transferFromExcluded(address,address,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#895) is too similar to DictatorDOGE._getValues(uint256).tTransferAmount (../../sb/DictatorDOGE.sol#921)
+Variable DictatorDOGE._transferToExcluded(address,address,uint256).rTransferAmount (../../sb/DictatorDOGE.sol#885) is too similar to DictatorDOGE._getValues(uint256).tTransferAmount (../../sb/DictatorDOGE.sol#921)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+DictatorDOGE.prepareForPreSale() (../../sb/DictatorDOGE.sol#1123-1128) uses literals with too many digits:
+	- _maxTxAmount = 1000000000 * 10 ** 6 * 10 ** 9 (../../sb/DictatorDOGE.sol#1127)
+DictatorDOGE.afterPreSale() (../../sb/DictatorDOGE.sol#1130-1135) uses literals with too many digits:
+	- _maxTxAmount = 3000000 * 10 ** 6 * 10 ** 9 (../../sb/DictatorDOGE.sol#1134)
+DictatorDOGE.slitherConstructorVariables() (../../sb/DictatorDOGE.sol#410-1188) uses literals with too many digits:
+	- _tTotal = 1000000000 * 10 ** 6 * 10 ** 9 (../../sb/DictatorDOGE.sol#426)
+DictatorDOGE.slitherConstructorVariables() (../../sb/DictatorDOGE.sol#410-1188) uses literals with too many digits:
+	- _maxTxAmount = 3000000 * 10 ** 6 * 10 ** 9 (../../sb/DictatorDOGE.sol#471)
+DictatorDOGE.slitherConstructorVariables() (../../sb/DictatorDOGE.sol#410-1188) uses literals with too many digits:
+	- minimumTokensBeforeSwap = 200000 * 10 ** 6 * 10 ** 9 (../../sb/DictatorDOGE.sol#472)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+Loop condition i < _sellHistories.length (../../sb/DictatorDOGE.sol#712) should use cached array length instead of referencing `length` member of the storage array.
+ Loop condition j < _sellHistories.length (../../sb/DictatorDOGE.sol#1021) should use cached array length instead of referencing `length` member of the storage array.
+ Loop condition i < _excluded.length (../../sb/DictatorDOGE.sol#949) should use cached array length instead of referencing `length` member of the storage array.
+ Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cache-array-length
+
+DictatorDOGE._decimals (../../sb/DictatorDOGE.sol#432) should be constant 
+DictatorDOGE._isEnabledBuyBackAndBurn (../../sb/DictatorDOGE.sol#489) should be constant 
+DictatorDOGE._name (../../sb/DictatorDOGE.sol#430) should be constant 
+DictatorDOGE._symbol (../../sb/DictatorDOGE.sol#431) should be constant 
+DictatorDOGE._tTotal (../../sb/DictatorDOGE.sol#426) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+/sb/DictatorDOGE.sol analyzed (10 contracts with 93 detectors), 172 result(s) found

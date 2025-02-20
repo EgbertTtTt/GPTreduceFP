@@ -1,0 +1,391 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 92 Code Findings │
+└──────────────────┘
+                       
+    /sb/MeowMining.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          490┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          494┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          512┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          517┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          522┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          988┆ contract MeowToken is ERC20("MeowToken", "MEOW"), Ownable {
+            ⋮┆----------------------------------------
+         1260┆ contract DevelopmentFund is Ownable {
+            ⋮┆----------------------------------------
+         1325┆ contract MeowMining is Ownable, ReentrancyGuard {
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+          996┆ uint256 public manualMinted = 0;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          734┆ constructor (string memory name_, string memory symbol_) public {
+          735┆     _name = name_;
+          736┆     _symbol = symbol_;
+          737┆     _decimals = 18;
+          738┆ }
+            ⋮┆----------------------------------------
+         1277┆ constructor(IERC20 _Meow) public {
+         1278┆   Meow = _Meow;
+         1279┆   devaddr = msg.sender;
+         1280┆ }
+            ⋮┆----------------------------------------
+         1395┆ constructor(
+         1396┆   MeowToken _meow,
+         1397┆   uint256 _meowPerSecond,
+         1398┆   uint256 _startTime,
+         1399┆   uint256 _preShare,
+         1400┆   uint256 _lockShare,
+         1401┆   address _devaddr,
+         1402┆   DevelopmentFund _developmentFund
+         1403┆ ) public {
+         1404┆   totalAllocPoint = 0;
+             [hid 9 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+         1182┆ Checkpoint memory cp = checkpoints[account][center];
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+         1476┆ for (uint256 pid = 0; pid < length; ++pid) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          161┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          176┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          193┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          210┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          227┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          339┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          343┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          400┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          401┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          425┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          449┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          509┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          510┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          511┆ );
+            ⋮┆----------------------------------------
+          539┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          590┆ require(_status != _ENTERED, "ReentrancyGuard: reentrant call");
+            ⋮┆----------------------------------------
+          661┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          682┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          888┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          889┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          908┆ require(account != address(0), "ERC20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+          929┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          952┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          953┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1009┆ require(totalSupply().add(_amount) <= cap(), "MeowToken::mint::  
+  cap exceeded.");                                                              
+            ⋮┆----------------------------------------
+         1022┆ require(block.timestamp >= manualMintAllowedAfter,               
+  "MeowToken::manualMint:: manualMint not allowed yet.");                       
+            ⋮┆----------------------------------------
+         1023┆ require(_amount <= (canManualMint()), "MeowToken::manualMint::   
+  manual mint limit exceeded.");                                                
+            ⋮┆----------------------------------------
+         1137┆ require(signatory != address(0), "MEOW::delegateBySig: invalid   
+  signature");                                                                  
+            ⋮┆----------------------------------------
+         1138┆ require(nonce == nonces[signatory]++, "MEOW::delegateBySig:      
+  invalid nonce");                                                              
+            ⋮┆----------------------------------------
+         1139┆ require(now <= expiry, "MEOW::delegateBySig: signature expired");
+            ⋮┆----------------------------------------
+         1161┆ require(blockNumber < block.number, "MEOW::getPriorVotes: not yet
+  determined");                                                                 
+            ⋮┆----------------------------------------
+         1284┆ require(msg.sender == devaddr, "DevelopmentFund::setDev::        
+  Forbidden.");                                                                 
+            ⋮┆----------------------------------------
+         1417┆ require(msg.sender == devaddr, "MeowMining::setDev::             
+  Forbidden.");                                                                 
+            ⋮┆----------------------------------------
+         1429┆ require(_stakeToken != address(0), "MeowMining::addPool:: not    
+  ZERO address.");                                                              
+            ⋮┆----------------------------------------
+         1430┆ require(!isPoolExist[_stakeToken], "MeowMining::addPool::        
+  stakeToken duplicate.");                                                      
+            ⋮┆----------------------------------------
+         1455┆ require(_amount <= (canManualMint()), "MeowMining::manualMint::  
+  manual mint limit exceeded.");                                                
+            ⋮┆----------------------------------------
+         1509┆ if (user.fundedBy != address(0)) require(user.fundedBy ==        
+  msg.sender, "MeowMining::deposit:: bad sof.");                                
+            ⋮┆----------------------------------------
+         1510┆ require(pool.stakeToken != address(0), "MeowMining::deposit:: not
+  accept deposit.");                                                            
+            ⋮┆----------------------------------------
+         1540┆ require(user.fundedBy == msg.sender, "MeowMining::withdraw:: only
+  funder.");                                                                    
+            ⋮┆----------------------------------------
+         1541┆ require(user.amount >= _amount, "MeowMining::withdraw:: not      
+  good.");                                                                      
+            ⋮┆----------------------------------------
+         1565┆ require(user.amount > 0, "MeowMining::harvest:: nothing to       
+  harvest.");                                                                   
+            ⋮┆----------------------------------------
+         1570┆ require(preAmount <= meow.balanceOf(address(this)),              
+  "MeowMining::harvest:: not enough Meow.");                                    
+            ⋮┆----------------------------------------
+         1627┆ require(user.fundedBy == msg.sender,                             
+  "MeowMining::emergencyWithdraw:: only funder.");                              
+            ⋮┆----------------------------------------
+         1639┆ require(meow.transfer(_to, meowBal),                             
+  "MeowMining::safeMeowTransfer:: failed to transfer MEOW.");                   
+            ⋮┆----------------------------------------
+         1641┆ require(meow.transfer(_to, _amount),                             
+  "MeowMining::safeMeowTransfer:: failed to transfer MEOW.");                   
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         1209┆ if (srcRep != dstRep && amount > 0) {
+         1210┆   if (srcRep != address(0)) {
+         1211┆     // decrease old representative
+         1212┆     uint32 srcRepNum = numCheckpoints[srcRep];
+         1213┆     uint256 srcRepOld = srcRepNum > 0 ?                          
+  checkpoints[srcRep][srcRepNum - 1].votes : 0;                                 
+         1214┆     uint256 srcRepNew = srcRepOld.sub(amount);
+         1215┆     _writeCheckpoint(srcRep, srcRepNum, srcRepOld, srcRepNew);
+         1216┆   }
+         1217┆ 
+         1218┆   if (dstRep != address(0)) {
+             [hid 7 additional lines, adjust with --max-lines-per-finding] 
+         1236┆ if (nCheckpoints > 0 && checkpoints[delegatee][nCheckpoints -    
+  1].fromBlock == blockNumber) {                                                
+         1237┆   checkpoints[delegatee][nCheckpoints - 1].votes = newVotes;
+         1238┆ } else {
+         1239┆   checkpoints[delegatee][nCheckpoints] = Checkpoint(blockNumber, 
+  newVotes);                                                                    
+         1240┆   numCheckpoints[delegatee] = nCheckpoints + 1;
+         1241┆ }
+            ⋮┆----------------------------------------
+         1465┆ if (block.timestamp > pool.lastRewardTime && stakeTokenSupply > 0
+  && totalAllocPoint > 0) {                                                     
+         1466┆   uint256 time = block.timestamp.sub(pool.lastRewardTime);
+         1467┆   uint256 meowReward =                                           
+  time.mul(meowPerSecond).mul(pool.allocPoint).div(totalAllocPoint);            
+         1468┆   accMeowPerShare =                                              
+  accMeowPerShare.add(meowReward.mul(ACC_MEOW_PRECISION).div(stakeTokenSupply));
+         1469┆ }
+            ⋮┆----------------------------------------
+         1486┆ if (stakeTokenSupply > 0 && totalAllocPoint > 0) {
+         1487┆   uint256 time = block.timestamp.sub(pool.lastRewardTime);
+         1488┆   uint256 meowReward =                                           
+  time.mul(meowPerSecond).mul(pool.allocPoint).div(totalAllocPoint);            
+         1489┆   // Every 11.4286 Meow minted will mint 1 Meow for dev, come    
+  from 80/7 = 11.4286 use 10,000 to avoid floating.                             
+         1490┆   uint256 devfund = meowReward.mul(10000).div(114286);
+         1491┆   meow.mint(address(this), devfund);
+         1492┆   meow.mint(address(this), meowReward);
+         1493┆   safeMeowTransfer(devaddr, devfund.mul(preShare).div(10000));
+         1494┆   developmentFund.lock(devfund.mul(lockShare).div(10000));
+         1495┆   pool.accMeowPerShare =                                         
+  pool.accMeowPerShare.add(meowReward.mul(ACC_MEOW_PRECISION).div(stakeTokenSupp
+  ly));                                                                         
+             [hid 1 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+         1138┆ require(nonce == nonces[signatory]++, "MEOW::delegateBySig:      
+  invalid nonce");                                                              
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          193┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          343┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          400┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          425┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          449┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          509┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          510┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          511┆ );
+            ⋮┆----------------------------------------
+          539┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          682┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          888┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          889┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          929┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          952┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          953┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+         1022┆ require(block.timestamp >= manualMintAllowedAfter,               
+  "MeowToken::manualMint:: manualMint not allowed yet.");                       
+            ⋮┆----------------------------------------
+         1023┆ require(_amount <= (canManualMint()), "MeowToken::manualMint::   
+  manual mint limit exceeded.");                                                
+            ⋮┆----------------------------------------
+         1137┆ require(signatory != address(0), "MEOW::delegateBySig: invalid   
+  signature");                                                                  
+            ⋮┆----------------------------------------
+         1138┆ require(nonce == nonces[signatory]++, "MEOW::delegateBySig:      
+  invalid nonce");                                                              
+            ⋮┆----------------------------------------
+         1139┆ require(now <= expiry, "MEOW::delegateBySig: signature expired");
+            ⋮┆----------------------------------------
+         1161┆ require(blockNumber < block.number, "MEOW::getPriorVotes: not yet
+  determined");                                                                 
+            ⋮┆----------------------------------------
+         1284┆ require(msg.sender == devaddr, "DevelopmentFund::setDev::        
+  Forbidden.");                                                                 
+            ⋮┆----------------------------------------
+         1429┆ require(_stakeToken != address(0), "MeowMining::addPool:: not    
+  ZERO address.");                                                              
+            ⋮┆----------------------------------------
+         1430┆ require(!isPoolExist[_stakeToken], "MeowMining::addPool::        
+  stakeToken duplicate.");                                                      
+            ⋮┆----------------------------------------
+         1455┆ require(_amount <= (canManualMint()), "MeowMining::manualMint::  
+  manual mint limit exceeded.");                                                
+            ⋮┆----------------------------------------
+         1510┆ require(pool.stakeToken != address(0), "MeowMining::deposit:: not
+  accept deposit.");                                                            
+            ⋮┆----------------------------------------
+         1540┆ require(user.fundedBy == msg.sender, "MeowMining::withdraw:: only
+  funder.");                                                                    
+            ⋮┆----------------------------------------
+         1565┆ require(user.amount > 0, "MeowMining::harvest:: nothing to       
+  harvest.");                                                                   
+            ⋮┆----------------------------------------
+         1570┆ require(preAmount <= meow.balanceOf(address(this)),              
+  "MeowMining::harvest:: not enough Meow.");                                    
+            ⋮┆----------------------------------------
+         1627┆ require(user.fundedBy == msg.sender,                             
+  "MeowMining::emergencyWithdraw:: only funder.");                              
+            ⋮┆----------------------------------------
+         1639┆ require(meow.transfer(_to, meowBal),                             
+  "MeowMining::safeMeowTransfer:: failed to transfer MEOW.");                   
+            ⋮┆----------------------------------------
+         1641┆ require(meow.transfer(_to, _amount),                             
+  "MeowMining::safeMeowTransfer:: failed to transfer MEOW.");                   
+
+
+Ran 48 rules on 1 file: 92 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

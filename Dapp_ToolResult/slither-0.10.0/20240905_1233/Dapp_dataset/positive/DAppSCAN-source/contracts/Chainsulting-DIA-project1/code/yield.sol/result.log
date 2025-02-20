@@ -1,0 +1,127 @@
+'solc --version' running
+'solc /sb/yield.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+DIACompanyLockup.deposit(address,uint256,uint256) (../../sb/yield.sol#588-619) uses arbitrary from in transferFrom: require(bool)(token.transferFrom(yieldWallet,address(this),yieldAmount)) (../../sb/yield.sol#601)
+DIACompanyLockup.deposit(address,uint256,uint256) (../../sb/yield.sol#588-619) uses arbitrary from in transferFrom: require(bool)(token.transferFrom(kickerWallet,address(this),kickerAmount)) (../../sb/yield.sol#606)
+DIACompanyLockup.allocatePremium(uint256,uint256) (../../sb/yield.sol#669-674) uses arbitrary from in transferFrom: require(bool)(token.transferFrom(kickerWallet,address(this),premiumAmount)) (../../sb/yield.sol#672)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#arbitrary-from-in-transferfrom
+
+DIACompanyLockup (../../sb/yield.sol#526-675) contract sets array length with a user-controlled value:
+	- lockBoxStructs.push(l) (../../sb/yield.sol#617)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#array-length-assignment
+
+Reentrancy in DIACompanyLockup.allocatePremium(uint256,uint256) (../../sb/yield.sol#669-674):
+	External calls:
+	- require(bool)(token.transferFrom(kickerWallet,address(this),premiumAmount)) (../../sb/yield.sol#672)
+	State variables written after the call(s):
+	- l.balance += premiumAmount (../../sb/yield.sol#673)
+	DIACompanyLockup.lockBoxStructs (../../sb/yield.sol#555) can be used in cross function reentrancies:
+	- DIACompanyLockup.allocatePremium(uint256,uint256) (../../sb/yield.sol#669-674)
+	- DIACompanyLockup.deposit(address,uint256,uint256) (../../sb/yield.sol#588-619)
+	- DIACompanyLockup.getLockBoxBeneficiary(uint256) (../../sb/yield.sol#571-573)
+	- DIACompanyLockup.lockBoxStructs (../../sb/yield.sol#555)
+	- DIACompanyLockup.triggerWithdrawAll() (../../sb/yield.sol#638-645)
+	- DIACompanyLockup.updateBeneficiary(uint256,address) (../../sb/yield.sol#622-626)
+	- DIACompanyLockup.withdraw(uint256) (../../sb/yield.sol#628-635)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+DIACompanyLockup.deposit(address,uint256,uint256).yieldAmount (../../sb/yield.sol#591) is a local variable never initialized
+DIACompanyLockup.deposit(address,uint256,uint256).l (../../sb/yield.sol#613) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+DIACompanyLockup.updateEndDepositTime(uint256) (../../sb/yield.sol#648-650) should emit an event for: 
+	- endDepositTime = newEndTime (../../sb/yield.sol#649) 
+DIACompanyLockup.updateKicker(address,uint256,uint256) (../../sb/yield.sol#656-660) should emit an event for: 
+	- kickerPromille = newPromille (../../sb/yield.sol#658) 
+	- kickerDeadline = newDeadline (../../sb/yield.sol#659) 
+DIACompanyLockup.updateYields(uint256,uint256,uint256) (../../sb/yield.sol#662-666) should emit an event for: 
+	- threeMonthPromille = threeMonths (../../sb/yield.sol#663) 
+	- sixMonthPromille = sixMonths (../../sb/yield.sol#664) 
+	- nineMonthPromille = nineMonths (../../sb/yield.sol#665) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+DIACompanyLockup.constructor(address,uint256,uint256,address,uint256,uint256,address)._kickerWallet (../../sb/yield.sol#560) lacks a zero-check on :
+		- kickerWallet = _kickerWallet (../../sb/yield.sol#565)
+DIACompanyLockup.constructor(address,uint256,uint256,address,uint256,uint256,address)._yieldWallet (../../sb/yield.sol#560) lacks a zero-check on :
+		- yieldWallet = _yieldWallet (../../sb/yield.sol#568)
+DIACompanyLockup.updateYieldWallet(address).newWallet (../../sb/yield.sol#652) lacks a zero-check on :
+		- yieldWallet = newWallet (../../sb/yield.sol#653)
+DIACompanyLockup.updateKicker(address,uint256,uint256).newWallet (../../sb/yield.sol#656) lacks a zero-check on :
+		- kickerWallet = newWallet (../../sb/yield.sol#657)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+DIACompanyLockup.withdraw(uint256) (../../sb/yield.sol#628-635) has external calls inside a loop: require(bool)(token.transfer(l.beneficiary,amount)) (../../sb/yield.sol#634)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in DIACompanyLockup.deposit(address,uint256,uint256) (../../sb/yield.sol#588-619):
+	External calls:
+	- require(bool)(token.transferFrom(yieldWallet,address(this),yieldAmount)) (../../sb/yield.sol#601)
+	- require(bool)(token.transferFrom(kickerWallet,address(this),kickerAmount)) (../../sb/yield.sol#606)
+	- require(bool)(token.transferFrom(msg.sender,address(this),amount)) (../../sb/yield.sol#610)
+	State variables written after the call(s):
+	- lockBoxStructs.push(l) (../../sb/yield.sol#617)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in DIACompanyLockup.deposit(address,uint256,uint256) (../../sb/yield.sol#588-619):
+	External calls:
+	- require(bool)(token.transferFrom(yieldWallet,address(this),yieldAmount)) (../../sb/yield.sol#601)
+	- require(bool)(token.transferFrom(kickerWallet,address(this),kickerAmount)) (../../sb/yield.sol#606)
+	- require(bool)(token.transferFrom(msg.sender,address(this),amount)) (../../sb/yield.sol#610)
+	Event emitted after the call(s):
+	- LogLockupDeposit(msg.sender,l.beneficiary,l.balance,l.releaseTime) (../../sb/yield.sol#618)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+DIACompanyLockup.deposit(address,uint256,uint256) (../../sb/yield.sol#588-619) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(now < endDepositTime,Deposit time has ended.) (../../sb/yield.sol#589)
+	- now <= kickerDeadline (../../sb/yield.sol#605)
+DIACompanyLockup.withdraw(uint256) (../../sb/yield.sol#628-635) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool)(l.releaseTime <= now) (../../sb/yield.sol#630)
+DIACompanyLockup.triggerWithdrawAll() (../../sb/yield.sol#638-645) uses timestamp for comparisons
+	Dangerous comparisons:
+	- lockBoxStructs[i].releaseTime <= now && lockBoxStructs[i].balance > 0 (../../sb/yield.sol#641)
+DIACompanyLockup.allocatePremium(uint256,uint256) (../../sb/yield.sol#669-674) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool)(l.releaseTime <= now) (../../sb/yield.sol#671)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/yield.sol#334-343) uses assembly
+	- INLINE ASM (../../sb/yield.sol#341)
+Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/yield.sol#427-448) uses assembly
+	- INLINE ASM (../../sb/yield.sol#440-443)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/yield.sol#427-448) is never used and should be removed
+Address.functionCall(address,bytes) (../../sb/yield.sol#387-389) is never used and should be removed
+Address.functionCall(address,bytes,string) (../../sb/yield.sol#397-399) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/yield.sol#412-414) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/yield.sol#422-425) is never used and should be removed
+Address.isContract(address) (../../sb/yield.sol#334-343) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/yield.sol#361-367) is never used and should be removed
+SafeERC20._callOptionalReturn(IERC20,bytes) (../../sb/yield.sol#506-516) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/yield.sol#479-488) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/yield.sol#495-498) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/yield.sol#490-493) is never used and should be removed
+SafeERC20.safeTransfer(IERC20,address,uint256) (../../sb/yield.sol#464-466) is never used and should be removed
+SafeERC20.safeTransferFrom(IERC20,address,address,uint256) (../../sb/yield.sol#468-470) is never used and should be removed
+SafeMath.add(uint256,uint256) (../../sb/yield.sol#181-186) is never used and should be removed
+SafeMath.div(uint256,uint256) (../../sb/yield.sol#255-257) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/yield.sol#271-277) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/yield.sol#291-293) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/yield.sol#307-310) is never used and should be removed
+SafeMath.mul(uint256,uint256) (../../sb/yield.sol#229-241) is never used and should be removed
+SafeMath.sub(uint256,uint256) (../../sb/yield.sol#198-200) is never used and should be removed
+SafeMath.sub(uint256,uint256,string) (../../sb/yield.sol#212-217) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.5.12 (../../sb/yield.sol#1) allows old versions
+solc-0.5.17 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/yield.sol#361-367):
+	- (success) = recipient.call.value(amount)() (../../sb/yield.sol#365)
+Low level call in Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/yield.sol#427-448):
+	- (success,returndata) = target.call.value(weiValue)(data) (../../sb/yield.sol#431)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+/sb/yield.sol analyzed (7 contracts with 93 detectors), 48 result(s) found

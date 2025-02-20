@@ -1,0 +1,88 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 10 Code Findings │
+└──────────────────┘
+                             
+    /sb/YVaultAssetProxy.sol 
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          497┆ constructor(
+          498┆     address vault_,
+          499┆     IERC20 _token,
+          500┆     string memory _name,
+          501┆     string memory _symbol
+          502┆ ) WrappedPosition(_token, _name, _symbol) {
+          503┆     vault = IYearnVault(vault_);
+          504┆     _token.approve(vault_, type(uint256).max);
+          505┆     vaultDecimals = IERC20(vault_).decimals();
+          506┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          213┆ require(balance >= amount, "ERC20: insufficient-balance");
+            ⋮┆----------------------------------------
+          215┆ require(allowed >= amount, "ERC20: insufficient-allowance");
+            ⋮┆----------------------------------------
+          272┆ require(owner != address(0), "ERC20: invalid-address-0");
+            ⋮┆----------------------------------------
+          273┆ require(owner == ecrecover(digest, v, r, s), "ERC20:             
+  invalid-permit");                                                             
+            ⋮┆----------------------------------------
+          274┆ require(
+          275┆     deadline == 0 || block.timestamp <= deadline,
+          276┆     "ERC20: permit-expired"
+          277┆ );
+            ⋮┆----------------------------------------
+          468┆ require(withdrawAmount >= _minUnderlying, "Not enough            
+  underlying");                                                                 
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          214┆ if (spender != msg.sender && allowed != type(uint256).max) {
+          215┆     require(allowed >= amount, "ERC20: insufficient-allowance");
+          216┆     allowance[spender][msg.sender] = allowed - amount;
+          217┆ }
+            ⋮┆----------------------------------------
+          537┆ if (localUnderlying == 0 && localShares == 0) {
+          538┆     _amount -= 1;
+          539┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          278┆ nonces[owner]++;
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 10 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

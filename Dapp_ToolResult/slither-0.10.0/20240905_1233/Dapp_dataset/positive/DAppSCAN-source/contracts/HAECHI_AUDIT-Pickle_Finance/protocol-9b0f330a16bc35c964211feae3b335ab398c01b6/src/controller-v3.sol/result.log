@@ -1,0 +1,124 @@
+'solc --version' running
+'solc /sb/controller-v3.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+Reentrancy in ControllerV3.setStrategy(address,address) (../../sb/controller-v3.sol#974-986):
+	External calls:
+	- IStrategy(_current).withdrawAll() (../../sb/controller-v3.sol#983)
+	State variables written after the call(s):
+	- strategies[_token] = _strategy (../../sb/controller-v3.sol#985)
+	ControllerV3.strategies (../../sb/controller-v3.sol#884) can be used in cross function reentrancies:
+	- ControllerV3.balanceOf(address) (../../sb/controller-v3.sol#1002-1004)
+	- ControllerV3.earn(address,uint256) (../../sb/controller-v3.sol#988-1000)
+	- ControllerV3.setStrategy(address,address) (../../sb/controller-v3.sol#974-986)
+	- ControllerV3.strategies (../../sb/controller-v3.sol#884)
+	- ControllerV3.withdraw(address,uint256) (../../sb/controller-v3.sol#1090-1093)
+	- ControllerV3.withdrawAll(address) (../../sb/controller-v3.sol#1006-1012)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+ControllerV3.setStrategy(address,address) (../../sb/controller-v3.sol#974-986) ignores return value by IStrategy(_current).withdrawAll() (../../sb/controller-v3.sol#983)
+ControllerV3.withdrawAll(address) (../../sb/controller-v3.sol#1006-1012) ignores return value by IStrategy(strategies[_token]).withdrawAll() (../../sb/controller-v3.sol#1011)
+ControllerV3.getExpectedReturn(address,address,uint256) (../../sb/controller-v3.sol#1032-1046) ignores return value by (expected,None) = OneSplitAudit(onesplit).getExpectedReturn(_token,_want,_balance,parts,0) (../../sb/controller-v3.sol#1039-1045)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+ERC20.constructor(string,string).name (../../sb/controller-v3.sol#461) shadows:
+	- ERC20.name() (../../sb/controller-v3.sol#470-472) (function)
+ERC20.constructor(string,string).symbol (../../sb/controller-v3.sol#461) shadows:
+	- ERC20.symbol() (../../sb/controller-v3.sol#478-480) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+ControllerV3.constructor(address,address,address,address,address)._governance (../../sb/controller-v3.sol#895) lacks a zero-check on :
+		- governance = _governance (../../sb/controller-v3.sol#901)
+ControllerV3.constructor(address,address,address,address,address)._strategist (../../sb/controller-v3.sol#896) lacks a zero-check on :
+		- strategist = _strategist (../../sb/controller-v3.sol#902)
+ControllerV3.constructor(address,address,address,address,address)._timelock (../../sb/controller-v3.sol#897) lacks a zero-check on :
+		- timelock = _timelock (../../sb/controller-v3.sol#903)
+ControllerV3.constructor(address,address,address,address,address)._devfund (../../sb/controller-v3.sol#898) lacks a zero-check on :
+		- devfund = _devfund (../../sb/controller-v3.sol#904)
+ControllerV3.constructor(address,address,address,address,address)._treasury (../../sb/controller-v3.sol#899) lacks a zero-check on :
+		- treasury = _treasury (../../sb/controller-v3.sol#905)
+ControllerV3.setDevFund(address)._devfund (../../sb/controller-v3.sol#908) lacks a zero-check on :
+		- devfund = _devfund (../../sb/controller-v3.sol#910)
+ControllerV3.setTreasury(address)._treasury (../../sb/controller-v3.sol#913) lacks a zero-check on :
+		- treasury = _treasury (../../sb/controller-v3.sol#915)
+ControllerV3.setStrategist(address)._strategist (../../sb/controller-v3.sol#918) lacks a zero-check on :
+		- strategist = _strategist (../../sb/controller-v3.sol#920)
+ControllerV3.setOneSplit(address)._onesplit (../../sb/controller-v3.sol#928) lacks a zero-check on :
+		- onesplit = _onesplit (../../sb/controller-v3.sol#930)
+ControllerV3.setGovernance(address)._governance (../../sb/controller-v3.sol#933) lacks a zero-check on :
+		- governance = _governance (../../sb/controller-v3.sol#935)
+ControllerV3.setTimelock(address)._timelock (../../sb/controller-v3.sol#938) lacks a zero-check on :
+		- timelock = _timelock (../../sb/controller-v3.sol#940)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Address.isContract(address) (../../sb/controller-v3.sol#296-305) uses assembly
+	- INLINE ASM (../../sb/controller-v3.sol#303)
+Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/controller-v3.sol#389-410) uses assembly
+	- INLINE ASM (../../sb/controller-v3.sol#402-405)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+ControllerV3.setStrategy(address,address) (../../sb/controller-v3.sol#974-986) compares to a boolean constant:
+	-require(bool,string)(approvedStrategies[_token][_strategy] == true,!approved) (../../sb/controller-v3.sol#979)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#boolean-equality
+
+Address.functionCall(address,bytes) (../../sb/controller-v3.sol#349-351) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/controller-v3.sol#374-376) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/controller-v3.sol#384-387) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/controller-v3.sol#323-329) is never used and should be removed
+Context._msgData() (../../sb/controller-v3.sol#192-195) is never used and should be removed
+ERC20._burn(address,uint256) (../../sb/controller-v3.sol#654-662) is never used and should be removed
+ERC20._mint(address,uint256) (../../sb/controller-v3.sol#633-641) is never used and should be removed
+ERC20._setupDecimals(uint8) (../../sb/controller-v3.sol#692-694) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/controller-v3.sol#757-760) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/controller-v3.sol#752-755) is never used and should be removed
+SafeERC20.safeTransferFrom(IERC20,address,address,uint256) (../../sb/controller-v3.sol#730-732) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/controller-v3.sol#155-157) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/controller-v3.sol#171-174) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.6.7 (../../sb/controller-v3.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/controller-v3.sol#323-329):
+	- (success) = recipient.call{value: amount}() (../../sb/controller-v3.sol#327)
+Low level call in Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/controller-v3.sol#389-410):
+	- (success,returndata) = target.call{value: weiValue}(data) (../../sb/controller-v3.sol#393)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter ControllerV3.setDevFund(address)._devfund (../../sb/controller-v3.sol#908) is not in mixedCase
+Parameter ControllerV3.setTreasury(address)._treasury (../../sb/controller-v3.sol#913) is not in mixedCase
+Parameter ControllerV3.setStrategist(address)._strategist (../../sb/controller-v3.sol#918) is not in mixedCase
+Parameter ControllerV3.setSplit(uint256)._split (../../sb/controller-v3.sol#923) is not in mixedCase
+Parameter ControllerV3.setOneSplit(address)._onesplit (../../sb/controller-v3.sol#928) is not in mixedCase
+Parameter ControllerV3.setGovernance(address)._governance (../../sb/controller-v3.sol#933) is not in mixedCase
+Parameter ControllerV3.setTimelock(address)._timelock (../../sb/controller-v3.sol#938) is not in mixedCase
+Parameter ControllerV3.setJar(address,address)._token (../../sb/controller-v3.sol#943) is not in mixedCase
+Parameter ControllerV3.setJar(address,address)._jar (../../sb/controller-v3.sol#943) is not in mixedCase
+Parameter ControllerV3.approveStrategy(address,address)._token (../../sb/controller-v3.sol#952) is not in mixedCase
+Parameter ControllerV3.approveStrategy(address,address)._strategy (../../sb/controller-v3.sol#952) is not in mixedCase
+Parameter ControllerV3.revokeStrategy(address,address)._token (../../sb/controller-v3.sol#957) is not in mixedCase
+Parameter ControllerV3.revokeStrategy(address,address)._strategy (../../sb/controller-v3.sol#957) is not in mixedCase
+Parameter ControllerV3.setConverter(address,address,address)._input (../../sb/controller-v3.sol#963) is not in mixedCase
+Parameter ControllerV3.setConverter(address,address,address)._output (../../sb/controller-v3.sol#964) is not in mixedCase
+Parameter ControllerV3.setConverter(address,address,address)._converter (../../sb/controller-v3.sol#965) is not in mixedCase
+Parameter ControllerV3.setStrategy(address,address)._token (../../sb/controller-v3.sol#974) is not in mixedCase
+Parameter ControllerV3.setStrategy(address,address)._strategy (../../sb/controller-v3.sol#974) is not in mixedCase
+Parameter ControllerV3.earn(address,uint256)._token (../../sb/controller-v3.sol#988) is not in mixedCase
+Parameter ControllerV3.earn(address,uint256)._amount (../../sb/controller-v3.sol#988) is not in mixedCase
+Parameter ControllerV3.balanceOf(address)._token (../../sb/controller-v3.sol#1002) is not in mixedCase
+Parameter ControllerV3.withdrawAll(address)._token (../../sb/controller-v3.sol#1006) is not in mixedCase
+Parameter ControllerV3.inCaseTokensGetStuck(address,uint256)._token (../../sb/controller-v3.sol#1014) is not in mixedCase
+Parameter ControllerV3.inCaseTokensGetStuck(address,uint256)._amount (../../sb/controller-v3.sol#1014) is not in mixedCase
+Parameter ControllerV3.inCaseStrategyTokenGetStuck(address,address)._strategy (../../sb/controller-v3.sol#1022) is not in mixedCase
+Parameter ControllerV3.inCaseStrategyTokenGetStuck(address,address)._token (../../sb/controller-v3.sol#1022) is not in mixedCase
+Parameter ControllerV3.getExpectedReturn(address,address,uint256)._strategy (../../sb/controller-v3.sol#1033) is not in mixedCase
+Parameter ControllerV3.getExpectedReturn(address,address,uint256)._token (../../sb/controller-v3.sol#1034) is not in mixedCase
+Parameter ControllerV3.yearn(address,address,uint256)._strategy (../../sb/controller-v3.sol#1050) is not in mixedCase
+Parameter ControllerV3.yearn(address,address,uint256)._token (../../sb/controller-v3.sol#1051) is not in mixedCase
+Parameter ControllerV3.withdraw(address,uint256)._token (../../sb/controller-v3.sol#1090) is not in mixedCase
+Parameter ControllerV3.withdraw(address,uint256)._amount (../../sb/controller-v3.sol#1090) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/controller-v3.sol#193)" inContext (../../sb/controller-v3.sol#187-196)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+/sb/controller-v3.sol analyzed (13 contracts with 93 detectors), 70 result(s) found

@@ -1,0 +1,36 @@
+{
+    "errors": [],
+    "fails": [],
+    "findings": [
+        {
+            "confidence": "Medium",
+            "contract": "Vault",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Coinspect-Incognito Audit/bridge-eth-4879219669a38d601265582f815596b6775855b6/bridge/contracts/vault.sol",
+            "function": "withdraw",
+            "impact": "High",
+            "line": 397,
+            "line_end": 450,
+            "message": "Vault.withdraw(bytes,uint256,bytes32[],bool[],bytes32,bytes32,uint256[],uint8[],bytes32[],bytes32[]) (vault.sol#397-450) sends eth to arbitrary user\n\tDangerous calls:\n\t- (success) = data.to.call{value: data.amount}() (vault.sol#443)\n",
+            "name": "arbitrary-send-eth",
+            "check": "TP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "Vault",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Coinspect-Incognito Audit/bridge-eth-4879219669a38d601265582f815596b6775855b6/bridge/contracts/vault.sol",
+            "function": "execute",
+            "impact": "High",
+            "line": 600,
+            "line_end": 635,
+            "message": "Reentrancy in Vault.execute(address,uint256,address,address,bytes,bytes,bytes) (vault.sol#600-635):\n\tExternal calls:\n\t- IERC20(token).transfer(exchangeAddress,amount) (vault.sol#627)\n\t- returnedAmount = callExtFunc(recipientToken,ethAmount,callData,exchangeAddress) (vault.sol#630)\n\t\t- (success,result) = exchangeAddress.call{value: ethAmount}(callData) (vault.sol#647)\n\tExternal calls sending eth:\n\t- returnedAmount = callExtFunc(recipientToken,ethAmount,callData,exchangeAddress) (vault.sol#630)\n\t\t- (success,result) = exchangeAddress.call{value: ethAmount}(callData) (vault.sol#647)\n\tState variables written after the call(s):\n\t- totalDepositedToSCAmount[recipientToken] = totalDepositedToSCAmount[recipientToken].safeAdd(returnedAmount) (vault.sol#634)\n\tVault.totalDepositedToSCAmount (vault.sol#172) can be used in cross function reentrancies:\n\t- Vault.totalDepositedToSCAmount (vault.sol#172)\n\t- Vault.updateAssets(address[],uint256[]) (vault.sol#700-709)\n\t- withdrawRequests[verifier][recipientToken] = withdrawRequests[verifier][recipientToken].safeAdd(returnedAmount) (vault.sol#633)\n\tVault.withdrawRequests (vault.sol#170) can be used in cross function reentrancies:\n\t- Vault.getDepositedBalance(address,address) (vault.sol#683-691)\n\t- Vault.withdrawRequests (vault.sol#170)\n",
+            "name": "reentrancy-eth",
+            "check": "FP"
+        }
+    ],
+    "infos": [],
+    "parser": {
+        "id": "slither-0.10.0",
+        "mode": "solidity",
+        "version": "2024/04/30"
+    }
+}

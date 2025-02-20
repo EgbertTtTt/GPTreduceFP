@@ -1,0 +1,100 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                   
+                   
+┌─────────────────┐
+│ 9 Code Findings │
+└─────────────────┘
+                    
+    /sb/Staking.sol 
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+           82┆ _stakedAmount += msg.value;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+           41┆ constructor() {}
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           34┆ require(
+           35┆     _delegatedStaker[_validatorNode] == msg.sender,
+           36┆     "Only staker can call function"
+           37┆ );
+            ⋮┆----------------------------------------
+           65┆ require(
+           66┆     msg.value >= VALIDATOR_THRESHOLD,
+           67┆     "You need more funds in order to stake!"
+           68┆ );
+            ⋮┆----------------------------------------
+          100┆ require(
+          101┆     _validators.length > MINIMUM_REQUIRED_NUM_VALIDATORS,
+          102┆     "Number of validators can't be less than                     
+  MINIMUM_REQUIRED_NUM_VALIDATORS"                                              
+          103┆ );
+            ⋮┆----------------------------------------
+          120┆ require(
+          121┆     _addressToValidatorIndex[staker] < _validators.length,
+          122┆     "index out of range"
+          123┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+           85┆ if (
+           86┆     !_addressToIsValidator[_validatorNode] &&
+           87┆     _addressToStakedAmount[_validatorNode] >= VALIDATOR_THRESHOLD
+           88┆ ) {
+           89┆     // append to validator set
+           90┆     _addressToIsValidator[_validatorNode] = true;
+           91┆     _addressToValidatorIndex[_validatorNode] =                   
+  _validators.length;                                                           
+           92┆     _delegatedStaker[_validatorNode] = msg.sender;
+           93┆     _validators.push(_validatorNode);
+           94┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           65┆ require(
+           66┆     msg.value >= VALIDATOR_THRESHOLD,
+           67┆     "You need more funds in order to stake!"
+           68┆ );
+            ⋮┆----------------------------------------
+          100┆ require(
+          101┆     _validators.length > MINIMUM_REQUIRED_NUM_VALIDATORS,
+          102┆     "Number of validators can't be less than                     
+  MINIMUM_REQUIRED_NUM_VALIDATORS"                                              
+          103┆ );
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 9 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

@@ -1,0 +1,165 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 29 Code Findings │
+└──────────────────┘
+                  
+    /sb/yield.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          465┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          469┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          487┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          492┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          497┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          640┆ for (uint256 i = 0; i < lockBoxStructs.length; ++i) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+           43┆ constructor() internal {
+           44┆                       
+  _addOwner(msg.sender);             
+           45┆ }
+            ⋮┆----------------------------------------
+          560┆ constructor(address tokenContract, uint256 _beginDepositTime,    
+  uint256 _endDepositTime, address _kickerWallet, uint256 _kickerDeadline,      
+  uint256 _kickerPromille,  ... [0m                                             
+          561┆     token = IERC20(tokenContract);
+          562┆     beginDepositTime = _beginDepositTime;
+          563┆     endDepositTime = _endDepositTime;
+          564┆ 
+          565┆     kickerWallet = _kickerWallet;
+          566┆     kickerDeadline = _kickerDeadline;
+          567┆     kickerPromille = _kickerPromille;
+          568┆     yieldWallet = _yieldWallet;
+          569┆ }
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          640┆ for (uint256 i = 0; i < lockBoxStructs.length; ++i) {
+            ⋮┆----------------------------------------
+          641┆ if (lockBoxStructs[i].releaseTime <= now &&                      
+  lockBoxStructs[i].balance > 0) {                                              
+            ⋮┆----------------------------------------
+          641┆ if (lockBoxStructs[i].releaseTime <= now &&                      
+  lockBoxStructs[i].balance > 0) {                                              
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          640┆ for (uint256 i = 0; i < lockBoxStructs.length; ++i) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           56┆ require(isOwner(msg.sender), "Sender is not owner");
+            ⋮┆----------------------------------------
+          183┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          238┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          362┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          366┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          423┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          428┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          484┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          485┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          486┆ );
+            ⋮┆----------------------------------------
+          514┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          589┆ require(now < endDepositTime, "Deposit time has ended.");
+            ⋮┆----------------------------------------
+          599┆ revert("Error: duration not allowed!");
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          641┆ if (lockBoxStructs[i].releaseTime <= now &&                      
+  lockBoxStructs[i].balance > 0) {                                              
+          642┆     withdraw(i);
+          643┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          238┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          366┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          423┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          484┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          485┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          486┆ );
+            ⋮┆----------------------------------------
+          514┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 29 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

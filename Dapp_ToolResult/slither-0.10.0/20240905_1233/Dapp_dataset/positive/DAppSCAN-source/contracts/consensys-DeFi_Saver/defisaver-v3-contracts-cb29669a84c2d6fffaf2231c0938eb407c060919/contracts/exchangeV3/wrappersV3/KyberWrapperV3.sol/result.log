@@ -1,0 +1,88 @@
+'solc --version' running
+'solc /sb/KyberWrapperV3.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+KyberWrapperV3.sendLeftOver(address) (../../sb/KyberWrapperV3.sol#588-594) sends eth to arbitrary user
+	Dangerous calls:
+	- msg.sender.transfer(address(this).balance) (../../sb/KyberWrapperV3.sol#589)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#functions-that-send-ether-to-arbitrary-destinations
+
+KyberWrapperV3.buy(address,address,uint256,bytes) (../../sb/KyberWrapperV3.sol#512-553) uses a dangerous strict equality:
+	- require(bool,string)(destAmount == _destAmount,Wrong dest amount) (../../sb/KyberWrapperV3.sol#539)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+KyberWrapperV3.getSellRate(address,address,uint256,bytes) (../../sb/KyberWrapperV3.sol#561-569) ignores return value by (rate,None) = KyberNetworkProxyInterface(KYBER_INTERFACE).getExpectedRate(IERC20(_srcAddr),IERC20(_destAddr),_srcAmount) (../../sb/KyberWrapperV3.sol#562-563)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+AdminVault.changeOwner(address)._owner (../../sb/KyberWrapperV3.sol#426) lacks a zero-check on :
+		- owner = _owner (../../sb/KyberWrapperV3.sol#428)
+AdminVault.changeAdmin(address)._admin (../../sb/KyberWrapperV3.sol#433) lacks a zero-check on :
+		- admin = _admin (../../sb/KyberWrapperV3.sol#435)
+AdminAuth.withdrawStuckFunds(address,address,uint256)._receiver (../../sb/KyberWrapperV3.sol#457) lacks a zero-check on :
+		- address(_receiver).transfer(_amount) (../../sb/KyberWrapperV3.sol#459)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Address.isContract(address) (../../sb/KyberWrapperV3.sol#28-39) uses assembly
+	- INLINE ASM (../../sb/KyberWrapperV3.sol#35-37)
+Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/KyberWrapperV3.sol#80-106) uses assembly
+	- INLINE ASM (../../sb/KyberWrapperV3.sol#98-101)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.functionCall(address,bytes) (../../sb/KyberWrapperV3.sol#49-51) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/KyberWrapperV3.sol#61-68) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/KyberWrapperV3.sol#70-78) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/KyberWrapperV3.sol#41-47) is never used and should be removed
+DSMath.div(uint256,uint256) (../../sb/KyberWrapperV3.sol#328-330) is never used and should be removed
+DSMath.imax(int256,int256) (../../sb/KyberWrapperV3.sol#344-346) is never used and should be removed
+DSMath.imin(int256,int256) (../../sb/KyberWrapperV3.sol#340-342) is never used and should be removed
+DSMath.max(uint256,uint256) (../../sb/KyberWrapperV3.sol#336-338) is never used and should be removed
+DSMath.min(uint256,uint256) (../../sb/KyberWrapperV3.sol#332-334) is never used and should be removed
+DSMath.rdiv(uint256,uint256) (../../sb/KyberWrapperV3.sol#363-365) is never used and should be removed
+DSMath.rmul(uint256,uint256) (../../sb/KyberWrapperV3.sol#355-357) is never used and should be removed
+DSMath.rpow(uint256,uint256) (../../sb/KyberWrapperV3.sol#382-392) is never used and should be removed
+DSMath.sub(uint256,uint256) (../../sb/KyberWrapperV3.sol#320-322) is never used and should be removed
+DSMath.wdiv(uint256,uint256) (../../sb/KyberWrapperV3.sol#359-361) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/KyberWrapperV3.sol#225-238) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/KyberWrapperV3.sol#213-223) is never used and should be removed
+SafeERC20.safeTransferFrom(IERC20,address,address,uint256) (../../sb/KyberWrapperV3.sol#188-198) is never used and should be removed
+SafeMath.add(uint256,uint256) (../../sb/KyberWrapperV3.sol#110-115) is never used and should be removed
+SafeMath.div(uint256,uint256) (../../sb/KyberWrapperV3.sol#146-148) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/KyberWrapperV3.sol#150-160) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/KyberWrapperV3.sol#162-164) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/KyberWrapperV3.sol#166-173) is never used and should be removed
+SafeMath.mul(uint256,uint256) (../../sb/KyberWrapperV3.sol#132-144) is never used and should be removed
+SafeMath.sub(uint256,uint256) (../../sb/KyberWrapperV3.sol#117-119) is never used and should be removed
+SafeMath.sub(uint256,uint256,string) (../../sb/KyberWrapperV3.sol#121-130) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.7.0 (../../sb/KyberWrapperV3.sol#1) allows old versions
+solc-0.7.6 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/KyberWrapperV3.sol#41-47):
+	- (success) = recipient.call{value: amount}() (../../sb/KyberWrapperV3.sol#45)
+Low level call in Address._functionCallWithValue(address,bytes,uint256,string) (../../sb/KyberWrapperV3.sol#80-106):
+	- (success,returndata) = target.call{value: weiValue}(data) (../../sb/KyberWrapperV3.sol#89)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter AdminVault.changeOwner(address)._owner (../../sb/KyberWrapperV3.sol#426) is not in mixedCase
+Parameter AdminVault.changeAdmin(address)._admin (../../sb/KyberWrapperV3.sol#433) is not in mixedCase
+Parameter AdminAuth.withdrawStuckFunds(address,address,uint256)._token (../../sb/KyberWrapperV3.sol#457) is not in mixedCase
+Parameter AdminAuth.withdrawStuckFunds(address,address,uint256)._receiver (../../sb/KyberWrapperV3.sol#457) is not in mixedCase
+Parameter AdminAuth.withdrawStuckFunds(address,address,uint256)._amount (../../sb/KyberWrapperV3.sol#457) is not in mixedCase
+Parameter KyberWrapperV3.sell(address,address,uint256,bytes)._srcAddr (../../sb/KyberWrapperV3.sol#484) is not in mixedCase
+Parameter KyberWrapperV3.sell(address,address,uint256,bytes)._destAddr (../../sb/KyberWrapperV3.sol#484) is not in mixedCase
+Parameter KyberWrapperV3.sell(address,address,uint256,bytes)._srcAmount (../../sb/KyberWrapperV3.sol#484) is not in mixedCase
+Parameter KyberWrapperV3.buy(address,address,uint256,bytes)._srcAddr (../../sb/KyberWrapperV3.sol#512) is not in mixedCase
+Parameter KyberWrapperV3.buy(address,address,uint256,bytes)._destAddr (../../sb/KyberWrapperV3.sol#512) is not in mixedCase
+Parameter KyberWrapperV3.buy(address,address,uint256,bytes)._destAmount (../../sb/KyberWrapperV3.sol#512) is not in mixedCase
+Parameter KyberWrapperV3.getSellRate(address,address,uint256,bytes)._srcAddr (../../sb/KyberWrapperV3.sol#561) is not in mixedCase
+Parameter KyberWrapperV3.getSellRate(address,address,uint256,bytes)._destAddr (../../sb/KyberWrapperV3.sol#561) is not in mixedCase
+Parameter KyberWrapperV3.getSellRate(address,address,uint256,bytes)._srcAmount (../../sb/KyberWrapperV3.sol#561) is not in mixedCase
+Parameter KyberWrapperV3.getBuyRate(address,address,uint256,bytes)._srcAddr (../../sb/KyberWrapperV3.sol#576) is not in mixedCase
+Parameter KyberWrapperV3.getBuyRate(address,address,uint256,bytes)._destAddr (../../sb/KyberWrapperV3.sol#576) is not in mixedCase
+Parameter KyberWrapperV3.getBuyRate(address,address,uint256,bytes)._destAmount (../../sb/KyberWrapperV3.sol#576) is not in mixedCase
+Parameter KyberWrapperV3.getBuyRate(address,address,uint256,bytes)._additionalData (../../sb/KyberWrapperV3.sol#576) is not in mixedCase
+Parameter KyberWrapperV3.sendLeftOver(address)._srcAddr (../../sb/KyberWrapperV3.sol#588) is not in mixedCase
+Parameter KyberWrapperV3.getDecimals(address)._token (../../sb/KyberWrapperV3.sol#599) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+/sb/KyberWrapperV3.sol analyzed (11 contracts with 93 detectors), 57 result(s) found

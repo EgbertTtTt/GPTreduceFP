@@ -1,0 +1,87 @@
+'solc --version' running
+'solc /sb/vault.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+Vault.withdraw(bytes,uint256,bytes32[],bool[],bytes32,bytes32,uint256[],uint8[],bytes32[],bytes32[]) (../../sb/vault.sol#397-450) sends eth to arbitrary user
+	Dangerous calls:
+	- (success) = data.to.call{value: data.amount}() (../../sb/vault.sol#443)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#functions-that-send-ether-to-arbitrary-destinations
+
+Reentrancy in Vault.execute(address,uint256,address,address,bytes,bytes,bytes) (../../sb/vault.sol#600-635):
+	External calls:
+	- IERC20(token).transfer(exchangeAddress,amount) (../../sb/vault.sol#627)
+	- returnedAmount = callExtFunc(recipientToken,ethAmount,callData,exchangeAddress) (../../sb/vault.sol#630)
+		- (success,result) = exchangeAddress.call{value: ethAmount}(callData) (../../sb/vault.sol#647)
+	External calls sending eth:
+	- returnedAmount = callExtFunc(recipientToken,ethAmount,callData,exchangeAddress) (../../sb/vault.sol#630)
+		- (success,result) = exchangeAddress.call{value: ethAmount}(callData) (../../sb/vault.sol#647)
+	State variables written after the call(s):
+	- totalDepositedToSCAmount[recipientToken] = totalDepositedToSCAmount[recipientToken].safeAdd(returnedAmount) (../../sb/vault.sol#634)
+	Vault.totalDepositedToSCAmount (../../sb/vault.sol#172) can be used in cross function reentrancies:
+	- Vault.totalDepositedToSCAmount (../../sb/vault.sol#172)
+	- Vault.updateAssets(address[],uint256[]) (../../sb/vault.sol#700-709)
+	- withdrawRequests[verifier][recipientToken] = withdrawRequests[verifier][recipientToken].safeAdd(returnedAmount) (../../sb/vault.sol#633)
+	Vault.withdrawRequests (../../sb/vault.sol#170) can be used in cross function reentrancies:
+	- Vault.getDepositedBalance(address,address) (../../sb/vault.sol#683-691)
+	- Vault.withdrawRequests (../../sb/vault.sol#170)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities
+
+IERC20 (../../sb/vault.sol#9-92) has incorrect ERC20 function interface:IERC20.transfer(address,uint256) (../../sb/vault.sol#27)
+IERC20 (../../sb/vault.sol#9-92) has incorrect ERC20 function interface:IERC20.approve(address,uint256) (../../sb/vault.sol#52)
+IERC20 (../../sb/vault.sol#9-92) has incorrect ERC20 function interface:IERC20.transferFrom(address,address,uint256) (../../sb/vault.sol#63)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-erc20-interface
+
+Vault.callExtFunc(address,uint256,bytes,address) (../../sb/vault.sol#640-654) uses a dangerous strict equality:
+	- require(bool,string)(returnedTokenAddress == recipientToken && balanceOf(recipientToken).safeSub(balanceBeforeTrade) == returnedAmount,errorToString(Errors.INVALID_RETURN_DATA)) (../../sb/vault.sol#651)
+Vault.depositERC20(address,uint256,string) (../../sb/vault.sol#283-299) uses a dangerous strict equality:
+	- require(bool,string)(balanceOf(token).safeSub(beforeTransfer) == amount,errorToString(Errors.NOT_EQUAL)) (../../sb/vault.sol#296)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Vault._incognito() (../../sb/vault.sol#254-260) uses assembly
+	- INLINE ASM (../../sb/vault.sol#257-259)
+Vault.parseBurnInst(bytes) (../../sb/vault.sol#322-342) uses assembly
+	- INLINE ASM (../../sb/vault.sol#330-336)
+Vault.sigToAddress(bytes,bytes32) (../../sb/vault.sol#521-531) uses assembly
+	- INLINE ASM (../../sb/vault.sol#525-528)
+Vault.checkSuccess() (../../sb/vault.sol#721-745) uses assembly
+	- INLINE ASM (../../sb/vault.sol#723-743)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+SafeMath.safeDiv(uint256,uint256) (../../sb/vault.sol#104-109) is never used and should be removed
+SafeMath.safeMul(uint256,uint256) (../../sb/vault.sol#98-102) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.6.6 (../../sb/vault.sol#1) allows old versions
+solc-0.6.6 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Vault.withdraw(bytes,uint256,bytes32[],bool[],bytes32,bytes32,uint256[],uint8[],bytes32[],bytes32[]) (../../sb/vault.sol#397-450):
+	- (success) = data.to.call{value: data.amount}() (../../sb/vault.sol#443)
+Low level call in Vault.callExtFunc(address,uint256,bytes,address) (../../sb/vault.sol#640-654):
+	- (success,result) = exchangeAddress.call{value: ethAmount}(callData) (../../sb/vault.sol#647)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter Vault.initialize(address)._prevVault (../../sb/vault.sol#244) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+withdraw(bytes,uint256,bytes32[],bool[],bytes32,bytes32,uint256[],uint8[],bytes32[],bytes32[]) should be declared external:
+	- Vault.withdraw(bytes,uint256,bytes32[],bool[],bytes32,bytes32,uint256[],uint8[],bytes32[],bytes32[]) (../../sb/vault.sol#397-450)
+Moreover, the following function parameters should change its data location:
+inst location should be calldata
+instPaths location should be calldata
+instPathIsLefts location should be calldata
+sigIdxs location should be calldata
+sigVs location should be calldata
+sigRs location should be calldata
+sigSs location should be calldata
+submitBurnProof(bytes,uint256,bytes32[],bool[],bytes32,bytes32,uint256[],uint8[],bytes32[],bytes32[]) should be declared external:
+	- Vault.submitBurnProof(bytes,uint256,bytes32[],bool[],bytes32,bytes32,uint256[],uint8[],bytes32[],bytes32[]) (../../sb/vault.sol#469-516)
+Moreover, the following function parameters should change its data location:
+inst location should be calldata
+instPaths location should be calldata
+instPathIsLefts location should be calldata
+sigIdxs location should be calldata
+sigVs location should be calldata
+sigRs location should be calldata
+sigSs location should be calldata
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#public-function-that-could-be-declared-external
+/sb/vault.sol analyzed (5 contracts with 93 detectors), 20 result(s) found

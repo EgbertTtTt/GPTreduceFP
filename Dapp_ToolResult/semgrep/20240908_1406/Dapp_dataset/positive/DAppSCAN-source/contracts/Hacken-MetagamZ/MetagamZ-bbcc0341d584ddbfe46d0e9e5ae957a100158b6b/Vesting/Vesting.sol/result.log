@@ -1,0 +1,151 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 26 Code Findings │
+└──────────────────┘
+                    
+    /sb/Vesting.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          201┆ contract TokenVesting is Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          319┆ for (uint256 i = 0; i < _receivers.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          217┆ constructor(address _tokenAddress) {
+          218┆     require(_tokenAddress != address(0), "Zero token address");
+          219┆     ERC20Interface = IERC20(_tokenAddress);
+          220┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          319┆ for (uint256 i = 0; i < _receivers.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          144┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          164┆ require(
+          165┆     newOwner != address(0),
+          166┆     "Ownable: new owner is the zero address"
+          167┆ );
+            ⋮┆----------------------------------------
+          218┆ require(_tokenAddress != address(0), "Zero token address");
+            ⋮┆----------------------------------------
+          237┆ require(_receiver != address(0), "Zero receiver address");
+            ⋮┆----------------------------------------
+          238┆ require(_amount > 0, "Zero amount");
+            ⋮┆----------------------------------------
+          239┆ require(_release > block.timestamp, "Incorrect release time");
+            ⋮┆----------------------------------------
+          260┆ require(id > 0 && id <= totalVestings, "Id out of bounds");
+            ⋮┆----------------------------------------
+          262┆ require(!vestingDetail.expired, "ID expired");
+            ⋮┆----------------------------------------
+          263┆ require(
+          264┆     block.timestamp >= vestingDetail.release,
+          265┆     "Release time not reached"
+          266┆ );
+            ⋮┆----------------------------------------
+          285┆ require(id > 0 && id <= totalVestings, "Id out of bounds");
+            ⋮┆----------------------------------------
+          287┆ require(
+          288┆     block.timestamp < vestingDetail.release,
+          289┆     "Release time already reached"
+          290┆ );
+            ⋮┆----------------------------------------
+          291┆ require(!vestingDetail.expired, "ID expired");
+            ⋮┆----------------------------------------
+          312┆ require(
+          313┆     _receivers.length == _amounts.length &&
+          314┆         _amounts.length == _releases.length,
+          315┆     "Invalid data"
+          316┆ );
+            ⋮┆----------------------------------------
+          325┆ require(success, "Creation of vesting failed");
+            ⋮┆----------------------------------------
+          346┆ require(amount <= ourAllowance, "Make sure to add enough         
+  allowance");                                                                  
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          260┆ require(id > 0 && id <= totalVestings, "Id out of bounds");
+            ⋮┆----------------------------------------
+          285┆ require(id > 0 && id <= totalVestings, "Id out of bounds");
+            ⋮┆----------------------------------------
+          312┆ require(
+          313┆     _receivers.length == _amounts.length &&
+          314┆         _amounts.length == _releases.length,
+          315┆     "Invalid data"
+          316┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          241┆ totalVestings++;
+            ⋮┆----------------------------------------
+          319┆ for (uint256 i = 0; i < _receivers.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          164┆ require(
+          165┆     newOwner != address(0),
+          166┆     "Ownable: new owner is the zero address"
+          167┆ );
+            ⋮┆----------------------------------------
+          346┆ require(amount <= ourAllowance, "Make sure to add enough         
+  allowance");                                                                  
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 26 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

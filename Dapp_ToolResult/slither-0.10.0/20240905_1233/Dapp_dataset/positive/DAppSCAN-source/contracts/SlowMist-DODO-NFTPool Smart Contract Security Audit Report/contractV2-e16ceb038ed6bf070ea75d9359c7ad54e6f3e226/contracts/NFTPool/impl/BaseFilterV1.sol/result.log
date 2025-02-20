@@ -1,0 +1,172 @@
+'solc --version' running
+'solc /sb/BaseFilterV1.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/BaseFilterV1.sol:
+Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> /sb/BaseFilterV1.sol:375:9:
+    |
+375 |         bool toggleFlag
+    |         ^^^^^^^^^^^^^^^
+
+Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> /sb/BaseFilterV1.sol:394:9:
+    |
+394 |         bool toggleFlag
+    |         ^^^^^^^^^^^^^^^
+
+Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> /sb/BaseFilterV1.sol:413:9:
+    |
+413 |         bool toggleFlag
+    |         ^^^^^^^^^^^^^^^
+
+Warning: Function state mutability can be restricted to pure
+   --> /sb/BaseFilterV1.sol:337:5:
+    |
+337 |     function _geometricCalc(
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+BaseFilterV1._NFT_COLLECTION_ (../../sb/BaseFilterV1.sol#202) is never initialized. It is used in:
+	- BaseFilterV1.isNFTValid(address,uint256) (../../sb/BaseFilterV1.sol#242-248)
+BaseFilterV1._NFT_IDS_ (../../sb/BaseFilterV1.sol#212) is never initialized. It is used in:
+	- BaseFilterV1.getNFTIndexById(uint256) (../../sb/BaseFilterV1.sol#270-277)
+BaseFilterV1._TOTAL_NFT_AMOUNT_ (../../sb/BaseFilterV1.sol#213) is never initialized. It is used in:
+	- BaseFilterV1.getAvaliableNFTInAmount() (../../sb/BaseFilterV1.sol#254-260)
+	- BaseFilterV1.getAvaliableNFTOutAmount() (../../sb/BaseFilterV1.sol#262-268)
+	- BaseFilterV1.queryNFTIn(uint256) (../../sb/BaseFilterV1.sol#281-297)
+	- BaseFilterV1.queryNFTTargetOut(uint256) (../../sb/BaseFilterV1.sol#299-315)
+	- BaseFilterV1.queryNFTRandomOut(uint256) (../../sb/BaseFilterV1.sol#317-333)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-state-variables
+
+DecimalMath.powFloor(uint256,uint256) (../../sb/BaseFilterV1.sol#165-178) performs a multiplication on the result of a division:
+	- p = p.mul(p) / (10 ** 18) (../../sb/BaseFilterV1.sol#172)
+	- p = p.mul(target) / (10 ** 18) (../../sb/BaseFilterV1.sol#174)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+BaseFilterV1.queryNFTIn(uint256) (../../sb/BaseFilterV1.sol#281-297) ignores return value by (None,None,received) = IFilterAdmin(_OWNER_).queryMintFee(rawReceive) (../../sb/BaseFilterV1.sol#296)
+BaseFilterV1.queryNFTTargetOut(uint256) (../../sb/BaseFilterV1.sol#299-315) ignores return value by (None,None,pay) = IFilterAdmin(_OWNER_).queryBurnFee(rawPay) (../../sb/BaseFilterV1.sol#314)
+BaseFilterV1.queryNFTRandomOut(uint256) (../../sb/BaseFilterV1.sol#317-333) ignores return value by (None,None,pay) = IFilterAdmin(_OWNER_).queryBurnFee(rawPay) (../../sb/BaseFilterV1.sol#332)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+InitializableOwnable.initOwner(address).newOwner (../../sb/BaseFilterV1.sol#30) lacks a zero-check on :
+		- _OWNER_ = newOwner (../../sb/BaseFilterV1.sol#32)
+InitializableOwnable.transferOwnership(address).newOwner (../../sb/BaseFilterV1.sol#35) lacks a zero-check on :
+		- _NEW_OWNER_ = newOwner (../../sb/BaseFilterV1.sol#37)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in BaseFilterV1.changeNFTAmountRange(uint256,uint256) (../../sb/BaseFilterV1.sol#421-426):
+	External calls:
+	- onlySuperOwner() (../../sb/BaseFilterV1.sol#423)
+		- require(bool,string)(msg.sender == IFilterAdmin(_OWNER_)._OWNER_(),ONLY_SUPER_OWNER) (../../sb/BaseFilterV1.sol#236)
+	State variables written after the call(s):
+	- _changeNFTAmountRange(maxNFTAmount,minNFTAmount) (../../sb/BaseFilterV1.sol#425)
+		- _MAX_NFT_AMOUNT_ = maxNFTAmount (../../sb/BaseFilterV1.sol#430)
+	- _changeNFTAmountRange(maxNFTAmount,minNFTAmount) (../../sb/BaseFilterV1.sol#425)
+		- _MIN_NFT_AMOUNT_ = minNFTAmount (../../sb/BaseFilterV1.sol#431)
+Reentrancy in BaseFilterV1.changeNFTInPrice(uint256,uint256,bool) (../../sb/BaseFilterV1.sol#364-370):
+	External calls:
+	- onlySuperOwner() (../../sb/BaseFilterV1.sol#368)
+		- require(bool,string)(msg.sender == IFilterAdmin(_OWNER_)._OWNER_(),ONLY_SUPER_OWNER) (../../sb/BaseFilterV1.sol#236)
+	State variables written after the call(s):
+	- _changeNFTInPrice(newGsStart,newCr,toggleFlag) (../../sb/BaseFilterV1.sol#369)
+		- _CR_IN_ = newCr (../../sb/BaseFilterV1.sol#379)
+	- _changeNFTInPrice(newGsStart,newCr,toggleFlag) (../../sb/BaseFilterV1.sol#369)
+		- _GS_START_IN_ = newGsStart (../../sb/BaseFilterV1.sol#378)
+	- _changeNFTInPrice(newGsStart,newCr,toggleFlag) (../../sb/BaseFilterV1.sol#369)
+		- _NFT_IN_TOGGLE_ = true (../../sb/BaseFilterV1.sol#380)
+Reentrancy in BaseFilterV1.changeNFTRandomInPrice(uint256,uint256,bool) (../../sb/BaseFilterV1.sol#383-389):
+	External calls:
+	- onlySuperOwner() (../../sb/BaseFilterV1.sol#387)
+		- require(bool,string)(msg.sender == IFilterAdmin(_OWNER_)._OWNER_(),ONLY_SUPER_OWNER) (../../sb/BaseFilterV1.sol#236)
+	State variables written after the call(s):
+	- _changeNFTRandomInPrice(newGsStart,newCr,toggleFlag) (../../sb/BaseFilterV1.sol#388)
+		- _CR_RANDOM_OUT_ = newCr (../../sb/BaseFilterV1.sol#398)
+	- _changeNFTRandomInPrice(newGsStart,newCr,toggleFlag) (../../sb/BaseFilterV1.sol#388)
+		- _GS_START_RANDOM_OUT_ = newGsStart (../../sb/BaseFilterV1.sol#397)
+	- _changeNFTRandomInPrice(newGsStart,newCr,toggleFlag) (../../sb/BaseFilterV1.sol#388)
+		- _NFT_RANDOM_OUT_TOGGLE_ = true (../../sb/BaseFilterV1.sol#399)
+Reentrancy in BaseFilterV1.changeNFTTargetOutPrice(uint256,uint256,bool) (../../sb/BaseFilterV1.sol#402-408):
+	External calls:
+	- onlySuperOwner() (../../sb/BaseFilterV1.sol#406)
+		- require(bool,string)(msg.sender == IFilterAdmin(_OWNER_)._OWNER_(),ONLY_SUPER_OWNER) (../../sb/BaseFilterV1.sol#236)
+	State variables written after the call(s):
+	- _changeNFTTargetOutPrice(newGsStart,newCr,toggleFlag) (../../sb/BaseFilterV1.sol#407)
+		- _CR_TARGET_OUT_ = newCr (../../sb/BaseFilterV1.sol#417)
+	- _changeNFTTargetOutPrice(newGsStart,newCr,toggleFlag) (../../sb/BaseFilterV1.sol#407)
+		- _GS_START_TARGET_OUT_ = newGsStart (../../sb/BaseFilterV1.sol#416)
+	- _changeNFTTargetOutPrice(newGsStart,newCr,toggleFlag) (../../sb/BaseFilterV1.sol#407)
+		- _NFT_TARGET_OUT_TOGGLE_ = true (../../sb/BaseFilterV1.sol#418)
+Reentrancy in BaseFilterV1.changeTokenIdMap(uint256[],bool[]) (../../sb/BaseFilterV1.sol#445-450):
+	External calls:
+	- onlySuperOwner() (../../sb/BaseFilterV1.sol#447)
+		- require(bool,string)(msg.sender == IFilterAdmin(_OWNER_)._OWNER_(),ONLY_SUPER_OWNER) (../../sb/BaseFilterV1.sol#236)
+	State variables written after the call(s):
+	- _changeTokenIdMap(tokenIds,isRegistered) (../../sb/BaseFilterV1.sol#449)
+		- _SPREAD_IDS_REGISTRY_[tokenIds[i]] = isRegistered[i] (../../sb/BaseFilterV1.sol#456)
+Reentrancy in BaseFilterV1.changeTokenIdRange(uint256,uint256) (../../sb/BaseFilterV1.sol#434-436):
+	External calls:
+	- onlySuperOwner() (../../sb/BaseFilterV1.sol#434)
+		- require(bool,string)(msg.sender == IFilterAdmin(_OWNER_)._OWNER_(),ONLY_SUPER_OWNER) (../../sb/BaseFilterV1.sol#236)
+	State variables written after the call(s):
+	- _changeTokenIdRange(nftIdStart,nftIdEnd) (../../sb/BaseFilterV1.sol#435)
+		- _NFT_ID_END_ = nftIdEnd (../../sb/BaseFilterV1.sol#442)
+	- _changeTokenIdRange(nftIdStart,nftIdEnd) (../../sb/BaseFilterV1.sol#435)
+		- _NFT_ID_START_ = nftIdStart (../../sb/BaseFilterV1.sol#441)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+DecimalMath.divCeil(uint256,uint256) (../../sb/BaseFilterV1.sol#153-155) is never used and should be removed
+DecimalMath.divFloor(uint256,uint256) (../../sb/BaseFilterV1.sol#149-151) is never used and should be removed
+DecimalMath.mulCeil(uint256,uint256) (../../sb/BaseFilterV1.sol#145-147) is never used and should be removed
+DecimalMath.mulFloor(uint256,uint256) (../../sb/BaseFilterV1.sol#141-143) is never used and should be removed
+DecimalMath.reciprocalCeil(uint256) (../../sb/BaseFilterV1.sol#161-163) is never used and should be removed
+DecimalMath.reciprocalFloor(uint256) (../../sb/BaseFilterV1.sol#157-159) is never used and should be removed
+SafeMath.add(uint256,uint256) (../../sb/BaseFilterV1.sol#80-84) is never used and should be removed
+SafeMath.divCeil(uint256,uint256) (../../sb/BaseFilterV1.sol#65-73) is never used and should be removed
+SafeMath.sqrt(uint256) (../../sb/BaseFilterV1.sol#86-93) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.6.9 (../../sb/BaseFilterV1.sol#1) is known to contain severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+solc-0.6.9 is known to contain severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Variable InitializableOwnable._OWNER_ (../../sb/BaseFilterV1.sol#6) is not in mixedCase
+Variable InitializableOwnable._NEW_OWNER_ (../../sb/BaseFilterV1.sol#7) is not in mixedCase
+Variable InitializableOwnable._INITIALIZED_ (../../sb/BaseFilterV1.sol#8) is not in mixedCase
+Function IFilterAdmin._OWNER_() (../../sb/BaseFilterV1.sol#97) is not in mixedCase
+Function IFilterAdmin._CONTROLLER_() (../../sb/BaseFilterV1.sol#99) is not in mixedCase
+Variable ReentrancyGuard._ENTERED_ (../../sb/BaseFilterV1.sol#184) is not in mixedCase
+Parameter BaseFilterV1.queryNFTIn(uint256).NFTInAmount (../../sb/BaseFilterV1.sol#281) is not in mixedCase
+Parameter BaseFilterV1.queryNFTTargetOut(uint256).NFTOutAmount (../../sb/BaseFilterV1.sol#299) is not in mixedCase
+Parameter BaseFilterV1.queryNFTRandomOut(uint256).NFTOutAmount (../../sb/BaseFilterV1.sol#317) is not in mixedCase
+Function BaseFilterV1._getRandomNum() (../../sb/BaseFilterV1.sol#356-360) is not in mixedCase
+Variable BaseFilterV1._NFT_COLLECTION_ (../../sb/BaseFilterV1.sol#202) is not in mixedCase
+Variable BaseFilterV1._NFT_ID_START_ (../../sb/BaseFilterV1.sol#203) is not in mixedCase
+Variable BaseFilterV1._NFT_ID_END_ (../../sb/BaseFilterV1.sol#204) is not in mixedCase
+Variable BaseFilterV1._SPREAD_IDS_REGISTRY_ (../../sb/BaseFilterV1.sol#207) is not in mixedCase
+Variable BaseFilterV1._NFT_RESERVE_ (../../sb/BaseFilterV1.sol#210) is not in mixedCase
+Variable BaseFilterV1._NFT_IDS_ (../../sb/BaseFilterV1.sol#212) is not in mixedCase
+Variable BaseFilterV1._TOTAL_NFT_AMOUNT_ (../../sb/BaseFilterV1.sol#213) is not in mixedCase
+Variable BaseFilterV1._MAX_NFT_AMOUNT_ (../../sb/BaseFilterV1.sol#214) is not in mixedCase
+Variable BaseFilterV1._MIN_NFT_AMOUNT_ (../../sb/BaseFilterV1.sol#215) is not in mixedCase
+Variable BaseFilterV1._GS_START_IN_ (../../sb/BaseFilterV1.sol#221) is not in mixedCase
+Variable BaseFilterV1._CR_IN_ (../../sb/BaseFilterV1.sol#222) is not in mixedCase
+Variable BaseFilterV1._NFT_IN_TOGGLE_ (../../sb/BaseFilterV1.sol#223) is not in mixedCase
+Variable BaseFilterV1._GS_START_RANDOM_OUT_ (../../sb/BaseFilterV1.sol#226) is not in mixedCase
+Variable BaseFilterV1._CR_RANDOM_OUT_ (../../sb/BaseFilterV1.sol#227) is not in mixedCase
+Variable BaseFilterV1._NFT_RANDOM_OUT_TOGGLE_ (../../sb/BaseFilterV1.sol#228) is not in mixedCase
+Variable BaseFilterV1._GS_START_TARGET_OUT_ (../../sb/BaseFilterV1.sol#231) is not in mixedCase
+Variable BaseFilterV1._CR_TARGET_OUT_ (../../sb/BaseFilterV1.sol#232) is not in mixedCase
+Variable BaseFilterV1._NFT_TARGET_OUT_TOGGLE_ (../../sb/BaseFilterV1.sol#233) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+DecimalMath.ONE (../../sb/BaseFilterV1.sol#138) is never used in DecimalMath (../../sb/BaseFilterV1.sol#135-179)
+DecimalMath.ONE2 (../../sb/BaseFilterV1.sol#139) is never used in DecimalMath (../../sb/BaseFilterV1.sol#135-179)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-state-variable
+
+Loop condition i < _NFT_IDS_.length (../../sb/BaseFilterV1.sol#272) should use cached array length instead of referencing `length` member of the storage array.
+ Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cache-array-length
+
+BaseFilterV1._NFT_COLLECTION_ (../../sb/BaseFilterV1.sol#202) should be constant 
+BaseFilterV1._TOTAL_NFT_AMOUNT_ (../../sb/BaseFilterV1.sol#213) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+/sb/BaseFilterV1.sol analyzed (6 contracts with 93 detectors), 59 result(s) found

@@ -1,0 +1,330 @@
+'solc --version' running
+'solc /sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol:
+Warning: Documentation tag on non-public state variables will be disallowed in 0.7.0. You will need to use the @dev tag explicitly.
+    --> /sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol:1044:5:
+     |
+1044 |     /// @notice A record of each accounts delegate
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+MasterChef.pendingMelody(uint256,address) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1438-1449) performs a multiplication on the result of a division:
+	- melodyReward = poolReward.mul(pool.allocPoint).div(totalAllocPoint) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1445)
+	- accMelodyPerShare = accMelodyPerShare.add(melodyReward.mul(1e12).div(lpSupply)) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1446)
+MasterChef.updatePool(uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1461-1479) performs a multiplication on the result of a division:
+	- melodyReward = poolReward.mul(pool.allocPoint).div(totalAllocPoint) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1472)
+	- treasuryReward = melodyReward.mul(8).div(100) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1473)
+MasterChef.updatePool(uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1461-1479) performs a multiplication on the result of a division:
+	- melodyReward = poolReward.mul(pool.allocPoint).div(totalAllocPoint) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1472)
+	- contractReward = melodyReward.mul(92).div(100) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1474)
+MasterChef.updatePool(uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1461-1479) performs a multiplication on the result of a division:
+	- melodyReward = poolReward.mul(pool.allocPoint).div(totalAllocPoint) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1472)
+	- pool.accMelodyPerShare = pool.accMelodyPerShare.add(melodyReward.mul(1e12).div(lpSupply)) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1477)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+MelodyToken._writeCheckpoint(address,uint32,uint256,uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1237-1255) uses a dangerous strict equality:
+	- nCheckpoints > 0 && checkpoints[delegatee][nCheckpoints - 1].fromBlock == blockNumber (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1247)
+MasterChef.updatePool(uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1461-1479) uses a dangerous strict equality:
+	- lpSupply == 0 || pool.allocPoint == 0 (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1467)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Reentrancy in MasterChef.add(uint256,IBEP20,uint16,bool) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1375-1390):
+	External calls:
+	- massUpdatePools() (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1378)
+		- melody.mint(devaddr,treasuryReward) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1475)
+		- melody.mint(address(this),contractReward) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1476)
+	State variables written after the call(s):
+	- poolExistence[_lpToken] = true (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1382)
+	MasterChef.poolExistence (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1368) can be used in cross function reentrancies:
+	- MasterChef.add(uint256,IBEP20,uint16,bool) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1375-1390)
+	- MasterChef.nonDuplicated(IBEP20) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1369-1372)
+	- MasterChef.poolExistence (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1368)
+	- poolInfo.push(PoolInfo({lpToken:_lpToken,allocPoint:_allocPoint,lastRewardBlock:lastRewardBlock,accMelodyPerShare:0,depositFeeBP:_depositFeeBP})) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1383-1389)
+	MasterChef.poolInfo (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1324) can be used in cross function reentrancies:
+	- MasterChef.add(uint256,IBEP20,uint16,bool) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1375-1390)
+	- MasterChef.massUpdatePools() (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1452-1458)
+	- MasterChef.pendingMelody(uint256,address) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1438-1449)
+	- MasterChef.poolInfo (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1324)
+	- MasterChef.poolLength() (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1364-1366)
+	- MasterChef.set(uint256,uint256,uint16,bool) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1393-1401)
+	- MasterChef.updatePool(uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1461-1479)
+	- totalAllocPoint = totalAllocPoint.add(_allocPoint) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1381)
+	MasterChef.totalAllocPoint (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1329) can be used in cross function reentrancies:
+	- MasterChef.add(uint256,IBEP20,uint16,bool) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1375-1390)
+	- MasterChef.pendingMelody(uint256,address) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1438-1449)
+	- MasterChef.set(uint256,uint256,uint16,bool) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1393-1401)
+	- MasterChef.totalAllocPoint (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1329)
+	- MasterChef.updatePool(uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1461-1479)
+Reentrancy in MasterChef.deposit(uint256,uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1482-1504):
+	External calls:
+	- updatePool(_pid) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1485)
+		- melody.mint(devaddr,treasuryReward) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1475)
+		- melody.mint(address(this),contractReward) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1476)
+	- safeMelodyTransfer(msg.sender,pending) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1489)
+		- transferSuccess = melody.transfer(_to,melodyBal) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1540)
+		- transferSuccess = melody.transfer(_to,_amount) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1542)
+	- pool.lpToken.safeTransferFrom(address(msg.sender),address(this),_amount) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1493)
+	- pool.lpToken.safeTransfer(feeAddress,depositFee) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1496)
+	State variables written after the call(s):
+	- user.amount = user.amount.add(_amount).sub(depositFee) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1497)
+	MasterChef.userInfo (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1327) can be used in cross function reentrancies:
+	- MasterChef.pendingMelody(uint256,address) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1438-1449)
+	- MasterChef.userInfo (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1327)
+Reentrancy in MasterChef.deposit(uint256,uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1482-1504):
+	External calls:
+	- updatePool(_pid) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1485)
+		- melody.mint(devaddr,treasuryReward) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1475)
+		- melody.mint(address(this),contractReward) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1476)
+	- safeMelodyTransfer(msg.sender,pending) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1489)
+		- transferSuccess = melody.transfer(_to,melodyBal) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1540)
+		- transferSuccess = melody.transfer(_to,_amount) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1542)
+	- pool.lpToken.safeTransferFrom(address(msg.sender),address(this),_amount) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1493)
+	State variables written after the call(s):
+	- user.amount = user.amount.add(_amount) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1499)
+	MasterChef.userInfo (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1327) can be used in cross function reentrancies:
+	- MasterChef.pendingMelody(uint256,address) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1438-1449)
+	- MasterChef.userInfo (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1327)
+Reentrancy in MasterChef.set(uint256,uint256,uint16,bool) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1393-1401):
+	External calls:
+	- massUpdatePools() (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1396)
+		- melody.mint(devaddr,treasuryReward) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1475)
+		- melody.mint(address(this),contractReward) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1476)
+	State variables written after the call(s):
+	- poolInfo[_pid].allocPoint = _allocPoint (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1399)
+	MasterChef.poolInfo (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1324) can be used in cross function reentrancies:
+	- MasterChef.add(uint256,IBEP20,uint16,bool) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1375-1390)
+	- MasterChef.massUpdatePools() (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1452-1458)
+	- MasterChef.pendingMelody(uint256,address) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1438-1449)
+	- MasterChef.poolInfo (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1324)
+	- MasterChef.poolLength() (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1364-1366)
+	- MasterChef.set(uint256,uint256,uint16,bool) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1393-1401)
+	- MasterChef.updatePool(uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1461-1479)
+	- poolInfo[_pid].depositFeeBP = _depositFeeBP (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1400)
+	MasterChef.poolInfo (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1324) can be used in cross function reentrancies:
+	- MasterChef.add(uint256,IBEP20,uint16,bool) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1375-1390)
+	- MasterChef.massUpdatePools() (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1452-1458)
+	- MasterChef.pendingMelody(uint256,address) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1438-1449)
+	- MasterChef.poolInfo (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1324)
+	- MasterChef.poolLength() (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1364-1366)
+	- MasterChef.set(uint256,uint256,uint16,bool) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1393-1401)
+	- MasterChef.updatePool(uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1461-1479)
+	- totalAllocPoint = totalAllocPoint.sub(poolInfo[_pid].allocPoint).add(_allocPoint) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1398)
+	MasterChef.totalAllocPoint (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1329) can be used in cross function reentrancies:
+	- MasterChef.add(uint256,IBEP20,uint16,bool) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1375-1390)
+	- MasterChef.pendingMelody(uint256,address) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1438-1449)
+	- MasterChef.set(uint256,uint256,uint16,bool) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1393-1401)
+	- MasterChef.totalAllocPoint (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1329)
+	- MasterChef.updatePool(uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1461-1479)
+Reentrancy in MasterChef.updatePool(uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1461-1479):
+	External calls:
+	- melody.mint(devaddr,treasuryReward) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1475)
+	- melody.mint(address(this),contractReward) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1476)
+	State variables written after the call(s):
+	- pool.accMelodyPerShare = pool.accMelodyPerShare.add(melodyReward.mul(1e12).div(lpSupply)) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1477)
+	MasterChef.poolInfo (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1324) can be used in cross function reentrancies:
+	- MasterChef.add(uint256,IBEP20,uint16,bool) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1375-1390)
+	- MasterChef.massUpdatePools() (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1452-1458)
+	- MasterChef.pendingMelody(uint256,address) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1438-1449)
+	- MasterChef.poolInfo (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1324)
+	- MasterChef.poolLength() (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1364-1366)
+	- MasterChef.set(uint256,uint256,uint16,bool) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1393-1401)
+	- MasterChef.updatePool(uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1461-1479)
+	- pool.lastRewardBlock = block.number (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1478)
+	MasterChef.poolInfo (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1324) can be used in cross function reentrancies:
+	- MasterChef.add(uint256,IBEP20,uint16,bool) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1375-1390)
+	- MasterChef.massUpdatePools() (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1452-1458)
+	- MasterChef.pendingMelody(uint256,address) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1438-1449)
+	- MasterChef.poolInfo (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1324)
+	- MasterChef.poolLength() (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1364-1366)
+	- MasterChef.set(uint256,uint256,uint16,bool) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1393-1401)
+	- MasterChef.updatePool(uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1461-1479)
+Reentrancy in MasterChef.withdraw(uint256,uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1507-1522):
+	External calls:
+	- updatePool(_pid) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1511)
+		- melody.mint(devaddr,treasuryReward) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1475)
+		- melody.mint(address(this),contractReward) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1476)
+	- safeMelodyTransfer(msg.sender,pending) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1514)
+		- transferSuccess = melody.transfer(_to,melodyBal) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1540)
+		- transferSuccess = melody.transfer(_to,_amount) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1542)
+	State variables written after the call(s):
+	- user.amount = user.amount.sub(_amount) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1517)
+	MasterChef.userInfo (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1327) can be used in cross function reentrancies:
+	- MasterChef.pendingMelody(uint256,address) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1438-1449)
+	- MasterChef.userInfo (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1327)
+Reentrancy in MasterChef.withdraw(uint256,uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1507-1522):
+	External calls:
+	- updatePool(_pid) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1511)
+		- melody.mint(devaddr,treasuryReward) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1475)
+		- melody.mint(address(this),contractReward) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1476)
+	- safeMelodyTransfer(msg.sender,pending) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1514)
+		- transferSuccess = melody.transfer(_to,melodyBal) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1540)
+		- transferSuccess = melody.transfer(_to,_amount) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1542)
+	- pool.lpToken.safeTransfer(address(msg.sender),_amount) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1518)
+	State variables written after the call(s):
+	- user.rewardDebt = user.amount.mul(pool.accMelodyPerShare).div(1e12) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1520)
+	MasterChef.userInfo (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1327) can be used in cross function reentrancies:
+	- MasterChef.pendingMelody(uint256,address) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1438-1449)
+	- MasterChef.userInfo (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1327)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+FixedBEP20.constructor(string,string,uint256).name (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#774) shadows:
+	- FixedBEP20.name() (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#791-793) (function)
+	- IBEP20.name() (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#250) (function)
+FixedBEP20.constructor(string,string,uint256).symbol (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#774) shadows:
+	- FixedBEP20.symbol() (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#799-801) (function)
+	- IBEP20.symbol() (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#245) (function)
+FixedBEP20.constructor(string,string,uint256).totalSupply (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#774) shadows:
+	- FixedBEP20.totalSupply() (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#813-815) (function)
+	- IBEP20.totalSupply() (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#235) (function)
+FixedBEP20.allowance(address,address).owner (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#840) shadows:
+	- Ownable.owner() (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#630-632) (function)
+FixedBEP20._approve(address,address,uint256).owner (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1009) shadows:
+	- Ownable.owner() (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#630-632) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+MasterChef.add(uint256,IBEP20,uint16,bool) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1375-1390) should emit an event for: 
+	- totalAllocPoint = totalAllocPoint.add(_allocPoint) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1381) 
+MasterChef.set(uint256,uint256,uint16,bool) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1393-1401) should emit an event for: 
+	- totalAllocPoint = totalAllocPoint.sub(poolInfo[_pid].allocPoint).add(_allocPoint) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1398) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+MasterChef.constructor(MelodyToken,address,address,uint256,uint256)._devaddr (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1350) lacks a zero-check on :
+		- devaddr = _devaddr (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1356)
+MasterChef.constructor(MelodyToken,address,address,uint256,uint256)._feeAddress (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1351) lacks a zero-check on :
+		- feeAddress = _feeAddress (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1357)
+MasterChef.dev(address)._devaddr (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1548) lacks a zero-check on :
+		- devaddr = _devaddr (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1550)
+MasterChef.setFeeAddress(address)._feeAddress (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1554) lacks a zero-check on :
+		- feeAddress = _feeAddress (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1556)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+MasterChef.updatePool(uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1461-1479) has external calls inside a loop: lpSupply = pool.lpToken.balanceOf(address(this)) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1466)
+MasterChef.updatePool(uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1461-1479) has external calls inside a loop: melody.mint(devaddr,treasuryReward) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1475)
+MasterChef.updatePool(uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1461-1479) has external calls inside a loop: melody.mint(address(this),contractReward) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1476)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+MelodyToken.delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1103-1144) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(now <= expiry,MELODY::delegateBySig: signature expired) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1142)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#344-353) uses assembly
+	- INLINE ASM (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#351)
+Address._verifyCallResult(bool,bytes,string) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#489-506) uses assembly
+	- INLINE ASM (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#498-501)
+MelodyToken.getChainId() (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1262-1266) uses assembly
+	- INLINE ASM (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1264)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+MasterChef.nonDuplicated(IBEP20) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1369-1372) compares to a boolean constant:
+	-require(bool,string)(poolExistence[_lpToken] == false,nonDuplicated: duplicated) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1370)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#boolean-equality
+
+Different versions of Solidity are used:
+	- Version used: ['0.6.12', '>=0.4.0', '>=0.6.0<0.8.0', '>=0.6.2<0.8.0', '>=0.6.4']
+	- 0.6.12 (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#10)
+	- 0.6.12 (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#11)
+	- >=0.4.0 (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#9)
+	- >=0.6.0<0.8.0 (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1)
+	- >=0.6.0<0.8.0 (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#4)
+	- >=0.6.0<0.8.0 (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#5)
+	- >=0.6.0<0.8.0 (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#6)
+	- >=0.6.0<0.8.0 (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#7)
+	- >=0.6.0<0.8.0 (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#8)
+	- >=0.6.2<0.8.0 (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#3)
+	- >=0.6.4 (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+
+Address.functionCall(address,bytes) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#397-399) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#422-424) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#471-473) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#481-487) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#447-449) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#457-463) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#371-377) is never used and should be removed
+Context._msgData() (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#594-597) is never used and should be removed
+FixedBEP20._burn(address,uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#988-994) is never used and should be removed
+FixedBEP20._burnFrom(address,uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1023-1026) is never used and should be removed
+SafeBEP20.safeApprove(IBEP20,address,uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#538-547) is never used and should be removed
+SafeBEP20.safeDecreaseAllowance(IBEP20,address,uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#554-557) is never used and should be removed
+SafeBEP20.safeIncreaseAllowance(IBEP20,address,uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#549-552) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#204-207) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#166-169) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#224-227) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#38-42) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#74-77) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#84-87) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#59-67) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#49-52) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version>=0.6.0<0.8.0 (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1) is too complex
+Pragma version>=0.6.4 (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#2) allows old versions
+Pragma version>=0.6.2<0.8.0 (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#3) is too complex
+Pragma version>=0.6.0<0.8.0 (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#4) is too complex
+Pragma version>=0.6.0<0.8.0 (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#5) is too complex
+Pragma version>=0.6.0<0.8.0 (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#6) is too complex
+Pragma version>=0.6.0<0.8.0 (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#7) is too complex
+Pragma version>=0.6.0<0.8.0 (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#8) is too complex
+Pragma version>=0.4.0 (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#9) allows old versions
+Pragma version0.6.12 (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#10) allows old versions
+Pragma version0.6.12 (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#11) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#371-377):
+	- (success) = recipient.call{value: amount}() (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#375)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#432-439):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#437)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#457-463):
+	- (success,returndata) = target.staticcall(data) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#461)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#481-487):
+	- (success,returndata) = target.delegatecall(data) (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#485)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter MelodyToken.mint(address,uint256)._to (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1033) is not in mixedCase
+Parameter MelodyToken.mint(address,uint256)._amount (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1033) is not in mixedCase
+Parameter MasterChef.add(uint256,IBEP20,uint16,bool)._allocPoint (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1375) is not in mixedCase
+Parameter MasterChef.add(uint256,IBEP20,uint16,bool)._lpToken (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1375) is not in mixedCase
+Parameter MasterChef.add(uint256,IBEP20,uint16,bool)._depositFeeBP (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1375) is not in mixedCase
+Parameter MasterChef.add(uint256,IBEP20,uint16,bool)._withUpdate (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1375) is not in mixedCase
+Parameter MasterChef.set(uint256,uint256,uint16,bool)._pid (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1393) is not in mixedCase
+Parameter MasterChef.set(uint256,uint256,uint16,bool)._allocPoint (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1393) is not in mixedCase
+Parameter MasterChef.set(uint256,uint256,uint16,bool)._depositFeeBP (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1393) is not in mixedCase
+Parameter MasterChef.set(uint256,uint256,uint16,bool)._withUpdate (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1393) is not in mixedCase
+Parameter MasterChef.getBlockReward(uint256,uint256)._prevBlock (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1404) is not in mixedCase
+Parameter MasterChef.getBlockReward(uint256,uint256)._currentBlock (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1404) is not in mixedCase
+Parameter MasterChef.pendingMelody(uint256,address)._pid (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1438) is not in mixedCase
+Parameter MasterChef.pendingMelody(uint256,address)._user (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1438) is not in mixedCase
+Parameter MasterChef.updatePool(uint256)._pid (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1461) is not in mixedCase
+Parameter MasterChef.deposit(uint256,uint256)._pid (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1482) is not in mixedCase
+Parameter MasterChef.deposit(uint256,uint256)._amount (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1482) is not in mixedCase
+Parameter MasterChef.withdraw(uint256,uint256)._pid (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1507) is not in mixedCase
+Parameter MasterChef.withdraw(uint256,uint256)._amount (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1507) is not in mixedCase
+Parameter MasterChef.emergencyWithdraw(uint256)._pid (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1525) is not in mixedCase
+Parameter MasterChef.safeMelodyTransfer(address,uint256)._to (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1536) is not in mixedCase
+Parameter MasterChef.safeMelodyTransfer(address,uint256)._amount (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1536) is not in mixedCase
+Parameter MasterChef.dev(address)._devaddr (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1548) is not in mixedCase
+Parameter MasterChef.setFeeAddress(address)._feeAddress (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1554) is not in mixedCase
+Parameter MasterChef.setRewardTable(uint256,uint256)._startBlock (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1560) is not in mixedCase
+Parameter MasterChef.setRewardTable(uint256,uint256)._endBlock (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1560) is not in mixedCase
+Parameter MasterChef.updateStartBlock(uint256)._startBlock (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1653) is not in mixedCase
+Parameter MasterChef.updateEndBlock(uint256)._endBlock (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1658) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#595)" inContext (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#589-598)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Loop condition i < rewardInfo.length (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1666) should use cached array length instead of referencing `length` member of the storage array.
+ Loop condition i < rewardInfo.length (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1418) should use cached array length instead of referencing `length` member of the storage array.
+ Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cache-array-length
+
+MasterChef.blockCountPerDay (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1336) should be constant 
+MasterChef.blockCountPerWeek (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1338) should be constant 
+MasterChef.blockRewardUnit (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1339) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+
+MasterChef.melody (../../sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol#1315) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/MasterChef0x254C3233C162CDe86f1b7a91Ac801B780f79d40D.sol analyzed (10 contracts with 93 detectors), 105 result(s) found

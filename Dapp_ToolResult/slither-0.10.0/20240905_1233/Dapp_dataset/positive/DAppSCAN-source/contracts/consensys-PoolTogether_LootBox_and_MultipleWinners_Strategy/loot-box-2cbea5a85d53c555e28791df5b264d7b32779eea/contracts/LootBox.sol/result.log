@@ -1,0 +1,90 @@
+'solc --version' running
+'solc /sb/LootBox.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+LootBox.transferEther(address,uint256) (../../sb/LootBox.sol#377-381) sends eth to arbitrary user
+	Dangerous calls:
+	- to.transfer(amount) (../../sb/LootBox.sol#378)
+LootBox._executeCall(address,uint256,bytes) (../../sb/LootBox.sol#411-415) sends eth to arbitrary user
+	Dangerous calls:
+	- (succeeded,returnValue) = to.call{value: value}(data) (../../sb/LootBox.sol#412)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#functions-that-send-ether-to-arbitrary-destinations
+
+LootBox.destroy(address) (../../sb/LootBox.sol#402-404) allows anyone to destruct the contract
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#suicidal
+
+LootBox._withdrawERC20(IERC20[],address) (../../sb/LootBox.sol#420-427) ignores return value by tokens[i].transfer(to,balance) (../../sb/LootBox.sol#423)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+LootBox.transferEther(address,uint256).to (../../sb/LootBox.sol#377) lacks a zero-check on :
+		- to.transfer(amount) (../../sb/LootBox.sol#378)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+LootBox._executeCall(address,uint256,bytes) (../../sb/LootBox.sol#411-415) has external calls inside a loop: (succeeded,returnValue) = to.call{value: value}(data) (../../sb/LootBox.sol#412)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in LootBox._withdrawERC1155(LootBox.WithdrawERC1155[],address) (../../sb/LootBox.sol#445-451):
+	External calls:
+	- withdrawals[i].token.safeBatchTransferFrom(address(this),to,withdrawals[i].ids,withdrawals[i].amounts,withdrawals[i].data) (../../sb/LootBox.sol#447)
+	Event emitted after the call(s):
+	- WithdrewERC1155(address(withdrawals[i].token),withdrawals[i].ids,withdrawals[i].amounts,withdrawals[i].data) (../../sb/LootBox.sol#449)
+Reentrancy in LootBox._withdrawERC20(IERC20[],address) (../../sb/LootBox.sol#420-427):
+	External calls:
+	- tokens[i].transfer(to,balance) (../../sb/LootBox.sol#423)
+	Event emitted after the call(s):
+	- WithdrewERC20(address(tokens[i]),balance) (../../sb/LootBox.sol#425)
+Reentrancy in LootBox._withdrawERC721(LootBox.WithdrawERC721[],address) (../../sb/LootBox.sol#432-440):
+	External calls:
+	- withdrawals[i].token.transferFrom(address(this),to,withdrawals[i].tokenIds[tokenIndex]) (../../sb/LootBox.sol#435)
+	Event emitted after the call(s):
+	- WithdrewERC721(address(withdrawals[i].token),withdrawals[i].tokenIds) (../../sb/LootBox.sol#438)
+Reentrancy in LootBox.plunder(IERC20[],LootBox.WithdrawERC721[],LootBox.WithdrawERC1155[],address) (../../sb/LootBox.sol#388-398):
+	External calls:
+	- _withdrawERC20(erc20,to) (../../sb/LootBox.sol#394)
+		- tokens[i].transfer(to,balance) (../../sb/LootBox.sol#423)
+	- _withdrawERC721(erc721,to) (../../sb/LootBox.sol#395)
+		- withdrawals[i].token.transferFrom(address(this),to,withdrawals[i].tokenIds[tokenIndex]) (../../sb/LootBox.sol#435)
+	Event emitted after the call(s):
+	- WithdrewERC721(address(withdrawals[i].token),withdrawals[i].tokenIds) (../../sb/LootBox.sol#438)
+		- _withdrawERC721(erc721,to) (../../sb/LootBox.sol#395)
+Reentrancy in LootBox.plunder(IERC20[],LootBox.WithdrawERC721[],LootBox.WithdrawERC1155[],address) (../../sb/LootBox.sol#388-398):
+	External calls:
+	- _withdrawERC20(erc20,to) (../../sb/LootBox.sol#394)
+		- tokens[i].transfer(to,balance) (../../sb/LootBox.sol#423)
+	- _withdrawERC721(erc721,to) (../../sb/LootBox.sol#395)
+		- withdrawals[i].token.transferFrom(address(this),to,withdrawals[i].tokenIds[tokenIndex]) (../../sb/LootBox.sol#435)
+	- _withdrawERC1155(erc1155,to) (../../sb/LootBox.sol#396)
+		- withdrawals[i].token.safeBatchTransferFrom(address(this),to,withdrawals[i].ids,withdrawals[i].amounts,withdrawals[i].data) (../../sb/LootBox.sol#447)
+	Event emitted after the call(s):
+	- WithdrewERC1155(address(withdrawals[i].token),withdrawals[i].ids,withdrawals[i].amounts,withdrawals[i].data) (../../sb/LootBox.sol#449)
+		- _withdrawERC1155(erc1155,to) (../../sb/LootBox.sol#396)
+Reentrancy in LootBox.plunder(IERC20[],LootBox.WithdrawERC721[],LootBox.WithdrawERC1155[],address) (../../sb/LootBox.sol#388-398):
+	External calls:
+	- _withdrawERC20(erc20,to) (../../sb/LootBox.sol#394)
+		- tokens[i].transfer(to,balance) (../../sb/LootBox.sol#423)
+	- _withdrawERC721(erc721,to) (../../sb/LootBox.sol#395)
+		- withdrawals[i].token.transferFrom(address(this),to,withdrawals[i].tokenIds[tokenIndex]) (../../sb/LootBox.sol#435)
+	- _withdrawERC1155(erc1155,to) (../../sb/LootBox.sol#396)
+		- withdrawals[i].token.safeBatchTransferFrom(address(this),to,withdrawals[i].ids,withdrawals[i].amounts,withdrawals[i].data) (../../sb/LootBox.sol#447)
+	External calls sending eth:
+	- transferEther(to,address(this).balance) (../../sb/LootBox.sol#397)
+		- to.transfer(amount) (../../sb/LootBox.sol#378)
+	Event emitted after the call(s):
+	- TransferredEther(to,amount) (../../sb/LootBox.sol#380)
+		- transferEther(to,address(this).balance) (../../sb/LootBox.sol#397)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Pragma version^0.6.12 (../../sb/LootBox.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in LootBox._executeCall(address,uint256,bytes) (../../sb/LootBox.sol#411-415):
+	- (succeeded,returnValue) = to.call{value: value}(data) (../../sb/LootBox.sol#412)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Reentrancy in LootBox.transferEther(address,uint256) (../../sb/LootBox.sol#377-381):
+	External calls:
+	- to.transfer(amount) (../../sb/LootBox.sol#378)
+	Event emitted after the call(s):
+	- TransferredEther(to,amount) (../../sb/LootBox.sol#380)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-4
+/sb/LootBox.sol analyzed (5 contracts with 93 detectors), 16 result(s) found

@@ -1,0 +1,154 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 26 Code Findings │
+└──────────────────┘
+                     
+    /sb/CoinDogg.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          552┆ contract CoinDogg is ERC20, Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+          405┆ _totalSupply += amount;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          162┆ constructor(string memory name_, string memory symbol_) {
+          163┆     _name = name_;
+          164┆     _symbol = symbol_;
+          165┆ }
+            ⋮┆----------------------------------------
+          553┆ constructor(address owner) public ERC20("CoinDogg", "DOG") {
+          554┆     _mint(owner, 1000000000  * 10**18);
+          555┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          287┆ require(
+          288┆     _allowances[sender][_msgSender()] >= amount,
+          289┆     "ERC20: transfer amount exceeds allowance"
+          290┆ );
+            ⋮┆----------------------------------------
+          344┆ require(
+          345┆     _allowances[_msgSender()][spender] >= subtractedValue,
+          346┆     "ERC20: decreased allowance below zero"
+          347┆ );
+            ⋮┆----------------------------------------
+          376┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          377┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          381┆ require(
+          382┆     _balances[sender] >= amount,
+          383┆     "ERC20: transfer amount exceeds balance"
+          384┆ );
+            ⋮┆----------------------------------------
+          401┆ require(account != address(0), "ERC20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+          422┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          426┆ require(
+          427┆     _balances[account] >= amount,
+          428┆     "ERC20: burn amount exceeds balance"
+          429┆ );
+            ⋮┆----------------------------------------
+          454┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          455┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          522┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          543┆ require(
+          544┆     newOwner != address(0),
+          545┆     "Ownable: new owner is the zero address"
+          546┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          287┆ require(
+          288┆     _allowances[sender][_msgSender()] >= amount,
+          289┆     "ERC20: transfer amount exceeds allowance"
+          290┆ );
+            ⋮┆----------------------------------------
+          344┆ require(
+          345┆     _allowances[_msgSender()][spender] >= subtractedValue,
+          346┆     "ERC20: decreased allowance below zero"
+          347┆ );
+            ⋮┆----------------------------------------
+          376┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          377┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          381┆ require(
+          382┆     _balances[sender] >= amount,
+          383┆     "ERC20: transfer amount exceeds balance"
+          384┆ );
+            ⋮┆----------------------------------------
+          422┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          426┆ require(
+          427┆     _balances[account] >= amount,
+          428┆     "ERC20: burn amount exceeds balance"
+          429┆ );
+            ⋮┆----------------------------------------
+          454┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          455┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          543┆ require(
+          544┆     newOwner != address(0),
+          545┆     "Ownable: new owner is the zero address"
+          546┆ );
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 26 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

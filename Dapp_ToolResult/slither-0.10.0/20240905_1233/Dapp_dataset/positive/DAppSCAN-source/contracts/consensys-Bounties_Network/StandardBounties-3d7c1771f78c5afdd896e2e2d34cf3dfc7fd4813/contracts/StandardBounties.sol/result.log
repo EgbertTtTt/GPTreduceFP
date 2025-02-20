@@ -1,0 +1,381 @@
+'solc --version' running
+'solc /sb/StandardBounties.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/StandardBounties.sol:
+/sb/StandardBounties.sol:2:1: Warning: Experimental features are turned on. Do not use experimental features on live deployments.
+pragma experimental ABIEncoderV2;
+^-------------------------------^
+
+
+StandardBounties.contribute(address,uint256,uint256) (../../sb/StandardBounties.sol#916-951) uses arbitrary from in transferFrom: require(bool)(ERC20Token(bounties[_bountyId].token).transferFrom(_sender,address(this),_amount)) (../../sb/StandardBounties.sol#937-939)
+StandardBounties.contribute(address,uint256,uint256) (../../sb/StandardBounties.sol#916-951) uses arbitrary from in transferFrom: ERC721BasicToken(bounties[_bountyId].token).transferFrom(_sender,address(this),_amount) (../../sb/StandardBounties.sol#942-944)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#arbitrary-from-in-transferfrom
+
+StandardBounties (../../sb/StandardBounties.sol#692-1405) contract sets array length with a user-controlled value:
+	- bounties[_bountyId].issuers.push(_issuers[i]) (../../sb/StandardBounties.sol#1288)
+StandardBounties (../../sb/StandardBounties.sol#692-1405) contract sets array length with a user-controlled value:
+	- bounties[_bountyId].approvers.push(_approvers[i]) (../../sb/StandardBounties.sol#1331)
+StandardBounties (../../sb/StandardBounties.sol#692-1405) contract sets array length with a user-controlled value:
+	- bounties[_bountyId].fulfillments.push(Fulfillment(_fulfillers,_sender)) (../../sb/StandardBounties.sol#1033)
+StandardBounties (../../sb/StandardBounties.sol#692-1405) contract sets array length with a user-controlled value:
+	- bounties[_bountyId].contributions.push(Contribution(_sender,_amount,false)) (../../sb/StandardBounties.sol#926-927)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#array-length-assignment
+
+Reentrancy in StandardBounties.acceptFulfillment(address,uint256,uint256,uint256,uint256[]) (../../sb/StandardBounties.sol#1077-1111):
+	External calls:
+	- transferTokens(_bountyId,fulfillment.fulfillers[i],_tokenAmounts[i]) (../../sb/StandardBounties.sol#1104)
+		- require(bool)(ERC20Token(bounties[_bountyId].token).transfer(_to,_amount)) (../../sb/StandardBounties.sol#1375)
+		- ERC721BasicToken(bounties[_bountyId].token).safeTransferFrom(address(this),_to,_amount) (../../sb/StandardBounties.sol#1377-1379)
+	External calls sending eth:
+	- transferTokens(_bountyId,fulfillment.fulfillers[i],_tokenAmounts[i]) (../../sb/StandardBounties.sol#1104)
+		- _to.transfer(_amount) (../../sb/StandardBounties.sol#1373)
+	State variables written after the call(s):
+	- i < fulfillment.fulfillers.length (../../sb/StandardBounties.sol#1097)
+	StandardBounties.bounties (../../sb/StandardBounties.sol#726) can be used in cross function reentrancies:
+	- StandardBounties.acceptFulfillment(address,uint256,uint256,uint256,uint256[]) (../../sb/StandardBounties.sol#1077-1111)
+	- StandardBounties.addApprovers(address,uint256,uint256,address[]) (../../sb/StandardBounties.sol#1319-1334)
+	- StandardBounties.addIssuers(address,uint256,uint256,address[]) (../../sb/StandardBounties.sol#1276-1291)
+	- StandardBounties.bounties (../../sb/StandardBounties.sol#726)
+	- StandardBounties.changeApprover(address,uint256,uint256,uint256,address) (../../sb/StandardBounties.sol#1210-1229)
+	- StandardBounties.changeBounty(address,uint256,uint256,address[],address[],string,uint256) (../../sb/StandardBounties.sol#1155-1178)
+	- StandardBounties.changeDeadline(address,uint256,uint256,uint256) (../../sb/StandardBounties.sol#1255-1269)
+	- StandardBounties.changeIssuer(address,uint256,uint256,uint256,address) (../../sb/StandardBounties.sol#1186-1202)
+	- StandardBounties.contribute(address,uint256,uint256) (../../sb/StandardBounties.sol#916-951)
+	- StandardBounties.fulfillAndAccept(address,uint256,address[],string,uint256,uint256[]) (../../sb/StandardBounties.sol#1124-1143)
+	- StandardBounties.fulfillBounty(address,uint256,address[],string) (../../sb/StandardBounties.sol#1021-1040)
+	- StandardBounties.getBounty(uint256) (../../sb/StandardBounties.sol#1360-1366)
+	- StandardBounties.hasNotPaid(uint256) (../../sb/StandardBounties.sol#813-818)
+	- StandardBounties.hasNotRefunded(uint256,uint256) (../../sb/StandardBounties.sol#820-826)
+	- StandardBounties.isApprover(address,uint256,uint256) (../../sb/StandardBounties.sol#804-811)
+	- StandardBounties.issueBounty(address,address[],address[],string,uint256,address,uint256,uint256) (../../sb/StandardBounties.sol#863-904)
+	- StandardBounties.onlyContributor(address,uint256,uint256) (../../sb/StandardBounties.sol#794-802)
+	- StandardBounties.onlyIssuer(address,uint256,uint256) (../../sb/StandardBounties.sol#775-782)
+	- StandardBounties.onlySubmitter(address,uint256,uint256) (../../sb/StandardBounties.sol#784-792)
+	- StandardBounties.refundContribution(address,uint256,uint256) (../../sb/StandardBounties.sol#959-982)
+	- StandardBounties.replaceApprovers(address,uint256,uint256,address[]) (../../sb/StandardBounties.sol#1341-1355)
+	- StandardBounties.replaceIssuers(address,uint256,uint256,address[]) (../../sb/StandardBounties.sol#1298-1312)
+	- StandardBounties.transferTokens(uint256,address,uint256) (../../sb/StandardBounties.sol#1369-1383)
+	- StandardBounties.updateFulfillment(address,uint256,uint256,address[],string) (../../sb/StandardBounties.sol#1048-1065)
+	- StandardBounties.validateApproverArrayIndex(uint256,uint256) (../../sb/StandardBounties.sol#767-773)
+	- StandardBounties.validateContributionArrayIndex(uint256,uint256) (../../sb/StandardBounties.sol#743-749)
+	- StandardBounties.validateFulfillmentArrayIndex(uint256,uint256) (../../sb/StandardBounties.sol#751-757)
+	- StandardBounties.validateIssuerArrayIndex(uint256,uint256) (../../sb/StandardBounties.sol#759-765)
+	- bounties[_bountyId].balance -= _tokenAmounts[i] (../../sb/StandardBounties.sol#1101)
+	StandardBounties.bounties (../../sb/StandardBounties.sol#726) can be used in cross function reentrancies:
+	- StandardBounties.acceptFulfillment(address,uint256,uint256,uint256,uint256[]) (../../sb/StandardBounties.sol#1077-1111)
+	- StandardBounties.addApprovers(address,uint256,uint256,address[]) (../../sb/StandardBounties.sol#1319-1334)
+	- StandardBounties.addIssuers(address,uint256,uint256,address[]) (../../sb/StandardBounties.sol#1276-1291)
+	- StandardBounties.bounties (../../sb/StandardBounties.sol#726)
+	- StandardBounties.changeApprover(address,uint256,uint256,uint256,address) (../../sb/StandardBounties.sol#1210-1229)
+	- StandardBounties.changeBounty(address,uint256,uint256,address[],address[],string,uint256) (../../sb/StandardBounties.sol#1155-1178)
+	- StandardBounties.changeDeadline(address,uint256,uint256,uint256) (../../sb/StandardBounties.sol#1255-1269)
+	- StandardBounties.changeIssuer(address,uint256,uint256,uint256,address) (../../sb/StandardBounties.sol#1186-1202)
+	- StandardBounties.contribute(address,uint256,uint256) (../../sb/StandardBounties.sol#916-951)
+	- StandardBounties.fulfillAndAccept(address,uint256,address[],string,uint256,uint256[]) (../../sb/StandardBounties.sol#1124-1143)
+	- StandardBounties.fulfillBounty(address,uint256,address[],string) (../../sb/StandardBounties.sol#1021-1040)
+	- StandardBounties.getBounty(uint256) (../../sb/StandardBounties.sol#1360-1366)
+	- StandardBounties.hasNotPaid(uint256) (../../sb/StandardBounties.sol#813-818)
+	- StandardBounties.hasNotRefunded(uint256,uint256) (../../sb/StandardBounties.sol#820-826)
+	- StandardBounties.isApprover(address,uint256,uint256) (../../sb/StandardBounties.sol#804-811)
+	- StandardBounties.issueBounty(address,address[],address[],string,uint256,address,uint256,uint256) (../../sb/StandardBounties.sol#863-904)
+	- StandardBounties.onlyContributor(address,uint256,uint256) (../../sb/StandardBounties.sol#794-802)
+	- StandardBounties.onlyIssuer(address,uint256,uint256) (../../sb/StandardBounties.sol#775-782)
+	- StandardBounties.onlySubmitter(address,uint256,uint256) (../../sb/StandardBounties.sol#784-792)
+	- StandardBounties.refundContribution(address,uint256,uint256) (../../sb/StandardBounties.sol#959-982)
+	- StandardBounties.replaceApprovers(address,uint256,uint256,address[]) (../../sb/StandardBounties.sol#1341-1355)
+	- StandardBounties.replaceIssuers(address,uint256,uint256,address[]) (../../sb/StandardBounties.sol#1298-1312)
+	- StandardBounties.transferTokens(uint256,address,uint256) (../../sb/StandardBounties.sol#1369-1383)
+	- StandardBounties.updateFulfillment(address,uint256,uint256,address[],string) (../../sb/StandardBounties.sol#1048-1065)
+	- StandardBounties.validateApproverArrayIndex(uint256,uint256) (../../sb/StandardBounties.sol#767-773)
+	- StandardBounties.validateContributionArrayIndex(uint256,uint256) (../../sb/StandardBounties.sol#743-749)
+	- StandardBounties.validateFulfillmentArrayIndex(uint256,uint256) (../../sb/StandardBounties.sol#751-757)
+	- StandardBounties.validateIssuerArrayIndex(uint256,uint256) (../../sb/StandardBounties.sol#759-765)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities
+
+StandardBounties.contribute(address,uint256,uint256) (../../sb/StandardBounties.sol#916-951) ignores return value by ERC721BasicToken(bounties[_bountyId].token).transferFrom(_sender,address(this),_amount) (../../sb/StandardBounties.sol#942-944)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+ERC721BasicTokenMock (../../sb/StandardBounties.sol#677-685) has incorrect ERC721 function interface:ERC721BasicToken.transferFrom(address,address,uint256) (../../sb/StandardBounties.sol#496-514)
+ERC721BasicTokenMock (../../sb/StandardBounties.sol#677-685) has incorrect ERC721 function interface:ERC721Basic.transferFrom(address,address,uint256) (../../sb/StandardBounties.sol#316)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-erc721-interface
+
+StandardBounties.setMetaTxRelayer(address) (../../sb/StandardBounties.sol#846-852) should emit an event for: 
+	- metaTxRelayer = _relayer (../../sb/StandardBounties.sol#851) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-access-control
+
+StandardBounties.setMetaTxRelayer(address)._relayer (../../sb/StandardBounties.sol#846) lacks a zero-check on :
+		- metaTxRelayer = _relayer (../../sb/StandardBounties.sol#851)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+StandardBounties.transferTokens(uint256,address,uint256) (../../sb/StandardBounties.sol#1369-1383) has external calls inside a loop: _to.transfer(_amount) (../../sb/StandardBounties.sol#1373)
+StandardBounties.transferTokens(uint256,address,uint256) (../../sb/StandardBounties.sol#1369-1383) has external calls inside a loop: require(bool)(ERC20Token(bounties[_bountyId].token).transfer(_to,_amount)) (../../sb/StandardBounties.sol#1375)
+StandardBounties.transferTokens(uint256,address,uint256) (../../sb/StandardBounties.sol#1369-1383) has external calls inside a loop: ERC721BasicToken(bounties[_bountyId].token).safeTransferFrom(address(this),_to,_amount) (../../sb/StandardBounties.sol#1377-1379)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in StandardBounties.acceptFulfillment(address,uint256,uint256,uint256,uint256[]) (../../sb/StandardBounties.sol#1077-1111):
+	External calls:
+	- transferTokens(_bountyId,fulfillment.fulfillers[i],_tokenAmounts[i]) (../../sb/StandardBounties.sol#1104)
+		- require(bool)(ERC20Token(bounties[_bountyId].token).transfer(_to,_amount)) (../../sb/StandardBounties.sol#1375)
+		- ERC721BasicToken(bounties[_bountyId].token).safeTransferFrom(address(this),_to,_amount) (../../sb/StandardBounties.sol#1377-1379)
+	External calls sending eth:
+	- transferTokens(_bountyId,fulfillment.fulfillers[i],_tokenAmounts[i]) (../../sb/StandardBounties.sol#1104)
+		- _to.transfer(_amount) (../../sb/StandardBounties.sol#1373)
+	Event emitted after the call(s):
+	- FulfillmentAccepted(_bountyId,_fulfillmentId,_sender,_tokenAmounts) (../../sb/StandardBounties.sol#1107-1110)
+Reentrancy in StandardBounties.contribute(address,uint256,uint256) (../../sb/StandardBounties.sol#916-951):
+	External calls:
+	- require(bool)(ERC20Token(bounties[_bountyId].token).transferFrom(_sender,address(this),_amount)) (../../sb/StandardBounties.sol#937-939)
+	- ERC721BasicToken(bounties[_bountyId].token).transferFrom(_sender,address(this),_amount) (../../sb/StandardBounties.sol#942-944)
+	Event emitted after the call(s):
+	- ContributionAdded(_bountyId,bounties[_bountyId].contributions.length - 1,_sender,_amount) (../../sb/StandardBounties.sol#947-950)
+Reentrancy in StandardBounties.refundContribution(address,uint256,uint256) (../../sb/StandardBounties.sol#959-982):
+	External calls:
+	- transferTokens(_bountyId,contribution.contributor,contribution.amount) (../../sb/StandardBounties.sol#979)
+		- require(bool)(ERC20Token(bounties[_bountyId].token).transfer(_to,_amount)) (../../sb/StandardBounties.sol#1375)
+		- ERC721BasicToken(bounties[_bountyId].token).safeTransferFrom(address(this),_to,_amount) (../../sb/StandardBounties.sol#1377-1379)
+	External calls sending eth:
+	- transferTokens(_bountyId,contribution.contributor,contribution.amount) (../../sb/StandardBounties.sol#979)
+		- _to.transfer(_amount) (../../sb/StandardBounties.sol#1373)
+	Event emitted after the call(s):
+	- ContributionRefunded(_bountyId,_contributionId) (../../sb/StandardBounties.sol#981)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+StandardBounties.refundContribution(address,uint256,uint256) (../../sb/StandardBounties.sol#959-982) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool)(now > bounties[_bountyId].deadline) (../../sb/StandardBounties.sol#971)
+StandardBounties.fulfillBounty(address,uint256,address[],string) (../../sb/StandardBounties.sol#1021-1040) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool)(now < bounties[_bountyId].deadline) (../../sb/StandardBounties.sol#1030)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+AddressUtils.isContract(address) (../../sb/StandardBounties.sol#167-178) uses assembly
+	- INLINE ASM (../../sb/StandardBounties.sol#176-177)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+SafeMath.div(uint256,uint256) (../../sb/StandardBounties.sol#130-135) is never used and should be removed
+SafeMath.mul(uint256,uint256) (../../sb/StandardBounties.sol#114-125) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.5.0 (../../sb/StandardBounties.sol#1) allows old versions
+solc-0.5.0 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Parameter ERC20Token.transfer(address,uint256)._to (../../sb/StandardBounties.sol#62) is not in mixedCase
+Parameter ERC20Token.transfer(address,uint256)._value (../../sb/StandardBounties.sol#62) is not in mixedCase
+Parameter ERC20Token.transferFrom(address,address,uint256)._from (../../sb/StandardBounties.sol#75) is not in mixedCase
+Parameter ERC20Token.transferFrom(address,address,uint256)._to (../../sb/StandardBounties.sol#75) is not in mixedCase
+Parameter ERC20Token.transferFrom(address,address,uint256)._value (../../sb/StandardBounties.sol#75) is not in mixedCase
+Parameter ERC20Token.balanceOf(address)._owner (../../sb/StandardBounties.sol#87) is not in mixedCase
+Parameter ERC20Token.approve(address,uint256)._spender (../../sb/StandardBounties.sol#91) is not in mixedCase
+Parameter ERC20Token.approve(address,uint256)._value (../../sb/StandardBounties.sol#91) is not in mixedCase
+Parameter ERC20Token.allowance(address,address)._owner (../../sb/StandardBounties.sol#97) is not in mixedCase
+Parameter ERC20Token.allowance(address,address)._spender (../../sb/StandardBounties.sol#97) is not in mixedCase
+Parameter SupportsInterfaceWithLookup.supportsInterface(bytes4)._interfaceId (../../sb/StandardBounties.sol#230) is not in mixedCase
+Parameter ERC721BasicToken.balanceOf(address)._owner (../../sb/StandardBounties.sol#407) is not in mixedCase
+Parameter ERC721BasicToken.ownerOf(uint256)._tokenId (../../sb/StandardBounties.sol#417) is not in mixedCase
+Parameter ERC721BasicToken.exists(uint256)._tokenId (../../sb/StandardBounties.sol#428) is not in mixedCase
+Parameter ERC721BasicToken.approve(address,uint256)._to (../../sb/StandardBounties.sol#441) is not in mixedCase
+Parameter ERC721BasicToken.approve(address,uint256)._tokenId (../../sb/StandardBounties.sol#441) is not in mixedCase
+Parameter ERC721BasicToken.getApproved(uint256)._tokenId (../../sb/StandardBounties.sol#455) is not in mixedCase
+Parameter ERC721BasicToken.setApprovalForAll(address,bool)._to (../../sb/StandardBounties.sol#465) is not in mixedCase
+Parameter ERC721BasicToken.setApprovalForAll(address,bool)._approved (../../sb/StandardBounties.sol#465) is not in mixedCase
+Parameter ERC721BasicToken.isApprovedForAll(address,address)._owner (../../sb/StandardBounties.sol#478) is not in mixedCase
+Parameter ERC721BasicToken.isApprovedForAll(address,address)._operator (../../sb/StandardBounties.sol#479) is not in mixedCase
+Parameter ERC721BasicToken.transferFrom(address,address,uint256)._from (../../sb/StandardBounties.sol#497) is not in mixedCase
+Parameter ERC721BasicToken.transferFrom(address,address,uint256)._to (../../sb/StandardBounties.sol#498) is not in mixedCase
+Parameter ERC721BasicToken.transferFrom(address,address,uint256)._tokenId (../../sb/StandardBounties.sol#499) is not in mixedCase
+Parameter ERC721BasicToken.safeTransferFrom(address,address,uint256)._from (../../sb/StandardBounties.sol#529) is not in mixedCase
+Parameter ERC721BasicToken.safeTransferFrom(address,address,uint256)._to (../../sb/StandardBounties.sol#530) is not in mixedCase
+Parameter ERC721BasicToken.safeTransferFrom(address,address,uint256)._tokenId (../../sb/StandardBounties.sol#531) is not in mixedCase
+Parameter ERC721BasicToken.safeTransferFrom(address,address,uint256,bytes)._from (../../sb/StandardBounties.sol#553) is not in mixedCase
+Parameter ERC721BasicToken.safeTransferFrom(address,address,uint256,bytes)._to (../../sb/StandardBounties.sol#554) is not in mixedCase
+Parameter ERC721BasicToken.safeTransferFrom(address,address,uint256,bytes)._tokenId (../../sb/StandardBounties.sol#555) is not in mixedCase
+Parameter ERC721BasicToken.safeTransferFrom(address,address,uint256,bytes)._data (../../sb/StandardBounties.sol#556) is not in mixedCase
+Parameter ERC721BasicToken.isApprovedOrOwner(address,uint256)._spender (../../sb/StandardBounties.sol#574) is not in mixedCase
+Parameter ERC721BasicToken.isApprovedOrOwner(address,uint256)._tokenId (../../sb/StandardBounties.sol#575) is not in mixedCase
+Parameter ERC721BasicToken.clearApproval(address,uint256)._owner (../../sb/StandardBounties.sol#621) is not in mixedCase
+Parameter ERC721BasicToken.clearApproval(address,uint256)._tokenId (../../sb/StandardBounties.sol#621) is not in mixedCase
+Parameter ERC721BasicToken.addTokenTo(address,uint256)._to (../../sb/StandardBounties.sol#633) is not in mixedCase
+Parameter ERC721BasicToken.addTokenTo(address,uint256)._tokenId (../../sb/StandardBounties.sol#633) is not in mixedCase
+Parameter ERC721BasicToken.removeTokenFrom(address,uint256)._from (../../sb/StandardBounties.sol#644) is not in mixedCase
+Parameter ERC721BasicToken.removeTokenFrom(address,uint256)._tokenId (../../sb/StandardBounties.sol#644) is not in mixedCase
+Parameter ERC721BasicToken.checkAndCallSafeTransfer(address,address,uint256,bytes)._from (../../sb/StandardBounties.sol#660) is not in mixedCase
+Parameter ERC721BasicToken.checkAndCallSafeTransfer(address,address,uint256,bytes)._to (../../sb/StandardBounties.sol#661) is not in mixedCase
+Parameter ERC721BasicToken.checkAndCallSafeTransfer(address,address,uint256,bytes)._tokenId (../../sb/StandardBounties.sol#662) is not in mixedCase
+Parameter ERC721BasicToken.checkAndCallSafeTransfer(address,address,uint256,bytes)._data (../../sb/StandardBounties.sol#663) is not in mixedCase
+Constant ERC721BasicToken.InterfaceId_ERC721 (../../sb/StandardBounties.sol#335) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant ERC721BasicToken.InterfaceId_ERC721Exists (../../sb/StandardBounties.sol#349) is not in UPPER_CASE_WITH_UNDERSCORES
+Parameter ERC721BasicTokenMock.mint(address,uint256)._to (../../sb/StandardBounties.sol#678) is not in mixedCase
+Parameter ERC721BasicTokenMock.mint(address,uint256)._tokenId (../../sb/StandardBounties.sol#678) is not in mixedCase
+Parameter ERC721BasicTokenMock.burn(uint256)._tokenId (../../sb/StandardBounties.sol#682) is not in mixedCase
+Parameter StandardBounties.setMetaTxRelayer(address)._relayer (../../sb/StandardBounties.sol#846) is not in mixedCase
+Parameter StandardBounties.issueBounty(address,address[],address[],string,uint256,address,uint256,uint256)._sender (../../sb/StandardBounties.sol#864) is not in mixedCase
+Parameter StandardBounties.issueBounty(address,address[],address[],string,uint256,address,uint256,uint256)._issuers (../../sb/StandardBounties.sol#865) is not in mixedCase
+Parameter StandardBounties.issueBounty(address,address[],address[],string,uint256,address,uint256,uint256)._approvers (../../sb/StandardBounties.sol#866) is not in mixedCase
+Parameter StandardBounties.issueBounty(address,address[],address[],string,uint256,address,uint256,uint256)._data (../../sb/StandardBounties.sol#867) is not in mixedCase
+Parameter StandardBounties.issueBounty(address,address[],address[],string,uint256,address,uint256,uint256)._deadline (../../sb/StandardBounties.sol#868) is not in mixedCase
+Parameter StandardBounties.issueBounty(address,address[],address[],string,uint256,address,uint256,uint256)._token (../../sb/StandardBounties.sol#869) is not in mixedCase
+Parameter StandardBounties.issueBounty(address,address[],address[],string,uint256,address,uint256,uint256)._tokenVersion (../../sb/StandardBounties.sol#870) is not in mixedCase
+Parameter StandardBounties.issueBounty(address,address[],address[],string,uint256,address,uint256,uint256)._depositAmount (../../sb/StandardBounties.sol#871) is not in mixedCase
+Parameter StandardBounties.contribute(address,uint256,uint256)._sender (../../sb/StandardBounties.sol#917) is not in mixedCase
+Parameter StandardBounties.contribute(address,uint256,uint256)._bountyId (../../sb/StandardBounties.sol#918) is not in mixedCase
+Parameter StandardBounties.contribute(address,uint256,uint256)._amount (../../sb/StandardBounties.sol#919) is not in mixedCase
+Parameter StandardBounties.refundContribution(address,uint256,uint256)._sender (../../sb/StandardBounties.sol#960) is not in mixedCase
+Parameter StandardBounties.refundContribution(address,uint256,uint256)._bountyId (../../sb/StandardBounties.sol#961) is not in mixedCase
+Parameter StandardBounties.refundContribution(address,uint256,uint256)._contributionId (../../sb/StandardBounties.sol#962) is not in mixedCase
+Parameter StandardBounties.refundContributions(address,uint256,uint256[])._sender (../../sb/StandardBounties.sol#989) is not in mixedCase
+Parameter StandardBounties.refundContributions(address,uint256,uint256[])._bountyId (../../sb/StandardBounties.sol#990) is not in mixedCase
+Parameter StandardBounties.refundContributions(address,uint256,uint256[])._contributionIds (../../sb/StandardBounties.sol#991) is not in mixedCase
+Parameter StandardBounties.performAction(address,uint256,string)._sender (../../sb/StandardBounties.sol#1006) is not in mixedCase
+Parameter StandardBounties.performAction(address,uint256,string)._bountyId (../../sb/StandardBounties.sol#1007) is not in mixedCase
+Parameter StandardBounties.performAction(address,uint256,string)._data (../../sb/StandardBounties.sol#1008) is not in mixedCase
+Parameter StandardBounties.fulfillBounty(address,uint256,address[],string)._sender (../../sb/StandardBounties.sol#1022) is not in mixedCase
+Parameter StandardBounties.fulfillBounty(address,uint256,address[],string)._bountyId (../../sb/StandardBounties.sol#1023) is not in mixedCase
+Parameter StandardBounties.fulfillBounty(address,uint256,address[],string)._fulfillers (../../sb/StandardBounties.sol#1024) is not in mixedCase
+Parameter StandardBounties.fulfillBounty(address,uint256,address[],string)._data (../../sb/StandardBounties.sol#1025) is not in mixedCase
+Parameter StandardBounties.updateFulfillment(address,uint256,uint256,address[],string)._sender (../../sb/StandardBounties.sol#1049) is not in mixedCase
+Parameter StandardBounties.updateFulfillment(address,uint256,uint256,address[],string)._bountyId (../../sb/StandardBounties.sol#1050) is not in mixedCase
+Parameter StandardBounties.updateFulfillment(address,uint256,uint256,address[],string)._fulfillmentId (../../sb/StandardBounties.sol#1051) is not in mixedCase
+Parameter StandardBounties.updateFulfillment(address,uint256,uint256,address[],string)._fulfillers (../../sb/StandardBounties.sol#1052) is not in mixedCase
+Parameter StandardBounties.updateFulfillment(address,uint256,uint256,address[],string)._data (../../sb/StandardBounties.sol#1053) is not in mixedCase
+Parameter StandardBounties.acceptFulfillment(address,uint256,uint256,uint256,uint256[])._sender (../../sb/StandardBounties.sol#1078) is not in mixedCase
+Parameter StandardBounties.acceptFulfillment(address,uint256,uint256,uint256,uint256[])._bountyId (../../sb/StandardBounties.sol#1079) is not in mixedCase
+Parameter StandardBounties.acceptFulfillment(address,uint256,uint256,uint256,uint256[])._fulfillmentId (../../sb/StandardBounties.sol#1080) is not in mixedCase
+Parameter StandardBounties.acceptFulfillment(address,uint256,uint256,uint256,uint256[])._approverId (../../sb/StandardBounties.sol#1081) is not in mixedCase
+Parameter StandardBounties.acceptFulfillment(address,uint256,uint256,uint256,uint256[])._tokenAmounts (../../sb/StandardBounties.sol#1082) is not in mixedCase
+Parameter StandardBounties.fulfillAndAccept(address,uint256,address[],string,uint256,uint256[])._sender (../../sb/StandardBounties.sol#1125) is not in mixedCase
+Parameter StandardBounties.fulfillAndAccept(address,uint256,address[],string,uint256,uint256[])._bountyId (../../sb/StandardBounties.sol#1126) is not in mixedCase
+Parameter StandardBounties.fulfillAndAccept(address,uint256,address[],string,uint256,uint256[])._fulfillers (../../sb/StandardBounties.sol#1127) is not in mixedCase
+Parameter StandardBounties.fulfillAndAccept(address,uint256,address[],string,uint256,uint256[])._data (../../sb/StandardBounties.sol#1128) is not in mixedCase
+Parameter StandardBounties.fulfillAndAccept(address,uint256,address[],string,uint256,uint256[])._approverId (../../sb/StandardBounties.sol#1129) is not in mixedCase
+Parameter StandardBounties.fulfillAndAccept(address,uint256,address[],string,uint256,uint256[])._tokenAmounts (../../sb/StandardBounties.sol#1130) is not in mixedCase
+Parameter StandardBounties.changeBounty(address,uint256,uint256,address[],address[],string,uint256)._sender (../../sb/StandardBounties.sol#1156) is not in mixedCase
+Parameter StandardBounties.changeBounty(address,uint256,uint256,address[],address[],string,uint256)._bountyId (../../sb/StandardBounties.sol#1157) is not in mixedCase
+Parameter StandardBounties.changeBounty(address,uint256,uint256,address[],address[],string,uint256)._issuerId (../../sb/StandardBounties.sol#1158) is not in mixedCase
+Parameter StandardBounties.changeBounty(address,uint256,uint256,address[],address[],string,uint256)._issuers (../../sb/StandardBounties.sol#1159) is not in mixedCase
+Parameter StandardBounties.changeBounty(address,uint256,uint256,address[],address[],string,uint256)._approvers (../../sb/StandardBounties.sol#1160) is not in mixedCase
+Parameter StandardBounties.changeBounty(address,uint256,uint256,address[],address[],string,uint256)._data (../../sb/StandardBounties.sol#1161) is not in mixedCase
+Parameter StandardBounties.changeBounty(address,uint256,uint256,address[],address[],string,uint256)._deadline (../../sb/StandardBounties.sol#1162) is not in mixedCase
+Parameter StandardBounties.changeIssuer(address,uint256,uint256,uint256,address)._sender (../../sb/StandardBounties.sol#1187) is not in mixedCase
+Parameter StandardBounties.changeIssuer(address,uint256,uint256,uint256,address)._bountyId (../../sb/StandardBounties.sol#1188) is not in mixedCase
+Parameter StandardBounties.changeIssuer(address,uint256,uint256,uint256,address)._issuerId (../../sb/StandardBounties.sol#1189) is not in mixedCase
+Parameter StandardBounties.changeIssuer(address,uint256,uint256,uint256,address)._issuerIdToChange (../../sb/StandardBounties.sol#1190) is not in mixedCase
+Parameter StandardBounties.changeIssuer(address,uint256,uint256,uint256,address)._newIssuer (../../sb/StandardBounties.sol#1191) is not in mixedCase
+Parameter StandardBounties.changeApprover(address,uint256,uint256,uint256,address)._sender (../../sb/StandardBounties.sol#1211) is not in mixedCase
+Parameter StandardBounties.changeApprover(address,uint256,uint256,uint256,address)._bountyId (../../sb/StandardBounties.sol#1212) is not in mixedCase
+Parameter StandardBounties.changeApprover(address,uint256,uint256,uint256,address)._issuerId (../../sb/StandardBounties.sol#1213) is not in mixedCase
+Parameter StandardBounties.changeApprover(address,uint256,uint256,uint256,address)._approverId (../../sb/StandardBounties.sol#1214) is not in mixedCase
+Parameter StandardBounties.changeApprover(address,uint256,uint256,uint256,address)._approver (../../sb/StandardBounties.sol#1215) is not in mixedCase
+Parameter StandardBounties.changeData(address,uint256,uint256,string)._sender (../../sb/StandardBounties.sol#1237) is not in mixedCase
+Parameter StandardBounties.changeData(address,uint256,uint256,string)._bountyId (../../sb/StandardBounties.sol#1238) is not in mixedCase
+Parameter StandardBounties.changeData(address,uint256,uint256,string)._issuerId (../../sb/StandardBounties.sol#1239) is not in mixedCase
+Parameter StandardBounties.changeData(address,uint256,uint256,string)._data (../../sb/StandardBounties.sol#1240) is not in mixedCase
+Parameter StandardBounties.changeDeadline(address,uint256,uint256,uint256)._sender (../../sb/StandardBounties.sol#1256) is not in mixedCase
+Parameter StandardBounties.changeDeadline(address,uint256,uint256,uint256)._bountyId (../../sb/StandardBounties.sol#1257) is not in mixedCase
+Parameter StandardBounties.changeDeadline(address,uint256,uint256,uint256)._issuerId (../../sb/StandardBounties.sol#1258) is not in mixedCase
+Parameter StandardBounties.changeDeadline(address,uint256,uint256,uint256)._deadline (../../sb/StandardBounties.sol#1259) is not in mixedCase
+Parameter StandardBounties.addIssuers(address,uint256,uint256,address[])._sender (../../sb/StandardBounties.sol#1277) is not in mixedCase
+Parameter StandardBounties.addIssuers(address,uint256,uint256,address[])._bountyId (../../sb/StandardBounties.sol#1278) is not in mixedCase
+Parameter StandardBounties.addIssuers(address,uint256,uint256,address[])._issuerId (../../sb/StandardBounties.sol#1279) is not in mixedCase
+Parameter StandardBounties.addIssuers(address,uint256,uint256,address[])._issuers (../../sb/StandardBounties.sol#1280) is not in mixedCase
+Parameter StandardBounties.replaceIssuers(address,uint256,uint256,address[])._sender (../../sb/StandardBounties.sol#1299) is not in mixedCase
+Parameter StandardBounties.replaceIssuers(address,uint256,uint256,address[])._bountyId (../../sb/StandardBounties.sol#1300) is not in mixedCase
+Parameter StandardBounties.replaceIssuers(address,uint256,uint256,address[])._issuerId (../../sb/StandardBounties.sol#1301) is not in mixedCase
+Parameter StandardBounties.replaceIssuers(address,uint256,uint256,address[])._issuers (../../sb/StandardBounties.sol#1302) is not in mixedCase
+Parameter StandardBounties.addApprovers(address,uint256,uint256,address[])._sender (../../sb/StandardBounties.sol#1320) is not in mixedCase
+Parameter StandardBounties.addApprovers(address,uint256,uint256,address[])._bountyId (../../sb/StandardBounties.sol#1321) is not in mixedCase
+Parameter StandardBounties.addApprovers(address,uint256,uint256,address[])._issuerId (../../sb/StandardBounties.sol#1322) is not in mixedCase
+Parameter StandardBounties.addApprovers(address,uint256,uint256,address[])._approvers (../../sb/StandardBounties.sol#1323) is not in mixedCase
+Parameter StandardBounties.replaceApprovers(address,uint256,uint256,address[])._sender (../../sb/StandardBounties.sol#1342) is not in mixedCase
+Parameter StandardBounties.replaceApprovers(address,uint256,uint256,address[])._bountyId (../../sb/StandardBounties.sol#1343) is not in mixedCase
+Parameter StandardBounties.replaceApprovers(address,uint256,uint256,address[])._issuerId (../../sb/StandardBounties.sol#1344) is not in mixedCase
+Parameter StandardBounties.replaceApprovers(address,uint256,uint256,address[])._approvers (../../sb/StandardBounties.sol#1345) is not in mixedCase
+Parameter StandardBounties.getBounty(uint256)._bountyId (../../sb/StandardBounties.sol#1360) is not in mixedCase
+Parameter StandardBounties.transferTokens(uint256,address,uint256)._bountyId (../../sb/StandardBounties.sol#1369) is not in mixedCase
+Parameter StandardBounties.transferTokens(uint256,address,uint256)._to (../../sb/StandardBounties.sol#1369) is not in mixedCase
+Parameter StandardBounties.transferTokens(uint256,address,uint256)._amount (../../sb/StandardBounties.sol#1369) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Reentrancy in StandardBounties.acceptFulfillment(address,uint256,uint256,uint256,uint256[]) (../../sb/StandardBounties.sol#1077-1111):
+	External calls:
+	- transferTokens(_bountyId,fulfillment.fulfillers[i],_tokenAmounts[i]) (../../sb/StandardBounties.sol#1104)
+		- _to.transfer(_amount) (../../sb/StandardBounties.sol#1373)
+	State variables written after the call(s):
+	- i < fulfillment.fulfillers.length (../../sb/StandardBounties.sol#1097)
+	- bounties[_bountyId].balance -= _tokenAmounts[i] (../../sb/StandardBounties.sol#1101)
+	Event emitted after the call(s):
+	- FulfillmentAccepted(_bountyId,_fulfillmentId,_sender,_tokenAmounts) (../../sb/StandardBounties.sol#1107-1110)
+Reentrancy in StandardBounties.refundContribution(address,uint256,uint256) (../../sb/StandardBounties.sol#959-982):
+	External calls:
+	- transferTokens(_bountyId,contribution.contributor,contribution.amount) (../../sb/StandardBounties.sol#979)
+		- _to.transfer(_amount) (../../sb/StandardBounties.sol#1373)
+	Event emitted after the call(s):
+	- ContributionRefunded(_bountyId,_contributionId) (../../sb/StandardBounties.sol#981)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-4
+
+ERC20 event Token.Transfer(address,address,uint256) (../../sb/StandardBounties.sol#48)does not index parameter _from
+ERC20 event Token.Transfer(address,address,uint256) (../../sb/StandardBounties.sol#48)does not index parameter _to
+ERC20 event Token.Approval(address,address,uint256) (../../sb/StandardBounties.sol#49)does not index parameter _owner
+ERC20 event Token.Approval(address,address,uint256) (../../sb/StandardBounties.sol#49)does not index parameter _spender
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unindexed-erc20-event-parameters
+
+ERC721BasicToken.testint (../../sb/StandardBounties.sol#375) should be constant 
+Token.totalSupply (../../sb/StandardBounties.sol#18) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+
+onERC721Received(address,uint256,bytes) should be declared external:
+	- ERC721Receiver.onERC721Received(address,uint256,bytes) (../../sb/StandardBounties.sol#274-280)
+Moreover, the following function parameters should change its data location:
+_data location should be calldata
+issueBounty(address,address[],address[],string,uint256,address,uint256,uint256) should be declared external:
+	- StandardBounties.issueBounty(address,address[],address[],string,uint256,address,uint256,uint256) (../../sb/StandardBounties.sol#863-904)
+Moreover, the following function parameters should change its data location:
+_issuers location should be calldata
+_approvers location should be calldata
+_data location should be calldata
+refundContributions(address,uint256,uint256[]) should be declared external:
+	- StandardBounties.refundContributions(address,uint256,uint256[]) (../../sb/StandardBounties.sol#988-998)
+Moreover, the following function parameters should change its data location:
+_contributionIds location should be calldata
+performAction(address,uint256,string) should be declared external:
+	- StandardBounties.performAction(address,uint256,string) (../../sb/StandardBounties.sol#1005-1014)
+Moreover, the following function parameters should change its data location:
+_data location should be calldata
+updateFulfillment(address,uint256,uint256,address[],string) should be declared external:
+	- StandardBounties.updateFulfillment(address,uint256,uint256,address[],string) (../../sb/StandardBounties.sol#1048-1065)
+Moreover, the following function parameters should change its data location:
+_fulfillers location should be calldata
+_data location should be calldata
+fulfillAndAccept(address,uint256,address[],string,uint256,uint256[]) should be declared external:
+	- StandardBounties.fulfillAndAccept(address,uint256,address[],string,uint256,uint256[]) (../../sb/StandardBounties.sol#1124-1143)
+Moreover, the following function parameters should change its data location:
+_fulfillers location should be calldata
+_data location should be calldata
+_tokenAmounts location should be calldata
+changeBounty(address,uint256,uint256,address[],address[],string,uint256) should be declared external:
+	- StandardBounties.changeBounty(address,uint256,uint256,address[],address[],string,uint256) (../../sb/StandardBounties.sol#1155-1178)
+Moreover, the following function parameters should change its data location:
+_issuers location should be calldata
+_approvers location should be calldata
+_data location should be calldata
+changeData(address,uint256,uint256,string) should be declared external:
+	- StandardBounties.changeData(address,uint256,uint256,string) (../../sb/StandardBounties.sol#1236-1248)
+Moreover, the following function parameters should change its data location:
+_data location should be calldata
+addIssuers(address,uint256,uint256,address[]) should be declared external:
+	- StandardBounties.addIssuers(address,uint256,uint256,address[]) (../../sb/StandardBounties.sol#1276-1291)
+Moreover, the following function parameters should change its data location:
+_issuers location should be calldata
+replaceIssuers(address,uint256,uint256,address[]) should be declared external:
+	- StandardBounties.replaceIssuers(address,uint256,uint256,address[]) (../../sb/StandardBounties.sol#1298-1312)
+Moreover, the following function parameters should change its data location:
+_issuers location should be calldata
+addApprovers(address,uint256,uint256,address[]) should be declared external:
+	- StandardBounties.addApprovers(address,uint256,uint256,address[]) (../../sb/StandardBounties.sol#1319-1334)
+Moreover, the following function parameters should change its data location:
+_approvers location should be calldata
+replaceApprovers(address,uint256,uint256,address[]) should be declared external:
+	- StandardBounties.replaceApprovers(address,uint256,uint256,address[]) (../../sb/StandardBounties.sol#1341-1355)
+Moreover, the following function parameters should change its data location:
+_approvers location should be calldata
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#public-function-that-could-be-declared-external
+/sb/StandardBounties.sol analyzed (11 contracts with 93 detectors), 179 result(s) found

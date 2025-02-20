@@ -1,0 +1,440 @@
+'solc --version' running
+'solc /sb/FraxUnifiedFarmTemplate.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/FraxUnifiedFarmTemplate.sol:
+Warning: Visibility for constructor is ignored. If you want the contract to be non-deployable, making it "abstract" is sufficient.
+   --> /sb/FraxUnifiedFarmTemplate.sol:693:5:
+    |
+693 |     constructor (string memory __name, string memory __symbol) public {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning: Visibility for constructor is ignored. If you want the contract to be non-deployable, making it "abstract" is sufficient.
+    --> /sb/FraxUnifiedFarmTemplate.sol:1100:5:
+     |
+1100 |     constructor () internal {
+     |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning: Visibility for constructor is ignored. If you want the contract to be non-deployable, making it "abstract" is sufficient.
+    --> /sb/FraxUnifiedFarmTemplate.sol:1131:5:
+     |
+1131 |     constructor (address _owner) public {
+     |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning: Unreachable code.
+    --> /sb/FraxUnifiedFarmTemplate.sol:1530:13:
+     |
+1530 |             _syncEarned(account);
+     |             ^^^^^^^^^^^^^^^^^^^^
+
+Warning: Unreachable code.
+    --> /sb/FraxUnifiedFarmTemplate.sol:1533:13:
+     |
+1533 |             _vefxsMultiplierStored[account] = new_vefxs_multiplier;
+     |             ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning: Unreachable code.
+    --> /sb/FraxUnifiedFarmTemplate.sol:1122:9:
+     |
+1122 |         _status = _NOT_ENTERED;
+     |         ^^^^^^^^^^^^^^^^^^^^^^
+
+Warning: Unreachable code.
+    --> /sb/FraxUnifiedFarmTemplate.sol:1594:9:
+     |
+1594 |         lastRewardClaimTime[rewardee] = block.timestamp;
+     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.
+    --> /sb/FraxUnifiedFarmTemplate.sol:1431:36:
+     |
+1431 |     function calcCurCombinedWeight(address account) public virtual view 
+     |                                    ^^^^^^^^^^^^^^^
+
+Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.
+    --> /sb/FraxUnifiedFarmTemplate.sol:1433:13:
+     |
+1433 |             uint256 old_combined_weight,
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.
+    --> /sb/FraxUnifiedFarmTemplate.sol:1434:13:
+     |
+1434 |             uint256 new_vefxs_multiplier,
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.
+    --> /sb/FraxUnifiedFarmTemplate.sol:1435:13:
+     |
+1435 |             uint256 new_combined_weight
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.
+    --> /sb/FraxUnifiedFarmTemplate.sol:1569:35:
+     |
+1569 |     function _getRewardExtraLogic(address rewardee, address destination_address) internal virtual {
+     |                                   ^^^^^^^^^^^^^^^^
+
+Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.
+    --> /sb/FraxUnifiedFarmTemplate.sol:1569:53:
+     |
+1569 |     function _getRewardExtraLogic(address rewardee, address destination_address) internal virtual {
+     |                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+FraxUnifiedFarmTemplate.recoverERC20(address,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#1718-1744) ignores return value by ERC20(tokenAddress).transfer(msg.sender,tokenAmount) (../../sb/FraxUnifiedFarmTemplate.sol#1730)
+FraxUnifiedFarmTemplate.recoverERC20(address,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#1718-1744) ignores return value by ERC20(tokenAddress).transfer(msg.sender,tokenAmount) (../../sb/FraxUnifiedFarmTemplate.sol#1736)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+FraxUnifiedFarmTemplate._total_liquidity_locked (../../sb/FraxUnifiedFarmTemplate.sol#1243) is never initialized. It is used in:
+	- FraxUnifiedFarmTemplate.rewardsPerToken() (../../sb/FraxUnifiedFarmTemplate.sol#1362-1375)
+	- FraxUnifiedFarmTemplate.totalLiquidityLocked() (../../sb/FraxUnifiedFarmTemplate.sol#1410-1412)
+FraxUnifiedFarmTemplate._locked_liquidity (../../sb/FraxUnifiedFarmTemplate.sol#1245) is never initialized. It is used in:
+	- FraxUnifiedFarmTemplate.lockedLiquidityOf(address) (../../sb/FraxUnifiedFarmTemplate.sol#1415-1417)
+	- FraxUnifiedFarmTemplate.userStakedFrax(address) (../../sb/FraxUnifiedFarmTemplate.sol#1455-1457)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-state-variables
+
+FraxUnifiedFarmTemplate.veFXSMultiplier(address) (../../sb/FraxUnifiedFarmTemplate.sol#1470-1492) performs a multiplication on the result of a division:
+	- user_vefxs_fraction = (veFXSBoostDlgPxy.adjusted_balance_of(account) * MULTIPLIER_PRECISION) / veFXS_needed_for_max_boost (../../sb/FraxUnifiedFarmTemplate.sol#1480)
+	- mult_op_2 = (user_vefxs_fraction * vefxs_max_multiplier) / MULTIPLIER_PRECISION (../../sb/FraxUnifiedFarmTemplate.sol#1482)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+Reentrancy in FraxUnifiedFarmTemplate._getReward(address,address) (../../sb/FraxUnifiedFarmTemplate.sol#1580-1595):
+	External calls:
+	- TransferHelper.safeTransfer(rewardTokens[i],destination_address,rewards_before[i]) (../../sb/FraxUnifiedFarmTemplate.sol#1587)
+	- updateRewardAndBalance(rewardee,true) (../../sb/FraxUnifiedFarmTemplate.sol#1580)
+		- rewards_distributor.distributeReward(address(this)) (../../sb/FraxUnifiedFarmTemplate.sol#1604)
+		- last_gauge_relative_weights[i] = IFraxGaugeController(gauge_controller_address).gauge_relative_weight_write(address(this),block.timestamp) (../../sb/FraxUnifiedFarmTemplate.sol#1650)
+	State variables written after the call(s):
+	- rewards[rewardee][i] = 0 (../../sb/FraxUnifiedFarmTemplate.sol#1586)
+	FraxUnifiedFarmTemplate.rewards (../../sb/FraxUnifiedFarmTemplate.sol#1235) can be used in cross function reentrancies:
+	- FraxUnifiedFarmTemplate.earned(address) (../../sb/FraxUnifiedFarmTemplate.sol#1380-1395)
+Reentrancy in FraxUnifiedFarmTemplate._updateRewardAndBalance(address,bool) (../../sb/FraxUnifiedFarmTemplate.sol#1514-1547):
+	External calls:
+	- sync() (../../sb/FraxUnifiedFarmTemplate.sol#1517)
+		- rewards_distributor.distributeReward(address(this)) (../../sb/FraxUnifiedFarmTemplate.sol#1604)
+		- last_gauge_relative_weights[i] = IFraxGaugeController(gauge_controller_address).gauge_relative_weight_write(address(this),block.timestamp) (../../sb/FraxUnifiedFarmTemplate.sol#1650)
+	State variables written after the call(s):
+	- _total_combined_weight = _total_combined_weight + weight_diff (../../sb/FraxUnifiedFarmTemplate.sol#1538)
+	FraxUnifiedFarmTemplate._total_combined_weight (../../sb/FraxUnifiedFarmTemplate.sol#1244) can be used in cross function reentrancies:
+	- FraxUnifiedFarmTemplate._total_combined_weight (../../sb/FraxUnifiedFarmTemplate.sol#1244)
+	- FraxUnifiedFarmTemplate.rewardsPerToken() (../../sb/FraxUnifiedFarmTemplate.sol#1362-1375)
+	- FraxUnifiedFarmTemplate.totalCombinedWeight() (../../sb/FraxUnifiedFarmTemplate.sol#1420-1422)
+	- _total_combined_weight = _total_combined_weight - weight_diff_scope_0 (../../sb/FraxUnifiedFarmTemplate.sol#1542)
+	FraxUnifiedFarmTemplate._total_combined_weight (../../sb/FraxUnifiedFarmTemplate.sol#1244) can be used in cross function reentrancies:
+	- FraxUnifiedFarmTemplate._total_combined_weight (../../sb/FraxUnifiedFarmTemplate.sol#1244)
+	- FraxUnifiedFarmTemplate.rewardsPerToken() (../../sb/FraxUnifiedFarmTemplate.sol#1362-1375)
+	- FraxUnifiedFarmTemplate.totalCombinedWeight() (../../sb/FraxUnifiedFarmTemplate.sol#1420-1422)
+Reentrancy in FraxUnifiedFarmTemplate.sync_gauge_weights(bool) (../../sb/FraxUnifiedFarmTemplate.sol#1643-1655):
+	External calls:
+	- last_gauge_relative_weights[i] = IFraxGaugeController(gauge_controller_address).gauge_relative_weight_write(address(this),block.timestamp) (../../sb/FraxUnifiedFarmTemplate.sol#1650)
+	State variables written after the call(s):
+	- last_gauge_time_totals[i] = IFraxGaugeController(gauge_controller_address).time_total() (../../sb/FraxUnifiedFarmTemplate.sol#1651)
+	FraxUnifiedFarmTemplate.last_gauge_time_totals (../../sb/FraxUnifiedFarmTemplate.sol#1240) can be used in cross function reentrancies:
+	- FraxUnifiedFarmTemplate.constructor(address,address[],address[],uint256[],address[]) (../../sb/FraxUnifiedFarmTemplate.sol#1292-1328)
+	- FraxUnifiedFarmTemplate.sync_gauge_weights(bool) (../../sb/FraxUnifiedFarmTemplate.sol#1643-1655)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+FraxUnifiedFarmTemplate.setMultipliers(uint256,uint256,uint256,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#1746-1761) contains a tautology or contradiction:
+	- require(bool,string)(_vefxs_max_multiplier >= 0,veFXS mul must be >= 0) (../../sb/FraxUnifiedFarmTemplate.sol#1753)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#tautology-or-contradiction
+
+FraxUnifiedFarmTemplate.retroCatchUp() (../../sb/FraxUnifiedFarmTemplate.sol#1602-1628) ignores return value by rewards_distributor.distributeReward(address(this)) (../../sb/FraxUnifiedFarmTemplate.sol#1604)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+FraxUnifiedFarmTemplate.setMultipliers(uint256,uint256,uint256,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#1746-1761) should emit an event for: 
+	- lock_max_multiplier = _lock_max_multiplier (../../sb/FraxUnifiedFarmTemplate.sol#1757) 
+	- vefxs_max_multiplier = _vefxs_max_multiplier (../../sb/FraxUnifiedFarmTemplate.sol#1758) 
+	- vefxs_per_frax_for_max_boost = _vefxs_per_frax_for_max_boost (../../sb/FraxUnifiedFarmTemplate.sol#1759) 
+	- vefxs_boost_scale_factor = _vefxs_boost_scale_factor (../../sb/FraxUnifiedFarmTemplate.sol#1760) 
+FraxUnifiedFarmTemplate.setLockedStakeTimeForMinAndMaxMultiplier(uint256,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#1763-1769) should emit an event for: 
+	- lock_time_for_max_multiplier = _lock_time_for_max_multiplier (../../sb/FraxUnifiedFarmTemplate.sol#1767) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+Owned.nominateNewOwner(address)._owner (../../sb/FraxUnifiedFarmTemplate.sol#1137) lacks a zero-check on :
+		- nominatedOwner = _owner (../../sb/FraxUnifiedFarmTemplate.sol#1138)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+FraxUnifiedFarmTemplate.rewardRates(uint256) (../../sb/FraxUnifiedFarmTemplate.sol#1351-1359) has external calls inside a loop: rwd_rate = (IFraxGaugeController(gauge_controller_address).global_emission_rate() * last_gauge_relative_weights[token_idx]) / 1e18 (../../sb/FraxUnifiedFarmTemplate.sol#1354)
+FraxUnifiedFarmTemplate.sync_gauge_weights(bool) (../../sb/FraxUnifiedFarmTemplate.sol#1643-1655) has external calls inside a loop: last_gauge_relative_weights[i] = IFraxGaugeController(gauge_controller_address).gauge_relative_weight_write(address(this),block.timestamp) (../../sb/FraxUnifiedFarmTemplate.sol#1650)
+FraxUnifiedFarmTemplate.sync_gauge_weights(bool) (../../sb/FraxUnifiedFarmTemplate.sol#1643-1655) has external calls inside a loop: last_gauge_time_totals[i] = IFraxGaugeController(gauge_controller_address).time_total() (../../sb/FraxUnifiedFarmTemplate.sol#1651)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in FraxUnifiedFarmTemplate._getReward(address,address) (../../sb/FraxUnifiedFarmTemplate.sol#1580-1595):
+	External calls:
+	- TransferHelper.safeTransfer(rewardTokens[i],destination_address,rewards_before[i]) (../../sb/FraxUnifiedFarmTemplate.sol#1587)
+	- updateRewardAndBalance(rewardee,true) (../../sb/FraxUnifiedFarmTemplate.sol#1580)
+		- rewards_distributor.distributeReward(address(this)) (../../sb/FraxUnifiedFarmTemplate.sol#1604)
+		- last_gauge_relative_weights[i] = IFraxGaugeController(gauge_controller_address).gauge_relative_weight_write(address(this),block.timestamp) (../../sb/FraxUnifiedFarmTemplate.sol#1650)
+	State variables written after the call(s):
+	- lastRewardClaimTime[rewardee] = block.timestamp (../../sb/FraxUnifiedFarmTemplate.sol#1594)
+Reentrancy in FraxUnifiedFarmTemplate._updateRewardAndBalance(address,bool) (../../sb/FraxUnifiedFarmTemplate.sol#1514-1547):
+	External calls:
+	- sync() (../../sb/FraxUnifiedFarmTemplate.sol#1517)
+		- rewards_distributor.distributeReward(address(this)) (../../sb/FraxUnifiedFarmTemplate.sol#1604)
+		- last_gauge_relative_weights[i] = IFraxGaugeController(gauge_controller_address).gauge_relative_weight_write(address(this),block.timestamp) (../../sb/FraxUnifiedFarmTemplate.sol#1650)
+	State variables written after the call(s):
+	- _combined_weights[account] = old_combined_weight + weight_diff (../../sb/FraxUnifiedFarmTemplate.sol#1539)
+	- _combined_weights[account] = old_combined_weight - weight_diff_scope_0 (../../sb/FraxUnifiedFarmTemplate.sol#1543)
+	- _vefxsMultiplierStored[account] = new_vefxs_multiplier (../../sb/FraxUnifiedFarmTemplate.sol#1533)
+	- _syncEarned(account) (../../sb/FraxUnifiedFarmTemplate.sol#1530)
+		- rewards[account][i] = earned_arr[i] (../../sb/FraxUnifiedFarmTemplate.sol#1556)
+	- _syncEarned(account) (../../sb/FraxUnifiedFarmTemplate.sol#1530)
+		- userRewardsPerTokenPaid[account][i_scope_0] = rewardsPerTokenStored[i_scope_0] (../../sb/FraxUnifiedFarmTemplate.sol#1561)
+Reentrancy in FraxUnifiedFarmTemplate.retroCatchUp() (../../sb/FraxUnifiedFarmTemplate.sol#1602-1628):
+	External calls:
+	- rewards_distributor.distributeReward(address(this)) (../../sb/FraxUnifiedFarmTemplate.sol#1604)
+	State variables written after the call(s):
+	- fraxPerLPStored = fraxPerLPToken() (../../sb/FraxUnifiedFarmTemplate.sol#1627)
+	- _updateStoredRewardsAndTime() (../../sb/FraxUnifiedFarmTemplate.sol#1624)
+		- lastUpdateTime = lastTimeRewardApplicable() (../../sb/FraxUnifiedFarmTemplate.sol#1640)
+	- periodFinish = periodFinish + ((num_periods_elapsed + 1) * rewardsDuration) (../../sb/FraxUnifiedFarmTemplate.sol#1621)
+	- _updateStoredRewardsAndTime() (../../sb/FraxUnifiedFarmTemplate.sol#1624)
+		- rewardsPerTokenStored[i] = rewards_per_token[i] (../../sb/FraxUnifiedFarmTemplate.sol#1636)
+Reentrancy in FraxUnifiedFarmTemplate.sync() (../../sb/FraxUnifiedFarmTemplate.sol#1657-1667):
+	External calls:
+	- sync_gauge_weights(false) (../../sb/FraxUnifiedFarmTemplate.sol#1659)
+		- last_gauge_relative_weights[i] = IFraxGaugeController(gauge_controller_address).gauge_relative_weight_write(address(this),block.timestamp) (../../sb/FraxUnifiedFarmTemplate.sol#1650)
+	- retroCatchUp() (../../sb/FraxUnifiedFarmTemplate.sol#1662)
+		- rewards_distributor.distributeReward(address(this)) (../../sb/FraxUnifiedFarmTemplate.sol#1604)
+	State variables written after the call(s):
+	- retroCatchUp() (../../sb/FraxUnifiedFarmTemplate.sol#1662)
+		- fraxPerLPStored = fraxPerLPToken() (../../sb/FraxUnifiedFarmTemplate.sol#1627)
+Reentrancy in FraxUnifiedFarmTemplate.sync() (../../sb/FraxUnifiedFarmTemplate.sol#1657-1667):
+	External calls:
+	- sync_gauge_weights(false) (../../sb/FraxUnifiedFarmTemplate.sol#1659)
+		- last_gauge_relative_weights[i] = IFraxGaugeController(gauge_controller_address).gauge_relative_weight_write(address(this),block.timestamp) (../../sb/FraxUnifiedFarmTemplate.sol#1650)
+	State variables written after the call(s):
+	- _updateStoredRewardsAndTime() (../../sb/FraxUnifiedFarmTemplate.sol#1665)
+		- lastUpdateTime = lastTimeRewardApplicable() (../../sb/FraxUnifiedFarmTemplate.sol#1640)
+	- _updateStoredRewardsAndTime() (../../sb/FraxUnifiedFarmTemplate.sol#1665)
+		- rewardsPerTokenStored[i] = rewards_per_token[i] (../../sb/FraxUnifiedFarmTemplate.sol#1636)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+FraxUnifiedFarmTemplate.retroCatchUp() (../../sb/FraxUnifiedFarmTemplate.sol#1602-1628) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)((rewardRates(i) * rewardsDuration * (num_periods_elapsed + 1)) <= ERC20(rewardTokens[i]).balanceOf(address(this)),string(abi.encodePacked(Not enough reward tokens available: ,rewardTokens[i]))) (../../sb/FraxUnifiedFarmTemplate.sol#1614)
+FraxUnifiedFarmTemplate.sync_gauge_weights(bool) (../../sb/FraxUnifiedFarmTemplate.sol#1643-1655) uses timestamp for comparisons
+	Dangerous comparisons:
+	- force_update || (block.timestamp > last_gauge_time_totals[i]) (../../sb/FraxUnifiedFarmTemplate.sol#1648)
+FraxUnifiedFarmTemplate.sync() (../../sb/FraxUnifiedFarmTemplate.sol#1657-1667) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp >= periodFinish (../../sb/FraxUnifiedFarmTemplate.sol#1661)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/FraxUnifiedFarmTemplate.sol#482-491) uses assembly
+	- INLINE ASM (../../sb/FraxUnifiedFarmTemplate.sol#489)
+Address._verifyCallResult(bool,bytes,string) (../../sb/FraxUnifiedFarmTemplate.sol#627-644) uses assembly
+	- INLINE ASM (../../sb/FraxUnifiedFarmTemplate.sol#636-639)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+FraxUnifiedFarmTemplate.getReward() (../../sb/FraxUnifiedFarmTemplate.sol#1574-1577) compares to a boolean constant:
+	-require(bool,string)(rewardsCollectionPaused == false,Rewards collection paused) (../../sb/FraxUnifiedFarmTemplate.sol#1575)
+FraxUnifiedFarmTemplate.isMigrating() (../../sb/FraxUnifiedFarmTemplate.sol#1280-1283) compares to a boolean constant:
+	-require(bool,string)(migrationsOn == true,Not in migration) (../../sb/FraxUnifiedFarmTemplate.sol#1281)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#boolean-equality
+
+Address._verifyCallResult(bool,bytes,string) (../../sb/FraxUnifiedFarmTemplate.sol#627-644) is never used and should be removed
+Address.functionCall(address,bytes) (../../sb/FraxUnifiedFarmTemplate.sol#535-537) is never used and should be removed
+Address.functionCall(address,bytes,string) (../../sb/FraxUnifiedFarmTemplate.sol#545-547) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#560-562) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/FraxUnifiedFarmTemplate.sol#570-577) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/FraxUnifiedFarmTemplate.sol#609-611) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/FraxUnifiedFarmTemplate.sol#619-625) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/FraxUnifiedFarmTemplate.sol#585-587) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/FraxUnifiedFarmTemplate.sol#595-601) is never used and should be removed
+Address.isContract(address) (../../sb/FraxUnifiedFarmTemplate.sol#482-491) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#509-515) is never used and should be removed
+Context._msgData() (../../sb/FraxUnifiedFarmTemplate.sol#225-228) is never used and should be removed
+ERC20._burnFrom(address,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#951-954) is never used and should be removed
+ERC20._mint(address,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#865-873) is never used and should be removed
+Math.average(uint256,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#28-31) is never used and should be removed
+Math.max(uint256,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#13-15) is never used and should be removed
+Math.sqrt(uint256) (../../sb/FraxUnifiedFarmTemplate.sol#34-45) is never used and should be removed
+SafeERC20._callOptionalReturn(IERC20,bytes) (../../sb/FraxUnifiedFarmTemplate.sol#1054-1064) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#1027-1036) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#1043-1046) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#1038-1041) is never used and should be removed
+SafeERC20.safeTransfer(IERC20,address,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#1012-1014) is never used and should be removed
+SafeERC20.safeTransferFrom(IERC20,address,address,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#1016-1018) is never used and should be removed
+SafeMath.div(uint256,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#326-328) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/FraxUnifiedFarmTemplate.sol#343-350) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#363-365) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/FraxUnifiedFarmTemplate.sol#380-383) is never used and should be removed
+SafeMath.mul(uint256,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#301-313) is never used and should be removed
+TransferHelper.safeApprove(address,address,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#975-979) is never used and should be removed
+TransferHelper.safeTransferETH(address,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#993-996) is never used and should be removed
+TransferHelper.safeTransferFrom(address,address,address,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#987-991) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version>=0.8.0 (../../sb/FraxUnifiedFarmTemplate.sol#1) allows old versions
+solc-0.8.27 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#509-515):
+	- (success) = recipient.call{value: amount}() (../../sb/FraxUnifiedFarmTemplate.sol#513)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/FraxUnifiedFarmTemplate.sol#570-577):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/FraxUnifiedFarmTemplate.sol#575)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/FraxUnifiedFarmTemplate.sol#595-601):
+	- (success,returndata) = target.staticcall(data) (../../sb/FraxUnifiedFarmTemplate.sol#599)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/FraxUnifiedFarmTemplate.sol#619-625):
+	- (success,returndata) = target.delegatecall(data) (../../sb/FraxUnifiedFarmTemplate.sol#623)
+Low level call in TransferHelper.safeApprove(address,address,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#975-979):
+	- (success,data) = token.call(abi.encodeWithSelector(0x095ea7b3,to,value)) (../../sb/FraxUnifiedFarmTemplate.sol#977)
+Low level call in TransferHelper.safeTransfer(address,address,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#981-985):
+	- (success,data) = token.call(abi.encodeWithSelector(0xa9059cbb,to,value)) (../../sb/FraxUnifiedFarmTemplate.sol#983)
+Low level call in TransferHelper.safeTransferFrom(address,address,address,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#987-991):
+	- (success,data) = token.call(abi.encodeWithSelector(0x23b872dd,from,to,value)) (../../sb/FraxUnifiedFarmTemplate.sol#989)
+Low level call in TransferHelper.safeTransferETH(address,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#993-996):
+	- (success) = to.call{value: value}(new bytes(0)) (../../sb/FraxUnifiedFarmTemplate.sol#994)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Function IveFXS.commit_transfer_ownership(address) (../../sb/FraxUnifiedFarmTemplate.sol#55) is not in mixedCase
+Function IveFXS.apply_transfer_ownership() (../../sb/FraxUnifiedFarmTemplate.sol#56) is not in mixedCase
+Function IveFXS.commit_smart_wallet_checker(address) (../../sb/FraxUnifiedFarmTemplate.sol#57) is not in mixedCase
+Function IveFXS.apply_smart_wallet_checker() (../../sb/FraxUnifiedFarmTemplate.sol#58) is not in mixedCase
+Parameter IveFXS.recoverERC20(address,uint256).token_addr (../../sb/FraxUnifiedFarmTemplate.sol#60) is not in mixedCase
+Function IveFXS.get_last_user_slope(address) (../../sb/FraxUnifiedFarmTemplate.sol#61) is not in mixedCase
+Function IveFXS.user_point_history__ts(address,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#62) is not in mixedCase
+Function IveFXS.locked__end(address) (../../sb/FraxUnifiedFarmTemplate.sol#63) is not in mixedCase
+Function IveFXS.deposit_for(address,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#65) is not in mixedCase
+Function IveFXS.create_lock(uint256,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#66) is not in mixedCase
+Parameter IveFXS.create_lock(uint256,uint256)._unlock_time (../../sb/FraxUnifiedFarmTemplate.sol#66) is not in mixedCase
+Function IveFXS.increase_amount(uint256) (../../sb/FraxUnifiedFarmTemplate.sol#67) is not in mixedCase
+Function IveFXS.increase_unlock_time(uint256) (../../sb/FraxUnifiedFarmTemplate.sol#68) is not in mixedCase
+Parameter IveFXS.increase_unlock_time(uint256)._unlock_time (../../sb/FraxUnifiedFarmTemplate.sol#68) is not in mixedCase
+Function IveFXS.point_history(uint256) (../../sb/FraxUnifiedFarmTemplate.sol#83) is not in mixedCase
+Function IveFXS.user_point_history(address,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#84) is not in mixedCase
+Function IveFXS.user_point_epoch(address) (../../sb/FraxUnifiedFarmTemplate.sol#85) is not in mixedCase
+Function IveFXS.slope_changes(uint256) (../../sb/FraxUnifiedFarmTemplate.sol#86) is not in mixedCase
+Function IveFXS.future_smart_wallet_checker() (../../sb/FraxUnifiedFarmTemplate.sol#94) is not in mixedCase
+Function IveFXS.smart_wallet_checker() (../../sb/FraxUnifiedFarmTemplate.sol#95) is not in mixedCase
+Function IveFXS.future_admin() (../../sb/FraxUnifiedFarmTemplate.sol#97) is not in mixedCase
+Function IDelegationProxy.adjusted_balance_of(address) (../../sb/FraxUnifiedFarmTemplate.sol#101) is not in mixedCase
+Function IDelegationProxy.kill_delegation() (../../sb/FraxUnifiedFarmTemplate.sol#102) is not in mixedCase
+Function IDelegationProxy.set_delegation(address) (../../sb/FraxUnifiedFarmTemplate.sol#103) is not in mixedCase
+Function IDelegationProxy.commit_set_admins(address,address) (../../sb/FraxUnifiedFarmTemplate.sol#104) is not in mixedCase
+Parameter IDelegationProxy.commit_set_admins(address,address)._o_admin (../../sb/FraxUnifiedFarmTemplate.sol#104) is not in mixedCase
+Parameter IDelegationProxy.commit_set_admins(address,address)._e_admin (../../sb/FraxUnifiedFarmTemplate.sol#104) is not in mixedCase
+Function IDelegationProxy.apply_set_admins() (../../sb/FraxUnifiedFarmTemplate.sol#105) is not in mixedCase
+Function IDelegationProxy.emergency_admin() (../../sb/FraxUnifiedFarmTemplate.sol#107) is not in mixedCase
+Function IDelegationProxy.ownership_admin() (../../sb/FraxUnifiedFarmTemplate.sol#108) is not in mixedCase
+Function IDelegationProxy.future_emergency_admin() (../../sb/FraxUnifiedFarmTemplate.sol#109) is not in mixedCase
+Function IDelegationProxy.future_ownership_admin() (../../sb/FraxUnifiedFarmTemplate.sol#110) is not in mixedCase
+Function IFraxGaugeController.future_admin() (../../sb/FraxUnifiedFarmTemplate.sol#128) is not in mixedCase
+Function IFraxGaugeController.voting_escrow() (../../sb/FraxUnifiedFarmTemplate.sol#130) is not in mixedCase
+Function IFraxGaugeController.n_gauge_types() (../../sb/FraxUnifiedFarmTemplate.sol#131) is not in mixedCase
+Function IFraxGaugeController.n_gauges() (../../sb/FraxUnifiedFarmTemplate.sol#132) is not in mixedCase
+Function IFraxGaugeController.gauge_type_names(int128) (../../sb/FraxUnifiedFarmTemplate.sol#133) is not in mixedCase
+Function IFraxGaugeController.vote_user_slopes(address,address) (../../sb/FraxUnifiedFarmTemplate.sol#135-138) is not in mixedCase
+Function IFraxGaugeController.vote_user_power(address) (../../sb/FraxUnifiedFarmTemplate.sol#139) is not in mixedCase
+Function IFraxGaugeController.last_user_vote(address,address) (../../sb/FraxUnifiedFarmTemplate.sol#140) is not in mixedCase
+Function IFraxGaugeController.points_weight(address,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#141-144) is not in mixedCase
+Function IFraxGaugeController.time_weight(address) (../../sb/FraxUnifiedFarmTemplate.sol#145) is not in mixedCase
+Function IFraxGaugeController.points_sum(int128,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#146) is not in mixedCase
+Function IFraxGaugeController.time_sum(uint256) (../../sb/FraxUnifiedFarmTemplate.sol#147) is not in mixedCase
+Function IFraxGaugeController.points_total(uint256) (../../sb/FraxUnifiedFarmTemplate.sol#148) is not in mixedCase
+Function IFraxGaugeController.time_total() (../../sb/FraxUnifiedFarmTemplate.sol#149) is not in mixedCase
+Function IFraxGaugeController.points_type_weight(int128,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#150-153) is not in mixedCase
+Function IFraxGaugeController.time_type_weight(uint256) (../../sb/FraxUnifiedFarmTemplate.sol#154) is not in mixedCase
+Function IFraxGaugeController.gauge_types(address) (../../sb/FraxUnifiedFarmTemplate.sol#157) is not in mixedCase
+Function IFraxGaugeController.gauge_relative_weight(address) (../../sb/FraxUnifiedFarmTemplate.sol#158) is not in mixedCase
+Function IFraxGaugeController.gauge_relative_weight(address,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#159) is not in mixedCase
+Function IFraxGaugeController.get_gauge_weight(address) (../../sb/FraxUnifiedFarmTemplate.sol#160) is not in mixedCase
+Function IFraxGaugeController.get_type_weight(int128) (../../sb/FraxUnifiedFarmTemplate.sol#161) is not in mixedCase
+Function IFraxGaugeController.get_total_weight() (../../sb/FraxUnifiedFarmTemplate.sol#162) is not in mixedCase
+Function IFraxGaugeController.get_weights_sum_per_type(int128) (../../sb/FraxUnifiedFarmTemplate.sol#163) is not in mixedCase
+Function IFraxGaugeController.commit_transfer_ownership(address) (../../sb/FraxUnifiedFarmTemplate.sol#166) is not in mixedCase
+Function IFraxGaugeController.apply_transfer_ownership() (../../sb/FraxUnifiedFarmTemplate.sol#167) is not in mixedCase
+Function IFraxGaugeController.add_gauge(address,int128,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#168-172) is not in mixedCase
+Function IFraxGaugeController.checkpoint_gauge(address) (../../sb/FraxUnifiedFarmTemplate.sol#174) is not in mixedCase
+Function IFraxGaugeController.global_emission_rate() (../../sb/FraxUnifiedFarmTemplate.sol#175) is not in mixedCase
+Function IFraxGaugeController.gauge_relative_weight_write(address) (../../sb/FraxUnifiedFarmTemplate.sol#176-178) is not in mixedCase
+Function IFraxGaugeController.gauge_relative_weight_write(address,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#179-181) is not in mixedCase
+Function IFraxGaugeController.add_type(string,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#182) is not in mixedCase
+Function IFraxGaugeController.change_type_weight(int128,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#183) is not in mixedCase
+Function IFraxGaugeController.change_gauge_weight(address,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#184) is not in mixedCase
+Function IFraxGaugeController.change_global_emission_rate(uint256) (../../sb/FraxUnifiedFarmTemplate.sol#185) is not in mixedCase
+Function IFraxGaugeController.vote_for_gauge_weights(address,uint256) (../../sb/FraxUnifiedFarmTemplate.sol#186) is not in mixedCase
+Function IFraxGaugeFXSRewardsDistributor.curator_address() (../../sb/FraxUnifiedFarmTemplate.sol#191) is not in mixedCase
+Parameter IFraxGaugeFXSRewardsDistributor.currentReward(address).gauge_address (../../sb/FraxUnifiedFarmTemplate.sol#192) is not in mixedCase
+Parameter IFraxGaugeFXSRewardsDistributor.distributeReward(address).gauge_address (../../sb/FraxUnifiedFarmTemplate.sol#193) is not in mixedCase
+Function IFraxGaugeFXSRewardsDistributor.gauge_whitelist(address) (../../sb/FraxUnifiedFarmTemplate.sol#195) is not in mixedCase
+Function IFraxGaugeFXSRewardsDistributor.is_middleman(address) (../../sb/FraxUnifiedFarmTemplate.sol#196) is not in mixedCase
+Function IFraxGaugeFXSRewardsDistributor.last_time_gauge_paid(address) (../../sb/FraxUnifiedFarmTemplate.sol#197) is not in mixedCase
+Parameter IFraxGaugeFXSRewardsDistributor.setCurator(address)._new_curator_address (../../sb/FraxUnifiedFarmTemplate.sol#202) is not in mixedCase
+Parameter IFraxGaugeFXSRewardsDistributor.setGaugeController(address)._gauge_controller_address (../../sb/FraxUnifiedFarmTemplate.sol#203) is not in mixedCase
+Parameter IFraxGaugeFXSRewardsDistributor.setGaugeState(address,bool,bool)._gauge_address (../../sb/FraxUnifiedFarmTemplate.sol#204) is not in mixedCase
+Parameter IFraxGaugeFXSRewardsDistributor.setGaugeState(address,bool,bool)._is_middleman (../../sb/FraxUnifiedFarmTemplate.sol#204) is not in mixedCase
+Parameter IFraxGaugeFXSRewardsDistributor.setGaugeState(address,bool,bool)._is_active (../../sb/FraxUnifiedFarmTemplate.sol#204) is not in mixedCase
+Parameter IFraxGaugeFXSRewardsDistributor.setTimelock(address)._new_timelock (../../sb/FraxUnifiedFarmTemplate.sol#205) is not in mixedCase
+Function IFraxGaugeFXSRewardsDistributor.timelock_address() (../../sb/FraxUnifiedFarmTemplate.sol#206) is not in mixedCase
+Parameter Owned.nominateNewOwner(address)._owner (../../sb/FraxUnifiedFarmTemplate.sol#1137) is not in mixedCase
+Parameter FraxUnifiedFarmTemplate.isTokenManagerFor(address,address).caller_addr (../../sb/FraxUnifiedFarmTemplate.sol#1335) is not in mixedCase
+Parameter FraxUnifiedFarmTemplate.isTokenManagerFor(address,address).reward_token_addr (../../sb/FraxUnifiedFarmTemplate.sol#1335) is not in mixedCase
+Parameter FraxUnifiedFarmTemplate.rewardRates(uint256).token_idx (../../sb/FraxUnifiedFarmTemplate.sol#1351) is not in mixedCase
+Parameter FraxUnifiedFarmTemplate.stakerToggleMigrator(address).migrator_address (../../sb/FraxUnifiedFarmTemplate.sol#1499) is not in mixedCase
+Function FraxUnifiedFarmTemplate.sync_gauge_weights(bool) (../../sb/FraxUnifiedFarmTemplate.sol#1643-1655) is not in mixedCase
+Parameter FraxUnifiedFarmTemplate.sync_gauge_weights(bool).force_update (../../sb/FraxUnifiedFarmTemplate.sol#1643) is not in mixedCase
+Function FraxUnifiedFarmTemplate.sync_other() (../../sb/FraxUnifiedFarmTemplate.sol#1669-1672) is not in mixedCase
+Parameter FraxUnifiedFarmTemplate.setPauses(bool,bool,bool)._stakingPaused (../../sb/FraxUnifiedFarmTemplate.sol#1683) is not in mixedCase
+Parameter FraxUnifiedFarmTemplate.setPauses(bool,bool,bool)._withdrawalsPaused (../../sb/FraxUnifiedFarmTemplate.sol#1684) is not in mixedCase
+Parameter FraxUnifiedFarmTemplate.setPauses(bool,bool,bool)._rewardsCollectionPaused (../../sb/FraxUnifiedFarmTemplate.sol#1685) is not in mixedCase
+Parameter FraxUnifiedFarmTemplate.greylistAddress(address)._address (../../sb/FraxUnifiedFarmTemplate.sol#1692) is not in mixedCase
+Parameter FraxUnifiedFarmTemplate.toggleMigrator(address).migrator_address (../../sb/FraxUnifiedFarmTemplate.sol#1708) is not in mixedCase
+Function FraxUnifiedFarmTemplate.set_veFXSBoostDelegationProxy(address) (../../sb/FraxUnifiedFarmTemplate.sol#1713-1715) is not in mixedCase
+Parameter FraxUnifiedFarmTemplate.set_veFXSBoostDelegationProxy(address)._dlg_pxy_addr (../../sb/FraxUnifiedFarmTemplate.sol#1713) is not in mixedCase
+Parameter FraxUnifiedFarmTemplate.setMultipliers(uint256,uint256,uint256,uint256)._lock_max_multiplier (../../sb/FraxUnifiedFarmTemplate.sol#1747) is not in mixedCase
+Parameter FraxUnifiedFarmTemplate.setMultipliers(uint256,uint256,uint256,uint256)._vefxs_max_multiplier (../../sb/FraxUnifiedFarmTemplate.sol#1748) is not in mixedCase
+Parameter FraxUnifiedFarmTemplate.setMultipliers(uint256,uint256,uint256,uint256)._vefxs_per_frax_for_max_boost (../../sb/FraxUnifiedFarmTemplate.sol#1749) is not in mixedCase
+Parameter FraxUnifiedFarmTemplate.setMultipliers(uint256,uint256,uint256,uint256)._vefxs_boost_scale_factor (../../sb/FraxUnifiedFarmTemplate.sol#1750) is not in mixedCase
+Parameter FraxUnifiedFarmTemplate.setLockedStakeTimeForMinAndMaxMultiplier(uint256,uint256)._lock_time_for_max_multiplier (../../sb/FraxUnifiedFarmTemplate.sol#1763) is not in mixedCase
+Parameter FraxUnifiedFarmTemplate.setLockedStakeTimeForMinAndMaxMultiplier(uint256,uint256)._lock_time_min (../../sb/FraxUnifiedFarmTemplate.sol#1763) is not in mixedCase
+Parameter FraxUnifiedFarmTemplate.setRewardRate(address,uint256).reward_token_address (../../sb/FraxUnifiedFarmTemplate.sol#1772) is not in mixedCase
+Parameter FraxUnifiedFarmTemplate.setRewardRate(address,uint256).new_rate (../../sb/FraxUnifiedFarmTemplate.sol#1772) is not in mixedCase
+Parameter FraxUnifiedFarmTemplate.setGaugeController(address,address,address).reward_token_address (../../sb/FraxUnifiedFarmTemplate.sol#1777) is not in mixedCase
+Parameter FraxUnifiedFarmTemplate.setGaugeController(address,address,address)._rewards_distributor_address (../../sb/FraxUnifiedFarmTemplate.sol#1777) is not in mixedCase
+Parameter FraxUnifiedFarmTemplate.setGaugeController(address,address,address)._gauge_controller_address (../../sb/FraxUnifiedFarmTemplate.sol#1777) is not in mixedCase
+Parameter FraxUnifiedFarmTemplate.changeTokenManager(address,address).reward_token_address (../../sb/FraxUnifiedFarmTemplate.sol#1783) is not in mixedCase
+Parameter FraxUnifiedFarmTemplate.changeTokenManager(address,address).new_manager_address (../../sb/FraxUnifiedFarmTemplate.sol#1783) is not in mixedCase
+Variable FraxUnifiedFarmTemplate.rewards_distributor (../../sb/FraxUnifiedFarmTemplate.sol#1196) is not in mixedCase
+Variable FraxUnifiedFarmTemplate.frax_address (../../sb/FraxUnifiedFarmTemplate.sol#1199) is not in mixedCase
+Variable FraxUnifiedFarmTemplate.frax_is_token0 (../../sb/FraxUnifiedFarmTemplate.sol#1200) is not in mixedCase
+Variable FraxUnifiedFarmTemplate.lock_max_multiplier (../../sb/FraxUnifiedFarmTemplate.sol#1211) is not in mixedCase
+Variable FraxUnifiedFarmTemplate.lock_time_for_max_multiplier (../../sb/FraxUnifiedFarmTemplate.sol#1212) is not in mixedCase
+Variable FraxUnifiedFarmTemplate.lock_time_min (../../sb/FraxUnifiedFarmTemplate.sol#1213) is not in mixedCase
+Variable FraxUnifiedFarmTemplate.vefxs_boost_scale_factor (../../sb/FraxUnifiedFarmTemplate.sol#1216) is not in mixedCase
+Variable FraxUnifiedFarmTemplate.vefxs_max_multiplier (../../sb/FraxUnifiedFarmTemplate.sol#1217) is not in mixedCase
+Variable FraxUnifiedFarmTemplate.vefxs_per_frax_for_max_boost (../../sb/FraxUnifiedFarmTemplate.sol#1218) is not in mixedCase
+Variable FraxUnifiedFarmTemplate._vefxsMultiplierStored (../../sb/FraxUnifiedFarmTemplate.sol#1219) is not in mixedCase
+Variable FraxUnifiedFarmTemplate.last_gauge_relative_weights (../../sb/FraxUnifiedFarmTemplate.sol#1239) is not in mixedCase
+Variable FraxUnifiedFarmTemplate.last_gauge_time_totals (../../sb/FraxUnifiedFarmTemplate.sol#1240) is not in mixedCase
+Variable FraxUnifiedFarmTemplate._total_liquidity_locked (../../sb/FraxUnifiedFarmTemplate.sol#1243) is not in mixedCase
+Variable FraxUnifiedFarmTemplate._total_combined_weight (../../sb/FraxUnifiedFarmTemplate.sol#1244) is not in mixedCase
+Variable FraxUnifiedFarmTemplate._locked_liquidity (../../sb/FraxUnifiedFarmTemplate.sol#1245) is not in mixedCase
+Variable FraxUnifiedFarmTemplate._combined_weights (../../sb/FraxUnifiedFarmTemplate.sol#1246) is not in mixedCase
+Variable FraxUnifiedFarmTemplate.valid_migrators (../../sb/FraxUnifiedFarmTemplate.sol#1249) is not in mixedCase
+Variable FraxUnifiedFarmTemplate.staker_allowed_migrators (../../sb/FraxUnifiedFarmTemplate.sol#1252) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/FraxUnifiedFarmTemplate.sol#226)" inContext (../../sb/FraxUnifiedFarmTemplate.sol#220-229)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Loop condition i < rewardTokens.length (../../sb/FraxUnifiedFarmTemplate.sol#1613) should use cached array length instead of referencing `length` member of the storage array.
+ Loop condition i < rewardsPerTokenStored.length (../../sb/FraxUnifiedFarmTemplate.sol#1635) should use cached array length instead of referencing `length` member of the storage array.
+ Loop condition i < rewardsPerTokenStored.length (../../sb/FraxUnifiedFarmTemplate.sol#1368) should use cached array length instead of referencing `length` member of the storage array.
+ Loop condition i < rewardTokens.length (../../sb/FraxUnifiedFarmTemplate.sol#1385) should use cached array length instead of referencing `length` member of the storage array.
+ Loop condition i_scope_0 < rewardTokens.length (../../sb/FraxUnifiedFarmTemplate.sol#1390) should use cached array length instead of referencing `length` member of the storage array.
+ Loop condition i < rewardRatesManual.length (../../sb/FraxUnifiedFarmTemplate.sol#1401) should use cached array length instead of referencing `length` member of the storage array.
+ Loop condition i < rewardTokens.length (../../sb/FraxUnifiedFarmTemplate.sol#1721) should use cached array length instead of referencing `length` member of the storage array.
+ Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cache-array-length
+
+FraxUnifiedFarmTemplate._total_liquidity_locked (../../sb/FraxUnifiedFarmTemplate.sol#1243) should be constant 
+FraxUnifiedFarmTemplate.frax_address (../../sb/FraxUnifiedFarmTemplate.sol#1199) should be constant 
+FraxUnifiedFarmTemplate.frax_is_token0 (../../sb/FraxUnifiedFarmTemplate.sol#1200) should be constant 
+FraxUnifiedFarmTemplate.rewardsDuration (../../sb/FraxUnifiedFarmTemplate.sol#1230) should be constant 
+FraxUnifiedFarmTemplate.veFXS (../../sb/FraxUnifiedFarmTemplate.sol#1194) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+
+ERC20._decimals (../../sb/FraxUnifiedFarmTemplate.sol#682) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/FraxUnifiedFarmTemplate.sol analyzed (15 contracts with 93 detectors), 209 result(s) found

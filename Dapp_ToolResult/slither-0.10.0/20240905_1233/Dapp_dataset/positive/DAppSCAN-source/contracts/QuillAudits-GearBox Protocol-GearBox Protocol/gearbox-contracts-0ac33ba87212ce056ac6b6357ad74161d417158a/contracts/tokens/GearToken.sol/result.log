@@ -1,0 +1,52 @@
+'solc --version' running
+'solc /sb/GearToken.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+GearToken._writeCheckpoint(address,uint32,uint96,uint96) (../../sb/GearToken.sol#676-701) uses a dangerous strict equality:
+	- nCheckpoints > 0 && checkpoints[delegatee][nCheckpoints - 1].fromBlock == blockNumber (../../sb/GearToken.sol#688-689)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+GearToken.transferOwnership(address) (../../sb/GearToken.sol#309-315) should emit an event for: 
+	- manager = newManager (../../sb/GearToken.sol#314) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-access-control
+
+GearToken.setMiner(address)._miner (../../sb/GearToken.sol#317) lacks a zero-check on :
+		- miner = _miner (../../sb/GearToken.sol#321)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+GearToken.permit(address,address,uint256,uint256,uint8,bytes32,bytes32) (../../sb/GearToken.sol#380-425) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp <= deadline,Gear::permit: signature expired) (../../sb/GearToken.sol#420)
+GearToken.delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32) (../../sb/GearToken.sol#502-538) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp <= expiry,Gear::delegateBySig: signature expired) (../../sb/GearToken.sol#533-536)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+GearToken.getChainId() (../../sb/GearToken.sol#740-746) uses assembly
+	- INLINE ASM (../../sb/GearToken.sol#742-744)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+SafeMath.add(uint256,uint256) (../../sb/GearToken.sol#72-76) is never used and should be removed
+SafeMath.div(uint256,uint256) (../../sb/GearToken.sol#122-125) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/GearToken.sol#177-180) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/GearToken.sol#139-142) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/GearToken.sol#197-200) is never used and should be removed
+SafeMath.mul(uint256,uint256) (../../sb/GearToken.sol#103-108) is never used and should be removed
+SafeMath.sub(uint256,uint256) (../../sb/GearToken.sol#88-91) is never used and should be removed
+SafeMath.sub(uint256,uint256,string) (../../sb/GearToken.sol#157-160) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/GearToken.sol#11-15) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/GearToken.sol#47-50) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/GearToken.sol#57-60) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/GearToken.sol#32-40) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/GearToken.sol#22-25) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.7.4 (../../sb/GearToken.sol#1) allows old versions
+solc-0.7.6 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Parameter GearToken.setMiner(address)._miner (../../sb/GearToken.sol#317) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+GearToken.totalSupply (../../sb/GearToken.sol#217) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+/sb/GearToken.sol analyzed (2 contracts with 93 detectors), 23 result(s) found

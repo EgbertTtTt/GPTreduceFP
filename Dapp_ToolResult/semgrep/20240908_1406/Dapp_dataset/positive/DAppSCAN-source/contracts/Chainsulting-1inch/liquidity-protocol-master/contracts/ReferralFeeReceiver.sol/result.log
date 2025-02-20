@@ -1,0 +1,481 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                     
+                     
+┌───────────────────┐
+│ 136 Code Findings │
+└───────────────────┘
+                                
+    /sb/ReferralFeeReceiver.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          557┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          561┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          579┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          584┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          589┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+         1417┆ abstract contract MooniswapGovernance is ERC20, Ownable,         
+  ReentrancyGuard {                                                             
+            ⋮┆----------------------------------------
+         2002┆ abstract contract Converter is Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          676┆ while (len < data.length && data[len] >= 0x20 && data[len] <=    
+  0x7E) {                                                                       
+            ⋮┆----------------------------------------
+          701┆ for (uint i = 0; i < data.length; i++) {
+            ⋮┆----------------------------------------
+         1763┆ for (uint i = 0; i < maxAmounts.length; i++) {
+            ⋮┆----------------------------------------
+         1775┆ for (uint i = 0; i < realBalances.length; i++) {
+            ⋮┆----------------------------------------
+         1781┆ for (uint i = 0; i < maxAmounts.length; i++) {
+            ⋮┆----------------------------------------
+         1787┆ for (uint i = 0; i < maxAmounts.length; i++) {
+            ⋮┆----------------------------------------
+         1798┆ for (uint i = 0; i < maxAmounts.length; i++) {
+            ⋮┆----------------------------------------
+         1827┆ for (uint i = 0; i < _tokens.length; i++) {
+            ⋮┆----------------------------------------
+         1834┆ require(i >= minReturns.length || value >= minReturns[i],        
+  "Mooniswap: result is not enough");                                           
+            ⋮┆----------------------------------------
+         2043┆ for (uint256 i = 1; i + 1 < path.length; i += 1) {
+            ⋮┆----------------------------------------
+         2102┆ for (uint256 i = 0; i + 1 < path.length; i += 1) {
+            ⋮┆----------------------------------------
+         2113┆ if (i + 2 < path.length) {
+            ⋮┆----------------------------------------
+         2217┆ for (uint256 i = 0; i + 1 < path.length; i += 1) {
+            ⋮┆----------------------------------------
+         2246┆ for (uint256 i = 0; i < pools.length; ++i) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          871┆ constructor (string memory name_, string memory symbol_) public {
+          872┆     _name = name_;
+          873┆     _symbol = symbol_;
+          874┆     _decimals = 18;
+          875┆ }
+            ⋮┆----------------------------------------
+         1689┆ constructor(
+         1690┆     IERC20 _token0,
+         1691┆     IERC20 _token1,
+         1692┆     string memory name,
+         1693┆     string memory symbol,
+         1694┆     IMooniswapFactoryGovernance _mooniswapFactoryGovernance
+         1695┆ )
+         1696┆     public
+         1697┆     ERC20(name, symbol)
+         1698┆     MooniswapGovernance(_mooniswapFactoryGovernance)
+             [hid 7 additional lines, adjust with --max-lines-per-finding] 
+         2155┆ constructor(IERC20 _inchToken, IMooniswapFactory                 
+  _mooniswapFactory) public Converter(_inchToken, _mooniswapFactory) {}         
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+         1799┆ virtualBalancesForRemoval[_tokens[i]].scale(_decayPeriod,        
+  realBalances[i], totalSupply.add(fairSupply), totalSupply);                   
+            ⋮┆----------------------------------------
+         1800┆ virtualBalancesForAddition[_tokens[i]].scale(_decayPeriod,       
+  realBalances[i], totalSupply.add(fairSupply), totalSupply);                   
+            ⋮┆----------------------------------------
+         1836┆ virtualBalancesForAddition[token].scale(_decayPeriod, preBalance,
+  totalSupply.sub(amount), totalSupply);                                        
+            ⋮┆----------------------------------------
+         1837┆ virtualBalancesForRemoval[token].scale(_decayPeriod, preBalance, 
+  totalSupply.sub(amount), totalSupply);                                        
+            ⋮┆----------------------------------------
+         2044┆ require(pathWhitelist[path[i]], "Token is not whitelisted");
+            ⋮┆----------------------------------------
+         2248┆ TokenInfo storage token = tokenInfo[mooniswap];
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          682┆ for (uint i = 0; i < len; i++) {
+            ⋮┆----------------------------------------
+          701┆ for (uint i = 0; i < data.length; i++) {
+            ⋮┆----------------------------------------
+         1763┆ for (uint i = 0; i < maxAmounts.length; i++) {
+            ⋮┆----------------------------------------
+         1775┆ for (uint i = 0; i < realBalances.length; i++) {
+            ⋮┆----------------------------------------
+         1781┆ for (uint i = 0; i < maxAmounts.length; i++) {
+            ⋮┆----------------------------------------
+         1787┆ for (uint i = 0; i < maxAmounts.length; i++) {
+            ⋮┆----------------------------------------
+         1798┆ for (uint i = 0; i < maxAmounts.length; i++) {
+            ⋮┆----------------------------------------
+         1827┆ for (uint i = 0; i < _tokens.length; i++) {
+            ⋮┆----------------------------------------
+         2159┆ for (uint i = 0; i < receivers.length; i++) {
+            ⋮┆----------------------------------------
+         2246┆ for (uint256 i = 0; i < pools.length; ++i) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           51┆ require(_status != _ENTERED, "ReentrancyGuard: reentrant call");
+            ⋮┆----------------------------------------
+          154┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          169┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          186┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          203┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          220┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          406┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          410┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          467┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          468┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          492┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          516┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          576┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          577┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          578┆ );
+            ⋮┆----------------------------------------
+          606┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          640┆ require(msg.value >= amount, "UniERC20: not enough value");
+            ⋮┆----------------------------------------
+          641┆ require(from == msg.sender, "from is not msg.sender");
+            ⋮┆----------------------------------------
+          642┆ require(to == address(this), "to is not this");
+            ⋮┆----------------------------------------
+          770┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          791┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1025┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1026┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1045┆ require(account != address(0), "ERC20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1066┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1089┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1090┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1145┆ require(value < 2**216, "value does not fit in 216 bits");
+            ⋮┆----------------------------------------
+         1150┆ require(value < 2**104, "value does not fit in 104 bits");
+            ⋮┆----------------------------------------
+         1155┆ require(value < 2**48, "value does not fit in 48 bits");
+            ⋮┆----------------------------------------
+         1160┆ require(value < 2**40, "value does not fit in 40 bits");
+            ⋮┆----------------------------------------
+         1493┆ require(vote <= MooniswapConstants._MAX_FEE, "Fee vote is too    
+  high");                                                                       
+            ⋮┆----------------------------------------
+         1500┆ require(vote <= MooniswapConstants._MAX_SLIPPAGE_FEE, "Slippage  
+  fee vote is too high");                                                       
+            ⋮┆----------------------------------------
+         1507┆ require(vote <= MooniswapConstants._MAX_DECAY_PERIOD, "Decay     
+  period vote is too high");                                                    
+            ⋮┆----------------------------------------
+         1508┆ require(vote >= MooniswapConstants._MIN_DECAY_PERIOD, "Decay     
+  period vote is too low");                                                     
+            ⋮┆----------------------------------------
+         1685┆ require(mooniswapFactoryGovernance.isActive(), "Mooniswap:       
+  factory shutdown");                                                           
+            ⋮┆----------------------------------------
+         1700┆ require(bytes(name).length > 0, "Mooniswap: name is empty");
+            ⋮┆----------------------------------------
+         1701┆ require(bytes(symbol).length > 0, "Mooniswap: symbol is empty");
+            ⋮┆----------------------------------------
+         1702┆ require(_token0 != _token1, "Mooniswap: duplicate tokens");
+            ⋮┆----------------------------------------
+         1721┆ revert("Pool has two tokens");
+            ⋮┆----------------------------------------
+         1755┆ require(msg.value == (_tokens[0].isETH() ? maxAmounts[0] :       
+  (_tokens[1].isETH() ? maxAmounts[1] : 0)), "Mooniswap: wrong value usage");   
+            ⋮┆----------------------------------------
+         1766┆ require(maxAmounts[i] > 0, "Mooniswap: amount is zero");
+            ⋮┆----------------------------------------
+         1767┆ require(maxAmounts[i] >= minAmounts[i], "Mooniswap: minAmount not
+  reached");                                                                    
+            ⋮┆----------------------------------------
+         1788┆ require(maxAmounts[i] > 0, "Mooniswap: amount is zero");
+            ⋮┆----------------------------------------
+         1790┆ require(amount >= minAmounts[i], "Mooniswap: minAmount not       
+  reached");                                                                    
+            ⋮┆----------------------------------------
+         1804┆ require(fairSupply > 0, "Mooniswap: result is not enough");
+            ⋮┆----------------------------------------
+         1834┆ require(i >= minReturns.length || value >= minReturns[i],        
+  "Mooniswap: result is not enough");                                           
+            ⋮┆----------------------------------------
+         1857┆ require(msg.value == (src.isETH() ? amount : 0), "Mooniswap:     
+  wrong value usage");                                                          
+            ⋮┆----------------------------------------
+         1889┆ require(result > 0 && result >= minReturn, "Mooniswap: return is 
+  not enough");                                                                 
+            ⋮┆----------------------------------------
+         1987┆ require(token0.uniBalanceOf(address(this)) >= balance0,          
+  "Mooniswap: access denied");                                                  
+            ⋮┆----------------------------------------
+         1988┆ require(token1.uniBalanceOf(address(this)) >= balance1,          
+  "Mooniswap: access denied");                                                  
+            ⋮┆----------------------------------------
+         1989┆ require(balanceOf(address(this)) >= _BASE_SUPPLY, "Mooniswap:    
+  access denied");                                                              
+            ⋮┆----------------------------------------
+         2023┆ require(msg.sender != tx.origin, "ETH transfer forbidden");
+            ⋮┆----------------------------------------
+         2027┆ require(_validateSpread(mooniswap), "Spread is too high");
+            ⋮┆----------------------------------------
+         2033┆ require(mooniswapFactory.isPool(mooniswap), "Invalid mooniswap");
+            ⋮┆----------------------------------------
+         2039┆ require(path.length > 0, "Min path length is 1");
+            ⋮┆----------------------------------------
+         2040┆ require(path.length < 5, "Max path length is 4");
+            ⋮┆----------------------------------------
+         2041┆ require(path[path.length - 1] == inchToken, "Should swap to      
+  target token");                                                               
+            ⋮┆----------------------------------------
+         2044┆ require(pathWhitelist[path[i]], "Token is not whitelisted");
+            ⋮┆----------------------------------------
+         2105┆ require(_validateSpread(mooniswap), "Spread is too high");
+            ⋮┆----------------------------------------
+         2183┆ require(token.firstUnprocessedEpoch == currentEpoch, "Previous   
+  epoch is not finalized");                                                     
+            ⋮┆----------------------------------------
+         2200┆ require(firstUnprocessedEpoch.add(1) == token.currentEpoch, "Prev
+  epoch already finalized");                                                    
+            ⋮┆----------------------------------------
+         2209┆ revert("Invalid first token");
+            ⋮┆----------------------------------------
+         2216┆ require(availableBalance == amount, "availableBalance is not     
+  dust");                                                                       
+            ⋮┆----------------------------------------
+         2219┆ require(_validateSpread(_mooniswap), "Spread is too high");
+            ⋮┆----------------------------------------
+         2280┆ require(firstUnprocessedEpoch.add(1) == currentEpoch, "Epoch     
+  already finalized");                                                          
+            ⋮┆----------------------------------------
+         2281┆ require(user.firstUnprocessedEpoch[mooniswap] ==                 
+  firstUnprocessedEpoch, "Epoch funds already claimed");                        
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 136 findings.
+         1889┆ require(result > 0 && result >= minReturn, "Mooniswap: return is 
+  not enough");                                                                 
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          667┆ if (success && data.length >= 96) {
+          668┆     (uint256 offset, uint256 len) = abi.decode(data, (uint256,   
+  uint256));                                                                    
+          669┆     if (offset == 0x20 && len > 0 && len <= 256) {
+          670┆         return string(abi.decode(data, (bytes)));
+          671┆     }
+          672┆ }
+            ⋮┆----------------------------------------
+          669┆ if (offset == 0x20 && len > 0 && len <= 256) {
+          670┆     return string(abi.decode(data, (bytes)));
+          671┆ }
+            ⋮┆----------------------------------------
+          674┆ if (success && data.length == 32) {
+          675┆     uint len = 0;
+          676┆     while (len < data.length && data[len] >= 0x20 && data[len] <=
+  0x7E) {                                                                       
+          677┆         len++;
+          678┆     }
+          679┆ 
+          680┆     if (len > 0) {
+          681┆         bytes memory result = new bytes(len);
+          682┆         for (uint i = 0; i < len; i++) {
+          683┆             result[i] = data[i];
+             [hid 4 additional lines, adjust with --max-lines-per-finding] 
+         1550┆ if (!updateFrom && !updateTo) {
+         1551┆     // mint to feeReceiver or burn from feeReceiver
+         1552┆     return;
+         1553┆ }
+            ⋮┆----------------------------------------
+         1599┆ if (voteFrom.isDefault() && voteTo.isDefault() &&                
+  params.updateFrom && params.updateTo) {                                       
+         1600┆     emitEvent(params.from, voteFrom.get(defaultValue), true,     
+  params.balanceFrom.sub(params.amount));                                       
+         1601┆     emitEvent(params.to, voteTo.get(defaultValue), true,         
+  params.balanceTo.add(params.amount));                                         
+         1602┆     return;
+         1603┆ }
+            ⋮┆----------------------------------------
+         1970┆ if (amount > 0 && src == token0 && dst == token1) {
+         1971┆     uint256 taxedAmount =                                        
+  amount.sub(amount.mul(fee).div(MooniswapConstants._FEE_DENOMINATOR));         
+         1972┆     uint256 srcBalancePlusTaxedAmount =                          
+  srcBalance.add(taxedAmount);                                                  
+         1973┆     uint256 ret =                                                
+  taxedAmount.mul(dstBalance).div(srcBalancePlusTaxedAmount);                   
+         1974┆     uint256 feeNumerator =                                       
+  MooniswapConstants._FEE_DENOMINATOR.mul(srcBalancePlusTaxedAmount).sub(slippag
+  eFee.mul(taxedAmount));                                                       
+         1975┆     uint256 feeDenominator =                                     
+  MooniswapConstants._FEE_DENOMINATOR.mul(srcBalancePlusTaxedAmount);           
+         1976┆     return ret.mul(feeNumerator).div(feeDenominator);
+         1977┆ }
+            ⋮┆----------------------------------------
+         2238┆ if (epochBalance.token0Balance == 0 && epochBalance.token1Balance
+  == 0) {                                                                       
+         2239┆     token.firstUnprocessedEpoch = firstUnprocessedEpoch.add(1);
+         2240┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          677┆ len++;
+            ⋮┆----------------------------------------
+          682┆ for (uint i = 0; i < len; i++) {
+            ⋮┆----------------------------------------
+          701┆ for (uint i = 0; i < data.length; i++) {
+            ⋮┆----------------------------------------
+         1763┆ for (uint i = 0; i < maxAmounts.length; i++) {
+            ⋮┆----------------------------------------
+         1775┆ for (uint i = 0; i < realBalances.length; i++) {
+            ⋮┆----------------------------------------
+         1781┆ for (uint i = 0; i < maxAmounts.length; i++) {
+            ⋮┆----------------------------------------
+         1787┆ for (uint i = 0; i < maxAmounts.length; i++) {
+            ⋮┆----------------------------------------
+         1798┆ for (uint i = 0; i < maxAmounts.length; i++) {
+            ⋮┆----------------------------------------
+         1827┆ for (uint i = 0; i < _tokens.length; i++) {
+            ⋮┆----------------------------------------
+         2159┆ for (uint i = 0; i < receivers.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          186┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          410┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          467┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          492┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          516┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          576┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          577┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          578┆ );
+            ⋮┆----------------------------------------
+          606┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          791┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1025┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1026┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1066┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1089┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1090┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

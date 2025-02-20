@@ -1,0 +1,190 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 32 Code Findings │
+└──────────────────┘
+                       
+    /sb/BsktLPPool.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          220┆ callOptionalReturn(
+          221┆     token,
+          222┆     abi.encodeWithSelector(token.transfer.selector, to, value)
+          223┆ );
+            ⋮┆----------------------------------------
+          232┆ callOptionalReturn(
+          233┆     token,
+          234┆     abi.encodeWithSelector(token.transferFrom.selector, from, to,
+  value)                                                                        
+          235┆ );
+            ⋮┆----------------------------------------
+          247┆ callOptionalReturn(
+          248┆     token,
+          249┆     abi.encodeWithSelector(token.approve.selector, spender,      
+  value)                                                                        
+          250┆ );
+            ⋮┆----------------------------------------
+          260┆ callOptionalReturn(
+          261┆     token,
+          262┆     abi.encodeWithSelector(
+          263┆         token.approve.selector,
+          264┆         spender,
+          265┆         newAllowance
+          266┆     )
+          267┆ );
+            ⋮┆----------------------------------------
+          280┆ callOptionalReturn(
+          281┆     token,
+          282┆     abi.encodeWithSelector(
+          283┆         token.approve.selector,
+          284┆         spender,
+          285┆         newAllowance
+          286┆     )
+          287┆ );
+            ⋮┆----------------------------------------
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          307┆ contract LPTokenWrapper is Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+          346┆ uint256 public starttime = 0;                   //-----| Pool    
+  will start once notify the reward |-----                                      
+            ⋮┆----------------------------------------
+          347┆ uint256 public periodFinish = 0;
+            ⋮┆----------------------------------------
+          348┆ uint256 public rewardRate = 0;
+            ⋮┆----------------------------------------
+          351┆ uint256 rewardAmount = 0;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+           90┆ constructor() internal {}
+            ⋮┆----------------------------------------
+          110┆ constructor() internal {
+          111┆     _owner = msg.sender;
+          112┆     emit OwnershipTransferred(address(0), _owner);
+          113┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           29┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+           55┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          120┆ require(isOwner(), "Ownable: caller is not the owner");
+            ⋮┆----------------------------------------
+          138┆ require(
+          139┆     newOwner != address(0),
+          140┆     "Ownable: new owner is the zero address"
+          141┆ );
+            ⋮┆----------------------------------------
+          198┆ require(
+          199┆     address(this).balance >= amount,
+          200┆     "Address: insufficient balance"
+          201┆ );
+            ⋮┆----------------------------------------
+          204┆ require(
+          205┆     success,
+          206┆     "Address: unable to send value, recipient may have reverted"
+          207┆ );
+            ⋮┆----------------------------------------
+          243┆ require(
+          244┆     (value == 0) || (token.allowance(address(this), spender) ==  
+  0),                                                                           
+          245┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          246┆ );
+            ⋮┆----------------------------------------
+          291┆ require(address(token).isContract(), "SafeERC20: call to         
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          294┆ require(success, "SafeERC20: low-level call failed");
+            ⋮┆----------------------------------------
+          299┆ require(
+          300┆     abi.decode(returndata, (bool)),
+          301┆     "SafeERC20: ERC20 operation did not succeed"
+          302┆ );
+            ⋮┆----------------------------------------
+          363┆ require(
+          364┆     block.timestamp >= starttime,
+          365┆     "Error:Pool not started yet."
+          366┆ );
+            ⋮┆----------------------------------------
+          407┆ require(amount > 0, "Cannot stake 0");
+            ⋮┆----------------------------------------
+          410┆ require(amount >= 5000 * 10 ** 18, "Error:For Initial entry 5000 
+  token must be required.");                                                    
+            ⋮┆----------------------------------------
+          421┆ require(amount > 0, "Cannot withdraw 0");
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           55┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          138┆ require(
+          139┆     newOwner != address(0),
+          140┆     "Ownable: new owner is the zero address"
+          141┆ );
+            ⋮┆----------------------------------------
+          204┆ require(
+          205┆     success,
+          206┆     "Address: unable to send value, recipient may have reverted"
+          207┆ );
+            ⋮┆----------------------------------------
+          243┆ require(
+          244┆     (value == 0) || (token.allowance(address(this), spender) ==  
+  0),                                                                           
+          245┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          246┆ );
+            ⋮┆----------------------------------------
+          299┆ require(
+          300┆     abi.decode(returndata, (bool)),
+          301┆     "SafeERC20: ERC20 operation did not succeed"
+          302┆ );
+            ⋮┆----------------------------------------
+          410┆ require(amount >= 5000 * 10 ** 18, "Error:For Initial entry 5000 
+  token must be required.");                                                    
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 32 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

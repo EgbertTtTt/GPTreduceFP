@@ -1,0 +1,90 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 12 Code Findings │
+└──────────────────┘
+                                   
+    /sb/ImpossibleWrappedToken.sol 
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          811┆ constructor(
+          812┆     address _underlying,
+          813┆     uint256 _ratioNum,
+          814┆     uint256 _ratioDenom
+          815┆ ) {
+          816┆     underlying = _underlying;
+          817┆     ratioNum = _ratioNum;
+          818┆     ratioDenom = _ratioDenom;
+          819┆     string memory desc =                                         
+  string(abi.encodePacked(IERC20(_underlying).symbol()));                       
+          820┆     name = string(abi.encodePacked('IF-Wrapped ', desc));
+             [hid 2 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          732┆ require((z = x + y) >= x, 'ds-math-add-overflow');
+            ⋮┆----------------------------------------
+          736┆ require((z = x - y) <= x, 'ds-math-sub-underflow');
+            ⋮┆----------------------------------------
+          740┆ require(y == 0 || (z = x * y) / y == x, 'ds-math-mul-overflow');
+            ⋮┆----------------------------------------
+          829┆ require(success, 'ImpossibleWrapper: TRANSFERFROM_FAILED');
+            ⋮┆----------------------------------------
+          875┆ require(success, 'IF Wrapper: UNDERLYING_TRANSFER_FAIL');
+            ⋮┆----------------------------------------
+          898┆ require(balanceOf[src] >= wad, '');
+            ⋮┆----------------------------------------
+          901┆ require(allowance[src][msg.sender] >= wad, 'ImpossibleWrapper:   
+  INSUFF_ALLOWANCE');                                                           
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          900┆ if (src != msg.sender && allowance[src][msg.sender] !=           
+  uint256(-1)) {                                                                
+          901┆     require(allowance[src][msg.sender] >= wad,                   
+  'ImpossibleWrapper: INSUFF_ALLOWANCE');                                       
+          902┆     allowance[src][msg.sender] -= wad;
+          903┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          829┆ require(success, 'ImpossibleWrapper: TRANSFERFROM_FAILED');
+            ⋮┆----------------------------------------
+          875┆ require(success, 'IF Wrapper: UNDERLYING_TRANSFER_FAIL');
+            ⋮┆----------------------------------------
+          901┆ require(allowance[src][msg.sender] >= wad, 'ImpossibleWrapper:   
+  INSUFF_ALLOWANCE');                                                           
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 12 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

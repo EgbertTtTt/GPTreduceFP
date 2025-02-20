@@ -1,0 +1,29 @@
+'solc --version' running
+'solc /sb/Staking.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/sb' running
+
+Staking.constructor(address,uint256,address,uint256,uint256,address) (../../sb/Staking.sol#179-196) uses arbitrary from in transferFrom: require(bool,string)(IERC20(oilerToken_).transferFrom(stakingFundAddress_,address(this),stakingFundAmount_),TransferFrom of OIL from StakingFund failed) (../../sb/Staking.sol#193)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#arbitrary-from-in-transferfrom
+
+Staking.getRewards() (../../sb/Staking.sol#294-312) uses a dangerous strict equality:
+	- require(bool,string)(stakes[msg.sender].tokenAmount == 0,You still have a stake locked - please unlock first, don't leave free money here) (../../sb/Staking.sol#296)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Reentrancy in Staking.lockTokens(uint72,uint24) (../../sb/Staking.sol#230-251):
+	External calls:
+	- require(bool,string)(poolToken.transferFrom(msg.sender,address(this),tokenAmount_),TransferFrom of poolTokens failed) (../../sb/Staking.sol#248)
+	Event emitted after the call(s):
+	- StakeLocked(msg.sender,tokenAmount_,lockingPeriodInBlocks_,expectedStakingRewardPoints) (../../sb/Staking.sol#250)
+Reentrancy in Staking.release() (../../sb/Staking.sol#333-341):
+	External calls:
+	- require(bool,string)(oilerToken.transfer(msg.sender,releasable),Reward oilers transfer failed) (../../sb/Staking.sol#338)
+	Event emitted after the call(s):
+	- grantedTokensReleased(msg.sender,releasable) (../../sb/Staking.sol#340)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Pragma version^0.8.3 (../../sb/Staking.sol#1) allows old versions
+solc-0.8.27 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Event Staking.grantedTokensReleased(address,uint256) (../../sb/Staking.sol#367) is not in CapWords
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+/sb/Staking.sol analyzed (2 contracts with 93 detectors), 7 result(s) found

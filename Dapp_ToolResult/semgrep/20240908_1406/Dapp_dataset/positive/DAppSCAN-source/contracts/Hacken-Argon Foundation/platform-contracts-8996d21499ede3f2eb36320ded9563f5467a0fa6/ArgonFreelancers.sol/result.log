@@ -1,0 +1,163 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 27 Code Findings │
+└──────────────────┘
+                             
+    /sb/ArgonFreelancers.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          297┆ for (uint256 x = 0; x < allPersons.length; x++) {
+            ⋮┆----------------------------------------
+          431┆ for (uint256 i = index; i < data.WorkAddresses.length - 1; i++) {
+            ⋮┆----------------------------------------
+          445┆ for (uint256 i = 0; i < data.WorkAddresses.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+           43┆ constructor() internal {
+           44┆     _addApprover(msg.sender);
+           45┆ 
+           46┆     firstSignAddress =                                           
+  0xBdCf81639242C471f79f985D66BE8A289bD78428; // You should change this address 
+  to your first sign address                                                    
+           47┆     secondSignAddress =                                          
+  0xFb46431618d4769F2b14178C19402eca7fbb2b5f; // You should change this address 
+  to your second sign address                                                   
+           48┆ }
+            ⋮┆----------------------------------------
+          176┆ constructor() public {
+          177┆     _status = _NOT_ENTERED;
+          178┆ }
+            ⋮┆----------------------------------------
+          247┆ constructor(
+          248┆     address _argonTokenAddress,
+          249┆     uint8 _bnbFeeRate,
+          250┆     address _feeAddress
+          251┆ ) public {
+          252┆     argonToken = IERC20(_argonTokenAddress);
+          253┆     bnbFeeRate = _bnbFeeRate;
+          254┆     remainingArgonToken = 5e6 ether;
+          255┆     approverMinArgonLimit = 20000 * 10**18;
+          256┆     feeAddress = _feeAddress;
+             [hid 2 additional lines, adjust with --max-lines-per-finding] 
+          535┆ constructor(
+          536┆     string _workTitle,
+          537┆     string _workCategory,
+          538┆     string _workDescription,
+          539┆     string _workAvarageBudget,
+          540┆     address _employerAddress,
+          541┆     address _t
+          542┆ ) public {
+          543┆     require(MainContract(_t).isActive());
+          544┆                                                                  
+  require(MainContract(_t).getPersonAccountType(_employerAddress) == 2);        
+             [hid 13 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          297┆ for (uint256 x = 0; x < allPersons.length; x++) {
+            ⋮┆----------------------------------------
+          298┆ if (allPersons[x] == msg.sender) {
+            ⋮┆----------------------------------------
+          299┆ delete allPersons[x];
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          297┆ for (uint256 x = 0; x < allPersons.length; x++) {
+            ⋮┆----------------------------------------
+          431┆ for (uint256 i = index; i < data.WorkAddresses.length - 1; i++) {
+            ⋮┆----------------------------------------
+          445┆ for (uint256 i = 0; i < data.WorkAddresses.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          189┆ require(_status != _ENTERED, "ReentrancyGuard: reentrant call");
+            ⋮┆----------------------------------------
+          765┆ require(freelancerSendFiles, "freelancer must be sent files");
+            ⋮┆----------------------------------------
+          779┆ require(freelancerSendFiles, "freelancer must be sent files");
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+           68┆ require(signed[firstSignAddress] && signed[secondSignAddress]);
+            ⋮┆----------------------------------------
+           76┆ require(signed[firstSignAddress] && signed[secondSignAddress]);
+            ⋮┆----------------------------------------
+           84┆ require(signed[firstSignAddress] && signed[secondSignAddress]);
+            ⋮┆----------------------------------------
+          530┆ require(approverConfirmStatus == 0 && approverStartDate > 0);
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          459┆ if (now > deployedWork.deadLine() && deployedWork.deadLine() !=  
+  0) {                                                                          
+          460┆     return (true, _workAddress);
+          461┆ } else {
+          462┆     return (false, _workAddress);
+          463┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-decrement-not-postfix                    
+          Consider using the prefix decrement expression whenever the return    
+  value is not needed. The                                                      
+          prefix decrement expression is cheaper in terms of gas.               
+                                                                                
+          435┆ data.WorkAddresses.length--;
+            ⋮┆----------------------------------------
+          610┆ workOfferCount--;
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          297┆ for (uint256 x = 0; x < allPersons.length; x++) {
+            ⋮┆----------------------------------------
+          431┆ for (uint256 i = index; i < data.WorkAddresses.length - 1; i++) {
+            ⋮┆----------------------------------------
+          445┆ for (uint256 i = 0; i < data.WorkAddresses.length; i++) {
+            ⋮┆----------------------------------------
+          605┆ workOfferCount++;
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 27 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

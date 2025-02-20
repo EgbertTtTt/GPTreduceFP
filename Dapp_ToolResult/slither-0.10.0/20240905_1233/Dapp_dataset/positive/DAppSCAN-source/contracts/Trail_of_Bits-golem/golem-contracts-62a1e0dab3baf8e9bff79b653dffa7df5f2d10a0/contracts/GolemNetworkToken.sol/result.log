@@ -1,0 +1,88 @@
+'solc --version' running
+'solc /sb/GolemNetworkToken.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/GolemNetworkToken.sol:
+/sb/GolemNetworkToken.sol:10:5: Warning: Defining constructors as functions with the same name as the contract is deprecated. Use "constructor(...) { ... }" instead.
+    function GNTAllocation(address _golemFactory) {}
+    ^----------------------------------------------^
+/sb/GolemNetworkToken.sol:51:5: Warning: Defining constructors as functions with the same name as the contract is deprecated. Use "constructor(...) { ... }" instead.
+    function GolemNetworkToken(address _golemFactory,
+    ^ (Relevant source part starts here and spans across multiple lines).
+/sb/GolemNetworkToken.sol:79:9: Warning: Use of the "var" keyword is deprecated.
+        var senderBalance = balances[msg.sender];
+        ^---------------^
+/sb/GolemNetworkToken.sol:156:9: Warning: Use of the "var" keyword is deprecated.
+        var numTokens = msg.value * tokenCreationRate;
+        ^-----------^
+/sb/GolemNetworkToken.sol:206:9: Warning: Use of the "var" keyword is deprecated.
+        var gntValue = balances[msg.sender];
+        ^----------^
+/sb/GolemNetworkToken.sol:211:9: Warning: Use of the "var" keyword is deprecated.
+        var ethValue = gntValue / tokenCreationRate;
+        ^----------^
+/sb/GolemNetworkToken.sol:84:13: Warning: Invoking events without "emit" prefix is deprecated.
+            Transfer(msg.sender, _to, _value);
+            ^-------------------------------^
+/sb/GolemNetworkToken.sol:116:9: Warning: Invoking events without "emit" prefix is deprecated.
+        Migrate(msg.sender, migrationAgent, _value);
+        ^-----------------------------------------^
+/sb/GolemNetworkToken.sol:163:9: Warning: Invoking events without "emit" prefix is deprecated.
+        Transfer(0, msg.sender, numTokens);
+        ^--------------------------------^
+/sb/GolemNetworkToken.sol:191:9: Warning: Invoking events without "emit" prefix is deprecated.
+        Transfer(0, lockedAllocation, additionalTokens);
+        ^---------------------------------------------^
+/sb/GolemNetworkToken.sol:194:32: Warning: Using contract member "balance" inherited from the address type is deprecated. Convert the contract to "address" type to access the member, for example use "address(contract).balance" instead.
+        if (!golemFactory.send(this.balance)) revert();
+                               ^----------^
+/sb/GolemNetworkToken.sol:212:9: Warning: Invoking events without "emit" prefix is deprecated.
+        Refund(msg.sender, ethValue);
+        ^--------------------------^
+/sb/GolemNetworkToken.sol:6:5: Warning: No visibility specified. Defaulting to "public". 
+    function migrateFrom(address _from, uint256 _value);
+    ^--------------------------------------------------^
+/sb/GolemNetworkToken.sol:10:5: Warning: No visibility specified. Defaulting to "public". 
+    function GNTAllocation(address _golemFactory) {}
+    ^----------------------------------------------^
+/sb/GolemNetworkToken.sol:10:28: Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.
+    function GNTAllocation(address _golemFactory) {}
+                           ^-------------------^
+/sb/GolemNetworkToken.sol:51:5: Warning: No visibility specified. Defaulting to "public". 
+    function GolemNetworkToken(address _golemFactory,
+    ^ (Relevant source part starts here and spans across multiple lines).
+/sb/GolemNetworkToken.sol:75:5: Warning: No visibility specified. Defaulting to "public". 
+    function transfer(address _to, uint256 _value) returns (bool) {
+    ^ (Relevant source part starts here and spans across multiple lines).
+
+
+GolemNetworkToken.finalize() (../../sb/GolemNetworkToken.sol#172-195) sends eth to arbitrary user
+	Dangerous calls:
+	- ! golemFactory.send(this.balance) (../../sb/GolemNetworkToken.sol#194)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#functions-that-send-ether-to-arbitrary-destinations
+
+GolemNetworkToken.setMigrationAgent(address)._agent (../../sb/GolemNetworkToken.sol#124) lacks a zero-check on :
+		- migrationAgent = _agent (../../sb/GolemNetworkToken.sol#129)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in GolemNetworkToken.migrate(uint256) (../../sb/GolemNetworkToken.sol#103-117):
+	External calls:
+	- MigrationAgent(migrationAgent).migrateFrom(msg.sender,_value) (../../sb/GolemNetworkToken.sol#115)
+	Event emitted after the call(s):
+	- Migrate(msg.sender,migrationAgent,_value) (../../sb/GolemNetworkToken.sol#116)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Pragma version^0.4.16 (../../sb/GolemNetworkToken.sol#1) allows old versions
+solc-0.4.26 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Parameter GolemNetworkToken.transfer(address,uint256)._to (../../sb/GolemNetworkToken.sol#75) is not in mixedCase
+Parameter GolemNetworkToken.transfer(address,uint256)._value (../../sb/GolemNetworkToken.sol#75) is not in mixedCase
+Parameter GolemNetworkToken.balanceOf(address)._owner (../../sb/GolemNetworkToken.sol#94) is not in mixedCase
+Parameter GolemNetworkToken.migrate(uint256)._value (../../sb/GolemNetworkToken.sol#103) is not in mixedCase
+Parameter GolemNetworkToken.setMigrationAgent(address)._agent (../../sb/GolemNetworkToken.sol#124) is not in mixedCase
+Parameter GolemNetworkToken.setMigrationMaster(address)._master (../../sb/GolemNetworkToken.sol#132) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+GolemNetworkToken.slitherConstructorConstantVariables() (../../sb/GolemNetworkToken.sol#14-215) uses literals with too many digits:
+	- tokenCreationRate = 10000000000 (../../sb/GolemNetworkToken.sol#19)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+/sb/GolemNetworkToken.sol analyzed (3 contracts with 93 detectors), 12 result(s) found

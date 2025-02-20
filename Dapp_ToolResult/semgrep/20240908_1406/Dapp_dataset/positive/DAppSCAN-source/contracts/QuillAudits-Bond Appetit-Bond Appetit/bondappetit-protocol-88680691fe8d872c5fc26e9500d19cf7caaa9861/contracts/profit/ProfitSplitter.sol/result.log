@@ -1,0 +1,319 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 87 Code Findings │
+└──────────────────┘
+                           
+    /sb/ProfitSplitter.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          811┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          815┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          833┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          838┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          843┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+         1308┆ contract OwnablePausable is Ownable, Pausable {
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+         1658┆ for (uint256 i = 0; i < recipientsIndex.length(); i++) {
+            ⋮┆----------------------------------------
+         1696┆ for (uint256 i = 0; i < recipientsIndex.length(); i++) {
+            ⋮┆----------------------------------------
+         1754┆ for (uint256 i = 0; i < recipientsIndex.length(); i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          358┆ constructor (string memory name_, string memory symbol_) public {
+          359┆     _name = name_;
+          360┆     _symbol = symbol_;
+          361┆     _decimals = 18;
+          362┆ }
+            ⋮┆----------------------------------------
+         1315┆ constructor() internal {
+         1316┆     pauser = owner();
+         1317┆ }
+            ⋮┆----------------------------------------
+         1600┆ constructor(address _incoming, address _uniswapRouter) public {
+         1601┆     incoming = ERC20(_incoming);
+         1602┆     uniswapRouter = IUniswapV2Router02(_uniswapRouter);
+         1603┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+         1658┆ for (uint256 i = 0; i < recipientsIndex.length(); i++) {
+            ⋮┆----------------------------------------
+         1659┆ result = result.add(shares[recipientsIndex.at(i)]);
+            ⋮┆----------------------------------------
+         1659┆ result = result.add(shares[recipientsIndex.at(i)]);
+            ⋮┆----------------------------------------
+         1696┆ for (uint256 i = 0; i < recipientsIndex.length(); i++) {
+            ⋮┆----------------------------------------
+         1697┆ result[i] = recipientsIndex.at(i);
+            ⋮┆----------------------------------------
+         1754┆ for (uint256 i = 0; i < recipientsIndex.length(); i++) {
+            ⋮┆----------------------------------------
+         1755┆ address recipient = recipientsIndex.at(i);
+            ⋮┆----------------------------------------
+         1756┆ uint256 share = shares[recipient];
+            ⋮┆----------------------------------------
+         1759┆ incoming.safeTransfer(recipient, amount);
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+         1658┆ for (uint256 i = 0; i < recipientsIndex.length(); i++) {
+            ⋮┆----------------------------------------
+         1696┆ for (uint256 i = 0; i < recipientsIndex.length(); i++) {
+            ⋮┆----------------------------------------
+         1754┆ for (uint256 i = 0; i < recipientsIndex.length(); i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          183┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          198┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          215┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          232┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          249┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          512┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          513┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          532┆ require(account != address(0), "ERC20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+          553┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          576┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          577┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          660┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          664┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          721┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          722┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          746┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          770┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          830┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          831┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          832┆ );
+            ⋮┆----------------------------------------
+          860┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          991┆ require(set._values.length > index, "EnumerableSet: index out of 
+  bounds");                                                                     
+            ⋮┆----------------------------------------
+         1196┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+         1217┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1267┆ require(!paused(), "Pausable: paused");
+            ⋮┆----------------------------------------
+         1279┆ require(paused(), "Pausable: not paused");
+            ⋮┆----------------------------------------
+         1332┆ require(pauser == _msgSender() || owner() == _msgSender(),       
+  "OwnablePausable::pause: only pauser and owner must pause contract");         
+            ⋮┆----------------------------------------
+         1340┆ require(pauser == _msgSender() || owner() == _msgSender(),       
+  "OwnablePausable::unpause: only pauser and owner must unpause contract");     
+            ⋮┆----------------------------------------
+         1631┆ require(_recipient != address(0), "ProfitSplitter::transfer:     
+  cannot transfer to the zero address");                                        
+            ⋮┆----------------------------------------
+         1643┆ require(address(incoming) != _incoming,                          
+  "ProfitSplitter::changeIncoming: duplicate incoming token address");          
+            ⋮┆----------------------------------------
+         1669┆ require(!recipientsIndex.contains(recipient),                    
+  "ProfitSplitter::addRecipient: recipient already added");                     
+            ⋮┆----------------------------------------
+         1670┆ require(_currentShare().add(share) <= 100,                       
+  "ProfitSplitter::addRecipient: invalid share");                               
+            ⋮┆----------------------------------------
+         1682┆ require(recipientsIndex.contains(recipient),                     
+  "ProfitSplitter::removeRecipient: recipient already removed");                
+            ⋮┆----------------------------------------
+         1723┆ require(amountsIn.length == 2, "ProfitSplitter::_payToBudget:    
+  invalid amounts in length");                                                  
+            ⋮┆----------------------------------------
+         1724┆ require(amountsIn[0] > 0, "ProfitSplitter::_payToBudget:         
+  liquidity pool is empty");                                                    
+            ⋮┆----------------------------------------
+         1730┆ require(amountsOut.length == 2, "ProfitSplitter::_payToBudget:   
+  invalid amounts out length");                                                 
+            ⋮┆----------------------------------------
+         1731┆ require(amountsOut[1] > 0, "ProfitSplitter::_payToBudget: amounts
+  out liquidity pool is empty");                                                
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+         1658┆ for (uint256 i = 0; i < recipientsIndex.length(); i++) {
+            ⋮┆----------------------------------------
+         1696┆ for (uint256 i = 0; i < recipientsIndex.length(); i++) {
+            ⋮┆----------------------------------------
+         1754┆ for (uint256 i = 0; i < recipientsIndex.length(); i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          215┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          512┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          513┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          553┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          576┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          577┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          664┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          721┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          746┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          770┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          830┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          831┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          832┆ );
+            ⋮┆----------------------------------------
+          860┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          991┆ require(set._values.length > index, "EnumerableSet: index out of 
+  bounds");                                                                     
+            ⋮┆----------------------------------------
+         1217┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1332┆ require(pauser == _msgSender() || owner() == _msgSender(),       
+  "OwnablePausable::pause: only pauser and owner must pause contract");         
+            ⋮┆----------------------------------------
+         1340┆ require(pauser == _msgSender() || owner() == _msgSender(),       
+  "OwnablePausable::unpause: only pauser and owner must unpause contract");     
+            ⋮┆----------------------------------------
+         1631┆ require(_recipient != address(0), "ProfitSplitter::transfer:     
+  cannot transfer to the zero address");                                        
+            ⋮┆----------------------------------------
+         1643┆ require(address(incoming) != _incoming,                          
+  "ProfitSplitter::changeIncoming: duplicate incoming token address");          
+            ⋮┆----------------------------------------
+         1669┆ require(!recipientsIndex.contains(recipient),                    
+  "ProfitSplitter::addRecipient: recipient already added");                     
+            ⋮┆----------------------------------------
+         1670┆ require(_currentShare().add(share) <= 100,                       
+  "ProfitSplitter::addRecipient: invalid share");                               
+            ⋮┆----------------------------------------
+         1682┆ require(recipientsIndex.contains(recipient),                     
+  "ProfitSplitter::removeRecipient: recipient already removed");                
+            ⋮┆----------------------------------------
+         1723┆ require(amountsIn.length == 2, "ProfitSplitter::_payToBudget:    
+  invalid amounts in length");                                                  
+            ⋮┆----------------------------------------
+         1724┆ require(amountsIn[0] > 0, "ProfitSplitter::_payToBudget:         
+  liquidity pool is empty");                                                    
+            ⋮┆----------------------------------------
+         1730┆ require(amountsOut.length == 2, "ProfitSplitter::_payToBudget:   
+  invalid amounts out length");                                                 
+            ⋮┆----------------------------------------
+         1731┆ require(amountsOut[1] > 0, "ProfitSplitter::_payToBudget: amounts
+  out liquidity pool is empty");                                                
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 87 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

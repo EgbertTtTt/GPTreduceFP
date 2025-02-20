@@ -1,0 +1,187 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 42 Code Findings │
+└──────────────────┘
+                         
+    /sb/Legendary_v9.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          150┆ contract Legendary_v8 is Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+           88┆ constructor() internal {}
+            ⋮┆----------------------------------------
+          109┆ constructor() internal {
+          110┆     _owner = _msgSender();
+          111┆     emit OwnershipTransferred(address(0), _owner);
+          112┆ }
+            ⋮┆----------------------------------------
+          222┆ constructor(
+          223┆     string memory name_,
+          224┆     address tokenAddress_,
+          225┆     uint64 rate_,
+          226┆     uint256 lockDuration_,
+          227┆     address rookieAddress_,
+          228┆     address professionalAddress_
+          229┆ ) public Ownable() {
+          230┆     name = name_;
+          231┆     require(tokenAddress_ != address(0), "Zero token address");
+             [hid 13 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          470┆ for (uint64 i = userIndex; i < index; i++) {
+            ⋮┆----------------------------------------
+          472┆ if (endTime < rates[i + 1].timeStamp) {
+            ⋮┆----------------------------------------
+          476┆ time = rates[i + 1].timeStamp.sub(depositTime);
+            ⋮┆----------------------------------------
+          477┆ interest = amount.mul(rates[i].newInterestRate).mul(time).div(
+            ⋮┆----------------------------------------
+          481┆ depositTime = rates[i + 1].timeStamp;
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          470┆ for (uint64 i = userIndex; i < index; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           48┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+           54┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+           66┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+           73┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+           80┆ require(b != 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          119┆ require(isOwner(), "Ownable: caller is not the owner");
+            ⋮┆----------------------------------------
+          137┆ require(
+          138┆     newOwner != address(0),
+          139┆     "Ownable: new owner is the zero address"
+          140┆ );
+            ⋮┆----------------------------------------
+          231┆ require(tokenAddress_ != address(0), "Zero token address");
+            ⋮┆----------------------------------------
+          234┆ require(rate_ != 0, "Zero interest rate");
+            ⋮┆----------------------------------------
+          237┆ require(rookieAddress_ != address(0), "Zero Rookie Address");
+            ⋮┆----------------------------------------
+          239┆ require(
+          240┆     professionalAddress_ != address(0),
+          241┆     "Zero Professional Address"
+          242┆ );
+            ⋮┆----------------------------------------
+          252┆ require(rate_ != 0, "Zero interest rate");
+            ⋮┆----------------------------------------
+          293┆ require(rewardAmount > 0, "Reward must be positive");
+            ⋮┆----------------------------------------
+          345┆ require(amount > 0, "Can't stake 0 amount");
+            ⋮┆----------------------------------------
+          347┆ require(hasStaked[from] == false, "Already Staked");
+            ⋮┆----------------------------------------
+          383┆ require(hasStaked[from] == true, "No stakes found for user");
+            ⋮┆----------------------------------------
+          384┆ require(
+          385┆     block.timestamp >= deposits[from].endTime,
+          386┆     "Requesting before lock time"
+          387┆ );
+            ⋮┆----------------------------------------
+          388┆ require(deposits[from].paid == false, "Already paid out");
+            ⋮┆----------------------------------------
+          396┆ require(reward <= rewardBalance, "Not enough rewards");
+            ⋮┆----------------------------------------
+          415┆ require(hasStaked[from] == true, "No stakes found for user");
+            ⋮┆----------------------------------------
+          416┆ require(
+          417┆     block.timestamp >= deposits[from].endTime,
+          418┆     "Requesting before lock time"
+          419┆ );
+            ⋮┆----------------------------------------
+          420┆ require(deposits[from].paid == false, "Already paid out");
+            ⋮┆----------------------------------------
+          435┆ require(principalPaid, "Error paying");
+            ⋮┆----------------------------------------
+          523┆ require(amount <= ourAllowance, "Make sure to add enough         
+  allowance");                                                                  
+            ⋮┆----------------------------------------
+          536┆ require(
+          537┆     RookieEligible || ProfessionalEligible,
+          538┆     "Need to be eligible in either Rookie or Professional to     
+  stake"                                                                        
+          539┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          254┆ index++;
+            ⋮┆----------------------------------------
+          470┆ for (uint64 i = userIndex; i < index; i++) {
+            ⋮┆----------------------------------------
+          482┆ userIndex++;
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           66┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          137┆ require(
+          138┆     newOwner != address(0),
+          139┆     "Ownable: new owner is the zero address"
+          140┆ );
+            ⋮┆----------------------------------------
+          523┆ require(amount <= ourAllowance, "Make sure to add enough         
+  allowance");                                                                  
+            ⋮┆----------------------------------------
+          536┆ require(
+          537┆     RookieEligible || ProfessionalEligible,
+          538┆     "Need to be eligible in either Rookie or Professional to     
+  stake"                                                                        
+          539┆ );
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 42 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

@@ -1,0 +1,521 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                     
+                     
+┌───────────────────┐
+│ 133 Code Findings │
+└───────────────────┘
+                   
+    /sb/Moloch.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          122┆ for (uint256 i = 0; i < approvedTokens.length; i++) {
+            ⋮┆----------------------------------------
+          294┆ for (uint256 i = 0; i < _approvedTokens.length; i++) {
+            ⋮┆----------------------------------------
+          684┆ for (uint256 i=0; i < tokenList.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+          406┆ proposalCount += 1;
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+          196┆ uint256 public proposalCount = 0; // total proposals submitted
+            ⋮┆----------------------------------------
+          197┆ uint256 public totalShares = 0; // total shares across all       
+  members                                                                       
+            ⋮┆----------------------------------------
+          198┆ uint256 public totalLoot = 0; // total loot across all members
+            ⋮┆----------------------------------------
+          200┆ bool public emergencyWarning = false; // true if emergency       
+  processing has ever been triggered                                            
+            ⋮┆----------------------------------------
+          201┆ uint256 public lastEmergencyProposalIndex = 0; // index of the   
+  last proposal which triggered emergency processing                            
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+           75┆ constructor () internal {
+           76┆     // Storing an initial non-zero value makes deployment a bit  
+  more                                                                          
+           77┆     // expensive, but in exchange the refund on every call to    
+  nonReentrant                                                                  
+           78┆     // will be lower in amount. Since refunds are capped to a    
+  percetange of                                                                 
+           79┆     // the total transaction's gas, it is best to keep them low  
+  in cases                                                                      
+           80┆     // like this one, to increase the likelihood of the full     
+  refund coming                                                                 
+           81┆     // into effect.
+           82┆     _notEntered = true;
+           83┆ }
+            ⋮┆----------------------------------------
+          110┆ constructor () public {
+          111┆     owner = msg.sender;
+          112┆ }
+            ⋮┆----------------------------------------
+          265┆ constructor(
+          266┆     address _summoner,
+          267┆     address[] memory _approvedTokens,
+          268┆     uint256 _periodDuration,
+          269┆     uint256 _votingPeriodLength,
+          270┆     uint256 _gracePeriodLength,
+          271┆     uint256 _emergencyProcessingWait,
+          272┆     uint256 _bailoutWait,
+          273┆     uint256 _proposalDeposit,
+          274┆     uint256 _dilutionBound,
+             [hid 45 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          296┆ require(!tokenWhitelist[_approvedTokens[i]], "duplicate approved 
+  token");                                                                      
+            ⋮┆----------------------------------------
+          297┆ tokenWhitelist[_approvedTokens[i]] = true;
+            ⋮┆----------------------------------------
+          298┆ approvedTokens.push(IERC20(_approvedTokens[i]));
+            ⋮┆----------------------------------------
+          685┆ require(tokenWhitelist[address(tokenList[i])], "token must be    
+  whitelisted");                                                                
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          122┆ for (uint256 i = 0; i < approvedTokens.length; i++) {
+            ⋮┆----------------------------------------
+          294┆ for (uint256 i = 0; i < _approvedTokens.length; i++) {
+            ⋮┆----------------------------------------
+          684┆ for (uint256 i=0; i < tokenList.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           94┆ require(_notEntered, "ReentrancyGuard: reentrant call");
+            ⋮┆----------------------------------------
+          251┆ require(members[msg.sender].shares > 0 ||                        
+  members[msg.sender].loot > 0, "not a member");                                
+            ⋮┆----------------------------------------
+          256┆ require(members[msg.sender].shares > 0, "not a shareholder");
+            ⋮┆----------------------------------------
+          261┆ require(members[memberAddressByDelegateKey[msg.sender]].shares > 
+  0, "not a delegate");                                                         
+            ⋮┆----------------------------------------
+          277┆ require(_summoner != address(0), "summoner cannot be 0");
+            ⋮┆----------------------------------------
+          278┆ require(_periodDuration > 0, "_periodDuration cannot be 0");
+            ⋮┆----------------------------------------
+          279┆ require(_votingPeriodLength > 0, "_votingPeriodLength cannot be  
+  0");                                                                          
+            ⋮┆----------------------------------------
+          280┆ require(_votingPeriodLength <= MAX_VOTING_PERIOD_LENGTH,         
+  "_votingPeriodLength exceeds limit");                                         
+            ⋮┆----------------------------------------
+          281┆ require(_gracePeriodLength <= MAX_GRACE_PERIOD_LENGTH,           
+  "_gracePeriodLength exceeds limit");                                          
+            ⋮┆----------------------------------------
+          282┆ require(_emergencyProcessingWait > 0, "_emergencyProcessingWait  
+  cannot be 0");                                                                
+            ⋮┆----------------------------------------
+          283┆ require(_bailoutWait > _emergencyProcessingWait, "_bailoutWait   
+  must be greater than _emergencyProcessingWait");                              
+            ⋮┆----------------------------------------
+          284┆ require(_bailoutWait <= MAX_BAILOUT_WAIT, "_bailoutWait exceeds  
+  limit");                                                                      
+            ⋮┆----------------------------------------
+          285┆ require(_dilutionBound > 0, "_dilutionBound cannot be 0");
+            ⋮┆----------------------------------------
+          286┆ require(_dilutionBound <= MAX_DILUTION_BOUND, "_dilutionBound    
+  exceeds limit");                                                              
+            ⋮┆----------------------------------------
+          287┆ require(_approvedTokens.length > 0, "need at least one approved  
+  token");                                                                      
+            ⋮┆----------------------------------------
+          288┆ require(_proposalDeposit >= _processingReward, "_proposalDeposit 
+  cannot be smaller than _processingReward");                                   
+            ⋮┆----------------------------------------
+          295┆ require(_approvedTokens[i] != address(0), "_approvedToken cannot 
+  be 0");                                                                       
+            ⋮┆----------------------------------------
+          296┆ require(!tokenWhitelist[_approvedTokens[i]], "duplicate approved 
+  token");                                                                      
+            ⋮┆----------------------------------------
+          334┆ require(sharesRequested.add(lootRequested) <=                    
+  MAX_NUMBER_OF_SHARES_AND_LOOT, "too many shares requested");                  
+            ⋮┆----------------------------------------
+          335┆ require(tokenWhitelist[tributeToken], "tributeToken is not       
+  whitelisted");                                                                
+            ⋮┆----------------------------------------
+          336┆ require(tokenWhitelist[paymentToken], "payment is not            
+  whitelisted");                                                                
+            ⋮┆----------------------------------------
+          337┆ require(applicant != address(0), "applicant cannot be 0");
+            ⋮┆----------------------------------------
+          338┆ require(members[applicant].jailed == 0, "proposal applicant must 
+  not be jailed");                                                              
+            ⋮┆----------------------------------------
+          341┆ require(IERC20(tributeToken).transferFrom(msg.sender,            
+  address(this), tributeOffered), "tribute token transfer failed");             
+            ⋮┆----------------------------------------
+          350┆ require(tokenToWhitelist != address(0), "must provide token      
+  address");                                                                    
+            ⋮┆----------------------------------------
+          351┆ require(!tokenWhitelist[tokenToWhitelist], "cannot already have  
+  whitelisted the token");                                                      
+            ⋮┆----------------------------------------
+          363┆ require(member.shares > 0 || member.loot > 0, "member must have  
+  at least one share or one loot");                                             
+            ⋮┆----------------------------------------
+          364┆ require(memberToKick != summoner, "the summoner may not be       
+  kicked");                                                                     
+            ⋮┆----------------------------------------
+          365┆ require(members[memberToKick].jailed == 0, "member must not      
+  already be jailed");                                                          
+            ⋮┆----------------------------------------
+          411┆ require(depositToken.transferFrom(msg.sender, address(this),     
+  proposalDeposit), "proposal deposit token transfer failed");                  
+            ⋮┆----------------------------------------
+          415┆ require(proposal.proposer != address(0), 'proposal must have been
+  proposed');                                                                   
+            ⋮┆----------------------------------------
+          416┆ require(!proposal.flags[0], "proposal has already been           
+  sponsored");                                                                  
+            ⋮┆----------------------------------------
+          417┆ require(!proposal.flags[3], "proposal has been cancelled");
+            ⋮┆----------------------------------------
+          418┆ require(members[proposal.applicant].jailed == 0, "proposal       
+  applicant must not be jailed");                                               
+            ⋮┆----------------------------------------
+          422┆ require(!tokenWhitelist[address(proposal.tributeToken)], "cannot 
+  already have whitelisted the token");                                         
+            ⋮┆----------------------------------------
+          423┆ require(!proposedToWhitelist[address(proposal.tributeToken)],    
+  'already proposed to whitelist');                                             
+            ⋮┆----------------------------------------
+          428┆ require(!proposedToKick[proposal.applicant], 'already proposed to
+  kick');                                                                       
+            ⋮┆----------------------------------------
+          454┆ require(proposalIndex < proposalQueue.length, "proposal does not 
+  exist");                                                                      
+            ⋮┆----------------------------------------
+          457┆ require(uintVote < 3, "must be less than 3");
+            ⋮┆----------------------------------------
+          460┆ require(getCurrentPeriod() >= proposal.startingPeriod, "voting   
+  period has not started");                                                     
+            ⋮┆----------------------------------------
+          461┆ require(!hasVotingPeriodExpired(proposal.startingPeriod),        
+  "proposal voting period has expired");                                        
+            ⋮┆----------------------------------------
+          462┆ require(proposal.votesByMember[memberAddress] == Vote.Null,      
+  "member has already voted");                                                  
+            ⋮┆----------------------------------------
+          463┆ require(vote == Vote.Yes || vote == Vote.No, "vote must be either
+  Yes or No");                                                                  
+            ⋮┆----------------------------------------
+          493┆ require(!proposal.flags[4] && !proposal.flags[5], "must be a     
+  standard proposal");                                                          
+            ⋮┆----------------------------------------
+          536┆ require(
+          537┆     proposal.tributeToken.transfer(address(guildBank),           
+  proposal.tributeOffered),                                                     
+          538┆     "token transfer to guild bank failed"
+          539┆ );
+            ⋮┆----------------------------------------
+          541┆ require(
+          542┆     guildBank.withdrawToken(proposal.paymentToken,               
+  proposal.applicant, proposal.paymentRequested),                               
+          543┆     "token payment to applicant failed"
+          544┆ );
+            ⋮┆----------------------------------------
+          552┆ require(
+          553┆     proposal.tributeToken.transfer(proposal.proposer,            
+  proposal.tributeOffered),                                                     
+          554┆     "failing vote token transfer failed"
+          555┆ );
+            ⋮┆----------------------------------------
+          570┆ require(proposal.flags[4], "must be a whitelist proposal");
+            ⋮┆----------------------------------------
+          596┆ require(proposal.flags[5], "must be a guild kick proposal");
+            ⋮┆----------------------------------------
+          658┆ require(proposalIndex < proposalQueue.length, "proposal does not 
+  exist");                                                                      
+            ⋮┆----------------------------------------
+          661┆ require(getCurrentPeriod() >=                                    
+  proposal.startingPeriod.add(votingPeriodLength).add(gracePeriodLength),       
+  "proposal is not ready to be processed");                                     
+            ⋮┆----------------------------------------
+          662┆ require(proposal.flags[1] == false, "proposal has already been   
+  processed");                                                                  
+            ⋮┆----------------------------------------
+          663┆ require(proposalIndex == 0 ||                                    
+  proposals[proposalQueue[proposalIndex.sub(1)]].flags[1], "previous proposal   
+  must be processed");                                                          
+            ⋮┆----------------------------------------
+          667┆ require(
+          668┆     depositToken.transfer(msg.sender, processingReward),
+          669┆     "failed to send processing reward to msg.sender"
+          670┆ );
+            ⋮┆----------------------------------------
+          672┆ require(
+          673┆     depositToken.transfer(sponsor,                               
+  proposalDeposit.sub(processingReward)),                                       
+          674┆     "failed to return proposal deposit to sponsor"
+          675┆ );
+            ⋮┆----------------------------------------
+          685┆ require(tokenWhitelist[address(tokenList[i])], "token must be    
+  whitelisted");                                                                
+            ⋮┆----------------------------------------
+          688┆ require(tokenList[i] > tokenList[i - 1], "token list must be     
+  unique and in ascending order");                                              
+            ⋮┆----------------------------------------
+          700┆ require(member.shares >= sharesToBurn, "insufficient shares");
+            ⋮┆----------------------------------------
+          701┆ require(member.loot >= lootToBurn, "insufficient loot");
+            ⋮┆----------------------------------------
+          703┆ require(canRagequit(member.highestIndexYesVote), "cannot ragequit
+  until highest index proposal member voted YES on is processed");              
+            ⋮┆----------------------------------------
+          714┆ require(
+          715┆     guildBank.withdraw(memberAddress, sharesAndLootToBurn,       
+  initialTotalSharesAndLoot, tokenList),                                        
+          716┆     "withdrawal of tokens from guildBank failed"
+          717┆ );
+            ⋮┆----------------------------------------
+          725┆ require(member.jailed != 0, "member must be in jail");
+            ⋮┆----------------------------------------
+          726┆ require(member.loot > 0, "member must have some loot"); // note -
+  should be impossible for jailed member to have shares                         
+            ⋮┆----------------------------------------
+          727┆ require(canRagequit(member.highestIndexYesVote), "cannot ragequit
+  until highest index proposal member voted YES on is processed");              
+            ⋮┆----------------------------------------
+          728┆ require(!canBailout(memberToKick), "bailoutWait has passed,      
+  member must be bailed out");                                                  
+            ⋮┆----------------------------------------
+          736┆ require(member.jailed != 0, "member must be in jail");
+            ⋮┆----------------------------------------
+          737┆ require(member.loot > 0, "member must have some loot"); // note -
+  should be impossible for jailed member to have shares                         
+            ⋮┆----------------------------------------
+          738┆ require(canBailout(memberToBail), "cannot bailout yet");
+            ⋮┆----------------------------------------
+          746┆ require(!proposal.flags[0], "proposal has already been           
+  sponsored");                                                                  
+            ⋮┆----------------------------------------
+          747┆ require(!proposal.flags[3], "proposal has already been           
+  cancelled");                                                                  
+            ⋮┆----------------------------------------
+          748┆ require(msg.sender == proposal.proposer, "solely the proposer can
+  cancel");                                                                     
+            ⋮┆----------------------------------------
+          752┆ require(
+          753┆     proposal.tributeToken.transfer(proposal.proposer,            
+  proposal.tributeOffered),                                                     
+          754┆     "failed to return tribute to proposer"
+          755┆ );
+            ⋮┆----------------------------------------
+          761┆ require(newDelegateKey != address(0), "newDelegateKey cannot be  
+  0");                                                                          
+            ⋮┆----------------------------------------
+          765┆ require(!members[newDelegateKey].exists, "cannot overwrite       
+  existing members");                                                           
+            ⋮┆----------------------------------------
+          766┆                                                                  
+  require(!members[memberAddressByDelegateKey[newDelegateKey]].exists, "cannot  
+  overwrite existing delegate keys");                                           
+            ⋮┆----------------------------------------
+          799┆ require(highestIndexYesVote < proposalQueue.length, "proposal    
+  does not exist");                                                             
+            ⋮┆----------------------------------------
+          821┆ require(members[memberAddress].exists, "member does not exist");
+            ⋮┆----------------------------------------
+          822┆ require(proposalIndex < proposalQueue.length, "proposal does not 
+  exist");                                                                      
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          493┆ require(!proposal.flags[4] && !proposal.flags[5], "must be a     
+  standard proposal");                                                          
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          505┆ if (!emergencyProcessing && proposal.paymentToken != IERC20(0) &&
+  proposal.paymentRequested >                                                   
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 133 findings.
+  proposal.paymentToken.balanceOf(address(guildBank))) {                        
+          506┆     didPass = false;
+          507┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          122┆ for (uint256 i = 0; i < approvedTokens.length; i++) {
+            ⋮┆----------------------------------------
+          294┆ for (uint256 i = 0; i < _approvedTokens.length; i++) {
+            ⋮┆----------------------------------------
+          684┆ for (uint256 i=0; i < tokenList.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          280┆ require(_votingPeriodLength <= MAX_VOTING_PERIOD_LENGTH,         
+  "_votingPeriodLength exceeds limit");                                         
+            ⋮┆----------------------------------------
+          282┆ require(_emergencyProcessingWait > 0, "_emergencyProcessingWait  
+  cannot be 0");                                                                
+            ⋮┆----------------------------------------
+          283┆ require(_bailoutWait > _emergencyProcessingWait, "_bailoutWait   
+  must be greater than _emergencyProcessingWait");                              
+            ⋮┆----------------------------------------
+          288┆ require(_proposalDeposit >= _processingReward, "_proposalDeposit 
+  cannot be smaller than _processingReward");                                   
+            ⋮┆----------------------------------------
+          338┆ require(members[applicant].jailed == 0, "proposal applicant must 
+  not be jailed");                                                              
+            ⋮┆----------------------------------------
+          351┆ require(!tokenWhitelist[tokenToWhitelist], "cannot already have  
+  whitelisted the token");                                                      
+            ⋮┆----------------------------------------
+          363┆ require(member.shares > 0 || member.loot > 0, "member must have  
+  at least one share or one loot");                                             
+            ⋮┆----------------------------------------
+          365┆ require(members[memberToKick].jailed == 0, "member must not      
+  already be jailed");                                                          
+            ⋮┆----------------------------------------
+          411┆ require(depositToken.transferFrom(msg.sender, address(this),     
+  proposalDeposit), "proposal deposit token transfer failed");                  
+            ⋮┆----------------------------------------
+          416┆ require(!proposal.flags[0], "proposal has already been           
+  sponsored");                                                                  
+            ⋮┆----------------------------------------
+          418┆ require(members[proposal.applicant].jailed == 0, "proposal       
+  applicant must not be jailed");                                               
+            ⋮┆----------------------------------------
+          422┆ require(!tokenWhitelist[address(proposal.tributeToken)], "cannot 
+  already have whitelisted the token");                                         
+            ⋮┆----------------------------------------
+          461┆ require(!hasVotingPeriodExpired(proposal.startingPeriod),        
+  "proposal voting period has expired");                                        
+            ⋮┆----------------------------------------
+          536┆ require(
+          537┆     proposal.tributeToken.transfer(address(guildBank),           
+  proposal.tributeOffered),                                                     
+          538┆     "token transfer to guild bank failed"
+          539┆ );
+            ⋮┆----------------------------------------
+          541┆ require(
+          542┆     guildBank.withdrawToken(proposal.paymentToken,               
+  proposal.applicant, proposal.paymentRequested),                               
+          543┆     "token payment to applicant failed"
+          544┆ );
+            ⋮┆----------------------------------------
+          552┆ require(
+          553┆     proposal.tributeToken.transfer(proposal.proposer,            
+  proposal.tributeOffered),                                                     
+          554┆     "failing vote token transfer failed"
+          555┆ );
+            ⋮┆----------------------------------------
+          661┆ require(getCurrentPeriod() >=                                    
+  proposal.startingPeriod.add(votingPeriodLength).add(gracePeriodLength),       
+  "proposal is not ready to be processed");                                     
+            ⋮┆----------------------------------------
+          662┆ require(proposal.flags[1] == false, "proposal has already been   
+  processed");                                                                  
+            ⋮┆----------------------------------------
+          663┆ require(proposalIndex == 0 ||                                    
+  proposals[proposalQueue[proposalIndex.sub(1)]].flags[1], "previous proposal   
+  must be processed");                                                          
+            ⋮┆----------------------------------------
+          667┆ require(
+          668┆     depositToken.transfer(msg.sender, processingReward),
+          669┆     "failed to send processing reward to msg.sender"
+          670┆ );
+            ⋮┆----------------------------------------
+          672┆ require(
+          673┆     depositToken.transfer(sponsor,                               
+  proposalDeposit.sub(processingReward)),                                       
+          674┆     "failed to return proposal deposit to sponsor"
+          675┆ );
+            ⋮┆----------------------------------------
+          688┆ require(tokenList[i] > tokenList[i - 1], "token list must be     
+  unique and in ascending order");                                              
+            ⋮┆----------------------------------------
+          703┆ require(canRagequit(member.highestIndexYesVote), "cannot ragequit
+  until highest index proposal member voted YES on is processed");              
+            ⋮┆----------------------------------------
+          714┆ require(
+          715┆     guildBank.withdraw(memberAddress, sharesAndLootToBurn,       
+  initialTotalSharesAndLoot, tokenList),                                        
+          716┆     "withdrawal of tokens from guildBank failed"
+          717┆ );
+            ⋮┆----------------------------------------
+          727┆ require(canRagequit(member.highestIndexYesVote), "cannot ragequit
+  until highest index proposal member voted YES on is processed");              
+            ⋮┆----------------------------------------
+          728┆ require(!canBailout(memberToKick), "bailoutWait has passed,      
+  member must be bailed out");                                                  
+            ⋮┆----------------------------------------
+          746┆ require(!proposal.flags[0], "proposal has already been           
+  sponsored");                                                                  
+            ⋮┆----------------------------------------
+          747┆ require(!proposal.flags[3], "proposal has already been           
+  cancelled");                                                                  
+            ⋮┆----------------------------------------
+          752┆ require(
+          753┆     proposal.tributeToken.transfer(proposal.proposer,            
+  proposal.tributeOffered),                                                     
+          754┆     "failed to return tribute to proposer"
+          755┆ );
+            ⋮┆----------------------------------------
+          765┆ require(!members[newDelegateKey].exists, "cannot overwrite       
+  existing members");                                                           
+            ⋮┆----------------------------------------
+          766┆                                                                  
+  require(!members[memberAddressByDelegateKey[newDelegateKey]].exists, "cannot  
+  overwrite existing delegate keys");                                           
+
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

@@ -1,0 +1,127 @@
+'solc --version' running
+'solc /sb/ThorusAutoStake.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/sb' running
+
+ThorusAutoStake.withdraw(uint256) (../../sb/ThorusAutoStake.sol#1165-1201) performs a multiplication on the result of a division:
+	- currentAmount = thorusBalanceOf() * _amount / totalSupply() (../../sb/ThorusAutoStake.sol#1170)
+	- currentWithdrawFee = currentAmount * withdrawFee / 10000 (../../sb/ThorusAutoStake.sol#1185)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+ThorusAutoStake.getPricePerFullShare() (../../sb/ThorusAutoStake.sol#1161-1163) uses a dangerous strict equality:
+	- totalSupply() == 0 (../../sb/ThorusAutoStake.sol#1162)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Reentrancy in ThorusAutoStake.withdraw(uint256) (../../sb/ThorusAutoStake.sol#1165-1201):
+	External calls:
+	- IThorusMaster(thorusMaster).withdraw(stakingPid,balWithdraw,true) (../../sb/ThorusAutoStake.sol#1176)
+	- thorus.safeTransfer(treasury,currentWithdrawFee) (../../sb/ThorusAutoStake.sol#1186)
+	State variables written after the call(s):
+	- user.thorusAtLastUserAction = balanceOf(msg.sender) * thorusBalanceOf() / totalSupply() (../../sb/ThorusAutoStake.sol#1191)
+	ThorusAutoStake.userInfo (../../sb/ThorusAutoStake.sol#993) can be used in cross function reentrancies:
+	- ThorusAutoStake.userInfo (../../sb/ThorusAutoStake.sol#993)
+	- ThorusAutoStake.withdraw(uint256) (../../sb/ThorusAutoStake.sol#1165-1201)
+	- user.thorusAtLastUserAction = 0 (../../sb/ThorusAutoStake.sol#1193)
+	ThorusAutoStake.userInfo (../../sb/ThorusAutoStake.sol#993) can be used in cross function reentrancies:
+	- ThorusAutoStake.userInfo (../../sb/ThorusAutoStake.sol#993)
+	- ThorusAutoStake.withdraw(uint256) (../../sb/ThorusAutoStake.sol#1165-1201)
+	- user.lastUserActionTime = block.timestamp (../../sb/ThorusAutoStake.sol#1196)
+	ThorusAutoStake.userInfo (../../sb/ThorusAutoStake.sol#993) can be used in cross function reentrancies:
+	- ThorusAutoStake.userInfo (../../sb/ThorusAutoStake.sol#993)
+	- ThorusAutoStake.withdraw(uint256) (../../sb/ThorusAutoStake.sol#1165-1201)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+ThorusAutoStake.constructor(IERC20,IThorusMaster,uint256,address) (../../sb/ThorusAutoStake.sol#1023-1035) ignores return value by IERC20(_thorus).approve(address(_thorusMaster),type()(uint256).max) (../../sb/ThorusAutoStake.sol#1034)
+ThorusAutoStake.thorusBalanceOf() (../../sb/ThorusAutoStake.sol#1207-1210) ignores return value by (amount) = IThorusMaster(thorusMaster).userInfo(stakingPid,address(this)) (../../sb/ThorusAutoStake.sol#1208)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+ThorusAutoStake.constructor(IERC20,IThorusMaster,uint256,address)._treasury (../../sb/ThorusAutoStake.sol#1027) lacks a zero-check on :
+		- treasury = _treasury (../../sb/ThorusAutoStake.sol#1032)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in ThorusAutoStake.deposit(address,uint256) (../../sb/ThorusAutoStake.sol#1051-1074):
+	External calls:
+	- thorus.safeTransferFrom(msg.sender,address(this),_amount) (../../sb/ThorusAutoStake.sol#1056)
+	State variables written after the call(s):
+	- _mint(_user,mintSupply) (../../sb/ThorusAutoStake.sol#1065)
+		- _balances[account] += amount (../../sb/ThorusAutoStake.sol#430)
+	- _mint(_user,mintSupply) (../../sb/ThorusAutoStake.sol#1065)
+		- _totalSupply += amount (../../sb/ThorusAutoStake.sol#429)
+	- user.lastDepositedTime = block.timestamp (../../sb/ThorusAutoStake.sol#1066)
+	- user.thorusAtLastUserAction = balanceOf(_user) * thorusBalanceOf() / totalSupply() (../../sb/ThorusAutoStake.sol#1068)
+	- user.lastUserActionTime = block.timestamp (../../sb/ThorusAutoStake.sol#1069)
+Reentrancy in ThorusAutoStake.emergencyWithdraw() (../../sb/ThorusAutoStake.sol#1130-1135):
+	External calls:
+	- IThorusMaster(thorusMaster).emergencyWithdraw(stakingPid) (../../sb/ThorusAutoStake.sol#1131)
+	State variables written after the call(s):
+	- _pause() (../../sb/ThorusAutoStake.sol#1133)
+		- _paused = true (../../sb/ThorusAutoStake.sol#890)
+	- hadEmergencyWithdrawn = true (../../sb/ThorusAutoStake.sol#1132)
+Reentrancy in ThorusAutoStake.harvest() (../../sb/ThorusAutoStake.sol#1080-1095):
+	External calls:
+	- IThorusMaster(thorusMaster).claim(stakingPid) (../../sb/ThorusAutoStake.sol#1081)
+	- thorus.safeTransfer(treasury,currentPerformanceFee) (../../sb/ThorusAutoStake.sol#1085)
+	- thorus.safeTransfer(msg.sender,currentCallFee) (../../sb/ThorusAutoStake.sol#1088)
+	- _earn() (../../sb/ThorusAutoStake.sol#1090)
+		- IThorusMaster(thorusMaster).deposit(stakingPid,bal,true) (../../sb/ThorusAutoStake.sol#1215)
+	State variables written after the call(s):
+	- lastHarvestedTime = block.timestamp (../../sb/ThorusAutoStake.sol#1092)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in ThorusAutoStake.emergencyWithdraw() (../../sb/ThorusAutoStake.sol#1130-1135):
+	External calls:
+	- IThorusMaster(thorusMaster).emergencyWithdraw(stakingPid) (../../sb/ThorusAutoStake.sol#1131)
+	Event emitted after the call(s):
+	- EmergencyWithdraw() (../../sb/ThorusAutoStake.sol#1134)
+	- Paused(_msgSender()) (../../sb/ThorusAutoStake.sol#891)
+		- _pause() (../../sb/ThorusAutoStake.sol#1133)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+ThorusAutoStake.withdraw(uint256) (../../sb/ThorusAutoStake.sol#1165-1201) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp < user.lastDepositedTime + withdrawFeePeriod (../../sb/ThorusAutoStake.sol#1184)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/ThorusAutoStake.sol#551-561) uses assembly
+	- INLINE ASM (../../sb/ThorusAutoStake.sol#557-559)
+Address._verifyCallResult(bool,bytes,string) (../../sb/ThorusAutoStake.sol#714-734) uses assembly
+	- INLINE ASM (../../sb/ThorusAutoStake.sol#726-729)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.functionCall(address,bytes) (../../sb/ThorusAutoStake.sol#604-606) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/ThorusAutoStake.sol#633-639) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/ThorusAutoStake.sol#693-695) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/ThorusAutoStake.sol#703-712) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/ThorusAutoStake.sol#666-668) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/ThorusAutoStake.sol#676-685) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/ThorusAutoStake.sol#579-584) is never used and should be removed
+Context._msgData() (../../sb/ThorusAutoStake.sol#21-23) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/ThorusAutoStake.sol#773-786) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/ThorusAutoStake.sol#797-808) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/ThorusAutoStake.sol#788-795) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.8.10 (../../sb/ThorusAutoStake.sol#1) allows old versions
+solc-0.8.10 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/ThorusAutoStake.sol#579-584):
+	- (success) = recipient.call{value: amount}() (../../sb/ThorusAutoStake.sol#582)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/ThorusAutoStake.sol#647-658):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/ThorusAutoStake.sol#656)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/ThorusAutoStake.sol#676-685):
+	- (success,returndata) = target.staticcall(data) (../../sb/ThorusAutoStake.sol#683)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/ThorusAutoStake.sol#703-712):
+	- (success,returndata) = target.delegatecall(data) (../../sb/ThorusAutoStake.sol#710)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter ThorusAutoStake.whitelistProxy(address)._proxy (../../sb/ThorusAutoStake.sol#1037) is not in mixedCase
+Parameter ThorusAutoStake.dewhitelistProxy(address)._proxy (../../sb/ThorusAutoStake.sol#1044) is not in mixedCase
+Parameter ThorusAutoStake.deposit(address,uint256)._user (../../sb/ThorusAutoStake.sol#1051) is not in mixedCase
+Parameter ThorusAutoStake.deposit(address,uint256)._amount (../../sb/ThorusAutoStake.sol#1051) is not in mixedCase
+Parameter ThorusAutoStake.setTreasury(address)._treasury (../../sb/ThorusAutoStake.sol#1097) is not in mixedCase
+Parameter ThorusAutoStake.setPerformanceFee(uint256)._performanceFee (../../sb/ThorusAutoStake.sol#1103) is not in mixedCase
+Parameter ThorusAutoStake.setCallFee(uint256)._callFee (../../sb/ThorusAutoStake.sol#1109) is not in mixedCase
+Parameter ThorusAutoStake.setWithdrawFee(uint256)._withdrawFee (../../sb/ThorusAutoStake.sol#1115) is not in mixedCase
+Parameter ThorusAutoStake.setWithdrawFeePeriod(uint256)._withdrawFeePeriod (../../sb/ThorusAutoStake.sol#1121) is not in mixedCase
+Parameter ThorusAutoStake.withdraw(uint256)._amount (../../sb/ThorusAutoStake.sol#1165) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+/sb/ThorusAutoStake.sol analyzed (11 contracts with 93 detectors), 40 result(s) found

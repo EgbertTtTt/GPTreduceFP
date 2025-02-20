@@ -1,0 +1,203 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 46 Code Findings │
+└──────────────────┘
+                  
+    /sb/Stake.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+           36┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+           39┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+           45┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+           49┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+           54┆ callOptionalReturn(token,                                        
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+          260┆ uint256 public totalAllocPoint = 0;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          270┆ constructor( // SWC-111-Use of Deprecated Solidity Functions:    
+  L263                                                                          
+          271┆     address minter,
+          272┆     address _HE,
+          273┆     uint256 _hePerBlock,
+          274┆     uint256 _startBlock,
+          275┆     uint256 _bonusEndBlock,
+          276┆     address _reward
+          277┆ ) public {
+          278┆     _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
+          279┆     _setupRole(CREATOR_ADMIN, minter);
+             [hid 6 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          383┆ for (uint256 pid = 0; pid < length; ++pid) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           42┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+           43┆     "SafeBEP20: approve from non-zero to non-zero allowance"
+           44┆ );
+            ⋮┆----------------------------------------
+           57┆ require(address(token).isContract(), "SafeBEP20: call to         
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+           59┆ require(success, "SafeBEP20: low-level call failed");
+            ⋮┆----------------------------------------
+           61┆ require(abi.decode(returndata, (bool)), "SafeBEP20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+           69┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+           73┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+           82┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+           87┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+           92┆ require(b != 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          182┆ require( hasRole(getRoleAdmin(role), _msgSender()),              
+  "AccessControl: sender must be an admin to grant");                           
+            ⋮┆----------------------------------------
+          186┆ require( hasRole(getRoleAdmin(role), _msgSender()),              
+  "AccessControl: sender must be an admin to revoke");                          
+            ⋮┆----------------------------------------
+          191┆ require( account == _msgSender(), "AccessControl: can only       
+  renounce roles for self" );                                                   
+            ⋮┆----------------------------------------
+          291┆ require(hasRole(DEFAULT_ADMIN_ROLE, address(msg.sender)), "Caller
+  is not a owner");                                                             
+            ⋮┆----------------------------------------
+          295┆ require(hasRole(DEFAULT_ADMIN_ROLE, address(msg.sender)), "Caller
+  is not a owner");                                                             
+            ⋮┆----------------------------------------
+          299┆ require(hasRole(DEFAULT_ADMIN_ROLE, address(msg.sender)), "Caller
+  is not a owner");                                                             
+            ⋮┆----------------------------------------
+          310┆ require(hasRole(DEFAULT_ADMIN_ROLE, address(msg.sender)), "Caller
+  is not a owner");                                                             
+            ⋮┆----------------------------------------
+          311┆ require(block.number > startBlock, 'has not started yet');
+            ⋮┆----------------------------------------
+          326┆ require(hasRole(DEFAULT_ADMIN_ROLE, address(msg.sender)), "Caller
+  is not a owner");                                                             
+            ⋮┆----------------------------------------
+          334┆ require(!boolAddWallet[_pid][_receive], "Wallet has been added");
+            ⋮┆----------------------------------------
+          431┆ require(user.amount >= _amount, "withdraw: not good");
+            ⋮┆----------------------------------------
+          450┆ require(status == 0, 'You have withdrawn');
+            ⋮┆----------------------------------------
+          452┆ require(amount >= 0 , 'withdraw: not good');
+            ⋮┆----------------------------------------
+          453┆ require((block.timestamp - timeWithdraw) > timeLockWithdraw, 'you
+  are still in lock');                                                          
+            ⋮┆----------------------------------------
+          461┆ require(user.amount >= 0, "withdraw: not good");
+            ⋮┆----------------------------------------
+          465┆ require(user.pendingDebt.add(pending) >= _amount, "Claim: not    
+  good");                                                                       
+            ⋮┆----------------------------------------
+          474┆ require(status == 0, 'You have withdrawn');
+            ⋮┆----------------------------------------
+          475┆ require(amount >= 0 , 'withdraw: not good');
+            ⋮┆----------------------------------------
+          476┆ require((block.timestamp - timeWithdraw) > timeLockClaim, 'you   
+  are still in lock');                                                          
+            ⋮┆----------------------------------------
+          485┆ require(user.amount >= 0, "amount: not good");
+            ⋮┆----------------------------------------
+          486┆ require(pool.heToken == HE, "Token does not support restake");
+            ⋮┆----------------------------------------
+          489┆ require(user.pendingDebt.add(pending) >= _amount, "Claim: not    
+  good");                                                                       
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          371┆ if (block.number > pool.lastRewardBlock && lpSupply != 0) {
+          372┆     uint256 multiplier = getMultiplier(pool.lastRewardBlock,     
+  block.number);                                                                
+          373┆     uint256 rewardThisBlock = getRewardPerBlock(block.number);
+          374┆     uint256 heReward =                                           
+  multiplier.mul(rewardThisBlock).mul(pool.allocPoint).div(totalAllocPoint);    
+          375┆     accHePerShare =                                              
+  accHePerShare.add(heReward.mul(1e18).div(lpSupply));                          
+          376┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           42┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+           43┆     "SafeBEP20: approve from non-zero to non-zero allowance"
+           44┆ );
+            ⋮┆----------------------------------------
+           61┆ require(abi.decode(returndata, (bool)), "SafeBEP20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+           82┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          182┆ require( hasRole(getRoleAdmin(role), _msgSender()),              
+  "AccessControl: sender must be an admin to grant");                           
+            ⋮┆----------------------------------------
+          186┆ require( hasRole(getRoleAdmin(role), _msgSender()),              
+  "AccessControl: sender must be an admin to revoke");                          
+            ⋮┆----------------------------------------
+          191┆ require( account == _msgSender(), "AccessControl: can only       
+  renounce roles for self" );                                                   
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 46 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

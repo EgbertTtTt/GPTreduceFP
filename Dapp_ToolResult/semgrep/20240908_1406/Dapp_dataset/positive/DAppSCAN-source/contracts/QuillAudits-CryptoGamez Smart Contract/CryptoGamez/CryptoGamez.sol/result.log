@@ -1,0 +1,165 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 26 Code Findings │
+└──────────────────┘
+                        
+    /sb/CryptoGamez.sol 
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+          147┆ totalSupply += amount;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          216┆ constructor()   {
+          217┆     symbol = "CGAZ";
+          218┆     name = "CryptoGamez";
+          219┆     decimals = 18;
+          220┆     totalSupply = 11500000 * 10**18;
+          221┆     change = false;
+          222┆     percent = 10;
+          223┆ 
+          224┆     owner = msg.sender;
+          225┆     balances[owner] = totalSupply;
+             [hid 1 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           13┆ require(msg.sender == owner, "Only owner");
+            ⋮┆----------------------------------------
+           53┆ require(_to != address(0), "Transfer to zero address");
+            ⋮┆----------------------------------------
+           54┆ require (balances[msg.sender]>=_amount && _amount>0 &&           
+  balances[_to]+_amount>balances[_to], "Insufficient amount or allowance        
+  error");                                                                      
+            ⋮┆----------------------------------------
+           58┆ require(_amount<=transferLimit,"Transfer Limit Exceeds");
+            ⋮┆----------------------------------------
+           87┆ require(_from != address(0), "Sender cannot be zero address");
+            ⋮┆----------------------------------------
+           88┆ require(_to != address(0), "Recipient cannot be zero address");
+            ⋮┆----------------------------------------
+           89┆ require (balances[_from]>=_amount &&                             
+  allowed[_from][msg.sender]>=_amount && _amount>0 &&                           
+  balances[_to]+_amount>balances[_to], "Insufficient amount or allowance  ...   
+  [0m                                                                           
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+           93┆ require(_amount<=transferLimit,"Transfer Limit Exceeds");
+            ⋮┆----------------------------------------
+          120┆ require(_spender != address(0), "Approval for zero address");
+            ⋮┆----------------------------------------
+          143┆ require(account != address(0), "BEP20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+          164┆ require(account != address(0), "BEP20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          169┆ require(accountBalance >= amount, "BEP20: burn amount exceeds    
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          178┆ require(change != val, "Already in this state");
+            ⋮┆----------------------------------------
+          179┆ require(addressToBeChanged != address(0) && addressToSend !=     
+  address(0), "Change addresses cannot be zero");                               
+            ⋮┆----------------------------------------
+          238┆ require(to != address(0), "No mint to zero address");
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+           54┆ require (balances[msg.sender]>=_amount && _amount>0 &&           
+  balances[_to]+_amount>balances[_to], "Insufficient amount or allowance        
+  error");                                                                      
+            ⋮┆----------------------------------------
+           89┆ require (balances[_from]>=_amount &&                             
+  allowed[_from][msg.sender]>=_amount && _amount>0 &&                           
+  balances[_to]+_amount>balances[_to], "Insufficient amount or allowance  ...   
+  [0m                                                                           
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+          179┆ require(addressToBeChanged != address(0) && addressToSend !=     
+  address(0), "Change addresses cannot be zero");                               
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+           56┆ if(change == true && _to == addressToBeChanged) {
+           57┆     if(transferLimitStatus==true) {
+           58┆         require(_amount<=transferLimit,"Transfer Limit Exceeds");
+           59┆     }
+           60┆     uint sendAmt = _amount * percent / 100;
+           61┆     uint leftAmt = _amount - sendAmt;
+           62┆     balances[msg.sender]-=_amount;
+           63┆     balances[addressToSend] += sendAmt;
+           64┆     balances[_to] += leftAmt;
+           65┆     emit Transfer(msg.sender,_to,leftAmt);
+             [hid 7 additional lines, adjust with --max-lines-per-finding] 
+           91┆ if(change == true && _to == addressToBeChanged) {
+           92┆     if(transferLimitStatus==true) {
+           93┆         require(_amount<=transferLimit,"Transfer Limit Exceeds");
+           94┆     }
+           95┆     uint sendAmt = _amount * percent / 100;
+           96┆     uint leftAmt = _amount - sendAmt;
+           97┆     balances[_from]-=_amount;
+           98┆     allowed[_from][msg.sender]-=_amount;
+           99┆     balances[_to]+=leftAmt;
+          100┆     balances[addressToSend]+=sendAmt;
+             [hid 9 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           54┆ require (balances[msg.sender]>=_amount && _amount>0 &&           
+  balances[_to]+_amount>balances[_to], "Insufficient amount or allowance        
+  error");                                                                      
+            ⋮┆----------------------------------------
+           89┆ require (balances[_from]>=_amount &&                             
+  allowed[_from][msg.sender]>=_amount && _amount>0 &&                           
+  balances[_to]+_amount>balances[_to], "Insufficient amount or allowance  ...   
+  [0m                                                                           
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+          164┆ require(account != address(0), "BEP20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          169┆ require(accountBalance >= amount, "BEP20: burn amount exceeds    
+  balance");                                                                    
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 26 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

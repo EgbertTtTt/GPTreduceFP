@@ -1,0 +1,69 @@
+'solc --version' running
+'solc /sb/kickico_token_v1.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+KickToken.constructor(string,string,uint8).name (../../sb/kickico_token_v1.sol#349) shadows:
+	- CToken.name (../../sb/kickico_token_v1.sol#44) (state variable)
+KickToken.constructor(string,string,uint8).symbol (../../sb/kickico_token_v1.sol#349) shadows:
+	- CToken.symbol (../../sb/kickico_token_v1.sol#45) (state variable)
+KickToken.constructor(string,string,uint8).decimals (../../sb/kickico_token_v1.sol#349) shadows:
+	- CToken.decimals (../../sb/kickico_token_v1.sol#46) (state variable)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+CToken.changeOwner(address) (../../sb/kickico_token_v1.sol#106-108) should emit an event for: 
+	- owner = newOwner (../../sb/kickico_token_v1.sol#107) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-access-control
+
+CToken.changeOwner(address).newOwner (../../sb/kickico_token_v1.sol#106) lacks a zero-check on :
+		- owner = newOwner (../../sb/kickico_token_v1.sol#107)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+CToken.onlyWhitelisted() (../../sb/kickico_token_v1.sol#71-74) compares to a boolean constant:
+	-require(bool,string)(_whitelisteds[msg.sender] == true,caller does not have the Whitelisted role) (../../sb/kickico_token_v1.sol#72)
+CToken.canTransfer() (../../sb/kickico_token_v1.sol#94-99) compares to a boolean constant:
+	-require(bool,string)(_whitelisteds[msg.sender] == true,can't perform an action) (../../sb/kickico_token_v1.sol#96)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#boolean-equality
+
+CToken._mint(address,uint256) (../../sb/kickico_token_v1.sol#182-190) has costly operations inside a loop:
+	- _totalSupply = _totalSupply.add(amount) (../../sb/kickico_token_v1.sol#187)
+CToken._mintfrozen(address,uint256) (../../sb/kickico_token_v1.sol#263-274) has costly operations inside a loop:
+	- _totalSupply = _totalSupply.add(amount) (../../sb/kickico_token_v1.sol#268)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#costly-operations-inside-a-loop
+
+Pragma version^0.5.8 (../../sb/kickico_token_v1.sol#1) allows old versions
+solc-0.5.17 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Function AccountFrozenBalances._frozen_add(address,uint256) (../../sb/kickico_token_v1.sol#26-29) is not in mixedCase
+Parameter AccountFrozenBalances._frozen_add(address,uint256)._account (../../sb/kickico_token_v1.sol#26) is not in mixedCase
+Parameter AccountFrozenBalances._frozen_add(address,uint256)._amount (../../sb/kickico_token_v1.sol#26) is not in mixedCase
+Function AccountFrozenBalances._frozen_sub(address,uint256) (../../sb/kickico_token_v1.sol#31-34) is not in mixedCase
+Parameter AccountFrozenBalances._frozen_sub(address,uint256)._account (../../sb/kickico_token_v1.sol#31) is not in mixedCase
+Parameter AccountFrozenBalances._frozen_sub(address,uint256)._amount (../../sb/kickico_token_v1.sol#31) is not in mixedCase
+Function AccountFrozenBalances._frozen_balanceOf(address) (../../sb/kickico_token_v1.sol#36-38) is not in mixedCase
+Parameter AccountFrozenBalances._frozen_balanceOf(address)._account (../../sb/kickico_token_v1.sol#36) is not in mixedCase
+Variable AccountFrozenBalances.frozen_balances (../../sb/kickico_token_v1.sol#24) is not in mixedCase
+Parameter CToken.pauseTrigger(bool)._paused (../../sb/kickico_token_v1.sol#84) is not in mixedCase
+Parameter CToken.burnTrigger(bool)._burnallowed (../../sb/kickico_token_v1.sol#111) is not in mixedCase
+Parameter CToken.allowance(address,address)._owner (../../sb/kickico_token_v1.sol#142) is not in mixedCase
+Parameter CToken.dropBatchToken(address[],uint256[])._recipients (../../sb/kickico_token_v1.sol#237) is not in mixedCase
+Parameter CToken.dropBatchToken(address[],uint256[])._amounts (../../sb/kickico_token_v1.sol#237) is not in mixedCase
+Parameter CToken.dropBatchFrozenToken(address[],uint256[])._recipients (../../sb/kickico_token_v1.sol#337) is not in mixedCase
+Parameter CToken.dropBatchFrozenToken(address[],uint256[])._amounts (../../sb/kickico_token_v1.sol#337) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+KickToken.constructor(string,string,uint8) (../../sb/kickico_token_v1.sol#349-350) uses literals with too many digits:
+	- super.mint(msg.sender,100000000000) (../../sb/kickico_token_v1.sol#350)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+dropBatchToken(address[],uint256[]) should be declared external:
+	- CToken.dropBatchToken(address[],uint256[]) (../../sb/kickico_token_v1.sol#237-245)
+Moreover, the following function parameters should change its data location:
+_recipients location should be calldata
+_amounts location should be calldata
+dropBatchFrozenToken(address[],uint256[]) should be declared external:
+	- CToken.dropBatchFrozenToken(address[],uint256[]) (../../sb/kickico_token_v1.sol#337-345)
+Moreover, the following function parameters should change its data location:
+_recipients location should be calldata
+_amounts location should be calldata
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#public-function-that-could-be-declared-external
+/sb/kickico_token_v1.sol analyzed (4 contracts with 93 detectors), 30 result(s) found

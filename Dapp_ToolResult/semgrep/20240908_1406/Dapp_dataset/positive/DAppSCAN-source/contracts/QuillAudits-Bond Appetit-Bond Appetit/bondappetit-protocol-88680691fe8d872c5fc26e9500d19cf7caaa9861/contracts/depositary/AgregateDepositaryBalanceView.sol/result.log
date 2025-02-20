@@ -1,0 +1,150 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 32 Code Findings │
+└──────────────────┘
+                                          
+    /sb/AgregateDepositaryBalanceView.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          386┆ contract OwnablePausable is Ownable, Pausable {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          393┆ constructor() internal {
+          394┆     pauser = owner();
+          395┆ }
+            ⋮┆----------------------------------------
+          465┆ constructor(uint256 _decimals, uint256 _maxSize) public {
+          466┆     decimals = _decimals;
+          467┆     maxSize = _maxSize;
+          468┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          512┆ result[i] = address(depositaries[i]);
+            ⋮┆----------------------------------------
+          522┆ uint256 depositaryBalance = depositaries[i].balance();
+            ⋮┆----------------------------------------
+          523┆ uint256 depositaryDecimals = depositaries[i].decimals();
+            ⋮┆----------------------------------------
+          524┆ uint256 decimalsPower = decimals.sub(depositaryDecimals);
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          511┆ for (uint256 i = 0; i < size(); i++) {
+            ⋮┆----------------------------------------
+          521┆ for (uint256 i = 0; i < size(); i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           87┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          102┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          119┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          136┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          153┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          274┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          295┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          345┆ require(!paused(), "Pausable: paused");
+            ⋮┆----------------------------------------
+          357┆ require(paused(), "Pausable: not paused");
+            ⋮┆----------------------------------------
+          410┆ require(pauser == _msgSender() || owner() == _msgSender(),       
+  "OwnablePausable::pause: only pauser and owner must pause contract");         
+            ⋮┆----------------------------------------
+          418┆ require(pauser == _msgSender() || owner() == _msgSender(),       
+  "OwnablePausable::unpause: only pauser and owner must unpause contract");     
+            ⋮┆----------------------------------------
+          483┆ require(depositariesIndex[depositary] == 0,                      
+  "AgregateDepositaryBalanceView::addDepositary: depositary already added");    
+            ⋮┆----------------------------------------
+          484┆ require(size() < maxSize,                                        
+  "AgregateDepositaryBalanceView::addDepositary: too many depositaries");       
+            ⋮┆----------------------------------------
+          497┆ require(depositaryIndex != 0,                                    
+  "AgregateDepositaryBalanceView::removeDepositary: depositary already          
+  removed");                                                                    
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          511┆ for (uint256 i = 0; i < size(); i++) {
+            ⋮┆----------------------------------------
+          521┆ for (uint256 i = 0; i < size(); i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          119┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          295┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          410┆ require(pauser == _msgSender() || owner() == _msgSender(),       
+  "OwnablePausable::pause: only pauser and owner must pause contract");         
+            ⋮┆----------------------------------------
+          418┆ require(pauser == _msgSender() || owner() == _msgSender(),       
+  "OwnablePausable::unpause: only pauser and owner must unpause contract");     
+            ⋮┆----------------------------------------
+          483┆ require(depositariesIndex[depositary] == 0,                      
+  "AgregateDepositaryBalanceView::addDepositary: depositary already added");    
+            ⋮┆----------------------------------------
+          484┆ require(size() < maxSize,                                        
+  "AgregateDepositaryBalanceView::addDepositary: too many depositaries");       
+            ⋮┆----------------------------------------
+          497┆ require(depositaryIndex != 0,                                    
+  "AgregateDepositaryBalanceView::removeDepositary: depositary already          
+  removed");                                                                    
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 32 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

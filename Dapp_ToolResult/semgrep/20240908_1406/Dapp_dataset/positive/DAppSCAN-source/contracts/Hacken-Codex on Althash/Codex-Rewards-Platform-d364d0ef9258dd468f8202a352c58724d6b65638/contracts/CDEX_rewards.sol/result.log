@@ -1,0 +1,65 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                   
+                   
+┌─────────────────┐
+│ 5 Code Findings │
+└─────────────────┘
+                         
+    /sb/CDEX_rewards.sol 
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+          377┆ totalMembers += 1;
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+          246┆ uint256 public periodFinish = 0;
+            ⋮┆----------------------------------------
+          247┆ uint256 public rewardRate = 0;
+            ⋮┆----------------------------------------
+          248┆ uint256 public rewardsDuration = 0;
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          434┆ if (reward > 0 && depositedRewardTokens >= reward) {
+          435┆     /// The withdraw is always for the full accrued reward amount
+          436┆     rewards[msg.sender] = 0;
+          437┆     /// Decrements the deposited reward tokens balance
+          438┆     depositedRewardTokens = depositedRewardTokens.sub(reward);
+          439┆     /// Defines the bonus amount based on the sender's reward    
+  tier                                                                          
+          440┆     if (_balances[msg.sender] >= loyaltyTier1) {
+          441┆         loyaltyBonus = reward.mul(loyaltyTier1Bonus).div(10000);
+          442┆     } else if (_balances[msg.sender] >= loyaltyTier2) {
+          443┆         loyaltyBonus = reward.mul(loyaltyTier2Bonus).div(10000);
+             [hid 14 additional lines, adjust with --max-lines-per-finding] 
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 5 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

@@ -1,0 +1,134 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 23 Code Findings │
+└──────────────────┘
+                         
+    /sb/ZrxAllowlist.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          204┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          213┆ _callOptionalReturn(
+          214┆     token,
+          215┆     abi.encodeWithSelector(token.transferFrom.selector, from, to,
+  value)                                                                        
+          216┆ );
+            ⋮┆----------------------------------------
+          228┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, 0));                  
+            ⋮┆----------------------------------------
+          229┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          238┆ _callOptionalReturn(
+          239┆     token,
+          240┆     abi.encodeWithSelector(token.approve.selector, spender,      
+  newAllowance)                                                                 
+          241┆ );
+            ⋮┆----------------------------------------
+          253┆ _callOptionalReturn(
+          254┆     token,
+          255┆     abi.encodeWithSelector(token.approve.selector, spender,      
+  newAllowance)                                                                 
+          256┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          277┆ constructor() {
+          278┆     owner = msg.sender;
+          279┆     admin = 0x25eFA336886C74eA8E282ac466BdCd0199f85BB9;
+          280┆ }
+            ⋮┆----------------------------------------
+          334┆ constructor() {
+          335┆     zrxAllowlist[0x6958F5e95332D93D21af0D7B9Ca85B8212fEE0A5] =   
+  true;                                                                         
+          336┆     zrxAllowlist[0x61935CbDd02287B511119DDb11Aeb42F1593b7Ef] =   
+  true;                                                                         
+          337┆     zrxAllowlist[0xDef1C0ded9bec7F1a1670819833240f027b25EfF] =   
+  true;                                                                         
+          338┆     zrxAllowlist[0x080bf510FCbF18b91105470639e9561022937712] =   
+  true;                                                                         
+          339┆ 
+          340┆     nonPayableAddrs[0x080bf510FCbF18b91105470639e9561022937712] =
+  true;                                                                         
+          341┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           61┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+           65┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+           95┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          105┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          131┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          160┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          267┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          285┆ require(admin == msg.sender, "msg.sender not admin");
+            ⋮┆----------------------------------------
+          292┆ require(admin == msg.sender, "msg.sender not admin");
+            ⋮┆----------------------------------------
+          305┆ require(adminVault.owner() == msg.sender, "msg.sender not        
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          310┆ require(adminVault.admin() == msg.sender, "msg.sender not        
+  admin");                                                                      
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           65┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+           95┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          160┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          267┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 23 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

@@ -1,0 +1,810 @@
+'solc --version' running
+'solc /sb/Pool.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/Pool.sol:
+Warning: Contract code size exceeds 24576 bytes (a limit introduced in Spurious Dragon). This contract may not be deployable on mainnet. Consider enabling the optimizer (with a low "runs" value!), turning off revert strings, or using libraries.
+    --> /sb/Pool.sol:1852:1:
+     |
+1852 | contract Pool is IPool, ERC20, Delegable {
+     | ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+Pool.sellDai(address,address,uint128) (../../sb/Pool.sol#1990-2002) uses arbitrary from in transferFrom: dai.transferFrom(from,address(this),daiIn) (../../sb/Pool.sol#1997)
+Pool.buyDai(address,address,uint128) (../../sb/Pool.sol#2038-2050) uses arbitrary from in transferFrom: yDai.transferFrom(from,address(this),yDaiIn) (../../sb/Pool.sol#2045)
+Pool.sellYDai(address,address,uint128) (../../sb/Pool.sol#2076-2088) uses arbitrary from in transferFrom: yDai.transferFrom(from,address(this),yDaiIn) (../../sb/Pool.sol#2083)
+Pool.buyYDai(address,address,uint128) (../../sb/Pool.sol#2114-2126) uses arbitrary from in transferFrom: dai.transferFrom(from,address(this),daiIn) (../../sb/Pool.sol#2121)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#arbitrary-from-in-transferfrom
+
+Pool.init(uint128) (../../sb/Pool.sol#1924-1936) ignores return value by dai.transferFrom(msg.sender,address(this),daiIn) (../../sb/Pool.sol#1933)
+Pool.burn(uint256) (../../sb/Pool.sol#1965-1982) ignores return value by dai.transfer(msg.sender,daiReturned) (../../sb/Pool.sol#1977)
+Pool.burn(uint256) (../../sb/Pool.sol#1965-1982) ignores return value by yDai.transfer(msg.sender,yDaiReturned) (../../sb/Pool.sol#1978)
+Pool.sellDai(address,address,uint128) (../../sb/Pool.sol#1990-2002) ignores return value by dai.transferFrom(from,address(this),daiIn) (../../sb/Pool.sol#1997)
+Pool.sellDai(address,address,uint128) (../../sb/Pool.sol#1990-2002) ignores return value by yDai.transfer(to,yDaiOut) (../../sb/Pool.sol#1998)
+Pool.buyDai(address,address,uint128) (../../sb/Pool.sol#2038-2050) ignores return value by yDai.transferFrom(from,address(this),yDaiIn) (../../sb/Pool.sol#2045)
+Pool.buyDai(address,address,uint128) (../../sb/Pool.sol#2038-2050) ignores return value by dai.transfer(to,daiOut) (../../sb/Pool.sol#2046)
+Pool.sellYDai(address,address,uint128) (../../sb/Pool.sol#2076-2088) ignores return value by yDai.transferFrom(from,address(this),yDaiIn) (../../sb/Pool.sol#2083)
+Pool.sellYDai(address,address,uint128) (../../sb/Pool.sol#2076-2088) ignores return value by dai.transfer(to,daiOut) (../../sb/Pool.sol#2084)
+Pool.buyYDai(address,address,uint128) (../../sb/Pool.sol#2114-2126) ignores return value by dai.transferFrom(from,address(this),daiIn) (../../sb/Pool.sol#2121)
+Pool.buyYDai(address,address,uint128) (../../sb/Pool.sol#2114-2126) ignores return value by yDai.transfer(to,yDaiOut) (../../sb/Pool.sol#2122)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+ABDKMath64x64.divuu(uint256,uint256) (../../sb/Pool.sol#1182-1221) performs a multiplication on the result of a division:
+	- result = (x << 255 - msb) / ((y - 1 >> msb - 191) + 1) (../../sb/Pool.sol#1199)
+	- hi = result * (y >> 128) (../../sb/Pool.sol#1202)
+ABDKMath64x64.divuu(uint256,uint256) (../../sb/Pool.sol#1182-1221) performs a multiplication on the result of a division:
+	- result = (x << 255 - msb) / ((y - 1 >> msb - 191) + 1) (../../sb/Pool.sol#1199)
+	- lo = result * (y & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF) (../../sb/Pool.sol#1203)
+Pool.mint(uint256) (../../sb/Pool.sol#1942-1959) performs a multiplication on the result of a division:
+	- tokensMinted = supply.mul(daiOffered).div(daiReserves) (../../sb/Pool.sol#1950)
+	- yDaiRequired = yDaiReserves.mul(tokensMinted).div(supply) (../../sb/Pool.sol#1951)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+Pool.init(uint128) (../../sb/Pool.sol#1924-1936) uses a dangerous strict equality:
+	- require(bool,string)(totalSupply() == 0,Pool: Already initialized) (../../sb/Pool.sol#1928-1931)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Reentrancy in Pool.init(uint128) (../../sb/Pool.sol#1924-1936):
+	External calls:
+	- dai.transferFrom(msg.sender,address(this),daiIn) (../../sb/Pool.sol#1933)
+	State variables written after the call(s):
+	- _mint(msg.sender,daiIn) (../../sb/Pool.sol#1934)
+		- _totalSupply = _totalSupply.add(amount) (../../sb/Pool.sol#535)
+	ERC20._totalSupply (../../sb/Pool.sol#342) can be used in cross function reentrancies:
+	- ERC20._burn(address,uint256) (../../sb/Pool.sol#551-559)
+	- ERC20._mint(address,uint256) (../../sb/Pool.sol#530-538)
+	- ERC20.totalSupply() (../../sb/Pool.sol#398-400)
+Reentrancy in Pool.mint(uint256) (../../sb/Pool.sol#1942-1959):
+	External calls:
+	- require(bool)(dai.transferFrom(msg.sender,address(this),daiOffered)) (../../sb/Pool.sol#1953)
+	- require(bool)(yDai.transferFrom(msg.sender,address(this),yDaiRequired)) (../../sb/Pool.sol#1954)
+	State variables written after the call(s):
+	- _mint(msg.sender,tokensMinted) (../../sb/Pool.sol#1955)
+		- _totalSupply = _totalSupply.add(amount) (../../sb/Pool.sol#535)
+	ERC20._totalSupply (../../sb/Pool.sol#342) can be used in cross function reentrancies:
+	- ERC20._burn(address,uint256) (../../sb/Pool.sol#551-559)
+	- ERC20._mint(address,uint256) (../../sb/Pool.sol#530-538)
+	- ERC20.totalSupply() (../../sb/Pool.sol#398-400)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+Reentrancy in Pool.init(uint128) (../../sb/Pool.sol#1924-1936):
+	External calls:
+	- dai.transferFrom(msg.sender,address(this),daiIn) (../../sb/Pool.sol#1933)
+	State variables written after the call(s):
+	- _mint(msg.sender,daiIn) (../../sb/Pool.sol#1934)
+		- _balances[account] = _balances[account].add(amount) (../../sb/Pool.sol#536)
+Reentrancy in Pool.mint(uint256) (../../sb/Pool.sol#1942-1959):
+	External calls:
+	- require(bool)(dai.transferFrom(msg.sender,address(this),daiOffered)) (../../sb/Pool.sol#1953)
+	- require(bool)(yDai.transferFrom(msg.sender,address(this),yDaiRequired)) (../../sb/Pool.sol#1954)
+	State variables written after the call(s):
+	- _mint(msg.sender,tokensMinted) (../../sb/Pool.sol#1955)
+		- _balances[account] = _balances[account].add(amount) (../../sb/Pool.sol#536)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in Pool.burn(uint256) (../../sb/Pool.sol#1965-1982):
+	External calls:
+	- dai.transfer(msg.sender,daiReturned) (../../sb/Pool.sol#1977)
+	- yDai.transfer(msg.sender,yDaiReturned) (../../sb/Pool.sol#1978)
+	Event emitted after the call(s):
+	- Liquidity(maturity,msg.sender,msg.sender,toInt256(daiReturned),toInt256(yDaiReturned),- toInt256(tokensBurned)) (../../sb/Pool.sol#1979)
+Reentrancy in Pool.buyDai(address,address,uint128) (../../sb/Pool.sol#2038-2050):
+	External calls:
+	- yDai.transferFrom(from,address(this),yDaiIn) (../../sb/Pool.sol#2045)
+	- dai.transfer(to,daiOut) (../../sb/Pool.sol#2046)
+	Event emitted after the call(s):
+	- Trade(maturity,from,to,toInt256(daiOut),- toInt256(yDaiIn)) (../../sb/Pool.sol#2047)
+Reentrancy in Pool.buyYDai(address,address,uint128) (../../sb/Pool.sol#2114-2126):
+	External calls:
+	- dai.transferFrom(from,address(this),daiIn) (../../sb/Pool.sol#2121)
+	- yDai.transfer(to,yDaiOut) (../../sb/Pool.sol#2122)
+	Event emitted after the call(s):
+	- Trade(maturity,from,to,- toInt256(daiIn),toInt256(yDaiOut)) (../../sb/Pool.sol#2123)
+Reentrancy in Pool.init(uint128) (../../sb/Pool.sol#1924-1936):
+	External calls:
+	- dai.transferFrom(msg.sender,address(this),daiIn) (../../sb/Pool.sol#1933)
+	Event emitted after the call(s):
+	- Liquidity(maturity,msg.sender,msg.sender,- toInt256(daiIn),0,toInt256(daiIn)) (../../sb/Pool.sol#1935)
+	- Transfer(address(0),account,amount) (../../sb/Pool.sol#537)
+		- _mint(msg.sender,daiIn) (../../sb/Pool.sol#1934)
+Reentrancy in Pool.mint(uint256) (../../sb/Pool.sol#1942-1959):
+	External calls:
+	- require(bool)(dai.transferFrom(msg.sender,address(this),daiOffered)) (../../sb/Pool.sol#1953)
+	- require(bool)(yDai.transferFrom(msg.sender,address(this),yDaiRequired)) (../../sb/Pool.sol#1954)
+	Event emitted after the call(s):
+	- Liquidity(maturity,msg.sender,msg.sender,- toInt256(daiOffered),- toInt256(yDaiRequired),toInt256(tokensMinted)) (../../sb/Pool.sol#1956)
+	- Transfer(address(0),account,amount) (../../sb/Pool.sol#537)
+		- _mint(msg.sender,tokensMinted) (../../sb/Pool.sol#1955)
+Reentrancy in Pool.sellDai(address,address,uint128) (../../sb/Pool.sol#1990-2002):
+	External calls:
+	- dai.transferFrom(from,address(this),daiIn) (../../sb/Pool.sol#1997)
+	- yDai.transfer(to,yDaiOut) (../../sb/Pool.sol#1998)
+	Event emitted after the call(s):
+	- Trade(maturity,from,to,- toInt256(daiIn),toInt256(yDaiOut)) (../../sb/Pool.sol#1999)
+Reentrancy in Pool.sellYDai(address,address,uint128) (../../sb/Pool.sol#2076-2088):
+	External calls:
+	- yDai.transferFrom(from,address(this),yDaiIn) (../../sb/Pool.sol#2083)
+	- dai.transfer(to,daiOut) (../../sb/Pool.sol#2084)
+	Event emitted after the call(s):
+	- Trade(maturity,from,to,toInt256(daiOut),- toInt256(yDaiIn)) (../../sb/Pool.sol#2085)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Pool.add(uint128,uint128) (../../sb/Pool.sol#1885-1892) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(c >= a,Pool: Dai reserves too high) (../../sb/Pool.sol#1889)
+Pool.sub(uint128,uint128) (../../sb/Pool.sol#1895-1900) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(b <= a,Pool: yDai reserves too low) (../../sb/Pool.sol#1896)
+Pool.toUint128(uint256) (../../sb/Pool.sol#1903-1909) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(x <= 340282366920938463463374607431768211455,Pool: Cast overflow) (../../sb/Pool.sol#1904-1907)
+Pool.toInt256(uint256) (../../sb/Pool.sol#1912-1918) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(x <= 57896044618658097711785492504343953926634992332820282019728792003956564819967,Pool: Cast overflow) (../../sb/Pool.sol#1913-1916)
+Pool.sellDaiPreview(uint128) (../../sb/Pool.sol#2007-2030) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(sub(yDaiReserves,yDaiOut) >= add(daiReserves,daiIn),Pool: yDai reserves too low) (../../sb/Pool.sol#2024-2027)
+Pool.buyYDaiPreview(uint128) (../../sb/Pool.sol#2132-2155) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(sub(yDaiReserves,yDaiOut) >= add(daiReserves,daiIn),Pool: yDai reserves too low) (../../sb/Pool.sol#2149-2152)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Void constructor called in Pool.constructor(address,address,string,string) (../../sb/Pool.sol#1864-1873):
+	- Delegable() (../../sb/Pool.sol#1867)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#void-constructor
+
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) has a high cyclomatic complexity (65).
+ABDKMath64x64.powu(uint256,uint256) (../../sb/Pool.sol#1231-1284) has a high cyclomatic complexity (16).
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) has a high cyclomatic complexity (49).
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) has a high cyclomatic complexity (42).
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cyclomatic-complexity
+
+ABDKMath64x64.abs(int128) (../../sb/Pool.sol#880-883) is never used and should be removed
+ABDKMath64x64.add(int128,int128) (../../sb/Pool.sol#711-715) is never used and should be removed
+ABDKMath64x64.avg(int128,int128) (../../sb/Pool.sol#906-908) is never used and should be removed
+ABDKMath64x64.div(int128,int128) (../../sb/Pool.sol#811-816) is never used and should be removed
+ABDKMath64x64.divi(int256,int256) (../../sb/Pool.sol#826-846) is never used and should be removed
+ABDKMath64x64.divu(uint256,uint256) (../../sb/Pool.sol#856-861) is never used and should be removed
+ABDKMath64x64.divuu(uint256,uint256) (../../sb/Pool.sol#1182-1221) is never used and should be removed
+ABDKMath64x64.exp(int128) (../../sb/Pool.sol#1165-1172) is never used and should be removed
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) is never used and should be removed
+ABDKMath64x64.from128x128(int256) (../../sb/Pool.sol#687-691) is never used and should be removed
+ABDKMath64x64.fromInt(int256) (../../sb/Pool.sol#640-643) is never used and should be removed
+ABDKMath64x64.gavg(int128,int128) (../../sb/Pool.sol#918-924) is never used and should be removed
+ABDKMath64x64.inv(int128) (../../sb/Pool.sol#892-897) is never used and should be removed
+ABDKMath64x64.ln(int128) (../../sb/Pool.sol#1004-1009) is never used and should be removed
+ABDKMath64x64.log_2(int128) (../../sb/Pool.sol#973-996) is never used and should be removed
+ABDKMath64x64.muli(int128,int256) (../../sb/Pool.sol#751-777) is never used and should be removed
+ABDKMath64x64.mulu(int128,uint256) (../../sb/Pool.sol#787-801) is never used and should be removed
+ABDKMath64x64.neg(int128) (../../sb/Pool.sol#869-872) is never used and should be removed
+ABDKMath64x64.pow(int128,uint256) (../../sb/Pool.sol#934-954) is never used and should be removed
+ABDKMath64x64.powu(uint256,uint256) (../../sb/Pool.sol#1231-1284) is never used and should be removed
+ABDKMath64x64.sqrt(int128) (../../sb/Pool.sol#962-965) is never used and should be removed
+ABDKMath64x64.sqrtu(uint256,uint256) (../../sb/Pool.sol#1293-1304) is never used and should be removed
+ABDKMath64x64.to128x128(int128) (../../sb/Pool.sol#700-702) is never used and should be removed
+ABDKMath64x64.toInt(int128) (../../sb/Pool.sol#652-654) is never used and should be removed
+ABDKMath64x64.toUInt(int128) (../../sb/Pool.sol#675-678) is never used and should be removed
+Context._msgData() (../../sb/Pool.sol#20-23) is never used and should be removed
+ERC20._setupDecimals(uint8) (../../sb/Pool.sol#589-591) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/Pool.sol#285-288) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/Pool.sol#247-250) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/Pool.sol#305-308) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/Pool.sol#119-123) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/Pool.sol#155-158) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/Pool.sol#165-168) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/Pool.sol#140-148) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/Pool.sol#130-133) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.6.10 (../../sb/Pool.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Function ABDKMath64x64.log_2(int128) (../../sb/Pool.sol#973-996) is not in mixedCase
+Function ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) is not in mixedCase
+Constant ABDKMath64x64.MIN_64x64 (../../sb/Pool.sol#626) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant ABDKMath64x64.MAX_64x64 (../../sb/Pool.sol#631) is not in UPPER_CASE_WITH_UNDERSCORES
+Function YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) is not in mixedCase
+Function YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/Pool.sol#21)" inContext (../../sb/Pool.sol#15-24)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+ABDKMath64x64.fromInt(int256) (../../sb/Pool.sol#640-643) uses literals with too many digits:
+	- require(bool)(x >= - 0x8000000000000000 && x <= 0x7FFFFFFFFFFFFFFF) (../../sb/Pool.sol#641)
+ABDKMath64x64.muli(int128,int256) (../../sb/Pool.sol#751-777) uses literals with too many digits:
+	- require(bool)(y >= - 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF && y <= 0x1000000000000000000000000000000000000000000000000) (../../sb/Pool.sol#753-754)
+ABDKMath64x64.muli(int128,int256) (../../sb/Pool.sol#751-777) uses literals with too many digits:
+	- require(bool)(absoluteResult <= 0x8000000000000000000000000000000000000000000000000000000000000000) (../../sb/Pool.sol#768-769)
+ABDKMath64x64.divi(int256,int256) (../../sb/Pool.sol#826-846) uses literals with too many digits:
+	- require(bool)(absoluteResult <= 0x80000000000000000000000000000000) (../../sb/Pool.sol#840)
+ABDKMath64x64.inv(int128) (../../sb/Pool.sol#892-897) uses literals with too many digits:
+	- result = int256(0x100000000000000000000000000000000) / x (../../sb/Pool.sol#894)
+ABDKMath64x64.gavg(int128,int128) (../../sb/Pool.sol#918-924) uses literals with too many digits:
+	- require(bool)(m < 0x4000000000000000000000000000000000000000000000000000000000000000) (../../sb/Pool.sol#921-922)
+ABDKMath64x64.pow(int128,uint256) (../../sb/Pool.sol#934-954) uses literals with too many digits:
+	- require(bool)(absoluteResult <= 0x80000000000000000000000000000000) (../../sb/Pool.sol#948)
+ABDKMath64x64.sqrt(int128) (../../sb/Pool.sol#962-965) uses literals with too many digits:
+	- int128(sqrtu(uint256(x) << 64,0x10000000000000000)) (../../sb/Pool.sol#964)
+ABDKMath64x64.log_2(int128) (../../sb/Pool.sol#973-996) uses literals with too many digits:
+	- xc >= 0x10000000000000000 (../../sb/Pool.sol#978)
+ABDKMath64x64.log_2(int128) (../../sb/Pool.sol#973-996) uses literals with too many digits:
+	- xc >= 0x100000000 (../../sb/Pool.sol#979)
+ABDKMath64x64.log_2(int128) (../../sb/Pool.sol#973-996) uses literals with too many digits:
+	- bit = 0x8000000000000000 (../../sb/Pool.sol#988)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- require(bool)(x < 0x400000000000000000) (../../sb/Pool.sol#1018)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x < - 0x400000000000000000 (../../sb/Pool.sol#1020)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = 0x80000000000000000000000000000000 (../../sb/Pool.sol#1022)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x8000000000000000 > 0 (../../sb/Pool.sol#1024)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x4000000000000000 > 0 (../../sb/Pool.sol#1026)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x2000000000000000 > 0 (../../sb/Pool.sol#1028)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x1000000000000000 > 0 (../../sb/Pool.sol#1030)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x800000000000000 > 0 (../../sb/Pool.sol#1032)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x400000000000000 > 0 (../../sb/Pool.sol#1034)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x200000000000000 > 0 (../../sb/Pool.sol#1036)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x100000000000000 > 0 (../../sb/Pool.sol#1038)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x80000000000000 > 0 (../../sb/Pool.sol#1040)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x40000000000000 > 0 (../../sb/Pool.sol#1042)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x20000000000000 > 0 (../../sb/Pool.sol#1044)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x10000000000000 > 0 (../../sb/Pool.sol#1046)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x8000000000000 > 0 (../../sb/Pool.sol#1048)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x4000000000000 > 0 (../../sb/Pool.sol#1050)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x2000000000000 > 0 (../../sb/Pool.sol#1052)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x1000000000000 > 0 (../../sb/Pool.sol#1054)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x800000000000 > 0 (../../sb/Pool.sol#1056)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x400000000000 > 0 (../../sb/Pool.sol#1058)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x200000000000 > 0 (../../sb/Pool.sol#1060)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x100000000000 > 0 (../../sb/Pool.sol#1062)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x100000B1721BCFC99D9F890EA06911763 >> 128 (../../sb/Pool.sol#1063)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x80000000000 > 0 (../../sb/Pool.sol#1064)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x10000058B90CF1E6D97F9CA14DBCC1628 >> 128 (../../sb/Pool.sol#1065)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x40000000000 > 0 (../../sb/Pool.sol#1066)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x1000002C5C863B73F016468F6BAC5CA2B >> 128 (../../sb/Pool.sol#1067)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x20000000000 > 0 (../../sb/Pool.sol#1068)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x100000162E430E5A18F6119E3C02282A5 >> 128 (../../sb/Pool.sol#1069)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x10000000000 > 0 (../../sb/Pool.sol#1070)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x1000000B1721835514B86E6D96EFD1BFE >> 128 (../../sb/Pool.sol#1071)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x8000000000 > 0 (../../sb/Pool.sol#1072)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x100000058B90C0B48C6BE5DF846C5B2EF >> 128 (../../sb/Pool.sol#1073)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x4000000000 > 0 (../../sb/Pool.sol#1074)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x10000002C5C8601CC6B9E94213C72737A >> 128 (../../sb/Pool.sol#1075)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x2000000000 > 0 (../../sb/Pool.sol#1076)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x1000000162E42FFF037DF38AA2B219F06 >> 128 (../../sb/Pool.sol#1077)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x1000000000 > 0 (../../sb/Pool.sol#1078)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x10000000B17217FBA9C739AA5819F44F9 >> 128 (../../sb/Pool.sol#1079)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x800000000 > 0 (../../sb/Pool.sol#1080)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x1000000058B90BFCDEE5ACD3C1CEDC823 >> 128 (../../sb/Pool.sol#1081)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x400000000 > 0 (../../sb/Pool.sol#1082)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x100000002C5C85FE31F35A6A30DA1BE50 >> 128 (../../sb/Pool.sol#1083)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x200000000 > 0 (../../sb/Pool.sol#1084)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x10000000162E42FF0999CE3541B9FFFCF >> 128 (../../sb/Pool.sol#1085)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x100000000 > 0 (../../sb/Pool.sol#1086)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x100000000B17217F80F4EF5AADDA45554 >> 128 (../../sb/Pool.sol#1087)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x80000000 > 0 (../../sb/Pool.sol#1088)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x10000000058B90BFBF8479BD5A81B51AD >> 128 (../../sb/Pool.sol#1089)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x40000000 > 0 (../../sb/Pool.sol#1090)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x1000000002C5C85FDF84BD62AE30A74CC >> 128 (../../sb/Pool.sol#1091)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x20000000 > 0 (../../sb/Pool.sol#1092)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x100000000162E42FEFB2FED257559BDAA >> 128 (../../sb/Pool.sol#1093)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x10000000 > 0 (../../sb/Pool.sol#1094)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x1000000000B17217F7D5A7716BBA4A9AE >> 128 (../../sb/Pool.sol#1095)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x8000000 > 0 (../../sb/Pool.sol#1096)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x100000000058B90BFBE9DDBAC5E109CCE >> 128 (../../sb/Pool.sol#1097)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x4000000 > 0 (../../sb/Pool.sol#1098)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x10000000002C5C85FDF4B15DE6F17EB0D >> 128 (../../sb/Pool.sol#1099)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x2000000 > 0 (../../sb/Pool.sol#1100)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x1000000000162E42FEFA494F1478FDE05 >> 128 (../../sb/Pool.sol#1101)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x1000000 > 0 (../../sb/Pool.sol#1102)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x10000000000B17217F7D20CF927C8E94C >> 128 (../../sb/Pool.sol#1103)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x800000 > 0 (../../sb/Pool.sol#1104)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x1000000000058B90BFBE8F71CB4E4B33D >> 128 (../../sb/Pool.sol#1105)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x400000 > 0 (../../sb/Pool.sol#1106)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x100000000002C5C85FDF477B662B26945 >> 128 (../../sb/Pool.sol#1107)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x200000 > 0 (../../sb/Pool.sol#1108)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x10000000000162E42FEFA3AE53369388C >> 128 (../../sb/Pool.sol#1109)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- x & 0x100000 > 0 (../../sb/Pool.sol#1110)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x100000000000B17217F7D1D351A389D40 >> 128 (../../sb/Pool.sol#1111)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x10000000000058B90BFBE8E8B2D3D4EDE >> 128 (../../sb/Pool.sol#1113)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x1000000000002C5C85FDF4741BEA6E77E >> 128 (../../sb/Pool.sol#1115)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x100000000000162E42FEFA39FE95583C2 >> 128 (../../sb/Pool.sol#1117)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x1000000000000B17217F7D1CFB72B45E1 >> 128 (../../sb/Pool.sol#1119)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x100000000000058B90BFBE8E7CC35C3F0 >> 128 (../../sb/Pool.sol#1121)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x10000000000002C5C85FDF473E242EA38 >> 128 (../../sb/Pool.sol#1123)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x1000000000000162E42FEFA39F02B772C >> 128 (../../sb/Pool.sol#1125)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x10000000000000B17217F7D1CF7D83C1A >> 128 (../../sb/Pool.sol#1127)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x1000000000000058B90BFBE8E7BDCBE2E >> 128 (../../sb/Pool.sol#1129)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x100000000000002C5C85FDF473DEA871F >> 128 (../../sb/Pool.sol#1131)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x10000000000000162E42FEFA39EF44D91 >> 128 (../../sb/Pool.sol#1133)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x100000000000000B17217F7D1CF79E949 >> 128 (../../sb/Pool.sol#1135)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x10000000000000058B90BFBE8E7BCE544 >> 128 (../../sb/Pool.sol#1137)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x1000000000000002C5C85FDF473DE6ECA >> 128 (../../sb/Pool.sol#1139)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x100000000000000162E42FEFA39EF366F >> 128 (../../sb/Pool.sol#1141)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x1000000000000000B17217F7D1CF79AFA >> 128 (../../sb/Pool.sol#1143)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x100000000000000058B90BFBE8E7BCD6D >> 128 (../../sb/Pool.sol#1145)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x10000000000000002C5C85FDF473DE6B2 >> 128 (../../sb/Pool.sol#1147)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x1000000000000000162E42FEFA39EF358 >> 128 (../../sb/Pool.sol#1149)
+ABDKMath64x64.exp_2(int128) (../../sb/Pool.sol#1017-1157) uses literals with too many digits:
+	- result = result * 0x10000000000000000B17217F7D1CF79AB >> 128 (../../sb/Pool.sol#1151)
+ABDKMath64x64.exp(int128) (../../sb/Pool.sol#1165-1172) uses literals with too many digits:
+	- require(bool)(x < 0x400000000000000000) (../../sb/Pool.sol#1166)
+ABDKMath64x64.exp(int128) (../../sb/Pool.sol#1165-1172) uses literals with too many digits:
+	- x < - 0x400000000000000000 (../../sb/Pool.sol#1168)
+ABDKMath64x64.divuu(uint256,uint256) (../../sb/Pool.sol#1182-1221) uses literals with too many digits:
+	- xc >= 0x100000000 (../../sb/Pool.sol#1192)
+ABDKMath64x64.powu(uint256,uint256) (../../sb/Pool.sol#1231-1284) uses literals with too many digits:
+	- 0x80000000000000000000000000000000 (../../sb/Pool.sol#1232)
+ABDKMath64x64.powu(uint256,uint256) (../../sb/Pool.sol#1231-1284) uses literals with too many digits:
+	- xc >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1237)
+ABDKMath64x64.powu(uint256,uint256) (../../sb/Pool.sol#1231-1284) uses literals with too many digits:
+	- xc >= 0x10000000000000000 (../../sb/Pool.sol#1238)
+ABDKMath64x64.powu(uint256,uint256) (../../sb/Pool.sol#1231-1284) uses literals with too many digits:
+	- xc >= 0x100000000 (../../sb/Pool.sol#1239)
+ABDKMath64x64.powu(uint256,uint256) (../../sb/Pool.sol#1231-1284) uses literals with too many digits:
+	- result = 0x80000000000000000000000000000000 (../../sb/Pool.sol#1250)
+ABDKMath64x64.powu(uint256,uint256) (../../sb/Pool.sol#1231-1284) uses literals with too many digits:
+	- result >= 0x8000000000000000000000000000000000000000000000000000000000000000 (../../sb/Pool.sol#1258-1259)
+ABDKMath64x64.powu(uint256,uint256) (../../sb/Pool.sol#1231-1284) uses literals with too many digits:
+	- x >= 0x8000000000000000000000000000000000000000000000000000000000000000 (../../sb/Pool.sol#1269-1270)
+ABDKMath64x64.slitherConstructorConstantVariables() (../../sb/Pool.sol#622-1305) uses literals with too many digits:
+	- MIN_64x64 = - 0x80000000000000000000000000000000 (../../sb/Pool.sol#626)
+YieldMath.yDaiOutForDaiIn(uint128,uint128,uint128,uint128,int128,int128) (../../sb/Pool.sol#1327-1352) uses literals with too many digits:
+	- a = ABDKMath64x64.sub(0x10000000000000000,ABDKMath64x64.mul(g,t)) (../../sb/Pool.sol#1335)
+YieldMath.yDaiOutForDaiIn(uint128,uint128,uint128,uint128,int128,int128) (../../sb/Pool.sol#1327-1352) uses literals with too many digits:
+	- require(bool,string)(xdx < 0x100000000000000000000000000000000,YieldMath: Too much Dai in) (../../sb/Pool.sol#1340)
+YieldMath.yDaiOutForDaiIn(uint128,uint128,uint128,uint128,int128,int128) (../../sb/Pool.sol#1327-1352) uses literals with too many digits:
+	- sum = uint256(pow(daiReserves,uint128(a),0x10000000000000000)) + uint256(pow(yDAIReserves,uint128(a),0x10000000000000000)) - uint256(pow(uint128(xdx),uint128(a),0x10000000000000000)) (../../sb/Pool.sol#1342-1345)
+YieldMath.yDaiOutForDaiIn(uint128,uint128,uint128,uint128,int128,int128) (../../sb/Pool.sol#1327-1352) uses literals with too many digits:
+	- require(bool,string)(sum < 0x100000000000000000000000000000000,YieldMath: Insufficient yDAI reserves) (../../sb/Pool.sol#1346)
+YieldMath.yDaiOutForDaiIn(uint128,uint128,uint128,uint128,int128,int128) (../../sb/Pool.sol#1327-1352) uses literals with too many digits:
+	- result = yDAIReserves - pow(uint128(sum),0x10000000000000000,uint128(a)) (../../sb/Pool.sol#1348)
+YieldMath.yDaiOutForDaiIn(uint128,uint128,uint128,uint128,int128,int128) (../../sb/Pool.sol#1327-1352) uses literals with too many digits:
+	- require(bool,string)(result < 0x100000000000000000000000000000000,YieldMath: Rounding induced error) (../../sb/Pool.sol#1349)
+YieldMath.daiOutForYDaiIn(uint128,uint128,uint128,uint128,int128,int128) (../../sb/Pool.sol#1365-1392) uses literals with too many digits:
+	- a = ABDKMath64x64.sub(0x10000000000000000,ABDKMath64x64.mul(g,t)) (../../sb/Pool.sol#1373)
+YieldMath.daiOutForYDaiIn(uint128,uint128,uint128,uint128,int128,int128) (../../sb/Pool.sol#1365-1392) uses literals with too many digits:
+	- require(bool,string)(ydy < 0x100000000000000000000000000000000,YieldMath: Too much yDai in) (../../sb/Pool.sol#1378)
+YieldMath.daiOutForYDaiIn(uint128,uint128,uint128,uint128,int128,int128) (../../sb/Pool.sol#1365-1392) uses literals with too many digits:
+	- sum = uint256(pow(uint128(daiReserves),uint128(a),0x10000000000000000)) - uint256(pow(uint128(ydy),uint128(a),0x10000000000000000)) + uint256(pow(yDAIReserves,uint128(a),0x10000000000000000)) (../../sb/Pool.sol#1380-1383)
+YieldMath.daiOutForYDaiIn(uint128,uint128,uint128,uint128,int128,int128) (../../sb/Pool.sol#1365-1392) uses literals with too many digits:
+	- require(bool,string)(sum < 0x100000000000000000000000000000000,YieldMath: Insufficient Dai reserves) (../../sb/Pool.sol#1384)
+YieldMath.daiOutForYDaiIn(uint128,uint128,uint128,uint128,int128,int128) (../../sb/Pool.sol#1365-1392) uses literals with too many digits:
+	- result = daiReserves - pow(uint128(sum),0x10000000000000000,uint128(a)) (../../sb/Pool.sol#1386-1388)
+YieldMath.daiOutForYDaiIn(uint128,uint128,uint128,uint128,int128,int128) (../../sb/Pool.sol#1365-1392) uses literals with too many digits:
+	- require(bool,string)(result < 0x100000000000000000000000000000000,YieldMath: Rounding induced error) (../../sb/Pool.sol#1389)
+YieldMath.yDaiInForDaiOut(uint128,uint128,uint128,uint128,int128,int128) (../../sb/Pool.sol#1405-1430) uses literals with too many digits:
+	- a = ABDKMath64x64.sub(0x10000000000000000,ABDKMath64x64.mul(g,t)) (../../sb/Pool.sol#1413)
+YieldMath.yDaiInForDaiOut(uint128,uint128,uint128,uint128,int128,int128) (../../sb/Pool.sol#1405-1430) uses literals with too many digits:
+	- require(bool,string)(xdx < 0x100000000000000000000000000000000,YieldMath: Too much Dai out) (../../sb/Pool.sol#1418)
+YieldMath.yDaiInForDaiOut(uint128,uint128,uint128,uint128,int128,int128) (../../sb/Pool.sol#1405-1430) uses literals with too many digits:
+	- sum = uint256(pow(uint128(daiReserves),uint128(a),0x10000000000000000)) + uint256(pow(yDAIReserves,uint128(a),0x10000000000000000)) - uint256(pow(uint128(xdx),uint128(a),0x10000000000000000)) (../../sb/Pool.sol#1420-1423)
+YieldMath.yDaiInForDaiOut(uint128,uint128,uint128,uint128,int128,int128) (../../sb/Pool.sol#1405-1430) uses literals with too many digits:
+	- require(bool,string)(sum < 0x100000000000000000000000000000000,YieldMath: Resulting yDai reserves too high) (../../sb/Pool.sol#1424)
+YieldMath.yDaiInForDaiOut(uint128,uint128,uint128,uint128,int128,int128) (../../sb/Pool.sol#1405-1430) uses literals with too many digits:
+	- result = pow(uint128(sum),0x10000000000000000,uint128(a)) - yDAIReserves (../../sb/Pool.sol#1426)
+YieldMath.yDaiInForDaiOut(uint128,uint128,uint128,uint128,int128,int128) (../../sb/Pool.sol#1405-1430) uses literals with too many digits:
+	- require(bool,string)(result < 0x100000000000000000000000000000000,YieldMath: Rounding induced error) (../../sb/Pool.sol#1427)
+YieldMath.daiInForYDaiOut(uint128,uint128,uint128,uint128,int128,int128) (../../sb/Pool.sol#1445-1469) uses literals with too many digits:
+	- a = ABDKMath64x64.sub(0x10000000000000000,ABDKMath64x64.mul(g,ABDKMath64x64.mul(k,ABDKMath64x64.fromUInt(timeTillMaturity)))) (../../sb/Pool.sol#1450)
+YieldMath.daiInForYDaiOut(uint128,uint128,uint128,uint128,int128,int128) (../../sb/Pool.sol#1445-1469) uses literals with too many digits:
+	- require(bool,string)(ydy < 0x100000000000000000000000000000000,YieldMath: Too much yDai out) (../../sb/Pool.sol#1455)
+YieldMath.daiInForYDaiOut(uint128,uint128,uint128,uint128,int128,int128) (../../sb/Pool.sol#1445-1469) uses literals with too many digits:
+	- sum = uint256(pow(daiReserves,uint128(a),0x10000000000000000)) + uint256(pow(yDAIReserves,uint128(a),0x10000000000000000)) - uint256(pow(uint128(ydy),uint128(a),0x10000000000000000)) (../../sb/Pool.sol#1457-1460)
+YieldMath.daiInForYDaiOut(uint128,uint128,uint128,uint128,int128,int128) (../../sb/Pool.sol#1445-1469) uses literals with too many digits:
+	- require(bool,string)(sum < 0x100000000000000000000000000000000,YieldMath: Resulting Dai reserves too high) (../../sb/Pool.sol#1461)
+YieldMath.daiInForYDaiOut(uint128,uint128,uint128,uint128,int128,int128) (../../sb/Pool.sol#1445-1469) uses literals with too many digits:
+	- result = pow(uint128(sum),0x10000000000000000,uint128(a)) - daiReserves (../../sb/Pool.sol#1463-1465)
+YieldMath.daiInForYDaiOut(uint128,uint128,uint128,uint128,int128,int128) (../../sb/Pool.sol#1445-1469) uses literals with too many digits:
+	- require(bool,string)(result < 0x100000000000000000000000000000000,YieldMath: Rounding induced error) (../../sb/Pool.sol#1466)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l = 0xFE000000000000000000000000000000 (../../sb/Pool.sol#1509)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b < 0x10000000000000000 (../../sb/Pool.sol#1511)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l -= 0x80000000000000000000000000000000 (../../sb/Pool.sol#1511)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b < 0x1000000000000000000000000 (../../sb/Pool.sol#1512)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l -= 0x40000000000000000000000000000000 (../../sb/Pool.sol#1512)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b < 0x10000000000000000000000000000 (../../sb/Pool.sol#1513)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l -= 0x20000000000000000000000000000000 (../../sb/Pool.sol#1513)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b < 0x1000000000000000000000000000000 (../../sb/Pool.sol#1514)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l -= 0x10000000000000000000000000000000 (../../sb/Pool.sol#1514)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b < 0x10000000000000000000000000000000 (../../sb/Pool.sol#1515)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l -= 0x8000000000000000000000000000000 (../../sb/Pool.sol#1515)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b < 0x40000000000000000000000000000000 (../../sb/Pool.sol#1516)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l -= 0x4000000000000000000000000000000 (../../sb/Pool.sol#1516)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b < 0x80000000000000000000000000000000 (../../sb/Pool.sol#1517)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l -= 0x2000000000000000000000000000000 (../../sb/Pool.sol#1517)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1519)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x1000000000000000000000000000000 (../../sb/Pool.sol#1519)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1520)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x800000000000000000000000000000 (../../sb/Pool.sol#1520)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1521)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x400000000000000000000000000000 (../../sb/Pool.sol#1521)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1522)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x200000000000000000000000000000 (../../sb/Pool.sol#1522)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1523)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x100000000000000000000000000000 (../../sb/Pool.sol#1523)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1524)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x80000000000000000000000000000 (../../sb/Pool.sol#1524)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1525)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x40000000000000000000000000000 (../../sb/Pool.sol#1525)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1526)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x20000000000000000000000000000 (../../sb/Pool.sol#1526)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1527)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x10000000000000000000000000000 (../../sb/Pool.sol#1527)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1528)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x8000000000000000000000000000 (../../sb/Pool.sol#1528)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1529)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x4000000000000000000000000000 (../../sb/Pool.sol#1529)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1530)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x2000000000000000000000000000 (../../sb/Pool.sol#1530)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1531)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x1000000000000000000000000000 (../../sb/Pool.sol#1531)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1532)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x800000000000000000000000000 (../../sb/Pool.sol#1532)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1533)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x400000000000000000000000000 (../../sb/Pool.sol#1533)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1534)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x200000000000000000000000000 (../../sb/Pool.sol#1534)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1535)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x100000000000000000000000000 (../../sb/Pool.sol#1535)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1536)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x80000000000000000000000000 (../../sb/Pool.sol#1536)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1537)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x40000000000000000000000000 (../../sb/Pool.sol#1537)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1538)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x20000000000000000000000000 (../../sb/Pool.sol#1538)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1539)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x10000000000000000000000000 (../../sb/Pool.sol#1539)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1540)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x8000000000000000000000000 (../../sb/Pool.sol#1540)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1541)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x4000000000000000000000000 (../../sb/Pool.sol#1541)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1542)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x2000000000000000000000000 (../../sb/Pool.sol#1542)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1543)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x1000000000000000000000000 (../../sb/Pool.sol#1543)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1544)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x800000000000000000000000 (../../sb/Pool.sol#1544)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1545)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x400000000000000000000000 (../../sb/Pool.sol#1545)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1546)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x200000000000000000000000 (../../sb/Pool.sol#1546)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1547)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x100000000000000000000000 (../../sb/Pool.sol#1547)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1548)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x80000000000000000000000 (../../sb/Pool.sol#1548)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1549)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x40000000000000000000000 (../../sb/Pool.sol#1549)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1550)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x20000000000000000000000 (../../sb/Pool.sol#1550)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1551)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x10000000000000000000000 (../../sb/Pool.sol#1551)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1552)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x8000000000000000000000 (../../sb/Pool.sol#1552)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1553)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x4000000000000000000000 (../../sb/Pool.sol#1553)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1554)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x2000000000000000000000 (../../sb/Pool.sol#1554)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1555)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x1000000000000000000000 (../../sb/Pool.sol#1555)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1556)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x800000000000000000000 (../../sb/Pool.sol#1556)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1557)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x400000000000000000000 (../../sb/Pool.sol#1557)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1558)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x200000000000000000000 (../../sb/Pool.sol#1558)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- b >= 0x100000000000000000000000000000000 (../../sb/Pool.sol#1559)
+YieldMath.log_2(uint128) (../../sb/Pool.sol#1503-1644) uses literals with too many digits:
+	- l |= 0x100000000000000000000 (../../sb/Pool.sol#1559)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- r = 0x80000000000000000000000000000000 (../../sb/Pool.sol#1654)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x1000000000000000000000000000000 > 0 (../../sb/Pool.sol#1655)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x800000000000000000000000000000 > 0 (../../sb/Pool.sol#1656)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x400000000000000000000000000000 > 0 (../../sb/Pool.sol#1657)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x200000000000000000000000000000 > 0 (../../sb/Pool.sol#1658)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x100000000000000000000000000000 > 0 (../../sb/Pool.sol#1659)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x80000000000000000000000000000 > 0 (../../sb/Pool.sol#1660)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x40000000000000000000000000000 > 0 (../../sb/Pool.sol#1661)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x20000000000000000000000000000 > 0 (../../sb/Pool.sol#1662)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x10000000000000000000000000000 > 0 (../../sb/Pool.sol#1663)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x8000000000000000000000000000 > 0 (../../sb/Pool.sol#1664)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x4000000000000000000000000000 > 0 (../../sb/Pool.sol#1665)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x2000000000000000000000000000 > 0 (../../sb/Pool.sol#1666)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x1000000000000000000000000000 > 0 (../../sb/Pool.sol#1667)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x800000000000000000000000000 > 0 (../../sb/Pool.sol#1668)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x400000000000000000000000000 > 0 (../../sb/Pool.sol#1669)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x200000000000000000000000000 > 0 (../../sb/Pool.sol#1670)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x100000000000000000000000000 > 0 (../../sb/Pool.sol#1671)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x80000000000000000000000000 > 0 (../../sb/Pool.sol#1672)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x40000000000000000000000000 > 0 (../../sb/Pool.sol#1673)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x20000000000000000000000000 > 0 (../../sb/Pool.sol#1674)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x10000000000000000000000000 > 0 (../../sb/Pool.sol#1675)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x8000000000000000000000000 > 0 (../../sb/Pool.sol#1676)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x4000000000000000000000000 > 0 (../../sb/Pool.sol#1677)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- r = r * 0x800000b1721872d0c7b08cf1e0114152 >> 127 (../../sb/Pool.sol#1677)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x2000000000000000000000000 > 0 (../../sb/Pool.sol#1678)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- r = r * 0x80000058b90c1aa8a5c3736cb77e8dff >> 127 (../../sb/Pool.sol#1678)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x1000000000000000000000000 > 0 (../../sb/Pool.sol#1679)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- r = r * 0x8000002c5c8605a4635f2efc2362d978 >> 127 (../../sb/Pool.sol#1679)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x800000000000000000000000 > 0 (../../sb/Pool.sol#1680)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- r = r * 0x800000162e4300e635cf4a109e3939bd >> 127 (../../sb/Pool.sol#1680)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x400000000000000000000000 > 0 (../../sb/Pool.sol#1681)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- r = r * 0x8000000b17217ff81bef9c551590cf83 >> 127 (../../sb/Pool.sol#1681)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x200000000000000000000000 > 0 (../../sb/Pool.sol#1682)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- r = r * 0x800000058b90bfdd4e39cd52c0cfa27c >> 127 (../../sb/Pool.sol#1682)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x100000000000000000000000 > 0 (../../sb/Pool.sol#1683)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- r = r * 0x80000002c5c85fe6f72d669e0e76e411 >> 127 (../../sb/Pool.sol#1683)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x80000000000000000000000 > 0 (../../sb/Pool.sol#1684)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- r = r * 0x8000000162e42ff18f9ad35186d0df28 >> 127 (../../sb/Pool.sol#1684)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x40000000000000000000000 > 0 (../../sb/Pool.sol#1685)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- r = r * 0x80000000b17217f84cce71aa0dcfffe7 >> 127 (../../sb/Pool.sol#1685)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x20000000000000000000000 > 0 (../../sb/Pool.sol#1686)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- r = r * 0x8000000058b90bfc07a77ad56ed22aaa >> 127 (../../sb/Pool.sol#1686)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x10000000000000000000000 > 0 (../../sb/Pool.sol#1687)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- r = r * 0x800000002c5c85fdfc23cdead40da8d6 >> 127 (../../sb/Pool.sol#1687)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x8000000000000000000000 > 0 (../../sb/Pool.sol#1688)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- r = r * 0x80000000162e42fefc25eb1571853a66 >> 127 (../../sb/Pool.sol#1688)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x4000000000000000000000 > 0 (../../sb/Pool.sol#1689)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- r = r * 0x800000000b17217f7d97f692baacded5 >> 127 (../../sb/Pool.sol#1689)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x2000000000000000000000 > 0 (../../sb/Pool.sol#1690)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- r = r * 0x80000000058b90bfbead3b8b5dd254d7 >> 127 (../../sb/Pool.sol#1690)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x1000000000000000000000 > 0 (../../sb/Pool.sol#1691)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- r = r * 0x8000000002c5c85fdf4eedd62f084e67 >> 127 (../../sb/Pool.sol#1691)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x800000000000000000000 > 0 (../../sb/Pool.sol#1692)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- r = r * 0x800000000162e42fefa58aef378bf586 >> 127 (../../sb/Pool.sol#1692)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x400000000000000000000 > 0 (../../sb/Pool.sol#1693)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- r = r * 0x8000000000b17217f7d24a78a3c7ef02 >> 127 (../../sb/Pool.sol#1693)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x200000000000000000000 > 0 (../../sb/Pool.sol#1694)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- r = r * 0x800000000058b90bfbe9067c93e474a6 >> 127 (../../sb/Pool.sol#1694)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- x & 0x100000000000000000000 > 0 (../../sb/Pool.sol#1695)
+YieldMath.pow_2(uint128) (../../sb/Pool.sol#1652-1782) uses literals with too many digits:
+	- r = r * 0x80000000002c5c85fdf47b8e5a72599f >> 127 (../../sb/Pool.sol#1695)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+Pool.dai (../../sb/Pool.sol#1861) should be immutable 
+Pool.yDai (../../sb/Pool.sol#1862) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/Pool.sol analyzed (11 contracts with 93 detectors), 383 result(s) found

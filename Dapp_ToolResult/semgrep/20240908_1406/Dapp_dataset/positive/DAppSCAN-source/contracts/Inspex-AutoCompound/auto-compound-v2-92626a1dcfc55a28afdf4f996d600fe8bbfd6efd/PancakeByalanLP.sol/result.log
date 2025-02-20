@@ -1,0 +1,217 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 46 Code Findings │
+└──────────────────┘
+                            
+    /sb/PancakeByalanLP.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          331┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          340┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          362┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          371┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          383┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+         1023┆ abstract contract ByalanIsland is Ownable, Pausable,             
+  IByalanIsland {                                                               
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+         1189┆ constructor(
+         1190┆     address _hydra,
+         1191┆     address _izlude,
+         1192┆     address _kswFeeRecipient,
+         1193┆     address _treasuryFeeRecipient,
+         1194┆     address _harvester,
+         1195┆     uint256 _pid,
+         1196┆     address[] memory _cakeToLp0Route,
+         1197┆     address[] memory _cakeToLp1Route
+         1198┆ )
+             [hid 38 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          150┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          153┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          223┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          224┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          251┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          278┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          358┆ require(
+          359┆     (value == 0) || (token.allowance(address(this), spender) ==  
+  0),                                                                           
+          360┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          361┆ );
+            ⋮┆----------------------------------------
+          381┆ require(oldAllowance >= value, "SafeERC20: decreased allowance   
+  below zero");                                                                 
+            ⋮┆----------------------------------------
+          401┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          453┆ require(_status != _ENTERED, "ReentrancyGuard: reentrant call");
+            ⋮┆----------------------------------------
+          900┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          920┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          976┆ require(!paused(), "Pausable: paused");
+            ⋮┆----------------------------------------
+          988┆ require(paused(), "Pausable: not paused");
+            ⋮┆----------------------------------------
+         1058┆ require(msg.sender == owner() || msg.sender == hydra, "!hydra");
+            ⋮┆----------------------------------------
+         1064┆ require(msg.sender == tx.origin, "!EOA");
+            ⋮┆----------------------------------------
+         1069┆ require(msg.sender == izlude, "!izlude");
+            ⋮┆----------------------------------------
+         1074┆ require(tx.origin == msg.sender || msg.sender == izlude,         
+  "!contract");                                                                 
+            ⋮┆----------------------------------------
+         1079┆ require(harvester == address(0) || msg.sender == harvester,      
+  "!harvester");                                                                
+            ⋮┆----------------------------------------
+         1084┆ require(tx.gasprice <= IGasPrice(gasPrice).maxGasPrice(), "gas is
+  too high!");                                                                  
+            ⋮┆----------------------------------------
+         1099┆ require(izlude == address(0), "already set");
+            ⋮┆----------------------------------------
+         1141┆ require(_totalFee <= MAX_TOTAL_FEE, "!cap");
+            ⋮┆----------------------------------------
+         1216┆ require(_cakeToLp0Route[0] == CAKE, "invalid lp 0 route");
+            ⋮┆----------------------------------------
+         1217┆ require(_cakeToLp0Route[_cakeToLp0Route.length - 1] == lpToken0, 
+  "invalid lp 0 route");                                                        
+            ⋮┆----------------------------------------
+         1218┆ require(
+         1219┆     IUniswapV2Router02(unirouter).getAmountsOut(1 ether,         
+  _cakeToLp0Route)[_cakeToLp0Route.length - 1] > 0,                             
+         1220┆     "invalid lp 0 route"
+         1221┆ );
+            ⋮┆----------------------------------------
+         1226┆ require(_cakeToLp1Route[0] == CAKE, "invalid lp 1 route");
+            ⋮┆----------------------------------------
+         1227┆ require(_cakeToLp1Route[_cakeToLp1Route.length - 1] == lpToken1, 
+  "invalid lp 1 route");                                                        
+            ⋮┆----------------------------------------
+         1228┆ require(
+         1229┆     IUniswapV2Router02(unirouter).getAmountsOut(1 ether,         
+  _cakeToLp1Route)[_cakeToLp1Route.length - 1] > 0,                             
+         1230┆     "invalid lp 1 route"
+         1231┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          153┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          223┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          251┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          278┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          358┆ require(
+          359┆     (value == 0) || (token.allowance(address(this), spender) ==  
+  0),                                                                           
+          360┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          361┆ );
+            ⋮┆----------------------------------------
+          381┆ require(oldAllowance >= value, "SafeERC20: decreased allowance   
+  below zero");                                                                 
+            ⋮┆----------------------------------------
+          401┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          920┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+       solidity.security.no-slippage-check          
+          No slippage check in a Uniswap v2/v3 trade
+                                                    
+         1281┆ IUniswapV2Router02(unirouter).swapExactTokensForETH(toBnb, 0,    
+  cakeToWbnbRoute, address(this), block.timestamp);                             
+            ⋮┆----------------------------------------
+         1300┆ IUniswapV2Router02(unirouter).swapExactTokensForTokens(
+         1301┆     cakeHalf,
+         1302┆     0,
+         1303┆     cakeToLp0Route,
+         1304┆     address(this),
+         1305┆     block.timestamp
+         1306┆ );
+            ⋮┆----------------------------------------
+         1310┆ IUniswapV2Router02(unirouter).swapExactTokensForTokens(
+         1311┆     cakeHalf,
+         1312┆     0,
+         1313┆     cakeToLp1Route,
+         1314┆     address(this),
+         1315┆     block.timestamp
+         1316┆ );
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 46 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

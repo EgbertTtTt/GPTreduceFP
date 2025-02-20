@@ -1,0 +1,149 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 23 Code Findings │
+└──────────────────┘
+                                       
+    /sb/MultiSigWalletWithTimeLock.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          262┆ for (uint i=0; i<owners.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+          291┆ transactionCount += 1;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          441┆ constructor (
+          442┆     address[] _owners,
+          443┆     uint256 _required,
+          444┆     uint256 _secondsTimeLocked
+          445┆ )
+          446┆     public
+          447┆     MultiSigWallet(_owners, _required)
+          448┆ {
+          449┆     secondsTimeLocked = _secondsTimeLocked;
+          450┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          262┆ for (uint i=0; i<owners.length; i++) {
+            ⋮┆----------------------------------------
+          263┆ if (confirmations[transactionId][owners[i]])
+            ⋮┆----------------------------------------
+          263┆ if (confirmations[transactionId][owners[i]])
+            ⋮┆----------------------------------------
+          265┆ if (count == required)
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          262┆ for (uint i=0; i<owners.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          413┆ require(
+          414┆     !isConfirmed(transactionId),
+          415┆     "TX_FULLY_CONFIRMED"
+          416┆ );
+            ⋮┆----------------------------------------
+          421┆ require(
+          422┆     isConfirmed(transactionId),
+          423┆     "TX_NOT_FULLY_CONFIRMED"
+          424┆ );
+            ⋮┆----------------------------------------
+          430┆ require(
+          431┆     block.timestamp >= confirmationTimes[transactionId] +        
+  secondsTimeLocked,                                                            
+          432┆     "TIME_LOCK_INCOMPLETE"
+          433┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+           88┆ require(ownerCount <= MAX_OWNER_COUNT
+           89┆     && _required <= ownerCount
+           90┆     && _required != 0
+           91┆     && ownerCount != 0);
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          321┆ if (   pending && !transactions[i].executed
+          322┆     || executed && transactions[i].executed)
+          323┆     count += 1;
+            ⋮┆----------------------------------------
+          372┆ if (   pending && !transactions[i].executed
+          373┆     || executed && transactions[i].executed)
+          374┆ {
+          375┆     transactionIdsTemp[count] = i;
+          376┆     count += 1;
+          377┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          131┆ for (uint i=0; i<owners.length - 1; i++)
+            ⋮┆----------------------------------------
+          151┆ for (uint i=0; i<owners.length; i++)
+            ⋮┆----------------------------------------
+          262┆ for (uint i=0; i<owners.length; i++) {
+            ⋮┆----------------------------------------
+          306┆ for (uint i=0; i<owners.length; i++)
+            ⋮┆----------------------------------------
+          320┆ for (uint i=0; i<transactionCount; i++)
+            ⋮┆----------------------------------------
+          347┆ for (i=0; i<owners.length; i++)
+            ⋮┆----------------------------------------
+          353┆ for (i=0; i<count; i++)
+            ⋮┆----------------------------------------
+          371┆ for (i=0; i<transactionCount; i++)
+            ⋮┆----------------------------------------
+          379┆ for (i=from; i<to; i++)
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+Some files were skipped or only partially analyzed.
+  Partially scanned: 1 files only partially analyzed due to parsing or internal Semgrep errors
+
+Ran 48 rules on 1 file: 23 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

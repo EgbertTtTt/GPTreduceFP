@@ -1,0 +1,226 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 51 Code Findings │
+└──────────────────┘
+                    
+    /sb/LCToken.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          900┆ contract LCBEP20 is Context, IBEP20, Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          925┆ constructor(string memory name, string memory symbol) public {
+          926┆     _name = name;
+          927┆     _symbol = symbol;
+          928┆     _decimals = 18;
+          929┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+         1384┆ Checkpoint memory cp = checkpoints[account][center];
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          131┆ require(set._values.length > index, "EnumerableSet: index out of 
+  bounds");                                                                     
+            ⋮┆----------------------------------------
+          357┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          378┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          561┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          576┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          593┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          610┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          627┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          739┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          743┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          800┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          801┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          825┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          849┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+         1094┆ require(sender != address(0), "BEP20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1095┆ require(recipient != address(0), "BEP20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1112┆ require(account != address(0), "BEP20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1134┆ require(account != address(0), "BEP20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1159┆ require(owner != address(0), "BEP20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1160┆ require(spender != address(0), "BEP20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1189┆ require(_addMinter != address(0), "Token: _addMinter is the zero 
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1194┆ require(_delMinter != address(0), "Token: _delMinter is the zero 
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1207┆ require(_index <= getMinterLength() - 1, "Token: index out of    
+  bounds");                                                                     
+            ⋮┆----------------------------------------
+         1213┆ require(isMinter(msg.sender), "caller is not the minter");
+            ⋮┆----------------------------------------
+         1331┆ require(signatory != address(0), "LC::delegateBySig: invalid     
+  signature");                                                                  
+            ⋮┆----------------------------------------
+         1332┆ require(nonce == nonces[signatory]++, "LC::delegateBySig: invalid
+  nonce");                                                                      
+            ⋮┆----------------------------------------
+         1333┆ require(now <= expiry, "LC::delegateBySig: signature expired");
+            ⋮┆----------------------------------------
+         1363┆ require(blockNumber < block.number, "LC::getPriorVotes: not yet  
+  determined");                                                                 
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         1409┆ if (srcRep != dstRep && amount > 0) {
+         1410┆     if (srcRep != address(0)) {
+         1411┆         // decrease old representative
+         1412┆         uint32 srcRepNum = numCheckpoints[srcRep];
+         1413┆         uint256 srcRepOld = srcRepNum > 0 ?                      
+  checkpoints[srcRep][srcRepNum - 1].votes : 0;                                 
+         1414┆         uint256 srcRepNew = srcRepOld.sub(amount);
+         1415┆         _writeCheckpoint(srcRep, srcRepNum, srcRepOld,           
+  srcRepNew);                                                                   
+         1416┆     }
+         1417┆ 
+         1418┆     if (dstRep != address(0)) {
+             [hid 7 additional lines, adjust with --max-lines-per-finding] 
+         1438┆ if (nCheckpoints > 0 && checkpoints[delegatee][nCheckpoints -    
+  1].fromBlock == blockNumber) {                                                
+         1439┆     checkpoints[delegatee][nCheckpoints - 1].votes = newVotes;
+         1440┆ } else {
+         1441┆     checkpoints[delegatee][nCheckpoints] =                       
+  Checkpoint(blockNumber, newVotes);                                            
+         1442┆     numCheckpoints[delegatee] = nCheckpoints + 1;
+         1443┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+         1332┆ require(nonce == nonces[signatory]++, "LC::delegateBySig: invalid
+  nonce");                                                                      
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          131┆ require(set._values.length > index, "EnumerableSet: index out of 
+  bounds");                                                                     
+            ⋮┆----------------------------------------
+          378┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          593┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          743┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          800┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          825┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          849┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+         1094┆ require(sender != address(0), "BEP20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1095┆ require(recipient != address(0), "BEP20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1134┆ require(account != address(0), "BEP20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1159┆ require(owner != address(0), "BEP20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1160┆ require(spender != address(0), "BEP20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1189┆ require(_addMinter != address(0), "Token: _addMinter is the zero 
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1194┆ require(_delMinter != address(0), "Token: _delMinter is the zero 
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1331┆ require(signatory != address(0), "LC::delegateBySig: invalid     
+  signature");                                                                  
+            ⋮┆----------------------------------------
+         1333┆ require(now <= expiry, "LC::delegateBySig: signature expired");
+            ⋮┆----------------------------------------
+         1363┆ require(blockNumber < block.number, "LC::getPriorVotes: not yet  
+  determined");                                                                 
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 51 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

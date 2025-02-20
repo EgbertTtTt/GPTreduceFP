@@ -1,0 +1,118 @@
+'solc --version' running
+'solc /sb/InterestTokenFactory.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/sb' running
+
+Tranche.deposit(uint256,address) (../../sb/InterestTokenFactory.sol#698-708) ignores return value by underlying.transferFrom(msg.sender,address(position),_amount) (../../sb/InterestTokenFactory.sol#704)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+DateString._daysToDate(uint256) (../../sb/InterestTokenFactory.sol#407-433) performs a multiplication on the result of a division:
+	- N = (4 * L) / 146097 (../../sb/InterestTokenFactory.sol#420)
+	- L = L - (146097 * N + 3) / 4 (../../sb/InterestTokenFactory.sol#421)
+DateString._daysToDate(uint256) (../../sb/InterestTokenFactory.sol#407-433) performs a multiplication on the result of a division:
+	- _year = (4000 * (L + 1)) / 1461001 (../../sb/InterestTokenFactory.sol#422)
+	- L = L - (1461 * _year) / 4 + 31 (../../sb/InterestTokenFactory.sol#423)
+DateString._daysToDate(uint256) (../../sb/InterestTokenFactory.sol#407-433) performs a multiplication on the result of a division:
+	- _month = (80 * L) / 2447 (../../sb/InterestTokenFactory.sol#424)
+	- _day = L - (2447 * _month) / 80 (../../sb/InterestTokenFactory.sol#425)
+DateString._daysToDate(uint256) (../../sb/InterestTokenFactory.sol#407-433) performs a multiplication on the result of a division:
+	- L = _month / 11 (../../sb/InterestTokenFactory.sol#426)
+	- _month = _month + 2 - 12 * L (../../sb/InterestTokenFactory.sol#427)
+Tranche.withdrawInterest(uint256,address) (../../sb/InterestTokenFactory.sol#801-836) performs a multiplication on the result of a division:
+	- redemptionAmount = (interest * _amount) / _interestSupply (../../sb/InterestTokenFactory.sol#823)
+	- minRedemption = redemptionAmount - (redemptionAmount * _SLIPPAGE_BP) / 1e18 (../../sb/InterestTokenFactory.sol#824-826)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+DateString._daysToDate(uint256).L (../../sb/InterestTokenFactory.sol#418) is written in both
+	L = L - (1461 * _year) / 4 + 31 (../../sb/InterestTokenFactory.sol#423)
+	L = _month / 11 (../../sb/InterestTokenFactory.sol#426)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#write-after-write
+
+Tranche.withdrawPrincipal(uint256,address) (../../sb/InterestTokenFactory.sol#778-791) should emit an event for: 
+	- valueSupplied -= uint128(_amount) (../../sb/InterestTokenFactory.sol#788) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+Reentrancy in Tranche.prefundedDeposit(address) (../../sb/InterestTokenFactory.sol#716-764):
+	External calls:
+	- (shares,usedUnderlying,balanceBefore) = position.prefundedDeposit(address(this)) (../../sb/InterestTokenFactory.sol#724-728)
+	State variables written after the call(s):
+	- (valueSupplied,interestSupply) = (uint128(_valueSupplied + adjustedAmount),uint128(_interestSupply + usedUnderlying)) (../../sb/InterestTokenFactory.sol#754-757)
+	- (valueSupplied,interestSupply) = (uint128(_valueSupplied + adjustedAmount),uint128(_interestSupply + usedUnderlying)) (../../sb/InterestTokenFactory.sol#754-757)
+Reentrancy in Tranche.prefundedDeposit(address) (../../sb/InterestTokenFactory.sol#716-764):
+	External calls:
+	- (shares,usedUnderlying,balanceBefore) = position.prefundedDeposit(address(this)) (../../sb/InterestTokenFactory.sol#724-728)
+	- interestToken.mint(_destination,usedUnderlying) (../../sb/InterestTokenFactory.sol#759)
+	State variables written after the call(s):
+	- _mint(_destination,adjustedAmount) (../../sb/InterestTokenFactory.sol#761)
+		- balanceOf[account] = balanceOf[account] + amount (../../sb/InterestTokenFactory.sol#281)
+Reentrancy in Tranche.withdrawInterest(uint256,address) (../../sb/InterestTokenFactory.sol#801-836):
+	External calls:
+	- interestToken.burn(msg.sender,_amount) (../../sb/InterestTokenFactory.sol#808)
+	State variables written after the call(s):
+	- interestSupply = uint128(_interestSupply - _amount) (../../sb/InterestTokenFactory.sol#828)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in Tranche.deposit(uint256,address) (../../sb/InterestTokenFactory.sol#698-708):
+	External calls:
+	- underlying.transferFrom(msg.sender,address(position),_amount) (../../sb/InterestTokenFactory.sol#704)
+	- prefundedDeposit(_destination) (../../sb/InterestTokenFactory.sol#707)
+		- (shares,usedUnderlying,balanceBefore) = position.prefundedDeposit(address(this)) (../../sb/InterestTokenFactory.sol#724-728)
+		- interestToken.mint(_destination,usedUnderlying) (../../sb/InterestTokenFactory.sol#759)
+	Event emitted after the call(s):
+	- Transfer(address(0),account,amount) (../../sb/InterestTokenFactory.sol#283)
+		- prefundedDeposit(_destination) (../../sb/InterestTokenFactory.sol#707)
+Reentrancy in Tranche.prefundedDeposit(address) (../../sb/InterestTokenFactory.sol#716-764):
+	External calls:
+	- (shares,usedUnderlying,balanceBefore) = position.prefundedDeposit(address(this)) (../../sb/InterestTokenFactory.sol#724-728)
+	- interestToken.mint(_destination,usedUnderlying) (../../sb/InterestTokenFactory.sol#759)
+	Event emitted after the call(s):
+	- Transfer(address(0),account,amount) (../../sb/InterestTokenFactory.sol#283)
+		- _mint(_destination,adjustedAmount) (../../sb/InterestTokenFactory.sol#761)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+ERC20Permit.permit(address,address,uint256,uint256,uint8,bytes32,bytes32) (../../sb/InterestTokenFactory.sol#330-372) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(deadline == 0 || block.timestamp <= deadline,ERC20: permit-expired) (../../sb/InterestTokenFactory.sol#362-365)
+Tranche.prefundedDeposit(address) (../../sb/InterestTokenFactory.sol#716-764) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp < unlockTimestamp,expired) (../../sb/InterestTokenFactory.sol#722)
+Tranche.withdrawPrincipal(uint256,address) (../../sb/InterestTokenFactory.sol#778-791) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp >= unlockTimestamp,not expired) (../../sb/InterestTokenFactory.sol#784)
+Tranche.withdrawInterest(uint256,address) (../../sb/InterestTokenFactory.sol#801-836) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp >= unlockTimestamp,not expired) (../../sb/InterestTokenFactory.sol#806)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+DateString.timestampToDateString(uint256,string) (../../sb/InterestTokenFactory.sol#466-560) has a high cyclomatic complexity (13).
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cyclomatic-complexity
+
+Pragma version^0.8.0 (../../sb/InterestTokenFactory.sol#1) allows old versions
+solc-0.8.27 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Function IERC20Permit.DOMAIN_SEPARATOR() (../../sb/InterestTokenFactory.sol#92) is not in mixedCase
+Variable ERC20Permit.DOMAIN_SEPARATOR (../../sb/InterestTokenFactory.sol#177) is not in mixedCase
+Parameter DateString.encodeAndWriteTimestamp(string,uint256,string)._prefix (../../sb/InterestTokenFactory.sol#443) is not in mixedCase
+Parameter DateString.encodeAndWriteTimestamp(string,uint256,string)._timestamp (../../sb/InterestTokenFactory.sol#444) is not in mixedCase
+Parameter DateString.encodeAndWriteTimestamp(string,uint256,string)._output (../../sb/InterestTokenFactory.sol#445) is not in mixedCase
+Parameter DateString.timestampToDateString(uint256,string)._timestamp (../../sb/InterestTokenFactory.sol#467) is not in mixedCase
+Parameter DateString.timestampToDateString(uint256,string)._outputPointer (../../sb/InterestTokenFactory.sol#468) is not in mixedCase
+Parameter InterestToken.mint(address,uint256)._account (../../sb/InterestTokenFactory.sol#603) is not in mixedCase
+Parameter InterestToken.mint(address,uint256)._amount (../../sb/InterestTokenFactory.sol#603) is not in mixedCase
+Parameter InterestToken.burn(address,uint256)._account (../../sb/InterestTokenFactory.sol#614) is not in mixedCase
+Parameter InterestToken.burn(address,uint256)._amount (../../sb/InterestTokenFactory.sol#614) is not in mixedCase
+Parameter Tranche.deposit(uint256,address)._amount (../../sb/InterestTokenFactory.sol#698) is not in mixedCase
+Parameter Tranche.deposit(uint256,address)._destination (../../sb/InterestTokenFactory.sol#698) is not in mixedCase
+Parameter Tranche.prefundedDeposit(address)._destination (../../sb/InterestTokenFactory.sol#716) is not in mixedCase
+Parameter Tranche.withdrawPrincipal(uint256,address)._amount (../../sb/InterestTokenFactory.sol#778) is not in mixedCase
+Parameter Tranche.withdrawPrincipal(uint256,address)._destination (../../sb/InterestTokenFactory.sol#778) is not in mixedCase
+Parameter Tranche.withdrawInterest(uint256,address)._amount (../../sb/InterestTokenFactory.sol#801) is not in mixedCase
+Parameter Tranche.withdrawInterest(uint256,address)._destination (../../sb/InterestTokenFactory.sol#801) is not in mixedCase
+Parameter InterestTokenFactory.deployInterestToken(address,string,uint256,uint8)._tranche (../../sb/InterestTokenFactory.sol#854) is not in mixedCase
+Parameter InterestTokenFactory.deployInterestToken(address,string,uint256,uint8)._strategySymbol (../../sb/InterestTokenFactory.sol#855) is not in mixedCase
+Parameter InterestTokenFactory.deployInterestToken(address,string,uint256,uint8)._expiration (../../sb/InterestTokenFactory.sol#856) is not in mixedCase
+Parameter InterestTokenFactory.deployInterestToken(address,string,uint256,uint8)._underlyingDecimals (../../sb/InterestTokenFactory.sol#857) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+ERC20Permit.DOMAIN_SEPARATOR (../../sb/InterestTokenFactory.sol#177) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/InterestTokenFactory.sol analyzed (11 contracts with 93 detectors), 43 result(s) found

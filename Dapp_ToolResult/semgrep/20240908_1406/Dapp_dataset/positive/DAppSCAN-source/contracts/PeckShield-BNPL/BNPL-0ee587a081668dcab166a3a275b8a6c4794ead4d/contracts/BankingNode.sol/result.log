@@ -1,0 +1,354 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 89 Code Findings │
+└──────────────────┘
+                        
+    /sb/BankingNode.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+         1605┆ (bool success, bytes memory data) = token.call(
+         1606┆     abi.encodeWithSelector(0x095ea7b3, to, value)
+         1607┆ );
+            ⋮┆----------------------------------------
+         1620┆ (bool success, bytes memory data) = token.call(
+         1621┆     abi.encodeWithSelector(0xa9059cbb, to, value)
+         1622┆ );
+            ⋮┆----------------------------------------
+         1636┆ (bool success, bytes memory data) = token.call(
+         1637┆     abi.encodeWithSelector(0x23b872dd, from, to, value)
+         1638┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+         1567┆ for (uint256 i; i < path.length - 1; i++) {
+            ⋮┆----------------------------------------
+         1586┆ for (uint256 i = path.length - 1; i > 0; i--) {
+            ⋮┆----------------------------------------
+         2548┆ for (uint256 i = 0; i < currentLoans.length; i++) {
+            ⋮┆----------------------------------------
+         2550┆ currentLoans[i] = currentLoans[currentLoans.length - 1];
+            ⋮┆----------------------------------------
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+         2220┆ totalStakingShares += what;
+            ⋮┆----------------------------------------
+         2260┆ totalUnbondingShares += _newUnbondingShares;
+            ⋮┆----------------------------------------
+         2261┆ unbondingAmount += what;
+            ⋮┆----------------------------------------
+         2361┆ slashingBalance += unbondingSlash + stakingSlash;
+            ⋮┆----------------------------------------
+         2463┆ accountsReceiveable += loanSize;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          357┆ constructor (string memory name_, string memory symbol_) public {
+          358┆     _name = name_;
+          359┆     _symbol = symbol_;
+          360┆     _decimals = 18;
+          361┆ }
+            ⋮┆----------------------------------------
+         1787┆ constructor() {
+         1788┆     bnplFactory = msg.sender;
+         1789┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+         2450┆ if (loanId == pendingRequests[i]) {
+            ⋮┆----------------------------------------
+         2451┆ pendingRequests[i] = pendingRequests[length - 1];
+            ⋮┆----------------------------------------
+         2451┆ pendingRequests[i] = pendingRequests[length - 1];
+            ⋮┆----------------------------------------
+         2452┆ pendingRequests.pop();
+            ⋮┆----------------------------------------
+         2500┆ whitelistedAddresses[newWhistelist] = _status;
+            ⋮┆----------------------------------------
+         2548┆ for (uint256 i = 0; i < currentLoans.length; i++) {
+            ⋮┆----------------------------------------
+         2549┆ if (loanId == currentLoans[i]) {
+            ⋮┆----------------------------------------
+         2550┆ currentLoans[i] = currentLoans[currentLoans.length - 1];
+            ⋮┆----------------------------------------
+         2550┆ currentLoans[i] = currentLoans[currentLoans.length - 1];
+            ⋮┆----------------------------------------
+         2550┆ currentLoans[i] = currentLoans[currentLoans.length - 1];
+            ⋮┆----------------------------------------
+         2551┆ currentLoans.pop();
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+         1567┆ for (uint256 i; i < path.length - 1; i++) {
+            ⋮┆----------------------------------------
+         2449┆ for (uint256 i = 0; i < length; i++) {
+            ⋮┆----------------------------------------
+         2498┆ for (uint256 i; i < length; i++) {
+            ⋮┆----------------------------------------
+         2548┆ for (uint256 i = 0; i < currentLoans.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          182┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          197┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          214┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          231┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          248┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          511┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          512┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          531┆ require(account != address(0), "ERC20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+          552┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          575┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          576┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1443┆ require((z = x + y) >= x, "ds-math-add-overflow");
+            ⋮┆----------------------------------------
+         1447┆ require((z = x - y) <= x, "ds-math-sub-underflow");
+            ⋮┆----------------------------------------
+         1451┆ require(y == 0 || (z = x * y) / y == x, "ds-math-mul-overflow");
+            ⋮┆----------------------------------------
+         1464┆ require(tokenA != tokenB, "UniswapV2Library:                     
+  IDENTICAL_ADDRESSES");                                                        
+            ⋮┆----------------------------------------
+         1468┆ require(token0 != address(0), "UniswapV2Library: ZERO_ADDRESS");
+            ⋮┆----------------------------------------
+         1517┆ require(amountA > 0, "UniswapV2Library: INSUFFICIENT_AMOUNT");
+            ⋮┆----------------------------------------
+         1518┆ require(
+         1519┆     reserveA > 0 && reserveB > 0,
+         1520┆     "UniswapV2Library: INSUFFICIENT_LIQUIDITY"
+         1521┆ );
+            ⋮┆----------------------------------------
+         1531┆ require(amountIn > 0, "UniswapV2Library:                         
+  INSUFFICIENT_INPUT_AMOUNT");                                                  
+            ⋮┆----------------------------------------
+         1532┆ require(
+         1533┆     reserveIn > 0 && reserveOut > 0,
+         1534┆     "UniswapV2Library: INSUFFICIENT_LIQUIDITY"
+         1535┆ );
+            ⋮┆----------------------------------------
+         1548┆ require(amountOut > 0, "UniswapV2Library:                        
+  INSUFFICIENT_OUTPUT_AMOUNT");                                                 
+            ⋮┆----------------------------------------
+         1549┆ require(
+         1550┆     reserveIn > 0 && reserveOut > 0,
+         1551┆     "UniswapV2Library: INSUFFICIENT_LIQUIDITY"
+         1552┆ );
+            ⋮┆----------------------------------------
+         1564┆ require(path.length >= 2, "UniswapV2Library: INVALID_PATH");
+            ⋮┆----------------------------------------
+         1583┆ require(path.length >= 2, "UniswapV2Library: INVALID_PATH");
+            ⋮┆----------------------------------------
+         1608┆ require(
+         1609┆     success && (data.length == 0 || abi.decode(data, (bool))),
+         1610┆     "TransferHelper: APPROVE_FAILED"
+         1611┆ );
+            ⋮┆----------------------------------------
+         1623┆ require(
+         1624┆     success && (data.length == 0 || abi.decode(data, (bool))),
+         1625┆     "TransferHelper: TRANSFER_FAILED"
+         1626┆ );
+            ⋮┆----------------------------------------
+         1639┆ require(
+         1640┆     success && (data.length == 0 || abi.decode(data, (bool))),
+         1641┆     "TransferHelper: TRANSFER_FROM_FAILED"
+         1642┆ );
+            ⋮┆----------------------------------------
+         1647┆ require(success, "TransferHelper: ETH_TRANSFER_FAILED");
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+         1518┆ require(
+         1519┆     reserveA > 0 && reserveB > 0,
+         1520┆     "UniswapV2Library: INSUFFICIENT_LIQUIDITY"
+         1521┆ );
+            ⋮┆----------------------------------------
+         1532┆ require(
+         1533┆     reserveIn > 0 && reserveOut > 0,
+         1534┆     "UniswapV2Library: INSUFFICIENT_LIQUIDITY"
+         1535┆ );
+            ⋮┆----------------------------------------
+         1549┆ require(
+         1550┆     reserveIn > 0 && reserveOut > 0,
+         1551┆     "UniswapV2Library: INSUFFICIENT_LIQUIDITY"
+         1552┆ );
+            ⋮┆----------------------------------------
+         1608┆ require(
+         1609┆     success && (data.length == 0 || abi.decode(data, (bool))),
+         1610┆     "TransferHelper: APPROVE_FAILED"
+         1611┆ );
+            ⋮┆----------------------------------------
+         1623┆ require(
+         1624┆     success && (data.length == 0 || abi.decode(data, (bool))),
+         1625┆     "TransferHelper: TRANSFER_FAILED"
+         1626┆ );
+            ⋮┆----------------------------------------
+         1639┆ require(
+         1640┆     success && (data.length == 0 || abi.decode(data, (bool))),
+         1641┆     "TransferHelper: TRANSFER_FROM_FAILED"
+         1642┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         1799┆ if (msg.sender != bnplFactory && msg.sender != _operator) {
+         1800┆     if (getBNPLBalance(_operator) < 0x13DA329B6336471800000) {
+         1801┆         revert NodeInactive();
+         1802┆     }
+         1803┆     if (requireKYC && whitelistedAddresses[msg.sender] == false) 
+  {                                                                             
+         1804┆         revert KYCNotApproved();
+         1805┆     }
+         1806┆ }
+            ⋮┆----------------------------------------
+         1803┆ if (requireKYC && whitelistedAddresses[msg.sender] == false) {
+         1804┆     revert KYCNotApproved();
+         1805┆ }
+            ⋮┆----------------------------------------
+         2233┆ if (msg.sender == _operator && currentLoans.length > 0) {
+         2234┆     revert ActiveLoansOngoing();
+         2235┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-decrement-not-postfix                    
+          Consider using the prefix decrement expression whenever the return    
+  value is not needed. The                                                      
+          prefix decrement expression is cheaper in terms of gas.               
+                                                                                
+         1586┆ for (uint256 i = path.length - 1; i > 0; i--) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+         1567┆ for (uint256 i; i < path.length - 1; i++) {
+            ⋮┆----------------------------------------
+         1922┆ incrementor++;
+            ⋮┆----------------------------------------
+         2031┆ loan.paymentsMade++;
+            ⋮┆----------------------------------------
+         2369┆ defaultedLoanCount++;
+            ⋮┆----------------------------------------
+         2449┆ for (uint256 i = 0; i < length; i++) {
+            ⋮┆----------------------------------------
+         2498┆ for (uint256 i; i < length; i++) {
+            ⋮┆----------------------------------------
+         2548┆ for (uint256 i = 0; i < currentLoans.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          214┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          511┆ require(sender != address(0), "ERC20: transfer from the zero     
+  address");                                                                    
+            ⋮┆----------------------------------------
+          512┆ require(recipient != address(0), "ERC20: transfer to the zero    
+  address");                                                                    
+            ⋮┆----------------------------------------
+          552┆ require(account != address(0), "ERC20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          575┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          576┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1464┆ require(tokenA != tokenB, "UniswapV2Library:                     
+  IDENTICAL_ADDRESSES");                                                        
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 89 findings.
+            ⋮┆----------------------------------------
+         1517┆ require(amountA > 0, "UniswapV2Library: INSUFFICIENT_AMOUNT");
+            ⋮┆----------------------------------------
+         1518┆ require(
+         1519┆     reserveA > 0 && reserveB > 0,
+         1520┆     "UniswapV2Library: INSUFFICIENT_LIQUIDITY"
+         1521┆ );
+            ⋮┆----------------------------------------
+         1531┆ require(amountIn > 0, "UniswapV2Library:                         
+  INSUFFICIENT_INPUT_AMOUNT");                                                  
+            ⋮┆----------------------------------------
+         1532┆ require(
+         1533┆     reserveIn > 0 && reserveOut > 0,
+         1534┆     "UniswapV2Library: INSUFFICIENT_LIQUIDITY"
+         1535┆ );
+            ⋮┆----------------------------------------
+         1548┆ require(amountOut > 0, "UniswapV2Library:                        
+  INSUFFICIENT_OUTPUT_AMOUNT");                                                 
+            ⋮┆----------------------------------------
+         1549┆ require(
+         1550┆     reserveIn > 0 && reserveOut > 0,
+         1551┆     "UniswapV2Library: INSUFFICIENT_LIQUIDITY"
+         1552┆ );
+            ⋮┆----------------------------------------
+         1639┆ require(
+         1640┆     success && (data.length == 0 || abi.decode(data, (bool))),
+         1641┆     "TransferHelper: TRANSFER_FROM_FAILED"
+         1642┆ );
+            ⋮┆----------------------------------------
+         1647┆ require(success, "TransferHelper: ETH_TRANSFER_FAILED");
+
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

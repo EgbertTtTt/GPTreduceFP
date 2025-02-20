@@ -1,0 +1,96 @@
+{
+    "errors": [],
+    "fails": [],
+    "findings": [
+        {
+            "confidence": "Medium",
+            "contract": "StratX2",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Inspex-SimpliChef, Token, ZapBSC & Broker/simpli-smart-contract-4823d1ebbd84a35dd7e8f9fd7f5207ef5c85c419/contracts/strategies/StratX2_PCS.sol",
+            "function": "withdraw",
+            "impact": "Medium",
+            "line": 1862,
+            "line_end": 1901,
+            "message": "Reentrancy in StratX2.withdraw(address,uint256) (StratX2_PCS.sol#1862-1901):\n\tExternal calls:\n\t- _unfarm(_wantAmt) (StratX2_PCS.sol#1884)\n\t\t- IPancakeswapFarm(farmContractAddress).leaveStaking(_wantAmt) (StratX2_PCS.sol#1856)\n\t\t- IPancakeswapFarm(farmContractAddress).withdraw(pid,_wantAmt) (StratX2_PCS.sol#1858)\n\tState variables written after the call(s):\n\t- wantLockedTotal = wantLockedTotal.sub(_wantAmt) (StratX2_PCS.sol#1896)\n\tStratX2.wantLockedTotal (StratX2_PCS.sol#1740) can be used in cross function reentrancies:\n\t- StratX2.wantLockedTotal (StratX2_PCS.sol#1740)\n",
+            "name": "reentrancy-no-eth",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "StratX2",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Inspex-SimpliChef, Token, ZapBSC & Broker/simpli-smart-contract-4823d1ebbd84a35dd7e8f9fd7f5207ef5c85c419/contracts/strategies/StratX2_PCS.sol",
+            "function": "earn",
+            "impact": "Medium",
+            "line": 1907,
+            "line_end": 2009,
+            "message": "StratX2.earn() (StratX2_PCS.sol#1907-2009) ignores return value by IPancakeRouter02(uniRouterAddress).addLiquidity(token0Address,token1Address,token0Amt,token1Amt,0,0,address(this),block.timestamp.add(600)) (StratX2_PCS.sol#1994-2003)\n",
+            "name": "unused-return",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "StratX2",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Inspex-SimpliChef, Token, ZapBSC & Broker/simpli-smart-contract-4823d1ebbd84a35dd7e8f9fd7f5207ef5c85c419/contracts/strategies/StratX2_PCS.sol",
+            "function": "deposit",
+            "impact": "Low",
+            "line": 1797,
+            "line_end": 1835,
+            "message": "Reentrancy in StratX2.deposit(address,uint256) (StratX2_PCS.sol#1797-1835):\n\tExternal calls:\n\t- IERC20(wantAddress).safeTransferFrom(address(msg.sender),address(this),_wantAmt) (StratX2_PCS.sol#1807-1811)\n\tState variables written after the call(s):\n\t- sharesTotal = sharesTotal.add(sharesAdded) (StratX2_PCS.sol#1826)\n\t- wantLockedTotal = wantLockedTotal.add(_wantAmt) (StratX2_PCS.sol#1831)\n",
+            "name": "reentrancy-benign",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "StratX2",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Inspex-SimpliChef, Token, ZapBSC & Broker/simpli-smart-contract-4823d1ebbd84a35dd7e8f9fd7f5207ef5c85c419/contracts/strategies/StratX2_PCS.sol",
+            "function": "earn",
+            "impact": "Low",
+            "line": 1907,
+            "line_end": 2009,
+            "message": "Reentrancy in StratX2.earn() (StratX2_PCS.sol#1907-2009):\n\tExternal calls:\n\t- _unfarm(0) (StratX2_PCS.sol#1914)\n\t\t- IPancakeswapFarm(farmContractAddress).leaveStaking(_wantAmt) (StratX2_PCS.sol#1856)\n\t\t- IPancakeswapFarm(farmContractAddress).withdraw(pid,_wantAmt) (StratX2_PCS.sol#1858)\n\t- _wrapBNB() (StratX2_PCS.sol#1917)\n\t\t- IWBNB(wbnbAddress).deposit{value: bnbBal}() (StratX2_PCS.sol#2242)\n\t- earnedAmt = distributeFees(earnedAmt,simpliStakingAddress,stakingFee,stakingFeeMax) (StratX2_PCS.sol#1925-1930)\n\t\t- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (StratX2_PCS.sol#946-950)\n\t\t- IPancakeRouter02(_uniRouterAddress).swapExactTokensForTokensSupportingFeeOnTransferTokens(_amountIn,amountOut.mul(_slippageFactor).div(1000),_path,_to,_deadline) (StratX2_PCS.sol#2264-2271)\n\t\t- (success,returndata) = target.call{value: value}(data) (StratX2_PCS.sol#743-744)\n\t\t- IERC20(earnedAddress).safeTransfer(_to,fee) (StratX2_PCS.sol#2053)\n\t\t- IERC20(earnedAddress).safeIncreaseAllowance(uniRouterAddress,fee) (StratX2_PCS.sol#2055-2058)\n\t- earnedAmt = distributeFees(earnedAmt,rewardsAddress,controllerFee,controllerFeeMax) (StratX2_PCS.sol#1932-1937)\n\t\t- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (StratX2_PCS.sol#946-950)\n\t\t- IPancakeRouter02(_uniRouterAddress).swapExactTokensForTokensSupportingFeeOnTransferTokens(_amountIn,amountOut.mul(_slippageFactor).div(1000),_path,_to,_deadline) (StratX2_PCS.sol#2264-2271)\n\t\t- (success,returndata) = target.call{value: value}(data) (StratX2_PCS.sol#743-744)\n\t\t- IERC20(earnedAddress).safeTransfer(_to,fee) (StratX2_PCS.sol#2053)\n\t\t- IERC20(earnedAddress).safeIncreaseAllowance(uniRouterAddress,fee) (StratX2_PCS.sol#2055-2058)\n\t- earnedAmt = distributeFees(earnedAmt,buyBackAddress,buyBackRate,buyBackRateMax) (StratX2_PCS.sol#1939-1944)\n\t\t- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (StratX2_PCS.sol#946-950)\n\t\t- IPancakeRouter02(_uniRouterAddress).swapExactTokensForTokensSupportingFeeOnTransferTokens(_amountIn,amountOut.mul(_slippageFactor).div(1000),_path,_to,_deadline) (StratX2_PCS.sol#2264-2271)\n\t\t- (success,returndata) = target.call{value: value}(data) (StratX2_PCS.sol#743-744)\n\t\t- IERC20(earnedAddress).safeTransfer(_to,fee) (StratX2_PCS.sol#2053)\n\t\t- IERC20(earnedAddress).safeIncreaseAllowance(uniRouterAddress,fee) (StratX2_PCS.sol#2055-2058)\n\tExternal calls sending eth:\n\t- _wrapBNB() (StratX2_PCS.sol#1917)\n\t\t- IWBNB(wbnbAddress).deposit{value: bnbBal}() (StratX2_PCS.sol#2242)\n\t- earnedAmt = distributeFees(earnedAmt,simpliStakingAddress,stakingFee,stakingFeeMax) (StratX2_PCS.sol#1925-1930)\n\t\t- (success,returndata) = target.call{value: value}(data) (StratX2_PCS.sol#743-744)\n\t- earnedAmt = distributeFees(earnedAmt,rewardsAddress,controllerFee,controllerFeeMax) (StratX2_PCS.sol#1932-1937)\n\t\t- (success,returndata) = target.call{value: value}(data) (StratX2_PCS.sol#743-744)\n\t- earnedAmt = distributeFees(earnedAmt,buyBackAddress,buyBackRate,buyBackRateMax) (StratX2_PCS.sol#1939-1944)\n\t\t- (success,returndata) = target.call{value: value}(data) (StratX2_PCS.sol#743-744)\n\tState variables written after the call(s):\n\t- lastEarnBlock = block.number (StratX2_PCS.sol#1947)\n",
+            "name": "reentrancy-benign",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "StratX2",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Inspex-SimpliChef, Token, ZapBSC & Broker/simpli-smart-contract-4823d1ebbd84a35dd7e8f9fd7f5207ef5c85c419/contracts/strategies/StratX2_PCS.sol",
+            "function": "earn",
+            "impact": "Low",
+            "line": 1907,
+            "line_end": 2009,
+            "message": "Reentrancy in StratX2.earn() (StratX2_PCS.sol#1907-2009):\n\tExternal calls:\n\t- _unfarm(0) (StratX2_PCS.sol#1914)\n\t\t- IPancakeswapFarm(farmContractAddress).leaveStaking(_wantAmt) (StratX2_PCS.sol#1856)\n\t\t- IPancakeswapFarm(farmContractAddress).withdraw(pid,_wantAmt) (StratX2_PCS.sol#1858)\n\t- _wrapBNB() (StratX2_PCS.sol#1917)\n\t\t- IWBNB(wbnbAddress).deposit{value: bnbBal}() (StratX2_PCS.sol#2242)\n\t- earnedAmt = distributeFees(earnedAmt,simpliStakingAddress,stakingFee,stakingFeeMax) (StratX2_PCS.sol#1925-1930)\n\t\t- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (StratX2_PCS.sol#946-950)\n\t\t- IPancakeRouter02(_uniRouterAddress).swapExactTokensForTokensSupportingFeeOnTransferTokens(_amountIn,amountOut.mul(_slippageFactor).div(1000),_path,_to,_deadline) (StratX2_PCS.sol#2264-2271)\n\t\t- (success,returndata) = target.call{value: value}(data) (StratX2_PCS.sol#743-744)\n\t\t- IERC20(earnedAddress).safeTransfer(_to,fee) (StratX2_PCS.sol#2053)\n\t\t- IERC20(earnedAddress).safeIncreaseAllowance(uniRouterAddress,fee) (StratX2_PCS.sol#2055-2058)\n\t- earnedAmt = distributeFees(earnedAmt,rewardsAddress,controllerFee,controllerFeeMax) (StratX2_PCS.sol#1932-1937)\n\t\t- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (StratX2_PCS.sol#946-950)\n\t\t- IPancakeRouter02(_uniRouterAddress).swapExactTokensForTokensSupportingFeeOnTransferTokens(_amountIn,amountOut.mul(_slippageFactor).div(1000),_path,_to,_deadline) (StratX2_PCS.sol#2264-2271)\n\t\t- (success,returndata) = target.call{value: value}(data) (StratX2_PCS.sol#743-744)\n\t\t- IERC20(earnedAddress).safeTransfer(_to,fee) (StratX2_PCS.sol#2053)\n\t\t- IERC20(earnedAddress).safeIncreaseAllowance(uniRouterAddress,fee) (StratX2_PCS.sol#2055-2058)\n\t- earnedAmt = distributeFees(earnedAmt,buyBackAddress,buyBackRate,buyBackRateMax) (StratX2_PCS.sol#1939-1944)\n\t\t- returndata = address(token).functionCall(data,SafeERC20: low-level call failed) (StratX2_PCS.sol#946-950)\n\t\t- IPancakeRouter02(_uniRouterAddress).swapExactTokensForTokensSupportingFeeOnTransferTokens(_amountIn,amountOut.mul(_slippageFactor).div(1000),_path,_to,_deadline) (StratX2_PCS.sol#2264-2271)\n\t\t- (success,returndata) = target.call{value: value}(data) (StratX2_PCS.sol#743-744)\n\t\t- IERC20(earnedAddress).safeTransfer(_to,fee) (StratX2_PCS.sol#2053)\n\t\t- IERC20(earnedAddress).safeIncreaseAllowance(uniRouterAddress,fee) (StratX2_PCS.sol#2055-2058)\n\t- IERC20(earnedAddress).safeApprove(uniRouterAddress,0) (StratX2_PCS.sol#1952)\n\t- IERC20(earnedAddress).safeIncreaseAllowance(uniRouterAddress,earnedAmt) (StratX2_PCS.sol#1953-1956)\n\t- _safeSwap(uniRouterAddress,earnedAmt.div(2),slippageFactor,earnedToToken0Path,address(this),block.timestamp.add(600)) (StratX2_PCS.sol#1960-1967)\n\t\t- IPancakeRouter02(_uniRouterAddress).swapExactTokensForTokensSupportingFeeOnTransferTokens(_amountIn,amountOut.mul(_slippageFactor).div(1000),_path,_to,_deadline) (StratX2_PCS.sol#2264-2271)\n\t- _safeSwap(uniRouterAddress,earnedAmt.div(2),slippageFactor,earnedToToken1Path,address(this),block.timestamp.add(600)) (StratX2_PCS.sol#1972-1979)\n\t\t- IPancakeRouter02(_uniRouterAddress).swapExactTokensForTokensSupportingFeeOnTransferTokens(_amountIn,amountOut.mul(_slippageFactor).div(1000),_path,_to,_deadline) (StratX2_PCS.sol#2264-2271)\n\t- IERC20(token0Address).safeIncreaseAllowance(uniRouterAddress,token0Amt) (StratX2_PCS.sol#1986-1989)\n\t- IERC20(token1Address).safeIncreaseAllowance(uniRouterAddress,token1Amt) (StratX2_PCS.sol#1990-1993)\n\t- IPancakeRouter02(uniRouterAddress).addLiquidity(token0Address,token1Address,token0Amt,token1Amt,0,0,address(this),block.timestamp.add(600)) (StratX2_PCS.sol#1994-2003)\n\tExternal calls sending eth:\n\t- _wrapBNB() (StratX2_PCS.sol#1917)\n\t\t- IWBNB(wbnbAddress).deposit{value: bnbBal}() (StratX2_PCS.sol#2242)\n\t- earnedAmt = distributeFees(earnedAmt,simpliStakingAddress,stakingFee,stakingFeeMax) (StratX2_PCS.sol#1925-1930)\n\t\t- (success,returndata) = target.call{value: value}(data) (StratX2_PCS.sol#743-744)\n\t- earnedAmt = distributeFees(earnedAmt,rewardsAddress,controllerFee,controllerFeeMax) (StratX2_PCS.sol#1932-1937)\n\t\t- (success,returndata) = target.call{value: value}(data) (StratX2_PCS.sol#743-744)\n\t- earnedAmt = distributeFees(earnedAmt,buyBackAddress,buyBackRate,buyBackRateMax) (StratX2_PCS.sol#1939-1944)\n\t\t- (success,returndata) = target.call{value: value}(data) (StratX2_PCS.sol#743-744)\n\tState variables written after the call(s):\n\t- lastEarnBlock = block.number (StratX2_PCS.sol#2006)\n",
+            "name": "reentrancy-benign",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "StratX2",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Inspex-SimpliChef, Token, ZapBSC & Broker/simpli-smart-contract-4823d1ebbd84a35dd7e8f9fd7f5207ef5c85c419/contracts/strategies/StratX2_PCS.sol",
+            "function": "inCaseTokensGetStuck",
+            "impact": "Low",
+            "line": 2227,
+            "line_end": 2236,
+            "message": "Reentrancy in StratX2.inCaseTokensGetStuck(address,uint256,address) (StratX2_PCS.sol#2227-2236):\n\tExternal calls:\n\t- IERC20(_token).safeTransfer(_to,_amount) (StratX2_PCS.sol#2234)\n\tEvent emitted after the call(s):\n\t- InCaseTokensGetStuck(_token,_amount,_to) (StratX2_PCS.sol#2235)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "StratX2",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Inspex-SimpliChef, Token, ZapBSC & Broker/simpli-smart-contract-4823d1ebbd84a35dd7e8f9fd7f5207ef5c85c419/contracts/strategies/StratX2_PCS.sol",
+            "function": "wrapBNB",
+            "impact": "Low",
+            "line": 2246,
+            "line_end": 2249,
+            "message": "Reentrancy in StratX2.wrapBNB() (StratX2_PCS.sol#2246-2249):\n\tExternal calls:\n\t- _wrapBNB() (StratX2_PCS.sol#2247)\n\t\t- IWBNB(wbnbAddress).deposit{value: bnbBal}() (StratX2_PCS.sol#2242)\n\tEvent emitted after the call(s):\n\t- WrapBNB() (StratX2_PCS.sol#2248)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        }
+    ],
+    "infos": [],
+    "parser": {
+        "id": "slither-0.10.0",
+        "mode": "solidity",
+        "version": "2024/04/30"
+    }
+}

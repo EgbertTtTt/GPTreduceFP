@@ -1,0 +1,380 @@
+'solc --version' running
+'solc /sb/CCapableErc20.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+EIP20NonStandardInterface (../../sb/CCapableErc20.sol#1152-1214) has incorrect ERC20 function interface:EIP20NonStandardInterface.transfer(address,uint256) (../../sb/CCapableErc20.sol#1178)
+EIP20NonStandardInterface (../../sb/CCapableErc20.sol#1152-1214) has incorrect ERC20 function interface:EIP20NonStandardInterface.transferFrom(address,address,uint256) (../../sb/CCapableErc20.sol#1192)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-erc20-interface
+
+CToken.accrueInterest() (../../sb/CCapableErc20.sol#1530-1582) uses a dangerous strict equality:
+	- accrualBlockNumberPrior == currentBlockNumber (../../sb/CCapableErc20.sol#1536)
+CToken.exchangeRateStoredInternal() (../../sb/CCapableErc20.sol#1497-1515) uses a dangerous strict equality:
+	- _totalSupply == 0 (../../sb/CCapableErc20.sol#1499)
+CCapableErc20.flashLoan(address,uint256,bytes) (../../sb/CCapableErc20.sol#2718-2742) uses a dangerous strict equality:
+	- require(bool,string)(cashOnChainAfter == add_(cashOnChainBefore,totalFee),BALANCE_INCONSISTENT) (../../sb/CCapableErc20.sol#2734)
+CToken.initialize(ComptrollerInterface,InterestRateModel,uint256,string,string,uint8) (../../sb/CCapableErc20.sol#1231-1262) uses a dangerous strict equality:
+	- require(bool,string)(accrualBlockNumber == 0 && borrowIndex == 0,market may only be initialized once) (../../sb/CCapableErc20.sol#1238)
+CToken.initialize(ComptrollerInterface,InterestRateModel,uint256,string,string,uint8) (../../sb/CCapableErc20.sol#1231-1262) uses a dangerous strict equality:
+	- require(bool,string)(err == uint256(Error.NO_ERROR),setting comptroller failed) (../../sb/CCapableErc20.sol#1246)
+CToken.initialize(ComptrollerInterface,InterestRateModel,uint256,string,string,uint8) (../../sb/CCapableErc20.sol#1231-1262) uses a dangerous strict equality:
+	- require(bool,string)(err == uint256(Error.NO_ERROR),setting interest rate model failed) (../../sb/CCapableErc20.sol#1254)
+CToken.liquidateBorrowFresh(address,address,uint256,CTokenInterface) (../../sb/CCapableErc20.sol#2029-2097) uses a dangerous strict equality:
+	- require(bool,string)(amountSeizeError == uint256(Error.NO_ERROR),LIQUIDATE_COMPTROLLER_CALCULATE_AMOUNT_SEIZE_FAILED) (../../sb/CCapableErc20.sol#2074)
+CToken.liquidateBorrowFresh(address,address,uint256,CTokenInterface) (../../sb/CCapableErc20.sol#2029-2097) uses a dangerous strict equality:
+	- require(bool,string)(seizeError == uint256(Error.NO_ERROR),token seizure failed) (../../sb/CCapableErc20.sol#2088)
+Exponential.mulExp(Exponential.Exp,Exponential.Exp) (../../sb/CCapableErc20.sol#887-907) uses a dangerous strict equality:
+	- assert(bool)(err2 == MathError.NO_ERROR) (../../sb/CCapableErc20.sol#904)
+CarefulMath.mulUInt(uint256,uint256) (../../sb/CCapableErc20.sol#642-654) uses a dangerous strict equality:
+	- a == 0 (../../sb/CCapableErc20.sol#643)
+Exponential.mul_(uint256,uint256,string) (../../sb/CCapableErc20.sol#1039-1046) uses a dangerous strict equality:
+	- a == 0 || b == 0 (../../sb/CCapableErc20.sol#1040)
+Exponential.mul_(uint256,uint256,string) (../../sb/CCapableErc20.sol#1039-1046) uses a dangerous strict equality:
+	- require(bool,string)(c / a == b,errorMessage) (../../sb/CCapableErc20.sol#1044)
+CToken.transfer(address,uint256) (../../sb/CCapableErc20.sol#1324-1326) uses a dangerous strict equality:
+	- transferTokens(msg.sender,msg.sender,dst,amount) == uint256(Error.NO_ERROR) (../../sb/CCapableErc20.sol#1325)
+CToken.transferFrom(address,address,uint256) (../../sb/CCapableErc20.sol#1335-1337) uses a dangerous strict equality:
+	- transferTokens(msg.sender,src,dst,amount) == uint256(Error.NO_ERROR) (../../sb/CCapableErc20.sol#1336)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Reentrancy in CCapableErc20.flashLoan(address,uint256,bytes) (../../sb/CCapableErc20.sol#2718-2742):
+	External calls:
+	- doTransferOut(address(uint160(receiver)),amount) (../../sb/CCapableErc20.sol#2727)
+		- token.transfer(to,amount) (../../sb/CCapableErc20.sol#2698)
+	- IFlashloanReceiver(receiver).executeOperation(msg.sender,underlying,amount,totalFee,params) (../../sb/CCapableErc20.sol#2730)
+	State variables written after the call(s):
+	- internalCash = add_(cashBefore,totalFee) (../../sb/CCapableErc20.sol#2739)
+	CDelegationStorageExtension.internalCash (../../sb/CCapableErc20.sol#393) can be used in cross function reentrancies:
+	- CCapableErc20.doTransferIn(address,uint256) (../../sb/CCapableErc20.sol#2659-2685)
+	- CCapableErc20.doTransferOut(address,uint256) (../../sb/CCapableErc20.sol#2696-2716)
+	- CCapableErc20.getCashPrior() (../../sb/CCapableErc20.sol#2636-2638)
+	- CCapableErc20.gulp() (../../sb/CCapableErc20.sol#2619-2626)
+	- CDelegationStorageExtension.internalCash (../../sb/CCapableErc20.sol#393)
+Reentrancy in CToken.liquidateBorrowInternal(address,uint256,CTokenInterface) (../../sb/CCapableErc20.sol#2003-2018):
+	External calls:
+	- error = cTokenCollateral.accrueInterest() (../../sb/CCapableErc20.sol#2010)
+	- liquidateBorrowFresh(msg.sender,borrower,repayAmount,cTokenCollateral) (../../sb/CCapableErc20.sol#2017)
+		- allowed = comptroller.repayBorrowAllowed(address(this),payer,borrower,repayAmount) (../../sb/CCapableErc20.sol#1935)
+		- allowed = comptroller.seizeAllowed(address(this),seizerToken,liquidator,borrower,seizeTokens) (../../sb/CCapableErc20.sol#2124)
+		- allowed = comptroller.liquidateBorrowAllowed(address(this),address(cTokenCollateral),liquidator,borrower,repayAmount) (../../sb/CCapableErc20.sol#2031)
+		- comptroller.seizeVerify(address(this),seizerToken,liquidator,borrower,seizeTokens) (../../sb/CCapableErc20.sol#2154)
+		- comptroller.repayBorrowVerify(address(this),payer,borrower,vars.actualRepayAmount,vars.borrowerIndex) (../../sb/CCapableErc20.sol#1990)
+		- seizeError = cTokenCollateral.seize(liquidator,borrower,seizeTokens) (../../sb/CCapableErc20.sol#2084)
+		- comptroller.liquidateBorrowVerify(address(this),address(cTokenCollateral),liquidator,borrower,actualRepayAmount,seizeTokens) (../../sb/CCapableErc20.sol#2094)
+	State variables written after the call(s):
+	- liquidateBorrowFresh(msg.sender,borrower,repayAmount,cTokenCollateral) (../../sb/CCapableErc20.sol#2017)
+		- totalBorrows = vars.totalBorrowsNew (../../sb/CCapableErc20.sol#1984)
+	CTokenStorage.totalBorrows (../../sb/CCapableErc20.sol#178) can be used in cross function reentrancies:
+	- CToken.accrueInterest() (../../sb/CCapableErc20.sol#1530-1582)
+	- CToken.borrowRatePerBlock() (../../sb/CCapableErc20.sol#1410-1412)
+	- CToken.exchangeRateStoredInternal() (../../sb/CCapableErc20.sol#1497-1515)
+	- CToken.supplyRatePerBlock() (../../sb/CCapableErc20.sol#1418-1420)
+	- CTokenStorage.totalBorrows (../../sb/CCapableErc20.sol#178)
+Reentrancy in CToken.redeemFresh(address,uint256,uint256) (../../sb/CCapableErc20.sol#1726-1801):
+	External calls:
+	- allowed = comptroller.redeemAllowed(address(this),redeemer,vars.redeemTokens) (../../sb/CCapableErc20.sol#1754)
+	State variables written after the call(s):
+	- totalSupply = vars.totalSupplyNew (../../sb/CCapableErc20.sol#1790)
+	CTokenStorage.totalSupply (../../sb/CCapableErc20.sol#188) can be used in cross function reentrancies:
+	- CToken.exchangeRateStoredInternal() (../../sb/CCapableErc20.sol#1497-1515)
+	- CTokenStorage.totalSupply (../../sb/CCapableErc20.sol#188)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+CToken.borrowFresh(address,uint256).vars (../../sb/CCapableErc20.sol#1847) is a local variable never initialized
+CToken.redeemFresh(address,uint256,uint256).vars (../../sb/CCapableErc20.sol#1729) is a local variable never initialized
+CToken.repayBorrowFresh(address,address,uint256).vars (../../sb/CCapableErc20.sol#1945) is a local variable never initialized
+CToken.mintFresh(address,uint256).vars (../../sb/CCapableErc20.sol#1629) is a local variable never initialized
+CToken._addReservesFresh(uint256).actualAddAmount (../../sb/CCapableErc20.sol#2307) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+CCapableErc20.initialize(address,ComptrollerInterface,InterestRateModel,uint256,string,string,uint8) (../../sb/CCapableErc20.sol#2515-2528) ignores return value by EIP20Interface(underlying).totalSupply() (../../sb/CCapableErc20.sol#2527)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+Exponential.divScalarByExpTruncate(uint256,Exponential.Exp).fraction (../../sb/CCapableErc20.sol#851) shadows:
+	- Exponential.fraction(uint256,uint256) (../../sb/CCapableErc20.sol#1081-1083) (function)
+Exponential.div_ScalarByExpTruncate(uint256,Exponential.Exp).fraction (../../sb/CCapableErc20.sol#880) shadows:
+	- Exponential.fraction(uint256,uint256) (../../sb/CCapableErc20.sol#1081-1083) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+CToken._setPendingAdmin(address).newPendingAdmin (../../sb/CCapableErc20.sol#2168) lacks a zero-check on :
+		- pendingAdmin = newPendingAdmin (../../sb/CCapableErc20.sol#2178)
+CCapableErc20.initialize(address,ComptrollerInterface,InterestRateModel,uint256,string,string,uint8).underlying_ (../../sb/CCapableErc20.sol#2515) lacks a zero-check on :
+		- underlying = underlying_ (../../sb/CCapableErc20.sol#2526)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in CToken.borrowFresh(address,uint256) (../../sb/CCapableErc20.sol#1830-1882):
+	External calls:
+	- allowed = comptroller.borrowAllowed(address(this),borrower,borrowAmount) (../../sb/CCapableErc20.sol#1832)
+	State variables written after the call(s):
+	- accountBorrows[borrower].principal = vars.accountBorrowsNew (../../sb/CCapableErc20.sol#1871)
+	- accountBorrows[borrower].interestIndex = borrowIndex (../../sb/CCapableErc20.sol#1872)
+	- totalBorrows = vars.totalBorrowsNew (../../sb/CCapableErc20.sol#1873)
+Reentrancy in CCapableErc20.doTransferIn(address,uint256) (../../sb/CCapableErc20.sol#2659-2685):
+	External calls:
+	- token.transferFrom(from,address(this),amount) (../../sb/CCapableErc20.sol#2662)
+	State variables written after the call(s):
+	- internalCash = add_(internalCash,transferredIn) (../../sb/CCapableErc20.sol#2683)
+Reentrancy in CCapableErc20.doTransferOut(address,uint256) (../../sb/CCapableErc20.sol#2696-2716):
+	External calls:
+	- token.transfer(to,amount) (../../sb/CCapableErc20.sol#2698)
+	State variables written after the call(s):
+	- internalCash = sub_(internalCash,amount) (../../sb/CCapableErc20.sol#2715)
+Reentrancy in CCapableErc20.flashLoan(address,uint256,bytes) (../../sb/CCapableErc20.sol#2718-2742):
+	External calls:
+	- doTransferOut(address(uint160(receiver)),amount) (../../sb/CCapableErc20.sol#2727)
+		- token.transfer(to,amount) (../../sb/CCapableErc20.sol#2698)
+	- IFlashloanReceiver(receiver).executeOperation(msg.sender,underlying,amount,totalFee,params) (../../sb/CCapableErc20.sol#2730)
+	State variables written after the call(s):
+	- totalReserves = add_(totalReserves,reservesFee) (../../sb/CCapableErc20.sol#2738)
+Reentrancy in CToken.mintFresh(address,uint256) (../../sb/CCapableErc20.sol#1617-1674):
+	External calls:
+	- allowed = comptroller.mintAllowed(address(this),minter,mintAmount) (../../sb/CCapableErc20.sol#1619)
+	State variables written after the call(s):
+	- accountTokens[minter] = vars.accountTokensNew (../../sb/CCapableErc20.sol#1664)
+	- totalSupply = vars.totalSupplyNew (../../sb/CCapableErc20.sol#1663)
+Reentrancy in CToken.redeemFresh(address,uint256,uint256) (../../sb/CCapableErc20.sol#1726-1801):
+	External calls:
+	- allowed = comptroller.redeemAllowed(address(this),redeemer,vars.redeemTokens) (../../sb/CCapableErc20.sol#1754)
+	State variables written after the call(s):
+	- accountTokens[redeemer] = vars.accountTokensNew (../../sb/CCapableErc20.sol#1791)
+Reentrancy in CToken.repayBorrowFresh(address,address,uint256) (../../sb/CCapableErc20.sol#1933-1993):
+	External calls:
+	- allowed = comptroller.repayBorrowAllowed(address(this),payer,borrower,repayAmount) (../../sb/CCapableErc20.sol#1935)
+	State variables written after the call(s):
+	- accountBorrows[borrower].principal = vars.accountBorrowsNew (../../sb/CCapableErc20.sol#1982)
+	- accountBorrows[borrower].interestIndex = borrowIndex (../../sb/CCapableErc20.sol#1983)
+	- totalBorrows = vars.totalBorrowsNew (../../sb/CCapableErc20.sol#1984)
+Reentrancy in CToken.seizeInternal(address,address,address,uint256) (../../sb/CCapableErc20.sol#2122-2157):
+	External calls:
+	- allowed = comptroller.seizeAllowed(address(this),seizerToken,liquidator,borrower,seizeTokens) (../../sb/CCapableErc20.sol#2124)
+	State variables written after the call(s):
+	- accountTokens[borrower] = borrowerTokensNew (../../sb/CCapableErc20.sol#2147)
+	- accountTokens[liquidator] = liquidatorTokensNew (../../sb/CCapableErc20.sol#2148)
+Reentrancy in CToken.transferTokens(address,address,address,uint256) (../../sb/CCapableErc20.sol#1273-1316):
+	External calls:
+	- allowed = comptroller.transferAllowed(address(this),src,dst,tokens) (../../sb/CCapableErc20.sol#1275)
+	State variables written after the call(s):
+	- accountTokens[src] = srcTokensNew (../../sb/CCapableErc20.sol#1302)
+	- accountTokens[dst] = dstTokensNew (../../sb/CCapableErc20.sol#1303)
+	- transferAllowances[src][spender] = allowanceNew (../../sb/CCapableErc20.sol#1307)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in CToken.borrowFresh(address,uint256) (../../sb/CCapableErc20.sol#1830-1882):
+	External calls:
+	- allowed = comptroller.borrowAllowed(address(this),borrower,borrowAmount) (../../sb/CCapableErc20.sol#1832)
+	Event emitted after the call(s):
+	- Borrow(borrower,borrowAmount,vars.accountBorrowsNew,vars.totalBorrowsNew) (../../sb/CCapableErc20.sol#1876)
+	- Failure(uint256(err),uint256(info),opaqueError) (../../sb/CCapableErc20.sol#615)
+		- failOpaque(Error.COMPTROLLER_REJECTION,FailureInfo.BORROW_COMPTROLLER_REJECTION,allowed) (../../sb/CCapableErc20.sol#1834)
+	- Failure(uint256(err),uint256(info),0) (../../sb/CCapableErc20.sol#606)
+		- fail(Error.MARKET_NOT_FRESH,FailureInfo.BORROW_FRESHNESS_CHECK) (../../sb/CCapableErc20.sol#1839)
+	- Failure(uint256(err),uint256(info),0) (../../sb/CCapableErc20.sol#606)
+		- fail(Error.TOKEN_INSUFFICIENT_CASH,FailureInfo.BORROW_CASH_NOT_AVAILABLE) (../../sb/CCapableErc20.sol#1844)
+Reentrancy in CToken.liquidateBorrowFresh(address,address,uint256,CTokenInterface) (../../sb/CCapableErc20.sol#2029-2097):
+	External calls:
+	- allowed = comptroller.liquidateBorrowAllowed(address(this),address(cTokenCollateral),liquidator,borrower,repayAmount) (../../sb/CCapableErc20.sol#2031)
+	Event emitted after the call(s):
+	- Failure(uint256(err),uint256(info),opaqueError) (../../sb/CCapableErc20.sol#615)
+		- (failOpaque(Error.COMPTROLLER_REJECTION,FailureInfo.LIQUIDATE_COMPTROLLER_REJECTION,allowed),0) (../../sb/CCapableErc20.sol#2033)
+	- Failure(uint256(err),uint256(info),0) (../../sb/CCapableErc20.sol#606)
+		- (fail(Error.MARKET_NOT_FRESH,FailureInfo.LIQUIDATE_FRESHNESS_CHECK),0) (../../sb/CCapableErc20.sol#2038)
+	- Failure(uint256(err),uint256(info),0) (../../sb/CCapableErc20.sol#606)
+		- (fail(Error.INVALID_CLOSE_AMOUNT_REQUESTED,FailureInfo.LIQUIDATE_CLOSE_AMOUNT_IS_ZERO),0) (../../sb/CCapableErc20.sol#2053)
+	- Failure(uint256(err),uint256(info),0) (../../sb/CCapableErc20.sol#606)
+		- (fail(Error.INVALID_CLOSE_AMOUNT_REQUESTED,FailureInfo.LIQUIDATE_CLOSE_AMOUNT_IS_UINT_MAX),0) (../../sb/CCapableErc20.sol#2058)
+	- Failure(uint256(err),uint256(info),0) (../../sb/CCapableErc20.sol#606)
+		- (fail(Error.MARKET_NOT_FRESH,FailureInfo.LIQUIDATE_COLLATERAL_FRESHNESS_CHECK),0) (../../sb/CCapableErc20.sol#2043)
+	- Failure(uint256(err),uint256(info),0) (../../sb/CCapableErc20.sol#606)
+		- (fail(Error.INVALID_ACCOUNT_PAIR,FailureInfo.LIQUIDATE_LIQUIDATOR_IS_BORROWER),0) (../../sb/CCapableErc20.sol#2048)
+Reentrancy in CToken.liquidateBorrowFresh(address,address,uint256,CTokenInterface) (../../sb/CCapableErc20.sol#2029-2097):
+	External calls:
+	- allowed = comptroller.liquidateBorrowAllowed(address(this),address(cTokenCollateral),liquidator,borrower,repayAmount) (../../sb/CCapableErc20.sol#2031)
+	- (repayBorrowError,actualRepayAmount) = repayBorrowFresh(liquidator,borrower,repayAmount) (../../sb/CCapableErc20.sol#2063)
+		- allowed = comptroller.repayBorrowAllowed(address(this),payer,borrower,repayAmount) (../../sb/CCapableErc20.sol#1935)
+		- comptroller.repayBorrowVerify(address(this),payer,borrower,vars.actualRepayAmount,vars.borrowerIndex) (../../sb/CCapableErc20.sol#1990)
+	Event emitted after the call(s):
+	- Failure(uint256(err),uint256(info),opaqueError) (../../sb/CCapableErc20.sol#615)
+		- (repayBorrowError,actualRepayAmount) = repayBorrowFresh(liquidator,borrower,repayAmount) (../../sb/CCapableErc20.sol#2063)
+	- Failure(uint256(err),uint256(info),0) (../../sb/CCapableErc20.sol#606)
+		- (fail(TokenErrorReporter.Error(repayBorrowError),FailureInfo.LIQUIDATE_REPAY_BORROW_FRESH_FAILED),0) (../../sb/CCapableErc20.sol#2065)
+	- Failure(uint256(err),uint256(info),0) (../../sb/CCapableErc20.sol#606)
+		- (repayBorrowError,actualRepayAmount) = repayBorrowFresh(liquidator,borrower,repayAmount) (../../sb/CCapableErc20.sol#2063)
+	- RepayBorrow(payer,borrower,vars.actualRepayAmount,vars.accountBorrowsNew,vars.totalBorrowsNew) (../../sb/CCapableErc20.sol#1987)
+		- (repayBorrowError,actualRepayAmount) = repayBorrowFresh(liquidator,borrower,repayAmount) (../../sb/CCapableErc20.sol#2063)
+Reentrancy in CToken.liquidateBorrowFresh(address,address,uint256,CTokenInterface) (../../sb/CCapableErc20.sol#2029-2097):
+	External calls:
+	- allowed = comptroller.liquidateBorrowAllowed(address(this),address(cTokenCollateral),liquidator,borrower,repayAmount) (../../sb/CCapableErc20.sol#2031)
+	- (repayBorrowError,actualRepayAmount) = repayBorrowFresh(liquidator,borrower,repayAmount) (../../sb/CCapableErc20.sol#2063)
+		- allowed = comptroller.repayBorrowAllowed(address(this),payer,borrower,repayAmount) (../../sb/CCapableErc20.sol#1935)
+		- comptroller.repayBorrowVerify(address(this),payer,borrower,vars.actualRepayAmount,vars.borrowerIndex) (../../sb/CCapableErc20.sol#1990)
+	- seizeError = seizeInternal(address(this),liquidator,borrower,seizeTokens) (../../sb/CCapableErc20.sol#2082)
+		- allowed = comptroller.seizeAllowed(address(this),seizerToken,liquidator,borrower,seizeTokens) (../../sb/CCapableErc20.sol#2124)
+		- comptroller.seizeVerify(address(this),seizerToken,liquidator,borrower,seizeTokens) (../../sb/CCapableErc20.sol#2154)
+	Event emitted after the call(s):
+	- Failure(uint256(err),uint256(info),0) (../../sb/CCapableErc20.sol#606)
+		- seizeError = seizeInternal(address(this),liquidator,borrower,seizeTokens) (../../sb/CCapableErc20.sol#2082)
+	- Failure(uint256(err),uint256(info),opaqueError) (../../sb/CCapableErc20.sol#615)
+		- seizeError = seizeInternal(address(this),liquidator,borrower,seizeTokens) (../../sb/CCapableErc20.sol#2082)
+	- Transfer(borrower,liquidator,seizeTokens) (../../sb/CCapableErc20.sol#2151)
+		- seizeError = seizeInternal(address(this),liquidator,borrower,seizeTokens) (../../sb/CCapableErc20.sol#2082)
+Reentrancy in CToken.liquidateBorrowFresh(address,address,uint256,CTokenInterface) (../../sb/CCapableErc20.sol#2029-2097):
+	External calls:
+	- allowed = comptroller.liquidateBorrowAllowed(address(this),address(cTokenCollateral),liquidator,borrower,repayAmount) (../../sb/CCapableErc20.sol#2031)
+	- (repayBorrowError,actualRepayAmount) = repayBorrowFresh(liquidator,borrower,repayAmount) (../../sb/CCapableErc20.sol#2063)
+		- allowed = comptroller.repayBorrowAllowed(address(this),payer,borrower,repayAmount) (../../sb/CCapableErc20.sol#1935)
+		- comptroller.repayBorrowVerify(address(this),payer,borrower,vars.actualRepayAmount,vars.borrowerIndex) (../../sb/CCapableErc20.sol#1990)
+	- seizeError = seizeInternal(address(this),liquidator,borrower,seizeTokens) (../../sb/CCapableErc20.sol#2082)
+		- allowed = comptroller.seizeAllowed(address(this),seizerToken,liquidator,borrower,seizeTokens) (../../sb/CCapableErc20.sol#2124)
+		- comptroller.seizeVerify(address(this),seizerToken,liquidator,borrower,seizeTokens) (../../sb/CCapableErc20.sol#2154)
+	- seizeError = cTokenCollateral.seize(liquidator,borrower,seizeTokens) (../../sb/CCapableErc20.sol#2084)
+	Event emitted after the call(s):
+	- LiquidateBorrow(liquidator,borrower,actualRepayAmount,address(cTokenCollateral),seizeTokens) (../../sb/CCapableErc20.sol#2091)
+Reentrancy in CToken.mintFresh(address,uint256) (../../sb/CCapableErc20.sol#1617-1674):
+	External calls:
+	- allowed = comptroller.mintAllowed(address(this),minter,mintAmount) (../../sb/CCapableErc20.sol#1619)
+	Event emitted after the call(s):
+	- Failure(uint256(err),uint256(info),0) (../../sb/CCapableErc20.sol#606)
+		- (fail(Error.MARKET_NOT_FRESH,FailureInfo.MINT_FRESHNESS_CHECK),0) (../../sb/CCapableErc20.sol#1626)
+	- Failure(uint256(err),uint256(info),opaqueError) (../../sb/CCapableErc20.sol#615)
+		- (failOpaque(Error.COMPTROLLER_REJECTION,FailureInfo.MINT_COMPTROLLER_REJECTION,allowed),0) (../../sb/CCapableErc20.sol#1621)
+	- Mint(minter,vars.actualMintAmount,vars.mintTokens) (../../sb/CCapableErc20.sol#1667)
+	- Transfer(address(this),minter,vars.mintTokens) (../../sb/CCapableErc20.sol#1668)
+Reentrancy in CToken.redeemFresh(address,uint256,uint256) (../../sb/CCapableErc20.sol#1726-1801):
+	External calls:
+	- allowed = comptroller.redeemAllowed(address(this),redeemer,vars.redeemTokens) (../../sb/CCapableErc20.sol#1754)
+	Event emitted after the call(s):
+	- Failure(uint256(err),uint256(info),0) (../../sb/CCapableErc20.sol#606)
+		- fail(Error.MARKET_NOT_FRESH,FailureInfo.REDEEM_FRESHNESS_CHECK) (../../sb/CCapableErc20.sol#1761)
+	- Failure(uint256(err),uint256(info),opaqueError) (../../sb/CCapableErc20.sol#615)
+		- failOpaque(Error.COMPTROLLER_REJECTION,FailureInfo.REDEEM_COMPTROLLER_REJECTION,allowed) (../../sb/CCapableErc20.sol#1756)
+	- Failure(uint256(err),uint256(info),0) (../../sb/CCapableErc20.sol#606)
+		- fail(Error.TOKEN_INSUFFICIENT_CASH,FailureInfo.REDEEM_TRANSFER_OUT_NOT_POSSIBLE) (../../sb/CCapableErc20.sol#1774)
+	- Redeem(redeemer,vars.redeemAmount,vars.redeemTokens) (../../sb/CCapableErc20.sol#1795)
+	- Transfer(redeemer,address(this),vars.redeemTokens) (../../sb/CCapableErc20.sol#1794)
+Reentrancy in CToken.repayBorrowFresh(address,address,uint256) (../../sb/CCapableErc20.sol#1933-1993):
+	External calls:
+	- allowed = comptroller.repayBorrowAllowed(address(this),payer,borrower,repayAmount) (../../sb/CCapableErc20.sol#1935)
+	Event emitted after the call(s):
+	- Failure(uint256(err),uint256(info),0) (../../sb/CCapableErc20.sol#606)
+		- (fail(Error.MARKET_NOT_FRESH,FailureInfo.REPAY_BORROW_FRESHNESS_CHECK),0) (../../sb/CCapableErc20.sol#1942)
+	- Failure(uint256(err),uint256(info),opaqueError) (../../sb/CCapableErc20.sol#615)
+		- (failOpaque(Error.COMPTROLLER_REJECTION,FailureInfo.REPAY_BORROW_COMPTROLLER_REJECTION,allowed),0) (../../sb/CCapableErc20.sol#1937)
+	- RepayBorrow(payer,borrower,vars.actualRepayAmount,vars.accountBorrowsNew,vars.totalBorrowsNew) (../../sb/CCapableErc20.sol#1987)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+CCapableErc20.doTransferIn(address,uint256) (../../sb/CCapableErc20.sol#2659-2685) uses assembly
+	- INLINE ASM (../../sb/CCapableErc20.sol#2665-2677)
+CCapableErc20.doTransferOut(address,uint256) (../../sb/CCapableErc20.sol#2696-2716) uses assembly
+	- INLINE ASM (../../sb/CCapableErc20.sol#2701-2713)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+CarefulMath.addThenSubUInt(uint256,uint256,uint256) (../../sb/CCapableErc20.sol#694-702) is never used and should be removed
+CarefulMath.addUInt(uint256,uint256) (../../sb/CCapableErc20.sol#681-689) is never used and should be removed
+CarefulMath.divUInt(uint256,uint256) (../../sb/CCapableErc20.sol#659-665) is never used and should be removed
+CarefulMath.mulUInt(uint256,uint256) (../../sb/CCapableErc20.sol#642-654) is never used and should be removed
+CarefulMath.subUInt(uint256,uint256) (../../sb/CCapableErc20.sol#670-676) is never used and should be removed
+ComptrollerErrorReporter.fail(ComptrollerErrorReporter.Error,ComptrollerErrorReporter.FailureInfo) (../../sb/CCapableErc20.sol#493-497) is never used and should be removed
+ComptrollerErrorReporter.failOpaque(ComptrollerErrorReporter.Error,ComptrollerErrorReporter.FailureInfo,uint256) (../../sb/CCapableErc20.sol#502-506) is never used and should be removed
+Exponential.addExp(Exponential.Exp,Exponential.Exp) (../../sb/CCapableErc20.sol#748-752) is never used and should be removed
+Exponential.add_(Exponential.Double,Exponential.Double) (../../sb/CCapableErc20.sol#980-982) is never used and should be removed
+Exponential.add_(Exponential.Exp,Exponential.Exp) (../../sb/CCapableErc20.sol#976-978) is never used and should be removed
+Exponential.divExp(Exponential.Exp,Exponential.Exp) (../../sb/CCapableErc20.sol#932-934) is never used and should be removed
+Exponential.divScalar(Exponential.Exp,uint256) (../../sb/CCapableErc20.sol#818-825) is never used and should be removed
+Exponential.divScalarByExp(uint256,Exponential.Exp) (../../sb/CCapableErc20.sol#830-845) is never used and should be removed
+Exponential.divScalarByExpTruncate(uint256,Exponential.Exp) (../../sb/CCapableErc20.sol#850-857) is never used and should be removed
+Exponential.div_(Exponential.Double,Exponential.Double) (../../sb/CCapableErc20.sol#1060-1062) is never used and should be removed
+Exponential.div_(Exponential.Double,uint256) (../../sb/CCapableErc20.sol#1064-1066) is never used and should be removed
+Exponential.div_(Exponential.Exp,Exponential.Exp) (../../sb/CCapableErc20.sol#1048-1050) is never used and should be removed
+Exponential.div_(Exponential.Exp,uint256) (../../sb/CCapableErc20.sol#1052-1054) is never used and should be removed
+Exponential.div_(uint256,Exponential.Double) (../../sb/CCapableErc20.sol#1068-1070) is never used and should be removed
+Exponential.fraction(uint256,uint256) (../../sb/CCapableErc20.sol#1081-1083) is never used and should be removed
+Exponential.getExp(uint256,uint256) (../../sb/CCapableErc20.sol#731-743) is never used and should be removed
+Exponential.isZeroExp(Exponential.Exp) (../../sb/CCapableErc20.sol#962-964) is never used and should be removed
+Exponential.lessThanExp(Exponential.Exp,Exponential.Exp) (../../sb/CCapableErc20.sol#948-950) is never used and should be removed
+Exponential.lessThanOrEqualExp(Exponential.Exp,Exponential.Exp) (../../sb/CCapableErc20.sol#955-957) is never used and should be removed
+Exponential.mulExp(Exponential.Exp,Exponential.Exp) (../../sb/CCapableErc20.sol#887-907) is never used and should be removed
+Exponential.mulExp(uint256,uint256) (../../sb/CCapableErc20.sol#912-914) is never used and should be removed
+Exponential.mulExp3(Exponential.Exp,Exponential.Exp,Exponential.Exp) (../../sb/CCapableErc20.sol#919-925) is never used and should be removed
+Exponential.mulScalar(Exponential.Exp,uint256) (../../sb/CCapableErc20.sol#766-773) is never used and should be removed
+Exponential.mulScalarTruncate(Exponential.Exp,uint256) (../../sb/CCapableErc20.sol#778-785) is never used and should be removed
+Exponential.mulScalarTruncateAddUInt(Exponential.Exp,uint256,uint256) (../../sb/CCapableErc20.sol#790-797) is never used and should be removed
+Exponential.mul_(Exponential.Double,Exponential.Double) (../../sb/CCapableErc20.sol#1023-1025) is never used and should be removed
+Exponential.mul_(Exponential.Double,uint256) (../../sb/CCapableErc20.sol#1027-1029) is never used and should be removed
+Exponential.mul_(Exponential.Exp,Exponential.Exp) (../../sb/CCapableErc20.sol#1011-1013) is never used and should be removed
+Exponential.mul_(uint256,Exponential.Double) (../../sb/CCapableErc20.sol#1031-1033) is never used and should be removed
+Exponential.mul_(uint256,Exponential.Exp) (../../sb/CCapableErc20.sol#1019-1021) is never used and should be removed
+Exponential.safe224(uint256,string) (../../sb/CCapableErc20.sol#966-969) is never used and should be removed
+Exponential.safe32(uint256,string) (../../sb/CCapableErc20.sol#971-974) is never used and should be removed
+Exponential.subExp(Exponential.Exp,Exponential.Exp) (../../sb/CCapableErc20.sol#757-761) is never used and should be removed
+Exponential.sub_(Exponential.Double,Exponential.Double) (../../sb/CCapableErc20.sol#998-1000) is never used and should be removed
+Exponential.sub_(Exponential.Exp,Exponential.Exp) (../../sb/CCapableErc20.sol#994-996) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.5.16 (../../sb/CCapableErc20.sol#1) allows old versions
+solc-0.5.17 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Constant CTokenStorage.borrowRateMaxMantissa (../../sb/CCapableErc20.sol#128) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant CTokenStorage.reserveFactorMaxMantissa (../../sb/CCapableErc20.sol#133) is not in UPPER_CASE_WITH_UNDERSCORES
+Function CTokenInterface._setPendingAdmin(address) (../../sb/CCapableErc20.sol#332) is not in mixedCase
+Function CTokenInterface._acceptAdmin() (../../sb/CCapableErc20.sol#333) is not in mixedCase
+Function CTokenInterface._setComptroller(ComptrollerInterface) (../../sb/CCapableErc20.sol#334) is not in mixedCase
+Function CTokenInterface._setReserveFactor(uint256) (../../sb/CCapableErc20.sol#335) is not in mixedCase
+Function CTokenInterface._reduceReserves(uint256) (../../sb/CCapableErc20.sol#336) is not in mixedCase
+Function CTokenInterface._setInterestRateModel(InterestRateModel) (../../sb/CCapableErc20.sol#337) is not in mixedCase
+Function CErc20Interface._addReserves(uint256) (../../sb/CCapableErc20.sol#361) is not in mixedCase
+Function CCapableErc20Interface._addReserves(uint256) (../../sb/CCapableErc20.sol#379) is not in mixedCase
+Function CDelegatorInterface._setImplementation(address,bool,bytes) (../../sb/CCapableErc20.sol#408) is not in mixedCase
+Function CDelegateInterface._becomeImplementation(bytes) (../../sb/CCapableErc20.sol#417) is not in mixedCase
+Function CDelegateInterface._resignImplementation() (../../sb/CCapableErc20.sol#422) is not in mixedCase
+Function CCapableDelegateInterface._becomeImplementation(bytes) (../../sb/CCapableErc20.sol#431) is not in mixedCase
+Function CCapableDelegateInterface._resignImplementation() (../../sb/CCapableErc20.sol#436) is not in mixedCase
+Function Exponential.mul_ScalarTruncate(Exponential.Exp,uint256) (../../sb/CCapableErc20.sol#802-805) is not in mixedCase
+Function Exponential.mul_ScalarTruncateAddUInt(Exponential.Exp,uint256,uint256) (../../sb/CCapableErc20.sol#810-813) is not in mixedCase
+Function Exponential.div_ScalarByExp(uint256,Exponential.Exp) (../../sb/CCapableErc20.sol#862-874) is not in mixedCase
+Function Exponential.div_ScalarByExpTruncate(uint256,Exponential.Exp) (../../sb/CCapableErc20.sol#879-882) is not in mixedCase
+Constant Exponential.expScale (../../sb/CCapableErc20.sol#713) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant Exponential.doubleScale (../../sb/CCapableErc20.sol#714) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant Exponential.halfExpScale (../../sb/CCapableErc20.sol#715) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant Exponential.mantissaOne (../../sb/CCapableErc20.sol#716) is not in UPPER_CASE_WITH_UNDERSCORES
+Function CToken._setPendingAdmin(address) (../../sb/CCapableErc20.sol#2168-2184) is not in mixedCase
+Function CToken._acceptAdmin() (../../sb/CCapableErc20.sol#2191-2211) is not in mixedCase
+Function CToken._setComptroller(ComptrollerInterface) (../../sb/CCapableErc20.sol#2218-2235) is not in mixedCase
+Function CToken._setReserveFactor(uint256) (../../sb/CCapableErc20.sol#2242-2250) is not in mixedCase
+Function CToken._reduceReserves(uint256) (../../sb/CCapableErc20.sol#2346-2354) is not in mixedCase
+Function CToken._setInterestRateModel(InterestRateModel) (../../sb/CCapableErc20.sol#2409-2417) is not in mixedCase
+Function CCapableErc20._addReserves(uint256) (../../sb/CCapableErc20.sol#2611-2613) is not in mixedCase
+Constant CCapableErc20.flashFeeBips (../../sb/CCapableErc20.sol#2503) is not in UPPER_CASE_WITH_UNDERSCORES
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Variable CToken.liquidateBorrowFresh(address,address,uint256,CTokenInterface).seizeTokens (../../sb/CCapableErc20.sol#2073) is too similar to CToken.seizeInternal(address,address,address,uint256).seizerToken (../../sb/CCapableErc20.sol#2122)
+Variable CToken.seize(address,address,uint256).seizeTokens (../../sb/CCapableErc20.sol#2108) is too similar to CToken.seizeInternal(address,address,address,uint256).seizerToken (../../sb/CCapableErc20.sol#2122)
+Variable CToken.seizeInternal(address,address,address,uint256).seizeTokens (../../sb/CCapableErc20.sol#2122) is too similar to CToken.seizeInternal(address,address,address,uint256).seizerToken (../../sb/CCapableErc20.sol#2122)
+Variable CTokenInterface.seize(address,address,uint256).seizeTokens (../../sb/CCapableErc20.sol#327) is too similar to CToken.seizeInternal(address,address,address,uint256).seizerToken (../../sb/CCapableErc20.sol#2122)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+CCapableErc20 (../../sb/CCapableErc20.sol#2500-2743) does not implement functions:
+	- CCapableDelegateInterface._becomeImplementation(bytes) (../../sb/CCapableErc20.sol#431)
+	- CCapableDelegateInterface._resignImplementation() (../../sb/CCapableErc20.sol#436)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unimplemented-functions
+
+CDelegationStorage.implementation (../../sb/CCapableErc20.sol#386) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+
+_setImplementation(address,bool,bytes) should be declared external:
+	- CDelegatorInterface._setImplementation(address,bool,bytes) (../../sb/CCapableErc20.sol#408)
+Moreover, the following function parameters should change its data location:
+becomeImplementationData location should be calldata
+_becomeImplementation(bytes) should be declared external:
+	- CDelegateInterface._becomeImplementation(bytes) (../../sb/CCapableErc20.sol#417)
+Moreover, the following function parameters should change its data location:
+data location should be calldata
+_becomeImplementation(bytes) should be declared external:
+	- CCapableDelegateInterface._becomeImplementation(bytes) (../../sb/CCapableErc20.sol#431)
+Moreover, the following function parameters should change its data location:
+data location should be calldata
+initialize(address,ComptrollerInterface,InterestRateModel,uint256,string,string,uint8) should be declared external:
+	- CCapableErc20.initialize(address,ComptrollerInterface,InterestRateModel,uint256,string,string,uint8) (../../sb/CCapableErc20.sol#2515-2528)
+Moreover, the following function parameters should change its data location:
+name_ location should be calldata
+symbol_ location should be calldata
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#public-function-that-could-be-declared-external
+/sb/CCapableErc20.sol analyzed (21 contracts with 93 detectors), 131 result(s) found

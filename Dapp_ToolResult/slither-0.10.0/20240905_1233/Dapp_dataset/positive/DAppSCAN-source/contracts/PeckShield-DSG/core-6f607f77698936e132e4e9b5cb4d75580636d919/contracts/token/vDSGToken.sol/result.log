@@ -1,0 +1,336 @@
+'solc --version' running
+'solc /sb/vDSGToken.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+MySafeMath.divCeil(uint256,uint256) (../../sb/vDSGToken.sol#932-940) performs a multiplication on the result of a division:
+	- quotient = a.div(b) (../../sb/vDSGToken.sol#933)
+	- remainder = a - quotient * b (../../sb/vDSGToken.sol#934)
+vDSGToken.getRatioValue(uint256) (../../sb/vDSGToken.sol#1328-1342) performs a multiplication on the result of a division:
+	- step = (_MAX_PENALTY_RATIO_ - _MIN_PENALTY_RATIO_) * 10 / ((_MAX_MINT_RATIO_ - _MIN_MINT_RATIO_) / 1e16) (../../sb/vDSGToken.sol#1339)
+	- _MAX_PENALTY_RATIO_ + step - DecimalMath.mulFloor(input,step * 10) (../../sb/vDSGToken.sol#1340)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+vDSGToken.getLatestAlpha() (../../sb/vDSGToken.sol#1251-1262) uses a dangerous strict equality:
+	- _lastRewardBlock == 0 (../../sb/vDSGToken.sol#1252)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Reentrancy in vDSGToken.changePerReward(uint256) (../../sb/vDSGToken.sol#1080-1084):
+	External calls:
+	- _updateAlpha() (../../sb/vDSGToken.sol#1081)
+		- IDsgToken(_dsgToken).mint(address(this),curDistribution) (../../sb/vDSGToken.sol#1359)
+	State variables written after the call(s):
+	- _dsgPerBlock = dsgPerBlock (../../sb/vDSGToken.sol#1082)
+	vDSGToken._dsgPerBlock (../../sb/vDSGToken.sol#1008) can be used in cross function reentrancies:
+	- vDSGToken._dsgPerBlock (../../sb/vDSGToken.sol#1008)
+	- vDSGToken.changePerReward(uint256) (../../sb/vDSGToken.sol#1080-1084)
+	- vDSGToken.getLatestAlpha() (../../sb/vDSGToken.sol#1251-1262)
+Reentrancy in vDSGToken.mint(uint256,address) (../../sb/vDSGToken.sol#1114-1148):
+	External calls:
+	- _updateAlpha() (../../sb/vDSGToken.sol#1139)
+		- IDsgToken(_dsgToken).mint(address(this),curDistribution) (../../sb/vDSGToken.sol#1359)
+	- IERC20(_dsgToken).safeTransferFrom(msg.sender,address(this),dsgAmount) (../../sb/vDSGToken.sol#1141)
+	State variables written after the call(s):
+	- _mint(user,newStakingPower) (../../sb/vDSGToken.sol#1145)
+		- _totalStakingPower = _totalStakingPower.add(stakingPower).add(superiorIncreSP) (../../sb/vDSGToken.sol#1379)
+	vDSGToken._totalStakingPower (../../sb/vDSGToken.sol#1020) can be used in cross function reentrancies:
+	- vDSGToken._mint(vDSGToken.UserInfo,uint256) (../../sb/vDSGToken.sol#1367-1380)
+	- vDSGToken._redeem(vDSGToken.UserInfo,uint256) (../../sb/vDSGToken.sol#1382-1425)
+	- vDSGToken._totalStakingPower (../../sb/vDSGToken.sol#1020)
+	- vDSGToken.donate(uint256) (../../sb/vDSGToken.sol#1189-1197)
+	- vDSGToken.getLatestAlpha() (../../sb/vDSGToken.sol#1251-1262)
+	- vDSGToken.redeem(uint256,bool) (../../sb/vDSGToken.sol#1150-1187)
+	- _mint(user,newStakingPower) (../../sb/vDSGToken.sol#1145)
+		- superior.stakingPower = uint128(uint256(superior.stakingPower).add(superiorIncreSP)) (../../sb/vDSGToken.sol#1376)
+		- superior.credit = uint128(uint256(superior.credit).add(superiorIncreCredit)) (../../sb/vDSGToken.sol#1377)
+	vDSGToken.userInfo (../../sb/vDSGToken.sol#1021) can be used in cross function reentrancies:
+	- vDSGToken._mint(vDSGToken.UserInfo,uint256) (../../sb/vDSGToken.sol#1367-1380)
+	- vDSGToken._redeem(vDSGToken.UserInfo,uint256) (../../sb/vDSGToken.sol#1382-1425)
+	- vDSGToken._transfer(address,address,uint256) (../../sb/vDSGToken.sol#1427-1445)
+	- vDSGToken.dsgBalanceOf(address) (../../sb/vDSGToken.sol#1268-1277)
+	- vDSGToken.getSuperior(address) (../../sb/vDSGToken.sol#1344-1346)
+	- vDSGToken.mint(uint256,address) (../../sb/vDSGToken.sol#1114-1148)
+	- vDSGToken.redeem(uint256,bool) (../../sb/vDSGToken.sol#1150-1187)
+	- vDSGToken.userInfo (../../sb/vDSGToken.sol#1021)
+Reentrancy in vDSGToken.redeem(uint256,bool) (../../sb/vDSGToken.sol#1150-1187):
+	External calls:
+	- _updateAlpha() (../../sb/vDSGToken.sol#1151)
+		- IDsgToken(_dsgToken).mint(address(this),curDistribution) (../../sb/vDSGToken.sol#1359)
+	State variables written after the call(s):
+	- _redeem(user,stakingPower) (../../sb/vDSGToken.sol#1165)
+		- _totalStakingPower = _totalStakingPower.sub(stakingPower).sub(superiorDecreSP).sub(userCreditSP) (../../sb/vDSGToken.sol#1424)
+	vDSGToken._totalStakingPower (../../sb/vDSGToken.sol#1020) can be used in cross function reentrancies:
+	- vDSGToken._mint(vDSGToken.UserInfo,uint256) (../../sb/vDSGToken.sol#1367-1380)
+	- vDSGToken._redeem(vDSGToken.UserInfo,uint256) (../../sb/vDSGToken.sol#1382-1425)
+	- vDSGToken._totalStakingPower (../../sb/vDSGToken.sol#1020)
+	- vDSGToken.donate(uint256) (../../sb/vDSGToken.sol#1189-1197)
+	- vDSGToken.getLatestAlpha() (../../sb/vDSGToken.sol#1251-1262)
+	- vDSGToken.redeem(uint256,bool) (../../sb/vDSGToken.sol#1150-1187)
+	- _redeem(user,stakingPower) (../../sb/vDSGToken.sol#1165)
+		- superior.creditDebt = 0 (../../sb/vDSGToken.sol#1406)
+		- superior.creditDebt = superior.creditDebt.sub(superiorDecreCredit) (../../sb/vDSGToken.sol#1408)
+		- superior.credit = 0 (../../sb/vDSGToken.sol#1415)
+		- superior.stakingPower = uint128(uint256(superior.stakingPower).sub(creditSP)) (../../sb/vDSGToken.sol#1416)
+		- superior.credit = uint128(uint256(superior.credit).sub(superiorDecreCredit)) (../../sb/vDSGToken.sol#1418-1420)
+		- superior.stakingPower = uint128(uint256(superior.stakingPower).sub(superiorDecreSP)) (../../sb/vDSGToken.sol#1421)
+	vDSGToken.userInfo (../../sb/vDSGToken.sol#1021) can be used in cross function reentrancies:
+	- vDSGToken._mint(vDSGToken.UserInfo,uint256) (../../sb/vDSGToken.sol#1367-1380)
+	- vDSGToken._redeem(vDSGToken.UserInfo,uint256) (../../sb/vDSGToken.sol#1382-1425)
+	- vDSGToken._transfer(address,address,uint256) (../../sb/vDSGToken.sol#1427-1445)
+	- vDSGToken.dsgBalanceOf(address) (../../sb/vDSGToken.sol#1268-1277)
+	- vDSGToken.getSuperior(address) (../../sb/vDSGToken.sol#1344-1346)
+	- vDSGToken.mint(uint256,address) (../../sb/vDSGToken.sol#1114-1148)
+	- vDSGToken.redeem(uint256,bool) (../../sb/vDSGToken.sol#1150-1187)
+	- vDSGToken.userInfo (../../sb/vDSGToken.sol#1021)
+Reentrancy in vDSGToken.redeem(uint256,bool) (../../sb/vDSGToken.sol#1150-1187):
+	External calls:
+	- _updateAlpha() (../../sb/vDSGToken.sol#1151)
+		- IDsgToken(_dsgToken).mint(address(this),curDistribution) (../../sb/vDSGToken.sol#1359)
+	- IERC20(_dsgToken).safeTransfer(msg.sender,dsgReceive) (../../sb/vDSGToken.sol#1169)
+	- IDsgToken(_dsgToken).burn(burnDsgAmount) (../../sb/vDSGToken.sol#1172)
+	- IERC20(_dsgToken).safeTransfer(_dsgReserve,reserveAmount) (../../sb/vDSGToken.sol#1175)
+	State variables written after the call(s):
+	- alpha = uint112(uint256(alpha).add(DecimalMath.divFloor(withdrawFeeAmount,_totalStakingPower))) (../../sb/vDSGToken.sol#1179-1183)
+	vDSGToken.alpha (../../sb/vDSGToken.sol#1015) can be used in cross function reentrancies:
+	- vDSGToken._mint(vDSGToken.UserInfo,uint256) (../../sb/vDSGToken.sol#1367-1380)
+	- vDSGToken._redeem(vDSGToken.UserInfo,uint256) (../../sb/vDSGToken.sol#1382-1425)
+	- vDSGToken._transfer(address,address,uint256) (../../sb/vDSGToken.sol#1427-1445)
+	- vDSGToken._updateAlpha() (../../sb/vDSGToken.sol#1350-1365)
+	- vDSGToken.alpha (../../sb/vDSGToken.sol#1015)
+	- vDSGToken.donate(uint256) (../../sb/vDSGToken.sol#1189-1197)
+	- vDSGToken.getLatestAlpha() (../../sb/vDSGToken.sol#1251-1262)
+	- vDSGToken.mint(uint256,address) (../../sb/vDSGToken.sol#1114-1148)
+	- vDSGToken.redeem(uint256,bool) (../../sb/vDSGToken.sol#1150-1187)
+Reentrancy in vDSGToken.transfer(address,uint256) (../../sb/vDSGToken.sol#1221-1225):
+	External calls:
+	- _updateAlpha() (../../sb/vDSGToken.sol#1222)
+		- IDsgToken(_dsgToken).mint(address(this),curDistribution) (../../sb/vDSGToken.sol#1359)
+	State variables written after the call(s):
+	- _transfer(msg.sender,to,vDsgAmount) (../../sb/vDSGToken.sol#1223)
+		- _totalStakingPower = _totalStakingPower.add(stakingPower).add(superiorIncreSP) (../../sb/vDSGToken.sol#1379)
+		- _totalStakingPower = _totalStakingPower.sub(stakingPower).sub(superiorDecreSP).sub(userCreditSP) (../../sb/vDSGToken.sol#1424)
+	vDSGToken._totalStakingPower (../../sb/vDSGToken.sol#1020) can be used in cross function reentrancies:
+	- vDSGToken._mint(vDSGToken.UserInfo,uint256) (../../sb/vDSGToken.sol#1367-1380)
+	- vDSGToken._redeem(vDSGToken.UserInfo,uint256) (../../sb/vDSGToken.sol#1382-1425)
+	- vDSGToken._totalStakingPower (../../sb/vDSGToken.sol#1020)
+	- vDSGToken.donate(uint256) (../../sb/vDSGToken.sol#1189-1197)
+	- vDSGToken.getLatestAlpha() (../../sb/vDSGToken.sol#1251-1262)
+	- vDSGToken.redeem(uint256,bool) (../../sb/vDSGToken.sol#1150-1187)
+Reentrancy in vDSGToken.transferFrom(address,address,uint256) (../../sb/vDSGToken.sol#1233-1243):
+	External calls:
+	- _updateAlpha() (../../sb/vDSGToken.sol#1239)
+		- IDsgToken(_dsgToken).mint(address(this),curDistribution) (../../sb/vDSGToken.sol#1359)
+	State variables written after the call(s):
+	- _allowed[from][msg.sender] = _allowed[from][msg.sender].sub(vDsgAmount) (../../sb/vDSGToken.sol#1241)
+	vDSGToken._allowed (../../sb/vDSGToken.sol#997) can be used in cross function reentrancies:
+	- vDSGToken.allowance(address,address) (../../sb/vDSGToken.sol#1245-1247)
+	- vDSGToken.approve(address,uint256) (../../sb/vDSGToken.sol#1227-1231)
+	- vDSGToken.transferFrom(address,address,uint256) (../../sb/vDSGToken.sol#1233-1243)
+	- _transfer(from,to,vDsgAmount) (../../sb/vDSGToken.sol#1240)
+		- _totalStakingPower = _totalStakingPower.add(stakingPower).add(superiorIncreSP) (../../sb/vDSGToken.sol#1379)
+		- _totalStakingPower = _totalStakingPower.sub(stakingPower).sub(superiorDecreSP).sub(userCreditSP) (../../sb/vDSGToken.sol#1424)
+	vDSGToken._totalStakingPower (../../sb/vDSGToken.sol#1020) can be used in cross function reentrancies:
+	- vDSGToken._mint(vDSGToken.UserInfo,uint256) (../../sb/vDSGToken.sol#1367-1380)
+	- vDSGToken._redeem(vDSGToken.UserInfo,uint256) (../../sb/vDSGToken.sol#1382-1425)
+	- vDSGToken._totalStakingPower (../../sb/vDSGToken.sol#1020)
+	- vDSGToken.donate(uint256) (../../sb/vDSGToken.sol#1189-1197)
+	- vDSGToken.getLatestAlpha() (../../sb/vDSGToken.sol#1251-1262)
+	- vDSGToken.redeem(uint256,bool) (../../sb/vDSGToken.sol#1150-1187)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+vDSGToken.allowance(address,address).owner (../../sb/vDSGToken.sol#1245) shadows:
+	- Ownable.owner() (../../sb/vDSGToken.sol#894-896) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+vDSGToken.updateDSGFeeReserveRatio(uint256) (../../sb/vDSGToken.sol#1091-1093) should emit an event for: 
+	- _dsgFeeReserveRatio = dsgFeeReserve (../../sb/vDSGToken.sol#1092) 
+vDSGToken.setRatioValue(uint256,uint256) (../../sb/vDSGToken.sol#1313-1318) should emit an event for: 
+	- _MIN_PENALTY_RATIO_ = min (../../sb/vDSGToken.sol#1316) 
+	- _MAX_PENALTY_RATIO_ = max (../../sb/vDSGToken.sol#1317) 
+vDSGToken.setMintLimitRatio(uint256,uint256) (../../sb/vDSGToken.sol#1320-1326) should emit an event for: 
+	- _MIN_MINT_RATIO_ = min (../../sb/vDSGToken.sol#1324) 
+	- _MAX_MINT_RATIO_ = max (../../sb/vDSGToken.sol#1325) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+vDSGToken.constructor(address,address,address).dsgToken (../../sb/vDSGToken.sol#1062) lacks a zero-check on :
+		- _dsgToken = dsgToken (../../sb/vDSGToken.sol#1066)
+vDSGToken.constructor(address,address,address).dsgTeam (../../sb/vDSGToken.sol#1063) lacks a zero-check on :
+		- _dsgTeam = dsgTeam (../../sb/vDSGToken.sol#1067)
+vDSGToken.constructor(address,address,address).dsgReserve (../../sb/vDSGToken.sol#1064) lacks a zero-check on :
+		- _dsgReserve = dsgReserve (../../sb/vDSGToken.sol#1068)
+vDSGToken.updateTeamAddress(address).team (../../sb/vDSGToken.sol#1095) lacks a zero-check on :
+		- _dsgTeam = team (../../sb/vDSGToken.sol#1096)
+vDSGToken.updateReserveAddress(address).newAddress (../../sb/vDSGToken.sol#1099) lacks a zero-check on :
+		- _dsgReserve = newAddress (../../sb/vDSGToken.sol#1100)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in vDSGToken._updateAlpha() (../../sb/vDSGToken.sol#1350-1365):
+	External calls:
+	- IDsgToken(_dsgToken).mint(address(this),curDistribution) (../../sb/vDSGToken.sol#1359)
+	State variables written after the call(s):
+	- _totalBlockReward = _totalBlockReward.add(curDistribution) (../../sb/vDSGToken.sol#1361)
+Reentrancy in vDSGToken.donate(uint256) (../../sb/vDSGToken.sol#1189-1197):
+	External calls:
+	- IERC20(_dsgToken).safeTransferFrom(msg.sender,address(this),dsgAmount) (../../sb/vDSGToken.sol#1191)
+	State variables written after the call(s):
+	- alpha = uint112(uint256(alpha).add(DecimalMath.divFloor(dsgAmount,_totalStakingPower))) (../../sb/vDSGToken.sol#1193-1195)
+Reentrancy in vDSGToken.transfer(address,uint256) (../../sb/vDSGToken.sol#1221-1225):
+	External calls:
+	- _updateAlpha() (../../sb/vDSGToken.sol#1222)
+		- IDsgToken(_dsgToken).mint(address(this),curDistribution) (../../sb/vDSGToken.sol#1359)
+	State variables written after the call(s):
+	- _transfer(msg.sender,to,vDsgAmount) (../../sb/vDSGToken.sol#1223)
+		- superior.stakingPower = uint128(uint256(superior.stakingPower).add(superiorIncreSP)) (../../sb/vDSGToken.sol#1376)
+		- superior.credit = uint128(uint256(superior.credit).add(superiorIncreCredit)) (../../sb/vDSGToken.sol#1377)
+		- superior.creditDebt = 0 (../../sb/vDSGToken.sol#1406)
+		- superior.creditDebt = superior.creditDebt.sub(superiorDecreCredit) (../../sb/vDSGToken.sol#1408)
+		- superior.credit = 0 (../../sb/vDSGToken.sol#1415)
+		- superior.stakingPower = uint128(uint256(superior.stakingPower).sub(creditSP)) (../../sb/vDSGToken.sol#1416)
+		- superior.credit = uint128(uint256(superior.credit).sub(superiorDecreCredit)) (../../sb/vDSGToken.sol#1418-1420)
+		- superior.stakingPower = uint128(uint256(superior.stakingPower).sub(superiorDecreSP)) (../../sb/vDSGToken.sol#1421)
+Reentrancy in vDSGToken.transferFrom(address,address,uint256) (../../sb/vDSGToken.sol#1233-1243):
+	External calls:
+	- _updateAlpha() (../../sb/vDSGToken.sol#1239)
+		- IDsgToken(_dsgToken).mint(address(this),curDistribution) (../../sb/vDSGToken.sol#1359)
+	State variables written after the call(s):
+	- _transfer(from,to,vDsgAmount) (../../sb/vDSGToken.sol#1240)
+		- superior.stakingPower = uint128(uint256(superior.stakingPower).add(superiorIncreSP)) (../../sb/vDSGToken.sol#1376)
+		- superior.credit = uint128(uint256(superior.credit).add(superiorIncreCredit)) (../../sb/vDSGToken.sol#1377)
+		- superior.creditDebt = 0 (../../sb/vDSGToken.sol#1406)
+		- superior.creditDebt = superior.creditDebt.sub(superiorDecreCredit) (../../sb/vDSGToken.sol#1408)
+		- superior.credit = 0 (../../sb/vDSGToken.sol#1415)
+		- superior.stakingPower = uint128(uint256(superior.stakingPower).sub(creditSP)) (../../sb/vDSGToken.sol#1416)
+		- superior.credit = uint128(uint256(superior.credit).sub(superiorDecreCredit)) (../../sb/vDSGToken.sol#1418-1420)
+		- superior.stakingPower = uint128(uint256(superior.stakingPower).sub(superiorDecreSP)) (../../sb/vDSGToken.sol#1421)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in vDSGToken._updateAlpha() (../../sb/vDSGToken.sol#1350-1365):
+	External calls:
+	- IDsgToken(_dsgToken).mint(address(this),curDistribution) (../../sb/vDSGToken.sol#1359)
+	Event emitted after the call(s):
+	- PreDeposit(curDistribution) (../../sb/vDSGToken.sol#1362)
+Reentrancy in vDSGToken.changePerReward(uint256) (../../sb/vDSGToken.sol#1080-1084):
+	External calls:
+	- _updateAlpha() (../../sb/vDSGToken.sol#1081)
+		- IDsgToken(_dsgToken).mint(address(this),curDistribution) (../../sb/vDSGToken.sol#1359)
+	Event emitted after the call(s):
+	- ChangePerReward(dsgPerBlock) (../../sb/vDSGToken.sol#1083)
+Reentrancy in vDSGToken.donate(uint256) (../../sb/vDSGToken.sol#1189-1197):
+	External calls:
+	- IERC20(_dsgToken).safeTransferFrom(msg.sender,address(this),dsgAmount) (../../sb/vDSGToken.sol#1191)
+	Event emitted after the call(s):
+	- DonateDSG(msg.sender,dsgAmount) (../../sb/vDSGToken.sol#1196)
+Reentrancy in vDSGToken.mint(uint256,address) (../../sb/vDSGToken.sol#1114-1148):
+	External calls:
+	- _updateAlpha() (../../sb/vDSGToken.sol#1139)
+		- IDsgToken(_dsgToken).mint(address(this),curDistribution) (../../sb/vDSGToken.sol#1359)
+	- IERC20(_dsgToken).safeTransferFrom(msg.sender,address(this),dsgAmount) (../../sb/vDSGToken.sol#1141)
+	Event emitted after the call(s):
+	- MintVDSG(msg.sender,superiorAddress,dsgAmount) (../../sb/vDSGToken.sol#1147)
+Reentrancy in vDSGToken.redeem(uint256,bool) (../../sb/vDSGToken.sol#1150-1187):
+	External calls:
+	- _updateAlpha() (../../sb/vDSGToken.sol#1151)
+		- IDsgToken(_dsgToken).mint(address(this),curDistribution) (../../sb/vDSGToken.sol#1359)
+	- IERC20(_dsgToken).safeTransfer(msg.sender,dsgReceive) (../../sb/vDSGToken.sol#1169)
+	- IDsgToken(_dsgToken).burn(burnDsgAmount) (../../sb/vDSGToken.sol#1172)
+	- IERC20(_dsgToken).safeTransfer(_dsgReserve,reserveAmount) (../../sb/vDSGToken.sol#1175)
+	Event emitted after the call(s):
+	- RedeemVDSG(msg.sender,dsgReceive,burnDsgAmount,withdrawFeeAmount,reserveAmount) (../../sb/vDSGToken.sol#1186)
+Reentrancy in vDSGToken.transfer(address,uint256) (../../sb/vDSGToken.sol#1221-1225):
+	External calls:
+	- _updateAlpha() (../../sb/vDSGToken.sol#1222)
+		- IDsgToken(_dsgToken).mint(address(this),curDistribution) (../../sb/vDSGToken.sol#1359)
+	Event emitted after the call(s):
+	- Transfer(from,to,vDsgAmount) (../../sb/vDSGToken.sol#1444)
+		- _transfer(msg.sender,to,vDsgAmount) (../../sb/vDSGToken.sol#1223)
+Reentrancy in vDSGToken.transferFrom(address,address,uint256) (../../sb/vDSGToken.sol#1233-1243):
+	External calls:
+	- _updateAlpha() (../../sb/vDSGToken.sol#1239)
+		- IDsgToken(_dsgToken).mint(address(this),curDistribution) (../../sb/vDSGToken.sol#1359)
+	Event emitted after the call(s):
+	- Transfer(from,to,vDsgAmount) (../../sb/vDSGToken.sol#1444)
+		- _transfer(from,to,vDsgAmount) (../../sb/vDSGToken.sol#1240)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Address.isContract(address) (../../sb/vDSGToken.sol#632-641) uses assembly
+	- INLINE ASM (../../sb/vDSGToken.sol#639)
+Address._verifyCallResult(bool,bytes,string) (../../sb/vDSGToken.sol#777-794) uses assembly
+	- INLINE ASM (../../sb/vDSGToken.sol#786-789)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.functionCall(address,bytes) (../../sb/vDSGToken.sol#685-687) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/vDSGToken.sol#710-712) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/vDSGToken.sol#759-761) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/vDSGToken.sol#769-775) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/vDSGToken.sol#735-737) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/vDSGToken.sol#745-751) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/vDSGToken.sol#659-665) is never used and should be removed
+Context._msgData() (../../sb/vDSGToken.sol#21-24) is never used and should be removed
+DecimalMath.mulCeil(uint256,uint256) (../../sb/vDSGToken.sol#953-955) is never used and should be removed
+DecimalMath.reciprocalCeil(uint256) (../../sb/vDSGToken.sol#969-971) is never used and should be removed
+DecimalMath.reciprocalFloor(uint256) (../../sb/vDSGToken.sol#965-967) is never used and should be removed
+ERC20._burn(address,uint256) (../../sb/vDSGToken.sol#552-560) is never used and should be removed
+ERC20._mint(address,uint256) (../../sb/vDSGToken.sol#531-539) is never used and should be removed
+ERC20._setupDecimals(uint8) (../../sb/vDSGToken.sol#590-592) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/vDSGToken.sol#825-834) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/vDSGToken.sol#841-844) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/vDSGToken.sol#836-839) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/vDSGToken.sol#286-289) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/vDSGToken.sol#248-251) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/vDSGToken.sol#306-309) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/vDSGToken.sol#120-124) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/vDSGToken.sol#156-159) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/vDSGToken.sol#166-169) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/vDSGToken.sol#141-149) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/vDSGToken.sol#131-134) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version=0.6.12 (../../sb/vDSGToken.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/vDSGToken.sol#659-665):
+	- (success) = recipient.call{value: amount}() (../../sb/vDSGToken.sol#663)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/vDSGToken.sol#720-727):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/vDSGToken.sol#725)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/vDSGToken.sol#745-751):
+	- (success,returndata) = target.staticcall(data) (../../sb/vDSGToken.sol#749)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/vDSGToken.sol#769-775):
+	- (success,returndata) = target.delegatecall(data) (../../sb/vDSGToken.sol#773)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+vDSGToken (../../sb/vDSGToken.sol#982-1450) should inherit from IERC20 (../../sb/vDSGToken.sol#30-99)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-inheritance
+
+Contract vDSGToken (../../sb/vDSGToken.sol#982-1450) is not in CapWords
+Variable vDSGToken._MIN_PENALTY_RATIO_ (../../sb/vDSGToken.sol#992) is not in mixedCase
+Variable vDSGToken._MAX_PENALTY_RATIO_ (../../sb/vDSGToken.sol#993) is not in mixedCase
+Variable vDSGToken._MIN_MINT_RATIO_ (../../sb/vDSGToken.sol#994) is not in mixedCase
+Variable vDSGToken._MAX_MINT_RATIO_ (../../sb/vDSGToken.sol#995) is not in mixedCase
+Variable vDSGToken._dsgToken (../../sb/vDSGToken.sol#1001) is not in mixedCase
+Variable vDSGToken._dsgTeam (../../sb/vDSGToken.sol#1002) is not in mixedCase
+Variable vDSGToken._dsgReserve (../../sb/vDSGToken.sol#1003) is not in mixedCase
+Variable vDSGToken._canTransfer (../../sb/vDSGToken.sol#1005) is not in mixedCase
+Variable vDSGToken._dsgPerBlock (../../sb/vDSGToken.sol#1008) is not in mixedCase
+Variable vDSGToken._dsgFeeBurnRatio (../../sb/vDSGToken.sol#1011) is not in mixedCase
+Variable vDSGToken._dsgFeeReserveRatio (../../sb/vDSGToken.sol#1012) is not in mixedCase
+Variable vDSGToken._totalBlockDistribution (../../sb/vDSGToken.sol#1016) is not in mixedCase
+Variable vDSGToken._lastRewardBlock (../../sb/vDSGToken.sol#1017) is not in mixedCase
+Variable vDSGToken._totalBlockReward (../../sb/vDSGToken.sol#1019) is not in mixedCase
+Variable vDSGToken._totalStakingPower (../../sb/vDSGToken.sol#1020) is not in mixedCase
+Variable vDSGToken._superiorMinDSG (../../sb/vDSGToken.sol#1023) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/vDSGToken.sol#22)" inContext (../../sb/vDSGToken.sol#16-25)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+DecimalMath.ONE (../../sb/vDSGToken.sol#946) is never used in DecimalMath (../../sb/vDSGToken.sol#943-972)
+DecimalMath.ONE2 (../../sb/vDSGToken.sol#947) is never used in DecimalMath (../../sb/vDSGToken.sol#943-972)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-state-variable
+
+vDSGToken.decimals (../../sb/vDSGToken.sol#990) should be constant 
+vDSGToken.name (../../sb/vDSGToken.sol#988) should be constant 
+vDSGToken.symbol (../../sb/vDSGToken.sol#989) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+
+vDSGToken._dsgToken (../../sb/vDSGToken.sol#1001) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/vDSGToken.sol analyzed (11 contracts with 93 detectors), 87 result(s) found

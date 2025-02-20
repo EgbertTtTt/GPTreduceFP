@@ -1,0 +1,207 @@
+'solc --version' running
+'solc /sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+WaultSwapPair._update(uint256,uint256,uint112,uint112) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#611-637) uses a weak PRNG: "blockTimestamp = uint32(block.timestamp % 2 ** 32) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#615)" 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#weak-PRNG
+
+WaultSwapPair._safeTransfer(address,address,uint256) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#553-559) uses a dangerous strict equality:
+	- require(bool,string)(success && (data.length == 0 || abi.decode(data,(bool))),WaultSwap: TRANSFER_FAILED) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#557)
+WaultSwapPair.mint(address) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#685-727) uses a dangerous strict equality:
+	- _totalSupply == 0 (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#703)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Reentrancy in WaultSwapPair.burn(address) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#733-777):
+	External calls:
+	- _safeTransfer(_token0,to,amount0) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#761)
+		- (success,data) = token.call(abi.encodeWithSelector(SELECTOR,to,value)) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#555)
+	- _safeTransfer(_token1,to,amount1) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#763)
+		- (success,data) = token.call(abi.encodeWithSelector(SELECTOR,to,value)) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#555)
+	State variables written after the call(s):
+	- _update(balance0,balance1,_reserve0,_reserve1) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#771)
+		- blockTimestampLast = blockTimestamp (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#633)
+	WaultSwapPair.blockTimestampLast (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#513) can be used in cross function reentrancies:
+	- WaultSwapPair._update(uint256,uint256,uint112,uint112) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#611-637)
+	- WaultSwapPair.getReserves() (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#541-549)
+	- kLast = uint256(reserve0).mul(reserve1) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#773)
+	WaultSwapPair.kLast (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#521) can be used in cross function reentrancies:
+	- WaultSwapPair._mintFee(uint112,uint112) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#643-679)
+	- WaultSwapPair.burn(address) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#733-777)
+	- WaultSwapPair.kLast (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#521)
+	- WaultSwapPair.mint(address) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#685-727)
+	- _update(balance0,balance1,_reserve0,_reserve1) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#771)
+		- reserve0 = uint112(balance0) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#629)
+	WaultSwapPair.reserve0 (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#509) can be used in cross function reentrancies:
+	- WaultSwapPair._update(uint256,uint256,uint112,uint112) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#611-637)
+	- WaultSwapPair.burn(address) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#733-777)
+	- WaultSwapPair.getReserves() (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#541-549)
+	- WaultSwapPair.mint(address) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#685-727)
+	- WaultSwapPair.skim(address) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#845-855)
+	- WaultSwapPair.sync() (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#861-865)
+	- _update(balance0,balance1,_reserve0,_reserve1) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#771)
+		- reserve1 = uint112(balance1) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#631)
+	WaultSwapPair.reserve1 (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#511) can be used in cross function reentrancies:
+	- WaultSwapPair._update(uint256,uint256,uint112,uint112) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#611-637)
+	- WaultSwapPair.burn(address) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#733-777)
+	- WaultSwapPair.getReserves() (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#541-549)
+	- WaultSwapPair.mint(address) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#685-727)
+	- WaultSwapPair.skim(address) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#845-855)
+	- WaultSwapPair.sync() (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#861-865)
+Reentrancy in WaultSwapFactory.createPair(address,address) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#907-937):
+	External calls:
+	- IWaultSwapPair(pair).initialize(token0,token1) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#927)
+	State variables written after the call(s):
+	- getPair[token0][token1] = pair (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#929)
+	WaultSwapFactory.getPair (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#881) can be used in cross function reentrancies:
+	- WaultSwapFactory.createPair(address,address) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#907-937)
+	- WaultSwapFactory.getPair (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#881)
+	- getPair[token1][token0] = pair (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#931)
+	WaultSwapFactory.getPair (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#881) can be used in cross function reentrancies:
+	- WaultSwapFactory.createPair(address,address) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#907-937)
+	- WaultSwapFactory.getPair (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#881)
+Reentrancy in WaultSwapPair.swap(uint256,uint256,address,bytes) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#783-839):
+	External calls:
+	- _safeTransfer(_token0,to,amount0Out) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#805)
+		- (success,data) = token.call(abi.encodeWithSelector(SELECTOR,to,value)) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#555)
+	- _safeTransfer(_token1,to,amount1Out) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#807)
+		- (success,data) = token.call(abi.encodeWithSelector(SELECTOR,to,value)) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#555)
+	- IWaultSwapCallee(to).waultSwapCall(msg.sender,amount0Out,amount1Out,data) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#809)
+	State variables written after the call(s):
+	- _update(balance0,balance1,_reserve0,_reserve1) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#835)
+		- blockTimestampLast = blockTimestamp (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#633)
+	WaultSwapPair.blockTimestampLast (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#513) can be used in cross function reentrancies:
+	- WaultSwapPair._update(uint256,uint256,uint112,uint112) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#611-637)
+	- WaultSwapPair.getReserves() (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#541-549)
+	- _update(balance0,balance1,_reserve0,_reserve1) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#835)
+		- reserve0 = uint112(balance0) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#629)
+	WaultSwapPair.reserve0 (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#509) can be used in cross function reentrancies:
+	- WaultSwapPair._update(uint256,uint256,uint112,uint112) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#611-637)
+	- WaultSwapPair.burn(address) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#733-777)
+	- WaultSwapPair.getReserves() (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#541-549)
+	- WaultSwapPair.mint(address) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#685-727)
+	- WaultSwapPair.skim(address) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#845-855)
+	- WaultSwapPair.sync() (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#861-865)
+	- _update(balance0,balance1,_reserve0,_reserve1) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#835)
+		- reserve1 = uint112(balance1) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#631)
+	WaultSwapPair.reserve1 (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#511) can be used in cross function reentrancies:
+	- WaultSwapPair._update(uint256,uint256,uint112,uint112) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#611-637)
+	- WaultSwapPair.burn(address) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#733-777)
+	- WaultSwapPair.getReserves() (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#541-549)
+	- WaultSwapPair.mint(address) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#685-727)
+	- WaultSwapPair.skim(address) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#845-855)
+	- WaultSwapPair.sync() (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#861-865)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+WaultSwapPair.initialize(address,address)._token0 (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#597) lacks a zero-check on :
+		- token0 = _token0 (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#601)
+WaultSwapPair.initialize(address,address)._token1 (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#597) lacks a zero-check on :
+		- token1 = _token1 (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#603)
+WaultSwapFactory.constructor(address)._feeToSetter (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#891) lacks a zero-check on :
+		- feeToSetter = _feeToSetter (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#893)
+WaultSwapFactory.setFeeTo(address)._feeTo (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#941) lacks a zero-check on :
+		- feeTo = _feeTo (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#945)
+WaultSwapFactory.setFeeToSetter(address)._feeToSetter (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#951) lacks a zero-check on :
+		- feeToSetter = _feeToSetter (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#955)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in WaultSwapPair.burn(address) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#733-777):
+	External calls:
+	- _safeTransfer(_token0,to,amount0) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#761)
+		- (success,data) = token.call(abi.encodeWithSelector(SELECTOR,to,value)) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#555)
+	- _safeTransfer(_token1,to,amount1) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#763)
+		- (success,data) = token.call(abi.encodeWithSelector(SELECTOR,to,value)) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#555)
+	State variables written after the call(s):
+	- _update(balance0,balance1,_reserve0,_reserve1) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#771)
+		- price0CumulativeLast += uint256(UQ112x112.encode(_reserve1).uqdiv(_reserve0)) * timeElapsed (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#623)
+	- _update(balance0,balance1,_reserve0,_reserve1) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#771)
+		- price1CumulativeLast += uint256(UQ112x112.encode(_reserve0).uqdiv(_reserve1)) * timeElapsed (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#625)
+Reentrancy in WaultSwapFactory.createPair(address,address) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#907-937):
+	External calls:
+	- IWaultSwapPair(pair).initialize(token0,token1) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#927)
+	State variables written after the call(s):
+	- allPairs.push(pair) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#933)
+Reentrancy in WaultSwapPair.swap(uint256,uint256,address,bytes) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#783-839):
+	External calls:
+	- _safeTransfer(_token0,to,amount0Out) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#805)
+		- (success,data) = token.call(abi.encodeWithSelector(SELECTOR,to,value)) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#555)
+	- _safeTransfer(_token1,to,amount1Out) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#807)
+		- (success,data) = token.call(abi.encodeWithSelector(SELECTOR,to,value)) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#555)
+	- IWaultSwapCallee(to).waultSwapCall(msg.sender,amount0Out,amount1Out,data) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#809)
+	State variables written after the call(s):
+	- _update(balance0,balance1,_reserve0,_reserve1) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#835)
+		- price0CumulativeLast += uint256(UQ112x112.encode(_reserve1).uqdiv(_reserve0)) * timeElapsed (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#623)
+	- _update(balance0,balance1,_reserve0,_reserve1) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#835)
+		- price1CumulativeLast += uint256(UQ112x112.encode(_reserve0).uqdiv(_reserve1)) * timeElapsed (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#625)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in WaultSwapPair.burn(address) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#733-777):
+	External calls:
+	- _safeTransfer(_token0,to,amount0) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#761)
+		- (success,data) = token.call(abi.encodeWithSelector(SELECTOR,to,value)) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#555)
+	- _safeTransfer(_token1,to,amount1) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#763)
+		- (success,data) = token.call(abi.encodeWithSelector(SELECTOR,to,value)) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#555)
+	Event emitted after the call(s):
+	- Burn(msg.sender,amount0,amount1,to) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#775)
+	- Sync(reserve0,reserve1) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#635)
+		- _update(balance0,balance1,_reserve0,_reserve1) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#771)
+Reentrancy in WaultSwapFactory.createPair(address,address) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#907-937):
+	External calls:
+	- IWaultSwapPair(pair).initialize(token0,token1) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#927)
+	Event emitted after the call(s):
+	- PairCreated(token0,token1,pair,allPairs.length) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#935)
+Reentrancy in WaultSwapPair.swap(uint256,uint256,address,bytes) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#783-839):
+	External calls:
+	- _safeTransfer(_token0,to,amount0Out) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#805)
+		- (success,data) = token.call(abi.encodeWithSelector(SELECTOR,to,value)) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#555)
+	- _safeTransfer(_token1,to,amount1Out) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#807)
+		- (success,data) = token.call(abi.encodeWithSelector(SELECTOR,to,value)) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#555)
+	- IWaultSwapCallee(to).waultSwapCall(msg.sender,amount0Out,amount1Out,data) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#809)
+	Event emitted after the call(s):
+	- Swap(msg.sender,amount0In,amount1In,amount0Out,amount1Out,to) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#837)
+	- Sync(reserve0,reserve1) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#635)
+		- _update(balance0,balance1,_reserve0,_reserve1) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#835)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+WaultSwapERC20.permit(address,address,uint256,uint256,uint8,bytes32,bytes32) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#355-379) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(deadline >= block.timestamp,WaultSwap: EXPIRED) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#357)
+WaultSwapPair._update(uint256,uint256,uint112,uint112) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#611-637) uses timestamp for comparisons
+	Dangerous comparisons:
+	- timeElapsed > 0 && _reserve0 != 0 && _reserve1 != 0 (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#619)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+WaultSwapERC20.constructor() (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#241-269) uses assembly
+	- INLINE ASM (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#245-249)
+WaultSwapFactory.createPair(address,address) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#907-937) uses assembly
+	- INLINE ASM (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#921-925)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Pragma version=0.5.16 (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#1) allows old versions
+solc-0.5.16 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in WaultSwapPair._safeTransfer(address,address,uint256) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#553-559):
+	- (success,data) = token.call(abi.encodeWithSelector(SELECTOR,to,value)) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#555)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Function IWaultSwapPair.DOMAIN_SEPARATOR() (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#66) is not in mixedCase
+Function IWaultSwapPair.PERMIT_TYPEHASH() (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#68) is not in mixedCase
+Function IWaultSwapPair.MINIMUM_LIQUIDITY() (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#102) is not in mixedCase
+Function IWaultSwapERC20.DOMAIN_SEPARATOR() (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#166) is not in mixedCase
+Function IWaultSwapERC20.PERMIT_TYPEHASH() (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#168) is not in mixedCase
+Variable WaultSwapERC20.DOMAIN_SEPARATOR (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#225) is not in mixedCase
+Parameter WaultSwapPair.initialize(address,address)._token0 (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#597) is not in mixedCase
+Parameter WaultSwapPair.initialize(address,address)._token1 (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#597) is not in mixedCase
+Parameter WaultSwapFactory.setFeeTo(address)._feeTo (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#941) is not in mixedCase
+Parameter WaultSwapFactory.setFeeToSetter(address)._feeToSetter (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#951) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Variable WaultSwapPair.swap(uint256,uint256,address,bytes).balance0Adjusted (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#825) is too similar to WaultSwapPair.swap(uint256,uint256,address,bytes).balance1Adjusted (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#827)
+Variable WaultSwapPair.price0CumulativeLast (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#517) is too similar to WaultSwapPair.price1CumulativeLast (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#519)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+WaultSwapFactory.createPair(address,address) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#907-937) uses literals with too many digits:
+	- bytecode = type(address)(WaultSwapPair).creationCode (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#917)
+WaultSwapFactory.slitherConstructorConstantVariables() (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#869-959) uses literals with too many digits:
+	- INIT_CODE_PAIR_HASH = keccak256(bytes)(abi.encodePacked(type(address)(WaultSwapPair).creationCode)) (../../sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol#871)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+/sb/WaultSwapFactory0xB42E3FE71b7E0673335b3331B3e1053BD9822570.sol analyzed (11 contracts with 93 detectors), 38 result(s) found

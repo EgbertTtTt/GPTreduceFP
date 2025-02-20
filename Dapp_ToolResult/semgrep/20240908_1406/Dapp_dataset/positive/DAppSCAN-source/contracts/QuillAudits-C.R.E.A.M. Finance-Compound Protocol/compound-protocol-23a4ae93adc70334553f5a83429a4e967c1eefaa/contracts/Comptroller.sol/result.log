@@ -1,0 +1,501 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                     
+                     
+┌───────────────────┐
+│ 126 Code Findings │
+└───────────────────┘
+                        
+    /sb/Comptroller.sol 
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+         3734┆ for (uint i = 0; i < assets.length; i++) {
+            ⋮┆----------------------------------------
+         3950┆ for (uint i = 0; i < allMarkets.length; i ++) {
+            ⋮┆----------------------------------------
+         4242┆ for (uint i = 0; i < cTokens.length; i++) {
+            ⋮┆----------------------------------------
+         4248┆ for (uint j = 0; j < holders.length; j++) {
+            ⋮┆----------------------------------------
+         4254┆ for (uint j = 0; j < holders.length; j++) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+         2563┆ constructor() public {
+         2564┆     // Set admin to caller
+         2565┆     admin = msg.sender;
+         2566┆ }
+            ⋮┆----------------------------------------
+         2739┆ constructor(address account) public {
+         2740┆     balances[account] = uint96(totalSupply);
+         2741┆     emit Transfer(address(0), account, totalSupply);
+         2742┆ }
+            ⋮┆----------------------------------------
+         3047┆ constructor() public {
+         3048┆     admin = msg.sender;
+         3049┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+         2887┆ Checkpoint memory cp = checkpoints[account][center];
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+         3083┆ for (uint i = 0; i < len; i++) {
+            ⋮┆----------------------------------------
+         3168┆ for (uint i = 0; i < len; i++) {
+            ⋮┆----------------------------------------
+         3734┆ for (uint i = 0; i < assets.length; i++) {
+            ⋮┆----------------------------------------
+         3950┆ for (uint i = 0; i < allMarkets.length; i ++) {
+            ⋮┆----------------------------------------
+         3987┆ for (uint i = 0; i < numMarkets; i++) {
+            ⋮┆----------------------------------------
+         4007┆ for (uint i = 0; i < numMarkets; i++) {
+            ⋮┆----------------------------------------
+         4242┆ for (uint i = 0; i < cTokens.length; i++) {
+            ⋮┆----------------------------------------
+         4248┆ for (uint j = 0; j < holders.length; j++) {
+            ⋮┆----------------------------------------
+         4254┆ for (uint j = 0; j < holders.length; j++) {
+            ⋮┆----------------------------------------
+         4276┆ for (uint i = 0; i < numMarkets; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+         1324┆ require(msg.sender == admin, "only admin may initialize the      
+  market");                                                                     
+            ⋮┆----------------------------------------
+         1325┆ require(accrualBlockNumber == 0 && borrowIndex == 0, "market may 
+  only be initialized once");                                                   
+            ⋮┆----------------------------------------
+         1329┆ require(initialExchangeRateMantissa > 0, "initial exchange rate  
+  must be greater than zero.");                                                 
+            ⋮┆----------------------------------------
+         1333┆ require(err == uint(Error.NO_ERROR), "setting comptroller        
+  failed");                                                                     
+            ⋮┆----------------------------------------
+         1341┆ require(err == uint(Error.NO_ERROR), "setting interest rate model
+  failed");                                                                     
+            ⋮┆----------------------------------------
+         1497┆ require(accrueInterest() == uint(Error.NO_ERROR), "accrue        
+  interest failed");                                                            
+            ⋮┆----------------------------------------
+         1507┆ require(accrueInterest() == uint(Error.NO_ERROR), "accrue        
+  interest failed");                                                            
+            ⋮┆----------------------------------------
+         1549┆ require(accrueInterest() == uint(Error.NO_ERROR), "accrue        
+  interest failed");                                                            
+            ⋮┆----------------------------------------
+         1618┆ require(borrowRateMantissa <= borrowRateMaxMantissa, "borrow rate
+  is absurdly high");                                                           
+            ⋮┆----------------------------------------
+         1975┆ require(amountSeizeError == uint(Error.NO_ERROR),                
+  "LIQUIDATE_COMPTROLLER_CALCULATE_AMOUNT_SEIZE_FAILED");                       
+            ⋮┆----------------------------------------
+         1978┆ require(cTokenCollateral.balanceOf(borrower) >= seizeTokens,     
+  "LIQUIDATE_SEIZE_TOO_MUCH");                                                  
+            ⋮┆----------------------------------------
+         1989┆ require(seizeError == uint(Error.NO_ERROR), "token seizure       
+  failed");                                                                     
+            ⋮┆----------------------------------------
+         2080┆ require(newComptroller.isComptroller(), "marker method returned  
+  false");                                                                      
+            ⋮┆----------------------------------------
+         2298┆ require(newInterestRateModel.isInterestRateModel(), "marker      
+  method returned false");                                                      
+            ⋮┆----------------------------------------
+         2367┆ require(_notEntered, "re-entered");
+            ⋮┆----------------------------------------
+         2842┆ require(signatory != address(0), "Comp::delegateBySig: invalid   
+  signature");                                                                  
+            ⋮┆----------------------------------------
+         2843┆ require(nonce == nonces[signatory]++, "Comp::delegateBySig:      
+  invalid nonce");                                                              
+            ⋮┆----------------------------------------
+         2844┆ require(now <= expiry, "Comp::delegateBySig: signature expired");
+            ⋮┆----------------------------------------
+         2866┆ require(blockNumber < block.number, "Comp::getPriorVotes: not yet
+  determined");                                                                 
+            ⋮┆----------------------------------------
+         2910┆ require(src != address(0), "Comp::_transferTokens: cannot        
+  transfer from the zero address");                                             
+            ⋮┆----------------------------------------
+         2911┆ require(dst != address(0), "Comp::_transferTokens: cannot        
+  transfer to the zero address");                                               
+            ⋮┆----------------------------------------
+         3137┆ require(oErr == 0, "exitMarket: getAccountSnapshot failed"); //  
+  semi-opaque error code                                                        
+            ⋮┆----------------------------------------
+         3203┆ require(!mintGuardianPaused[cToken], "mint is paused");
+            ⋮┆----------------------------------------
+         3221┆ require(mathErr == MathError.NO_ERROR, "totalSupplies failed");
+            ⋮┆----------------------------------------
+         3224┆ require(nextTotalSupplies < supplyCap, "market supply cap        
+  reached");                                                                    
+            ⋮┆----------------------------------------
+         3311┆ revert("redeemTokens zero");
+            ⋮┆----------------------------------------
+         3324┆ require(!borrowGuardianPaused[cToken], "borrow is paused");
+            ⋮┆----------------------------------------
+         3332┆ require(msg.sender == cToken, "sender must be cToken");
+            ⋮┆----------------------------------------
+         3354┆ require(nextTotalBorrows < borrowCap, "market borrow cap         
+  reached");                                                                    
+            ⋮┆----------------------------------------
+         3534┆ require(!seizeGuardianPaused, "seize is paused");
+            ⋮┆----------------------------------------
+         3593┆ require(!transferGuardianPaused, "transfer is paused");
+            ⋮┆----------------------------------------
+         3637┆ require(msg.sender == cToken, "only cToken could update its      
+  version");                                                                    
+            ⋮┆----------------------------------------
+         3951┆ require(allMarkets[i] != CToken(cToken), "market already added");
+            ⋮┆----------------------------------------
+         3961┆ require(msg.sender == admin, "only admin can set supply cap      
+  guardian");                                                                   
+            ⋮┆----------------------------------------
+         3980┆ require(msg.sender == admin || msg.sender == supplyCapGuardian,  
+  "only admin or supply cap guardian can set supply caps");                     
+            ⋮┆----------------------------------------
+         3985┆ require(numMarkets != 0 && numMarkets == numSupplyCaps, "invalid 
+  input");                                                                      
+            ⋮┆----------------------------------------
+         4000┆ require(msg.sender == admin || msg.sender == borrowCapGuardian,  
+  "only admin or borrow cap guardian can set borrow caps");                     
+            ⋮┆----------------------------------------
+         4005┆ require(numMarkets != 0 && numMarkets == numBorrowCaps, "invalid 
+  input");                                                                      
+            ⋮┆----------------------------------------
+         4018┆ require(msg.sender == admin, "only admin can set borrow cap      
+  guardian");                                                                   
+            ⋮┆----------------------------------------
+         4053┆ require(markets[address(cToken)].isListed, "cannot pause a market
+  that is not listed");                                                         
+            ⋮┆----------------------------------------
+         4054┆ require(msg.sender == pauseGuardian || msg.sender == admin, "only
+  pause guardian and admin can pause");                                         
+            ⋮┆----------------------------------------
+         4055┆ require(msg.sender == admin || state == true, "only admin can    
+  unpause");                                                                    
+            ⋮┆----------------------------------------
+         4063┆ require(markets[address(cToken)].isListed, "cannot pause a market
+  that is not listed");                                                         
+            ⋮┆----------------------------------------
+         4064┆ require(msg.sender == pauseGuardian || msg.sender == admin, "only
+  pause guardian and admin can pause");                                         
+            ⋮┆----------------------------------------
+         4065┆ require(msg.sender == admin || state == true, "only admin can    
+  unpause");                                                                    
+            ⋮┆----------------------------------------
+         4073┆ require(msg.sender == pauseGuardian || msg.sender == admin, "only
+  pause guardian and admin can pause");                                         
+            ⋮┆----------------------------------------
+         4074┆ require(msg.sender == admin || state == true, "only admin can    
+  unpause");                                                                    
+            ⋮┆----------------------------------------
+         4082┆ require(msg.sender == pauseGuardian || msg.sender == admin, "only
+  pause guardian and admin can pause");                                         
+            ⋮┆----------------------------------------
+         4083┆ require(msg.sender == admin || state == true, "only admin can    
+  unpause");                                                                    
+            ⋮┆----------------------------------------
+         4091┆ require(msg.sender == unitroller.admin(), "only unitroller admin 
+  can change brains");                                                          
+            ⋮┆----------------------------------------
+         4092┆ require(unitroller._acceptImplementation() == 0, "change not     
+  authorized");                                                                 
+            ⋮┆----------------------------------------
+         4244┆ require(markets[address(cToken)].isListed, "market must be       
+  listed");                                                                     
+            ⋮┆----------------------------------------
+         4269┆ require(msg.sender == admin, "only admin can set comp speeds");
+            ⋮┆----------------------------------------
+         4274┆ require(numMarkets != 0 && numMarkets == numSpeeds, "invalid     
+  input");                                                                      
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+         1325┆ require(accrualBlockNumber == 0 && borrowIndex == 0, "market may 
+  only be initialized once");                                                   
+            ⋮┆----------------------------------------
+         3985┆ require(numMarkets != 0 && numMarkets == numSupplyCaps, "invalid 
+  input");                                                                      
+            ⋮┆----------------------------------------
+         4005┆ require(numMarkets != 0 && numMarkets == numBorrowCaps, "invalid 
+  input");                                                                      
+            ⋮┆----------------------------------------
+         4274┆ require(numMarkets != 0 && numMarkets == numSpeeds, "invalid     
+  input");                                                                      
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         2809┆ if (spender != src && spenderAllowance != uint96(-1)) {
+         2810┆     uint96 newAllowance = sub96(spenderAllowance, amount,        
+  "Comp::transferFrom: transfer amount exceeds spender allowance");             
+         2811┆     allowances[src][spender] = newAllowance;
+         2812┆ 
+         2813┆     emit Approval(src, spender, newAllowance);
+         2814┆ }
+            ⋮┆----------------------------------------
+         2921┆ if (srcRep != dstRep && amount > 0) {
+         2922┆     if (srcRep != address(0)) {
+         2923┆         uint32 srcRepNum = numCheckpoints[srcRep];
+         2924┆         uint96 srcRepOld = srcRepNum > 0 ?                       
+  checkpoints[srcRep][srcRepNum - 1].votes : 0;                                 
+         2925┆         uint96 srcRepNew = sub96(srcRepOld, amount,              
+  "Comp::_moveVotes: vote amount underflows");                                  
+         2926┆         _writeCheckpoint(srcRep, srcRepNum, srcRepOld,           
+  srcRepNew);                                                                   
+         2927┆     }
+         2928┆ 
+         2929┆     if (dstRep != address(0)) {
+         2930┆         uint32 dstRepNum = numCheckpoints[dstRep];
+             [hid 5 additional lines, adjust with --max-lines-per-finding] 
+         2941┆ if (nCheckpoints > 0 && checkpoints[delegatee][nCheckpoints -    
+  1].fromBlock == blockNumber) {                                                
+         2942┆     checkpoints[delegatee][nCheckpoints - 1].votes = newVotes;
+         2943┆ } else {
+         2944┆     checkpoints[delegatee][nCheckpoints] =                       
+  Checkpoint(blockNumber, newVotes);                                            
+         2945┆     numCheckpoints[delegatee] = nCheckpoints + 1;
+         2946┆ }
+            ⋮┆----------------------------------------
+         3085┆ if (result == Error.NO_ERROR && markets[cTokens[i]].version ==   
+  Version.COLLATERALCAP) {                                                      
+         3086┆                                                                  
+  CCollateralCapErc20Interface(cTokens[i]).registerCollateral(msg.sender);      
+         3087┆ }
+            ⋮┆----------------------------------------
+         3310┆ if (redeemTokens == 0 && redeemAmount > 0) {
+         3311┆     revert("redeemTokens zero");
+         3312┆ }
+            ⋮┆----------------------------------------
+         3884┆ if (newCollateralFactorMantissa != 0 &&                          
+  oracle.getUnderlyingPrice(cToken) == 0) {                                     
+         3885┆     return fail(Error.PRICE_ERROR,                               
+  FailureInfo.SET_COLLATERAL_FACTOR_WITHOUT_PRICE);                             
+         3886┆ }
+            ⋮┆----------------------------------------
+         4113┆ if (deltaBlocks > 0 && supplySpeed > 0) {
+         4114┆     uint supplyTokens = CToken(cToken).totalSupply();
+         4115┆     uint compAccrued = mul_(deltaBlocks, supplySpeed);
+         4116┆     Double memory ratio = supplyTokens > 0 ?                     
+  fraction(compAccrued, supplyTokens) : Double({mantissa: 0});                  
+         4117┆     Double memory index = add_(Double({mantissa:                 
+  supplyState.index}), ratio);                                                  
+         4118┆     compSupplyState[cToken] = CompMarketState({
+         4119┆         index: safe224(index.mantissa, "new index exceeds 224    
+  bits"),                                                                       
+         4120┆         block: safe32(blockNumber, "block number exceeds 32      
+  bits")                                                                        
+         4121┆     });
+         4122┆ } else if (deltaBlocks > 0) {
+             [hid 2 additional lines, adjust with --max-lines-per-finding] 
+         4136┆ if (deltaBlocks > 0 && borrowSpeed > 0) {
+         4137┆     uint borrowAmount = div_(CToken(cToken).totalBorrows(),      
+  marketBorrowIndex);                                                           
+         4138┆     uint compAccrued = mul_(deltaBlocks, borrowSpeed);
+         4139┆     Double memory ratio = borrowAmount > 0 ?                     
+  fraction(compAccrued, borrowAmount) : Double({mantissa: 0});                  
+         4140┆     Double memory index = add_(Double({mantissa:                 
+  borrowState.index}), ratio);                                                  
+         4141┆     compBorrowState[cToken] = CompMarketState({
+         4142┆         index: safe224(index.mantissa, "new index exceeds 224    
+  bits"),                                                                       
+         4143┆         block: safe32(blockNumber, "block number exceeds 32      
+  bits")                                                                        
+         4144┆     });
+         4145┆ } else if (deltaBlocks > 0) {
+             [hid 2 additional lines, adjust with --max-lines-per-finding] 
+         4161┆ if (supplierIndex.mantissa == 0 && supplyIndex.mantissa > 0) {
+         4162┆     supplierIndex.mantissa = compInitialIndex;
+         4163┆ }
+            ⋮┆----------------------------------------
+         4203┆ if (userAccrued >= threshold && userAccrued > 0) {
+         4204┆     Comp comp = Comp(getCompAddress());
+         4205┆     uint compRemaining = comp.balanceOf(address(this));
+         4206┆     if (userAccrued <= compRemaining) {
+         4207┆         comp.transfer(user, userAccrued);
+         4208┆         return 0;
+         4209┆     }
+         4210┆ }
+            ⋮┆----------------------------------------
+         4293┆ if (compSupplyState[cToken].index == 0 &&                        
+  compSupplyState[cToken].block == 0) {                                         
+         4294┆     compSupplyState[cToken] = CompMarketState({
+         4295┆         index: compInitialIndex,
+         4296┆         block: safe32(getBlockNumber(), "block number exceeds 32 
+  bits")                                                                        
+         4297┆     });
+         4298┆ }
+            ⋮┆----------------------------------------
+         4300┆ if (compBorrowState[cToken].index == 0 &&                        
+  compBorrowState[cToken].block == 0) {                                         
+         4301┆     compBorrowState[cToken] = CompMarketState({
+         4302┆         index: compInitialIndex,
+         4303┆         block: safe32(getBlockNumber(), "block number exceeds 32 
+  bits")                                                                        
+         4304┆     });
+         4305┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-decrement-not-postfix                    
+          Consider using the prefix decrement expression whenever the return    
+  value is not needed. The                                                      
+          prefix decrement expression is cheaper in terms of gas.               
+                                                                                
+         3181┆ storedList.length--;
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+         2843┆ require(nonce == nonces[signatory]++, "Comp::delegateBySig:      
+  invalid nonce");                                                              
+            ⋮┆----------------------------------------
+         3083┆ for (uint i = 0; i < len; i++) {
+            ⋮┆----------------------------------------
+         3168┆ for (uint i = 0; i < len; i++) {
+            ⋮┆----------------------------------------
+         3734┆ for (uint i = 0; i < assets.length; i++) {
+            ⋮┆----------------------------------------
+         3950┆ for (uint i = 0; i < allMarkets.length; i ++) {
+            ⋮┆----------------------------------------
+         3987┆ for (uint i = 0; i < numMarkets; i++) {
+            ⋮┆----------------------------------------
+         4007┆ for (uint i = 0; i < numMarkets; i++) {
+            ⋮┆----------------------------------------
+         4242┆ for (uint i = 0; i < cTokens.length; i++) {
+            ⋮┆----------------------------------------
+         4248┆ for (uint j = 0; j < holders.length; j++) {
+            ⋮┆----------------------------------------
+         4254┆ for (uint j = 0; j < holders.length; j++) {
+            ⋮┆----------------------------------------
+         4276┆ for (uint i = 0; i < numMarkets; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+         1324┆ require(msg.sender == admin, "only admin may initialize the      
+  market");                                                                     
+            ⋮┆----------------------------------------
+         1325┆ require(accrualBlockNumber == 0 && borrowIndex == 0, "market may 
+  only be initialized once");                                                   
+            ⋮┆----------------------------------------
+         1329┆ require(initialExchangeRateMantissa > 0, "initial exchange rate  
+  must be greater than zero.");                                                 
+            ⋮┆----------------------------------------
+         1341┆ require(err == uint(Error.NO_ERROR), "setting interest rate model
+  failed");                                                                     
+            ⋮┆----------------------------------------
+         1975┆ require(amountSeizeError == uint(Error.NO_ERROR),                
+  "LIQUIDATE_COMPTROLLER_CALCULATE_AMOUNT_SEIZE_FAILED");                       
+            ⋮┆----------------------------------------
+         2842┆ require(signatory != address(0), "Comp::delegateBySig: invalid   
+  signature");                                                                  
+            ⋮┆----------------------------------------
+         2843┆ require(nonce == nonces[signatory]++, "Comp::delegateBySig:      
+  invalid nonce");                                                              
+            ⋮┆----------------------------------------
+         2844┆ require(now <= expiry, "Comp::delegateBySig: signature expired");
+            ⋮┆----------------------------------------
+         2866┆ require(blockNumber < block.number, "Comp::getPriorVotes: not yet
+  determined");                                                                 
+            ⋮┆----------------------------------------
+         2910┆ require(src != address(0), "Comp::_transferTokens: cannot        
+  transfer from the zero address");                                             
+            ⋮┆----------------------------------------
+         2911┆ require(dst != address(0), "Comp::_transferTokens: cannot        
+  transfer to the zero address");                                               
+            ⋮┆----------------------------------------
+         3137┆ require(oErr == 0, "exitMarket: getAccountSnapshot failed"); //  
+  semi-opaque error code                                                        
+            ⋮┆----------------------------------------
+         3637┆ require(msg.sender == cToken, "only cToken could update its      
+  version");                                                                    
+            ⋮┆----------------------------------------
+         3961┆ require(msg.sender == admin, "only admin can set supply cap      
+  guardian");                                                                   
+            ⋮┆----------------------------------------
+         3980┆ require(msg.sender == admin || msg.sender == supplyCapGuardian,  
+  "only admin or supply cap guardian can set supply caps");                     
+            ⋮┆----------------------------------------
+         4000┆ require(msg.sender == admin || msg.sender == borrowCapGuardian,  
+  "only admin or borrow cap guardian can set borrow caps");                     
+            ⋮┆----------------------------------------
+         4018┆ require(msg.sender == admin, "only admin can set borrow cap      
+  guardian");                                                                   
+            ⋮┆----------------------------------------
+         4053┆ require(markets[address(cToken)].isListed, "cannot pause a market
+  that is not listed");                                                         
+            ⋮┆----------------------------------------
+         4054┆ require(msg.sender == pauseGuardian || msg.sender == admin, "only
+  pause guardian and admin can pause");                                         
+            ⋮┆----------------------------------------
+         4063┆ require(markets[address(cToken)].isListed, "cannot pause a market
+  that is not listed");                                                         
+            ⋮┆----------------------------------------
+         4064┆ require(msg.sender == pauseGuardian || msg.sender == admin, "only
+  pause guardian and admin can pause");                                         
+            ⋮┆----------------------------------------
+         4073┆ require(msg.sender == pauseGuardian || msg.sender == admin, "only
+  pause guardian and admin can pause");                                         
+            ⋮┆----------------------------------------
+         4082┆ require(msg.sender == pauseGuardian || msg.sender == admin, "only
+  pause guardian and admin can pause");                                         
+            ⋮┆----------------------------------------
+         4091┆ require(msg.sender == unitroller.admin(), "only unitroller admin 
+  can change brains");                                                          
+            ⋮┆----------------------------------------
+       solidity.security.compound-borrowfresh-reentrancy                        
+          Function borrowFresh() in Compound performs state update after        
+  doTransferOut()                                                               
+                                                                                
+         1767┆ doTransferOut(borrower, borrowAmount);
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+Some files were skipped or only partially analyzed.
+  Partially scanned: 1 files only partially analyzed due to parsing or internal Semgrep errors
+
+Ran 48 rules on 1 file: 126 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

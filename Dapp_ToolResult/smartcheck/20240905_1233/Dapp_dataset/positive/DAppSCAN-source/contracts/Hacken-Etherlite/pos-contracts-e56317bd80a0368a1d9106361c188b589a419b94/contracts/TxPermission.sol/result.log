@@ -1,0 +1,214 @@
+/sb/TxPermission.sol
+line 199:27 extraneous input '_allowed' expecting {',', ')'}
+jar:file:/usr/local/lib/node_modules/@smartdec/smartcheck/jdeploy-bundle/smartcheck-2.0-jar-with-dependencies.jar!/solidity-rules.xmlruleId: SOLIDITY_ADDRESS_HARDCODED
+patternId: b140cd
+severity: 1
+line: 427
+column: 35
+content: 0xffffffff
+
+ruleId: SOLIDITY_ADDRESS_HARDCODED
+patternId: b140cd
+severity: 1
+line: 428
+column: 37
+content: 0x01
+
+ruleId: SOLIDITY_ADDRESS_HARDCODED
+patternId: b140cd
+severity: 1
+line: 429
+column: 36
+content: 0x02
+
+ruleId: SOLIDITY_ADDRESS_HARDCODED
+patternId: b140cd
+severity: 1
+line: 431
+column: 38
+content: 0x04
+
+ruleId: SOLIDITY_ADDRESS_HARDCODED
+patternId: b140cd
+severity: 1
+line: 432
+column: 39
+content: 0x08
+
+ruleId: SOLIDITY_ADDRESS_HARDCODED
+patternId: b140cd
+severity: 1
+line: 437
+column: 53
+content: 0x0b61ba85
+
+ruleId: SOLIDITY_ADDRESS_HARDCODED
+patternId: b140cd
+severity: 1
+line: 440
+column: 62
+content: 0x93b4e25e
+
+ruleId: SOLIDITY_ADDRESS_HARDCODED
+patternId: b140cd
+severity: 1
+line: 443
+column: 58
+content: 0xc476dd40
+
+ruleId: SOLIDITY_ADDRESS_HARDCODED
+patternId: b140cd
+severity: 1
+line: 446
+column: 55
+content: 0x98df67c6
+
+ruleId: SOLIDITY_ADDRESS_HARDCODED
+patternId: b140cd
+severity: 1
+line: 449
+column: 55
+content: 0xfe7d567d
+
+ruleId: SOLIDITY_ARRAY_LENGTH_MANIPULATION
+patternId: 872bdd
+severity: 1
+line: 233
+column: 16
+content: _allowedSenders.length--
+
+ruleId: SOLIDITY_EXTRA_GAS_IN_LOOPS
+patternId: d3j11j
+severity: 1
+line: 207
+column: 8
+content: for(uint256i=0;i<_allowed.length;i++){_addAllowedSender(_allowed[i]);}
+
+ruleId: SOLIDITY_FUNCTIONS_RETURNS_TYPE_AND_NO_RETURN
+patternId: 58bdd3
+severity: 1
+line: 113
+column: 4
+content: function_admin()internalviewreturns(addressadm){bytes32slot=ADMIN_SLOT;assembly{adm:=sload(slot)}}
+
+ruleId: SOLIDITY_GAS_LIMIT_IN_LOOPS
+patternId: f6f853
+severity: 2
+line: 207
+column: 8
+content: for(uint256i=0;i<_allowed.length;i++){_addAllowedSender(_allowed[i]);}
+
+ruleId: SOLIDITY_GAS_LIMIT_IN_LOOPS
+patternId: f6f853
+severity: 2
+line: 230
+column: 8
+content: for(uint256i=0;i<allowedSendersLength;i++){if(_sender==_allowedSenders[i]){_allowedSenders[i]=_allowedSenders[allowedSendersLength-1];_allowedSenders.length--;break;}}
+
+ruleId: SOLIDITY_OVERPOWERED_ROLE
+patternId: j83hf7
+severity: 2
+line: 246
+column: 4
+content: functionsetDeployerInputLengthLimit(address_deployer,uint256_limit)publiconlyOwneronlyInitialized{_deployerInputLengthLimit[_deployer]=_limit;emitDeployerInputLengthLimitSet(_deployer,_limit);}
+
+ruleId: SOLIDITY_OVERPOWERED_ROLE
+patternId: j83hf7
+severity: 2
+line: 254
+column: 4
+content: functionsetSenderMinGasPrice(address_sender,uint256_minGasPrice)publiconlyOwneronlyInitialized{senderMinGasPrice[_sender]=_minGasPrice;emitSenderMinGasPriceSet(_sender,_minGasPrice);}
+
+ruleId: SOLIDITY_SHOULD_NOT_BE_VIEW
+patternId: 189abf
+severity: 1
+line: 113
+column: 4
+content: function_admin()internalviewreturns(addressadm){bytes32slot=ADMIN_SLOT;assembly{adm:=sload(slot)}}
+
+ruleId: SOLIDITY_SHOULD_NOT_BE_VIEW
+patternId: 189abf
+severity: 1
+line: 299
+column: 4
+content: functionallowedTxTypes(address_sender,address_to,uint256_value,uint256_gasPrice,bytesmemory_data)publicviewreturns(uint32typesMask,boolcache){if(isSenderAllowed[_sender]){return(ALL,false);}if(_to==address(0)&&_data.length>deployerInputLengthLimit(_sender)){return(NONE,false);}bytes4signature=bytes4(0);assembly{signature:=shl(224,mload(add(_data,4)))}if(_to==validatorSetContract.randomContract()){if(signature==COMMIT_HASH_SIGNATURE&&_data.length>4+32){bytes32numberHash;assembly{numberHash:=mload(add(_data,36))}return(IRandomAuRa(_to).commitHashCallable(_sender,numberHash)?CALL:NONE,false);}elseif((signature==REVEAL_NUMBER_SIGNATURE||signature==REVEAL_SECRET_SIGNATURE)&&_data.length==4+32){uint256num;assembly{num:=mload(add(_data,36))}return(IRandomAuRa(_to).revealNumberCallable(_sender,num)?CALL:NONE,false);}else{return(NONE,false);}}if(_to==address(validatorSetContract)){if(signature==EMIT_INITIATE_CHANGE_SIGNATURE){return(validatorSetContract.emitInitiateChangeCallable()?CALL:NONE,false);}elseif(signature==REPORT_MALICIOUS_SIGNATURE&&_data.length>=4+64){addressmaliciousMiningAddress;uint256blockNumber;assembly{maliciousMiningAddress:=mload(add(_data,36))blockNumber:=mload(add(_data,68))}(boolcallable,)=validatorSetContract.reportMaliciousCallable(_sender,maliciousMiningAddress,blockNumber);return(callable?CALL:NONE,false);}elseif(_gasPrice>0){return(validatorSetContract.isValidator(_sender)?NONE:CALL,false);}}if(validatorSetContract.isValidator(_sender)&&_gasPrice>0){return(_sender.balance>0?BASIC:NONE,false);}if(validatorSetContract.isValidator(_to)){return(NONE,false);}if(_gasPrice==0){return(certifierContract.certifiedExplicitly(_sender)?ALL:NONE,false);}if(_gasPrice<senderMinGasPrice[_sender]){return(NONE,false);}return(ALL,false);}
+
+ruleId: SOLIDITY_SHOULD_RETURN_STRUCT
+patternId: 83hf3l
+severity: 1
+line: 35
+column: 55
+content: (uint256[]memory,uint256)
+
+ruleId: SOLIDITY_SHOULD_RETURN_STRUCT
+patternId: 83hf3l
+severity: 1
+line: 90
+column: 63
+content: (uint256,address)
+
+ruleId: SOLIDITY_SHOULD_RETURN_STRUCT
+patternId: 83hf3l
+severity: 1
+line: 93
+column: 85
+content: (bool,bool)
+
+ruleId: SOLIDITY_SHOULD_RETURN_STRUCT
+patternId: 83hf3l
+severity: 1
+line: 99
+column: 60
+content: (address[]memory,bool)
+
+ruleId: SOLIDITY_SHOULD_RETURN_STRUCT
+patternId: 83hf3l
+severity: 1
+line: 308
+column: 15
+content: (uint32typesMask,boolcache)
+
+ruleId: SOLIDITY_USING_INLINE_ASSEMBLY
+patternId: 109cd5
+severity: 1
+line: 115
+column: 8
+content: assembly{adm:=sload(slot)}
+
+ruleId: SOLIDITY_USING_INLINE_ASSEMBLY
+patternId: 109cd5
+severity: 1
+line: 322
+column: 8
+content: assembly{signature:=shl(224,mload(add(_data,4)))}
+
+ruleId: SOLIDITY_USING_INLINE_ASSEMBLY
+patternId: 109cd5
+severity: 1
+line: 329
+column: 16
+content: assembly{numberHash:=mload(add(_data,36))}
+
+ruleId: SOLIDITY_USING_INLINE_ASSEMBLY
+patternId: 109cd5
+severity: 1
+line: 336
+column: 16
+content: assembly{num:=mload(add(_data,36))}
+
+ruleId: SOLIDITY_USING_INLINE_ASSEMBLY
+patternId: 109cd5
+severity: 1
+line: 352
+column: 16
+content: assembly{maliciousMiningAddress:=mload(add(_data,36))blockNumber:=mload(add(_data,68))}
+
+SOLIDITY_OVERPOWERED_ROLE :2
+SOLIDITY_ARRAY_LENGTH_MANIPULATION :1
+SOLIDITY_FUNCTIONS_RETURNS_TYPE_AND_NO_RETURN :1
+SOLIDITY_EXTRA_GAS_IN_LOOPS :1
+SOLIDITY_ADDRESS_HARDCODED :10
+SOLIDITY_GAS_LIMIT_IN_LOOPS :2
+SOLIDITY_USING_INLINE_ASSEMBLY :5
+SOLIDITY_SHOULD_RETURN_STRUCT :5
+SOLIDITY_SHOULD_NOT_BE_VIEW :2

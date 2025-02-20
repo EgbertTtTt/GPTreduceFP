@@ -1,0 +1,272 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 49 Code Findings │
+└──────────────────┘
+                            
+    /sb/stakin_contract.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          378┆ contract AlgoVestStaking is Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          430┆ constructor(
+          431┆     IERC20 _AVSAddress,
+          432┆     uint256 _zeroDayStartTime,
+          433┆     uint256 _dayDurationSec
+          434┆ ) public {
+          435┆     avsAddress = _AVSAddress;
+          436┆     zeroDayStartTime = _zeroDayStartTime;
+          437┆     dayDurationSec = _dayDurationSec;
+          438┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          830┆ stake_day = allStakes[step].startDay;
+            ⋮┆----------------------------------------
+          831┆ num_stake_days = allStakes[step].numDaysStake;
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          727┆ for (uint256 i = 2; i <= num_of_parts; ++i) {
+            ⋮┆----------------------------------------
+          757┆ for (uint256 i = 2; i <= num_of_parts; ++i) {
+            ⋮┆----------------------------------------
+          820┆ for (uint256 i = 2; i <= num_of_parts; ++i) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           63┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+           84┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          172┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          187┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          204┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          221┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          238┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          385┆ require(
+          386┆     now >= zeroDayStartTime,
+          387┆     "StakingAVS: Contract is not open yet"
+          388┆ );
+            ⋮┆----------------------------------------
+          443┆ require(
+          444┆     avsAddress.transferFrom(sender, address(this), amount),
+          445┆     "StakingAVS: Could not get AVS tokens"
+          446┆ );
+            ⋮┆----------------------------------------
+          454┆ require(sender == owner(), "StakingAVS: Sender is not owner");
+            ⋮┆----------------------------------------
+          455┆ require(
+          456┆     allAVSTokens >= amount,
+          457┆     "StakingAVS: Not enough value on this contract"
+          458┆ );
+            ⋮┆----------------------------------------
+          459┆ require(
+          460┆     unfreezedAVSTokens >= amount,
+          461┆     "StakingAVS: Not enough unfreezed value on this contract"
+          462┆ );
+            ⋮┆----------------------------------------
+          463┆ require(
+          464┆     avsAddress.transfer(sender, amount),
+          465┆     "StakingAVS: Could not send AVS tokens"
+          466┆ );
+            ⋮┆----------------------------------------
+          476┆ require(
+          477┆     numDaysStake > 0 &&
+          478┆         numDaysStake <= maxNumDays &&
+          479┆         numDaysStake % 15 == 0,
+          480┆     "StakingAVS: Wrong number of days"
+          481┆ );
+            ⋮┆----------------------------------------
+          483┆ require(
+          484┆     avsAddress.transferFrom(sender, address(this), amount),
+          485┆     "StakingAVS: AVS token transfer failed"
+          486┆ );
+            ⋮┆----------------------------------------
+          491┆ require(
+          492┆     unfreezedAVSTokens >= avsEarnings - amount,
+          493┆     "StakingAVS: Insufficient funds of AVS tokens to this stake"
+          494┆ );
+            ⋮┆----------------------------------------
+          528┆ require(
+          529┆     stakeIndex >= 0 && stakeIndex < stakeList[sender].length,
+          530┆     "StakingAVS: Wrong stakeIndex"
+          531┆ );
+            ⋮┆----------------------------------------
+          533┆ require(st.stakeId == stakeId, "StakingAVS: Wrong stakeId");
+            ⋮┆----------------------------------------
+          539┆ require(
+          540┆     st.freezedRewardAVSTokens >= avsTokensToReturn -             
+  st.stakedAVS,                                                                 
+          541┆     "StakingAVS: Internal error!"
+          542┆ );
+            ⋮┆----------------------------------------
+          570┆ require(
+          571┆     st.freezedRewardAVSTokens >= avsTokensToReturn -             
+  st.stakedAVS,                                                                 
+          572┆     "StakingAVS: Internal error!"
+          573┆ );
+            ⋮┆----------------------------------------
+          664┆ require(
+          665┆     stakeIndex < stakeList[who].length,
+          666┆     "StakingAVS: Wrong stakeIndex"
+          667┆ );
+            ⋮┆----------------------------------------
+          668┆ require(
+          669┆     stakeId == stakeList[who][stakeIndex].stakeId,
+          670┆     "StakingAVS: Wrong stakeId"
+          671┆ );
+            ⋮┆----------------------------------------
+          686┆ require(
+          687┆     stakeIndex < stakeList[who].length,
+          688┆     "StakingAVS: Wrong stakeIndex"
+          689┆ );
+            ⋮┆----------------------------------------
+          690┆ require(
+          691┆     stakeId == stakeList[who][stakeIndex].stakeId,
+          692┆     "StakingAVS: Wrong stakeId"
+          693┆ );
+            ⋮┆----------------------------------------
+          720┆ require(
+          721┆     numOfDays >= 0 && numOfDays <= maxNumDays,
+          722┆     "StakingAVS: Wrong numOfDays"
+          723┆ );
+            ⋮┆----------------------------------------
+          750┆ require(
+          751┆     numOfDays >= 0 && numOfDays <= maxNumDays,
+          752┆     "StakingAVS: Wrong numOfDays"
+          753┆ );
+            ⋮┆----------------------------------------
+          775┆ require(
+          776┆     stakeIndex >= 0 && stakeIndex < stakeListLength,
+          777┆     "StakingAVS: Wrong stakeIndex"
+          778┆ );
+            ⋮┆----------------------------------------
+          780┆ require(st.stakeId == stakeId, "StakingAVS: Wrong stakeId");
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          476┆ require(
+          477┆     numDaysStake > 0 &&
+          478┆         numDaysStake <= maxNumDays &&
+          479┆         numDaysStake % 15 == 0,
+          480┆     "StakingAVS: Wrong number of days"
+          481┆ );
+            ⋮┆----------------------------------------
+          528┆ require(
+          529┆     stakeIndex >= 0 && stakeIndex < stakeList[sender].length,
+          530┆     "StakingAVS: Wrong stakeIndex"
+          531┆ );
+            ⋮┆----------------------------------------
+          720┆ require(
+          721┆     numOfDays >= 0 && numOfDays <= maxNumDays,
+          722┆     "StakingAVS: Wrong numOfDays"
+          723┆ );
+            ⋮┆----------------------------------------
+          750┆ require(
+          751┆     numOfDays >= 0 && numOfDays <= maxNumDays,
+          752┆     "StakingAVS: Wrong numOfDays"
+          753┆ );
+            ⋮┆----------------------------------------
+          775┆ require(
+          776┆     stakeIndex >= 0 && stakeIndex < stakeListLength,
+          777┆     "StakingAVS: Wrong stakeIndex"
+          778┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           84┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          204┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          385┆ require(
+          386┆     now >= zeroDayStartTime,
+          387┆     "StakingAVS: Contract is not open yet"
+          388┆ );
+            ⋮┆----------------------------------------
+          443┆ require(
+          444┆     avsAddress.transferFrom(sender, address(this), amount),
+          445┆     "StakingAVS: Could not get AVS tokens"
+          446┆ );
+            ⋮┆----------------------------------------
+          455┆ require(
+          456┆     allAVSTokens >= amount,
+          457┆     "StakingAVS: Not enough value on this contract"
+          458┆ );
+            ⋮┆----------------------------------------
+          459┆ require(
+          460┆     unfreezedAVSTokens >= amount,
+          461┆     "StakingAVS: Not enough unfreezed value on this contract"
+          462┆ );
+            ⋮┆----------------------------------------
+          463┆ require(
+          464┆     avsAddress.transfer(sender, amount),
+          465┆     "StakingAVS: Could not send AVS tokens"
+          466┆ );
+            ⋮┆----------------------------------------
+          483┆ require(
+          484┆     avsAddress.transferFrom(sender, address(this), amount),
+          485┆     "StakingAVS: AVS token transfer failed"
+          486┆ );
+            ⋮┆----------------------------------------
+          491┆ require(
+          492┆     unfreezedAVSTokens >= avsEarnings - amount,
+          493┆     "StakingAVS: Insufficient funds of AVS tokens to this stake"
+          494┆ );
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 49 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

@@ -1,0 +1,1152 @@
+'solc --version' running
+'solc /sb/StrategyMDex.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/StrategyMDex.sol:
+Warning: Unused local variable.
+    --> /sb/StrategyMDex.sol:2309:9:
+     |
+2309 |         UserInfo storage accountInfo = userInfo[_pid][_account];
+     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning: Contract code size exceeds 24576 bytes (a limit introduced in Spurious Dragon). This contract may not be deployable on mainnet. Consider enabling the optimizer (with a low "runs" value!), turning off revert strings, or using libraries.
+    --> /sb/StrategyMDex.sol:1458:1:
+     |
+1458 | contract StrategyUtils is Ownable {
+     | ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning: Contract code size exceeds 24576 bytes (a limit introduced in Spurious Dragon). This contract may not be deployable on mainnet. Consider enabling the optimizer (with a low "runs" value!), turning off revert strings, or using libraries.
+    --> /sb/StrategyMDex.sol:1842:1:
+     |
+1842 | contract StrategyMDex is StrategyMDexPools, Ownable, IStrategyLink, IActionTrigger {
+     | ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+StrategyUtils.makeFeeTransfer(address,uint256,uint256,address) (../../sb/StrategyMDex.sol#1488-1496) performs a multiplication on the result of a division:
+	- feeValue = IERC20(_token).balanceOf(strategy).mul(_balancerate).div(1e9).mul(_feerate).div(1e9) (../../sb/StrategyMDex.sol#1492)
+StrategyUtils._optimalDepositA(uint256,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#1740-1756) performs a multiplication on the result of a division:
+	- c = _c.mul(1000).div(amtB.add(resB)).mul(resA) (../../sb/StrategyMDex.sol#1750)
+StrategyUtils.getLPToken2TokenAmount(address,address,uint256) (../../sb/StrategyMDex.sol#1758-1771) performs a multiplication on the result of a division:
+	- amount = _lpTokenAmount.mul(b).div(ERC20(_lpToken).totalSupply()).mul(2) (../../sb/StrategyMDex.sol#1766)
+StrategyUtils.getLPToken2TokenAmount(address,address,uint256) (../../sb/StrategyMDex.sol#1758-1771) performs a multiplication on the result of a division:
+	- amount = _lpTokenAmount.mul(a).div(ERC20(_lpToken).totalSupply()).mul(2) (../../sb/StrategyMDex.sol#1764)
+StrategyMDex._withdraw(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2266-2305) performs a multiplication on the result of a division:
+	- removedPoint = user.lpPoints.mul(_rate).div(1e9) (../../sb/StrategyMDex.sol#2276)
+	- withdrawLPTokenAmount = removedPoint.mul(poolInfo[_pid].totalLPReinvest).div(poolInfo[_pid].totalPoints) (../../sb/StrategyMDex.sol#2277)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+StrategyUtils.getAmountIn(address,uint256,address) (../../sb/StrategyMDex.sol#1789-1802) uses a dangerous strict equality:
+	- result.length == 0 (../../sb/StrategyMDex.sol#1798)
+StrategyUtils.getAmountOut(address,address,uint256) (../../sb/StrategyMDex.sol#1773-1787) uses a dangerous strict equality:
+	- result.length == 0 (../../sb/StrategyMDex.sol#1783)
+StrategyUtils.getTokenInTo(address,address,uint256,address) (../../sb/StrategyMDex.sol#1819-1838) uses a dangerous strict equality:
+	- result.length == 0 (../../sb/StrategyMDex.sol#1833)
+StrategyMDex.makeBorrowBaseToken(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2166-2183) uses a dangerous strict equality:
+	- require(bool,string)(userInfo[_pid][_account].bid == bid,cannot change bid order) (../../sb/StrategyMDex.sol#2180)
+StrategyMDex.updatePool(uint256) (../../sb/StrategyMDex.sol#2032-2081) uses a dangerous strict equality:
+	- pool.lastRewardsBlock == block.number || pool.totalLPAmount.add(pool.totalLPReinvest) == 0 (../../sb/StrategyMDex.sol#2034-2035)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Reentrancy in StrategyMDex._emergencyWithdraw(uint256,address) (../../sb/StrategyMDex.sol#2349-2369):
+	External calls:
+	- makeWithdrawRemoveLiquidity(_pid,withdrawLPTokenAmount) (../../sb/StrategyMDex.sol#2363)
+		- hecopool.withdraw(_poolId,_lpAmount) (../../sb/StrategyMDex.sol#1119)
+		- router.removeLiquidity(token0,token1,_withdrawLPTokenAmount,0,0,address(this),block.timestamp.add(60)) (../../sb/StrategyMDex.sol#2331)
+	- repayBorrow(_pid,_account,1e9,false) (../../sb/StrategyMDex.sol#2364)
+		- utils.makeRepay(_pid,userInfo[_pid][_account].borrowFrom,_account,_rate,_fast) (../../sb/StrategyMDex.sol#2335)
+	State variables written after the call(s):
+	- repayBorrow(_pid,_account,1e9,false) (../../sb/StrategyMDex.sol#2364)
+		- userInfo[_pid][_account].borrowFrom = address(0) (../../sb/StrategyMDex.sol#2337)
+		- userInfo[_pid][_account].bid = 0 (../../sb/StrategyMDex.sol#2338)
+	StrategyMDex.userInfo (../../sb/StrategyMDex.sol#1873) can be used in cross function reentrancies:
+	- StrategyMDex._emergencyWithdraw(uint256,address) (../../sb/StrategyMDex.sol#2349-2369)
+	- StrategyMDex._withdraw(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2266-2305)
+	- StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2101-2164)
+	- StrategyMDex.getATUserAmount(uint256,address) (../../sb/StrategyMDex.sol#1905-1908)
+	- StrategyMDex.getBorrowInfo(uint256,address) (../../sb/StrategyMDex.sol#1933-1937)
+	- StrategyMDex.liquidation(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2371-2417)
+	- StrategyMDex.makeBorrowBaseToken(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2166-2183)
+	- StrategyMDex.makeLiquidationRepay(uint256,address,uint256) (../../sb/StrategyMDex.sol#2419-2432)
+	- StrategyMDex.makeWithdrawCalcAmount(uint256,address) (../../sb/StrategyMDex.sol#2307-2323)
+	- StrategyMDex.pendingLPAmount(uint256,address) (../../sb/StrategyMDex.sol#2005-2012)
+	- StrategyMDex.pendingRewards(uint256,address) (../../sb/StrategyMDex.sol#1999-2002)
+	- StrategyMDex.repayBorrow(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2334-2343)
+	- StrategyMDex.userInfo (../../sb/StrategyMDex.sol#1873)
+Reentrancy in StrategyMDex._withdraw(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2266-2305):
+	External calls:
+	- updatePool(_pid) (../../sb/StrategyMDex.sol#2268)
+		- hecopool.deposit(_poolId,_lpAmount) (../../sb/StrategyMDex.sol#1115)
+		- hecopool.deposit(_poolId,0) (../../sb/StrategyMDex.sol#1124)
+		- router.addLiquidity(poolInfo[_pid].collateralToken[0],poolInfo[_pid].collateralToken[1],_amount0,_amount1,0,0,address(this),block.timestamp.add(60)) (../../sb/StrategyMDex.sol#2232-2234)
+		- actionPool.onAcionUpdate(_pid) (../../sb/StrategyMDex.sol#2041)
+		- utils.getTokenIn(token1,swapAmt,token0) (../../sb/StrategyMDex.sol#2206)
+		- utils.getTokenIn(token0,swapAmt,token1) (../../sb/StrategyMDex.sol#2210)
+		- newRewardBase = utils.getTokenIn(rewardToken,newRewards,pool.baseToken) (../../sb/StrategyMDex.sol#2060)
+		- utils.makeRefundFee(_pid,newRewardBase) (../../sb/StrategyMDex.sol#2063)
+	- makeWithdrawRemoveLiquidity(_pid,withdrawLPTokenAmount) (../../sb/StrategyMDex.sol#2282)
+		- hecopool.withdraw(_poolId,_lpAmount) (../../sb/StrategyMDex.sol#1119)
+		- router.removeLiquidity(token0,token1,_withdrawLPTokenAmount,0,0,address(this),block.timestamp.add(60)) (../../sb/StrategyMDex.sol#2331)
+	- utils.makeWithdrawRewardFee(_pid,borrowRate,rewardsRate) (../../sb/StrategyMDex.sol#2286)
+	- repayBorrow(_pid,_account,_rate,_fast) (../../sb/StrategyMDex.sol#2288)
+		- utils.makeRepay(_pid,userInfo[_pid][_account].borrowFrom,_account,_rate,_fast) (../../sb/StrategyMDex.sol#2335)
+	State variables written after the call(s):
+	- poolInfo[_pid].totalPoints = TenMath.safeSub(poolInfo[_pid].totalPoints,removedPoint) (../../sb/StrategyMDex.sol#2293)
+	StrategyMDex.poolInfo (../../sb/StrategyMDex.sol#1871) can be used in cross function reentrancies:
+	- StrategyMDex._emergencyWithdraw(uint256,address) (../../sb/StrategyMDex.sol#2349-2369)
+	- StrategyMDex._withdraw(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2266-2305)
+	- StrategyMDex.addPool(uint256,address[],address) (../../sb/StrategyMDex.sol#1947-1967)
+	- StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2101-2164)
+	- StrategyMDex.depositLPToken(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2085-2099)
+	- StrategyMDex.getATPoolInfo(uint256) (../../sb/StrategyMDex.sol#1898-1903)
+	- StrategyMDex.getBaseToken(uint256) (../../sb/StrategyMDex.sol#1929-1931)
+	- StrategyMDex.getDepositAmount(uint256,address) (../../sb/StrategyMDex.sol#2018-2021)
+	- StrategyMDex.getPoolCollateralToken(uint256) (../../sb/StrategyMDex.sol#1921-1923)
+	- StrategyMDex.getPoolInfo(uint256) (../../sb/StrategyMDex.sol#1910-1919)
+	- StrategyMDex.getPoollpToken(uint256) (../../sb/StrategyMDex.sol#1925-1927)
+	- StrategyMDex.liquidation(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2371-2417)
+	- StrategyMDex.makeBalanceOptimalLiquidity(uint256) (../../sb/StrategyMDex.sol#2185-2191)
+	- StrategyMDex.makeBalanceOptimalLiquidityByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2193-2213)
+	- StrategyMDex.makeLiquidationRepay(uint256,address,uint256) (../../sb/StrategyMDex.sol#2419-2432)
+	- StrategyMDex.makeLiquidityAndDeposit(uint256) (../../sb/StrategyMDex.sol#2215-2221)
+	- StrategyMDex.makeLiquidityAndDepositByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2223-2242)
+	- StrategyMDex.makeWithdrawCalcAmount(uint256,address) (../../sb/StrategyMDex.sol#2307-2323)
+	- StrategyMDex.makeWithdrawRemoveLiquidity(uint256,uint256) (../../sb/StrategyMDex.sol#2325-2332)
+	- StrategyMDex.massUpdatePools() (../../sb/StrategyMDex.sol#2024-2029)
+	- StrategyMDex.pendingLPAmount(uint256,address) (../../sb/StrategyMDex.sol#2005-2012)
+	- StrategyMDex.poolInfo (../../sb/StrategyMDex.sol#1871)
+	- StrategyMDex.poolLength() (../../sb/StrategyMDex.sol#1893-1895)
+	- StrategyMDex.resetApprove(uint256) (../../sb/StrategyMDex.sol#1969-1984)
+	- StrategyMDex.setMiniRewardAmount(uint256,uint256) (../../sb/StrategyMDex.sol#1994-1996)
+	- StrategyMDex.updatePool(uint256) (../../sb/StrategyMDex.sol#2032-2081)
+	- StrategyMDex.withdraw(uint256,address,uint256) (../../sb/StrategyMDex.sol#2259-2264)
+	- StrategyMDex.withdrawLPToken(uint256,address,uint256) (../../sb/StrategyMDex.sol#2244-2257)
+	- poolInfo[_pid].totalLPReinvest = TenMath.safeSub(poolInfo[_pid].totalLPReinvest,withdrawLPTokenAmount) (../../sb/StrategyMDex.sol#2294)
+	StrategyMDex.poolInfo (../../sb/StrategyMDex.sol#1871) can be used in cross function reentrancies:
+	- StrategyMDex._emergencyWithdraw(uint256,address) (../../sb/StrategyMDex.sol#2349-2369)
+	- StrategyMDex._withdraw(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2266-2305)
+	- StrategyMDex.addPool(uint256,address[],address) (../../sb/StrategyMDex.sol#1947-1967)
+	- StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2101-2164)
+	- StrategyMDex.depositLPToken(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2085-2099)
+	- StrategyMDex.getATPoolInfo(uint256) (../../sb/StrategyMDex.sol#1898-1903)
+	- StrategyMDex.getBaseToken(uint256) (../../sb/StrategyMDex.sol#1929-1931)
+	- StrategyMDex.getDepositAmount(uint256,address) (../../sb/StrategyMDex.sol#2018-2021)
+	- StrategyMDex.getPoolCollateralToken(uint256) (../../sb/StrategyMDex.sol#1921-1923)
+	- StrategyMDex.getPoolInfo(uint256) (../../sb/StrategyMDex.sol#1910-1919)
+	- StrategyMDex.getPoollpToken(uint256) (../../sb/StrategyMDex.sol#1925-1927)
+	- StrategyMDex.liquidation(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2371-2417)
+	- StrategyMDex.makeBalanceOptimalLiquidity(uint256) (../../sb/StrategyMDex.sol#2185-2191)
+	- StrategyMDex.makeBalanceOptimalLiquidityByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2193-2213)
+	- StrategyMDex.makeLiquidationRepay(uint256,address,uint256) (../../sb/StrategyMDex.sol#2419-2432)
+	- StrategyMDex.makeLiquidityAndDeposit(uint256) (../../sb/StrategyMDex.sol#2215-2221)
+	- StrategyMDex.makeLiquidityAndDepositByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2223-2242)
+	- StrategyMDex.makeWithdrawCalcAmount(uint256,address) (../../sb/StrategyMDex.sol#2307-2323)
+	- StrategyMDex.makeWithdrawRemoveLiquidity(uint256,uint256) (../../sb/StrategyMDex.sol#2325-2332)
+	- StrategyMDex.massUpdatePools() (../../sb/StrategyMDex.sol#2024-2029)
+	- StrategyMDex.pendingLPAmount(uint256,address) (../../sb/StrategyMDex.sol#2005-2012)
+	- StrategyMDex.poolInfo (../../sb/StrategyMDex.sol#1871)
+	- StrategyMDex.poolLength() (../../sb/StrategyMDex.sol#1893-1895)
+	- StrategyMDex.resetApprove(uint256) (../../sb/StrategyMDex.sol#1969-1984)
+	- StrategyMDex.setMiniRewardAmount(uint256,uint256) (../../sb/StrategyMDex.sol#1994-1996)
+	- StrategyMDex.updatePool(uint256) (../../sb/StrategyMDex.sol#2032-2081)
+	- StrategyMDex.withdraw(uint256,address,uint256) (../../sb/StrategyMDex.sol#2259-2264)
+	- StrategyMDex.withdrawLPToken(uint256,address,uint256) (../../sb/StrategyMDex.sol#2244-2257)
+	- poolInfo[_pid].totalLPAmount = TenMath.safeSub(poolInfo[_pid].totalLPAmount,removedLPAmount) (../../sb/StrategyMDex.sol#2298)
+	StrategyMDex.poolInfo (../../sb/StrategyMDex.sol#1871) can be used in cross function reentrancies:
+	- StrategyMDex._emergencyWithdraw(uint256,address) (../../sb/StrategyMDex.sol#2349-2369)
+	- StrategyMDex._withdraw(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2266-2305)
+	- StrategyMDex.addPool(uint256,address[],address) (../../sb/StrategyMDex.sol#1947-1967)
+	- StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2101-2164)
+	- StrategyMDex.depositLPToken(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2085-2099)
+	- StrategyMDex.getATPoolInfo(uint256) (../../sb/StrategyMDex.sol#1898-1903)
+	- StrategyMDex.getBaseToken(uint256) (../../sb/StrategyMDex.sol#1929-1931)
+	- StrategyMDex.getDepositAmount(uint256,address) (../../sb/StrategyMDex.sol#2018-2021)
+	- StrategyMDex.getPoolCollateralToken(uint256) (../../sb/StrategyMDex.sol#1921-1923)
+	- StrategyMDex.getPoolInfo(uint256) (../../sb/StrategyMDex.sol#1910-1919)
+	- StrategyMDex.getPoollpToken(uint256) (../../sb/StrategyMDex.sol#1925-1927)
+	- StrategyMDex.liquidation(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2371-2417)
+	- StrategyMDex.makeBalanceOptimalLiquidity(uint256) (../../sb/StrategyMDex.sol#2185-2191)
+	- StrategyMDex.makeBalanceOptimalLiquidityByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2193-2213)
+	- StrategyMDex.makeLiquidationRepay(uint256,address,uint256) (../../sb/StrategyMDex.sol#2419-2432)
+	- StrategyMDex.makeLiquidityAndDeposit(uint256) (../../sb/StrategyMDex.sol#2215-2221)
+	- StrategyMDex.makeLiquidityAndDepositByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2223-2242)
+	- StrategyMDex.makeWithdrawCalcAmount(uint256,address) (../../sb/StrategyMDex.sol#2307-2323)
+	- StrategyMDex.makeWithdrawRemoveLiquidity(uint256,uint256) (../../sb/StrategyMDex.sol#2325-2332)
+	- StrategyMDex.massUpdatePools() (../../sb/StrategyMDex.sol#2024-2029)
+	- StrategyMDex.pendingLPAmount(uint256,address) (../../sb/StrategyMDex.sol#2005-2012)
+	- StrategyMDex.poolInfo (../../sb/StrategyMDex.sol#1871)
+	- StrategyMDex.poolLength() (../../sb/StrategyMDex.sol#1893-1895)
+	- StrategyMDex.resetApprove(uint256) (../../sb/StrategyMDex.sol#1969-1984)
+	- StrategyMDex.setMiniRewardAmount(uint256,uint256) (../../sb/StrategyMDex.sol#1994-1996)
+	- StrategyMDex.updatePool(uint256) (../../sb/StrategyMDex.sol#2032-2081)
+	- StrategyMDex.withdraw(uint256,address,uint256) (../../sb/StrategyMDex.sol#2259-2264)
+	- StrategyMDex.withdrawLPToken(uint256,address,uint256) (../../sb/StrategyMDex.sol#2244-2257)
+	- repayBorrow(_pid,_account,_rate,_fast) (../../sb/StrategyMDex.sol#2288)
+		- userInfo[_pid][_account].borrowFrom = address(0) (../../sb/StrategyMDex.sol#2337)
+		- userInfo[_pid][_account].bid = 0 (../../sb/StrategyMDex.sol#2338)
+	StrategyMDex.userInfo (../../sb/StrategyMDex.sol#1873) can be used in cross function reentrancies:
+	- StrategyMDex._emergencyWithdraw(uint256,address) (../../sb/StrategyMDex.sol#2349-2369)
+	- StrategyMDex._withdraw(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2266-2305)
+	- StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2101-2164)
+	- StrategyMDex.getATUserAmount(uint256,address) (../../sb/StrategyMDex.sol#1905-1908)
+	- StrategyMDex.getBorrowInfo(uint256,address) (../../sb/StrategyMDex.sol#1933-1937)
+	- StrategyMDex.liquidation(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2371-2417)
+	- StrategyMDex.makeBorrowBaseToken(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2166-2183)
+	- StrategyMDex.makeLiquidationRepay(uint256,address,uint256) (../../sb/StrategyMDex.sol#2419-2432)
+	- StrategyMDex.makeWithdrawCalcAmount(uint256,address) (../../sb/StrategyMDex.sol#2307-2323)
+	- StrategyMDex.pendingLPAmount(uint256,address) (../../sb/StrategyMDex.sol#2005-2012)
+	- StrategyMDex.pendingRewards(uint256,address) (../../sb/StrategyMDex.sol#1999-2002)
+	- StrategyMDex.repayBorrow(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2334-2343)
+	- StrategyMDex.userInfo (../../sb/StrategyMDex.sol#1873)
+	- user.lpPoints = TenMath.safeSub(user.lpPoints,removedPoint) (../../sb/StrategyMDex.sol#2292)
+	StrategyMDex.userInfo (../../sb/StrategyMDex.sol#1873) can be used in cross function reentrancies:
+	- StrategyMDex._emergencyWithdraw(uint256,address) (../../sb/StrategyMDex.sol#2349-2369)
+	- StrategyMDex._withdraw(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2266-2305)
+	- StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2101-2164)
+	- StrategyMDex.getATUserAmount(uint256,address) (../../sb/StrategyMDex.sol#1905-1908)
+	- StrategyMDex.getBorrowInfo(uint256,address) (../../sb/StrategyMDex.sol#1933-1937)
+	- StrategyMDex.liquidation(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2371-2417)
+	- StrategyMDex.makeBorrowBaseToken(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2166-2183)
+	- StrategyMDex.makeLiquidationRepay(uint256,address,uint256) (../../sb/StrategyMDex.sol#2419-2432)
+	- StrategyMDex.makeWithdrawCalcAmount(uint256,address) (../../sb/StrategyMDex.sol#2307-2323)
+	- StrategyMDex.pendingLPAmount(uint256,address) (../../sb/StrategyMDex.sol#2005-2012)
+	- StrategyMDex.pendingRewards(uint256,address) (../../sb/StrategyMDex.sol#1999-2002)
+	- StrategyMDex.repayBorrow(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2334-2343)
+	- StrategyMDex.userInfo (../../sb/StrategyMDex.sol#1873)
+	- user.lpAmount = TenMath.safeSub(user.lpAmount,removedLPAmount) (../../sb/StrategyMDex.sol#2297)
+	StrategyMDex.userInfo (../../sb/StrategyMDex.sol#1873) can be used in cross function reentrancies:
+	- StrategyMDex._emergencyWithdraw(uint256,address) (../../sb/StrategyMDex.sol#2349-2369)
+	- StrategyMDex._withdraw(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2266-2305)
+	- StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2101-2164)
+	- StrategyMDex.getATUserAmount(uint256,address) (../../sb/StrategyMDex.sol#1905-1908)
+	- StrategyMDex.getBorrowInfo(uint256,address) (../../sb/StrategyMDex.sol#1933-1937)
+	- StrategyMDex.liquidation(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2371-2417)
+	- StrategyMDex.makeBorrowBaseToken(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2166-2183)
+	- StrategyMDex.makeLiquidationRepay(uint256,address,uint256) (../../sb/StrategyMDex.sol#2419-2432)
+	- StrategyMDex.makeWithdrawCalcAmount(uint256,address) (../../sb/StrategyMDex.sol#2307-2323)
+	- StrategyMDex.pendingLPAmount(uint256,address) (../../sb/StrategyMDex.sol#2005-2012)
+	- StrategyMDex.pendingRewards(uint256,address) (../../sb/StrategyMDex.sol#1999-2002)
+	- StrategyMDex.repayBorrow(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2334-2343)
+	- StrategyMDex.userInfo (../../sb/StrategyMDex.sol#1873)
+Reentrancy in StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2101-2164):
+	External calls:
+	- updatePool(_pid) (../../sb/StrategyMDex.sol#2116)
+		- hecopool.deposit(_poolId,_lpAmount) (../../sb/StrategyMDex.sol#1115)
+		- hecopool.deposit(_poolId,0) (../../sb/StrategyMDex.sol#1124)
+		- router.addLiquidity(poolInfo[_pid].collateralToken[0],poolInfo[_pid].collateralToken[1],_amount0,_amount1,0,0,address(this),block.timestamp.add(60)) (../../sb/StrategyMDex.sol#2232-2234)
+		- actionPool.onAcionUpdate(_pid) (../../sb/StrategyMDex.sol#2041)
+		- utils.getTokenIn(token1,swapAmt,token0) (../../sb/StrategyMDex.sol#2206)
+		- utils.getTokenIn(token0,swapAmt,token1) (../../sb/StrategyMDex.sol#2210)
+		- newRewardBase = utils.getTokenIn(rewardToken,newRewards,pool.baseToken) (../../sb/StrategyMDex.sol#2060)
+		- utils.makeRefundFee(_pid,newRewardBase) (../../sb/StrategyMDex.sol#2063)
+	- utils.makeDepositFee(_pid) (../../sb/StrategyMDex.sol#2121)
+	- makeBorrowBaseToken(_pid,_account,user.borrowFrom,_bAmount) (../../sb/StrategyMDex.sol#2124)
+		- bid = ITenBankHall(bank).makeBorrowFrom(_pid,_account,_borrowFrom,_bAmount) (../../sb/StrategyMDex.sol#2175)
+	State variables written after the call(s):
+	- makeBorrowBaseToken(_pid,_account,user.borrowFrom,_bAmount) (../../sb/StrategyMDex.sol#2124)
+		- userInfo[_pid][_account].bid = bid (../../sb/StrategyMDex.sol#2182)
+	StrategyMDex.userInfo (../../sb/StrategyMDex.sol#1873) can be used in cross function reentrancies:
+	- StrategyMDex._emergencyWithdraw(uint256,address) (../../sb/StrategyMDex.sol#2349-2369)
+	- StrategyMDex._withdraw(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2266-2305)
+	- StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2101-2164)
+	- StrategyMDex.getATUserAmount(uint256,address) (../../sb/StrategyMDex.sol#1905-1908)
+	- StrategyMDex.getBorrowInfo(uint256,address) (../../sb/StrategyMDex.sol#1933-1937)
+	- StrategyMDex.liquidation(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2371-2417)
+	- StrategyMDex.makeBorrowBaseToken(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2166-2183)
+	- StrategyMDex.makeLiquidationRepay(uint256,address,uint256) (../../sb/StrategyMDex.sol#2419-2432)
+	- StrategyMDex.makeWithdrawCalcAmount(uint256,address) (../../sb/StrategyMDex.sol#2307-2323)
+	- StrategyMDex.pendingLPAmount(uint256,address) (../../sb/StrategyMDex.sol#2005-2012)
+	- StrategyMDex.pendingRewards(uint256,address) (../../sb/StrategyMDex.sol#1999-2002)
+	- StrategyMDex.repayBorrow(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2334-2343)
+	- StrategyMDex.userInfo (../../sb/StrategyMDex.sol#1873)
+Reentrancy in StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2101-2164):
+	External calls:
+	- updatePool(_pid) (../../sb/StrategyMDex.sol#2116)
+		- hecopool.deposit(_poolId,_lpAmount) (../../sb/StrategyMDex.sol#1115)
+		- hecopool.deposit(_poolId,0) (../../sb/StrategyMDex.sol#1124)
+		- router.addLiquidity(poolInfo[_pid].collateralToken[0],poolInfo[_pid].collateralToken[1],_amount0,_amount1,0,0,address(this),block.timestamp.add(60)) (../../sb/StrategyMDex.sol#2232-2234)
+		- actionPool.onAcionUpdate(_pid) (../../sb/StrategyMDex.sol#2041)
+		- utils.getTokenIn(token1,swapAmt,token0) (../../sb/StrategyMDex.sol#2206)
+		- utils.getTokenIn(token0,swapAmt,token1) (../../sb/StrategyMDex.sol#2210)
+		- newRewardBase = utils.getTokenIn(rewardToken,newRewards,pool.baseToken) (../../sb/StrategyMDex.sol#2060)
+		- utils.makeRefundFee(_pid,newRewardBase) (../../sb/StrategyMDex.sol#2063)
+	- utils.makeDepositFee(_pid) (../../sb/StrategyMDex.sol#2121)
+	- makeBorrowBaseToken(_pid,_account,user.borrowFrom,_bAmount) (../../sb/StrategyMDex.sol#2124)
+		- bid = ITenBankHall(bank).makeBorrowFrom(_pid,_account,_borrowFrom,_bAmount) (../../sb/StrategyMDex.sol#2175)
+	- makeBalanceOptimalLiquidity(_pid) (../../sb/StrategyMDex.sol#2127)
+		- utils.getTokenIn(token1,swapAmt,token0) (../../sb/StrategyMDex.sol#2206)
+		- utils.getTokenIn(token0,swapAmt,token1) (../../sb/StrategyMDex.sol#2210)
+	- lpAmount = makeLiquidityAndDeposit(_pid) (../../sb/StrategyMDex.sol#2130)
+		- hecopool.deposit(_poolId,_lpAmount) (../../sb/StrategyMDex.sol#1115)
+		- router.addLiquidity(poolInfo[_pid].collateralToken[0],poolInfo[_pid].collateralToken[1],_amount0,_amount1,0,0,address(this),block.timestamp.add(60)) (../../sb/StrategyMDex.sol#2232-2234)
+	- utils.transferFromAllToken(address(this),_account,token0,token1) (../../sb/StrategyMDex.sol#2139)
+	State variables written after the call(s):
+	- poolInfo[_pid].totalPoints = poolInfo[_pid].totalPoints.add(addPoint) (../../sb/StrategyMDex.sol#2149)
+	StrategyMDex.poolInfo (../../sb/StrategyMDex.sol#1871) can be used in cross function reentrancies:
+	- StrategyMDex._emergencyWithdraw(uint256,address) (../../sb/StrategyMDex.sol#2349-2369)
+	- StrategyMDex._withdraw(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2266-2305)
+	- StrategyMDex.addPool(uint256,address[],address) (../../sb/StrategyMDex.sol#1947-1967)
+	- StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2101-2164)
+	- StrategyMDex.depositLPToken(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2085-2099)
+	- StrategyMDex.getATPoolInfo(uint256) (../../sb/StrategyMDex.sol#1898-1903)
+	- StrategyMDex.getBaseToken(uint256) (../../sb/StrategyMDex.sol#1929-1931)
+	- StrategyMDex.getDepositAmount(uint256,address) (../../sb/StrategyMDex.sol#2018-2021)
+	- StrategyMDex.getPoolCollateralToken(uint256) (../../sb/StrategyMDex.sol#1921-1923)
+	- StrategyMDex.getPoolInfo(uint256) (../../sb/StrategyMDex.sol#1910-1919)
+	- StrategyMDex.getPoollpToken(uint256) (../../sb/StrategyMDex.sol#1925-1927)
+	- StrategyMDex.liquidation(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2371-2417)
+	- StrategyMDex.makeBalanceOptimalLiquidity(uint256) (../../sb/StrategyMDex.sol#2185-2191)
+	- StrategyMDex.makeBalanceOptimalLiquidityByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2193-2213)
+	- StrategyMDex.makeLiquidationRepay(uint256,address,uint256) (../../sb/StrategyMDex.sol#2419-2432)
+	- StrategyMDex.makeLiquidityAndDeposit(uint256) (../../sb/StrategyMDex.sol#2215-2221)
+	- StrategyMDex.makeLiquidityAndDepositByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2223-2242)
+	- StrategyMDex.makeWithdrawCalcAmount(uint256,address) (../../sb/StrategyMDex.sol#2307-2323)
+	- StrategyMDex.makeWithdrawRemoveLiquidity(uint256,uint256) (../../sb/StrategyMDex.sol#2325-2332)
+	- StrategyMDex.massUpdatePools() (../../sb/StrategyMDex.sol#2024-2029)
+	- StrategyMDex.pendingLPAmount(uint256,address) (../../sb/StrategyMDex.sol#2005-2012)
+	- StrategyMDex.poolInfo (../../sb/StrategyMDex.sol#1871)
+	- StrategyMDex.poolLength() (../../sb/StrategyMDex.sol#1893-1895)
+	- StrategyMDex.resetApprove(uint256) (../../sb/StrategyMDex.sol#1969-1984)
+	- StrategyMDex.setMiniRewardAmount(uint256,uint256) (../../sb/StrategyMDex.sol#1994-1996)
+	- StrategyMDex.updatePool(uint256) (../../sb/StrategyMDex.sol#2032-2081)
+	- StrategyMDex.withdraw(uint256,address,uint256) (../../sb/StrategyMDex.sol#2259-2264)
+	- StrategyMDex.withdrawLPToken(uint256,address,uint256) (../../sb/StrategyMDex.sol#2244-2257)
+	- poolInfo[_pid].totalLPReinvest = poolInfo[_pid].totalLPReinvest.add(lpAmount) (../../sb/StrategyMDex.sol#2150)
+	StrategyMDex.poolInfo (../../sb/StrategyMDex.sol#1871) can be used in cross function reentrancies:
+	- StrategyMDex._emergencyWithdraw(uint256,address) (../../sb/StrategyMDex.sol#2349-2369)
+	- StrategyMDex._withdraw(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2266-2305)
+	- StrategyMDex.addPool(uint256,address[],address) (../../sb/StrategyMDex.sol#1947-1967)
+	- StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2101-2164)
+	- StrategyMDex.depositLPToken(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2085-2099)
+	- StrategyMDex.getATPoolInfo(uint256) (../../sb/StrategyMDex.sol#1898-1903)
+	- StrategyMDex.getBaseToken(uint256) (../../sb/StrategyMDex.sol#1929-1931)
+	- StrategyMDex.getDepositAmount(uint256,address) (../../sb/StrategyMDex.sol#2018-2021)
+	- StrategyMDex.getPoolCollateralToken(uint256) (../../sb/StrategyMDex.sol#1921-1923)
+	- StrategyMDex.getPoolInfo(uint256) (../../sb/StrategyMDex.sol#1910-1919)
+	- StrategyMDex.getPoollpToken(uint256) (../../sb/StrategyMDex.sol#1925-1927)
+	- StrategyMDex.liquidation(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2371-2417)
+	- StrategyMDex.makeBalanceOptimalLiquidity(uint256) (../../sb/StrategyMDex.sol#2185-2191)
+	- StrategyMDex.makeBalanceOptimalLiquidityByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2193-2213)
+	- StrategyMDex.makeLiquidationRepay(uint256,address,uint256) (../../sb/StrategyMDex.sol#2419-2432)
+	- StrategyMDex.makeLiquidityAndDeposit(uint256) (../../sb/StrategyMDex.sol#2215-2221)
+	- StrategyMDex.makeLiquidityAndDepositByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2223-2242)
+	- StrategyMDex.makeWithdrawCalcAmount(uint256,address) (../../sb/StrategyMDex.sol#2307-2323)
+	- StrategyMDex.makeWithdrawRemoveLiquidity(uint256,uint256) (../../sb/StrategyMDex.sol#2325-2332)
+	- StrategyMDex.massUpdatePools() (../../sb/StrategyMDex.sol#2024-2029)
+	- StrategyMDex.pendingLPAmount(uint256,address) (../../sb/StrategyMDex.sol#2005-2012)
+	- StrategyMDex.poolInfo (../../sb/StrategyMDex.sol#1871)
+	- StrategyMDex.poolLength() (../../sb/StrategyMDex.sol#1893-1895)
+	- StrategyMDex.resetApprove(uint256) (../../sb/StrategyMDex.sol#1969-1984)
+	- StrategyMDex.setMiniRewardAmount(uint256,uint256) (../../sb/StrategyMDex.sol#1994-1996)
+	- StrategyMDex.updatePool(uint256) (../../sb/StrategyMDex.sol#2032-2081)
+	- StrategyMDex.withdraw(uint256,address,uint256) (../../sb/StrategyMDex.sol#2259-2264)
+	- StrategyMDex.withdrawLPToken(uint256,address,uint256) (../../sb/StrategyMDex.sol#2244-2257)
+	- poolInfo[_pid].totalLPAmount = poolInfo[_pid].totalLPAmount.add(lpAmount) (../../sb/StrategyMDex.sol#2153)
+	StrategyMDex.poolInfo (../../sb/StrategyMDex.sol#1871) can be used in cross function reentrancies:
+	- StrategyMDex._emergencyWithdraw(uint256,address) (../../sb/StrategyMDex.sol#2349-2369)
+	- StrategyMDex._withdraw(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2266-2305)
+	- StrategyMDex.addPool(uint256,address[],address) (../../sb/StrategyMDex.sol#1947-1967)
+	- StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2101-2164)
+	- StrategyMDex.depositLPToken(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2085-2099)
+	- StrategyMDex.getATPoolInfo(uint256) (../../sb/StrategyMDex.sol#1898-1903)
+	- StrategyMDex.getBaseToken(uint256) (../../sb/StrategyMDex.sol#1929-1931)
+	- StrategyMDex.getDepositAmount(uint256,address) (../../sb/StrategyMDex.sol#2018-2021)
+	- StrategyMDex.getPoolCollateralToken(uint256) (../../sb/StrategyMDex.sol#1921-1923)
+	- StrategyMDex.getPoolInfo(uint256) (../../sb/StrategyMDex.sol#1910-1919)
+	- StrategyMDex.getPoollpToken(uint256) (../../sb/StrategyMDex.sol#1925-1927)
+	- StrategyMDex.liquidation(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2371-2417)
+	- StrategyMDex.makeBalanceOptimalLiquidity(uint256) (../../sb/StrategyMDex.sol#2185-2191)
+	- StrategyMDex.makeBalanceOptimalLiquidityByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2193-2213)
+	- StrategyMDex.makeLiquidationRepay(uint256,address,uint256) (../../sb/StrategyMDex.sol#2419-2432)
+	- StrategyMDex.makeLiquidityAndDeposit(uint256) (../../sb/StrategyMDex.sol#2215-2221)
+	- StrategyMDex.makeLiquidityAndDepositByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2223-2242)
+	- StrategyMDex.makeWithdrawCalcAmount(uint256,address) (../../sb/StrategyMDex.sol#2307-2323)
+	- StrategyMDex.makeWithdrawRemoveLiquidity(uint256,uint256) (../../sb/StrategyMDex.sol#2325-2332)
+	- StrategyMDex.massUpdatePools() (../../sb/StrategyMDex.sol#2024-2029)
+	- StrategyMDex.pendingLPAmount(uint256,address) (../../sb/StrategyMDex.sol#2005-2012)
+	- StrategyMDex.poolInfo (../../sb/StrategyMDex.sol#1871)
+	- StrategyMDex.poolLength() (../../sb/StrategyMDex.sol#1893-1895)
+	- StrategyMDex.resetApprove(uint256) (../../sb/StrategyMDex.sol#1969-1984)
+	- StrategyMDex.setMiniRewardAmount(uint256,uint256) (../../sb/StrategyMDex.sol#1994-1996)
+	- StrategyMDex.updatePool(uint256) (../../sb/StrategyMDex.sol#2032-2081)
+	- StrategyMDex.withdraw(uint256,address,uint256) (../../sb/StrategyMDex.sol#2259-2264)
+	- StrategyMDex.withdrawLPToken(uint256,address,uint256) (../../sb/StrategyMDex.sol#2244-2257)
+	- user.lpPoints = user.lpPoints.add(addPoint) (../../sb/StrategyMDex.sol#2148)
+	StrategyMDex.userInfo (../../sb/StrategyMDex.sol#1873) can be used in cross function reentrancies:
+	- StrategyMDex._emergencyWithdraw(uint256,address) (../../sb/StrategyMDex.sol#2349-2369)
+	- StrategyMDex._withdraw(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2266-2305)
+	- StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2101-2164)
+	- StrategyMDex.getATUserAmount(uint256,address) (../../sb/StrategyMDex.sol#1905-1908)
+	- StrategyMDex.getBorrowInfo(uint256,address) (../../sb/StrategyMDex.sol#1933-1937)
+	- StrategyMDex.liquidation(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2371-2417)
+	- StrategyMDex.makeBorrowBaseToken(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2166-2183)
+	- StrategyMDex.makeLiquidationRepay(uint256,address,uint256) (../../sb/StrategyMDex.sol#2419-2432)
+	- StrategyMDex.makeWithdrawCalcAmount(uint256,address) (../../sb/StrategyMDex.sol#2307-2323)
+	- StrategyMDex.pendingLPAmount(uint256,address) (../../sb/StrategyMDex.sol#2005-2012)
+	- StrategyMDex.pendingRewards(uint256,address) (../../sb/StrategyMDex.sol#1999-2002)
+	- StrategyMDex.repayBorrow(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2334-2343)
+	- StrategyMDex.userInfo (../../sb/StrategyMDex.sol#1873)
+	- user.lpAmount = user.lpAmount.add(lpAmount) (../../sb/StrategyMDex.sol#2152)
+	StrategyMDex.userInfo (../../sb/StrategyMDex.sol#1873) can be used in cross function reentrancies:
+	- StrategyMDex._emergencyWithdraw(uint256,address) (../../sb/StrategyMDex.sol#2349-2369)
+	- StrategyMDex._withdraw(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2266-2305)
+	- StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2101-2164)
+	- StrategyMDex.getATUserAmount(uint256,address) (../../sb/StrategyMDex.sol#1905-1908)
+	- StrategyMDex.getBorrowInfo(uint256,address) (../../sb/StrategyMDex.sol#1933-1937)
+	- StrategyMDex.liquidation(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2371-2417)
+	- StrategyMDex.makeBorrowBaseToken(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2166-2183)
+	- StrategyMDex.makeLiquidationRepay(uint256,address,uint256) (../../sb/StrategyMDex.sol#2419-2432)
+	- StrategyMDex.makeWithdrawCalcAmount(uint256,address) (../../sb/StrategyMDex.sol#2307-2323)
+	- StrategyMDex.pendingLPAmount(uint256,address) (../../sb/StrategyMDex.sol#2005-2012)
+	- StrategyMDex.pendingRewards(uint256,address) (../../sb/StrategyMDex.sol#1999-2002)
+	- StrategyMDex.repayBorrow(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2334-2343)
+	- StrategyMDex.userInfo (../../sb/StrategyMDex.sol#1873)
+Reentrancy in StrategyMDex.depositLPToken(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2085-2099):
+	External calls:
+	- router.removeLiquidity(token0,token1,withdrawLPAmount,0,0,address(this),block.timestamp.add(60)) (../../sb/StrategyMDex.sol#2095)
+	- lpAmount = deposit(_pid,_account,_borrowFrom,_bAmount,_desirePrice,_slippage) (../../sb/StrategyMDex.sol#2098)
+		- hecopool.deposit(_poolId,_lpAmount) (../../sb/StrategyMDex.sol#1115)
+		- hecopool.deposit(_poolId,0) (../../sb/StrategyMDex.sol#1124)
+		- router.addLiquidity(poolInfo[_pid].collateralToken[0],poolInfo[_pid].collateralToken[1],_amount0,_amount1,0,0,address(this),block.timestamp.add(60)) (../../sb/StrategyMDex.sol#2232-2234)
+		- bid = ITenBankHall(bank).makeBorrowFrom(_pid,_account,_borrowFrom,_bAmount) (../../sb/StrategyMDex.sol#2175)
+		- actionPool.onAcionUpdate(_pid) (../../sb/StrategyMDex.sol#2041)
+		- utils.makeDepositFee(_pid) (../../sb/StrategyMDex.sol#2121)
+		- utils.getTokenIn(token1,swapAmt,token0) (../../sb/StrategyMDex.sol#2206)
+		- utils.transferFromAllToken(address(this),_account,token0,token1) (../../sb/StrategyMDex.sol#2139)
+		- utils.getTokenIn(token0,swapAmt,token1) (../../sb/StrategyMDex.sol#2210)
+		- newRewardBase = utils.getTokenIn(rewardToken,newRewards,pool.baseToken) (../../sb/StrategyMDex.sol#2060)
+		- utils.makeRefundFee(_pid,newRewardBase) (../../sb/StrategyMDex.sol#2063)
+		- actionPool.onAcionIn(_pid,_account,lpAmountOld,user.lpAmount) (../../sb/StrategyMDex.sol#2162)
+	State variables written after the call(s):
+	- lpAmount = deposit(_pid,_account,_borrowFrom,_bAmount,_desirePrice,_slippage) (../../sb/StrategyMDex.sol#2098)
+		- pool.lastRewardsBlock = block.number (../../sb/StrategyMDex.sol#2036)
+		- pool.lastRewardsBlock = block.number (../../sb/StrategyMDex.sol#2044)
+		- poolInfo[_pid].totalPoints = poolInfo[_pid].totalPoints.add(addPoint) (../../sb/StrategyMDex.sol#2149)
+		- poolInfo[_pid].totalLPReinvest = poolInfo[_pid].totalLPReinvest.add(lpAmount) (../../sb/StrategyMDex.sol#2150)
+		- poolInfo[_pid].totalLPAmount = poolInfo[_pid].totalLPAmount.add(lpAmount) (../../sb/StrategyMDex.sol#2153)
+		- pool.totalLPReinvest = pool.totalLPReinvest.add(lpAmount) (../../sb/StrategyMDex.sol#2080)
+	StrategyMDex.poolInfo (../../sb/StrategyMDex.sol#1871) can be used in cross function reentrancies:
+	- StrategyMDex._emergencyWithdraw(uint256,address) (../../sb/StrategyMDex.sol#2349-2369)
+	- StrategyMDex._withdraw(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2266-2305)
+	- StrategyMDex.addPool(uint256,address[],address) (../../sb/StrategyMDex.sol#1947-1967)
+	- StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2101-2164)
+	- StrategyMDex.depositLPToken(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2085-2099)
+	- StrategyMDex.getATPoolInfo(uint256) (../../sb/StrategyMDex.sol#1898-1903)
+	- StrategyMDex.getBaseToken(uint256) (../../sb/StrategyMDex.sol#1929-1931)
+	- StrategyMDex.getDepositAmount(uint256,address) (../../sb/StrategyMDex.sol#2018-2021)
+	- StrategyMDex.getPoolCollateralToken(uint256) (../../sb/StrategyMDex.sol#1921-1923)
+	- StrategyMDex.getPoolInfo(uint256) (../../sb/StrategyMDex.sol#1910-1919)
+	- StrategyMDex.getPoollpToken(uint256) (../../sb/StrategyMDex.sol#1925-1927)
+	- StrategyMDex.liquidation(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2371-2417)
+	- StrategyMDex.makeBalanceOptimalLiquidity(uint256) (../../sb/StrategyMDex.sol#2185-2191)
+	- StrategyMDex.makeBalanceOptimalLiquidityByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2193-2213)
+	- StrategyMDex.makeLiquidationRepay(uint256,address,uint256) (../../sb/StrategyMDex.sol#2419-2432)
+	- StrategyMDex.makeLiquidityAndDeposit(uint256) (../../sb/StrategyMDex.sol#2215-2221)
+	- StrategyMDex.makeLiquidityAndDepositByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2223-2242)
+	- StrategyMDex.makeWithdrawCalcAmount(uint256,address) (../../sb/StrategyMDex.sol#2307-2323)
+	- StrategyMDex.makeWithdrawRemoveLiquidity(uint256,uint256) (../../sb/StrategyMDex.sol#2325-2332)
+	- StrategyMDex.massUpdatePools() (../../sb/StrategyMDex.sol#2024-2029)
+	- StrategyMDex.pendingLPAmount(uint256,address) (../../sb/StrategyMDex.sol#2005-2012)
+	- StrategyMDex.poolInfo (../../sb/StrategyMDex.sol#1871)
+	- StrategyMDex.poolLength() (../../sb/StrategyMDex.sol#1893-1895)
+	- StrategyMDex.resetApprove(uint256) (../../sb/StrategyMDex.sol#1969-1984)
+	- StrategyMDex.setMiniRewardAmount(uint256,uint256) (../../sb/StrategyMDex.sol#1994-1996)
+	- StrategyMDex.updatePool(uint256) (../../sb/StrategyMDex.sol#2032-2081)
+	- StrategyMDex.withdraw(uint256,address,uint256) (../../sb/StrategyMDex.sol#2259-2264)
+	- StrategyMDex.withdrawLPToken(uint256,address,uint256) (../../sb/StrategyMDex.sol#2244-2257)
+Reentrancy in StrategyMDex.liquidation(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2371-2417):
+	External calls:
+	- updatePool(_pid) (../../sb/StrategyMDex.sol#2377)
+		- hecopool.deposit(_poolId,_lpAmount) (../../sb/StrategyMDex.sol#1115)
+		- hecopool.deposit(_poolId,0) (../../sb/StrategyMDex.sol#1124)
+		- router.addLiquidity(poolInfo[_pid].collateralToken[0],poolInfo[_pid].collateralToken[1],_amount0,_amount1,0,0,address(this),block.timestamp.add(60)) (../../sb/StrategyMDex.sol#2232-2234)
+		- actionPool.onAcionUpdate(_pid) (../../sb/StrategyMDex.sol#2041)
+		- utils.getTokenIn(token1,swapAmt,token0) (../../sb/StrategyMDex.sol#2206)
+		- utils.getTokenIn(token0,swapAmt,token1) (../../sb/StrategyMDex.sol#2210)
+		- newRewardBase = utils.getTokenIn(rewardToken,newRewards,pool.baseToken) (../../sb/StrategyMDex.sol#2060)
+		- utils.makeRefundFee(_pid,newRewardBase) (../../sb/StrategyMDex.sol#2063)
+	State variables written after the call(s):
+	- poolInfo[_pid].totalLPAmount = TenMath.safeSub(poolInfo[_pid].totalLPAmount,user.lpAmount) (../../sb/StrategyMDex.sol#2392)
+	StrategyMDex.poolInfo (../../sb/StrategyMDex.sol#1871) can be used in cross function reentrancies:
+	- StrategyMDex._emergencyWithdraw(uint256,address) (../../sb/StrategyMDex.sol#2349-2369)
+	- StrategyMDex._withdraw(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2266-2305)
+	- StrategyMDex.addPool(uint256,address[],address) (../../sb/StrategyMDex.sol#1947-1967)
+	- StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2101-2164)
+	- StrategyMDex.depositLPToken(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2085-2099)
+	- StrategyMDex.getATPoolInfo(uint256) (../../sb/StrategyMDex.sol#1898-1903)
+	- StrategyMDex.getBaseToken(uint256) (../../sb/StrategyMDex.sol#1929-1931)
+	- StrategyMDex.getDepositAmount(uint256,address) (../../sb/StrategyMDex.sol#2018-2021)
+	- StrategyMDex.getPoolCollateralToken(uint256) (../../sb/StrategyMDex.sol#1921-1923)
+	- StrategyMDex.getPoolInfo(uint256) (../../sb/StrategyMDex.sol#1910-1919)
+	- StrategyMDex.getPoollpToken(uint256) (../../sb/StrategyMDex.sol#1925-1927)
+	- StrategyMDex.liquidation(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2371-2417)
+	- StrategyMDex.makeBalanceOptimalLiquidity(uint256) (../../sb/StrategyMDex.sol#2185-2191)
+	- StrategyMDex.makeBalanceOptimalLiquidityByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2193-2213)
+	- StrategyMDex.makeLiquidationRepay(uint256,address,uint256) (../../sb/StrategyMDex.sol#2419-2432)
+	- StrategyMDex.makeLiquidityAndDeposit(uint256) (../../sb/StrategyMDex.sol#2215-2221)
+	- StrategyMDex.makeLiquidityAndDepositByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2223-2242)
+	- StrategyMDex.makeWithdrawCalcAmount(uint256,address) (../../sb/StrategyMDex.sol#2307-2323)
+	- StrategyMDex.makeWithdrawRemoveLiquidity(uint256,uint256) (../../sb/StrategyMDex.sol#2325-2332)
+	- StrategyMDex.massUpdatePools() (../../sb/StrategyMDex.sol#2024-2029)
+	- StrategyMDex.pendingLPAmount(uint256,address) (../../sb/StrategyMDex.sol#2005-2012)
+	- StrategyMDex.poolInfo (../../sb/StrategyMDex.sol#1871)
+	- StrategyMDex.poolLength() (../../sb/StrategyMDex.sol#1893-1895)
+	- StrategyMDex.resetApprove(uint256) (../../sb/StrategyMDex.sol#1969-1984)
+	- StrategyMDex.setMiniRewardAmount(uint256,uint256) (../../sb/StrategyMDex.sol#1994-1996)
+	- StrategyMDex.updatePool(uint256) (../../sb/StrategyMDex.sol#2032-2081)
+	- StrategyMDex.withdraw(uint256,address,uint256) (../../sb/StrategyMDex.sol#2259-2264)
+	- StrategyMDex.withdrawLPToken(uint256,address,uint256) (../../sb/StrategyMDex.sol#2244-2257)
+	- poolInfo[_pid].totalLPReinvest = TenMath.safeSub(poolInfo[_pid].totalLPReinvest,withdrawLPTokenAmount) (../../sb/StrategyMDex.sol#2393)
+	StrategyMDex.poolInfo (../../sb/StrategyMDex.sol#1871) can be used in cross function reentrancies:
+	- StrategyMDex._emergencyWithdraw(uint256,address) (../../sb/StrategyMDex.sol#2349-2369)
+	- StrategyMDex._withdraw(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2266-2305)
+	- StrategyMDex.addPool(uint256,address[],address) (../../sb/StrategyMDex.sol#1947-1967)
+	- StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2101-2164)
+	- StrategyMDex.depositLPToken(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2085-2099)
+	- StrategyMDex.getATPoolInfo(uint256) (../../sb/StrategyMDex.sol#1898-1903)
+	- StrategyMDex.getBaseToken(uint256) (../../sb/StrategyMDex.sol#1929-1931)
+	- StrategyMDex.getDepositAmount(uint256,address) (../../sb/StrategyMDex.sol#2018-2021)
+	- StrategyMDex.getPoolCollateralToken(uint256) (../../sb/StrategyMDex.sol#1921-1923)
+	- StrategyMDex.getPoolInfo(uint256) (../../sb/StrategyMDex.sol#1910-1919)
+	- StrategyMDex.getPoollpToken(uint256) (../../sb/StrategyMDex.sol#1925-1927)
+	- StrategyMDex.liquidation(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2371-2417)
+	- StrategyMDex.makeBalanceOptimalLiquidity(uint256) (../../sb/StrategyMDex.sol#2185-2191)
+	- StrategyMDex.makeBalanceOptimalLiquidityByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2193-2213)
+	- StrategyMDex.makeLiquidationRepay(uint256,address,uint256) (../../sb/StrategyMDex.sol#2419-2432)
+	- StrategyMDex.makeLiquidityAndDeposit(uint256) (../../sb/StrategyMDex.sol#2215-2221)
+	- StrategyMDex.makeLiquidityAndDepositByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2223-2242)
+	- StrategyMDex.makeWithdrawCalcAmount(uint256,address) (../../sb/StrategyMDex.sol#2307-2323)
+	- StrategyMDex.makeWithdrawRemoveLiquidity(uint256,uint256) (../../sb/StrategyMDex.sol#2325-2332)
+	- StrategyMDex.massUpdatePools() (../../sb/StrategyMDex.sol#2024-2029)
+	- StrategyMDex.pendingLPAmount(uint256,address) (../../sb/StrategyMDex.sol#2005-2012)
+	- StrategyMDex.poolInfo (../../sb/StrategyMDex.sol#1871)
+	- StrategyMDex.poolLength() (../../sb/StrategyMDex.sol#1893-1895)
+	- StrategyMDex.resetApprove(uint256) (../../sb/StrategyMDex.sol#1969-1984)
+	- StrategyMDex.setMiniRewardAmount(uint256,uint256) (../../sb/StrategyMDex.sol#1994-1996)
+	- StrategyMDex.updatePool(uint256) (../../sb/StrategyMDex.sol#2032-2081)
+	- StrategyMDex.withdraw(uint256,address,uint256) (../../sb/StrategyMDex.sol#2259-2264)
+	- StrategyMDex.withdrawLPToken(uint256,address,uint256) (../../sb/StrategyMDex.sol#2244-2257)
+	- poolInfo[_pid].totalPoints = TenMath.safeSub(poolInfo[_pid].totalPoints,user.lpPoints) (../../sb/StrategyMDex.sol#2394)
+	StrategyMDex.poolInfo (../../sb/StrategyMDex.sol#1871) can be used in cross function reentrancies:
+	- StrategyMDex._emergencyWithdraw(uint256,address) (../../sb/StrategyMDex.sol#2349-2369)
+	- StrategyMDex._withdraw(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2266-2305)
+	- StrategyMDex.addPool(uint256,address[],address) (../../sb/StrategyMDex.sol#1947-1967)
+	- StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2101-2164)
+	- StrategyMDex.depositLPToken(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2085-2099)
+	- StrategyMDex.getATPoolInfo(uint256) (../../sb/StrategyMDex.sol#1898-1903)
+	- StrategyMDex.getBaseToken(uint256) (../../sb/StrategyMDex.sol#1929-1931)
+	- StrategyMDex.getDepositAmount(uint256,address) (../../sb/StrategyMDex.sol#2018-2021)
+	- StrategyMDex.getPoolCollateralToken(uint256) (../../sb/StrategyMDex.sol#1921-1923)
+	- StrategyMDex.getPoolInfo(uint256) (../../sb/StrategyMDex.sol#1910-1919)
+	- StrategyMDex.getPoollpToken(uint256) (../../sb/StrategyMDex.sol#1925-1927)
+	- StrategyMDex.liquidation(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2371-2417)
+	- StrategyMDex.makeBalanceOptimalLiquidity(uint256) (../../sb/StrategyMDex.sol#2185-2191)
+	- StrategyMDex.makeBalanceOptimalLiquidityByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2193-2213)
+	- StrategyMDex.makeLiquidationRepay(uint256,address,uint256) (../../sb/StrategyMDex.sol#2419-2432)
+	- StrategyMDex.makeLiquidityAndDeposit(uint256) (../../sb/StrategyMDex.sol#2215-2221)
+	- StrategyMDex.makeLiquidityAndDepositByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2223-2242)
+	- StrategyMDex.makeWithdrawCalcAmount(uint256,address) (../../sb/StrategyMDex.sol#2307-2323)
+	- StrategyMDex.makeWithdrawRemoveLiquidity(uint256,uint256) (../../sb/StrategyMDex.sol#2325-2332)
+	- StrategyMDex.massUpdatePools() (../../sb/StrategyMDex.sol#2024-2029)
+	- StrategyMDex.pendingLPAmount(uint256,address) (../../sb/StrategyMDex.sol#2005-2012)
+	- StrategyMDex.poolInfo (../../sb/StrategyMDex.sol#1871)
+	- StrategyMDex.poolLength() (../../sb/StrategyMDex.sol#1893-1895)
+	- StrategyMDex.resetApprove(uint256) (../../sb/StrategyMDex.sol#1969-1984)
+	- StrategyMDex.setMiniRewardAmount(uint256,uint256) (../../sb/StrategyMDex.sol#1994-1996)
+	- StrategyMDex.updatePool(uint256) (../../sb/StrategyMDex.sol#2032-2081)
+	- StrategyMDex.withdraw(uint256,address,uint256) (../../sb/StrategyMDex.sol#2259-2264)
+	- StrategyMDex.withdrawLPToken(uint256,address,uint256) (../../sb/StrategyMDex.sol#2244-2257)
+	- user.lpPoints = 0 (../../sb/StrategyMDex.sol#2396)
+	StrategyMDex.userInfo (../../sb/StrategyMDex.sol#1873) can be used in cross function reentrancies:
+	- StrategyMDex._emergencyWithdraw(uint256,address) (../../sb/StrategyMDex.sol#2349-2369)
+	- StrategyMDex._withdraw(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2266-2305)
+	- StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2101-2164)
+	- StrategyMDex.getATUserAmount(uint256,address) (../../sb/StrategyMDex.sol#1905-1908)
+	- StrategyMDex.getBorrowInfo(uint256,address) (../../sb/StrategyMDex.sol#1933-1937)
+	- StrategyMDex.liquidation(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2371-2417)
+	- StrategyMDex.makeBorrowBaseToken(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2166-2183)
+	- StrategyMDex.makeLiquidationRepay(uint256,address,uint256) (../../sb/StrategyMDex.sol#2419-2432)
+	- StrategyMDex.makeWithdrawCalcAmount(uint256,address) (../../sb/StrategyMDex.sol#2307-2323)
+	- StrategyMDex.pendingLPAmount(uint256,address) (../../sb/StrategyMDex.sol#2005-2012)
+	- StrategyMDex.pendingRewards(uint256,address) (../../sb/StrategyMDex.sol#1999-2002)
+	- StrategyMDex.repayBorrow(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2334-2343)
+	- StrategyMDex.userInfo (../../sb/StrategyMDex.sol#1873)
+	- user.lpAmount = 0 (../../sb/StrategyMDex.sol#2397)
+	StrategyMDex.userInfo (../../sb/StrategyMDex.sol#1873) can be used in cross function reentrancies:
+	- StrategyMDex._emergencyWithdraw(uint256,address) (../../sb/StrategyMDex.sol#2349-2369)
+	- StrategyMDex._withdraw(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2266-2305)
+	- StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2101-2164)
+	- StrategyMDex.getATUserAmount(uint256,address) (../../sb/StrategyMDex.sol#1905-1908)
+	- StrategyMDex.getBorrowInfo(uint256,address) (../../sb/StrategyMDex.sol#1933-1937)
+	- StrategyMDex.liquidation(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2371-2417)
+	- StrategyMDex.makeBorrowBaseToken(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2166-2183)
+	- StrategyMDex.makeLiquidationRepay(uint256,address,uint256) (../../sb/StrategyMDex.sol#2419-2432)
+	- StrategyMDex.makeWithdrawCalcAmount(uint256,address) (../../sb/StrategyMDex.sol#2307-2323)
+	- StrategyMDex.pendingLPAmount(uint256,address) (../../sb/StrategyMDex.sol#2005-2012)
+	- StrategyMDex.pendingRewards(uint256,address) (../../sb/StrategyMDex.sol#1999-2002)
+	- StrategyMDex.repayBorrow(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2334-2343)
+	- StrategyMDex.userInfo (../../sb/StrategyMDex.sol#1873)
+Reentrancy in StrategyMDex.liquidation(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2371-2417):
+	External calls:
+	- updatePool(_pid) (../../sb/StrategyMDex.sol#2377)
+		- hecopool.deposit(_poolId,_lpAmount) (../../sb/StrategyMDex.sol#1115)
+		- hecopool.deposit(_poolId,0) (../../sb/StrategyMDex.sol#1124)
+		- router.addLiquidity(poolInfo[_pid].collateralToken[0],poolInfo[_pid].collateralToken[1],_amount0,_amount1,0,0,address(this),block.timestamp.add(60)) (../../sb/StrategyMDex.sol#2232-2234)
+		- actionPool.onAcionUpdate(_pid) (../../sb/StrategyMDex.sol#2041)
+		- utils.getTokenIn(token1,swapAmt,token0) (../../sb/StrategyMDex.sol#2206)
+		- utils.getTokenIn(token0,swapAmt,token1) (../../sb/StrategyMDex.sol#2210)
+		- newRewardBase = utils.getTokenIn(rewardToken,newRewards,pool.baseToken) (../../sb/StrategyMDex.sol#2060)
+		- utils.makeRefundFee(_pid,newRewardBase) (../../sb/StrategyMDex.sol#2063)
+	- makeWithdrawRemoveLiquidity(_pid,withdrawLPTokenAmount) (../../sb/StrategyMDex.sol#2400)
+		- hecopool.withdraw(_poolId,_lpAmount) (../../sb/StrategyMDex.sol#1119)
+		- router.removeLiquidity(token0,token1,_withdrawLPTokenAmount,0,0,address(this),block.timestamp.add(60)) (../../sb/StrategyMDex.sol#2331)
+	- makeLiquidationRepay(_pid,_account,borrowAmount) (../../sb/StrategyMDex.sol#2405)
+		- utils.makeRepay(_pid,userInfo[_pid][_account].borrowFrom,_account,_rate,_fast) (../../sb/StrategyMDex.sol#2335)
+		- utils.getTokenIn(token0,amount0,poolInfo[_pid].baseToken) (../../sb/StrategyMDex.sol#2426)
+		- utils.getTokenIn(token1,amount1,poolInfo[_pid].baseToken) (../../sb/StrategyMDex.sol#2427)
+	State variables written after the call(s):
+	- makeLiquidationRepay(_pid,_account,borrowAmount) (../../sb/StrategyMDex.sol#2405)
+		- userInfo[_pid][_account].borrowFrom = address(0) (../../sb/StrategyMDex.sol#2337)
+		- userInfo[_pid][_account].bid = 0 (../../sb/StrategyMDex.sol#2338)
+	StrategyMDex.userInfo (../../sb/StrategyMDex.sol#1873) can be used in cross function reentrancies:
+	- StrategyMDex._emergencyWithdraw(uint256,address) (../../sb/StrategyMDex.sol#2349-2369)
+	- StrategyMDex._withdraw(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2266-2305)
+	- StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2101-2164)
+	- StrategyMDex.getATUserAmount(uint256,address) (../../sb/StrategyMDex.sol#1905-1908)
+	- StrategyMDex.getBorrowInfo(uint256,address) (../../sb/StrategyMDex.sol#1933-1937)
+	- StrategyMDex.liquidation(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2371-2417)
+	- StrategyMDex.makeBorrowBaseToken(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2166-2183)
+	- StrategyMDex.makeLiquidationRepay(uint256,address,uint256) (../../sb/StrategyMDex.sol#2419-2432)
+	- StrategyMDex.makeWithdrawCalcAmount(uint256,address) (../../sb/StrategyMDex.sol#2307-2323)
+	- StrategyMDex.pendingLPAmount(uint256,address) (../../sb/StrategyMDex.sol#2005-2012)
+	- StrategyMDex.pendingRewards(uint256,address) (../../sb/StrategyMDex.sol#1999-2002)
+	- StrategyMDex.repayBorrow(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2334-2343)
+	- StrategyMDex.userInfo (../../sb/StrategyMDex.sol#1873)
+Reentrancy in StrategyMDex.makeBorrowBaseToken(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2166-2183):
+	External calls:
+	- bid = ITenBankHall(bank).makeBorrowFrom(_pid,_account,_borrowFrom,_bAmount) (../../sb/StrategyMDex.sol#2175)
+	State variables written after the call(s):
+	- userInfo[_pid][_account].bid = bid (../../sb/StrategyMDex.sol#2182)
+	StrategyMDex.userInfo (../../sb/StrategyMDex.sol#1873) can be used in cross function reentrancies:
+	- StrategyMDex._emergencyWithdraw(uint256,address) (../../sb/StrategyMDex.sol#2349-2369)
+	- StrategyMDex._withdraw(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2266-2305)
+	- StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2101-2164)
+	- StrategyMDex.getATUserAmount(uint256,address) (../../sb/StrategyMDex.sol#1905-1908)
+	- StrategyMDex.getBorrowInfo(uint256,address) (../../sb/StrategyMDex.sol#1933-1937)
+	- StrategyMDex.liquidation(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2371-2417)
+	- StrategyMDex.makeBorrowBaseToken(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2166-2183)
+	- StrategyMDex.makeLiquidationRepay(uint256,address,uint256) (../../sb/StrategyMDex.sol#2419-2432)
+	- StrategyMDex.makeWithdrawCalcAmount(uint256,address) (../../sb/StrategyMDex.sol#2307-2323)
+	- StrategyMDex.pendingLPAmount(uint256,address) (../../sb/StrategyMDex.sol#2005-2012)
+	- StrategyMDex.pendingRewards(uint256,address) (../../sb/StrategyMDex.sol#1999-2002)
+	- StrategyMDex.repayBorrow(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2334-2343)
+	- StrategyMDex.userInfo (../../sb/StrategyMDex.sol#1873)
+Reentrancy in StrategyMDex.repayBorrow(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2334-2343):
+	External calls:
+	- utils.makeRepay(_pid,userInfo[_pid][_account].borrowFrom,_account,_rate,_fast) (../../sb/StrategyMDex.sol#2335)
+	State variables written after the call(s):
+	- userInfo[_pid][_account].borrowFrom = address(0) (../../sb/StrategyMDex.sol#2337)
+	StrategyMDex.userInfo (../../sb/StrategyMDex.sol#1873) can be used in cross function reentrancies:
+	- StrategyMDex._emergencyWithdraw(uint256,address) (../../sb/StrategyMDex.sol#2349-2369)
+	- StrategyMDex._withdraw(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2266-2305)
+	- StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2101-2164)
+	- StrategyMDex.getATUserAmount(uint256,address) (../../sb/StrategyMDex.sol#1905-1908)
+	- StrategyMDex.getBorrowInfo(uint256,address) (../../sb/StrategyMDex.sol#1933-1937)
+	- StrategyMDex.liquidation(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2371-2417)
+	- StrategyMDex.makeBorrowBaseToken(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2166-2183)
+	- StrategyMDex.makeLiquidationRepay(uint256,address,uint256) (../../sb/StrategyMDex.sol#2419-2432)
+	- StrategyMDex.makeWithdrawCalcAmount(uint256,address) (../../sb/StrategyMDex.sol#2307-2323)
+	- StrategyMDex.pendingLPAmount(uint256,address) (../../sb/StrategyMDex.sol#2005-2012)
+	- StrategyMDex.pendingRewards(uint256,address) (../../sb/StrategyMDex.sol#1999-2002)
+	- StrategyMDex.repayBorrow(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2334-2343)
+	- StrategyMDex.userInfo (../../sb/StrategyMDex.sol#1873)
+	- userInfo[_pid][_account].bid = 0 (../../sb/StrategyMDex.sol#2338)
+	StrategyMDex.userInfo (../../sb/StrategyMDex.sol#1873) can be used in cross function reentrancies:
+	- StrategyMDex._emergencyWithdraw(uint256,address) (../../sb/StrategyMDex.sol#2349-2369)
+	- StrategyMDex._withdraw(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2266-2305)
+	- StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2101-2164)
+	- StrategyMDex.getATUserAmount(uint256,address) (../../sb/StrategyMDex.sol#1905-1908)
+	- StrategyMDex.getBorrowInfo(uint256,address) (../../sb/StrategyMDex.sol#1933-1937)
+	- StrategyMDex.liquidation(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2371-2417)
+	- StrategyMDex.makeBorrowBaseToken(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2166-2183)
+	- StrategyMDex.makeLiquidationRepay(uint256,address,uint256) (../../sb/StrategyMDex.sol#2419-2432)
+	- StrategyMDex.makeWithdrawCalcAmount(uint256,address) (../../sb/StrategyMDex.sol#2307-2323)
+	- StrategyMDex.pendingLPAmount(uint256,address) (../../sb/StrategyMDex.sol#2005-2012)
+	- StrategyMDex.pendingRewards(uint256,address) (../../sb/StrategyMDex.sol#1999-2002)
+	- StrategyMDex.repayBorrow(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2334-2343)
+	- StrategyMDex.userInfo (../../sb/StrategyMDex.sol#1873)
+Reentrancy in StrategyMDex.updatePool(uint256) (../../sb/StrategyMDex.sol#2032-2081):
+	External calls:
+	- actionPool.onAcionUpdate(_pid) (../../sb/StrategyMDex.sol#2041)
+	State variables written after the call(s):
+	- pool.lastRewardsBlock = block.number (../../sb/StrategyMDex.sol#2044)
+	StrategyMDex.poolInfo (../../sb/StrategyMDex.sol#1871) can be used in cross function reentrancies:
+	- StrategyMDex._emergencyWithdraw(uint256,address) (../../sb/StrategyMDex.sol#2349-2369)
+	- StrategyMDex._withdraw(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2266-2305)
+	- StrategyMDex.addPool(uint256,address[],address) (../../sb/StrategyMDex.sol#1947-1967)
+	- StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2101-2164)
+	- StrategyMDex.depositLPToken(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2085-2099)
+	- StrategyMDex.getATPoolInfo(uint256) (../../sb/StrategyMDex.sol#1898-1903)
+	- StrategyMDex.getBaseToken(uint256) (../../sb/StrategyMDex.sol#1929-1931)
+	- StrategyMDex.getDepositAmount(uint256,address) (../../sb/StrategyMDex.sol#2018-2021)
+	- StrategyMDex.getPoolCollateralToken(uint256) (../../sb/StrategyMDex.sol#1921-1923)
+	- StrategyMDex.getPoolInfo(uint256) (../../sb/StrategyMDex.sol#1910-1919)
+	- StrategyMDex.getPoollpToken(uint256) (../../sb/StrategyMDex.sol#1925-1927)
+	- StrategyMDex.liquidation(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2371-2417)
+	- StrategyMDex.makeBalanceOptimalLiquidity(uint256) (../../sb/StrategyMDex.sol#2185-2191)
+	- StrategyMDex.makeBalanceOptimalLiquidityByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2193-2213)
+	- StrategyMDex.makeLiquidationRepay(uint256,address,uint256) (../../sb/StrategyMDex.sol#2419-2432)
+	- StrategyMDex.makeLiquidityAndDeposit(uint256) (../../sb/StrategyMDex.sol#2215-2221)
+	- StrategyMDex.makeLiquidityAndDepositByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2223-2242)
+	- StrategyMDex.makeWithdrawCalcAmount(uint256,address) (../../sb/StrategyMDex.sol#2307-2323)
+	- StrategyMDex.makeWithdrawRemoveLiquidity(uint256,uint256) (../../sb/StrategyMDex.sol#2325-2332)
+	- StrategyMDex.massUpdatePools() (../../sb/StrategyMDex.sol#2024-2029)
+	- StrategyMDex.pendingLPAmount(uint256,address) (../../sb/StrategyMDex.sol#2005-2012)
+	- StrategyMDex.poolInfo (../../sb/StrategyMDex.sol#1871)
+	- StrategyMDex.poolLength() (../../sb/StrategyMDex.sol#1893-1895)
+	- StrategyMDex.resetApprove(uint256) (../../sb/StrategyMDex.sol#1969-1984)
+	- StrategyMDex.setMiniRewardAmount(uint256,uint256) (../../sb/StrategyMDex.sol#1994-1996)
+	- StrategyMDex.updatePool(uint256) (../../sb/StrategyMDex.sol#2032-2081)
+	- StrategyMDex.withdraw(uint256,address,uint256) (../../sb/StrategyMDex.sol#2259-2264)
+	- StrategyMDex.withdrawLPToken(uint256,address,uint256) (../../sb/StrategyMDex.sol#2244-2257)
+Reentrancy in StrategyMDex.updatePool(uint256) (../../sb/StrategyMDex.sol#2032-2081):
+	External calls:
+	- actionPool.onAcionUpdate(_pid) (../../sb/StrategyMDex.sol#2041)
+	- newRewards = poolClaim(pool.poolId) (../../sb/StrategyMDex.sol#2049)
+		- hecopool.deposit(_poolId,0) (../../sb/StrategyMDex.sol#1124)
+	- newRewardBase = utils.getTokenIn(rewardToken,newRewards,pool.baseToken) (../../sb/StrategyMDex.sol#2060)
+	- utils.makeRefundFee(_pid,newRewardBase) (../../sb/StrategyMDex.sol#2063)
+	- makeBalanceOptimalLiquidityByAmount(_pid,uBalanceAfter0.sub(uBalanceBefore0),uBalanceAfter1.sub(uBalanceBefore1)) (../../sb/StrategyMDex.sol#2068-2070)
+		- utils.getTokenIn(token1,swapAmt,token0) (../../sb/StrategyMDex.sol#2206)
+		- utils.getTokenIn(token0,swapAmt,token1) (../../sb/StrategyMDex.sol#2210)
+	- lpAmount = makeLiquidityAndDepositByAmount(_pid,uBalanceAfter0.sub(uBalanceBefore0),uBalanceAfter1.sub(uBalanceBefore1)) (../../sb/StrategyMDex.sol#2075-2077)
+		- hecopool.deposit(_poolId,_lpAmount) (../../sb/StrategyMDex.sol#1115)
+		- router.addLiquidity(poolInfo[_pid].collateralToken[0],poolInfo[_pid].collateralToken[1],_amount0,_amount1,0,0,address(this),block.timestamp.add(60)) (../../sb/StrategyMDex.sol#2232-2234)
+	State variables written after the call(s):
+	- pool.totalLPReinvest = pool.totalLPReinvest.add(lpAmount) (../../sb/StrategyMDex.sol#2080)
+	StrategyMDex.poolInfo (../../sb/StrategyMDex.sol#1871) can be used in cross function reentrancies:
+	- StrategyMDex._emergencyWithdraw(uint256,address) (../../sb/StrategyMDex.sol#2349-2369)
+	- StrategyMDex._withdraw(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2266-2305)
+	- StrategyMDex.addPool(uint256,address[],address) (../../sb/StrategyMDex.sol#1947-1967)
+	- StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2101-2164)
+	- StrategyMDex.depositLPToken(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2085-2099)
+	- StrategyMDex.getATPoolInfo(uint256) (../../sb/StrategyMDex.sol#1898-1903)
+	- StrategyMDex.getBaseToken(uint256) (../../sb/StrategyMDex.sol#1929-1931)
+	- StrategyMDex.getDepositAmount(uint256,address) (../../sb/StrategyMDex.sol#2018-2021)
+	- StrategyMDex.getPoolCollateralToken(uint256) (../../sb/StrategyMDex.sol#1921-1923)
+	- StrategyMDex.getPoolInfo(uint256) (../../sb/StrategyMDex.sol#1910-1919)
+	- StrategyMDex.getPoollpToken(uint256) (../../sb/StrategyMDex.sol#1925-1927)
+	- StrategyMDex.liquidation(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2371-2417)
+	- StrategyMDex.makeBalanceOptimalLiquidity(uint256) (../../sb/StrategyMDex.sol#2185-2191)
+	- StrategyMDex.makeBalanceOptimalLiquidityByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2193-2213)
+	- StrategyMDex.makeLiquidationRepay(uint256,address,uint256) (../../sb/StrategyMDex.sol#2419-2432)
+	- StrategyMDex.makeLiquidityAndDeposit(uint256) (../../sb/StrategyMDex.sol#2215-2221)
+	- StrategyMDex.makeLiquidityAndDepositByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2223-2242)
+	- StrategyMDex.makeWithdrawCalcAmount(uint256,address) (../../sb/StrategyMDex.sol#2307-2323)
+	- StrategyMDex.makeWithdrawRemoveLiquidity(uint256,uint256) (../../sb/StrategyMDex.sol#2325-2332)
+	- StrategyMDex.massUpdatePools() (../../sb/StrategyMDex.sol#2024-2029)
+	- StrategyMDex.pendingLPAmount(uint256,address) (../../sb/StrategyMDex.sol#2005-2012)
+	- StrategyMDex.poolInfo (../../sb/StrategyMDex.sol#1871)
+	- StrategyMDex.poolLength() (../../sb/StrategyMDex.sol#1893-1895)
+	- StrategyMDex.resetApprove(uint256) (../../sb/StrategyMDex.sol#1969-1984)
+	- StrategyMDex.setMiniRewardAmount(uint256,uint256) (../../sb/StrategyMDex.sol#1994-1996)
+	- StrategyMDex.updatePool(uint256) (../../sb/StrategyMDex.sol#2032-2081)
+	- StrategyMDex.withdraw(uint256,address,uint256) (../../sb/StrategyMDex.sol#2259-2264)
+	- StrategyMDex.withdrawLPToken(uint256,address,uint256) (../../sb/StrategyMDex.sol#2244-2257)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+StrategyUtils.checkDepositLimit(uint256,address,uint256) (../../sb/StrategyMDex.sol#1565-1575) ignores return value by (totalLPRefund) = IStrategyLink(strategy).getPoolInfo(_pid) (../../sb/StrategyMDex.sol#1573)
+StrategyUtils.checkSlippageLimit(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#1577-1590) ignores return value by (a,b) = IMdexPair(pairs).getReserves() (../../sb/StrategyMDex.sol#1587)
+StrategyUtils.optimalDepositAmount(address,uint256,uint256) (../../sb/StrategyMDex.sol#1717-1732) ignores return value by (resA,resB,None) = IMdexPair(lpToken).getReserves() (../../sb/StrategyMDex.sol#1724)
+StrategyUtils.getLPToken2TokenAmount(address,address,uint256) (../../sb/StrategyMDex.sol#1758-1771) ignores return value by (a,b) = IMdexPair(_lpToken).getReserves() (../../sb/StrategyMDex.sol#1760)
+StrategyUtils.getTokenInTo(address,address,uint256,address) (../../sb/StrategyMDex.sol#1819-1838) ignores return value by IERC20(_tokenIn).approve(address(router),uint256(- 1)) (../../sb/StrategyMDex.sol#1829)
+StrategyMDexPools.poolDepositToken(uint256) (../../sb/StrategyMDex.sol#1097-1099) ignores return value by (lpToken,None,None,None,None,None) = hecopool.poolInfo(_poolId) (../../sb/StrategyMDex.sol#1098)
+StrategyMDexPools.poolTokenApprove(address,uint256) (../../sb/StrategyMDex.sol#1110-1112) ignores return value by IERC20(_token).approve(address(hecopool),_value) (../../sb/StrategyMDex.sol#1111)
+StrategyMDex.resetApprove(uint256) (../../sb/StrategyMDex.sol#1969-1984) ignores return value by IERC20(pool.collateralToken[0]).approve(address(router),uint256(- 1)) (../../sb/StrategyMDex.sol#1973)
+StrategyMDex.resetApprove(uint256) (../../sb/StrategyMDex.sol#1969-1984) ignores return value by IERC20(pool.collateralToken[1]).approve(address(router),uint256(- 1)) (../../sb/StrategyMDex.sol#1974)
+StrategyMDex.resetApprove(uint256) (../../sb/StrategyMDex.sol#1969-1984) ignores return value by IERC20(address(pool.lpToken)).approve(address(router),uint256(- 1)) (../../sb/StrategyMDex.sol#1975)
+StrategyMDex.resetApprove(uint256) (../../sb/StrategyMDex.sol#1969-1984) ignores return value by IERC20(rewardToken).approve(address(router),uint256(- 1)) (../../sb/StrategyMDex.sol#1976)
+StrategyMDex.resetApprove(uint256) (../../sb/StrategyMDex.sol#1969-1984) ignores return value by IERC20(pool.collateralToken[0]).approve(address(utils),uint256(- 1)) (../../sb/StrategyMDex.sol#1978)
+StrategyMDex.resetApprove(uint256) (../../sb/StrategyMDex.sol#1969-1984) ignores return value by IERC20(pool.collateralToken[1]).approve(address(utils),uint256(- 1)) (../../sb/StrategyMDex.sol#1979)
+StrategyMDex.resetApprove(uint256) (../../sb/StrategyMDex.sol#1969-1984) ignores return value by IERC20(address(pool.lpToken)).approve(address(utils),uint256(- 1)) (../../sb/StrategyMDex.sol#1980)
+StrategyMDex.resetApprove(uint256) (../../sb/StrategyMDex.sol#1969-1984) ignores return value by IERC20(rewardToken).approve(address(utils),uint256(- 1)) (../../sb/StrategyMDex.sol#1981)
+StrategyMDex.depositLPToken(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2085-2099) ignores return value by router.removeLiquidity(token0,token1,withdrawLPAmount,0,0,address(this),block.timestamp.add(60)) (../../sb/StrategyMDex.sol#2095)
+StrategyMDex.makeBalanceOptimalLiquidityByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2193-2213) ignores return value by utils.getTokenIn(token1,swapAmt,token0) (../../sb/StrategyMDex.sol#2206)
+StrategyMDex.makeBalanceOptimalLiquidityByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2193-2213) ignores return value by utils.getTokenIn(token0,swapAmt,token1) (../../sb/StrategyMDex.sol#2210)
+StrategyMDex.makeLiquidityAndDepositByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2223-2242) ignores return value by router.addLiquidity(poolInfo[_pid].collateralToken[0],poolInfo[_pid].collateralToken[1],_amount0,_amount1,0,0,address(this),block.timestamp.add(60)) (../../sb/StrategyMDex.sol#2232-2234)
+StrategyMDex.withdrawLPToken(uint256,address,uint256) (../../sb/StrategyMDex.sol#2244-2257) ignores return value by router.addLiquidity(token0,token1,amount0,amount1,0,0,_account,block.timestamp.add(60)) (../../sb/StrategyMDex.sol#2253)
+StrategyMDex.makeWithdrawRemoveLiquidity(uint256,uint256) (../../sb/StrategyMDex.sol#2325-2332) ignores return value by router.removeLiquidity(token0,token1,_withdrawLPTokenAmount,0,0,address(this),block.timestamp.add(60)) (../../sb/StrategyMDex.sol#2331)
+StrategyMDex.makeLiquidationRepay(uint256,address,uint256) (../../sb/StrategyMDex.sol#2419-2432) ignores return value by utils.getTokenIn(token0,amount0,poolInfo[_pid].baseToken) (../../sb/StrategyMDex.sol#2426)
+StrategyMDex.makeLiquidationRepay(uint256,address,uint256) (../../sb/StrategyMDex.sol#2419-2432) ignores return value by utils.getTokenIn(token1,amount1,poolInfo[_pid].baseToken) (../../sb/StrategyMDex.sol#2427)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+StrategyMDex.updatePool(uint256).uBalanceAfter0 (../../sb/StrategyMDex.sol#2066) is written in both
+	(uBalanceAfter0,uBalanceAfter1) = getTokenBalance_this(token0,token1) (../../sb/StrategyMDex.sol#2072)
+	(uBalanceAfter0,uBalanceAfter1) = getTokenBalance_this(token0,token1) (../../sb/StrategyMDex.sol#2078)
+StrategyMDex.updatePool(uint256).uBalanceAfter1 (../../sb/StrategyMDex.sol#2066) is written in both
+	(uBalanceAfter0,uBalanceAfter1) = getTokenBalance_this(token0,token1) (../../sb/StrategyMDex.sol#2072)
+	(uBalanceAfter0,uBalanceAfter1) = getTokenBalance_this(token0,token1) (../../sb/StrategyMDex.sol#2078)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#write-after-write
+
+StrategyMDex.constructor(address,address)._bank (../../sb/StrategyMDex.sol#1884) lacks a zero-check on :
+		- bank = _bank (../../sb/StrategyMDex.sol#1885)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+StrategyMDex.updatePool(uint256) (../../sb/StrategyMDex.sol#2032-2081) has external calls inside a loop: actionPool.onAcionUpdate(_pid) (../../sb/StrategyMDex.sol#2041)
+StrategyMDex.getTokenBalance_this(address,address) (../../sb/StrategyMDex.sol#1939-1943) has external calls inside a loop: a1 = IERC20(_token0).balanceOf(address(this)) (../../sb/StrategyMDex.sol#1941)
+StrategyMDex.getTokenBalance_this(address,address) (../../sb/StrategyMDex.sol#1939-1943) has external calls inside a loop: a2 = IERC20(_token1).balanceOf(address(this)) (../../sb/StrategyMDex.sol#1942)
+StrategyMDexPools.poolClaim(uint256) (../../sb/StrategyMDex.sol#1122-1127) has external calls inside a loop: uBalanceBefore = IERC20(mdxToken).balanceOf(address(this)) (../../sb/StrategyMDex.sol#1123)
+StrategyMDexPools.poolClaim(uint256) (../../sb/StrategyMDex.sol#1122-1127) has external calls inside a loop: hecopool.deposit(_poolId,0) (../../sb/StrategyMDex.sol#1124)
+StrategyMDexPools.poolClaim(uint256) (../../sb/StrategyMDex.sol#1122-1127) has external calls inside a loop: uBalanceAfter = IERC20(mdxToken).balanceOf(address(this)) (../../sb/StrategyMDex.sol#1125)
+StrategyMDex.updatePool(uint256) (../../sb/StrategyMDex.sol#2032-2081) has external calls inside a loop: utils.getAmountIn(rewardToken,newRewards,pool.baseToken) <= 0 (../../sb/StrategyMDex.sol#2055)
+StrategyMDex.updatePool(uint256) (../../sb/StrategyMDex.sol#2032-2081) has external calls inside a loop: newRewardBase = utils.getTokenIn(rewardToken,newRewards,pool.baseToken) (../../sb/StrategyMDex.sol#2060)
+StrategyMDex.updatePool(uint256) (../../sb/StrategyMDex.sol#2032-2081) has external calls inside a loop: utils.makeRefundFee(_pid,newRewardBase) (../../sb/StrategyMDex.sol#2063)
+StrategyMDex.makeBalanceOptimalLiquidityByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2193-2213) has external calls inside a loop: pairs = factory.getPair(poolInfo[_pid].collateralToken[0],poolInfo[_pid].collateralToken[1]) (../../sb/StrategyMDex.sol#2194)
+StrategyMDex.makeBalanceOptimalLiquidityByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2193-2213) has external calls inside a loop: token0 = IMdexPair(pairs).token0() (../../sb/StrategyMDex.sol#2195)
+StrategyMDex.makeBalanceOptimalLiquidityByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2193-2213) has external calls inside a loop: token1 = IMdexPair(pairs).token1() (../../sb/StrategyMDex.sol#2196)
+StrategyMDex.makeBalanceOptimalLiquidityByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2193-2213) has external calls inside a loop: (swapAmt,isReversed) = utils.optimalDepositAmount(address(pairs),_amount0,_amount1) (../../sb/StrategyMDex.sol#2200)
+StrategyMDex.makeBalanceOptimalLiquidityByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2193-2213) has external calls inside a loop: utils.getAmountIn(token1,swapAmt,token0) > 0 (../../sb/StrategyMDex.sol#2205)
+StrategyMDex.makeBalanceOptimalLiquidityByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2193-2213) has external calls inside a loop: utils.getTokenIn(token1,swapAmt,token0) (../../sb/StrategyMDex.sol#2206)
+StrategyMDex.makeBalanceOptimalLiquidityByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2193-2213) has external calls inside a loop: utils.getAmountIn(token0,swapAmt,token1) > 0 (../../sb/StrategyMDex.sol#2209)
+StrategyMDex.makeBalanceOptimalLiquidityByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2193-2213) has external calls inside a loop: utils.getTokenIn(token0,swapAmt,token1) (../../sb/StrategyMDex.sol#2210)
+StrategyMDex.makeLiquidityAndDepositByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2223-2242) has external calls inside a loop: uBalanceBefore = poolInfo[_pid].lpToken.balanceOf(address(this)) (../../sb/StrategyMDex.sol#2231)
+StrategyMDex.makeLiquidityAndDepositByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2223-2242) has external calls inside a loop: router.addLiquidity(poolInfo[_pid].collateralToken[0],poolInfo[_pid].collateralToken[1],_amount0,_amount1,0,0,address(this),block.timestamp.add(60)) (../../sb/StrategyMDex.sol#2232-2234)
+StrategyMDex.makeLiquidityAndDepositByAmount(uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2223-2242) has external calls inside a loop: uBalanceAfter = poolInfo[_pid].lpToken.balanceOf(address(this)) (../../sb/StrategyMDex.sol#2235)
+StrategyMDexPools.poolDeposit(uint256,uint256) (../../sb/StrategyMDex.sol#1114-1116) has external calls inside a loop: hecopool.deposit(_poolId,_lpAmount) (../../sb/StrategyMDex.sol#1115)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in StrategyMDex._withdraw(uint256,address,uint256,bool) (../../sb/StrategyMDex.sol#2266-2305):
+	External calls:
+	- updatePool(_pid) (../../sb/StrategyMDex.sol#2268)
+		- hecopool.deposit(_poolId,_lpAmount) (../../sb/StrategyMDex.sol#1115)
+		- hecopool.deposit(_poolId,0) (../../sb/StrategyMDex.sol#1124)
+		- router.addLiquidity(poolInfo[_pid].collateralToken[0],poolInfo[_pid].collateralToken[1],_amount0,_amount1,0,0,address(this),block.timestamp.add(60)) (../../sb/StrategyMDex.sol#2232-2234)
+		- actionPool.onAcionUpdate(_pid) (../../sb/StrategyMDex.sol#2041)
+		- utils.getTokenIn(token1,swapAmt,token0) (../../sb/StrategyMDex.sol#2206)
+		- utils.getTokenIn(token0,swapAmt,token1) (../../sb/StrategyMDex.sol#2210)
+		- newRewardBase = utils.getTokenIn(rewardToken,newRewards,pool.baseToken) (../../sb/StrategyMDex.sol#2060)
+		- utils.makeRefundFee(_pid,newRewardBase) (../../sb/StrategyMDex.sol#2063)
+	- makeWithdrawRemoveLiquidity(_pid,withdrawLPTokenAmount) (../../sb/StrategyMDex.sol#2282)
+		- hecopool.withdraw(_poolId,_lpAmount) (../../sb/StrategyMDex.sol#1119)
+		- router.removeLiquidity(token0,token1,_withdrawLPTokenAmount,0,0,address(this),block.timestamp.add(60)) (../../sb/StrategyMDex.sol#2331)
+	- utils.makeWithdrawRewardFee(_pid,borrowRate,rewardsRate) (../../sb/StrategyMDex.sol#2286)
+	- repayBorrow(_pid,_account,_rate,_fast) (../../sb/StrategyMDex.sol#2288)
+		- utils.makeRepay(_pid,userInfo[_pid][_account].borrowFrom,_account,_rate,_fast) (../../sb/StrategyMDex.sol#2335)
+	Event emitted after the call(s):
+	- StrategyWithdraw(address(this),_pid,_account,withdrawLPTokenAmount) (../../sb/StrategyMDex.sol#2300)
+Reentrancy in StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2101-2164):
+	External calls:
+	- updatePool(_pid) (../../sb/StrategyMDex.sol#2116)
+		- hecopool.deposit(_poolId,_lpAmount) (../../sb/StrategyMDex.sol#1115)
+		- hecopool.deposit(_poolId,0) (../../sb/StrategyMDex.sol#1124)
+		- router.addLiquidity(poolInfo[_pid].collateralToken[0],poolInfo[_pid].collateralToken[1],_amount0,_amount1,0,0,address(this),block.timestamp.add(60)) (../../sb/StrategyMDex.sol#2232-2234)
+		- actionPool.onAcionUpdate(_pid) (../../sb/StrategyMDex.sol#2041)
+		- utils.getTokenIn(token1,swapAmt,token0) (../../sb/StrategyMDex.sol#2206)
+		- utils.getTokenIn(token0,swapAmt,token1) (../../sb/StrategyMDex.sol#2210)
+		- newRewardBase = utils.getTokenIn(rewardToken,newRewards,pool.baseToken) (../../sb/StrategyMDex.sol#2060)
+		- utils.makeRefundFee(_pid,newRewardBase) (../../sb/StrategyMDex.sol#2063)
+	- utils.makeDepositFee(_pid) (../../sb/StrategyMDex.sol#2121)
+	- makeBorrowBaseToken(_pid,_account,user.borrowFrom,_bAmount) (../../sb/StrategyMDex.sol#2124)
+		- bid = ITenBankHall(bank).makeBorrowFrom(_pid,_account,_borrowFrom,_bAmount) (../../sb/StrategyMDex.sol#2175)
+	Event emitted after the call(s):
+	- StrategyBorrow(address(this),_pid,_account,_bAmount) (../../sb/StrategyMDex.sol#2177)
+		- makeBorrowBaseToken(_pid,_account,user.borrowFrom,_bAmount) (../../sb/StrategyMDex.sol#2124)
+Reentrancy in StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2101-2164):
+	External calls:
+	- updatePool(_pid) (../../sb/StrategyMDex.sol#2116)
+		- hecopool.deposit(_poolId,_lpAmount) (../../sb/StrategyMDex.sol#1115)
+		- hecopool.deposit(_poolId,0) (../../sb/StrategyMDex.sol#1124)
+		- router.addLiquidity(poolInfo[_pid].collateralToken[0],poolInfo[_pid].collateralToken[1],_amount0,_amount1,0,0,address(this),block.timestamp.add(60)) (../../sb/StrategyMDex.sol#2232-2234)
+		- actionPool.onAcionUpdate(_pid) (../../sb/StrategyMDex.sol#2041)
+		- utils.getTokenIn(token1,swapAmt,token0) (../../sb/StrategyMDex.sol#2206)
+		- utils.getTokenIn(token0,swapAmt,token1) (../../sb/StrategyMDex.sol#2210)
+		- newRewardBase = utils.getTokenIn(rewardToken,newRewards,pool.baseToken) (../../sb/StrategyMDex.sol#2060)
+		- utils.makeRefundFee(_pid,newRewardBase) (../../sb/StrategyMDex.sol#2063)
+	- utils.makeDepositFee(_pid) (../../sb/StrategyMDex.sol#2121)
+	- makeBorrowBaseToken(_pid,_account,user.borrowFrom,_bAmount) (../../sb/StrategyMDex.sol#2124)
+		- bid = ITenBankHall(bank).makeBorrowFrom(_pid,_account,_borrowFrom,_bAmount) (../../sb/StrategyMDex.sol#2175)
+	- makeBalanceOptimalLiquidity(_pid) (../../sb/StrategyMDex.sol#2127)
+		- utils.getTokenIn(token1,swapAmt,token0) (../../sb/StrategyMDex.sol#2206)
+		- utils.getTokenIn(token0,swapAmt,token1) (../../sb/StrategyMDex.sol#2210)
+	- lpAmount = makeLiquidityAndDeposit(_pid) (../../sb/StrategyMDex.sol#2130)
+		- hecopool.deposit(_poolId,_lpAmount) (../../sb/StrategyMDex.sol#1115)
+		- router.addLiquidity(poolInfo[_pid].collateralToken[0],poolInfo[_pid].collateralToken[1],_amount0,_amount1,0,0,address(this),block.timestamp.add(60)) (../../sb/StrategyMDex.sol#2232-2234)
+	- utils.transferFromAllToken(address(this),_account,token0,token1) (../../sb/StrategyMDex.sol#2139)
+	Event emitted after the call(s):
+	- StrategyDeposit(address(this),_pid,_account,lpAmount,_bAmount) (../../sb/StrategyMDex.sol#2159)
+Reentrancy in StrategyMDex.depositLPToken(uint256,address,address,uint256,uint256,uint256) (../../sb/StrategyMDex.sol#2085-2099):
+	External calls:
+	- router.removeLiquidity(token0,token1,withdrawLPAmount,0,0,address(this),block.timestamp.add(60)) (../../sb/StrategyMDex.sol#2095)
+	- lpAmount = deposit(_pid,_account,_borrowFrom,_bAmount,_desirePrice,_slippage) (../../sb/StrategyMDex.sol#2098)
+		- hecopool.deposit(_poolId,_lpAmount) (../../sb/StrategyMDex.sol#1115)
+		- hecopool.deposit(_poolId,0) (../../sb/StrategyMDex.sol#1124)
+		- router.addLiquidity(poolInfo[_pid].collateralToken[0],poolInfo[_pid].collateralToken[1],_amount0,_amount1,0,0,address(this),block.timestamp.add(60)) (../../sb/StrategyMDex.sol#2232-2234)
+		- bid = ITenBankHall(bank).makeBorrowFrom(_pid,_account,_borrowFrom,_bAmount) (../../sb/StrategyMDex.sol#2175)
+		- actionPool.onAcionUpdate(_pid) (../../sb/StrategyMDex.sol#2041)
+		- utils.makeDepositFee(_pid) (../../sb/StrategyMDex.sol#2121)
+		- utils.getTokenIn(token1,swapAmt,token0) (../../sb/StrategyMDex.sol#2206)
+		- utils.transferFromAllToken(address(this),_account,token0,token1) (../../sb/StrategyMDex.sol#2139)
+		- utils.getTokenIn(token0,swapAmt,token1) (../../sb/StrategyMDex.sol#2210)
+		- newRewardBase = utils.getTokenIn(rewardToken,newRewards,pool.baseToken) (../../sb/StrategyMDex.sol#2060)
+		- utils.makeRefundFee(_pid,newRewardBase) (../../sb/StrategyMDex.sol#2063)
+		- actionPool.onAcionIn(_pid,_account,lpAmountOld,user.lpAmount) (../../sb/StrategyMDex.sol#2162)
+	Event emitted after the call(s):
+	- StrategyBorrow(address(this),_pid,_account,_bAmount) (../../sb/StrategyMDex.sol#2177)
+		- lpAmount = deposit(_pid,_account,_borrowFrom,_bAmount,_desirePrice,_slippage) (../../sb/StrategyMDex.sol#2098)
+	- StrategyDeposit(address(this),_pid,_account,lpAmount,_bAmount) (../../sb/StrategyMDex.sol#2159)
+		- lpAmount = deposit(_pid,_account,_borrowFrom,_bAmount,_desirePrice,_slippage) (../../sb/StrategyMDex.sol#2098)
+Reentrancy in StrategyMDex.liquidation(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2371-2417):
+	External calls:
+	- updatePool(_pid) (../../sb/StrategyMDex.sol#2377)
+		- hecopool.deposit(_poolId,_lpAmount) (../../sb/StrategyMDex.sol#1115)
+		- hecopool.deposit(_poolId,0) (../../sb/StrategyMDex.sol#1124)
+		- router.addLiquidity(poolInfo[_pid].collateralToken[0],poolInfo[_pid].collateralToken[1],_amount0,_amount1,0,0,address(this),block.timestamp.add(60)) (../../sb/StrategyMDex.sol#2232-2234)
+		- actionPool.onAcionUpdate(_pid) (../../sb/StrategyMDex.sol#2041)
+		- utils.getTokenIn(token1,swapAmt,token0) (../../sb/StrategyMDex.sol#2206)
+		- utils.getTokenIn(token0,swapAmt,token1) (../../sb/StrategyMDex.sol#2210)
+		- newRewardBase = utils.getTokenIn(rewardToken,newRewards,pool.baseToken) (../../sb/StrategyMDex.sol#2060)
+		- utils.makeRefundFee(_pid,newRewardBase) (../../sb/StrategyMDex.sol#2063)
+	- makeWithdrawRemoveLiquidity(_pid,withdrawLPTokenAmount) (../../sb/StrategyMDex.sol#2400)
+		- hecopool.withdraw(_poolId,_lpAmount) (../../sb/StrategyMDex.sol#1119)
+		- router.removeLiquidity(token0,token1,_withdrawLPTokenAmount,0,0,address(this),block.timestamp.add(60)) (../../sb/StrategyMDex.sol#2331)
+	Event emitted after the call(s):
+	- StrategyLiquidation(address(this),_pid,_account,withdrawLPTokenAmount) (../../sb/StrategyMDex.sol#2402)
+Reentrancy in StrategyMDex.makeBorrowBaseToken(uint256,address,address,uint256) (../../sb/StrategyMDex.sol#2166-2183):
+	External calls:
+	- bid = ITenBankHall(bank).makeBorrowFrom(_pid,_account,_borrowFrom,_bAmount) (../../sb/StrategyMDex.sol#2175)
+	Event emitted after the call(s):
+	- StrategyBorrow(address(this),_pid,_account,_bAmount) (../../sb/StrategyMDex.sol#2177)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+StrategyUtils.getTokenInTo(address,address,uint256,address) (../../sb/StrategyMDex.sol#1819-1838) uses timestamp for comparisons
+	Dangerous comparisons:
+	- result.length == 0 (../../sb/StrategyMDex.sol#1833)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/StrategyMDex.sol#311-320) uses assembly
+	- INLINE ASM (../../sb/StrategyMDex.sol#318)
+Address._verifyCallResult(bool,bytes,string) (../../sb/StrategyMDex.sol#456-473) uses assembly
+	- INLINE ASM (../../sb/StrategyMDex.sol#465-468)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.functionCall(address,bytes) (../../sb/StrategyMDex.sol#364-366) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/StrategyMDex.sol#389-391) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/StrategyMDex.sol#438-440) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/StrategyMDex.sol#448-454) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/StrategyMDex.sol#414-416) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/StrategyMDex.sol#424-430) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/StrategyMDex.sol#338-344) is never used and should be removed
+Context._msgData() (../../sb/StrategyMDex.sol#559-562) is never used and should be removed
+ERC20._burn(address,uint256) (../../sb/StrategyMDex.sol#1370-1378) is never used and should be removed
+ERC20._mint(address,uint256) (../../sb/StrategyMDex.sol#1349-1357) is never used and should be removed
+ERC20._setupDecimals(uint8) (../../sb/StrategyMDex.sol#1408-1410) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/StrategyMDex.sol#504-513) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/StrategyMDex.sol#520-523) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/StrategyMDex.sol#515-518) is never used and should be removed
+SafeMath.div(uint256,uint256,string) (../../sb/StrategyMDex.sol#264-267) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/StrategyMDex.sol#226-229) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/StrategyMDex.sol#284-287) is never used and should be removed
+SafeMath.tryAdd(uint256,uint256) (../../sb/StrategyMDex.sol#98-102) is never used and should be removed
+SafeMath.tryDiv(uint256,uint256) (../../sb/StrategyMDex.sol#134-137) is never used and should be removed
+SafeMath.tryMod(uint256,uint256) (../../sb/StrategyMDex.sol#144-147) is never used and should be removed
+SafeMath.tryMul(uint256,uint256) (../../sb/StrategyMDex.sol#119-127) is never used and should be removed
+SafeMath.trySub(uint256,uint256) (../../sb/StrategyMDex.sol#109-112) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.6.12 (../../sb/StrategyMDex.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/StrategyMDex.sol#338-344):
+	- (success) = recipient.call{value: amount}() (../../sb/StrategyMDex.sol#342)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/StrategyMDex.sol#399-406):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/StrategyMDex.sol#404)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/StrategyMDex.sol#424-430):
+	- (success,returndata) = target.staticcall(data) (../../sb/StrategyMDex.sol#428)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/StrategyMDex.sol#448-454):
+	- (success,returndata) = target.delegatecall(data) (../../sb/StrategyMDex.sol#452)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Function IMdexRouter.WHT() (../../sb/StrategyMDex.sol#632) is not in mixedCase
+Parameter StrategyMDexPools.poolDepositToken(uint256)._poolId (../../sb/StrategyMDex.sol#1097) is not in mixedCase
+Parameter StrategyMDexPools.poolPending(uint256)._poolId (../../sb/StrategyMDex.sol#1106) is not in mixedCase
+Parameter StrategyMDexPools.poolTokenApprove(address,uint256)._token (../../sb/StrategyMDex.sol#1110) is not in mixedCase
+Parameter StrategyMDexPools.poolTokenApprove(address,uint256)._value (../../sb/StrategyMDex.sol#1110) is not in mixedCase
+Parameter StrategyMDexPools.poolDeposit(uint256,uint256)._poolId (../../sb/StrategyMDex.sol#1114) is not in mixedCase
+Parameter StrategyMDexPools.poolDeposit(uint256,uint256)._lpAmount (../../sb/StrategyMDex.sol#1114) is not in mixedCase
+Parameter StrategyMDexPools.poolWithdraw(uint256,uint256)._poolId (../../sb/StrategyMDex.sol#1118) is not in mixedCase
+Parameter StrategyMDexPools.poolWithdraw(uint256,uint256)._lpAmount (../../sb/StrategyMDex.sol#1118) is not in mixedCase
+Parameter StrategyMDexPools.poolClaim(uint256)._poolId (../../sb/StrategyMDex.sol#1122) is not in mixedCase
+Constant StrategyMDexPools.hecopool (../../sb/StrategyMDex.sol#1094) is not in UPPER_CASE_WITH_UNDERSCORES
+Parameter StrategyUtils.setSConfig(address)._sconfig (../../sb/StrategyMDex.sol#1473) is not in mixedCase
+Parameter StrategyUtils.makeDepositFee(uint256)._pid (../../sb/StrategyMDex.sol#1478) is not in mixedCase
+Parameter StrategyUtils.makeFeeTransfer(address,uint256,uint256,address)._token (../../sb/StrategyMDex.sol#1488) is not in mixedCase
+Parameter StrategyUtils.makeFeeTransfer(address,uint256,uint256,address)._feerate (../../sb/StrategyMDex.sol#1488) is not in mixedCase
+Parameter StrategyUtils.makeFeeTransfer(address,uint256,uint256,address)._balancerate (../../sb/StrategyMDex.sol#1488) is not in mixedCase
+Parameter StrategyUtils.makeFeeTransfer(address,uint256,uint256,address)._gather (../../sb/StrategyMDex.sol#1488) is not in mixedCase
+Parameter StrategyUtils.makeFeeTransferByValue(address,uint256,address)._token (../../sb/StrategyMDex.sol#1498) is not in mixedCase
+Parameter StrategyUtils.makeFeeTransferByValue(address,uint256,address)._feeValue (../../sb/StrategyMDex.sol#1498) is not in mixedCase
+Parameter StrategyUtils.makeFeeTransferByValue(address,uint256,address)._gather (../../sb/StrategyMDex.sol#1498) is not in mixedCase
+Parameter StrategyUtils.makeWithdrawRewardFee(uint256,uint256,uint256)._pid (../../sb/StrategyMDex.sol#1507) is not in mixedCase
+Parameter StrategyUtils.makeWithdrawRewardFee(uint256,uint256,uint256)._borrowRate (../../sb/StrategyMDex.sol#1507) is not in mixedCase
+Parameter StrategyUtils.makeWithdrawRewardFee(uint256,uint256,uint256)._rewardsRate (../../sb/StrategyMDex.sol#1507) is not in mixedCase
+Parameter StrategyUtils.makeRefundFee(uint256,uint256)._pid (../../sb/StrategyMDex.sol#1522) is not in mixedCase
+Parameter StrategyUtils.makeRefundFee(uint256,uint256)._newRewardBase (../../sb/StrategyMDex.sol#1522) is not in mixedCase
+Parameter StrategyUtils.makeLiquidationFee(uint256,address,uint256)._pid (../../sb/StrategyMDex.sol#1534) is not in mixedCase
+Parameter StrategyUtils.makeLiquidationFee(uint256,address,uint256)._baseToken (../../sb/StrategyMDex.sol#1534) is not in mixedCase
+Parameter StrategyUtils.checkAddPoolLimit(uint256,address,address)._pid (../../sb/StrategyMDex.sol#1547) is not in mixedCase
+Parameter StrategyUtils.checkAddPoolLimit(uint256,address,address)._baseToken (../../sb/StrategyMDex.sol#1547) is not in mixedCase
+Parameter StrategyUtils.checkAddPoolLimit(uint256,address,address)._lpTokenInPools (../../sb/StrategyMDex.sol#1547) is not in mixedCase
+Parameter StrategyUtils.checkDepositLimit(uint256,address,uint256)._pid (../../sb/StrategyMDex.sol#1565) is not in mixedCase
+Parameter StrategyUtils.checkDepositLimit(uint256,address,uint256)._lpAmount (../../sb/StrategyMDex.sol#1565) is not in mixedCase
+Parameter StrategyUtils.checkSlippageLimit(uint256,uint256,uint256)._pid (../../sb/StrategyMDex.sol#1577) is not in mixedCase
+Parameter StrategyUtils.checkSlippageLimit(uint256,uint256,uint256)._desirePrice (../../sb/StrategyMDex.sol#1577) is not in mixedCase
+Parameter StrategyUtils.checkSlippageLimit(uint256,uint256,uint256)._slippage (../../sb/StrategyMDex.sol#1577) is not in mixedCase
+Parameter StrategyUtils.checkBorrowLimit(uint256,address,address,uint256)._pid (../../sb/StrategyMDex.sol#1592) is not in mixedCase
+Parameter StrategyUtils.checkBorrowLimit(uint256,address,address,uint256)._account (../../sb/StrategyMDex.sol#1592) is not in mixedCase
+Parameter StrategyUtils.checkBorrowLimit(uint256,address,address,uint256)._borrowFrom (../../sb/StrategyMDex.sol#1592) is not in mixedCase
+Parameter StrategyUtils.checkBorrowLimit(uint256,address,address,uint256)._borrowAmount (../../sb/StrategyMDex.sol#1592) is not in mixedCase
+Parameter StrategyUtils.checkBorrowGetHoldAmount(address,uint256,address)._strategy (../../sb/StrategyMDex.sol#1610) is not in mixedCase
+Parameter StrategyUtils.checkBorrowGetHoldAmount(address,uint256,address)._pid (../../sb/StrategyMDex.sol#1610) is not in mixedCase
+Parameter StrategyUtils.checkLiquidationLimit(uint256,address,uint256)._pid (../../sb/StrategyMDex.sol#1626) is not in mixedCase
+Parameter StrategyUtils.checkLiquidationLimit(uint256,address,uint256)._borrowRate (../../sb/StrategyMDex.sol#1626) is not in mixedCase
+Parameter StrategyUtils.makeRepay(uint256,address,address,uint256,bool)._pid (../../sb/StrategyMDex.sol#1635) is not in mixedCase
+Parameter StrategyUtils.makeRepay(uint256,address,address,uint256,bool)._borrowFrom (../../sb/StrategyMDex.sol#1635) is not in mixedCase
+Parameter StrategyUtils.makeRepay(uint256,address,address,uint256,bool)._account (../../sb/StrategyMDex.sol#1635) is not in mixedCase
+Parameter StrategyUtils.makeRepay(uint256,address,address,uint256,bool)._rate (../../sb/StrategyMDex.sol#1635) is not in mixedCase
+Parameter StrategyUtils.makeRepay(uint256,address,address,uint256,bool)._fast (../../sb/StrategyMDex.sol#1635) is not in mixedCase
+Parameter StrategyUtils.getBorrowAmount(uint256,address)._pid (../../sb/StrategyMDex.sol#1683) is not in mixedCase
+Parameter StrategyUtils.getBorrowAmount(uint256,address)._account (../../sb/StrategyMDex.sol#1683) is not in mixedCase
+Parameter StrategyUtils.transferFromAllToken(address,address,address,address)._from (../../sb/StrategyMDex.sol#1694) is not in mixedCase
+Parameter StrategyUtils.transferFromAllToken(address,address,address,address)._to (../../sb/StrategyMDex.sol#1694) is not in mixedCase
+Parameter StrategyUtils.transferFromAllToken(address,address,address,address)._token0 (../../sb/StrategyMDex.sol#1694) is not in mixedCase
+Parameter StrategyUtils.transferFromAllToken(address,address,address,address)._token1 (../../sb/StrategyMDex.sol#1694) is not in mixedCase
+Parameter StrategyUtils.transferFromToken(address,address,address)._from (../../sb/StrategyMDex.sol#1701) is not in mixedCase
+Parameter StrategyUtils.transferFromToken(address,address,address)._to (../../sb/StrategyMDex.sol#1701) is not in mixedCase
+Parameter StrategyUtils.transferFromToken(address,address,address)._token (../../sb/StrategyMDex.sol#1701) is not in mixedCase
+Parameter StrategyUtils.getLPToken2TokenAmount(address,address,uint256)._lpToken (../../sb/StrategyMDex.sol#1758) is not in mixedCase
+Parameter StrategyUtils.getLPToken2TokenAmount(address,address,uint256)._baseToken (../../sb/StrategyMDex.sol#1758) is not in mixedCase
+Parameter StrategyUtils.getLPToken2TokenAmount(address,address,uint256)._lpTokenAmount (../../sb/StrategyMDex.sol#1758) is not in mixedCase
+Parameter StrategyUtils.getAmountOut(address,address,uint256)._tokenIn (../../sb/StrategyMDex.sol#1773) is not in mixedCase
+Parameter StrategyUtils.getAmountOut(address,address,uint256)._tokenOut (../../sb/StrategyMDex.sol#1773) is not in mixedCase
+Parameter StrategyUtils.getAmountOut(address,address,uint256)._amountOut (../../sb/StrategyMDex.sol#1773) is not in mixedCase
+Parameter StrategyUtils.getAmountIn(address,uint256,address)._tokenIn (../../sb/StrategyMDex.sol#1789) is not in mixedCase
+Parameter StrategyUtils.getAmountIn(address,uint256,address)._amountIn (../../sb/StrategyMDex.sol#1789) is not in mixedCase
+Parameter StrategyUtils.getAmountIn(address,uint256,address)._tokenOut (../../sb/StrategyMDex.sol#1789) is not in mixedCase
+Parameter StrategyUtils.getTokenOut(address,address,uint256)._tokenIn (../../sb/StrategyMDex.sol#1804) is not in mixedCase
+Parameter StrategyUtils.getTokenOut(address,address,uint256)._tokenOut (../../sb/StrategyMDex.sol#1804) is not in mixedCase
+Parameter StrategyUtils.getTokenOut(address,address,uint256)._amountOut (../../sb/StrategyMDex.sol#1804) is not in mixedCase
+Parameter StrategyUtils.getTokenIn(address,uint256,address)._tokenIn (../../sb/StrategyMDex.sol#1812) is not in mixedCase
+Parameter StrategyUtils.getTokenIn(address,uint256,address)._amountIn (../../sb/StrategyMDex.sol#1812) is not in mixedCase
+Parameter StrategyUtils.getTokenIn(address,uint256,address)._tokenOut (../../sb/StrategyMDex.sol#1812) is not in mixedCase
+Parameter StrategyUtils.getTokenInTo(address,address,uint256,address)._toAddress (../../sb/StrategyMDex.sol#1819) is not in mixedCase
+Parameter StrategyUtils.getTokenInTo(address,address,uint256,address)._tokenIn (../../sb/StrategyMDex.sol#1819) is not in mixedCase
+Parameter StrategyUtils.getTokenInTo(address,address,uint256,address)._amountIn (../../sb/StrategyMDex.sol#1819) is not in mixedCase
+Parameter StrategyUtils.getTokenInTo(address,address,uint256,address)._tokenOut (../../sb/StrategyMDex.sol#1819) is not in mixedCase
+Constant StrategyUtils.factory (../../sb/StrategyMDex.sol#1465) is not in UPPER_CASE_WITH_UNDERSCORES
+Parameter StrategyMDex.getATPoolInfo(uint256)._pid (../../sb/StrategyMDex.sol#1898) is not in mixedCase
+Parameter StrategyMDex.getATUserAmount(uint256,address)._pid (../../sb/StrategyMDex.sol#1905) is not in mixedCase
+Parameter StrategyMDex.getATUserAmount(uint256,address)._account (../../sb/StrategyMDex.sol#1905) is not in mixedCase
+Parameter StrategyMDex.getPoolInfo(uint256)._pid (../../sb/StrategyMDex.sol#1910) is not in mixedCase
+Parameter StrategyMDex.getPoolCollateralToken(uint256)._pid (../../sb/StrategyMDex.sol#1921) is not in mixedCase
+Parameter StrategyMDex.getPoollpToken(uint256)._pid (../../sb/StrategyMDex.sol#1925) is not in mixedCase
+Parameter StrategyMDex.getBaseToken(uint256)._pid (../../sb/StrategyMDex.sol#1929) is not in mixedCase
+Parameter StrategyMDex.getBorrowInfo(uint256,address)._pid (../../sb/StrategyMDex.sol#1933) is not in mixedCase
+Parameter StrategyMDex.getBorrowInfo(uint256,address)._account (../../sb/StrategyMDex.sol#1933) is not in mixedCase
+Function StrategyMDex.getTokenBalance_this(address,address) (../../sb/StrategyMDex.sol#1939-1943) is not in mixedCase
+Parameter StrategyMDex.getTokenBalance_this(address,address)._token0 (../../sb/StrategyMDex.sol#1939) is not in mixedCase
+Parameter StrategyMDex.getTokenBalance_this(address,address)._token1 (../../sb/StrategyMDex.sol#1939) is not in mixedCase
+Parameter StrategyMDex.addPool(uint256,address[],address)._poolId (../../sb/StrategyMDex.sol#1947) is not in mixedCase
+Parameter StrategyMDex.addPool(uint256,address[],address)._collateralToken (../../sb/StrategyMDex.sol#1947) is not in mixedCase
+Parameter StrategyMDex.addPool(uint256,address[],address)._baseToken (../../sb/StrategyMDex.sol#1947) is not in mixedCase
+Parameter StrategyMDex.resetApprove(uint256)._pid (../../sb/StrategyMDex.sol#1969) is not in mixedCase
+Parameter StrategyMDex.setAcionPool(address)._actionPool (../../sb/StrategyMDex.sol#1986) is not in mixedCase
+Parameter StrategyMDex.setSConfig(address)._sconfig (../../sb/StrategyMDex.sol#1990) is not in mixedCase
+Parameter StrategyMDex.setMiniRewardAmount(uint256,uint256)._pid (../../sb/StrategyMDex.sol#1994) is not in mixedCase
+Parameter StrategyMDex.setMiniRewardAmount(uint256,uint256)._miniRewardAmount (../../sb/StrategyMDex.sol#1994) is not in mixedCase
+Parameter StrategyMDex.pendingRewards(uint256,address)._pid (../../sb/StrategyMDex.sol#1999) is not in mixedCase
+Parameter StrategyMDex.pendingRewards(uint256,address)._account (../../sb/StrategyMDex.sol#1999) is not in mixedCase
+Parameter StrategyMDex.pendingLPAmount(uint256,address)._pid (../../sb/StrategyMDex.sol#2005) is not in mixedCase
+Parameter StrategyMDex.pendingLPAmount(uint256,address)._account (../../sb/StrategyMDex.sol#2005) is not in mixedCase
+Parameter StrategyMDex.getBorrowAmount(uint256,address)._pid (../../sb/StrategyMDex.sol#2014) is not in mixedCase
+Parameter StrategyMDex.getBorrowAmount(uint256,address)._account (../../sb/StrategyMDex.sol#2014) is not in mixedCase
+Parameter StrategyMDex.getDepositAmount(uint256,address)._pid (../../sb/StrategyMDex.sol#2018) is not in mixedCase
+Parameter StrategyMDex.getDepositAmount(uint256,address)._account (../../sb/StrategyMDex.sol#2018) is not in mixedCase
+Parameter StrategyMDex.updatePool(uint256)._pid (../../sb/StrategyMDex.sol#2032) is not in mixedCase
+Parameter StrategyMDex.depositLPToken(uint256,address,address,uint256,uint256,uint256)._pid (../../sb/StrategyMDex.sol#2085) is not in mixedCase
+Parameter StrategyMDex.depositLPToken(uint256,address,address,uint256,uint256,uint256)._account (../../sb/StrategyMDex.sol#2085) is not in mixedCase
+Parameter StrategyMDex.depositLPToken(uint256,address,address,uint256,uint256,uint256)._borrowFrom (../../sb/StrategyMDex.sol#2085) is not in mixedCase
+Parameter StrategyMDex.depositLPToken(uint256,address,address,uint256,uint256,uint256)._bAmount (../../sb/StrategyMDex.sol#2086) is not in mixedCase
+Parameter StrategyMDex.depositLPToken(uint256,address,address,uint256,uint256,uint256)._desirePrice (../../sb/StrategyMDex.sol#2086) is not in mixedCase
+Parameter StrategyMDex.depositLPToken(uint256,address,address,uint256,uint256,uint256)._slippage (../../sb/StrategyMDex.sol#2086) is not in mixedCase
+Parameter StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256)._pid (../../sb/StrategyMDex.sol#2101) is not in mixedCase
+Parameter StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256)._account (../../sb/StrategyMDex.sol#2101) is not in mixedCase
+Parameter StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256)._borrowFrom (../../sb/StrategyMDex.sol#2101) is not in mixedCase
+Parameter StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256)._bAmount (../../sb/StrategyMDex.sol#2102) is not in mixedCase
+Parameter StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256)._desirePrice (../../sb/StrategyMDex.sol#2102) is not in mixedCase
+Parameter StrategyMDex.deposit(uint256,address,address,uint256,uint256,uint256)._slippage (../../sb/StrategyMDex.sol#2102) is not in mixedCase
+Parameter StrategyMDex.makeBorrowBaseToken(uint256,address,address,uint256)._pid (../../sb/StrategyMDex.sol#2166) is not in mixedCase
+Parameter StrategyMDex.makeBorrowBaseToken(uint256,address,address,uint256)._account (../../sb/StrategyMDex.sol#2166) is not in mixedCase
+Parameter StrategyMDex.makeBorrowBaseToken(uint256,address,address,uint256)._borrowFrom (../../sb/StrategyMDex.sol#2166) is not in mixedCase
+Parameter StrategyMDex.makeBorrowBaseToken(uint256,address,address,uint256)._bAmount (../../sb/StrategyMDex.sol#2166) is not in mixedCase
+Parameter StrategyMDex.makeBalanceOptimalLiquidity(uint256)._pid (../../sb/StrategyMDex.sol#2185) is not in mixedCase
+Parameter StrategyMDex.makeBalanceOptimalLiquidityByAmount(uint256,uint256,uint256)._pid (../../sb/StrategyMDex.sol#2193) is not in mixedCase
+Parameter StrategyMDex.makeBalanceOptimalLiquidityByAmount(uint256,uint256,uint256)._amount0 (../../sb/StrategyMDex.sol#2193) is not in mixedCase
+Parameter StrategyMDex.makeBalanceOptimalLiquidityByAmount(uint256,uint256,uint256)._amount1 (../../sb/StrategyMDex.sol#2193) is not in mixedCase
+Parameter StrategyMDex.makeLiquidityAndDeposit(uint256)._pid (../../sb/StrategyMDex.sol#2215) is not in mixedCase
+Parameter StrategyMDex.makeLiquidityAndDepositByAmount(uint256,uint256,uint256)._pid (../../sb/StrategyMDex.sol#2223) is not in mixedCase
+Parameter StrategyMDex.makeLiquidityAndDepositByAmount(uint256,uint256,uint256)._amount0 (../../sb/StrategyMDex.sol#2223) is not in mixedCase
+Parameter StrategyMDex.makeLiquidityAndDepositByAmount(uint256,uint256,uint256)._amount1 (../../sb/StrategyMDex.sol#2223) is not in mixedCase
+Parameter StrategyMDex.withdrawLPToken(uint256,address,uint256)._pid (../../sb/StrategyMDex.sol#2244) is not in mixedCase
+Parameter StrategyMDex.withdrawLPToken(uint256,address,uint256)._account (../../sb/StrategyMDex.sol#2244) is not in mixedCase
+Parameter StrategyMDex.withdrawLPToken(uint256,address,uint256)._rate (../../sb/StrategyMDex.sol#2244) is not in mixedCase
+Parameter StrategyMDex.withdraw(uint256,address,uint256)._pid (../../sb/StrategyMDex.sol#2259) is not in mixedCase
+Parameter StrategyMDex.withdraw(uint256,address,uint256)._account (../../sb/StrategyMDex.sol#2259) is not in mixedCase
+Parameter StrategyMDex.withdraw(uint256,address,uint256)._rate (../../sb/StrategyMDex.sol#2259) is not in mixedCase
+Parameter StrategyMDex.makeWithdrawCalcAmount(uint256,address)._pid (../../sb/StrategyMDex.sol#2307) is not in mixedCase
+Parameter StrategyMDex.makeWithdrawCalcAmount(uint256,address)._account (../../sb/StrategyMDex.sol#2307) is not in mixedCase
+Parameter StrategyMDex.makeWithdrawRemoveLiquidity(uint256,uint256)._pid (../../sb/StrategyMDex.sol#2325) is not in mixedCase
+Parameter StrategyMDex.makeWithdrawRemoveLiquidity(uint256,uint256)._withdrawLPTokenAmount (../../sb/StrategyMDex.sol#2325) is not in mixedCase
+Parameter StrategyMDex.repayBorrow(uint256,address,uint256,bool)._pid (../../sb/StrategyMDex.sol#2334) is not in mixedCase
+Parameter StrategyMDex.repayBorrow(uint256,address,uint256,bool)._account (../../sb/StrategyMDex.sol#2334) is not in mixedCase
+Parameter StrategyMDex.repayBorrow(uint256,address,uint256,bool)._rate (../../sb/StrategyMDex.sol#2334) is not in mixedCase
+Parameter StrategyMDex.repayBorrow(uint256,address,uint256,bool)._fast (../../sb/StrategyMDex.sol#2334) is not in mixedCase
+Parameter StrategyMDex.emergencyWithdraw(uint256,address)._pid (../../sb/StrategyMDex.sol#2345) is not in mixedCase
+Parameter StrategyMDex.emergencyWithdraw(uint256,address)._account (../../sb/StrategyMDex.sol#2345) is not in mixedCase
+Parameter StrategyMDex.liquidation(uint256,address,address,uint256)._pid (../../sb/StrategyMDex.sol#2371) is not in mixedCase
+Parameter StrategyMDex.liquidation(uint256,address,address,uint256)._account (../../sb/StrategyMDex.sol#2371) is not in mixedCase
+Parameter StrategyMDex.liquidation(uint256,address,address,uint256)._hunter (../../sb/StrategyMDex.sol#2371) is not in mixedCase
+Parameter StrategyMDex.makeLiquidationRepay(uint256,address,uint256)._pid (../../sb/StrategyMDex.sol#2419) is not in mixedCase
+Parameter StrategyMDex.makeLiquidationRepay(uint256,address,uint256)._account (../../sb/StrategyMDex.sol#2419) is not in mixedCase
+Constant StrategyMDex.factory (../../sb/StrategyMDex.sol#1867) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant StrategyMDex.router (../../sb/StrategyMDex.sol#1868) is not in UPPER_CASE_WITH_UNDERSCORES
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/StrategyMDex.sol#560)" inContext (../../sb/StrategyMDex.sol#554-563)
+Redundant expression "_poolId (../../sb/StrategyMDex.sol#1102)" inStrategyMDexPools (../../sb/StrategyMDex.sol#1090-1128)
+Redundant expression "_borrowAmount (../../sb/StrategyMDex.sol#1539)" inStrategyUtils (../../sb/StrategyMDex.sol#1458-1839)
+Redundant expression "_account (../../sb/StrategyMDex.sol#1567)" inStrategyUtils (../../sb/StrategyMDex.sol#1458-1839)
+Redundant expression "_account (../../sb/StrategyMDex.sol#1628)" inStrategyUtils (../../sb/StrategyMDex.sol#1458-1839)
+Redundant expression "_maxDebt (../../sb/StrategyMDex.sol#2372)" inStrategyMDex (../../sb/StrategyMDex.sol#1842-2433)
+Redundant expression "_borrowAmount (../../sb/StrategyMDex.sol#2420)" inStrategyMDex (../../sb/StrategyMDex.sol#1842-2433)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Variable IMdexRouter.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountADesired (../../sb/StrategyMDex.sol#639) is too similar to IMdexRouter.addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256).amountBDesired (../../sb/StrategyMDex.sol#640)
+Variable StrategyMDex.updatePool(uint256).uBalanceAfter0 (../../sb/StrategyMDex.sol#2066) is too similar to StrategyMDex.updatePool(uint256).uBalanceAfter1 (../../sb/StrategyMDex.sol#2066)
+Variable StrategyMDex.updatePool(uint256).uBalanceBefore0 (../../sb/StrategyMDex.sol#2048) is too similar to StrategyMDex.updatePool(uint256).uBalanceBefore1 (../../sb/StrategyMDex.sol#2048)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+TenMath.sqrt(uint256) (../../sb/StrategyMDex.sol#1017-1060) uses literals with too many digits:
+	- xx >= 0x100000000000000000000000000000000 (../../sb/StrategyMDex.sol#1022)
+TenMath.sqrt(uint256) (../../sb/StrategyMDex.sol#1017-1060) uses literals with too many digits:
+	- xx >= 0x10000000000000000 (../../sb/StrategyMDex.sol#1027)
+TenMath.sqrt(uint256) (../../sb/StrategyMDex.sol#1017-1060) uses literals with too many digits:
+	- xx >= 0x100000000 (../../sb/StrategyMDex.sol#1031)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+StrategyMDexPools.mdxToken (../../sb/StrategyMDex.sol#1095) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+
+StrategyMDex.bank (../../sb/StrategyMDex.sol#1876) should be immutable 
+StrategyMDex.utils (../../sb/StrategyMDex.sol#1875) should be immutable 
+StrategyUtils.strategy (../../sb/StrategyMDex.sol#1463) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/StrategyMDex.sol analyzed (21 contracts with 93 detectors), 275 result(s) found

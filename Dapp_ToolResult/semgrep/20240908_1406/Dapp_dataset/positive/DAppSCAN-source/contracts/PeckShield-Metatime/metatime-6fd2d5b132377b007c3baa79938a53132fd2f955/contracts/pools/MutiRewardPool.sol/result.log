@@ -1,0 +1,339 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 83 Code Findings │
+└──────────────────┘
+                           
+    /sb/MutiRewardPool.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          576┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          580┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          598┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          603┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          608┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          934┆ contract PoolVault is Ownable {
+            ⋮┆----------------------------------------
+         1015┆ contract MutiRewardPool is Ownable, IERC20, BasicMetaTransaction 
+  {                                                                             
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+         1653┆ for (uint256 i = 0; i < poolInfo.length; i++) {
+            ⋮┆----------------------------------------
+         1706┆ for(uint i = 0; i < poolInfo.length; ++i) {
+            ⋮┆----------------------------------------
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+         1122┆ uint256 private totalAllocPoint = 0;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          936┆ constructor() public {}
+            ⋮┆----------------------------------------
+         1136┆ constructor(
+         1137┆     IERC20 _depositToken,
+         1138┆     IERC20 _rewardToken0,
+         1139┆     IERC20 _rewardToken1,
+         1140┆     uint256 _token0RewardPerBlock,
+         1141┆     uint256 _token1RewardPerBlock,
+         1142┆     uint256 _startBlock,
+         1143┆     uint256 _bonusEndBlock
+         1144┆ ) public {
+         1145┆     depositToken = _depositToken;
+             [hid 10 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+         1369┆ if (stakingInfo[id].pid != pid) {
+            ⋮┆----------------------------------------
+         1496┆ amount = amount.add(stakingInfo[user.stakingIds.at(i)].amount);
+            ⋮┆----------------------------------------
+         1512┆ PoolInfo storage pool = poolInfo[pid];
+            ⋮┆----------------------------------------
+         1521┆ uint256 tokenReward =                                            
+  realAmount.mul(1e12).mul(pool.allocPoint).div(totalAllocPoint);               
+            ⋮┆----------------------------------------
+         1653┆ for (uint256 i = 0; i < poolInfo.length; i++) {
+            ⋮┆----------------------------------------
+         1706┆ for(uint i = 0; i < poolInfo.length; ++i) {
+            ⋮┆----------------------------------------
+         1707┆ totalDeposit =                                                   
+  totalDeposit.add(poolInfo[i].totalDeposit.mul(poolInfo[i].allocPoint));       
+            ⋮┆----------------------------------------
+         1707┆ totalDeposit =                                                   
+  totalDeposit.add(poolInfo[i].totalDeposit.mul(poolInfo[i].allocPoint));       
+            ⋮┆----------------------------------------
+         1719┆ StakingInfo memory staking = stakingInfo[user.stakingIds.at(i)];
+            ⋮┆----------------------------------------
+         1720┆ bal =                                                            
+  bal.add(staking.amount.mul(poolInfo[staking.pid].allocPoint));                
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+         1316┆ for (uint256 pid = 0; pid < length; ++pid) {
+            ⋮┆----------------------------------------
+         1357┆ for(uint256 i = 0; i < len; ++i) {
+            ⋮┆----------------------------------------
+         1367┆ for(uint256 i = 0; i < len; ++i) {
+            ⋮┆----------------------------------------
+         1495┆ for (uint i = 0; i < ln; ++i) {
+            ⋮┆----------------------------------------
+         1509┆ for (uint256 pid = 0; pid < length; ++pid) {
+            ⋮┆----------------------------------------
+         1653┆ for (uint256 i = 0; i < poolInfo.length; i++) {
+            ⋮┆----------------------------------------
+         1684┆ for (uint i = 0; i < len; ++i) {
+            ⋮┆----------------------------------------
+         1706┆ for(uint i = 0; i < poolInfo.length; ++i) {
+            ⋮┆----------------------------------------
+         1718┆ for (uint i = 0; i < ln; ++i) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           64┆ require(owner() == _msgSender(), "Ownable: caller is not the     
+  owner");                                                                      
+            ⋮┆----------------------------------------
+           85┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          247┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          262┆ require(b <= a, "SafeMath: subtraction overflow");
+            ⋮┆----------------------------------------
+          279┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          296┆ require(b > 0, "SafeMath: division by zero");
+            ⋮┆----------------------------------------
+          313┆ require(b > 0, "SafeMath: modulo by zero");
+            ⋮┆----------------------------------------
+          425┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          429┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          486┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          487┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          511┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          535┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          595┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          596┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          597┆ );
+            ⋮┆----------------------------------------
+          625┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          756┆ require(set._values.length > index, "EnumerableSet: index out of 
+  bounds");                                                                     
+            ⋮┆----------------------------------------
+          972┆ require(verify(userAddress, nonces[userAddress], getChainID(),   
+  functionSignature, sigR, sigS, sigV), "Signer and signature do not match");   
+            ⋮┆----------------------------------------
+          978┆ require(success, "Function call not successful");
+            ⋮┆----------------------------------------
+          997┆ require(signer != address(0), "Invalid signature");
+            ⋮┆----------------------------------------
+         1323┆ require(_amount > 0, "bad amount");
+            ⋮┆----------------------------------------
+         1379┆ require(user.stakingIds.contains(_stakingId), "not the staking   
+  owner");                                                                      
+            ⋮┆----------------------------------------
+         1430┆ require(user.stakingIds.contains(_stakingId), "not the staking   
+  owner");                                                                      
+            ⋮┆----------------------------------------
+         1434┆ require(block.timestamp.sub(staking.time) >= pool.duration, "not 
+  time");                                                                       
+            ⋮┆----------------------------------------
+         1455┆ require(user.stakingIds.contains(_stakingId), "not the staking   
+  owner");                                                                      
+            ⋮┆----------------------------------------
+         1458┆ require(block.number.sub(staking.time) >= pool.duration, "not    
+  time");                                                                       
+            ⋮┆----------------------------------------
+         1481┆ require(_amount <= rewardToken0.balanceOf(address(this)), 'not   
+  enough token');                                                               
+            ⋮┆----------------------------------------
+         1487┆ require(_amount <= rewardToken1.balanceOf(address(this)), 'not   
+  enough token');                                                               
+            ⋮┆----------------------------------------
+         1501┆ require(token == rewardToken0 || token == rewardToken1, "not     
+  support token");                                                              
+            ⋮┆----------------------------------------
+         1534┆ require(token == rewardToken0 || token == rewardToken1, "not     
+  support token");                                                              
+            ⋮┆----------------------------------------
+         1607┆ require(pid < poolInfo.length, "MutiRewardPool: pid out of       
+  range");                                                                      
+            ⋮┆----------------------------------------
+         1727┆ revert("can not allow transfer");
+            ⋮┆----------------------------------------
+         1735┆ revert("can not allow approve");
+            ⋮┆----------------------------------------
+         1739┆ revert("can not allow transfer");
+            ⋮┆----------------------------------------
+         1746┆ require(isCaller(msgSender()), "Treasury: not the caller");
+            ⋮┆----------------------------------------
+         1751┆ require(_newCaller != address(0), "MutiRewardPool: address is    
+  zero");                                                                       
+            ⋮┆----------------------------------------
+         1756┆ require(_delCaller != address(0), "MutiRewardPool: address is    
+  zero");                                                                       
+            ⋮┆----------------------------------------
+         1769┆ require(_index <= getCallerLength() - 1, "MutiRewardPool: index  
+  out of bounds");                                                              
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+         1214┆ if (block.number > pool.lastRewardBlock && lpSupply != 0) {
+         1215┆ 
+         1216┆     uint256 accRewardsPerShare = pool.token0AccRewardsPerShare;
+         1217┆     uint256 multiplier = getMultiplier(pool.lastRewardBlock,     
+  block.number);                                                                
+         1218┆     uint256 tokenReward =                                        
+  multiplier.mul(token0RewardPerBlock).mul(pool.allocPoint).div(totalAllocPoint)
+  ;                                                                             
+         1219┆     accRewardsPerShare =                                         
+  accRewardsPerShare.add(tokenReward.mul(1e12).div(lpSupply));                  
+         1220┆     amount = user.amount.mul(accRewardsPerShare);
+         1221┆ 
+         1222┆     uint256 endBlock = block.number >                            
+  token0AdditionalRewardEndBlock? token0AdditionalRewardEndBlock : block.number;
+         1223┆     uint256 accAdditionalRewardsPerShare =                       
+  pool.token0AccAdditionalRewardsPerShare;                                      
+             [hid 7 additional lines, adjust with --max-lines-per-finding] 
+         1246┆ if (block.number > pool.lastRewardBlock && lpSupply != 0) {
+         1247┆ 
+         1248┆     uint256 accRewardsPerShare = pool.token1AccRewardsPerShare;
+         1249┆     uint256 multiplier = getMultiplier(pool.lastRewardBlock,     
+  block.number);                                                                
+         1250┆     uint256 tokenReward =                                        
+  multiplier.mul(token1RewardPerBlock).mul(pool.allocPoint).div(totalAllocPoint)
+  ;                                                                             
+         1251┆     accRewardsPerShare =                                         
+  accRewardsPerShare.add(tokenReward.mul(1e12).div(lpSupply));                  
+         1252┆     amount = user.amount.mul(accRewardsPerShare);
+         1253┆ 
+         1254┆     uint256 endBlock = block.number >                            
+  token1AdditionalRewardEndBlock? token1AdditionalRewardEndBlock : block.number;
+         1255┆     uint256 accAdditionalRewardsPerShare =                       
+  pool.token1AccAdditionalRewardsPerShare;                                      
+             [hid 7 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+         1336┆ lastStakingId++;
+            ⋮┆----------------------------------------
+         1653┆ for (uint256 i = 0; i < poolInfo.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           85┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          279┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          429┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          486┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          511┆ require(isContract(target), "Address: static call to             
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          535┆ require(isContract(target), "Address: delegate call to           
+  non-contract");                                                               
+            ⋮┆----------------------------------------
+          595┆ require((value == 0) || (token.allowance(address(this), spender) 
+  == 0),                                                                        
+          596┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          597┆ );
+            ⋮┆----------------------------------------
+          625┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          756┆ require(set._values.length > index, "EnumerableSet: index out of 
+  bounds");                                                                     
+            ⋮┆----------------------------------------
+          972┆ require(verify(userAddress, nonces[userAddress], getChainID(),   
+  functionSignature, sigR, sigS, sigV), "Signer and signature do not match");   
+            ⋮┆----------------------------------------
+         1769┆ require(_index <= getCallerLength() - 1, "MutiRewardPool: index  
+  out of bounds");                                                              
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 83 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

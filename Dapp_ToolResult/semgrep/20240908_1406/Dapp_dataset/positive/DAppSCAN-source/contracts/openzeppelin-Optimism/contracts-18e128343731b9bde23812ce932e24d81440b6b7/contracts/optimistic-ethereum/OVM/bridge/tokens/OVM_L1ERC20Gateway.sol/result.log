@@ -1,0 +1,98 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                   
+                   
+┌─────────────────┐
+│ 9 Code Findings │
+└─────────────────┘
+                               
+    /sb/OVM_L1ERC20Gateway.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          334┆ bytes memory data = abi.encodeWithSelector(
+          335┆     iOVM_L2DepositedToken.finalizeDeposit.selector,
+          336┆     _to,
+          337┆     _amount
+          338┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          132┆ constructor(
+          133┆     address _messenger
+          134┆ ) {
+          135┆     messenger = _messenger;
+          136┆ }
+            ⋮┆----------------------------------------
+          461┆ constructor(
+          462┆     iOVM_ERC20 _l1ERC20,
+          463┆     address _l2DepositedERC20,
+          464┆     address _l1messenger
+          465┆ )
+          466┆     Abs_L1TokenGateway(
+          467┆         _l2DepositedERC20,
+          468┆         _l1messenger
+          469┆     )
+          470┆ {
+             [hid 2 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          149┆ require(
+          150┆     msg.sender == address(getCrossDomainMessenger()),
+          151┆     "OVM_XCHAIN: messenger contract unauthenticated"
+          152┆ );
+            ⋮┆----------------------------------------
+          154┆ require(
+          155┆     getCrossDomainMessenger().xDomainMessageSender() ==          
+  _sourceDomainAccount,                                                         
+          156┆     "OVM_XCHAIN: wrong sender of cross-domain message"
+          157┆ );
+            ⋮┆----------------------------------------
+          241┆ revert("Implement me in child contracts");
+            ⋮┆----------------------------------------
+          260┆ revert("Implement me in child contracts");
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          149┆ require(
+          150┆     msg.sender == address(getCrossDomainMessenger()),
+          151┆     "OVM_XCHAIN: messenger contract unauthenticated"
+          152┆ );
+            ⋮┆----------------------------------------
+          154┆ require(
+          155┆     getCrossDomainMessenger().xDomainMessageSender() ==          
+  _sourceDomainAccount,                                                         
+          156┆     "OVM_XCHAIN: wrong sender of cross-domain message"
+          157┆ );
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 9 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

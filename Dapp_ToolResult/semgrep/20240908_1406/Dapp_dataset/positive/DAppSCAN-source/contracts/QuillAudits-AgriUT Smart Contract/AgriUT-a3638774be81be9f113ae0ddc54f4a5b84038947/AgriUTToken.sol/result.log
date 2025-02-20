@@ -1,0 +1,130 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 26 Code Findings │
+└──────────────────┘
+                        
+    /sb/AgriUTToken.sol 
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+           68┆ constructor( uint256 initialSupply, string memory tokenName,     
+  string memory tokenSymbol)                                                    
+           69┆  {
+           70┆      _totalSupply = initialSupply * 10 ** uint256(_decimals);  //
+  Update total supply with the decimal amount                                   
+           71┆      _balances[msg.sender] = _totalSupply;                       
+  // Give the creator all initial tokens                                        
+           72┆      _name = tokenName;                                       // 
+  Set the name for display purposes                                             
+           73┆      _symbol = tokenSymbol;                                   // 
+  Set the symbol for display purposes                                           
+           74┆  }
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           28┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          121┆ require (_to != address(0x0), "ERC20: No transfer to 0x0         
+  address");                      // Prevent transfer to 0x0 address. Use burn()
+  instead                                                                       
+            ⋮┆----------------------------------------
+          122┆ require (_balances[_from] >= _value, "ERC20: Insufficent         
+  tokens");                 // Check if the sender has enough                   
+            ⋮┆----------------------------------------
+          123┆ require (_balances[_to] + _value >= _balances[_to],              
+  "ERC20:Invalid amount");    // Check for overflows                            
+            ⋮┆----------------------------------------
+          124┆ require(!_frozenAccounts[_from], "From account frozen");         
+  // Check if sender is frozen                                                  
+            ⋮┆----------------------------------------
+          125┆ require(!_frozenAccounts[_to], "To account frozen");             
+  // Check if recipient is frozen                                               
+            ⋮┆----------------------------------------
+          126┆ require (_balances[_to] + _value <= _totalSupply, "ERC20: Total  
+  supply exceeded");  //Ensure allocate more than total supply to 1 account     
+            ⋮┆----------------------------------------
+          154┆ require(currentAllowance >= amount, "ERC20: transfer amount      
+  exceeds allowance");                                                          
+            ⋮┆----------------------------------------
+          171┆ require(_managedAccounts[sender], "Not a Managed wallet");
+            ⋮┆----------------------------------------
+          199┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          200┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          221┆ require(target != owner(), "Cannot freeze the owner account");
+            ⋮┆----------------------------------------
+          245┆ require(_managedAccounts[_from], "Not a Managed wallet");
+            ⋮┆----------------------------------------
+          259┆ require(currentAllowance >= _value, "ERC20: burn amount exceeds  
+  allowance");                                                                  
+            ⋮┆----------------------------------------
+          269┆ require(_address != address(0), "ERC20: burn from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          270┆ require(_balances[_address] >= _value, "ERC20: burn amount       
+  exceeds balance");                // Check if the targeted balance is enough  
+            ⋮┆----------------------------------------
+          271┆ require(!_frozenAccounts[_address], "Account is frozen");
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           28┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          121┆ require (_to != address(0x0), "ERC20: No transfer to 0x0         
+  address");                      // Prevent transfer to 0x0 address. Use burn()
+  instead                                                                       
+            ⋮┆----------------------------------------
+          154┆ require(currentAllowance >= amount, "ERC20: transfer amount      
+  exceeds allowance");                                                          
+            ⋮┆----------------------------------------
+          199┆ require(owner != address(0), "ERC20: approve from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          200┆ require(spender != address(0), "ERC20: approve to the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          259┆ require(currentAllowance >= _value, "ERC20: burn amount exceeds  
+  allowance");                                                                  
+            ⋮┆----------------------------------------
+          269┆ require(_address != address(0), "ERC20: burn from the zero       
+  address");                                                                    
+            ⋮┆----------------------------------------
+          270┆ require(_balances[_address] >= _value, "ERC20: burn amount       
+  exceeds balance");                // Check if the targeted balance is enough  
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 26 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

@@ -1,0 +1,168 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 30 Code Findings │
+└──────────────────┘
+                        
+    /sb/TradeCallee.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          485┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          494┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+          517┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+          526┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+          538┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, newAllowance));       
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          617┆ for (uint256 i = 0; i < orders.length; i++) {
+            ⋮┆----------------------------------------
+          638┆ for (uint256 i = 0; i < orders.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          580┆ constructor(
+          581┆     address _exchange,
+          582┆     address _weth,
+          583┆     address _controller
+          584┆ ) public {
+          585┆     exchange = ZeroXExchangeInterface(_exchange);
+          586┆     weth = WETH9Interface(_weth);
+          587┆     controller = _controller;
+          588┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          622┆                                                                  
+  ERC20Interface(takerAsset).safeIncreaseAllowance(address(exchange),           
+  takerTokenFillAmounts[i]);                                                    
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          617┆ for (uint256 i = 0; i < orders.length; i++) {
+            ⋮┆----------------------------------------
+          638┆ for (uint256 i = 0; i < orders.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+          182┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+          238┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          369┆ require(address(this).balance >= amount, "Address: insufficient  
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          373┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          443┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          453┆ require(isContract(target), "Address: call to non-contract");
+            ⋮┆----------------------------------------
+          513┆ require(
+          514┆     (value == 0) || (token.allowance(address(this), spender) ==  
+  0),                                                                           
+          515┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          516┆ );
+            ⋮┆----------------------------------------
+          556┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          596┆ require(msg.sender == controller, "TradeCallee: sender is not    
+  controller");                                                                 
+            ⋮┆----------------------------------------
+          612┆ require(
+          613┆     tx.origin == trader,
+          614┆     "TradeCallee: funds can only be transferred in from the      
+  person sending the transaction"                                               
+          615┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          617┆ for (uint256 i = 0; i < orders.length; i++) {
+            ⋮┆----------------------------------------
+          638┆ for (uint256 i = 0; i < orders.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          238┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          373┆ require(success, "Address: unable to send value, recipient may   
+  have reverted");                                                              
+            ⋮┆----------------------------------------
+          443┆ require(address(this).balance >= value, "Address: insufficient   
+  balance for call");                                                           
+            ⋮┆----------------------------------------
+          513┆ require(
+          514┆     (value == 0) || (token.allowance(address(this), spender) ==  
+  0),                                                                           
+          515┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          516┆ );
+            ⋮┆----------------------------------------
+          556┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          596┆ require(msg.sender == controller, "TradeCallee: sender is not    
+  controller");                                                                 
+            ⋮┆----------------------------------------
+          612┆ require(
+          613┆     tx.origin == trader,
+          614┆     "TradeCallee: funds can only be transferred in from the      
+  person sending the transaction"                                               
+          615┆ );
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 30 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

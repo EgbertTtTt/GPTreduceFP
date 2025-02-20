@@ -1,0 +1,50 @@
+'solc --version' running
+'solc /sb/MonstaPresale.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+MonstaPresale.giveaway(address[]).given (../../sb/MonstaPresale.sol#187) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+MonstaPresale.setRedemptionAddress(address) (../../sb/MonstaPresale.sol#166-168) should emit an event for: 
+	- _redemptionAddress = redemptionAddress (../../sb/MonstaPresale.sol#167) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-access-control
+
+MonstaPresale.setRedemptionAddress(address).redemptionAddress (../../sb/MonstaPresale.sol#166) lacks a zero-check on :
+		- _redemptionAddress = redemptionAddress (../../sb/MonstaPresale.sol#167)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+MonstaPresale.adoptMonsta() (../../sb/MonstaPresale.sol#146-161) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool)(now <= PRESALE_END_TIMESTAMP) (../../sb/MonstaPresale.sol#147)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+SafeMath.mul(uint256,uint256) (../../sb/MonstaPresale.sol#14-16) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.6.0 (../../sb/MonstaPresale.sol#1) allows old versions
+solc-0.6.0 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Parameter MonstaPresale.giveaway(address[])._addresses (../../sb/MonstaPresale.sol#185) is not in mixedCase
+Variable MonstaPresale._currentPrice (../../sb/MonstaPresale.sol#123) is not in mixedCase
+Variable MonstaPresale._totalAdoptedMonstas (../../sb/MonstaPresale.sol#124) is not in mixedCase
+Variable MonstaPresale._totalGiveawayMonstas (../../sb/MonstaPresale.sol#125) is not in mixedCase
+Variable MonstaPresale._totalRedeemedMonstas (../../sb/MonstaPresale.sol#126) is not in mixedCase
+Variable MonstaPresale._redemptionAddress (../../sb/MonstaPresale.sol#128) is not in mixedCase
+Variable MonstaPresale._adopters (../../sb/MonstaPresale.sol#129) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Reentrancy in MonstaPresale.adoptMonsta() (../../sb/MonstaPresale.sol#146-161):
+	External calls:
+	- msg.sender.transfer(value) (../../sb/MonstaPresale.sol#154)
+	State variables written after the call(s):
+	- _adopters[msg.sender] = true (../../sb/MonstaPresale.sol#156)
+	- _currentPrice = _currentPrice.add(PRICE_INCREMENT) (../../sb/MonstaPresale.sol#158)
+	- _totalAdoptedMonstas = _totalAdoptedMonstas.add(1) (../../sb/MonstaPresale.sol#157)
+	Event emitted after the call(s):
+	- MonstaAdopted(msg.sender) (../../sb/MonstaPresale.sol#160)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-4
+
+MonstaPresale.slitherConstructorConstantVariables() (../../sb/MonstaPresale.sol#114-205) uses literals with too many digits:
+	- INITIAL_PRICE = 200000000000000000 (../../sb/MonstaPresale.sol#119)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+/sb/MonstaPresale.sol analyzed (4 contracts with 93 detectors), 16 result(s) found

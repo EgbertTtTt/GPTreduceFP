@@ -1,0 +1,113 @@
+'solc --version' running
+'solc /sb/StandardToken.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+StandardToken._sellAndDistributeAccumulatedTKNFee() (../../sb/StandardToken.sol#168-193) sends eth to arbitrary user
+	Dangerous calls:
+	- router.addLiquidityETH{value: BNBtoLiquidity}(address(this),TKNtoLiquidity,0,0,owner,block.timestamp) (../../sb/StandardToken.sol#191)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#functions-that-send-ether-to-arbitrary-destinations
+
+Reentrancy in StandardToken._transfer(address,address,uint256) (../../sb/StandardToken.sol#137-149):
+	External calls:
+	- _sellAndDistributeAccumulatedTKNFee() (../../sb/StandardToken.sol#144)
+		- router.swapExactTokensForETHSupportingFeeOnTransferTokens(amountToSwap,0,path,address(this),block.timestamp) (../../sb/StandardToken.sol#183)
+		- router.addLiquidityETH{value: BNBtoLiquidity}(address(this),TKNtoLiquidity,0,0,owner,block.timestamp) (../../sb/StandardToken.sol#191)
+	External calls sending eth:
+	- _sellAndDistributeAccumulatedTKNFee() (../../sb/StandardToken.sol#144)
+		- router.addLiquidityETH{value: BNBtoLiquidity}(address(this),TKNtoLiquidity,0,0,owner,block.timestamp) (../../sb/StandardToken.sol#191)
+	State variables written after the call(s):
+	- balanceOf[_from] -= tempValue (../../sb/StandardToken.sol#146)
+	StandardToken.balanceOf (../../sb/StandardToken.sol#76) can be used in cross function reentrancies:
+	- StandardToken._sellAndDistributeAccumulatedTKNFee() (../../sb/StandardToken.sol#168-193)
+	- StandardToken._substractBurn(address,uint256) (../../sb/StandardToken.sol#152-158)
+	- StandardToken._substractFees(address,uint256) (../../sb/StandardToken.sol#160-166)
+	- StandardToken._transfer(address,address,uint256) (../../sb/StandardToken.sol#137-149)
+	- StandardToken.balanceOf (../../sb/StandardToken.sol#76)
+	- StandardToken.burn(uint256) (../../sb/StandardToken.sol#214-219)
+	- StandardToken.constructor(address) (../../sb/StandardToken.sol#260-281)
+	- StandardToken.mint(address,uint256) (../../sb/StandardToken.sol#220-226)
+	- balanceOf[_to] += tempValue (../../sb/StandardToken.sol#147)
+	StandardToken.balanceOf (../../sb/StandardToken.sol#76) can be used in cross function reentrancies:
+	- StandardToken._sellAndDistributeAccumulatedTKNFee() (../../sb/StandardToken.sol#168-193)
+	- StandardToken._substractBurn(address,uint256) (../../sb/StandardToken.sol#152-158)
+	- StandardToken._substractFees(address,uint256) (../../sb/StandardToken.sol#160-166)
+	- StandardToken._transfer(address,address,uint256) (../../sb/StandardToken.sol#137-149)
+	- StandardToken.balanceOf (../../sb/StandardToken.sol#76)
+	- StandardToken.burn(uint256) (../../sb/StandardToken.sol#214-219)
+	- StandardToken.constructor(address) (../../sb/StandardToken.sol#260-281)
+	- StandardToken.mint(address,uint256) (../../sb/StandardToken.sol#220-226)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities
+
+StandardToken._sellAndDistributeAccumulatedTKNFee() (../../sb/StandardToken.sol#168-193) performs a multiplication on the result of a division:
+	- _amount = ((totalSupply * _SWAPBACK_THRESHOLD[0]) / _SWAPBACK_THRESHOLD[1]) (../../sb/StandardToken.sol#169)
+	- holdersFee = (_amount * fees.holders) / fees.total (../../sb/StandardToken.sol#172)
+StandardToken._sellAndDistributeAccumulatedTKNFee() (../../sb/StandardToken.sol#168-193) performs a multiplication on the result of a division:
+	- _amount = ((totalSupply * _SWAPBACK_THRESHOLD[0]) / _SWAPBACK_THRESHOLD[1]) (../../sb/StandardToken.sol#169)
+	- halfLiquidityFee = fees.liquidity / 2 (../../sb/StandardToken.sol#175)
+	- TKNtoLiquidity = (_amount * halfLiquidityFee) / fees.total (../../sb/StandardToken.sol#176)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+StandardToken._sellAndDistributeAccumulatedTKNFee() (../../sb/StandardToken.sol#168-193) ignores return value by router.addLiquidityETH{value: BNBtoLiquidity}(address(this),TKNtoLiquidity,0,0,owner,block.timestamp) (../../sb/StandardToken.sol#191)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+StandardToken.setHoldersWallet(address)._holdersWallet (../../sb/StandardToken.sol#245) lacks a zero-check on :
+		- holdersWallet = _holdersWallet (../../sb/StandardToken.sol#246)
+StandardToken.setPair(address)._address (../../sb/StandardToken.sol#256) lacks a zero-check on :
+		- pair = _address (../../sb/StandardToken.sol#257)
+StandardToken.constructor(address)._owner (../../sb/StandardToken.sol#260) lacks a zero-check on :
+		- owner = _owner (../../sb/StandardToken.sol#268)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in StandardToken._transfer(address,address,uint256) (../../sb/StandardToken.sol#137-149):
+	External calls:
+	- _sellAndDistributeAccumulatedTKNFee() (../../sb/StandardToken.sol#144)
+		- router.swapExactTokensForETHSupportingFeeOnTransferTokens(amountToSwap,0,path,address(this),block.timestamp) (../../sb/StandardToken.sol#183)
+		- router.addLiquidityETH{value: BNBtoLiquidity}(address(this),TKNtoLiquidity,0,0,owner,block.timestamp) (../../sb/StandardToken.sol#191)
+	External calls sending eth:
+	- _sellAndDistributeAccumulatedTKNFee() (../../sb/StandardToken.sol#144)
+		- router.addLiquidityETH{value: BNBtoLiquidity}(address(this),TKNtoLiquidity,0,0,owner,block.timestamp) (../../sb/StandardToken.sol#191)
+	Event emitted after the call(s):
+	- Transfer(_from,_to,tempValue) (../../sb/StandardToken.sol#148)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Pragma version0.8.5 (../../sb/StandardToken.sol#1) allows old versions
+solc-0.8.5 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Parameter StandardToken.transfer(address,uint256)._to (../../sb/StandardToken.sol#122) is not in mixedCase
+Parameter StandardToken.transfer(address,uint256)._value (../../sb/StandardToken.sol#122) is not in mixedCase
+Parameter StandardToken.transferFrom(address,address,uint256)._from (../../sb/StandardToken.sol#129) is not in mixedCase
+Parameter StandardToken.transferFrom(address,address,uint256)._to (../../sb/StandardToken.sol#129) is not in mixedCase
+Parameter StandardToken.transferFrom(address,address,uint256)._value (../../sb/StandardToken.sol#129) is not in mixedCase
+Parameter StandardToken.approve(address,uint256)._spender (../../sb/StandardToken.sol#195) is not in mixedCase
+Parameter StandardToken.approve(address,uint256)._value (../../sb/StandardToken.sol#195) is not in mixedCase
+Parameter StandardToken.increaseApproval(address,uint256)._spender (../../sb/StandardToken.sol#201) is not in mixedCase
+Parameter StandardToken.increaseApproval(address,uint256)._value (../../sb/StandardToken.sol#201) is not in mixedCase
+Parameter StandardToken.decreaseApproval(address,uint256)._spender (../../sb/StandardToken.sol#207) is not in mixedCase
+Parameter StandardToken.decreaseApproval(address,uint256)._value (../../sb/StandardToken.sol#207) is not in mixedCase
+Parameter StandardToken.burn(uint256)._value (../../sb/StandardToken.sol#214) is not in mixedCase
+Parameter StandardToken.mint(address,uint256)._who (../../sb/StandardToken.sol#220) is not in mixedCase
+Parameter StandardToken.mint(address,uint256)._value (../../sb/StandardToken.sol#220) is not in mixedCase
+Parameter StandardToken.setBlacklisted(address,bool)._address (../../sb/StandardToken.sol#230) is not in mixedCase
+Parameter StandardToken.setBlacklisted(address,bool)._isBlackListed (../../sb/StandardToken.sol#230) is not in mixedCase
+Parameter StandardToken.setPair(address,bool)._address (../../sb/StandardToken.sol#235) is not in mixedCase
+Parameter StandardToken.setPair(address,bool)._isExcluded (../../sb/StandardToken.sol#235) is not in mixedCase
+Parameter StandardToken.setFees(uint256,uint256,uint256,uint256)._liquidity (../../sb/StandardToken.sol#240) is not in mixedCase
+Parameter StandardToken.setFees(uint256,uint256,uint256,uint256)._holders (../../sb/StandardToken.sol#240) is not in mixedCase
+Parameter StandardToken.setFees(uint256,uint256,uint256,uint256)._burn (../../sb/StandardToken.sol#240) is not in mixedCase
+Parameter StandardToken.setFees(uint256,uint256,uint256,uint256)._denominator (../../sb/StandardToken.sol#240) is not in mixedCase
+Parameter StandardToken.setHoldersWallet(address)._holdersWallet (../../sb/StandardToken.sol#245) is not in mixedCase
+Parameter StandardToken.setLiquifyThreshold(uint256,uint256)._numerator (../../sb/StandardToken.sol#248) is not in mixedCase
+Parameter StandardToken.setLiquifyThreshold(uint256,uint256)._denominator (../../sb/StandardToken.sol#248) is not in mixedCase
+Parameter StandardToken.setRouter(IDEXRouter)._address (../../sb/StandardToken.sol#251) is not in mixedCase
+Parameter StandardToken.setPair(address)._address (../../sb/StandardToken.sol#256) is not in mixedCase
+Variable StandardToken.WBNB (../../sb/StandardToken.sol#81) is not in mixedCase
+Variable StandardToken._SWAPBACK_THRESHOLD (../../sb/StandardToken.sol#102) is not in mixedCase
+Variable StandardToken.MINT_FORBIDDEN (../../sb/StandardToken.sol#103) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+StandardToken.WBNB (../../sb/StandardToken.sol#81) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+
+StandardToken.decimals (../../sb/StandardToken.sol#72) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/StandardToken.sol analyzed (6 contracts with 93 detectors), 43 result(s) found

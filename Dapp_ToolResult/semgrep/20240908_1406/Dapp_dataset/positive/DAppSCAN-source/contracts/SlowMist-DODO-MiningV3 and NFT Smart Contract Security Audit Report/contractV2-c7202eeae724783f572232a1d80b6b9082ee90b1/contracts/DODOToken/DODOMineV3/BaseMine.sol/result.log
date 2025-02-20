@@ -1,0 +1,243 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 65 Code Findings │
+└──────────────────┘
+                     
+    /sb/BaseMine.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+          128┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+          137┆ _callOptionalReturn(
+          138┆     token,
+          139┆     abi.encodeWithSelector(token.transferFrom.selector, from, to,
+  value)                                                                        
+          140┆ );
+            ⋮┆----------------------------------------
+          156┆ _callOptionalReturn(token,                                       
+  abi.encodeWithSelector(token.approve.selector, spender, value));              
+            ⋮┆----------------------------------------
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          305┆ contract RewardVault is Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          280┆ constructor() internal {
+          281┆     _OWNER_ = msg.sender;
+          282┆     emit OwnershipTransferred(address(0), _OWNER_);
+          283┆ }
+            ⋮┆----------------------------------------
+          316┆ constructor(address _rewardToken) public {
+          317┆     _REWARD_TOKEN_ = _rewardToken;
+          318┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          420┆ if (rewardToken == rewardTokenInfos[i].rewardToken) {
+            ⋮┆----------------------------------------
+          434┆ if (rewardToken == rewardTokenInfos[i].rewardToken) {
+            ⋮┆----------------------------------------
+          435┆ return rewardTokenInfos[i].rewardVault;
+            ⋮┆----------------------------------------
+          444┆ if (rewardToken == rewardTokenInfos[i].rewardToken) {
+            ⋮┆----------------------------------------
+          445┆ uint256 totalDepositReward =                                     
+  IRewardVault(rewardTokenInfos[i].rewardVault)._TOTAL_REWARD_();               
+            ⋮┆----------------------------------------
+          446┆ uint256 gap =                                                    
+  rewardTokenInfos[i].endBlock.sub(rewardTokenInfos[i].lastFlagBlock);          
+            ⋮┆----------------------------------------
+          446┆ uint256 gap =                                                    
+  rewardTokenInfos[i].endBlock.sub(rewardTokenInfos[i].lastFlagBlock);          
+            ⋮┆----------------------------------------
+          447┆ uint256 totalReward =                                            
+  rewardTokenInfos[i].workThroughReward.add(gap.mul(rewardTokenInfos[i].rewardPe
+  rBlock));                                                                     
+            ⋮┆----------------------------------------
+          447┆ uint256 totalReward =                                            
+  rewardTokenInfos[i].workThroughReward.add(gap.mul(rewardTokenInfos[i].rewardPe
+  rBlock));                                                                     
+            ⋮┆----------------------------------------
+          494┆ rewardToken != rewardTokenInfos[i].rewardToken,
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          419┆ for (uint256 i = 0; i < len; i++) {
+            ⋮┆----------------------------------------
+          433┆ for (uint256 i = 0; i < len; i++) {
+            ⋮┆----------------------------------------
+          443┆ for (uint256 i = 0; i < len; i++) {
+            ⋮┆----------------------------------------
+          474┆ for (uint256 i = 0; i < len; i++) {
+            ⋮┆----------------------------------------
+          492┆ for (uint256 i = 0; i < len; i++) {
+            ⋮┆----------------------------------------
+          592┆ for (uint256 i = 0; i < len; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           79┆ require(c / a == b, "MUL_ERROR");
+            ⋮┆----------------------------------------
+           85┆ require(b > 0, "DIVIDING_ERROR");
+            ⋮┆----------------------------------------
+          100┆ require(b <= a, "SUB_ERROR");
+            ⋮┆----------------------------------------
+          106┆ require(c >= a, "ADD_ERROR");
+            ⋮┆----------------------------------------
+          152┆ require(
+          153┆     (value == 0) || (token.allowance(address(this), spender) ==  
+  0),                                                                           
+          154┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          155┆ );
+            ⋮┆----------------------------------------
+          177┆ require(success, "SafeERC20: low-level call failed");
+            ⋮┆----------------------------------------
+          182┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+            ⋮┆----------------------------------------
+          232┆ require(!_INITIALIZED_, "DODO_INITIALIZED");
+            ⋮┆----------------------------------------
+          237┆ require(msg.sender == _OWNER_, "NOT_OWNER");
+            ⋮┆----------------------------------------
+          254┆ require(msg.sender == _NEW_OWNER_, "INVALID_CLAIM");
+            ⋮┆----------------------------------------
+          274┆ require(msg.sender == _OWNER_, "NOT_OWNER");
+            ⋮┆----------------------------------------
+          291┆ require(msg.sender == _NEW_OWNER_, "INVALID_CLAIM");
+            ⋮┆----------------------------------------
+          321┆ require(_REWARD_RESERVE_ >= amount, "VAULT_NOT_ENOUGH");
+            ⋮┆----------------------------------------
+          327┆ require(_REWARD_RESERVE_ >= amount, "VAULT_NOT_ENOUGH");
+            ⋮┆----------------------------------------
+          386┆ require(i<rewardTokenInfos.length, "DODOMineV3:                  
+  REWARD_ID_NOT_FOUND");                                                        
+            ⋮┆----------------------------------------
+          412┆ require(i<rewardTokenInfos.length, "DODOMineV3:                  
+  REWARD_ID_NOT_FOUND");                                                        
+            ⋮┆----------------------------------------
+          424┆ require(false, "DODOMineV3: TOKEN_NOT_FOUND");
+            ⋮┆----------------------------------------
+          438┆ require(false, "DODOMineV3: TOKEN_NOT_FOUND");
+            ⋮┆----------------------------------------
+          455┆ require(false, "DODOMineV3: TOKEN_NOT_FOUND");
+            ⋮┆----------------------------------------
+          461┆ require(i<rewardTokenInfos.length, "DODOMineV3:                  
+  REWARD_ID_NOT_FOUND");                                                        
+            ⋮┆----------------------------------------
+          487┆ require(rewardToken != address(0), "DODOMineV3: TOKEN_INVALID");
+            ⋮┆----------------------------------------
+          488┆ require(startBlock > block.number, "DODOMineV3:                  
+  START_BLOCK_INVALID");                                                        
+            ⋮┆----------------------------------------
+          489┆ require(endBlock > startBlock, "DODOMineV3: DURATION_INVALID");
+            ⋮┆----------------------------------------
+          493┆ require(
+          494┆     rewardToken != rewardTokenInfos[i].rewardToken,
+          495┆     "DODOMineV3: TOKEN_ALREADY_ADDED"
+          496┆ );
+            ⋮┆----------------------------------------
+          518┆ require(i < rewardTokenInfos.length, "DODOMineV3:                
+  REWARD_ID_NOT_FOUND");                                                        
+            ⋮┆----------------------------------------
+          526┆ require(totalDepositReward >= totalReward, "DODOMineV3:          
+  REWARD_NOT_ENOUGH");                                                          
+            ⋮┆----------------------------------------
+          528┆ require(block.number < newEndBlock, "DODOMineV3:                 
+  END_BLOCK_INVALID");                                                          
+            ⋮┆----------------------------------------
+          529┆ require(block.number > rt.startBlock, "DODOMineV3: NOT_START");
+            ⋮┆----------------------------------------
+          530┆ require(block.number < rt.endBlock, "DODOMineV3: ALREADY_CLOSE");
+            ⋮┆----------------------------------------
+          540┆ require(i < rewardTokenInfos.length, "DODOMineV3:                
+  REWARD_ID_NOT_FOUND");                                                        
+            ⋮┆----------------------------------------
+          544┆ require(block.number < rt.endBlock, "DODOMineV3: ALREADY_CLOSE");
+            ⋮┆----------------------------------------
+          553┆ require(totalDepositReward >= totalReward, "DODOMineV3:          
+  REWARD_NOT_ENOUGH");                                                          
+            ⋮┆----------------------------------------
+          559┆ require(i < rewardTokenInfos.length, "DODOMineV3:                
+  REWARD_ID_NOT_FOUND");                                                        
+            ⋮┆----------------------------------------
+          562┆ require(block.number > rt.endBlock, "DODOMineV3:                 
+  MINING_NOT_FINISHED");                                                        
+            ⋮┆----------------------------------------
+          571┆ require(newOwner != address(0), "DODOMineV3: ZERO_ADDRESS");
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          419┆ for (uint256 i = 0; i < len; i++) {
+            ⋮┆----------------------------------------
+          433┆ for (uint256 i = 0; i < len; i++) {
+            ⋮┆----------------------------------------
+          443┆ for (uint256 i = 0; i < len; i++) {
+            ⋮┆----------------------------------------
+          474┆ for (uint256 i = 0; i < len; i++) {
+            ⋮┆----------------------------------------
+          492┆ for (uint256 i = 0; i < len; i++) {
+            ⋮┆----------------------------------------
+          592┆ for (uint256 i = 0; i < len; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+          152┆ require(
+          153┆     (value == 0) || (token.allowance(address(this), spender) ==  
+  0),                                                                           
+          154┆     "SafeERC20: approve from non-zero to non-zero allowance"
+          155┆ );
+            ⋮┆----------------------------------------
+          182┆ require(abi.decode(returndata, (bool)), "SafeERC20: ERC20        
+  operation did not succeed");                                                  
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 65 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

@@ -1,0 +1,134 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 22 Code Findings │
+└──────────────────┘
+                      
+    /sb/GameZilla.sol 
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+          155┆ totalSupply += amount;
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          219┆ constructor()   {
+          220┆     symbol = "GZILA";
+          221┆     name = "GameZilla";
+          222┆     decimals = 18;
+          223┆     totalSupply = 1175000000 * 10**18;
+          224┆     change = false;
+          225┆     percent = 30;
+          226┆ 
+          227┆     owner = msg.sender;
+          228┆     balances[owner] = totalSupply;
+             [hid 1 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           13┆ require(msg.sender == owner, "Only owner");
+            ⋮┆----------------------------------------
+           52┆ require(_to != address(0), "Transfer to zero address");
+            ⋮┆----------------------------------------
+           53┆ require (balances[msg.sender]>=_amount && _amount>0 &&           
+  balances[_to]+_amount>balances[_to], "Insufficient amount or allowance        
+  error");                                                                      
+            ⋮┆----------------------------------------
+           90┆ require(_from != address(0), "Sender cannot be zero address");
+            ⋮┆----------------------------------------
+           91┆ require(_to != address(0), "Recipient cannot be zero address");
+            ⋮┆----------------------------------------
+           92┆ require (balances[_from]>=_amount &&                             
+  allowed[_from][msg.sender]>=_amount && _amount>0 &&                           
+  balances[_to]+_amount>balances[_to], "Insufficient amount or allowance  ...   
+  [0m                                                                           
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+          128┆ require(_spender != address(0), "Approval for zero address");
+            ⋮┆----------------------------------------
+          151┆ require(account != address(0), "BEP20: mint to the zero          
+  address");                                                                    
+            ⋮┆----------------------------------------
+          172┆ require(account != address(0), "BEP20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          177┆ require(accountBalance >= amount, "BEP20: burn amount exceeds    
+  balance");                                                                    
+            ⋮┆----------------------------------------
+          186┆ require(change != val, "Already in this state");
+            ⋮┆----------------------------------------
+          187┆ require(addressToBeChanged != address(0) && addressToSend !=     
+  address(0), "Change addresses cannot be zero");                               
+            ⋮┆----------------------------------------
+          241┆ require(to != address(0), "No mint to zero address");
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+           53┆ require (balances[msg.sender]>=_amount && _amount>0 &&           
+  balances[_to]+_amount>balances[_to], "Insufficient amount or allowance        
+  error");                                                                      
+            ⋮┆----------------------------------------
+           92┆ require (balances[_from]>=_amount &&                             
+  allowed[_from][msg.sender]>=_amount && _amount>0 &&                           
+  balances[_to]+_amount>balances[_to], "Insufficient amount or allowance  ...   
+  [0m                                                                           
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+          187┆ require(addressToBeChanged != address(0) && addressToSend !=     
+  address(0), "Change addresses cannot be zero");                               
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           53┆ require (balances[msg.sender]>=_amount && _amount>0 &&           
+  balances[_to]+_amount>balances[_to], "Insufficient amount or allowance        
+  error");                                                                      
+            ⋮┆----------------------------------------
+           92┆ require (balances[_from]>=_amount &&                             
+  allowed[_from][msg.sender]>=_amount && _amount>0 &&                           
+  balances[_to]+_amount>balances[_to], "Insufficient amount or allowance  ...   
+  [0m                                                                           
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+          172┆ require(account != address(0), "BEP20: burn from the zero        
+  address");                                                                    
+            ⋮┆----------------------------------------
+          177┆ require(accountBalance >= amount, "BEP20: burn amount exceeds    
+  balance");                                                                    
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 22 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

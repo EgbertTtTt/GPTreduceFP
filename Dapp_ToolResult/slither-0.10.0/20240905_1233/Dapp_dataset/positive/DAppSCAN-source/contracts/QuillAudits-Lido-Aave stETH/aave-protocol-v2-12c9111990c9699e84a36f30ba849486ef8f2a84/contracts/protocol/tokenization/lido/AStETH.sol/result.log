@@ -1,0 +1,229 @@
+'solc --version' running
+'solc /sb/AStETH.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/AStETH.sol:
+Warning: SPDX license identifier not provided in source file. Before publishing, consider adding a comment containing "SPDX-License-Identifier: <SPDX-License>" to each source file. Use "SPDX-License-Identifier: UNLICENSED" for non-open-source code. Please see https://spdx.org for more information.
+--> /sb/AStETH.sol
+
+Warning: This declaration shadows an existing declaration.
+    --> /sb/AStETH.sol:2025:5:
+     |
+2025 |     uint256 scaledTotalSupply = _scaledTotalSupply(e);
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+Note: The shadowed declaration is here:
+    --> /sb/AStETH.sol:1939:3:
+     |
+1939 |   function scaledTotalSupply() public view virtual override returns (uint256) {
+     |   ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning: This declaration shadows an existing declaration.
+    --> /sb/AStETH.sol:2108:7:
+     |
+2108 |       uint256 mintAmountInternal =
+     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Note: The shadowed declaration is here:
+    --> /sb/AStETH.sol:2104:5:
+     |
+2104 |     uint256 mintAmountInternal = 0;
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning: This declaration shadows an existing declaration.
+    --> /sb/AStETH.sol:2235:5:
+     |
+2235 |     uint256 scaledTotalSupply = _scaledTotalSupply(e);
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+Note: The shadowed declaration is here:
+    --> /sb/AStETH.sol:1939:3:
+     |
+1939 |   function scaledTotalSupply() public view virtual override returns (uint256) {
+     |   ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+Reentrancy in AStETH.burn(address,address,uint256,uint256) (../../sb/AStETH.sol#1755-1773):
+	External calls:
+	- _burnScaled(user,amountScaled,_fetchExtData()) (../../sb/AStETH.sol#1764)
+		- _incentivesController.handleAction(account,oldTotalSupply,oldAccountBalance) (../../sb/AStETH.sol#1458)
+	State variables written after the call(s):
+	- _totalShares = _totalShares.sub(ISTETH(UNDERLYING_ASSET_ADDRESS).getSharesByPooledEth(amountScaled).toInt256Safe()) (../../sb/AStETH.sol#1765-1767)
+	AStETH._totalShares (../../sb/AStETH.sol#1684) can be used in cross function reentrancies:
+	- AStETH._scaledTotalSupply(AStETH.ExtData) (../../sb/AStETH.sol#2217-2223)
+	- AStETH.burn(address,address,uint256,uint256) (../../sb/AStETH.sol#1755-1773)
+	- AStETH.mint(address,uint256,uint256) (../../sb/AStETH.sol#1783-1802)
+	- AStETH.mintToTreasury(uint256,uint256) (../../sb/AStETH.sol#1810-1829)
+Reentrancy in AStETH.mint(address,uint256,uint256) (../../sb/AStETH.sol#1783-1802):
+	External calls:
+	- _mintScaled(user,amountScaled,_fetchExtData()) (../../sb/AStETH.sol#1793)
+		- _incentivesController.handleAction(account,oldTotalSupply,oldAccountBalance) (../../sb/AStETH.sol#1442)
+	State variables written after the call(s):
+	- _totalShares = _totalShares.add(ISTETH(UNDERLYING_ASSET_ADDRESS).getSharesByPooledEth(amountScaled).toInt256Safe()) (../../sb/AStETH.sol#1794-1796)
+	AStETH._totalShares (../../sb/AStETH.sol#1684) can be used in cross function reentrancies:
+	- AStETH._scaledTotalSupply(AStETH.ExtData) (../../sb/AStETH.sol#2217-2223)
+	- AStETH.burn(address,address,uint256,uint256) (../../sb/AStETH.sol#1755-1773)
+	- AStETH.mint(address,uint256,uint256) (../../sb/AStETH.sol#1783-1802)
+	- AStETH.mintToTreasury(uint256,uint256) (../../sb/AStETH.sol#1810-1829)
+Reentrancy in AStETH.mintToTreasury(uint256,uint256) (../../sb/AStETH.sol#1810-1829):
+	External calls:
+	- _mintScaled(treasury,amountScaled,_fetchExtData()) (../../sb/AStETH.sol#1822)
+		- _incentivesController.handleAction(account,oldTotalSupply,oldAccountBalance) (../../sb/AStETH.sol#1442)
+	State variables written after the call(s):
+	- _totalShares = _totalShares.add(ISTETH(UNDERLYING_ASSET_ADDRESS).getSharesByPooledEth(amountScaled).toInt256Safe()) (../../sb/AStETH.sol#1823-1825)
+	AStETH._totalShares (../../sb/AStETH.sol#1684) can be used in cross function reentrancies:
+	- AStETH._scaledTotalSupply(AStETH.ExtData) (../../sb/AStETH.sol#2217-2223)
+	- AStETH.burn(address,address,uint256,uint256) (../../sb/AStETH.sol#1755-1773)
+	- AStETH.mint(address,uint256,uint256) (../../sb/AStETH.sol#1783-1802)
+	- AStETH.mintToTreasury(uint256,uint256) (../../sb/AStETH.sol#1810-1829)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+AStETH._fetchExtData().extData (../../sb/AStETH.sol#2189) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+IncentivizedERC20.constructor(string,string,uint8,address).name (../../sb/AStETH.sol#1267) shadows:
+	- IncentivizedERC20.name() (../../sb/AStETH.sol#1281-1283) (function)
+	- IERC20Detailed.name() (../../sb/AStETH.sol#1238) (function)
+IncentivizedERC20.constructor(string,string,uint8,address).symbol (../../sb/AStETH.sol#1268) shadows:
+	- IncentivizedERC20.symbol() (../../sb/AStETH.sol#1288-1290) (function)
+	- IERC20Detailed.symbol() (../../sb/AStETH.sol#1240) (function)
+IncentivizedERC20.constructor(string,string,uint8,address).decimals (../../sb/AStETH.sol#1269) shadows:
+	- IncentivizedERC20.decimals() (../../sb/AStETH.sol#1295-1297) (function)
+	- IERC20Detailed.decimals() (../../sb/AStETH.sol#1242) (function)
+AStETH.getScaledUserBalanceAndSupply(address).scaledTotalSupply (../../sb/AStETH.sol#1902) shadows:
+	- AStETH.scaledTotalSupply() (../../sb/AStETH.sol#1939-1941) (function)
+	- IScaledBalanceToken.scaledTotalSupply() (../../sb/AStETH.sol#855) (function)
+AStETH._transfer(address,address,uint256,bool).scaledTotalSupply (../../sb/AStETH.sol#2025) shadows:
+	- AStETH.scaledTotalSupply() (../../sb/AStETH.sol#1939-1941) (function)
+	- IScaledBalanceToken.scaledTotalSupply() (../../sb/AStETH.sol#855) (function)
+AStETH._scaledBalanceOf(uint256,uint256,uint256)._scaledTotalSupply (../../sb/AStETH.sol#2204) shadows:
+	- AStETH._scaledTotalSupply(AStETH.ExtData) (../../sb/AStETH.sol#2217-2223) (function)
+AStETH._transferScaled(address,address,uint256,AStETH.ExtData).scaledTotalSupply (../../sb/AStETH.sol#2235) shadows:
+	- AStETH.scaledTotalSupply() (../../sb/AStETH.sol#1939-1941) (function)
+	- IScaledBalanceToken.scaledTotalSupply() (../../sb/AStETH.sol#855) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+AStETH.constructor(ILendingPool,address,address,string,string,address).underlyingAssetAddress (../../sb/AStETH.sol#1700) lacks a zero-check on :
+		- UNDERLYING_ASSET_ADDRESS = underlyingAssetAddress (../../sb/AStETH.sol#1707)
+AStETH.constructor(ILendingPool,address,address,string,string,address).reserveTreasuryAddress (../../sb/AStETH.sol#1701) lacks a zero-check on :
+		- RESERVE_TREASURY_ADDRESS = reserveTreasuryAddress (../../sb/AStETH.sol#1708)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in IncentivizedERC20.transferFrom(address,address,uint256) (../../sb/AStETH.sol#1358-1371):
+	External calls:
+	- _transfer(sender,recipient,amount) (../../sb/AStETH.sol#1363)
+		- _incentivesController.handleAction(sender,currentTotalSupply,oldSenderBalance) (../../sb/AStETH.sol#1423)
+		- _incentivesController.handleAction(recipient,currentTotalSupply,oldRecipientBalance) (../../sb/AStETH.sol#1425)
+	State variables written after the call(s):
+	- _approve(sender,_msgSender(),_allowances[sender][_msgSender()].sub(amount,ERC20: transfer amount exceeds allowance)) (../../sb/AStETH.sol#1364-1368)
+		- _allowances[owner][spender] = amount (../../sb/AStETH.sol#1470)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in AStETH._transfer(address,address,uint256,bool) (../../sb/AStETH.sol#2013-2045):
+	External calls:
+	- _transferScaled(from,to,amountScaled,e) (../../sb/AStETH.sol#2031)
+		- _incentivesController.handleAction(sender,currentTotalSupply,oldSenderBalance) (../../sb/AStETH.sol#1423)
+		- _incentivesController.handleAction(recipient,currentTotalSupply,oldRecipientBalance) (../../sb/AStETH.sol#1425)
+	- POOL.finalizeTransfer(UNDERLYING_ASSET_ADDRESS,from,to,amount,fromBalanceScaled.rayMul(index),toBalanceScaled.rayMul(index)) (../../sb/AStETH.sol#2034-2041)
+	Event emitted after the call(s):
+	- BalanceTransfer(from,to,amount,index) (../../sb/AStETH.sol#2044)
+Reentrancy in AStETH.burn(address,address,uint256,uint256) (../../sb/AStETH.sol#1755-1773):
+	External calls:
+	- _burnScaled(user,amountScaled,_fetchExtData()) (../../sb/AStETH.sol#1764)
+		- _incentivesController.handleAction(account,oldTotalSupply,oldAccountBalance) (../../sb/AStETH.sol#1458)
+	- IERC20(UNDERLYING_ASSET_ADDRESS).safeTransfer(receiverOfUnderlying,amount) (../../sb/AStETH.sol#1769)
+	Event emitted after the call(s):
+	- Burn(user,receiverOfUnderlying,amount,index) (../../sb/AStETH.sol#1772)
+	- Transfer(user,address(0),amount) (../../sb/AStETH.sol#1771)
+Reentrancy in AStETH.mint(address,uint256,uint256) (../../sb/AStETH.sol#1783-1802):
+	External calls:
+	- _mintScaled(user,amountScaled,_fetchExtData()) (../../sb/AStETH.sol#1793)
+		- _incentivesController.handleAction(account,oldTotalSupply,oldAccountBalance) (../../sb/AStETH.sol#1442)
+	Event emitted after the call(s):
+	- Mint(user,amount,index) (../../sb/AStETH.sol#1799)
+	- Transfer(address(0),user,amount) (../../sb/AStETH.sol#1798)
+Reentrancy in AStETH.mintToTreasury(uint256,uint256) (../../sb/AStETH.sol#1810-1829):
+	External calls:
+	- _mintScaled(treasury,amountScaled,_fetchExtData()) (../../sb/AStETH.sol#1822)
+		- _incentivesController.handleAction(account,oldTotalSupply,oldAccountBalance) (../../sb/AStETH.sol#1442)
+	Event emitted after the call(s):
+	- Mint(treasury,amount,index) (../../sb/AStETH.sol#1828)
+	- Transfer(address(0),treasury,amount) (../../sb/AStETH.sol#1827)
+Reentrancy in IncentivizedERC20.transfer(address,uint256) (../../sb/AStETH.sol#1319-1323):
+	External calls:
+	- _transfer(_msgSender(),recipient,amount) (../../sb/AStETH.sol#1320)
+		- _incentivesController.handleAction(sender,currentTotalSupply,oldSenderBalance) (../../sb/AStETH.sol#1423)
+		- _incentivesController.handleAction(recipient,currentTotalSupply,oldRecipientBalance) (../../sb/AStETH.sol#1425)
+	Event emitted after the call(s):
+	- Transfer(_msgSender(),recipient,amount) (../../sb/AStETH.sol#1321)
+Reentrancy in IncentivizedERC20.transferFrom(address,address,uint256) (../../sb/AStETH.sol#1358-1371):
+	External calls:
+	- _transfer(sender,recipient,amount) (../../sb/AStETH.sol#1363)
+		- _incentivesController.handleAction(sender,currentTotalSupply,oldSenderBalance) (../../sb/AStETH.sol#1423)
+		- _incentivesController.handleAction(recipient,currentTotalSupply,oldRecipientBalance) (../../sb/AStETH.sol#1425)
+	Event emitted after the call(s):
+	- Approval(owner,spender,amount) (../../sb/AStETH.sol#1471)
+		- _approve(sender,_msgSender(),_allowances[sender][_msgSender()].sub(amount,ERC20: transfer amount exceeds allowance)) (../../sb/AStETH.sol#1364-1368)
+	- Transfer(sender,recipient,amount) (../../sb/AStETH.sol#1369)
+Reentrancy in AStETH.transferOnLiquidation(address,address,uint256) (../../sb/AStETH.sol#1838-1848):
+	External calls:
+	- _transfer(from,to,value,false) (../../sb/AStETH.sol#1845)
+		- POOL.finalizeTransfer(UNDERLYING_ASSET_ADDRESS,from,to,amount,fromBalanceScaled.rayMul(index),toBalanceScaled.rayMul(index)) (../../sb/AStETH.sol#2034-2041)
+		- _incentivesController.handleAction(sender,currentTotalSupply,oldSenderBalance) (../../sb/AStETH.sol#1423)
+		- _incentivesController.handleAction(recipient,currentTotalSupply,oldRecipientBalance) (../../sb/AStETH.sol#1425)
+	Event emitted after the call(s):
+	- Transfer(from,to,value) (../../sb/AStETH.sol#1847)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+AStETH.permit(address,address,uint256,uint256,uint8,bytes32,bytes32) (../../sb/AStETH.sol#1979-2003) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp <= deadline,INVALID_EXPIRATION) (../../sb/AStETH.sol#1990)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/AStETH.sol#246-257) uses assembly
+	- INLINE ASM (../../sb/AStETH.sol#253-255)
+VersionedInitializable.isConstructor() (../../sb/AStETH.sol#1208-1220) uses assembly
+	- INLINE ASM (../../sb/AStETH.sol#1216-1218)
+AStETH.initialize(uint8,string,string) (../../sb/AStETH.sol#1715-1740) uses assembly
+	- INLINE ASM (../../sb/AStETH.sol#1723-1725)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.sendValue(address,uint256) (../../sb/AStETH.sol#275-281) is never used and should be removed
+Context._msgData() (../../sb/AStETH.sol#1231-1234) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/AStETH.sol#305-315) is never used and should be removed
+SafeERC20.safeTransferFrom(IERC20,address,address,uint256) (../../sb/AStETH.sol#296-303) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/AStETH.sol#203-205) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/AStETH.sol#218-225) is never used and should be removed
+SignedSafeMath.div(int256,int256) (../../sb/AStETH.sol#1589-1596) is never used and should be removed
+SignedSafeMath.mul(int256,int256) (../../sb/AStETH.sol#1561-1575) is never used and should be removed
+WadRayMath.halfRay() (../../sb/AStETH.sol#1067-1069) is never used and should be removed
+WadRayMath.halfWad() (../../sb/AStETH.sol#1074-1076) is never used and should be removed
+WadRayMath.ray() (../../sb/AStETH.sol#1052-1054) is never used and should be removed
+WadRayMath.rayToWad(uint256) (../../sb/AStETH.sol#1145-1151) is never used and should be removed
+WadRayMath.wad() (../../sb/AStETH.sol#1060-1062) is never used and should be removed
+WadRayMath.wadToRay(uint256) (../../sb/AStETH.sol#1158-1162) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.6.12 (../../sb/AStETH.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/AStETH.sol#275-281):
+	- (success) = recipient.call{value: amount}() (../../sb/AStETH.sol#279)
+Low level call in SafeERC20.callOptionalReturn(IERC20,bytes) (../../sb/AStETH.sol#317-329):
+	- (success,returndata) = address(token).call(data) (../../sb/AStETH.sol#321)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Constant WadRayMath.halfWAD (../../sb/AStETH.sol#1042) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant WadRayMath.halfRAY (../../sb/AStETH.sol#1045) is not in UPPER_CASE_WITH_UNDERSCORES
+Variable VersionedInitializable.______gap (../../sb/AStETH.sol#1223) is not in mixedCase
+Function AStETH.VARIABLE_DEBT_TOKEN_ADDRESS() (../../sb/AStETH.sol#2241-2243) is not in mixedCase
+Variable AStETH.UNDERLYING_ASSET_ADDRESS (../../sb/AStETH.sol#1672) is not in mixedCase
+Variable AStETH.RESERVE_TREASURY_ADDRESS (../../sb/AStETH.sol#1673) is not in mixedCase
+Variable AStETH.POOL (../../sb/AStETH.sol#1674) is not in mixedCase
+Variable AStETH._nonces (../../sb/AStETH.sol#1677) is not in mixedCase
+Variable AStETH.DOMAIN_SEPARATOR (../../sb/AStETH.sol#1679) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "this (../../sb/AStETH.sol#1232)" inContext (../../sb/AStETH.sol#1226-1235)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Variable Errors.LP_INCONSISTENT_FLASHLOAN_PARAMS (../../sb/AStETH.sol#974) is too similar to Errors.VL_INCONSISTENT_FLASHLOAN_PARAMS (../../sb/AStETH.sol#1019)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+/sb/AStETH.sol analyzed (21 contracts with 93 detectors), 54 result(s) found

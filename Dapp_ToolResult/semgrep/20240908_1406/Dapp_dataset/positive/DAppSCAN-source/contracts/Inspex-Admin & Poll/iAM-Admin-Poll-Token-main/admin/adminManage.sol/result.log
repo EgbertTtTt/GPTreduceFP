@@ -1,0 +1,261 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 41 Code Findings │
+└──────────────────┘
+                        
+    /sb/adminManage.sol 
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+           39┆ constructor(address inittialSuperadmin, uint32 _deadline) {
+           40┆   superAdmin[inittialSuperadmin] = Node(address(0),              
+  GENESIS_ADDRESS);                                                             
+           41┆   superAdmin[GENESIS_ADDRESS] = Node(inittialSuperadmin,         
+  address(0));                                                                  
+           42┆   superAdminHead = inittialSuperadmin;
+           43┆   superAdminCount++;
+           44┆ 
+           45┆   addAdmin(inittialSuperadmin);
+           46┆   adminHead = inittialSuperadmin;
+           47┆ 
+           48┆   deadline = _deadline;
+             [hid 1 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+           65┆ currentSuperAdmin = superAdmin[currentSuperAdmin].next;
+            ⋮┆----------------------------------------
+           78┆ currentAdmin = admin[currentAdmin].next;
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           32┆ require(
+           33┆   superAdmin[msg.sender].next != address(0) && msg.sender !=     
+  GENESIS_ADDRESS,                                                              
+           34┆   'AdminManage: require superAdmin'
+           35┆ );
+            ⋮┆----------------------------------------
+           86┆ require(
+           87┆   _newAdmin != address(0) && _newAdmin != GENESIS_ADDRESS,
+           88┆   'AdminManage [addAdmin]: Invalid owner address provided'
+           89┆ );
+            ⋮┆----------------------------------------
+           90┆ require(admin[_newAdmin].next == address(0), 'AdminManage        
+  [addAdmin]: Address is already a admin');                                     
+            ⋮┆----------------------------------------
+          102┆ require(
+          103┆   _newSuperAdmin != address(0) && _newSuperAdmin !=              
+  GENESIS_ADDRESS,                                                              
+          104┆   'AdminManage: Invalid owner address provided'
+          105┆ );
+            ⋮┆----------------------------------------
+          106┆ require(superAdmin[_newSuperAdmin].next == address(0),           
+  'AdminManage: Address is already an superAdmin');                             
+            ⋮┆----------------------------------------
+          118┆ require(admin[_admin].next != address(0), 'AdminManage           
+  [removeAdmin]: require admin wallet at arg[0]');                              
+            ⋮┆----------------------------------------
+          132┆ require(
+          133┆   _admin != address(0) && admin[_prevAdmin].next == _admin,
+          134┆   'AdminManage [_removeSuperAdmin]: Invalid prevOwner, owner pair
+  provided'                                                                     
+          135┆ );
+            ⋮┆----------------------------------------
+          146┆ require(
+          147┆   superAdmin[_superAdmin].next != address(0),
+          148┆   'AdminManage [removeSuperAdmin]: require superAdmin wallet at  
+  arg[0]'                                                                       
+          149┆ );
+            ⋮┆----------------------------------------
+          158┆ require(msg.sender != tmp.lastVoter, "AdminManage                
+  [removeSuperAdmin]: can't use the same address to vote");                     
+            ⋮┆----------------------------------------
+          167┆ require(
+          168┆   _superAdmin != GENESIS_ADDRESS && superAdminCount > 1,
+          169┆   'AdminManage [_removeSuperAdmin]: Invalid owner address        
+  provided'                                                                     
+          170┆ );
+            ⋮┆----------------------------------------
+          184┆ require(
+          185┆   _superAdmin != address(0) && superAdmin[_prevSuperAdmin].next  
+  == _superAdmin,                                                               
+          186┆   'AdminManage [_removeSuperAdmin]: Invalid prevOwner, owner pair
+  provided'                                                                     
+          187┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+           32┆ require(
+           33┆   superAdmin[msg.sender].next != address(0) && msg.sender !=     
+  GENESIS_ADDRESS,                                                              
+           34┆   'AdminManage: require superAdmin'
+           35┆ );
+            ⋮┆----------------------------------------
+           86┆ require(
+           87┆   _newAdmin != address(0) && _newAdmin != GENESIS_ADDRESS,
+           88┆   'AdminManage [addAdmin]: Invalid owner address provided'
+           89┆ );
+            ⋮┆----------------------------------------
+          102┆ require(
+          103┆   _newSuperAdmin != address(0) && _newSuperAdmin !=              
+  GENESIS_ADDRESS,                                                              
+          104┆   'AdminManage: Invalid owner address provided'
+          105┆ );
+            ⋮┆----------------------------------------
+          132┆ require(
+          133┆   _admin != address(0) && admin[_prevAdmin].next == _admin,
+          134┆   'AdminManage [_removeSuperAdmin]: Invalid prevOwner, owner pair
+  provided'                                                                     
+          135┆ );
+            ⋮┆----------------------------------------
+          167┆ require(
+          168┆   _superAdmin != GENESIS_ADDRESS && superAdminCount > 1,
+          169┆   'AdminManage [_removeSuperAdmin]: Invalid owner address        
+  provided'                                                                     
+          170┆ );
+            ⋮┆----------------------------------------
+          184┆ require(
+          185┆   _superAdmin != address(0) && superAdmin[_prevSuperAdmin].next  
+  == _superAdmin,                                                               
+          186┆   'AdminManage [_removeSuperAdmin]: Invalid prevOwner, owner pair
+  provided'                                                                     
+          187┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          123┆ if (_prevAdmin == address(0) && _admin == adminHead) {
+          124┆   adminHead = admin[_admin].next;
+          125┆   admin[admin[_admin].next].prev = address(0);
+          126┆   admin[_admin].prev = address(0);
+          127┆   admin[_admin].next = address(0);
+          128┆   adminCount--;
+          129┆   return;
+          130┆ }
+            ⋮┆----------------------------------------
+          175┆ if (_prevSuperAdmin == address(0) && _superAdmin ==              
+  superAdminHead) {                                                             
+          176┆   superAdminHead = superAdmin[_superAdmin].next;
+          177┆   superAdmin[superAdmin[_superAdmin].next].prev = address(0);
+          178┆   superAdmin[_superAdmin].prev = address(0);
+          179┆   superAdmin[_superAdmin].next = address(0);
+          180┆   superAdminCount--;
+          181┆   return;
+          182┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-decrement-not-postfix                    
+          Consider using the prefix decrement expression whenever the return    
+  value is not needed. The                                                      
+          prefix decrement expression is cheaper in terms of gas.               
+                                                                                
+          128┆ adminCount--;
+            ⋮┆----------------------------------------
+          142┆ adminCount--;
+            ⋮┆----------------------------------------
+          180┆ superAdminCount--;
+            ⋮┆----------------------------------------
+          194┆ superAdminCount--;
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+           43┆ superAdminCount++;
+            ⋮┆----------------------------------------
+           66┆ index++;
+            ⋮┆----------------------------------------
+           79┆ index++;
+            ⋮┆----------------------------------------
+           98┆ adminCount++;
+            ⋮┆----------------------------------------
+          114┆ superAdminCount++;
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           86┆ require(
+           87┆   _newAdmin != address(0) && _newAdmin != GENESIS_ADDRESS,
+           88┆   'AdminManage [addAdmin]: Invalid owner address provided'
+           89┆ );
+            ⋮┆----------------------------------------
+           90┆ require(admin[_newAdmin].next == address(0), 'AdminManage        
+  [addAdmin]: Address is already a admin');                                     
+            ⋮┆----------------------------------------
+          102┆ require(
+          103┆   _newSuperAdmin != address(0) && _newSuperAdmin !=              
+  GENESIS_ADDRESS,                                                              
+          104┆   'AdminManage: Invalid owner address provided'
+          105┆ );
+            ⋮┆----------------------------------------
+          106┆ require(superAdmin[_newSuperAdmin].next == address(0),           
+  'AdminManage: Address is already an superAdmin');                             
+            ⋮┆----------------------------------------
+          118┆ require(admin[_admin].next != address(0), 'AdminManage           
+  [removeAdmin]: require admin wallet at arg[0]');                              
+            ⋮┆----------------------------------------
+          132┆ require(
+          133┆   _admin != address(0) && admin[_prevAdmin].next == _admin,
+          134┆   'AdminManage [_removeSuperAdmin]: Invalid prevOwner, owner pair
+  provided'                                                                     
+          135┆ );
+            ⋮┆----------------------------------------
+          146┆ require(
+          147┆   superAdmin[_superAdmin].next != address(0),
+          148┆   'AdminManage [removeSuperAdmin]: require superAdmin wallet at  
+  arg[0]'                                                                       
+          149┆ );
+            ⋮┆----------------------------------------
+          158┆ require(msg.sender != tmp.lastVoter, "AdminManage                
+  [removeSuperAdmin]: can't use the same address to vote");                     
+            ⋮┆----------------------------------------
+          167┆ require(
+          168┆   _superAdmin != GENESIS_ADDRESS && superAdminCount > 1,
+          169┆   'AdminManage [_removeSuperAdmin]: Invalid owner address        
+  provided'                                                                     
+          170┆ );
+            ⋮┆----------------------------------------
+          184┆ require(
+          185┆   _superAdmin != address(0) && superAdmin[_prevSuperAdmin].next  
+  == _superAdmin,                                                               
+          186┆   'AdminManage [_removeSuperAdmin]: Invalid prevOwner, owner pair
+  provided'                                                                     
+          187┆ );
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 41 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

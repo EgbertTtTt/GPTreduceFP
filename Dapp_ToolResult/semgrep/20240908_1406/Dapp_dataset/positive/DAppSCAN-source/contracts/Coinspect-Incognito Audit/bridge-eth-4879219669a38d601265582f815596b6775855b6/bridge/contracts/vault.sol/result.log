@@ -1,0 +1,116 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 15 Code Findings │
+└──────────────────┘
+                  
+    /sb/vault.sol 
+       solidity.performance.init-variables-with-default-value                   
+          Uninitialized variables are assigned with the types default value.    
+  Explicitly initializing a                                                     
+          variable with its default value costs unnecessary gas.                
+                                                                                
+          175┆ bool public isInitialized = false;
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+          704┆ totalDepositedToSCAmount[assets[i]] =                            
+  totalDepositedToSCAmount[assets[i]].safeAdd(amounts[i]);                      
+            ⋮┆----------------------------------------
+          704┆ totalDepositedToSCAmount[assets[i]] =                            
+  totalDepositedToSCAmount[assets[i]].safeAdd(amounts[i]);                      
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          703┆ for (uint i = 0; i < assets.length; i++) {
+            ⋮┆----------------------------------------
+          761┆ for (uint j = 0; j <= i; j++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          118┆ require(c>=a && c>=b);
+            ⋮┆----------------------------------------
+          213┆ require(address(prevVault) != address(0x0) && msg.sender ==      
+  address(prevVault), errorToString(Errors.ONLY_PREVAULT));                     
+            ⋮┆----------------------------------------
+          293┆ require(emitAmount <= 10 ** 18 && tokenBalance <= 10 ** 18 &&    
+  emitAmount.safeAdd(tokenBalance) <= 10 ** 18,                                 
+  errorToString(Errors.VALUE_OVER_FLOW));                                       
+            ⋮┆----------------------------------------
+          411┆ require(data.meta == 241 && data.shard == 1); // Check           
+  instruction type                                                              
+            ⋮┆----------------------------------------
+          483┆ require(data.meta == 243 && data.shard == 1); // Check           
+  instruction type                                                              
+            ⋮┆----------------------------------------
+          651┆ require(returnedTokenAddress == recipientToken &&                
+  balanceOf(recipientToken).safeSub(balanceBeforeTrade) == returnedAmount,      
+  errorToString(Errors.INVALID_RETURN_D ... [0m                                 
+            [shortened a long line from output, adjust with                     
+  --max-chars-per-line]                                                         
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          674┆       if (address(prevVault) != address(0x0) &&                  
+  !migration[owner][token]) {                                                   
+          675┆           withdrawRequests[owner][token] =                       
+  withdrawRequests[owner][token].safeAdd(prevVault.getDepositedBalance(token,   
+  owner));                                                                      
+          676┆            migration[owner][token] =   
+  true;                                               
+          677┆     
+  }                
+            ⋮┆----------------------------------------
+          687┆        if (address(prevVault) != address(0x0) &&                 
+  !migration[owner][token]) {                                                   
+          688┆            return                                                
+  withdrawRequests[owner][token].safeAdd(prevVault.getDepositedBalance(token,   
+  owner));                                                                      
+          689┆      
+  }                 
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          703┆ for (uint i = 0; i < assets.length; i++) {
+            ⋮┆----------------------------------------
+          761┆ for (uint j = 0; j <= i; j++) {
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 15 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

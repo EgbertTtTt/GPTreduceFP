@@ -1,0 +1,206 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                    
+                    
+┌──────────────────┐
+│ 35 Code Findings │
+└──────────────────┘
+                                
+    /sb/ConvergentCurvePool.sol 
+       solidity.best-practice.use-abi-encodecall-instead-of-encodewithselector  
+          To guarantee arguments type safety it is recommended to use           
+  `abi.encodeCall` instead of                                                   
+          `abi.encodeWithSelector`.                                             
+                                                                                
+         1263┆ _callOptionalReturn(address(token),                              
+  abi.encodeWithSelector(token.transfer.selector, to, value));                  
+            ⋮┆----------------------------------------
+         1267┆ _callOptionalReturn(address(token),                              
+  abi.encodeWithSelector(token.transferFrom.selector, from, to, value));        
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+          823┆ for (uint256 i = 1; i < array.length; ++i) {
+            ⋮┆----------------------------------------
+         2114┆ for (uint256 i = 0; i < tokens.length; ++i) {
+            ⋮┆----------------------------------------
+       solidity.performance.inefficient-state-variable-increment             
+          <x> += <y> costs more gas than <x> = <x> + <y> for state variables.
+                                                                             
+         2969┆ feesUnderlying += uint128(impliedYieldFee);
+            ⋮┆----------------------------------------
+         2978┆ feesBond += uint128(impliedYieldFee);
+            ⋮┆----------------------------------------
+         2989┆ feesBond += uint128(impliedYieldFee);
+            ⋮┆----------------------------------------
+         2998┆ feesUnderlying += uint128(impliedYieldFee);
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+         2074┆ constructor(IVault _vault) {
+         2075┆     vault = _vault;
+         2076┆ }
+            ⋮┆----------------------------------------
+         2401┆ constructor(string memory tokenName, string memory tokenSymbol) {
+         2402┆     _name = tokenName;
+         2403┆     _symbol = tokenSymbol;
+         2404┆ }
+            ⋮┆----------------------------------------
+         2594┆ constructor(
+         2595┆     IERC20 _underlying,
+         2596┆     IERC20 _bond,
+         2597┆     uint256 _expiration,
+         2598┆     uint256 _unitSeconds,
+         2599┆     IVault vault,
+         2600┆     uint256 _percentFee,
+         2601┆     uint256 _percentFeeGov,
+         2602┆     address _governance,
+         2603┆     string memory name,
+             [hid 41 additional lines, adjust with --max-lines-per-finding] 
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+          249┆ for (uint256 j = 0; j <= i; j++) {
+            ⋮┆----------------------------------------
+          823┆ for (uint256 i = 1; i < array.length; ++i) {
+            ⋮┆----------------------------------------
+         2085┆ for (uint256 i = 0; i < tokens.length; ++i) {
+            ⋮┆----------------------------------------
+         2114┆ for (uint256 i = 0; i < tokens.length; ++i) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+         2631┆ require(_percentFeeGov < FEE_BOUND, "Fee too high");
+            ⋮┆----------------------------------------
+         2685┆ require(msg.sender == address(_vault), "Non Vault caller");
+            ⋮┆----------------------------------------
+         2772┆ require(msg.sender == address(_vault), "Non Vault caller");
+            ⋮┆----------------------------------------
+         2774┆ require(
+         2775┆     currentBalances.length == 2 && maxAmountsIn.length == 2,
+         2776┆     "Invalid format"
+         2777┆ );
+            ⋮┆----------------------------------------
+         2841┆ require(msg.sender == address(_vault), "Non Vault caller");
+            ⋮┆----------------------------------------
+         2843┆ require(
+         2844┆     currentBalances.length == 2 && minAmountsOut.length == 2,
+         2845┆     "Invalid format"
+         2846┆ );
+            ⋮┆----------------------------------------
+         3221┆ revert("Token request doesn't match stored");
+            ⋮┆----------------------------------------
+         3240┆ revert("Called with non pool token");
+            ⋮┆----------------------------------------
+         3261┆ revert("Called with non pool token");
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+         2774┆ require(
+         2775┆     currentBalances.length == 2 && maxAmountsIn.length == 2,
+         2776┆     "Invalid format"
+         2777┆ );
+            ⋮┆----------------------------------------
+         2843┆ require(
+         2844┆     currentBalances.length == 2 && minAmountsOut.length == 2,
+         2845┆     "Invalid format"
+         2846┆ );
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          490┆ if (PRECISION_LOG_UNDER_BOUND < x_int256 && x_int256 <           
+  PRECISION_LOG_UPPER_BOUND) {                                                  
+          491┆     int256 logbase = n_log_36(x_int256);
+          492┆     logx_times_y = ((logbase / DECIMALS) * y_int256 + ((logbase %
+  DECIMALS) * y_int256) / DECIMALS);                                            
+          493┆ } else {
+          494┆     logx_times_y = n_log(x_int256) * y_int256;
+          495┆ }
+            ⋮┆----------------------------------------
+          513┆ if (PRECISION_LOG_UNDER_BOUND < base && base <                   
+  PRECISION_LOG_UPPER_BOUND) {                                                  
+          514┆     logbase = n_log_36(base);
+          515┆ } else {
+          516┆     logbase = n_log(base) * DECIMALS;
+          517┆ }
+            ⋮┆----------------------------------------
+          519┆ if (PRECISION_LOG_UNDER_BOUND < arg && arg <                     
+  PRECISION_LOG_UPPER_BOUND) {                                                  
+          520┆     logarg = n_log_36(arg);
+          521┆ } else {
+          522┆     logarg = n_log(arg) * DECIMALS;
+          523┆ }
+            ⋮┆----------------------------------------
+         2456┆ if (msg.sender != sender && currentAllowance != uint256(-1)) {
+         2457┆     _require(currentAllowance >= amount,                         
+  Errors.INSUFFICIENT_ALLOWANCE);                                               
+         2458┆     _setAllowance(sender, msg.sender, currentAllowance - amount);
+         2459┆ }
+            ⋮┆----------------------------------------
+         3213┆ if (tokenIn == underlying && tokenOut == bond) {
+         3214┆     // We return (underlyingReserve, bondReserve + totalLP)
+         3215┆     return (reserveTokenIn, reserveTokenOut + totalSupply());
+         3216┆ } else if (tokenIn == bond && tokenOut == underlying) {
+         3217┆     // We return (bondReserve + totalLP, underlyingReserve)
+         3218┆     return (reserveTokenIn + totalSupply(), reserveTokenOut);
+         3219┆ }
+            ⋮┆----------------------------------------
+         3216┆ } else if (tokenIn == bond && tokenOut == underlying) {
+         3217┆     // We return (bondReserve + totalLP, underlyingReserve)
+         3218┆     return (reserveTokenIn + totalSupply(), reserveTokenOut);
+         3219┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+          235┆ for (i = 0; code != 0; i++) {
+            ⋮┆----------------------------------------
+          249┆ for (uint256 j = 0; j <= i; j++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+         3221┆ revert("Token request doesn't match stored");
+
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+
+Ran 48 rules on 1 file: 35 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

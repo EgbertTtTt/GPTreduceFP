@@ -1,0 +1,158 @@
+'solc --version' running
+'solc /sb/Keep3rV1Oracle.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+UniswapV2OracleLibrary.currentBlockTimestamp() (../../sb/Keep3rV1Oracle.sol#139-141) uses a weak PRNG: "uint32(block.timestamp % 2 ** 32) (../../sb/Keep3rV1Oracle.sol#140)" 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#weak-PRNG
+
+Keep3rV1Oracle.current(address,uint256,address) (../../sb/Keep3rV1Oracle.sol#641-660) uses a dangerous strict equality:
+	- block.timestamp == _observation.timestamp (../../sb/Keep3rV1Oracle.sol#648)
+Keep3rV1Oracle.current(address,uint256,address) (../../sb/Keep3rV1Oracle.sol#641-660) uses a dangerous strict equality:
+	- timeElapsed == 0 (../../sb/Keep3rV1Oracle.sol#654)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+FixedPoint.mul(FixedPoint.uq112x112,uint256).z (../../sb/Keep3rV1Oracle.sol#109) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+UniswapV2Library.getReserves(address,address,address) (../../sb/Keep3rV1Oracle.sol#372-376) ignores return value by (reserve0,reserve1) = IUniswapV2Pair(pairFor(factory,tokenA,tokenB)).getReserves() (../../sb/Keep3rV1Oracle.sol#374)
+Keep3rV1Oracle.add(address,address) (../../sb/Keep3rV1Oracle.sol#557-566) ignores return value by (price0Cumulative,price1Cumulative) = UniswapV2OracleLibrary.currentCumulativePrices(pair) (../../sb/Keep3rV1Oracle.sol#564)
+Keep3rV1Oracle._update(address) (../../sb/Keep3rV1Oracle.sol#613-623) ignores return value by (price0Cumulative,price1Cumulative) = UniswapV2OracleLibrary.currentCumulativePrices(pair) (../../sb/Keep3rV1Oracle.sol#618)
+Keep3rV1Oracle.current(address,uint256,address) (../../sb/Keep3rV1Oracle.sol#641-660) ignores return value by (token0) = UniswapV2Library.sortTokens(tokenIn,tokenOut) (../../sb/Keep3rV1Oracle.sol#644)
+Keep3rV1Oracle.current(address,uint256,address) (../../sb/Keep3rV1Oracle.sol#641-660) ignores return value by (price0Cumulative,price1Cumulative) = UniswapV2OracleLibrary.currentCumulativePrices(pair) (../../sb/Keep3rV1Oracle.sol#647)
+Keep3rV1Oracle.quote(address,uint256,address,uint256) (../../sb/Keep3rV1Oracle.sol#662-698) ignores return value by (token0) = UniswapV2Library.sortTokens(tokenIn,tokenOut) (../../sb/Keep3rV1Oracle.sol#665)
+Keep3rV1Oracle.sample(address,uint256,address,uint256,uint256) (../../sb/Keep3rV1Oracle.sol#704-742) ignores return value by (token0) = UniswapV2Library.sortTokens(tokenIn,tokenOut) (../../sb/Keep3rV1Oracle.sol#706)
+Keep3rV1Oracle._swap(uint256) (../../sb/Keep3rV1Oracle.sol#847-858) ignores return value by KP3R.approve(address(UNI),_amount) (../../sb/Keep3rV1Oracle.sol#849)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+Keep3rV1Oracle.setGovernance(address)._governance (../../sb/Keep3rV1Oracle.sol#502) lacks a zero-check on :
+		- pendingGovernance = _governance (../../sb/Keep3rV1Oracle.sol#504)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+UniswapV2OracleLibrary.currentCumulativePrices(address) (../../sb/Keep3rV1Oracle.sol#144-164) has external calls inside a loop: price0Cumulative = IUniswapV2Pair(pair).price0CumulativeLast() (../../sb/Keep3rV1Oracle.sol#148)
+UniswapV2OracleLibrary.currentCumulativePrices(address) (../../sb/Keep3rV1Oracle.sol#144-164) has external calls inside a loop: price1Cumulative = IUniswapV2Pair(pair).price1CumulativeLast() (../../sb/Keep3rV1Oracle.sol#149)
+UniswapV2OracleLibrary.currentCumulativePrices(address) (../../sb/Keep3rV1Oracle.sol#144-164) has external calls inside a loop: (reserve0,reserve1,blockTimestampLast) = IUniswapV2Pair(pair).getReserves() (../../sb/Keep3rV1Oracle.sol#152)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in Keep3rV1Oracle.update(address,address) (../../sb/Keep3rV1Oracle.sol#552-555):
+	External calls:
+	- keeper() (../../sb/Keep3rV1Oracle.sol#552)
+		- require(bool,string)(KP3R.isMinKeeper(msg.sender,minKeep,0,0),::isKeeper: keeper is not registered) (../../sb/Keep3rV1Oracle.sol#476)
+	State variables written after the call(s):
+	- _update(pair) (../../sb/Keep3rV1Oracle.sol#554)
+		- observations[pair].push(Observation(block.timestamp,price0Cumulative,price1Cumulative)) (../../sb/Keep3rV1Oracle.sol#619)
+Reentrancy in Keep3rV1Oracle.updateFor(uint256,uint256) (../../sb/Keep3rV1Oracle.sol#591-597):
+	External calls:
+	- keeper() (../../sb/Keep3rV1Oracle.sol#591)
+		- require(bool,string)(KP3R.isMinKeeper(msg.sender,minKeep,0,0),::isKeeper: keeper is not registered) (../../sb/Keep3rV1Oracle.sol#476)
+	State variables written after the call(s):
+	- _update(_pairs[i]) (../../sb/Keep3rV1Oracle.sol#593)
+		- observations[pair].push(Observation(block.timestamp,price0Cumulative,price1Cumulative)) (../../sb/Keep3rV1Oracle.sol#619)
+Reentrancy in Keep3rV1Oracle.updatePair(address) (../../sb/Keep3rV1Oracle.sol#548-550):
+	External calls:
+	- keeper() (../../sb/Keep3rV1Oracle.sol#548)
+		- require(bool,string)(KP3R.isMinKeeper(msg.sender,minKeep,0,0),::isKeeper: keeper is not registered) (../../sb/Keep3rV1Oracle.sol#476)
+	State variables written after the call(s):
+	- _update(pair) (../../sb/Keep3rV1Oracle.sol#549)
+		- observations[pair].push(Observation(block.timestamp,price0Cumulative,price1Cumulative)) (../../sb/Keep3rV1Oracle.sol#619)
+Reentrancy in Keep3rV1Oracle.work() (../../sb/Keep3rV1Oracle.sol#568-571):
+	External calls:
+	- upkeep() (../../sb/Keep3rV1Oracle.sol#568)
+		- KP3R.approve(address(UNI),_amount) (../../sb/Keep3rV1Oracle.sol#849)
+		- require(bool,string)(KP3R.isMinKeeper(msg.sender,minKeep,0,0),::isKeeper: keeper is not registered) (../../sb/Keep3rV1Oracle.sol#482)
+		- KP3R.receipt(address(KP3R),address(this),_received) (../../sb/Keep3rV1Oracle.sol#485)
+		- amounts = UNI.swapExactTokensForTokens(_amount,uint256(0),path,address(this),now.add(1800)) (../../sb/Keep3rV1Oracle.sol#855)
+		- WETH.withdraw(amounts[1]) (../../sb/Keep3rV1Oracle.sol#856)
+	External calls sending eth:
+	- upkeep() (../../sb/Keep3rV1Oracle.sol#568)
+		- msg.sender.transfer(_received) (../../sb/Keep3rV1Oracle.sol#487)
+	State variables written after the call(s):
+	- worked = _updateAll() (../../sb/Keep3rV1Oracle.sol#569)
+		- observations[pair].push(Observation(block.timestamp,price0Cumulative,price1Cumulative)) (../../sb/Keep3rV1Oracle.sol#619)
+Reentrancy in Keep3rV1Oracle.workForFree() (../../sb/Keep3rV1Oracle.sol#573-576):
+	External calls:
+	- keeper() (../../sb/Keep3rV1Oracle.sol#573)
+		- require(bool,string)(KP3R.isMinKeeper(msg.sender,minKeep,0,0),::isKeeper: keeper is not registered) (../../sb/Keep3rV1Oracle.sol#476)
+	State variables written after the call(s):
+	- worked = _updateAll() (../../sb/Keep3rV1Oracle.sol#574)
+		- observations[pair].push(Observation(block.timestamp,price0Cumulative,price1Cumulative)) (../../sb/Keep3rV1Oracle.sol#619)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+UniswapV2OracleLibrary.currentCumulativePrices(address) (../../sb/Keep3rV1Oracle.sol#144-164) uses timestamp for comparisons
+	Dangerous comparisons:
+	- blockTimestampLast != blockTimestamp (../../sb/Keep3rV1Oracle.sol#153)
+Keep3rV1Oracle.workable(address) (../../sb/Keep3rV1Oracle.sol#599-601) uses timestamp for comparisons
+	Dangerous comparisons:
+	- (block.timestamp - lastObservation(pair).timestamp) > periodSize (../../sb/Keep3rV1Oracle.sol#600)
+Keep3rV1Oracle._update(address) (../../sb/Keep3rV1Oracle.sol#613-623) uses timestamp for comparisons
+	Dangerous comparisons:
+	- timeElapsed > periodSize (../../sb/Keep3rV1Oracle.sol#617)
+Keep3rV1Oracle._valid(address,uint256) (../../sb/Keep3rV1Oracle.sol#637-639) uses timestamp for comparisons
+	Dangerous comparisons:
+	- (block.timestamp - lastObservation(pair).timestamp) <= age (../../sb/Keep3rV1Oracle.sol#638)
+Keep3rV1Oracle.current(address,uint256,address) (../../sb/Keep3rV1Oracle.sol#641-660) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp == _observation.timestamp (../../sb/Keep3rV1Oracle.sol#648)
+	- timeElapsed == 0 (../../sb/Keep3rV1Oracle.sol#654)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+FixedPoint.decode(FixedPoint.uq112x112) (../../sb/Keep3rV1Oracle.sol#124-126) is never used and should be removed
+FixedPoint.div(FixedPoint.uq112x112,uint112) (../../sb/Keep3rV1Oracle.sol#100-104) is never used and should be removed
+FixedPoint.encode(uint112) (../../sb/Keep3rV1Oracle.sol#90-92) is never used and should be removed
+FixedPoint.encode144(uint144) (../../sb/Keep3rV1Oracle.sol#95-97) is never used and should be removed
+SafeMath.add(uint256,uint256,string) (../../sb/Keep3rV1Oracle.sol#205-210) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/Keep3rV1Oracle.sol#329-331) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/Keep3rV1Oracle.sol#344-347) is never used and should be removed
+SafeMath.mul(uint256,uint256,string) (../../sb/Keep3rV1Oracle.sol#269-281) is never used and should be removed
+UniswapV2Library.getAmountIn(uint256,uint256,uint256) (../../sb/Keep3rV1Oracle.sol#398-405) is never used and should be removed
+UniswapV2Library.getAmountOut(uint256,uint256,uint256) (../../sb/Keep3rV1Oracle.sol#387-395) is never used and should be removed
+UniswapV2Library.getAmountsIn(address,uint256,address[]) (../../sb/Keep3rV1Oracle.sol#419-427) is never used and should be removed
+UniswapV2Library.getAmountsOut(address,uint256,address[]) (../../sb/Keep3rV1Oracle.sol#408-416) is never used and should be removed
+UniswapV2Library.getReserves(address,address,address) (../../sb/Keep3rV1Oracle.sol#372-376) is never used and should be removed
+UniswapV2Library.quote(uint256,uint256,uint256) (../../sb/Keep3rV1Oracle.sol#379-384) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.6.12 (../../sb/Keep3rV1Oracle.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Function IUniswapV2Pair.DOMAIN_SEPARATOR() (../../sb/Keep3rV1Oracle.sol#37) is not in mixedCase
+Function IUniswapV2Pair.PERMIT_TYPEHASH() (../../sb/Keep3rV1Oracle.sol#38) is not in mixedCase
+Function IUniswapV2Pair.MINIMUM_LIQUIDITY() (../../sb/Keep3rV1Oracle.sol#55) is not in mixedCase
+Struct FixedPoint.uq112x112 (../../sb/Keep3rV1Oracle.sol#77-79) is not in CapWords
+Struct FixedPoint.uq144x112 (../../sb/Keep3rV1Oracle.sol#83-85) is not in CapWords
+Function IKeep3rV1.KPRH() (../../sb/Keep3rV1Oracle.sol#455) is not in mixedCase
+Parameter Keep3rV1Oracle.setMinKeep(uint256)._keep (../../sb/Keep3rV1Oracle.sol#493) is not in mixedCase
+Parameter Keep3rV1Oracle.setGovernance(address)._governance (../../sb/Keep3rV1Oracle.sol#502) is not in mixedCase
+Parameter Keep3rV1Oracle.blackScholesEstimate(uint256,uint256,uint256)._vol (../../sb/Keep3rV1Oracle.sol#821) is not in mixedCase
+Parameter Keep3rV1Oracle.blackScholesEstimate(uint256,uint256,uint256)._underlying (../../sb/Keep3rV1Oracle.sol#822) is not in mixedCase
+Parameter Keep3rV1Oracle.blackScholesEstimate(uint256,uint256,uint256)._time (../../sb/Keep3rV1Oracle.sol#823) is not in mixedCase
+Parameter Keep3rV1Oracle.retBasedBlackScholesEstimate(uint256[],uint256,uint256)._numbers (../../sb/Keep3rV1Oracle.sol#837) is not in mixedCase
+Parameter Keep3rV1Oracle.retBasedBlackScholesEstimate(uint256[],uint256,uint256)._underlying (../../sb/Keep3rV1Oracle.sol#838) is not in mixedCase
+Parameter Keep3rV1Oracle.retBasedBlackScholesEstimate(uint256[],uint256,uint256)._time (../../sb/Keep3rV1Oracle.sol#839) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Reentrancy in Keep3rV1Oracle.work() (../../sb/Keep3rV1Oracle.sol#568-571):
+	External calls:
+	- upkeep() (../../sb/Keep3rV1Oracle.sol#568)
+		- msg.sender.transfer(_received) (../../sb/Keep3rV1Oracle.sol#487)
+	State variables written after the call(s):
+	- worked = _updateAll() (../../sb/Keep3rV1Oracle.sol#569)
+		- observations[pair].push(Observation(block.timestamp,price0Cumulative,price1Cumulative)) (../../sb/Keep3rV1Oracle.sol#619)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-4
+
+Variable UniswapV2OracleLibrary.currentCumulativePrices(address).price0Cumulative (../../sb/Keep3rV1Oracle.sol#146) is too similar to UniswapV2OracleLibrary.currentCumulativePrices(address).price1Cumulative (../../sb/Keep3rV1Oracle.sol#146)
+Variable Keep3rV1Oracle.current(address,uint256,address)._observation (../../sb/Keep3rV1Oracle.sol#646) is too similar to Keep3rV1Oracle.observations (../../sb/Keep3rV1Oracle.sol#530)
+Variable Keep3rV1Oracle.add(address,address).price0Cumulative (../../sb/Keep3rV1Oracle.sol#564) is too similar to Keep3rV1Oracle.current(address,uint256,address).price1Cumulative (../../sb/Keep3rV1Oracle.sol#647)
+Variable Keep3rV1Oracle.current(address,uint256,address).price0Cumulative (../../sb/Keep3rV1Oracle.sol#647) is too similar to Keep3rV1Oracle.add(address,address).price1Cumulative (../../sb/Keep3rV1Oracle.sol#564)
+Variable Keep3rV1Oracle.add(address,address).price0Cumulative (../../sb/Keep3rV1Oracle.sol#564) is too similar to Keep3rV1Oracle.add(address,address).price1Cumulative (../../sb/Keep3rV1Oracle.sol#564)
+Variable Keep3rV1Oracle._update(address).price0Cumulative (../../sb/Keep3rV1Oracle.sol#618) is too similar to Keep3rV1Oracle._update(address).price1Cumulative (../../sb/Keep3rV1Oracle.sol#618)
+Variable Keep3rV1Oracle.current(address,uint256,address).price0Cumulative (../../sb/Keep3rV1Oracle.sol#647) is too similar to Keep3rV1Oracle._update(address).price1Cumulative (../../sb/Keep3rV1Oracle.sol#618)
+Variable Keep3rV1Oracle.current(address,uint256,address).price0Cumulative (../../sb/Keep3rV1Oracle.sol#647) is too similar to Keep3rV1Oracle.current(address,uint256,address).price1Cumulative (../../sb/Keep3rV1Oracle.sol#647)
+Variable Keep3rV1Oracle.add(address,address).price0Cumulative (../../sb/Keep3rV1Oracle.sol#564) is too similar to Keep3rV1Oracle._update(address).price1Cumulative (../../sb/Keep3rV1Oracle.sol#618)
+Variable Keep3rV1Oracle._update(address).price0Cumulative (../../sb/Keep3rV1Oracle.sol#618) is too similar to Keep3rV1Oracle.current(address,uint256,address).price1Cumulative (../../sb/Keep3rV1Oracle.sol#647)
+Variable Keep3rV1Oracle._update(address).price0Cumulative (../../sb/Keep3rV1Oracle.sol#618) is too similar to Keep3rV1Oracle.add(address,address).price1Cumulative (../../sb/Keep3rV1Oracle.sol#564)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#variable-names-too-similar
+
+Loop condition i < _pairs.length (../../sb/Keep3rV1Oracle.sol#584) should use cached array length instead of referencing `length` member of the storage array.
+ Loop condition i < _pairs.length (../../sb/Keep3rV1Oracle.sol#605) should use cached array length instead of referencing `length` member of the storage array.
+ Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cache-array-length
+/sb/Keep3rV1Oracle.sol analyzed (11 contracts with 93 detectors), 70 result(s) found

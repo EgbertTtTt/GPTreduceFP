@@ -1,0 +1,581 @@
+METRICS: Using configs from the Registry (like --config=p/ci) reports pseudonymous rule metrics to semgrep.dev.
+To disable Registry rule metrics, use "--metrics=off".
+Using configs only from local files (like --config=xyz.yml) does not enable metrics.
+
+More information: https://semgrep.dev/docs/metrics
+
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 48 Code rules:
+  Scanning 1 file with 48 solidity rules.
+                     
+                     
+┌───────────────────┐
+│ 127 Code Findings │
+└───────────────────┘
+                             
+    /sb/MarginCalculator.sol 
+       solidity.best-practice.use-ownable2step                                  
+          By demanding that the receiver of the owner permissions actively      
+  accept via a contract call                                                    
+          of its own,  `Ownable2Step` and `Ownable2StepUpgradeable` prevent the 
+  contract ownership                                                            
+          from accidentally being transferred  to an address that cannot handle 
+  it.                                                                           
+                                                                                
+          933┆ contract MarginCalculator is Ownable {
+            ⋮┆----------------------------------------
+       solidity.performance.array-length-outside-loop                           
+          Caching the array length outside a loop saves reading it on each      
+  iteration, as long as the                                                     
+          array's length is not changed during the loop.                        
+                                                                                
+         1742┆ for (uint8 i = 0; i < timesToExpiry.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.non-payable-constructor      
+          Consider making costructor payable to save gas.
+                                                         
+          183┆ constructor() internal {
+          184┆     address msgSender = _msgSender();
+          185┆     _owner = msgSender;
+          186┆     emit OwnershipTransferred(address(0), msgSender);
+          187┆ }
+            ⋮┆----------------------------------------
+         1004┆ constructor(address _oracle) public {
+         1005┆     require(_oracle != address(0), "MarginCalculator: invalid    
+  oracle address");                                                             
+         1006┆ 
+         1007┆     oracle = OracleInterface(_oracle);
+         1008┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.state-variable-read-in-a-loop                       
+          Replace state variable reads and writes within loops with local       
+  variable reads and writes.                                                    
+                                                                                
+         1065┆ maxPriceAtTimeToExpiry[productHash][_timesToExpiry[i]] =         
+  _values[i];                                                                   
+            ⋮┆----------------------------------------
+         1744┆ return                                                           
+  FPI.fromScaledUint(maxPriceAtTimeToExpiry[_productHash][timesToExpiry[i]],    
+  SCALING_FACTOR);                                                              
+            ⋮┆----------------------------------------
+       solidity.performance.unnecessary-checked-arithmetic-in-loop              
+          A lot of times there is no risk that the loop counter can overflow.   
+  Using Solidity's                                                              
+          unchecked block saves the overflow checks.                            
+                                                                                
+         1056┆ for (uint256 i = 0; i < _timesToExpiry.length; i++) {
+            ⋮┆----------------------------------------
+         1742┆ for (uint8 i = 0; i < timesToExpiry.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-custom-error-not-require                        
+          Consider using custom errors as they are more gas efficient while     
+  allowing developers  to                                                       
+          describe the error in detail using NatSpec.                           
+                                                                                
+           17┆ require(c >= a, "SafeMath: addition overflow");
+            ⋮┆----------------------------------------
+           73┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          200┆ require(_owner == _msgSender(), "Ownable: caller is not the      
+  owner");                                                                      
+            ⋮┆----------------------------------------
+          221┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          414┆ require(!(a == -1 && b == _INT256_MIN), "SignedSafeMath:         
+  multiplication overflow");                                                    
+            ⋮┆----------------------------------------
+          417┆ require(c / a == b, "SignedSafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          435┆ require(b != 0, "SignedSafeMath: division by zero");
+            ⋮┆----------------------------------------
+          436┆ require(!(b == -1 && a == _INT256_MIN), "SignedSafeMath: division
+  overflow");                                                                   
+            ⋮┆----------------------------------------
+          455┆ require((b >= 0 && c <= a) || (b < 0 && c > a), "SignedSafeMath: 
+  subtraction overflow");                                                       
+            ⋮┆----------------------------------------
+          472┆ require((b >= 0 && c >= a) || (b < 0 && c < a), "SignedSafeMath: 
+  addition overflow");                                                          
+            ⋮┆----------------------------------------
+          493┆ require(a < 2**255, "FixedPointInt256: out of int range");
+            ⋮┆----------------------------------------
+          754┆ require(_amount > 0, "MarginVault: invalid short otoken amount");
+            ⋮┆----------------------------------------
+          762┆ require(
+          763┆     (_index < _vault.shortOtokens.length) && (_index <           
+  _vault.shortAmounts.length),                                                  
+          764┆     "MarginVault: invalid short otoken index"
+          765┆ );
+            ⋮┆----------------------------------------
+          767┆ require(
+          768┆     (existingShort == _shortOtoken) || (existingShort ==         
+  address(0)),                                                                  
+          769┆     "MarginVault: short otoken address mismatch"
+          770┆ );
+            ⋮┆----------------------------------------
+          791┆ require(_index < _vault.shortOtokens.length, "MarginVault:       
+  invalid short otoken index");                                                 
+            ⋮┆----------------------------------------
+          792┆ require(_vault.shortOtokens[_index] == _shortOtoken,             
+  "MarginVault: short otoken address mismatch");                                
+            ⋮┆----------------------------------------
+          815┆ require(_amount > 0, "MarginVault: invalid long otoken amount");
+            ⋮┆----------------------------------------
+          823┆ require(
+          824┆     (_index < _vault.longOtokens.length) && (_index <            
+  _vault.longAmounts.length),                                                   
+          825┆     "MarginVault: invalid long otoken index"
+          826┆ );
+            ⋮┆----------------------------------------
+          828┆ require(
+          829┆     (existingLong == _longOtoken) || (existingLong ==            
+  address(0)),                                                                  
+          830┆     "MarginVault: long otoken address mismatch"
+          831┆ );
+            ⋮┆----------------------------------------
+          852┆ require(_index < _vault.longOtokens.length, "MarginVault: invalid
+  long otoken index");                                                          
+            ⋮┆----------------------------------------
+          853┆ require(_vault.longOtokens[_index] == _longOtoken, "MarginVault: 
+  long otoken address mismatch");                                               
+            ⋮┆----------------------------------------
+          876┆ require(_amount > 0, "MarginVault: invalid collateral amount");
+            ⋮┆----------------------------------------
+          884┆ require(
+          885┆     (_index < _vault.collateralAssets.length) && (_index <       
+  _vault.collateralAmounts.length),                                             
+          886┆     "MarginVault: invalid collateral token index"
+          887┆ );
+            ⋮┆----------------------------------------
+          889┆ require(
+          890┆     (existingCollateral == _collateralAsset) ||                  
+  (existingCollateral == address(0)),                                           
+          891┆     "MarginVault: collateral token address mismatch"
+          892┆ );
+            ⋮┆----------------------------------------
+          913┆ require(_index < _vault.collateralAssets.length, "MarginVault:   
+  invalid collateral asset index");                                             
+            ⋮┆----------------------------------------
+          914┆ require(_vault.collateralAssets[_index] == _collateralAsset,     
+  "MarginVault: collateral token address mismatch");                            
+            ⋮┆----------------------------------------
+         1005┆ require(_oracle != address(0), "MarginCalculator: invalid oracle 
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1017┆ require(_dust > 0, "MarginCalculator: dust amount should be      
+  greater than zero");                                                          
+            ⋮┆----------------------------------------
+         1041┆ require(_timesToExpiry.length > 0, "MarginCalculator: invalid    
+  times to expiry array");                                                      
+            ⋮┆----------------------------------------
+         1042┆ require(_timesToExpiry.length == _values.length,                 
+  "MarginCalculator: invalid values array");                                    
+            ⋮┆----------------------------------------
+         1051┆ require(
+         1052┆     (expiryArray.length == 0) || (_timesToExpiry[0] >            
+  expiryArray[expiryArray.length.sub(1)]),                                      
+         1053┆     "MarginCalculator: expiry array is not in order"
+         1054┆ );
+            ⋮┆----------------------------------------
+         1059┆ require(_timesToExpiry[i] < _timesToExpiry[i.add(1)],            
+  "MarginCalculator: time should be in order");                                 
+            ⋮┆----------------------------------------
+         1062┆ require(_values[i] > 0, "MarginCalculator: no expiry upper bound 
+  value found");                                                                
+            ⋮┆----------------------------------------
+         1090┆ require(_value > 0, "MarginCalculator: invalid option upper bound
+  value");                                                                      
+            ⋮┆----------------------------------------
+         1094┆ require(
+         1095┆     maxPriceAtTimeToExpiry[productHash][_timeToExpiry] != 0,
+         1096┆     "MarginCalculator: upper bound value not found"
+         1097┆ );
+            ⋮┆----------------------------------------
+         1119┆ require(_shockValue > 0, "MarginCalculator: invalid spot shock   
+  value");                                                                      
+            ⋮┆----------------------------------------
+         1267┆ require(_otoken != address(0), "MarginCalculator: Invalid token  
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1280┆ require(now >= expiry, "MarginCalculator: Otoken not expired     
+  yet");                                                                        
+            ⋮┆----------------------------------------
+         1335┆ require(_vaultType == 1, "MarginCalculator: invalid vault type to
+  liquidate");                                                                  
+            ⋮┆----------------------------------------
+         1342┆ require(now < vaultDetails.shortExpiryTimestamp,                 
+  "MarginCalculator: can not liquidate expired position");                      
+            ⋮┆----------------------------------------
+         1350┆ require(
+         1351┆     timestamp > _vaultLatestUpdate,
+         1352┆     "MarginCalculator: auction timestamp should be post vault    
+  latest update"                                                                
+         1353┆ );
+            ⋮┆----------------------------------------
+         1553┆ require(
+         1554┆     collateralAmount.isGreaterThan(dustAmount),
+         1555┆     "MarginCalculator: naked margin vault should have collateral 
+  amount greater than dust amount"                                              
+         1556┆ );
+            ⋮┆----------------------------------------
+         1731┆ require(timesToExpiry.length != 0, "MarginCalculator: product    
+  have no expiry values");                                                      
+            ⋮┆----------------------------------------
+         1736┆ require(
+         1737┆     timesToExpiry[timesToExpiry.length.sub(1)] >=                
+  optionTimeToExpiry,                                                           
+         1738┆     "MarginCalculator: product have no upper bound value"
+         1739┆ );
+            ⋮┆----------------------------------------
+         1843┆ require(priceAFinalized && priceBFinalized, "MarginCalculator:   
+  price at expiry not finalized yet");                                          
+            ⋮┆----------------------------------------
+         2041┆ require(_vault.shortOtokens.length <= 1, "MarginCalculator: Too  
+  many short otokens in the vault");                                            
+            ⋮┆----------------------------------------
+         2042┆ require(_vault.longOtokens.length <= 1, "MarginCalculator: Too   
+  many long otokens in the vault");                                             
+            ⋮┆----------------------------------------
+         2043┆ require(_vault.collateralAssets.length <= 1, "MarginCalculator:  
+  Too many collateral assets in the vault");                                    
+            ⋮┆----------------------------------------
+         2045┆ require(
+         2046┆     _vault.shortOtokens.length == _vault.shortAmounts.length,
+         2047┆     "MarginCalculator: Short asset and amount mismatch"
+         2048┆ );
+            ⋮┆----------------------------------------
+         2049┆ require(
+         2050┆     _vault.longOtokens.length == _vault.longAmounts.length,
+         2051┆     "MarginCalculator: Long asset and amount mismatch"
+         2052┆ );
+            ⋮┆----------------------------------------
+         2053┆ require(
+         2054┆     _vault.collateralAssets.length ==                            
+  _vault.collateralAmounts.length,                                              
+         2055┆     "MarginCalculator: Collateral asset and amount mismatch"
+         2056┆ );
+            ⋮┆----------------------------------------
+         2059┆ require(
+         2060┆     _isMarginableLong(_vault, _vaultDetails),
+         2061┆     "MarginCalculator: long asset not marginable for short asset"
+         2062┆ );
+            ⋮┆----------------------------------------
+         2065┆ require(
+         2066┆     _isMarginableCollateral(_vault, _vaultDetails),
+         2067┆     "MarginCalculator: collateral asset not marginable for short 
+  asset"                                                                        
+         2068┆ );
+            ⋮┆----------------------------------------
+         2083┆ require(!_vaultDetails.hasLong, "MarginCalculator: naked margin  
+  vault cannot have long otoken");                                              
+            ⋮┆----------------------------------------
+       solidity.performance.use-multiple-require                                
+          Using multiple require statements is cheaper than using && multiple   
+  check combinations.                                                           
+          There are more advantages, such as easier to read code and better     
+  coverage reports.                                                             
+                                                                                
+          414┆ require(!(a == -1 && b == _INT256_MIN), "SignedSafeMath:         
+  multiplication overflow");                                                    
+            ⋮┆----------------------------------------
+          436┆ require(!(b == -1 && a == _INT256_MIN), "SignedSafeMath: division
+  overflow");                                                                   
+            ⋮┆----------------------------------------
+          455┆ require((b >= 0 && c <= a) || (b < 0 && c > a), "SignedSafeMath: 
+  subtraction overflow");                                                       
+            ⋮┆----------------------------------------
+          472┆ require((b >= 0 && c >= a) || (b < 0 && c < a), "SignedSafeMath: 
+  addition overflow");                                                          
+            ⋮┆----------------------------------------
+          762┆ require(
+          763┆     (_index < _vault.shortOtokens.length) && (_index <           
+  _vault.shortAmounts.length),                                                  
+          764┆     "MarginVault: invalid short otoken index"
+          765┆ );
+            ⋮┆----------------------------------------
+          823┆ require(
+          824┆     (_index < _vault.longOtokens.length) && (_index <            
+  _vault.longAmounts.length),                                                   
+          825┆     "MarginVault: invalid long otoken index"
+          826┆ );
+            ⋮┆----------------------------------------
+          884┆ require(
+          885┆     (_index < _vault.collateralAssets.length) && (_index <       
+  _vault.collateralAmounts.length),                                             
+          886┆     "MarginVault: invalid collateral token index"
+          887┆ );
+            ⋮┆----------------------------------------
+         1843┆ require(priceAFinalized && priceBFinalized, "MarginCalculator:   
+  price at expiry not finalized yet");                                          
+            ⋮┆----------------------------------------
+       solidity.performance.use-nested-if                                       
+          Using nested is cheaper than using && multiple check combinations.    
+  There are more                                                                
+          advantages, such as easier to read code and better coverage reports.  
+                                                                                
+          758┆ if ((_index == _vault.shortOtokens.length) && (_index ==         
+  _vault.shortAmounts.length)) {                                                
+          759┆     _vault.shortOtokens.push(_shortOtoken);
+          760┆     _vault.shortAmounts.push(_amount);
+          761┆ } else {
+          762┆     require(
+          763┆         (_index < _vault.shortOtokens.length) && (_index <       
+  _vault.shortAmounts.length),                                                  
+          764┆         "MarginVault: invalid short otoken index"
+          765┆     );
+          766┆     address existingShort = _vault.shortOtokens[_index];
+          767┆     require(
+             [hid 7 additional lines, adjust with --max-lines-per-finding] 
+          819┆ if ((_index == _vault.longOtokens.length) && (_index ==          
+  _vault.longAmounts.length)) {                                                 
+          820┆     _vault.longOtokens.push(_longOtoken);
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+          821┆     _vault.longAmounts.push(_amount);
+          822┆ } else {
+          823┆     require(
+          824┆         (_index < _vault.longOtokens.length) && (_index <        
+  _vault.longAmounts.length),                                                   
+          825┆         "MarginVault: invalid long otoken index"
+          826┆     );
+          827┆     address existingLong = _vault.longOtokens[_index];
+          828┆     require(
+             [hid 7 additional lines, adjust with --max-lines-per-finding] 
+          880┆ if ((_index == _vault.collateralAssets.length) && (_index ==     
+  _vault.collateralAmounts.length)) {                                           
+          881┆     _vault.collateralAssets.push(_collateralAsset);
+          882┆     _vault.collateralAmounts.push(_amount);
+          883┆ } else {
+          884┆     require(
+          885┆         (_index < _vault.collateralAssets.length) && (_index <   
+  _vault.collateralAmounts.length),                                             
+          886┆         "MarginVault: invalid collateral token index"
+          887┆     );
+          888┆     address existingCollateral = _vault.collateralAssets[_index];
+          889┆     require(
+             [hid 7 additional lines, adjust with --max-lines-per-finding] 
+         1444┆ if (!vaultDetails.hasShort && !vaultDetails.hasLong) {
+         1445┆     uint256 amount = vaultDetails.hasCollateral ?                
+  _vault.collateralAmounts[0] : 0;                                              
+         1446┆     return (amount, true);
+         1447┆ }
+            ⋮┆----------------------------------------
+       solidity.performance.use-prefix-increment-not-postfix                    
+          Consider using the prefix increment expression whenever the return    
+  value is not needed. The                                                      
+          prefix increment expression is cheaper in terms of gas.               
+                                                                                
+         1056┆ for (uint256 i = 0; i < _timesToExpiry.length; i++) {
+            ⋮┆----------------------------------------
+         1742┆ for (uint8 i = 0; i < timesToExpiry.length; i++) {
+            ⋮┆----------------------------------------
+       solidity.performance.use-short-revert-string                             
+          Shortening revert strings to fit in 32 bytes will decrease gas costs  
+  for deployment and  gas                                                       
+          costs when the revert condition has been met.                         
+                                                                                
+           73┆ require(c / a == b, "SafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          221┆ require(newOwner != address(0), "Ownable: new owner is the zero  
+  address");                                                                    
+            ⋮┆----------------------------------------
+          414┆ require(!(a == -1 && b == _INT256_MIN), "SignedSafeMath:         
+  multiplication overflow");                                                    
+            ⋮┆----------------------------------------
+          417┆ require(c / a == b, "SignedSafeMath: multiplication overflow");
+            ⋮┆----------------------------------------
+          436┆ require(!(b == -1 && a == _INT256_MIN), "SignedSafeMath: division
+  overflow");                                                                   
+            ⋮┆----------------------------------------
+          455┆ require((b >= 0 && c <= a) || (b < 0 && c > a), "SignedSafeMath: 
+  subtraction overflow");                                                       
+            ⋮┆----------------------------------------
+          472┆ require((b >= 0 && c >= a) || (b < 0 && c < a), "SignedSafeMath: 
+  addition overflow");                                                          
+            ⋮┆----------------------------------------
+          493┆ require(a < 2**255, "FixedPointInt256: out of int range");
+            ⋮┆----------------------------------------
+          754┆ require(_amount > 0, "MarginVault: invalid short otoken amount");
+            ⋮┆----------------------------------------
+          762┆ require(
+          763┆     (_index < _vault.shortOtokens.length) && (_index <           
+  _vault.shortAmounts.length),                                                  
+          764┆     "MarginVault: invalid short otoken index"
+          765┆ );
+            ⋮┆----------------------------------------
+          767┆ require(
+          768┆     (existingShort == _shortOtoken) || (existingShort ==         
+  address(0)),                                                                  
+          769┆     "MarginVault: short otoken address mismatch"
+          770┆ );
+            ⋮┆----------------------------------------
+          791┆ require(_index < _vault.shortOtokens.length, "MarginVault:       
+  invalid short otoken index");                                                 
+            ⋮┆----------------------------------------
+          792┆ require(_vault.shortOtokens[_index] == _shortOtoken,             
+  "MarginVault: short otoken address mismatch");                                
+            ⋮┆----------------------------------------
+          815┆ require(_amount > 0, "MarginVault: invalid long otoken amount");
+            ⋮┆----------------------------------------
+          823┆ require(
+          824┆     (_index < _vault.longOtokens.length) && (_index <            
+  _vault.longAmounts.length),                                                   
+          825┆     "MarginVault: invalid long otoken index"
+          826┆ );
+            ⋮┆----------------------------------------
+          828┆ require(
+          829┆     (existingLong == _longOtoken) || (existingLong ==            
+  address(0)),                                                                  
+          830┆     "MarginVault: long otoken address mismatch"
+          831┆ );
+            ⋮┆----------------------------------------
+          852┆ require(_index < _vault.longOtokens.length, "MarginVault: invalid
+  long otoken index");                                                          
+            ⋮┆----------------------------------------
+          853┆ require(_vault.longOtokens[_index] == _longOtoken, "MarginVault: 
+  long otoken address mismatch");                                               
+            ⋮┆----------------------------------------
+          876┆ require(_amount > 0, "MarginVault: invalid collateral amount");
+            ⋮┆----------------------------------------
+          884┆ require(
+          885┆     (_index < _vault.collateralAssets.length) && (_index <       
+  _vault.collateralAmounts.length),                                             
+          886┆     "MarginVault: invalid collateral token index"
+          887┆ );
+            ⋮┆----------------------------------------
+          889┆ require(
+          890┆     (existingCollateral == _collateralAsset) ||                  
+  (existingCollateral == address(0)),                                           
+          891┆     "MarginVault: collateral token address mismatch"
+          892┆ );
+            ⋮┆----------------------------------------
+          913┆ require(_index < _vault.collateralAssets.length, "MarginVault:   
+  invalid collateral asset index");                                             
+            ⋮┆----------------------------------------
+          914┆ require(_vault.collateralAssets[_index] == _collateralAsset,     
+  "MarginVault: collateral token address mismatch");                            
+            ⋮┆----------------------------------------
+         1005┆ require(_oracle != address(0), "MarginCalculator: invalid oracle 
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1017┆ require(_dust > 0, "MarginCalculator: dust amount should be      
+  greater than zero");                                                          
+            ⋮┆----------------------------------------
+         1041┆ require(_timesToExpiry.length > 0, "MarginCalculator: invalid    
+  times to expiry array");                                                      
+            ⋮┆----------------------------------------
+         1042┆ require(_timesToExpiry.length == _values.length,                 
+  "MarginCalculator: invalid values array");                                    
+            ⋮┆----------------------------------------
+         1051┆ require(
+         1052┆     (expiryArray.length == 0) || (_timesToExpiry[0] >            
+  expiryArray[expiryArray.length.sub(1)]),                                      
+         1053┆     "MarginCalculator: expiry array is not in order"
+         1054┆ );
+            ⋮┆----------------------------------------
+         1059┆ require(_timesToExpiry[i] < _timesToExpiry[i.add(1)],            
+  "MarginCalculator: time should be in order");                                 
+            ⋮┆----------------------------------------
+         1062┆ require(_values[i] > 0, "MarginCalculator: no expiry upper bound 
+  value found");                                                                
+            ⋮┆----------------------------------------
+         1090┆ require(_value > 0, "MarginCalculator: invalid option upper bound
+  value");                                                                      
+            ⋮┆----------------------------------------
+         1094┆ require(
+         1095┆     maxPriceAtTimeToExpiry[productHash][_timeToExpiry] != 0,
+         1096┆     "MarginCalculator: upper bound value not found"
+         1097┆ );
+            ⋮┆----------------------------------------
+         1119┆ require(_shockValue > 0, "MarginCalculator: invalid spot shock   
+  value");                                                                      
+            ⋮┆----------------------------------------
+         1267┆ require(_otoken != address(0), "MarginCalculator: Invalid token  
+  address");                                                                    
+            ⋮┆----------------------------------------
+         1280┆ require(now >= expiry, "MarginCalculator: Otoken not expired     
+  yet");                                                                        
+            ⋮┆----------------------------------------
+         1335┆ require(_vaultType == 1, "MarginCalculator: invalid vault type to
+  liquidate");                                                                  
+            ⋮┆----------------------------------------
+         1342┆ require(now < vaultDetails.shortExpiryTimestamp,                 
+  "MarginCalculator: can not liquidate expired position");                      
+            ⋮┆----------------------------------------
+         1350┆ require(
+         1351┆     timestamp > _vaultLatestUpdate,
+         1352┆     "MarginCalculator: auction timestamp should be post vault    
+  latest update"                                                                
+         1353┆ );
+            ⋮┆----------------------------------------
+         1553┆ require(
+         1554┆     collateralAmount.isGreaterThan(dustAmount),
+         1555┆     "MarginCalculator: naked margin vault should have collateral 
+  amount greater than dust amount"                                              
+         1556┆ );
+            ⋮┆----------------------------------------
+         1731┆ require(timesToExpiry.length != 0, "MarginCalculator: product    
+  have no expiry values");                                                      
+            ⋮┆----------------------------------------
+         1736┆ require(
+         1737┆     timesToExpiry[timesToExpiry.length.sub(1)] >=                
+  optionTimeToExpiry,                                                           
+         1738┆     "MarginCalculator: product have no upper bound value"
+         1739┆ );
+            ⋮┆----------------------------------------
+         1843┆ require(priceAFinalized && priceBFinalized, "MarginCalculator:   
+  price at expiry not finalized yet");                                          
+            ⋮┆----------------------------------------
+         2041┆ require(_vault.shortOtokens.length <= 1, "MarginCalculator: Too  
+  many short otokens in the vault");                                            
+            ⋮┆----------------------------------------
+         2042┆ require(_vault.longOtokens.length <= 1, "MarginCalculator: Too   
+  many long otokens in the vault");                                             
+            ⋮┆----------------------------------------
+         2043┆ require(_vault.collateralAssets.length <= 1, "MarginCalculator:  
+  Too many collateral assets in the vault");                                    
+            ⋮┆----------------------------------------
+         2045┆ require(
+         2046┆     _vault.shortOtokens.length == _vault.shortAmounts.length,
+         2047┆     "MarginCalculator: Short asset and amount mismatch"
+         2048┆ );
+            ⋮┆----------------------------------------
+         2049┆ require(
+         2050┆     _vault.longOtokens.length == _vault.longAmounts.length,
+         2051┆     "MarginCalculator: Long asset and amount mismatch"
+         2052┆ );
+            ⋮┆----------------------------------------
+         2053┆ require(
+         2054┆     _vault.collateralAssets.length ==                            
+  _vault.collateralAmounts.length,                                              
+         2055┆     "MarginCalculator: Collateral asset and amount mismatch"
+         2056┆ );
+            ⋮┆----------------------------------------
+         2059┆ require(
+         2060┆     _isMarginableLong(_vault, _vaultDetails),
+         2061┆     "MarginCalculator: long asset not marginable for short asset"
+         2062┆ );
+            ⋮┆----------------------------------------
+         2065┆ require(
+         2066┆     _isMarginableCollateral(_vault, _vaultDetails),
+         2067┆     "MarginCalculator: collateral asset not marginable for short 
+  asset"                                                                        
+         2068┆ );
+            ⋮┆----------------------------------------
+         2083┆ require(!_vaultDetails.hasLong, "MarginCalculator: naked margin  
+  vault cannot have long otoken");                                              
+
+
+Ran 48 rules on 1 file: 127 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+
+Versions prior to 1.43.0 will cease to work with Semgrep.dev after March 11th 2024, please upgrade.

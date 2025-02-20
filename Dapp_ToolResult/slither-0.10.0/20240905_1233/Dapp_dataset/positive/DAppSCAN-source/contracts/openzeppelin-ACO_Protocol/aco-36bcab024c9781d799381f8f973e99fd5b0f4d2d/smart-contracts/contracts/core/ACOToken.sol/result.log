@@ -1,0 +1,353 @@
+'solc --version' running
+'solc /sb/ACOToken.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/ACOToken.sol:
+Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.
+   --> /sb/ACOToken.sol:735:17:
+    |
+735 |         uint256 amount;
+    |                 ^^^^^^
+
+Warning: Only state variables can have a docstring. This will be disallowed in 0.7.0.
+   --> /sb/ACOToken.sol:740:17:
+    |
+740 |         uint256 index;
+    |                 ^^^^^
+
+Warning: SPDX license identifier not provided in source file. Before publishing, consider adding a comment containing "SPDX-License-Identifier: <SPDX-License>" to each source file. Use "SPDX-License-Identifier: UNLICENSED" for non-open-source code. Please see https://spdx.org for more information.
+--> /sb/ACOToken.sol
+
+Warning: Contract code size exceeds 24576 bytes (a limit introduced in Spurious Dragon). This contract may not be deployable on mainnet. Consider enabling the optimizer (with a low "runs" value!), turning off revert strings, or using libraries.
+   --> /sb/ACOToken.sol:725:1:
+    |
+725 | contract ACOToken is ERC20 {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+ACOToken._name() (../../sb/ACOToken.sol#1585-1597) calls abi.encodePacked() with multiple dynamic arguments:
+	- string(abi.encodePacked(ACO ,underlyingSymbol,-,_getFormattedStrikePrice(),strikeAssetSymbol,-,_getType(),-,_getFormattedExpiryTime())) (../../sb/ACOToken.sol#1586-1596)
+ACOToken._getFormattedExpiryTime() (../../sb/ACOToken.sol#1615-1626) calls abi.encodePacked() with multiple dynamic arguments:
+	- string(abi.encodePacked(_getNumberWithTwoCaracters(day),_getMonthFormatted(month),_getYearFormatted(year),-,_getNumberWithTwoCaracters(hour),_getNumberWithTwoCaracters(minute),UTC)) (../../sb/ACOToken.sol#1617-1625)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#abi-encodePacked-collision
+
+BokkyPooBahsDateTimeLibrary._daysFromDate(uint256,uint256,uint256) (../../sb/ACOToken.sol#442-456) performs a multiplication on the result of a division:
+	- __days = _day - 32075 + 1461 * (_year + 4800 + (_month - 14) / 12) / 4 + 367 * (_month - 2 - (_month - 14) / 12 * 12) / 12 - 3 * ((_year + 4900 + (_month - 14) / 12) / 100) / 4 - OFFSET19700101 (../../sb/ACOToken.sol#448-453)
+BokkyPooBahsDateTimeLibrary._daysToDate(uint256) (../../sb/ACOToken.sol#475-492) performs a multiplication on the result of a division:
+	- N = 4 * L / 146097 (../../sb/ACOToken.sol#479)
+	- L = L - (146097 * N + 3) / 4 (../../sb/ACOToken.sol#480)
+BokkyPooBahsDateTimeLibrary._daysToDate(uint256) (../../sb/ACOToken.sol#475-492) performs a multiplication on the result of a division:
+	- _year = 4000 * (L + 1) / 1461001 (../../sb/ACOToken.sol#481)
+	- L = L - 1461 * _year / 4 + 31 (../../sb/ACOToken.sol#482)
+BokkyPooBahsDateTimeLibrary._daysToDate(uint256) (../../sb/ACOToken.sol#475-492) performs a multiplication on the result of a division:
+	- _month = 80 * L / 2447 (../../sb/ACOToken.sol#483)
+	- _day = L - 2447 * _month / 80 (../../sb/ACOToken.sol#484)
+BokkyPooBahsDateTimeLibrary._daysToDate(uint256) (../../sb/ACOToken.sol#475-492) performs a multiplication on the result of a division:
+	- L = _month / 11 (../../sb/ACOToken.sol#485)
+	- _month = _month + 2 - 12 * L (../../sb/ACOToken.sol#486)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+ACOToken._exerciseOwners(address,uint256) (../../sb/ACOToken.sol#1377-1386) contains a tautology or contradiction:
+	- i >= 0 (../../sb/ACOToken.sol#1379)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#tautology-or-contradiction
+
+ACOToken._getFormattedStrikePrice().digits (../../sb/ACOToken.sol#1694) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+ACOToken._getFormattedExpiryTime() (../../sb/ACOToken.sol#1615-1626) ignores return value by (year,month,day,hour,minute) = BokkyPooBahsDateTimeLibrary.timestampToDateTime(expiryTime) (../../sb/ACOToken.sol#1616)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+BokkyPooBahsDateTimeLibrary._daysToDate(uint256).L (../../sb/ACOToken.sol#478) is written in both
+	L = L - 1461 * _year / 4 + 31 (../../sb/ACOToken.sol#482)
+	L = _month / 11 (../../sb/ACOToken.sol#485)
+BokkyPooBahsDateTimeLibrary.subMonths(uint256,uint256).year (../../sb/ACOToken.sol#630) is written in both
+	(year,month,day) = _daysToDate(timestamp / SECONDS_PER_DAY) (../../sb/ACOToken.sol#630)
+	year = yearMonth / 12 (../../sb/ACOToken.sol#632)
+BokkyPooBahsDateTimeLibrary.subMonths(uint256,uint256).month (../../sb/ACOToken.sol#630) is written in both
+	(year,month,day) = _daysToDate(timestamp / SECONDS_PER_DAY) (../../sb/ACOToken.sol#630)
+	month = yearMonth % 12 + 1 (../../sb/ACOToken.sol#633)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#write-after-write
+
+ACOToken.init(address,address,bool,uint256,uint256,uint256,address)._feeDestination (../../sb/ACOToken.sol#896) lacks a zero-check on :
+		- feeDestination = _feeDestination (../../sb/ACOToken.sol#913)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in ACOToken._burn(address,uint256) (../../sb/ACOToken.sol#1495-1498):
+	External calls:
+	- _redeemCollateral(account,tokenAmount) (../../sb/ACOToken.sol#1496)
+		- (success,returndata) = token.call(abi.encodeWithSelector(_transferSelector,recipient,amount)) (../../sb/ACOToken.sol#1776)
+	External calls sending eth:
+	- _redeemCollateral(account,tokenAmount) (../../sb/ACOToken.sol#1496)
+		- address(msg.sender).transfer(collateralAmount) (../../sb/ACOToken.sol#1333)
+		- feeDestination.transfer(fee) (../../sb/ACOToken.sol#1335)
+	State variables written after the call(s):
+	- _callBurn(account,tokenAmount) (../../sb/ACOToken.sol#1497)
+		- _allowances[owner][spender] = amount (../../sb/ACOToken.sol#308)
+	- _callBurn(account,tokenAmount) (../../sb/ACOToken.sol#1497)
+		- _balances[account] = _balances[account].sub(amount) (../../sb/ACOToken.sol#325)
+	- _callBurn(account,tokenAmount) (../../sb/ACOToken.sol#1497)
+		- _totalSupply = _totalSupply.sub(amount) (../../sb/ACOToken.sol#326)
+Reentrancy in ACOToken._redeem(address) (../../sb/ACOToken.sol#1483-1488):
+	External calls:
+	- _redeemCollateral(account,tokenData[account].amount) (../../sb/ACOToken.sol#1486)
+		- (success,returndata) = token.call(abi.encodeWithSelector(_transferSelector,recipient,amount)) (../../sb/ACOToken.sol#1776)
+	External calls sending eth:
+	- _redeemCollateral(account,tokenData[account].amount) (../../sb/ACOToken.sol#1486)
+		- address(msg.sender).transfer(collateralAmount) (../../sb/ACOToken.sol#1333)
+		- feeDestination.transfer(fee) (../../sb/ACOToken.sol#1335)
+	State variables written after the call(s):
+	- super._burnAction(account,balanceOf(account)) (../../sb/ACOToken.sol#1487)
+		- _balances[account] = _balances[account].sub(amount) (../../sb/ACOToken.sol#325)
+	- super._burnAction(account,balanceOf(account)) (../../sb/ACOToken.sol#1487)
+		- _totalSupply = _totalSupply.sub(amount) (../../sb/ACOToken.sol#326)
+Reentrancy in ACOToken.mint(uint256) (../../sb/ACOToken.sol#1112-1118):
+	External calls:
+	- _transferFromERC20(_collateral,msg.sender,address(this),collateralAmount) (../../sb/ACOToken.sol#1116)
+		- (success,returndata) = token.call(abi.encodeWithSelector(_transferFromSelector,sender,recipient,amount)) (../../sb/ACOToken.sol#1788)
+	State variables written after the call(s):
+	- _mintToken(msg.sender,collateralAmount) (../../sb/ACOToken.sol#1117)
+		- _balances[account] = _balances[account].add(amount) (../../sb/ACOToken.sol#317)
+	- _mintToken(msg.sender,collateralAmount) (../../sb/ACOToken.sol#1117)
+		- _collateralOwners.push(account) (../../sb/ACOToken.sol#1284)
+	- _mintToken(msg.sender,collateralAmount) (../../sb/ACOToken.sol#1117)
+		- _notEntered = false (../../sb/ACOToken.sol#872)
+		- _notEntered = true (../../sb/ACOToken.sol#874)
+	- _mintToken(msg.sender,collateralAmount) (../../sb/ACOToken.sol#1117)
+		- _totalSupply = _totalSupply.add(amount) (../../sb/ACOToken.sol#316)
+	- _mintToken(msg.sender,collateralAmount) (../../sb/ACOToken.sol#1117)
+		- tokenData[account].index = _collateralOwners.length (../../sb/ACOToken.sol#1283)
+		- tokenData[account].amount = tokenData[account].amount.add(tokenAmount) (../../sb/ACOToken.sol#1288)
+	- _mintToken(msg.sender,collateralAmount) (../../sb/ACOToken.sol#1117)
+		- totalCollateral = totalCollateral.add(collateralAmount) (../../sb/ACOToken.sol#1290)
+Reentrancy in ACOToken.mintTo(address,uint256) (../../sb/ACOToken.sol#1127-1133):
+	External calls:
+	- _transferFromERC20(_collateral,msg.sender,address(this),collateralAmount) (../../sb/ACOToken.sol#1131)
+		- (success,returndata) = token.call(abi.encodeWithSelector(_transferFromSelector,sender,recipient,amount)) (../../sb/ACOToken.sol#1788)
+	State variables written after the call(s):
+	- _mintToken(account,collateralAmount) (../../sb/ACOToken.sol#1132)
+		- _balances[account] = _balances[account].add(amount) (../../sb/ACOToken.sol#317)
+	- _mintToken(account,collateralAmount) (../../sb/ACOToken.sol#1132)
+		- _collateralOwners.push(account) (../../sb/ACOToken.sol#1284)
+	- _mintToken(account,collateralAmount) (../../sb/ACOToken.sol#1132)
+		- _notEntered = false (../../sb/ACOToken.sol#872)
+		- _notEntered = true (../../sb/ACOToken.sol#874)
+	- _mintToken(account,collateralAmount) (../../sb/ACOToken.sol#1132)
+		- _totalSupply = _totalSupply.add(amount) (../../sb/ACOToken.sol#316)
+	- _mintToken(account,collateralAmount) (../../sb/ACOToken.sol#1132)
+		- tokenData[account].index = _collateralOwners.length (../../sb/ACOToken.sol#1283)
+		- tokenData[account].amount = tokenData[account].amount.add(tokenAmount) (../../sb/ACOToken.sol#1288)
+	- _mintToken(account,collateralAmount) (../../sb/ACOToken.sol#1132)
+		- totalCollateral = totalCollateral.add(collateralAmount) (../../sb/ACOToken.sol#1290)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in ACOToken._exerciseAccount(address,uint256,address) (../../sb/ACOToken.sol#1411-1440):
+	External calls:
+	- _transferERC20(exerciseAsset,account,amount) (../../sb/ACOToken.sol#1434)
+		- (success,returndata) = token.call(abi.encodeWithSelector(_transferSelector,recipient,amount)) (../../sb/ACOToken.sol#1776)
+	External calls sending eth:
+	- address(account).transfer(amount) (../../sb/ACOToken.sol#1432)
+	Event emitted after the call(s):
+	- Assigned(account,exerciseAccount,amount,valueToTransfer) (../../sb/ACOToken.sol#1436)
+Reentrancy in ACOToken._transferCollateral(address,uint256,uint256) (../../sb/ACOToken.sol#1327-1345):
+	External calls:
+	- _transferERC20(_collateral,msg.sender,collateralAmount) (../../sb/ACOToken.sol#1338)
+		- (success,returndata) = token.call(abi.encodeWithSelector(_transferSelector,recipient,amount)) (../../sb/ACOToken.sol#1776)
+	- _transferERC20(_collateral,feeDestination,fee) (../../sb/ACOToken.sol#1340)
+		- (success,returndata) = token.call(abi.encodeWithSelector(_transferSelector,recipient,amount)) (../../sb/ACOToken.sol#1776)
+	External calls sending eth:
+	- address(msg.sender).transfer(collateralAmount) (../../sb/ACOToken.sol#1333)
+	- feeDestination.transfer(fee) (../../sb/ACOToken.sol#1335)
+	Event emitted after the call(s):
+	- CollateralWithdraw(account,msg.sender,collateralAmount,fee) (../../sb/ACOToken.sol#1344)
+Reentrancy in ACOToken.mint(uint256) (../../sb/ACOToken.sol#1112-1118):
+	External calls:
+	- _transferFromERC20(_collateral,msg.sender,address(this),collateralAmount) (../../sb/ACOToken.sol#1116)
+		- (success,returndata) = token.call(abi.encodeWithSelector(_transferFromSelector,sender,recipient,amount)) (../../sb/ACOToken.sol#1788)
+	Event emitted after the call(s):
+	- CollateralDeposit(account,collateralAmount) (../../sb/ACOToken.sol#1292)
+		- _mintToken(msg.sender,collateralAmount) (../../sb/ACOToken.sol#1117)
+	- Transfer(address(0),account,amount) (../../sb/ACOToken.sol#319)
+		- _mintToken(msg.sender,collateralAmount) (../../sb/ACOToken.sol#1117)
+Reentrancy in ACOToken.mintTo(address,uint256) (../../sb/ACOToken.sol#1127-1133):
+	External calls:
+	- _transferFromERC20(_collateral,msg.sender,address(this),collateralAmount) (../../sb/ACOToken.sol#1131)
+		- (success,returndata) = token.call(abi.encodeWithSelector(_transferFromSelector,sender,recipient,amount)) (../../sb/ACOToken.sol#1788)
+	Event emitted after the call(s):
+	- CollateralDeposit(account,collateralAmount) (../../sb/ACOToken.sol#1292)
+		- _mintToken(account,collateralAmount) (../../sb/ACOToken.sol#1132)
+	- Transfer(address(0),account,amount) (../../sb/ACOToken.sol#319)
+		- _mintToken(account,collateralAmount) (../../sb/ACOToken.sol#1132)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+ACOToken.init(address,address,bool,uint256,uint256,uint256,address) (../../sb/ACOToken.sol#889-924) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(_expiryTime > now,ACOToken::init: Invalid expiry) (../../sb/ACOToken.sol#900)
+ACOToken._notExpired() (../../sb/ACOToken.sol#1548-1550) uses timestamp for comparisons
+	Dangerous comparisons:
+	- now <= expiryTime (../../sb/ACOToken.sol#1549)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Address.isContract(address) (../../sb/ACOToken.sol#354-363) uses assembly
+	- INLINE ASM (../../sb/ACOToken.sol#361)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.sendValue(address,uint256) (../../sb/ACOToken.sol#381-387) is never used and should be removed
+BokkyPooBahsDateTimeLibrary._daysFromDate(uint256,uint256,uint256) (../../sb/ACOToken.sol#442-456) is never used and should be removed
+BokkyPooBahsDateTimeLibrary._getDaysInMonth(uint256,uint256) (../../sb/ACOToken.sol#544-552) is never used and should be removed
+BokkyPooBahsDateTimeLibrary._isLeapYear(uint256) (../../sb/ACOToken.sol#531-533) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.addDays(uint256,uint256) (../../sb/ACOToken.sol#602-605) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.addHours(uint256,uint256) (../../sb/ACOToken.sol#606-609) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.addMinutes(uint256,uint256) (../../sb/ACOToken.sol#610-613) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.addMonths(uint256,uint256) (../../sb/ACOToken.sol#590-601) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.addSeconds(uint256,uint256) (../../sb/ACOToken.sol#614-617) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.addYears(uint256,uint256) (../../sb/ACOToken.sol#580-589) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.diffDays(uint256,uint256) (../../sb/ACOToken.sol#670-673) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.diffHours(uint256,uint256) (../../sb/ACOToken.sol#674-677) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.diffMinutes(uint256,uint256) (../../sb/ACOToken.sol#678-681) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.diffMonths(uint256,uint256) (../../sb/ACOToken.sol#664-669) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.diffSeconds(uint256,uint256) (../../sb/ACOToken.sol#682-685) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.diffYears(uint256,uint256) (../../sb/ACOToken.sol#658-663) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.getDay(uint256) (../../sb/ACOToken.sol#565-567) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.getDayOfWeek(uint256) (../../sb/ACOToken.sol#554-557) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.getDaysInMonth(uint256) (../../sb/ACOToken.sol#540-543) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.getHour(uint256) (../../sb/ACOToken.sol#568-571) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.getMinute(uint256) (../../sb/ACOToken.sol#572-575) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.getMonth(uint256) (../../sb/ACOToken.sol#562-564) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.getSecond(uint256) (../../sb/ACOToken.sol#576-578) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.getYear(uint256) (../../sb/ACOToken.sol#559-561) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.isLeapYear(uint256) (../../sb/ACOToken.sol#527-530) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.isValidDate(uint256,uint256,uint256) (../../sb/ACOToken.sol#512-519) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.isValidDateTime(uint256,uint256,uint256,uint256,uint256,uint256) (../../sb/ACOToken.sol#520-526) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.isWeekDay(uint256) (../../sb/ACOToken.sol#534-536) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.isWeekEnd(uint256) (../../sb/ACOToken.sol#537-539) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.subDays(uint256,uint256) (../../sb/ACOToken.sol#641-644) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.subHours(uint256,uint256) (../../sb/ACOToken.sol#645-648) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.subMinutes(uint256,uint256) (../../sb/ACOToken.sol#649-652) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.subMonths(uint256,uint256) (../../sb/ACOToken.sol#629-640) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.subSeconds(uint256,uint256) (../../sb/ACOToken.sol#653-656) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.subYears(uint256,uint256) (../../sb/ACOToken.sol#619-628) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.timestampFromDate(uint256,uint256,uint256) (../../sb/ACOToken.sol#494-496) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.timestampFromDateTime(uint256,uint256,uint256,uint256,uint256,uint256) (../../sb/ACOToken.sol#497-499) is never used and should be removed
+BokkyPooBahsDateTimeLibrary.timestampToDate(uint256) (../../sb/ACOToken.sol#500-502) is never used and should be removed
+ERC20._approve(address,address,uint256) (../../sb/ACOToken.sol#285-287) is never used and should be removed
+ERC20._transfer(address,address,uint256) (../../sb/ACOToken.sol#281-283) is never used and should be removed
+SafeMath.mod(uint256,uint256) (../../sb/ACOToken.sol#132-134) is never used and should be removed
+SafeMath.mod(uint256,uint256,string) (../../sb/ACOToken.sol#147-150) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.6.6 (../../sb/ACOToken.sol#1) allows old versions
+solc-0.6.12 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/ACOToken.sol#381-387):
+	- (success) = recipient.call{value: amount}() (../../sb/ACOToken.sol#385)
+Low level call in ACOToken._getAssetDecimals(address) (../../sb/ACOToken.sol#1744-1752):
+	- (success,returndata) = asset.staticcall(abi.encodeWithSignature(decimals())) (../../sb/ACOToken.sol#1748)
+Low level call in ACOToken._getAssetSymbol(address) (../../sb/ACOToken.sol#1759-1767):
+	- (success,returndata) = asset.staticcall(abi.encodeWithSignature(symbol())) (../../sb/ACOToken.sol#1763)
+Low level call in ACOToken._transferERC20(address,address,uint256) (../../sb/ACOToken.sol#1775-1778):
+	- (success,returndata) = token.call(abi.encodeWithSelector(_transferSelector,recipient,amount)) (../../sb/ACOToken.sol#1776)
+Low level call in ACOToken._transferFromERC20(address,address,address,uint256) (../../sb/ACOToken.sol#1787-1790):
+	- (success,returndata) = token.call(abi.encodeWithSelector(_transferFromSelector,sender,recipient,amount)) (../../sb/ACOToken.sol#1788)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Parameter BokkyPooBahsDateTimeLibrary.addYears(uint256,uint256)._years (../../sb/ACOToken.sol#580) is not in mixedCase
+Parameter BokkyPooBahsDateTimeLibrary.addMonths(uint256,uint256)._months (../../sb/ACOToken.sol#590) is not in mixedCase
+Parameter BokkyPooBahsDateTimeLibrary.addDays(uint256,uint256)._days (../../sb/ACOToken.sol#602) is not in mixedCase
+Parameter BokkyPooBahsDateTimeLibrary.addHours(uint256,uint256)._hours (../../sb/ACOToken.sol#606) is not in mixedCase
+Parameter BokkyPooBahsDateTimeLibrary.addMinutes(uint256,uint256)._minutes (../../sb/ACOToken.sol#610) is not in mixedCase
+Parameter BokkyPooBahsDateTimeLibrary.addSeconds(uint256,uint256)._seconds (../../sb/ACOToken.sol#614) is not in mixedCase
+Parameter BokkyPooBahsDateTimeLibrary.subYears(uint256,uint256)._years (../../sb/ACOToken.sol#619) is not in mixedCase
+Parameter BokkyPooBahsDateTimeLibrary.subMonths(uint256,uint256)._months (../../sb/ACOToken.sol#629) is not in mixedCase
+Parameter BokkyPooBahsDateTimeLibrary.subDays(uint256,uint256)._days (../../sb/ACOToken.sol#641) is not in mixedCase
+Parameter BokkyPooBahsDateTimeLibrary.subHours(uint256,uint256)._hours (../../sb/ACOToken.sol#645) is not in mixedCase
+Parameter BokkyPooBahsDateTimeLibrary.subMinutes(uint256,uint256)._minutes (../../sb/ACOToken.sol#649) is not in mixedCase
+Parameter BokkyPooBahsDateTimeLibrary.subSeconds(uint256,uint256)._seconds (../../sb/ACOToken.sol#653) is not in mixedCase
+Parameter ACOToken.init(address,address,bool,uint256,uint256,uint256,address)._underlying (../../sb/ACOToken.sol#890) is not in mixedCase
+Parameter ACOToken.init(address,address,bool,uint256,uint256,uint256,address)._strikeAsset (../../sb/ACOToken.sol#891) is not in mixedCase
+Parameter ACOToken.init(address,address,bool,uint256,uint256,uint256,address)._isCall (../../sb/ACOToken.sol#892) is not in mixedCase
+Parameter ACOToken.init(address,address,bool,uint256,uint256,uint256,address)._strikePrice (../../sb/ACOToken.sol#893) is not in mixedCase
+Parameter ACOToken.init(address,address,bool,uint256,uint256,uint256,address)._expiryTime (../../sb/ACOToken.sol#894) is not in mixedCase
+Parameter ACOToken.init(address,address,bool,uint256,uint256,uint256,address)._acoFee (../../sb/ACOToken.sol#895) is not in mixedCase
+Parameter ACOToken.init(address,address,bool,uint256,uint256,uint256,address)._feeDestination (../../sb/ACOToken.sol#896) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Reentrancy in ACOToken._burn(address,uint256) (../../sb/ACOToken.sol#1495-1498):
+	External calls:
+	- _redeemCollateral(account,tokenAmount) (../../sb/ACOToken.sol#1496)
+		- address(msg.sender).transfer(collateralAmount) (../../sb/ACOToken.sol#1333)
+		- feeDestination.transfer(fee) (../../sb/ACOToken.sol#1335)
+	State variables written after the call(s):
+	- _callBurn(account,tokenAmount) (../../sb/ACOToken.sol#1497)
+		- _allowances[owner][spender] = amount (../../sb/ACOToken.sol#308)
+	- _callBurn(account,tokenAmount) (../../sb/ACOToken.sol#1497)
+		- _balances[account] = _balances[account].sub(amount) (../../sb/ACOToken.sol#325)
+	- _callBurn(account,tokenAmount) (../../sb/ACOToken.sol#1497)
+		- _totalSupply = _totalSupply.sub(amount) (../../sb/ACOToken.sol#326)
+	Event emitted after the call(s):
+	- Approval(owner,spender,amount) (../../sb/ACOToken.sol#310)
+		- _callBurn(account,tokenAmount) (../../sb/ACOToken.sol#1497)
+	- Transfer(account,address(0),amount) (../../sb/ACOToken.sol#328)
+		- _callBurn(account,tokenAmount) (../../sb/ACOToken.sol#1497)
+Reentrancy in ACOToken._exercise(address,uint256) (../../sb/ACOToken.sol#1352-1357):
+	External calls:
+	- _exerciseOwners(account,tokenAmount) (../../sb/ACOToken.sol#1354)
+		- address(account).transfer(amount) (../../sb/ACOToken.sol#1432)
+	- _transferCollateral(account,collateralAmount,fee) (../../sb/ACOToken.sol#1356)
+		- address(msg.sender).transfer(collateralAmount) (../../sb/ACOToken.sol#1333)
+		- feeDestination.transfer(fee) (../../sb/ACOToken.sol#1335)
+	State variables written after the call(s):
+	- _transferCollateral(account,collateralAmount,fee) (../../sb/ACOToken.sol#1356)
+		- totalCollateral = totalCollateral.sub(collateralAmount.add(fee)) (../../sb/ACOToken.sol#1329)
+	Event emitted after the call(s):
+	- CollateralWithdraw(account,msg.sender,collateralAmount,fee) (../../sb/ACOToken.sol#1344)
+		- _transferCollateral(account,collateralAmount,fee) (../../sb/ACOToken.sol#1356)
+Reentrancy in ACOToken._exerciseAccount(address,uint256,address) (../../sb/ACOToken.sol#1411-1440):
+	External calls:
+	- address(account).transfer(amount) (../../sb/ACOToken.sol#1432)
+	Event emitted after the call(s):
+	- Assigned(account,exerciseAccount,amount,valueToTransfer) (../../sb/ACOToken.sol#1436)
+Reentrancy in ACOToken._exerciseFromAccounts(address,uint256,address[]) (../../sb/ACOToken.sol#1365-1370):
+	External calls:
+	- _exerciseAccounts(account,tokenAmount,accounts) (../../sb/ACOToken.sol#1367)
+		- address(account).transfer(amount) (../../sb/ACOToken.sol#1432)
+	- _transferCollateral(account,collateralAmount,fee) (../../sb/ACOToken.sol#1369)
+		- address(msg.sender).transfer(collateralAmount) (../../sb/ACOToken.sol#1333)
+		- feeDestination.transfer(fee) (../../sb/ACOToken.sol#1335)
+	State variables written after the call(s):
+	- _transferCollateral(account,collateralAmount,fee) (../../sb/ACOToken.sol#1369)
+		- totalCollateral = totalCollateral.sub(collateralAmount.add(fee)) (../../sb/ACOToken.sol#1329)
+	Event emitted after the call(s):
+	- CollateralWithdraw(account,msg.sender,collateralAmount,fee) (../../sb/ACOToken.sol#1344)
+		- _transferCollateral(account,collateralAmount,fee) (../../sb/ACOToken.sol#1369)
+Reentrancy in ACOToken._redeem(address) (../../sb/ACOToken.sol#1483-1488):
+	External calls:
+	- _redeemCollateral(account,tokenData[account].amount) (../../sb/ACOToken.sol#1486)
+		- address(msg.sender).transfer(collateralAmount) (../../sb/ACOToken.sol#1333)
+		- feeDestination.transfer(fee) (../../sb/ACOToken.sol#1335)
+	State variables written after the call(s):
+	- super._burnAction(account,balanceOf(account)) (../../sb/ACOToken.sol#1487)
+		- _balances[account] = _balances[account].sub(amount) (../../sb/ACOToken.sol#325)
+	- super._burnAction(account,balanceOf(account)) (../../sb/ACOToken.sol#1487)
+		- _totalSupply = _totalSupply.sub(amount) (../../sb/ACOToken.sol#326)
+	Event emitted after the call(s):
+	- Transfer(account,address(0),amount) (../../sb/ACOToken.sol#328)
+		- super._burnAction(account,balanceOf(account)) (../../sb/ACOToken.sol#1487)
+Reentrancy in ACOToken._transferCollateral(address,uint256,uint256) (../../sb/ACOToken.sol#1327-1345):
+	External calls:
+	- address(msg.sender).transfer(collateralAmount) (../../sb/ACOToken.sol#1333)
+	- feeDestination.transfer(fee) (../../sb/ACOToken.sol#1335)
+	Event emitted after the call(s):
+	- CollateralWithdraw(account,msg.sender,collateralAmount,fee) (../../sb/ACOToken.sol#1344)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-4
+
+ACOToken.getCollateralOnExercise(uint256) (../../sb/ACOToken.sol#1068-1073) uses literals with too many digits:
+	- fee = collateralAmount.mul(acoFee).div(100000) (../../sb/ACOToken.sol#1070)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+BokkyPooBahsDateTimeLibrary.DOW_MON (../../sb/ACOToken.sol#421) is never used in BokkyPooBahsDateTimeLibrary (../../sb/ACOToken.sol#414-686)
+BokkyPooBahsDateTimeLibrary.DOW_TUE (../../sb/ACOToken.sol#422) is never used in BokkyPooBahsDateTimeLibrary (../../sb/ACOToken.sol#414-686)
+BokkyPooBahsDateTimeLibrary.DOW_WED (../../sb/ACOToken.sol#423) is never used in BokkyPooBahsDateTimeLibrary (../../sb/ACOToken.sol#414-686)
+BokkyPooBahsDateTimeLibrary.DOW_THU (../../sb/ACOToken.sol#424) is never used in BokkyPooBahsDateTimeLibrary (../../sb/ACOToken.sol#414-686)
+BokkyPooBahsDateTimeLibrary.DOW_SUN (../../sb/ACOToken.sol#427) is never used in BokkyPooBahsDateTimeLibrary (../../sb/ACOToken.sol#414-686)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-state-variable
+/sb/ACOToken.sol analyzed (7 contracts with 93 detectors), 105 result(s) found

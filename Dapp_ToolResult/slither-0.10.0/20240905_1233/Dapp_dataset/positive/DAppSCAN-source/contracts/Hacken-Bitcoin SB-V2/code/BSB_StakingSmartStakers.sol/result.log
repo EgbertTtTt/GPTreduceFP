@@ -1,0 +1,400 @@
+'solc --version' running
+'solc /sb/BSB_StakingSmartStakers.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/sb' running
+
+BSB_StakingSmartStakers.transferAnyERC20Tokens(address,address,uint256) (../../sb/BSB_StakingSmartStakers.sol#778-782) ignores return value by Token(_tokenAddr).transfer(_to,_amount) (../../sb/BSB_StakingSmartStakers.sol#780)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+BSB_StakingSmartStakers.getMaxAmountWithdrawable(address) (../../sb/BSB_StakingSmartStakers.sol#608-651) performs a multiplication on the result of a division:
+	- _numIntervals = (block.timestamp.sub(_time)).div(duration_interval) (../../sb/BSB_StakingSmartStakers.sol#626)
+	- _numIntervals.mul(amountPerInterval[_staker]) > alreadyProgUnstaked[_staker] (../../sb/BSB_StakingSmartStakers.sol#640)
+BSB_StakingSmartStakers.getMaxAmountWithdrawable(address) (../../sb/BSB_StakingSmartStakers.sol#608-651) performs a multiplication on the result of a division:
+	- _numIntervals = (block.timestamp.sub(_time)).div(duration_interval) (../../sb/BSB_StakingSmartStakers.sol#626)
+	- _res = _numIntervals.mul(amountPerInterval[_staker]).sub(alreadyProgUnstaked[_staker]) (../../sb/BSB_StakingSmartStakers.sol#641)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+BSB_StakingSmartStakers.getClaimableAmount(address) (../../sb/BSB_StakingSmartStakers.sol#784-815) uses a dangerous strict equality:
+	- depositedTokens[account] == 0 (../../sb/BSB_StakingSmartStakers.sol#794)
+BSB_StakingSmartStakers.getClaimableAmount(address) (../../sb/BSB_StakingSmartStakers.sol#784-815) uses a dangerous strict equality:
+	- depositedTokens[account] == 0 (../../sb/BSB_StakingSmartStakers.sol#804)
+BSB_StakingSmartStakers.getMaxAmountWithdrawable(address) (../../sb/BSB_StakingSmartStakers.sol#608-651) uses a dangerous strict equality:
+	- _numIntervals == 0 (../../sb/BSB_StakingSmartStakers.sol#628)
+BSB_StakingSmartStakers.getOnlyPendingRewards(address) (../../sb/BSB_StakingSmartStakers.sol#537-559) uses a dangerous strict equality:
+	- depositedTokens[_holder] == 0 || ended (../../sb/BSB_StakingSmartStakers.sol#539)
+BSB_StakingSmartStakers.getPendingRewards(address) (../../sb/BSB_StakingSmartStakers.sol#511-535) uses a dangerous strict equality:
+	- depositedTokens[_holder] == 0 && unclaimed[_holder] == 0 && ! ended (../../sb/BSB_StakingSmartStakers.sol#513)
+BSB_StakingSmartStakers.updateAccount(address,bool,bool) (../../sb/BSB_StakingSmartStakers.sol#428-501) uses a dangerous strict equality:
+	- depositedTokens[account] == 0 (../../sb/BSB_StakingSmartStakers.sol#440)
+BSB_StakingSmartStakers.updateAccount(address,bool,bool) (../../sb/BSB_StakingSmartStakers.sol#428-501) uses a dangerous strict equality:
+	- depositedTokens[account] == 0 (../../sb/BSB_StakingSmartStakers.sol#473)
+BSB_StakingSmartStakers.withdraw2(uint256) (../../sb/BSB_StakingSmartStakers.sol#656-680) uses a dangerous strict equality:
+	- holders.contains(msg.sender) && depositedTokens[msg.sender] == 0 && getPendingRewards(msg.sender) == 0 (../../sb/BSB_StakingSmartStakers.sol#675)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Reentrancy in BSB_StakingSmartStakers.deposit(uint256) (../../sb/BSB_StakingSmartStakers.sol#565-603):
+	External calls:
+	- require(bool,string)(Token(tokenDepositAddress).transferFrom(msg.sender,address(this),amountToStake),Insufficient Token Allowance) (../../sb/BSB_StakingSmartStakers.sol#570)
+	- require(bool,string)(updateAccount(msg.sender,true,false),Error updating account) (../../sb/BSB_StakingSmartStakers.sol#573)
+		- require(bool,string)(Token(tokenDepositAddress).transfer(account,toSend),Could not transfer tokens.) (../../sb/BSB_StakingSmartStakers.sol#449)
+		- require(bool,string)(Token(tokenDepositAddress).transfer(account,toSend),Could not transfer tokens.) (../../sb/BSB_StakingSmartStakers.sol#493)
+	State variables written after the call(s):
+	- require(bool,string)(updateAccount(msg.sender,true,false),Error updating account) (../../sb/BSB_StakingSmartStakers.sol#573)
+		- depositedTokens[account] = depositedTokens[account].add(pendingDivs) (../../sb/BSB_StakingSmartStakers.sol#458)
+	BSB_StakingSmartStakers.depositedTokens (../../sb/BSB_StakingSmartStakers.sol#351) can be used in cross function reentrancies:
+	- BSB_StakingSmartStakers.deposit(uint256) (../../sb/BSB_StakingSmartStakers.sol#565-603)
+	- BSB_StakingSmartStakers.depositedTokens (../../sb/BSB_StakingSmartStakers.sol#351)
+	- BSB_StakingSmartStakers.end() (../../sb/BSB_StakingSmartStakers.sol#387-404)
+	- BSB_StakingSmartStakers.getClaimableAmount(address) (../../sb/BSB_StakingSmartStakers.sol#784-815)
+	- BSB_StakingSmartStakers.getMaxAmountWithdrawable(address) (../../sb/BSB_StakingSmartStakers.sol#608-651)
+	- BSB_StakingSmartStakers.getOnlyPendingRewards(address) (../../sb/BSB_StakingSmartStakers.sol#537-559)
+	- BSB_StakingSmartStakers.getPendingRewards(address) (../../sb/BSB_StakingSmartStakers.sol#511-535)
+	- BSB_StakingSmartStakers.getStakersList(uint256,uint256) (../../sb/BSB_StakingSmartStakers.sol#754-773)
+	- BSB_StakingSmartStakers.updateAccount(address,bool,bool) (../../sb/BSB_StakingSmartStakers.sol#428-501)
+	- BSB_StakingSmartStakers.withdraw(uint256) (../../sb/BSB_StakingSmartStakers.sol#685-710)
+	- BSB_StakingSmartStakers.withdraw2(uint256) (../../sb/BSB_StakingSmartStakers.sol#656-680)
+	- require(bool,string)(updateAccount(msg.sender,true,false),Error updating account) (../../sb/BSB_StakingSmartStakers.sol#573)
+		- lastClaimedTime[account] = block.timestamp (../../sb/BSB_StakingSmartStakers.sol#499)
+	BSB_StakingSmartStakers.lastClaimedTime (../../sb/BSB_StakingSmartStakers.sol#355) can be used in cross function reentrancies:
+	- BSB_StakingSmartStakers.claimDivs() (../../sb/BSB_StakingSmartStakers.sol#747-752)
+	- BSB_StakingSmartStakers.getOnlyPendingRewards(address) (../../sb/BSB_StakingSmartStakers.sol#537-559)
+	- BSB_StakingSmartStakers.getPendingRewards(address) (../../sb/BSB_StakingSmartStakers.sol#511-535)
+	- BSB_StakingSmartStakers.getStakersList(uint256,uint256) (../../sb/BSB_StakingSmartStakers.sol#754-773)
+	- BSB_StakingSmartStakers.getTimeToClaim(address) (../../sb/BSB_StakingSmartStakers.sol#737-745)
+	- BSB_StakingSmartStakers.lastClaimedTime (../../sb/BSB_StakingSmartStakers.sol#355)
+	- BSB_StakingSmartStakers.updateAccount(address,bool,bool) (../../sb/BSB_StakingSmartStakers.sol#428-501)
+	- require(bool,string)(updateAccount(msg.sender,true,false),Error updating account) (../../sb/BSB_StakingSmartStakers.sol#573)
+		- rewardEnded[account] = rewardEnded[account].sub(toSend) (../../sb/BSB_StakingSmartStakers.sol#448)
+	BSB_StakingSmartStakers.rewardEnded (../../sb/BSB_StakingSmartStakers.sol#359) can be used in cross function reentrancies:
+	- BSB_StakingSmartStakers.end() (../../sb/BSB_StakingSmartStakers.sol#387-404)
+	- BSB_StakingSmartStakers.getPendingRewards(address) (../../sb/BSB_StakingSmartStakers.sol#511-535)
+	- BSB_StakingSmartStakers.rewardEnded (../../sb/BSB_StakingSmartStakers.sol#359)
+	- BSB_StakingSmartStakers.updateAccount(address,bool,bool) (../../sb/BSB_StakingSmartStakers.sol#428-501)
+	- require(bool,string)(updateAccount(msg.sender,true,false),Error updating account) (../../sb/BSB_StakingSmartStakers.sol#573)
+		- totalClaimedRewards = totalClaimedRewards.add(toSend) (../../sb/BSB_StakingSmartStakers.sol#451)
+		- totalClaimedRewards = totalClaimedRewards.add(pendingDivs) (../../sb/BSB_StakingSmartStakers.sol#468)
+		- totalClaimedRewards = totalClaimedRewards.add(toSend) (../../sb/BSB_StakingSmartStakers.sol#495)
+	BSB_StakingSmartStakers.totalClaimedRewards (../../sb/BSB_StakingSmartStakers.sol#345) can be used in cross function reentrancies:
+	- BSB_StakingSmartStakers.getRewardsLeft() (../../sb/BSB_StakingSmartStakers.sol#406-426)
+	- BSB_StakingSmartStakers.totalClaimedRewards (../../sb/BSB_StakingSmartStakers.sol#345)
+	- BSB_StakingSmartStakers.updateAccount(address,bool,bool) (../../sb/BSB_StakingSmartStakers.sol#428-501)
+	- require(bool,string)(updateAccount(msg.sender,true,false),Error updating account) (../../sb/BSB_StakingSmartStakers.sol#573)
+		- unclaimed[account] = 0 (../../sb/BSB_StakingSmartStakers.sol#460)
+		- unclaimed[account] = pendingDivs (../../sb/BSB_StakingSmartStakers.sol#470)
+		- unclaimed[account] = unclaimed[account].add(toUnclaimed).sub(subUnclaimed) (../../sb/BSB_StakingSmartStakers.sol#492)
+	BSB_StakingSmartStakers.unclaimed (../../sb/BSB_StakingSmartStakers.sol#378) can be used in cross function reentrancies:
+	- BSB_StakingSmartStakers.end() (../../sb/BSB_StakingSmartStakers.sol#387-404)
+	- BSB_StakingSmartStakers.getPendingRewards(address) (../../sb/BSB_StakingSmartStakers.sol#511-535)
+	- BSB_StakingSmartStakers.unclaimed (../../sb/BSB_StakingSmartStakers.sol#378)
+	- BSB_StakingSmartStakers.updateAccount(address,bool,bool) (../../sb/BSB_StakingSmartStakers.sol#428-501)
+Reentrancy in BSB_StakingSmartStakers.deposit(uint256) (../../sb/BSB_StakingSmartStakers.sol#565-603):
+	External calls:
+	- require(bool,string)(Token(tokenDepositAddress).transferFrom(msg.sender,address(this),amountToStake),Insufficient Token Allowance) (../../sb/BSB_StakingSmartStakers.sol#570)
+	- require(bool,string)(updateAccount(msg.sender,true,false),Error updating account) (../../sb/BSB_StakingSmartStakers.sol#573)
+		- require(bool,string)(Token(tokenDepositAddress).transfer(account,toSend),Could not transfer tokens.) (../../sb/BSB_StakingSmartStakers.sol#449)
+		- require(bool,string)(Token(tokenDepositAddress).transfer(account,toSend),Could not transfer tokens.) (../../sb/BSB_StakingSmartStakers.sol#493)
+	- require(bool,string)(Token(tokenDepositAddress).transfer(owner,fee),Could not transfer deposit fee.) (../../sb/BSB_StakingSmartStakers.sol#578)
+	State variables written after the call(s):
+	- alreadyProgUnstaked[msg.sender] = 0 (../../sb/BSB_StakingSmartStakers.sol#599)
+	BSB_StakingSmartStakers.alreadyProgUnstaked (../../sb/BSB_StakingSmartStakers.sol#364) can be used in cross function reentrancies:
+	- BSB_StakingSmartStakers.alreadyProgUnstaked (../../sb/BSB_StakingSmartStakers.sol#364)
+	- BSB_StakingSmartStakers.deposit(uint256) (../../sb/BSB_StakingSmartStakers.sol#565-603)
+	- BSB_StakingSmartStakers.end() (../../sb/BSB_StakingSmartStakers.sol#387-404)
+	- BSB_StakingSmartStakers.getAPY(address) (../../sb/BSB_StakingSmartStakers.sol#503-509)
+	- BSB_StakingSmartStakers.getMaxAmountWithdrawable(address) (../../sb/BSB_StakingSmartStakers.sol#608-651)
+	- BSB_StakingSmartStakers.getTimeToWithdraw(address) (../../sb/BSB_StakingSmartStakers.sol#712-735)
+	- BSB_StakingSmartStakers.withdraw(uint256) (../../sb/BSB_StakingSmartStakers.sol#685-710)
+	- BSB_StakingSmartStakers.withdraw2(uint256) (../../sb/BSB_StakingSmartStakers.sol#656-680)
+	- availablePoolSize = availablePoolSize.sub(amountAfterFee) (../../sb/BSB_StakingSmartStakers.sol#584)
+	BSB_StakingSmartStakers.availablePoolSize (../../sb/BSB_StakingSmartStakers.sol#338) can be used in cross function reentrancies:
+	- BSB_StakingSmartStakers.availablePoolSize (../../sb/BSB_StakingSmartStakers.sol#338)
+	- BSB_StakingSmartStakers.deposit(uint256) (../../sb/BSB_StakingSmartStakers.sol#565-603)
+	- BSB_StakingSmartStakers.updateAccount(address,bool,bool) (../../sb/BSB_StakingSmartStakers.sol#428-501)
+	- BSB_StakingSmartStakers.withdraw(uint256) (../../sb/BSB_StakingSmartStakers.sol#685-710)
+	- BSB_StakingSmartStakers.withdraw2(uint256) (../../sb/BSB_StakingSmartStakers.sol#656-680)
+	- depositedTokens[msg.sender] = depositedTokens[msg.sender].add(amountAfterFee) (../../sb/BSB_StakingSmartStakers.sol#580)
+	BSB_StakingSmartStakers.depositedTokens (../../sb/BSB_StakingSmartStakers.sol#351) can be used in cross function reentrancies:
+	- BSB_StakingSmartStakers.deposit(uint256) (../../sb/BSB_StakingSmartStakers.sol#565-603)
+	- BSB_StakingSmartStakers.depositedTokens (../../sb/BSB_StakingSmartStakers.sol#351)
+	- BSB_StakingSmartStakers.end() (../../sb/BSB_StakingSmartStakers.sol#387-404)
+	- BSB_StakingSmartStakers.getClaimableAmount(address) (../../sb/BSB_StakingSmartStakers.sol#784-815)
+	- BSB_StakingSmartStakers.getMaxAmountWithdrawable(address) (../../sb/BSB_StakingSmartStakers.sol#608-651)
+	- BSB_StakingSmartStakers.getOnlyPendingRewards(address) (../../sb/BSB_StakingSmartStakers.sol#537-559)
+	- BSB_StakingSmartStakers.getPendingRewards(address) (../../sb/BSB_StakingSmartStakers.sol#511-535)
+	- BSB_StakingSmartStakers.getStakersList(uint256,uint256) (../../sb/BSB_StakingSmartStakers.sol#754-773)
+	- BSB_StakingSmartStakers.updateAccount(address,bool,bool) (../../sb/BSB_StakingSmartStakers.sol#428-501)
+	- BSB_StakingSmartStakers.withdraw(uint256) (../../sb/BSB_StakingSmartStakers.sol#685-710)
+	- BSB_StakingSmartStakers.withdraw2(uint256) (../../sb/BSB_StakingSmartStakers.sol#656-680)
+	- firstTime[msg.sender] = block.timestamp (../../sb/BSB_StakingSmartStakers.sol#589)
+	BSB_StakingSmartStakers.firstTime (../../sb/BSB_StakingSmartStakers.sol#354) can be used in cross function reentrancies:
+	- BSB_StakingSmartStakers.deposit(uint256) (../../sb/BSB_StakingSmartStakers.sol#565-603)
+	- BSB_StakingSmartStakers.firstTime (../../sb/BSB_StakingSmartStakers.sol#354)
+	- BSB_StakingSmartStakers.getAPY(address) (../../sb/BSB_StakingSmartStakers.sol#503-509)
+	- BSB_StakingSmartStakers.withdraw2(uint256) (../../sb/BSB_StakingSmartStakers.sol#656-680)
+	- firstTime[msg.sender] = block.timestamp (../../sb/BSB_StakingSmartStakers.sol#596)
+	BSB_StakingSmartStakers.firstTime (../../sb/BSB_StakingSmartStakers.sol#354) can be used in cross function reentrancies:
+	- BSB_StakingSmartStakers.deposit(uint256) (../../sb/BSB_StakingSmartStakers.sol#565-603)
+	- BSB_StakingSmartStakers.firstTime (../../sb/BSB_StakingSmartStakers.sol#354)
+	- BSB_StakingSmartStakers.getAPY(address) (../../sb/BSB_StakingSmartStakers.sol#503-509)
+	- BSB_StakingSmartStakers.withdraw2(uint256) (../../sb/BSB_StakingSmartStakers.sol#656-680)
+	- maxDepositedTokens[msg.sender] = depositedTokens[msg.sender] (../../sb/BSB_StakingSmartStakers.sol#582)
+	BSB_StakingSmartStakers.maxDepositedTokens (../../sb/BSB_StakingSmartStakers.sol#352) can be used in cross function reentrancies:
+	- BSB_StakingSmartStakers.deposit(uint256) (../../sb/BSB_StakingSmartStakers.sol#565-603)
+	- BSB_StakingSmartStakers.getClaimableAmount(address) (../../sb/BSB_StakingSmartStakers.sol#784-815)
+	- BSB_StakingSmartStakers.maxDepositedTokens (../../sb/BSB_StakingSmartStakers.sol#352)
+	- BSB_StakingSmartStakers.updateAccount(address,bool,bool) (../../sb/BSB_StakingSmartStakers.sol#428-501)
+	- totalDeposited = totalDeposited.add(amountAfterFee) (../../sb/BSB_StakingSmartStakers.sol#585)
+	BSB_StakingSmartStakers.totalDeposited (../../sb/BSB_StakingSmartStakers.sol#346) can be used in cross function reentrancies:
+	- BSB_StakingSmartStakers.deposit(uint256) (../../sb/BSB_StakingSmartStakers.sol#565-603)
+	- BSB_StakingSmartStakers.totalDeposited (../../sb/BSB_StakingSmartStakers.sol#346)
+	- BSB_StakingSmartStakers.updateAccount(address,bool,bool) (../../sb/BSB_StakingSmartStakers.sol#428-501)
+	- BSB_StakingSmartStakers.withdraw(uint256) (../../sb/BSB_StakingSmartStakers.sol#685-710)
+	- BSB_StakingSmartStakers.withdraw2(uint256) (../../sb/BSB_StakingSmartStakers.sol#656-680)
+Reentrancy in BSB_StakingSmartStakers.updateAccount(address,bool,bool) (../../sb/BSB_StakingSmartStakers.sol#428-501):
+	External calls:
+	- require(bool,string)(Token(tokenDepositAddress).transfer(account,toSend),Could not transfer tokens.) (../../sb/BSB_StakingSmartStakers.sol#449)
+	- require(bool,string)(Token(tokenDepositAddress).transfer(account,toSend),Could not transfer tokens.) (../../sb/BSB_StakingSmartStakers.sol#493)
+	State variables written after the call(s):
+	- lastClaimedTime[account] = block.timestamp (../../sb/BSB_StakingSmartStakers.sol#499)
+	BSB_StakingSmartStakers.lastClaimedTime (../../sb/BSB_StakingSmartStakers.sol#355) can be used in cross function reentrancies:
+	- BSB_StakingSmartStakers.claimDivs() (../../sb/BSB_StakingSmartStakers.sol#747-752)
+	- BSB_StakingSmartStakers.getOnlyPendingRewards(address) (../../sb/BSB_StakingSmartStakers.sol#537-559)
+	- BSB_StakingSmartStakers.getPendingRewards(address) (../../sb/BSB_StakingSmartStakers.sol#511-535)
+	- BSB_StakingSmartStakers.getStakersList(uint256,uint256) (../../sb/BSB_StakingSmartStakers.sol#754-773)
+	- BSB_StakingSmartStakers.getTimeToClaim(address) (../../sb/BSB_StakingSmartStakers.sol#737-745)
+	- BSB_StakingSmartStakers.lastClaimedTime (../../sb/BSB_StakingSmartStakers.sol#355)
+	- BSB_StakingSmartStakers.updateAccount(address,bool,bool) (../../sb/BSB_StakingSmartStakers.sol#428-501)
+Reentrancy in BSB_StakingSmartStakers.withdraw(uint256) (../../sb/BSB_StakingSmartStakers.sol#685-710):
+	External calls:
+	- updateAccount(msg.sender,false,true) (../../sb/BSB_StakingSmartStakers.sol#695)
+		- require(bool,string)(Token(tokenDepositAddress).transfer(account,toSend),Could not transfer tokens.) (../../sb/BSB_StakingSmartStakers.sol#449)
+		- require(bool,string)(Token(tokenDepositAddress).transfer(account,toSend),Could not transfer tokens.) (../../sb/BSB_StakingSmartStakers.sol#493)
+	- require(bool,string)(Token(tokenDepositAddress).transfer(owner,fee),Could not transfer withdraw fee.) (../../sb/BSB_StakingSmartStakers.sol#700)
+	- require(bool,string)(Token(tokenDepositAddress).transfer(msg.sender,amountAfterFee),Could not transfer tokens.) (../../sb/BSB_StakingSmartStakers.sol#701)
+	State variables written after the call(s):
+	- availablePoolSize = availablePoolSize.add(amountToWithdraw) (../../sb/BSB_StakingSmartStakers.sol#704)
+	BSB_StakingSmartStakers.availablePoolSize (../../sb/BSB_StakingSmartStakers.sol#338) can be used in cross function reentrancies:
+	- BSB_StakingSmartStakers.availablePoolSize (../../sb/BSB_StakingSmartStakers.sol#338)
+	- BSB_StakingSmartStakers.deposit(uint256) (../../sb/BSB_StakingSmartStakers.sol#565-603)
+	- BSB_StakingSmartStakers.updateAccount(address,bool,bool) (../../sb/BSB_StakingSmartStakers.sol#428-501)
+	- BSB_StakingSmartStakers.withdraw(uint256) (../../sb/BSB_StakingSmartStakers.sol#685-710)
+	- BSB_StakingSmartStakers.withdraw2(uint256) (../../sb/BSB_StakingSmartStakers.sol#656-680)
+	- depositedTokens[msg.sender] = depositedTokens[msg.sender].sub(amountToWithdraw) (../../sb/BSB_StakingSmartStakers.sol#703)
+	BSB_StakingSmartStakers.depositedTokens (../../sb/BSB_StakingSmartStakers.sol#351) can be used in cross function reentrancies:
+	- BSB_StakingSmartStakers.deposit(uint256) (../../sb/BSB_StakingSmartStakers.sol#565-603)
+	- BSB_StakingSmartStakers.depositedTokens (../../sb/BSB_StakingSmartStakers.sol#351)
+	- BSB_StakingSmartStakers.end() (../../sb/BSB_StakingSmartStakers.sol#387-404)
+	- BSB_StakingSmartStakers.getClaimableAmount(address) (../../sb/BSB_StakingSmartStakers.sol#784-815)
+	- BSB_StakingSmartStakers.getMaxAmountWithdrawable(address) (../../sb/BSB_StakingSmartStakers.sol#608-651)
+	- BSB_StakingSmartStakers.getOnlyPendingRewards(address) (../../sb/BSB_StakingSmartStakers.sol#537-559)
+	- BSB_StakingSmartStakers.getPendingRewards(address) (../../sb/BSB_StakingSmartStakers.sol#511-535)
+	- BSB_StakingSmartStakers.getStakersList(uint256,uint256) (../../sb/BSB_StakingSmartStakers.sol#754-773)
+	- BSB_StakingSmartStakers.updateAccount(address,bool,bool) (../../sb/BSB_StakingSmartStakers.sol#428-501)
+	- BSB_StakingSmartStakers.withdraw(uint256) (../../sb/BSB_StakingSmartStakers.sol#685-710)
+	- BSB_StakingSmartStakers.withdraw2(uint256) (../../sb/BSB_StakingSmartStakers.sol#656-680)
+	- totalDeposited = totalDeposited.sub(amountToWithdraw) (../../sb/BSB_StakingSmartStakers.sol#705)
+	BSB_StakingSmartStakers.totalDeposited (../../sb/BSB_StakingSmartStakers.sol#346) can be used in cross function reentrancies:
+	- BSB_StakingSmartStakers.deposit(uint256) (../../sb/BSB_StakingSmartStakers.sol#565-603)
+	- BSB_StakingSmartStakers.totalDeposited (../../sb/BSB_StakingSmartStakers.sol#346)
+	- BSB_StakingSmartStakers.updateAccount(address,bool,bool) (../../sb/BSB_StakingSmartStakers.sol#428-501)
+	- BSB_StakingSmartStakers.withdraw(uint256) (../../sb/BSB_StakingSmartStakers.sol#685-710)
+	- BSB_StakingSmartStakers.withdraw2(uint256) (../../sb/BSB_StakingSmartStakers.sol#656-680)
+Reentrancy in BSB_StakingSmartStakers.withdraw2(uint256) (../../sb/BSB_StakingSmartStakers.sol#656-680):
+	External calls:
+	- updateAccount(msg.sender,false,true) (../../sb/BSB_StakingSmartStakers.sol#666)
+		- require(bool,string)(Token(tokenDepositAddress).transfer(account,toSend),Could not transfer tokens.) (../../sb/BSB_StakingSmartStakers.sol#449)
+		- require(bool,string)(Token(tokenDepositAddress).transfer(account,toSend),Could not transfer tokens.) (../../sb/BSB_StakingSmartStakers.sol#493)
+	- require(bool,string)(Token(tokenDepositAddress).transfer(owner,fee),Could not transfer withdraw fee.) (../../sb/BSB_StakingSmartStakers.sol#668)
+	- require(bool,string)(Token(tokenDepositAddress).transfer(msg.sender,amountAfterFee),Could not transfer tokens.) (../../sb/BSB_StakingSmartStakers.sol#669)
+	State variables written after the call(s):
+	- availablePoolSize = availablePoolSize.add(amountToWithdraw) (../../sb/BSB_StakingSmartStakers.sol#672)
+	BSB_StakingSmartStakers.availablePoolSize (../../sb/BSB_StakingSmartStakers.sol#338) can be used in cross function reentrancies:
+	- BSB_StakingSmartStakers.availablePoolSize (../../sb/BSB_StakingSmartStakers.sol#338)
+	- BSB_StakingSmartStakers.deposit(uint256) (../../sb/BSB_StakingSmartStakers.sol#565-603)
+	- BSB_StakingSmartStakers.updateAccount(address,bool,bool) (../../sb/BSB_StakingSmartStakers.sol#428-501)
+	- BSB_StakingSmartStakers.withdraw(uint256) (../../sb/BSB_StakingSmartStakers.sol#685-710)
+	- BSB_StakingSmartStakers.withdraw2(uint256) (../../sb/BSB_StakingSmartStakers.sol#656-680)
+	- depositedTokens[msg.sender] = depositedTokens[msg.sender].sub(amountToWithdraw) (../../sb/BSB_StakingSmartStakers.sol#671)
+	BSB_StakingSmartStakers.depositedTokens (../../sb/BSB_StakingSmartStakers.sol#351) can be used in cross function reentrancies:
+	- BSB_StakingSmartStakers.deposit(uint256) (../../sb/BSB_StakingSmartStakers.sol#565-603)
+	- BSB_StakingSmartStakers.depositedTokens (../../sb/BSB_StakingSmartStakers.sol#351)
+	- BSB_StakingSmartStakers.end() (../../sb/BSB_StakingSmartStakers.sol#387-404)
+	- BSB_StakingSmartStakers.getClaimableAmount(address) (../../sb/BSB_StakingSmartStakers.sol#784-815)
+	- BSB_StakingSmartStakers.getMaxAmountWithdrawable(address) (../../sb/BSB_StakingSmartStakers.sol#608-651)
+	- BSB_StakingSmartStakers.getOnlyPendingRewards(address) (../../sb/BSB_StakingSmartStakers.sol#537-559)
+	- BSB_StakingSmartStakers.getPendingRewards(address) (../../sb/BSB_StakingSmartStakers.sol#511-535)
+	- BSB_StakingSmartStakers.getStakersList(uint256,uint256) (../../sb/BSB_StakingSmartStakers.sol#754-773)
+	- BSB_StakingSmartStakers.updateAccount(address,bool,bool) (../../sb/BSB_StakingSmartStakers.sol#428-501)
+	- BSB_StakingSmartStakers.withdraw(uint256) (../../sb/BSB_StakingSmartStakers.sol#685-710)
+	- BSB_StakingSmartStakers.withdraw2(uint256) (../../sb/BSB_StakingSmartStakers.sol#656-680)
+	- firstTime[msg.sender] = 0 (../../sb/BSB_StakingSmartStakers.sol#677)
+	BSB_StakingSmartStakers.firstTime (../../sb/BSB_StakingSmartStakers.sol#354) can be used in cross function reentrancies:
+	- BSB_StakingSmartStakers.deposit(uint256) (../../sb/BSB_StakingSmartStakers.sol#565-603)
+	- BSB_StakingSmartStakers.firstTime (../../sb/BSB_StakingSmartStakers.sol#354)
+	- BSB_StakingSmartStakers.getAPY(address) (../../sb/BSB_StakingSmartStakers.sol#503-509)
+	- BSB_StakingSmartStakers.withdraw2(uint256) (../../sb/BSB_StakingSmartStakers.sol#656-680)
+	- totalDeposited = totalDeposited.sub(amountToWithdraw) (../../sb/BSB_StakingSmartStakers.sol#673)
+	BSB_StakingSmartStakers.totalDeposited (../../sb/BSB_StakingSmartStakers.sol#346) can be used in cross function reentrancies:
+	- BSB_StakingSmartStakers.deposit(uint256) (../../sb/BSB_StakingSmartStakers.sol#565-603)
+	- BSB_StakingSmartStakers.totalDeposited (../../sb/BSB_StakingSmartStakers.sol#346)
+	- BSB_StakingSmartStakers.updateAccount(address,bool,bool) (../../sb/BSB_StakingSmartStakers.sol#428-501)
+	- BSB_StakingSmartStakers.withdraw(uint256) (../../sb/BSB_StakingSmartStakers.sol#685-710)
+	- BSB_StakingSmartStakers.withdraw2(uint256) (../../sb/BSB_StakingSmartStakers.sol#656-680)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+BSB_StakingSmartStakers.deposit(uint256) (../../sb/BSB_StakingSmartStakers.sol#565-603) ignores return value by holders.add(msg.sender) (../../sb/BSB_StakingSmartStakers.sol#588)
+BSB_StakingSmartStakers.withdraw2(uint256) (../../sb/BSB_StakingSmartStakers.sol#656-680) ignores return value by holders.remove(msg.sender) (../../sb/BSB_StakingSmartStakers.sol#676)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+BSB_StakingSmartStakers.deposit(uint256) (../../sb/BSB_StakingSmartStakers.sol#565-603) should emit an event for: 
+	- availablePoolSize = availablePoolSize.sub(amountAfterFee) (../../sb/BSB_StakingSmartStakers.sol#584) 
+	- totalDeposited = totalDeposited.add(amountAfterFee) (../../sb/BSB_StakingSmartStakers.sol#585) 
+BSB_StakingSmartStakers.withdraw2(uint256) (../../sb/BSB_StakingSmartStakers.sol#656-680) should emit an event for: 
+	- availablePoolSize = availablePoolSize.add(amountToWithdraw) (../../sb/BSB_StakingSmartStakers.sol#672) 
+	- totalDeposited = totalDeposited.sub(amountToWithdraw) (../../sb/BSB_StakingSmartStakers.sol#673) 
+BSB_StakingSmartStakers.withdraw(uint256) (../../sb/BSB_StakingSmartStakers.sol#685-710) should emit an event for: 
+	- availablePoolSize = availablePoolSize.add(amountToWithdraw) (../../sb/BSB_StakingSmartStakers.sol#704) 
+	- totalDeposited = totalDeposited.sub(amountToWithdraw) (../../sb/BSB_StakingSmartStakers.sol#705) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+
+Reentrancy in BSB_StakingSmartStakers.deposit(uint256) (../../sb/BSB_StakingSmartStakers.sol#565-603):
+	External calls:
+	- require(bool,string)(Token(tokenDepositAddress).transferFrom(msg.sender,address(this),amountToStake),Insufficient Token Allowance) (../../sb/BSB_StakingSmartStakers.sol#570)
+	- require(bool,string)(updateAccount(msg.sender,true,false),Error updating account) (../../sb/BSB_StakingSmartStakers.sol#573)
+		- require(bool,string)(Token(tokenDepositAddress).transfer(account,toSend),Could not transfer tokens.) (../../sb/BSB_StakingSmartStakers.sol#449)
+		- require(bool,string)(Token(tokenDepositAddress).transfer(account,toSend),Could not transfer tokens.) (../../sb/BSB_StakingSmartStakers.sol#493)
+	- require(bool,string)(Token(tokenDepositAddress).transfer(owner,fee),Could not transfer deposit fee.) (../../sb/BSB_StakingSmartStakers.sol#578)
+	State variables written after the call(s):
+	- amountPerInterval[msg.sender] = 0 (../../sb/BSB_StakingSmartStakers.sol#594)
+	- stakingTime[msg.sender] = block.timestamp (../../sb/BSB_StakingSmartStakers.sol#601)
+Reentrancy in BSB_StakingSmartStakers.updateAccount(address,bool,bool) (../../sb/BSB_StakingSmartStakers.sol#428-501):
+	External calls:
+	- require(bool,string)(Token(tokenDepositAddress).transfer(account,toSend),Could not transfer tokens.) (../../sb/BSB_StakingSmartStakers.sol#449)
+	State variables written after the call(s):
+	- totalClaimedRewards = totalClaimedRewards.add(toSend) (../../sb/BSB_StakingSmartStakers.sol#451)
+	- totalEarnedTokens[account] = totalEarnedTokens[account].add(toSend) (../../sb/BSB_StakingSmartStakers.sol#450)
+Reentrancy in BSB_StakingSmartStakers.updateAccount(address,bool,bool) (../../sb/BSB_StakingSmartStakers.sol#428-501):
+	External calls:
+	- require(bool,string)(Token(tokenDepositAddress).transfer(account,toSend),Could not transfer tokens.) (../../sb/BSB_StakingSmartStakers.sol#493)
+	State variables written after the call(s):
+	- totalClaimedRewards = totalClaimedRewards.add(toSend) (../../sb/BSB_StakingSmartStakers.sol#495)
+	- totalEarnedTokens[account] = totalEarnedTokens[account].add(toSend) (../../sb/BSB_StakingSmartStakers.sol#494)
+Reentrancy in BSB_StakingSmartStakers.withdraw(uint256) (../../sb/BSB_StakingSmartStakers.sol#685-710):
+	External calls:
+	- updateAccount(msg.sender,false,true) (../../sb/BSB_StakingSmartStakers.sol#695)
+		- require(bool,string)(Token(tokenDepositAddress).transfer(account,toSend),Could not transfer tokens.) (../../sb/BSB_StakingSmartStakers.sol#449)
+		- require(bool,string)(Token(tokenDepositAddress).transfer(account,toSend),Could not transfer tokens.) (../../sb/BSB_StakingSmartStakers.sol#493)
+	- require(bool,string)(Token(tokenDepositAddress).transfer(owner,fee),Could not transfer withdraw fee.) (../../sb/BSB_StakingSmartStakers.sol#700)
+	- require(bool,string)(Token(tokenDepositAddress).transfer(msg.sender,amountAfterFee),Could not transfer tokens.) (../../sb/BSB_StakingSmartStakers.sol#701)
+	State variables written after the call(s):
+	- progressiveTime[msg.sender] = block.timestamp (../../sb/BSB_StakingSmartStakers.sol#707)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+BSB_StakingSmartStakers.getRewardsLeft() (../../sb/BSB_StakingSmartStakers.sol#406-426) uses timestamp for comparisons
+	Dangerous comparisons:
+	- totalRewards > totalClaimedRewards.add(totalPending) (../../sb/BSB_StakingSmartStakers.sol#417)
+BSB_StakingSmartStakers.updateAccount(address,bool,bool) (../../sb/BSB_StakingSmartStakers.sol#428-501) uses timestamp for comparisons
+	Dangerous comparisons:
+	- depositedTokens[account].mul(percent_claim).div(100) < pendingDivs (../../sb/BSB_StakingSmartStakers.sol#432)
+	- pendingDivs > 0 (../../sb/BSB_StakingSmartStakers.sol#436)
+	- depositedTokens[account] == 0 (../../sb/BSB_StakingSmartStakers.sol#440)
+	- maxDepositedTokens[account].mul(percent_claim).div(100) > pendingDivs (../../sb/BSB_StakingSmartStakers.sol#442)
+	- require(bool,string)(Token(tokenDepositAddress).transfer(account,toSend),Could not transfer tokens.) (../../sb/BSB_StakingSmartStakers.sol#449)
+	- require(bool,string)(pendingDivs <= availablePoolSize,No spot available) (../../sb/BSB_StakingSmartStakers.sol#457)
+	- depositedTokens[account] > maxDepositedTokens[account] (../../sb/BSB_StakingSmartStakers.sol#462)
+	- depositedTokens[account] == 0 (../../sb/BSB_StakingSmartStakers.sol#473)
+	- maxDepositedTokens[account].mul(percent_claim).div(100) > pendingDivs (../../sb/BSB_StakingSmartStakers.sol#475)
+	- toSend > pendingWithoutUnclaimed (../../sb/BSB_StakingSmartStakers.sol#484)
+	- require(bool,string)(Token(tokenDepositAddress).transfer(account,toSend),Could not transfer tokens.) (../../sb/BSB_StakingSmartStakers.sol#493)
+BSB_StakingSmartStakers.getAPY(address) (../../sb/BSB_StakingSmartStakers.sol#503-509) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp.sub(firstTime[_staker]) > unstakeTime && alreadyProgUnstaked[_staker] == 0 && ! ended (../../sb/BSB_StakingSmartStakers.sol#505)
+BSB_StakingSmartStakers.getPendingRewards(address) (../../sb/BSB_StakingSmartStakers.sol#511-535) uses timestamp for comparisons
+	Dangerous comparisons:
+	- depositedTokens[_holder] == 0 && unclaimed[_holder] == 0 && ! ended (../../sb/BSB_StakingSmartStakers.sol#513)
+BSB_StakingSmartStakers.getOnlyPendingRewards(address) (../../sb/BSB_StakingSmartStakers.sol#537-559) uses timestamp for comparisons
+	Dangerous comparisons:
+	- depositedTokens[_holder] == 0 || ended (../../sb/BSB_StakingSmartStakers.sol#539)
+BSB_StakingSmartStakers.deposit(uint256) (../../sb/BSB_StakingSmartStakers.sol#565-603) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(amountAfterFee <= availablePoolSize,No space available) (../../sb/BSB_StakingSmartStakers.sol#577)
+	- depositedTokens[msg.sender] > maxDepositedTokens[msg.sender] (../../sb/BSB_StakingSmartStakers.sol#581)
+BSB_StakingSmartStakers.getMaxAmountWithdrawable(address) (../../sb/BSB_StakingSmartStakers.sol#608-651) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp.sub(stakingTime[msg.sender]) < unstakeTime && ! ended && alreadyProgUnstaked[_staker] == 0 (../../sb/BSB_StakingSmartStakers.sol#610)
+	- block.timestamp.sub(stakingTime[msg.sender]) > unstakeTime (../../sb/BSB_StakingSmartStakers.sol#614)
+	- block.timestamp < _time.add(duration_interval) (../../sb/BSB_StakingSmartStakers.sol#621)
+	- _numIntervals == 0 (../../sb/BSB_StakingSmartStakers.sol#628)
+	- _numIntervals > number_intervals (../../sb/BSB_StakingSmartStakers.sol#636)
+	- _numIntervals.mul(amountPerInterval[_staker]) > alreadyProgUnstaked[_staker] (../../sb/BSB_StakingSmartStakers.sol#640)
+BSB_StakingSmartStakers.withdraw2(uint256) (../../sb/BSB_StakingSmartStakers.sol#656-680) uses timestamp for comparisons
+	Dangerous comparisons:
+	- holders.contains(msg.sender) && depositedTokens[msg.sender] == 0 && getPendingRewards(msg.sender) == 0 (../../sb/BSB_StakingSmartStakers.sol#675)
+BSB_StakingSmartStakers.withdraw(uint256) (../../sb/BSB_StakingSmartStakers.sol#685-710) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(depositedTokens[msg.sender].div(number_intervals) >= amountToWithdraw,Invalid amount to withdraw) (../../sb/BSB_StakingSmartStakers.sol#689)
+	- require(bool,string)(block.timestamp.sub(stakingTime[msg.sender]) > unstakeTime || ended,You recently staked, please wait before withdrawing.) (../../sb/BSB_StakingSmartStakers.sol#691)
+BSB_StakingSmartStakers.getTimeToWithdraw(address) (../../sb/BSB_StakingSmartStakers.sol#712-735) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp <= _time.add(unstakeTime) (../../sb/BSB_StakingSmartStakers.sol#719)
+	- block.timestamp < _time.add(duration_interval.mul(i)) (../../sb/BSB_StakingSmartStakers.sol#727)
+BSB_StakingSmartStakers.getTimeToClaim(address) (../../sb/BSB_StakingSmartStakers.sol#737-745) uses timestamp for comparisons
+	Dangerous comparisons:
+	- lastClaimedTime[_staker].add(claimTime) > block.timestamp (../../sb/BSB_StakingSmartStakers.sol#740)
+BSB_StakingSmartStakers.claimDivs() (../../sb/BSB_StakingSmartStakers.sol#747-752) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp.sub(lastClaimedTime[msg.sender]) > claimTime,Not yet) (../../sb/BSB_StakingSmartStakers.sol#749)
+BSB_StakingSmartStakers.getClaimableAmount(address) (../../sb/BSB_StakingSmartStakers.sol#784-815) uses timestamp for comparisons
+	Dangerous comparisons:
+	- depositedTokens[account].mul(percent_claim).div(100) < pendingDivs (../../sb/BSB_StakingSmartStakers.sol#788)
+	- pendingDivs > 0 (../../sb/BSB_StakingSmartStakers.sol#792)
+	- depositedTokens[account] == 0 (../../sb/BSB_StakingSmartStakers.sol#794)
+	- maxDepositedTokens[account].mul(percent_claim).div(100) > pendingDivs (../../sb/BSB_StakingSmartStakers.sol#796)
+	- depositedTokens[account] == 0 (../../sb/BSB_StakingSmartStakers.sol#804)
+	- maxDepositedTokens[account].mul(percent_claim).div(100) > pendingDivs (../../sb/BSB_StakingSmartStakers.sol#806)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+BSB_StakingSmartStakers.updateAccount(address,bool,bool) (../../sb/BSB_StakingSmartStakers.sol#428-501) has a high cyclomatic complexity (13).
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cyclomatic-complexity
+
+EnumerableSet.add(EnumerableSet.UintSet,uint256) (../../sb/BSB_StakingSmartStakers.sol#207-209) is never used and should be removed
+EnumerableSet.at(EnumerableSet.UintSet,uint256) (../../sb/BSB_StakingSmartStakers.sol#245-247) is never used and should be removed
+EnumerableSet.contains(EnumerableSet.UintSet,uint256) (../../sb/BSB_StakingSmartStakers.sol#224-226) is never used and should be removed
+EnumerableSet.length(EnumerableSet.UintSet) (../../sb/BSB_StakingSmartStakers.sol#231-233) is never used and should be removed
+EnumerableSet.remove(EnumerableSet.UintSet,uint256) (../../sb/BSB_StakingSmartStakers.sol#217-219) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version>=0.8.0 (../../sb/BSB_StakingSmartStakers.sol#1) allows old versions
+solc-0.8.27 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Contract BSB_StakingSmartStakers (../../sb/BSB_StakingSmartStakers.sol#296-817) is not in CapWords
+Parameter BSB_StakingSmartStakers.updateAccount(address,bool,bool)._restake (../../sb/BSB_StakingSmartStakers.sol#428) is not in mixedCase
+Parameter BSB_StakingSmartStakers.updateAccount(address,bool,bool)._withdraw (../../sb/BSB_StakingSmartStakers.sol#428) is not in mixedCase
+Parameter BSB_StakingSmartStakers.getAPY(address)._staker (../../sb/BSB_StakingSmartStakers.sol#503) is not in mixedCase
+Parameter BSB_StakingSmartStakers.getPendingRewards(address)._holder (../../sb/BSB_StakingSmartStakers.sol#511) is not in mixedCase
+Parameter BSB_StakingSmartStakers.getOnlyPendingRewards(address)._holder (../../sb/BSB_StakingSmartStakers.sol#537) is not in mixedCase
+Parameter BSB_StakingSmartStakers.getMaxAmountWithdrawable(address)._staker (../../sb/BSB_StakingSmartStakers.sol#608) is not in mixedCase
+Parameter BSB_StakingSmartStakers.getTimeToWithdraw(address)._staker (../../sb/BSB_StakingSmartStakers.sol#712) is not in mixedCase
+Parameter BSB_StakingSmartStakers.getTimeToClaim(address)._staker (../../sb/BSB_StakingSmartStakers.sol#737) is not in mixedCase
+Parameter BSB_StakingSmartStakers.transferAnyERC20Tokens(address,address,uint256)._tokenAddr (../../sb/BSB_StakingSmartStakers.sol#778) is not in mixedCase
+Parameter BSB_StakingSmartStakers.transferAnyERC20Tokens(address,address,uint256)._to (../../sb/BSB_StakingSmartStakers.sol#778) is not in mixedCase
+Parameter BSB_StakingSmartStakers.transferAnyERC20Tokens(address,address,uint256)._amount (../../sb/BSB_StakingSmartStakers.sol#778) is not in mixedCase
+Variable BSB_StakingSmartStakers.number_intervals (../../sb/BSB_StakingSmartStakers.sol#366) is not in mixedCase
+Variable BSB_StakingSmartStakers.duration_interval (../../sb/BSB_StakingSmartStakers.sol#367) is not in mixedCase
+Variable BSB_StakingSmartStakers.percent_claim (../../sb/BSB_StakingSmartStakers.sol#377) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+BSB_StakingSmartStakers.slitherConstructorVariables() (../../sb/BSB_StakingSmartStakers.sol#296-817) uses literals with too many digits:
+	- availablePoolSize = 50000000000000000000000 (../../sb/BSB_StakingSmartStakers.sol#338)
+BSB_StakingSmartStakers.slitherConstructorConstantVariables() (../../sb/BSB_StakingSmartStakers.sol#296-817) uses literals with too many digits:
+	- maxPoolSize = 50000000000000000000000 (../../sb/BSB_StakingSmartStakers.sol#337)
+BSB_StakingSmartStakers.slitherConstructorConstantVariables() (../../sb/BSB_StakingSmartStakers.sol#296-817) uses literals with too many digits:
+	- totalRewards = 200000000000000000000000 (../../sb/BSB_StakingSmartStakers.sol#343)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+BSB_StakingSmartStakers.duration_interval (../../sb/BSB_StakingSmartStakers.sol#367) should be constant 
+BSB_StakingSmartStakers.extraAPY (../../sb/BSB_StakingSmartStakers.sol#372) should be constant 
+BSB_StakingSmartStakers.number_intervals (../../sb/BSB_StakingSmartStakers.sol#366) should be constant 
+BSB_StakingSmartStakers.percent_claim (../../sb/BSB_StakingSmartStakers.sol#377) should be constant 
+BSB_StakingSmartStakers.rewardRate (../../sb/BSB_StakingSmartStakers.sol#311) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+/sb/BSB_StakingSmartStakers.sol analyzed (5 contracts with 93 detectors), 69 result(s) found

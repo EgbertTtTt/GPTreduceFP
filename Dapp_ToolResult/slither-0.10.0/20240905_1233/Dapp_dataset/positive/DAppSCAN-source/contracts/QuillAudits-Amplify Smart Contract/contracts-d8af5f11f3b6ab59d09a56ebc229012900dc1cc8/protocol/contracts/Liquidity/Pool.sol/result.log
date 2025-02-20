@@ -1,0 +1,177 @@
+'solc --version' running
+'solc /sb/Pool.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/sb' running
+Compilation warnings/errors on /sb/Pool.sol:
+Warning: Contract code size is 35446 bytes and exceeds 24576 bytes (a limit introduced in Spurious Dragon). This contract may not be deployable on Mainnet. Consider enabling the optimizer (with a low "runs" value!), turning off revert strings, or using libraries.
+    --> /sb/Pool.sol:1020:1:
+     |
+1020 | contract Pool is Ownable, Lendable, Borrowable {
+     | ^ (Relevant source part starts here and spans across multiple lines).
+
+
+
+ErrorReporter.uint2str(uint256) (../../sb/Pool.sol#291-311) performs a multiplication on the result of a division:
+	- temp = (48 + uint8(_i - _i / 10 * 10)) (../../sb/Pool.sol#305)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+Borrowable._isActive(uint256,address) (../../sb/Pool.sol#650-653) uses a dangerous strict equality:
+	- require(bool,string)(creditLines[_loanId].isClosed == false,toString(Error.LOAN_IS_ALREADY_CLOSED)) (../../sb/Pool.sol#651)
+Borrowable.borrowBalanceSnapshot(uint256) (../../sb/Pool.sol#860-876) uses a dangerous strict equality:
+	- require(bool,string)(vars.mathErr == MathError.NO_ERROR,principal times failed) (../../sb/Pool.sol#870)
+Borrowable.borrowBalanceSnapshot(uint256) (../../sb/Pool.sol#860-876) uses a dangerous strict equality:
+	- require(bool,string)(vars.mathErr == MathError.NO_ERROR,borrowBalance failed) (../../sb/Pool.sol#873)
+Borrowable.borrowInternal(uint256,address,uint256) (../../sb/Pool.sol#773-801) uses a dangerous strict equality:
+	- require(bool,string)(vars.mathErr == MathError.NO_ERROR,borrow: principal failed) (../../sb/Pool.sol#791)
+CarefulMath.divUInt(uint256,uint256) (../../sb/Pool.sol#346-352) uses a dangerous strict equality:
+	- b == 0 (../../sb/Pool.sol#347)
+Pool.getBorrowIndex(uint256) (../../sb/Pool.sol#1183-1207) uses a dangerous strict equality:
+	- vars.accrualBlockNumber == vars.blockNumber || vars.accrualBlockNumber == 0 (../../sb/Pool.sol#1192)
+CarefulMath.mulUInt(uint256,uint256) (../../sb/Pool.sol#323-335) uses a dangerous strict equality:
+	- a == 0 (../../sb/Pool.sol#324)
+Lendable.redeemInternal(address,uint256,uint256) (../../sb/Pool.sol#506-538) uses a dangerous strict equality:
+	- require(bool,string)(allowed == 0,ErrorReporter.uint2str(allowed)) (../../sb/Pool.sol#528)
+Borrowable.repayInternal(uint256,address,address,uint256) (../../sb/Pool.sol#810-852) uses a dangerous strict equality:
+	- require(bool,string)(vars.mathErr == MathError.NO_ERROR,repay: penalty amount failed) (../../sb/Pool.sol#827)
+Borrowable.repayInternal(uint256,address,address,uint256) (../../sb/Pool.sol#810-852) uses a dangerous strict equality:
+	- require(bool,string)(vars.mathErr == MathError.NO_ERROR,repay: principal failed) (../../sb/Pool.sol#838)
+Borrowable.repayInternal(uint256,address,address,uint256) (../../sb/Pool.sol#810-852) uses a dangerous strict equality:
+	- creditLine.principal == 0 (../../sb/Pool.sol#847)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Pool.getPenaltyIndexAndFee(uint256).vars (../../sb/Pool.sol#1227) is a local variable never initialized
+Borrowable.repayInternal(uint256,address,address,uint256).vars (../../sb/Pool.sol#816) is a local variable never initialized
+Pool.createCreditLine(uint256).vars (../../sb/Pool.sol#1114) is a local variable never initialized
+Pool.getBorrowIndex(uint256).vars (../../sb/Pool.sol#1185) is a local variable never initialized
+Borrowable.borrowInternal(uint256,address,uint256).vars (../../sb/Pool.sol#778) is a local variable never initialized
+Pool._transferTokensOnBorrow(address,address,uint256).vars (../../sb/Pool.sol#1297) is a local variable never initialized
+Borrowable.getBorrowerTotalPrincipal(address).balance (../../sb/Pool.sol#676) is a local variable never initialized
+Lendable.redeemInternal(address,uint256,uint256).vars (../../sb/Pool.sol#509) is a local variable never initialized
+Borrowable.borrowBalanceSnapshot(uint256).vars (../../sb/Pool.sol#866) is a local variable never initialized
+Pool.unlockAsset(uint256).vars (../../sb/Pool.sol#1144) is a local variable never initialized
+Lendable.lendInternal(address,address,uint256).vars (../../sb/Pool.sol#483) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+ERC20Mintable.constructor(string,string).name (../../sb/Pool.sol#158) shadows:
+	- ERC20.name() (../../sb/Pool.sol#49-51) (function)
+	- IERC20Metadata.name() (../../sb/Pool.sol#24) (function)
+ERC20Mintable.constructor(string,string).symbol (../../sb/Pool.sol#158) shadows:
+	- ERC20.symbol() (../../sb/Pool.sol#53-55) (function)
+	- IERC20Metadata.symbol() (../../sb/Pool.sol#25) (function)
+PoolToken.constructor(string,string).name (../../sb/Pool.sol#176) shadows:
+	- ERC20.name() (../../sb/Pool.sol#49-51) (function)
+	- IERC20Metadata.name() (../../sb/Pool.sol#24) (function)
+PoolToken.createPoolTokenSymbol(string).symbol (../../sb/Pool.sol#180) shadows:
+	- ERC20.symbol() (../../sb/Pool.sol#53-55) (function)
+	- IERC20Metadata.symbol() (../../sb/Pool.sol#25) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+Pool.getBorrowIndex(uint256) (../../sb/Pool.sol#1183-1207) has external calls inside a loop: vars.borrowRateMantissa = controller.interestRateModel().getBorrowRate(creditLine.interestRate) (../../sb/Pool.sol#1196)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in Pool.createCreditLine(uint256) (../../sb/Pool.sol#1113-1128):
+	External calls:
+	- (vars.allowed,vars.assetValue,vars.maturity,vars.interestRate,vars.advanceRate) = controller.createCreditLineAllowed(address(this),msg.sender,tokenId) (../../sb/Pool.sol#1115-1121)
+	State variables written after the call(s):
+	- createCreditLineInternal(msg.sender,tokenId,vars.borrowCap,vars.interestRate,vars.maturity) (../../sb/Pool.sol#1127)
+		- creditLines.push(CreditLine({borrower:borrower,borrowCap:borrowCap,borrowIndex:mantissaOne,principal:0,lockedAsset:tokenId,interestRate:interestRate,accrualBlockNumber:getBlockNumber(),isClosed:false})) (../../sb/Pool.sol#714-723)
+	- createCreditLineInternal(msg.sender,tokenId,vars.borrowCap,vars.interestRate,vars.maturity) (../../sb/Pool.sol#1127)
+		- loansIdsByAddress[borrower].push(loanId) (../../sb/Pool.sol#712)
+	- createCreditLineInternal(msg.sender,tokenId,vars.borrowCap,vars.interestRate,vars.maturity) (../../sb/Pool.sol#1127)
+		- lockedAssetsIds[tokenId] = true (../../sb/Pool.sol#711)
+	- createCreditLineInternal(msg.sender,tokenId,vars.borrowCap,vars.interestRate,vars.maturity) (../../sb/Pool.sol#1127)
+		- penaltyInfo[loanId] = PenaltyInfo({maturity:maturity,index:mantissaOne,timestamp:maturity + 2592000,isOpened:false}) (../../sb/Pool.sol#725-730)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Pool._transferTokens(address,address,uint256) (../../sb/Pool.sol#1082-1090) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(stableCoin.balanceOf(from) >= amount,toString(Error.INSUFFICIENT_FUNDS)) (../../sb/Pool.sol#1083)
+	- require(bool,string)(stableCoin.transfer(to,amount),toString(Error.TRANSFER_FAILED)) (../../sb/Pool.sol#1085)
+	- require(bool,string)(stableCoin.transferFrom(from,to,amount),toString(Error.TRANSFER_FAILED)) (../../sb/Pool.sol#1087)
+Pool.getTotalBorrowBalance() (../../sb/Pool.sol#1165-1171) uses timestamp for comparisons
+	Dangerous comparisons:
+	- i < creditLines.length (../../sb/Pool.sol#1167)
+Pool.getPenaltyIndexAndFee(uint256) (../../sb/Pool.sol#1220-1259) uses timestamp for comparisons
+	Dangerous comparisons:
+	- vars.timestamp >= _start (../../sb/Pool.sol#1241)
+	- vars.timestamp > _end (../../sb/Pool.sol#1242)
+	- vars.fee > 0 (../../sb/Pool.sol#1254)
+Pool._calculateDaysDelta(uint256,uint256,uint256,uint256) (../../sb/Pool.sol#1261-1272) uses timestamp for comparisons
+	Dangerous comparisons:
+	- acrrualTimestamp > _start (../../sb/Pool.sol#1264)
+Pool._transferTokensOnBorrow(address,address,uint256) (../../sb/Pool.sol#1294-1310) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(stableCoin.transfer(to,vars.amountWithoutFees),toString(Error.TRANSFER_FAILED)) (../../sb/Pool.sol#1307)
+	- require(bool,string)(stableCoin.transfer(controller.provisionPool.address,vars.feesAmount),toString(Error.LPP_TRANSFER_FAILED)) (../../sb/Pool.sol#1308)
+Pool._transferTokensOnRepay(address,address,uint256,uint256) (../../sb/Pool.sol#1312-1319) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(_transferTokens(from,to,amount),toString(Error.TRANSFER_FAILED)) (../../sb/Pool.sol#1313)
+	- penaltyAmount > 0 (../../sb/Pool.sol#1315)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Borrowable._isActive(uint256,address) (../../sb/Pool.sol#650-653) compares to a boolean constant:
+	-require(bool,string)(creditLines[_loanId].isClosed == false,toString(Error.LOAN_IS_ALREADY_CLOSED)) (../../sb/Pool.sol#651)
+Borrowable.createCreditLineInternal(address,uint256,uint256,uint256,uint256) (../../sb/Pool.sol#706-736) compares to a boolean constant:
+	-require(bool,string)(lockedAssetsIds[tokenId] == false,toString(Error.LOAN_ASSET_ALREADY_USED)) (../../sb/Pool.sol#707)
+Borrowable.unlockAssetInternal(address,uint256) (../../sb/Pool.sol#750-763) compares to a boolean constant:
+	-require(bool,string)(creditLine.isClosed == true,toString(Error.LOAN_IS_NOT_CLOSED)) (../../sb/Pool.sol#754)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#boolean-equality
+
+CarefulMath.mulThenAddUInt(uint256,uint256,uint256) (../../sb/Pool.sol#337-344) is never used and should be removed
+Exponential.divScalar(Exponential.Exp,uint256) (../../sb/Pool.sol#436-443) is never used and should be removed
+TokenErrorReporter.fail(TokenErrorReporter.Error,uint256) (../../sb/Pool.sol#275-279) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version^0.8.0 (../../sb/Pool.sol#1) allows old versions
+solc-0.8.27 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Constant PoolToken.prefix (../../sb/Pool.sol#173) is not in UPPER_CASE_WITH_UNDERSCORES
+Parameter ErrorReporter.uint2str(uint256)._i (../../sb/Pool.sol#291) is not in mixedCase
+Constant Exponential.expScale (../../sb/Pool.sol#384) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant Exponential.halfScale (../../sb/Pool.sol#385) is not in UPPER_CASE_WITH_UNDERSCORES
+Constant Exponential.mantissaOne (../../sb/Pool.sol#386) is not in UPPER_CASE_WITH_UNDERSCORES
+Parameter Lendable.redeemInternal(address,uint256,uint256)._amount (../../sb/Pool.sol#506) is not in mixedCase
+Parameter Lendable.redeemInternal(address,uint256,uint256)._tokenAmount (../../sb/Pool.sol#506) is not in mixedCase
+Constant Lendable.initialExchangeRate (../../sb/Pool.sol#464) is not in UPPER_CASE_WITH_UNDERSCORES
+Parameter Borrowable.getBorrowerTotalPrincipal(address)._borrower (../../sb/Pool.sol#675) is not in mixedCase
+Parameter Borrowable.getBorrowerBalance(address)._borrower (../../sb/Pool.sol#688) is not in mixedCase
+Parameter Borrowable.getBorrowerLoans(address)._borrower (../../sb/Pool.sol#702) is not in mixedCase
+Parameter Ownable.transferOwnership(address)._newOwner (../../sb/Pool.sol#956) is not in mixedCase
+Parameter Pool.initialize(address,address,string,uint256,Pool.Access)._admin (../../sb/Pool.sol#1035) is not in mixedCase
+Parameter Pool.initialize(address,address,string,uint256,Pool.Access)._stableCoin (../../sb/Pool.sol#1035) is not in mixedCase
+Parameter Pool.initialize(address,address,string,uint256,Pool.Access)._name (../../sb/Pool.sol#1035) is not in mixedCase
+Parameter Pool.initialize(address,address,string,uint256,Pool.Access)._minDeposit (../../sb/Pool.sol#1035) is not in mixedCase
+Parameter Pool.initialize(address,address,string,uint256,Pool.Access)._access (../../sb/Pool.sol#1035) is not in mixedCase
+Parameter Pool.changeAccess(Pool.Access)._access (../../sb/Pool.sol#1059) is not in mixedCase
+Function Pool._lend(uint256,address) (../../sb/Pool.sol#1069-1072) is not in mixedCase
+Parameter Pool.lendAllowed(address,address,uint256)._pool (../../sb/Pool.sol#1096) is not in mixedCase
+Parameter Pool.lendAllowed(address,address,uint256)._lender (../../sb/Pool.sol#1096) is not in mixedCase
+Parameter Pool.lendAllowed(address,address,uint256)._amount (../../sb/Pool.sol#1096) is not in mixedCase
+Parameter Pool.redeemAllowed(address,address,uint256)._pool (../../sb/Pool.sol#1100) is not in mixedCase
+Parameter Pool.redeemAllowed(address,address,uint256)._redeemer (../../sb/Pool.sol#1100) is not in mixedCase
+Parameter Pool.redeemAllowed(address,address,uint256)._tokenAmount (../../sb/Pool.sol#1100) is not in mixedCase
+Parameter Pool.borrowAllowed(address,address,uint256)._pool (../../sb/Pool.sol#1321) is not in mixedCase
+Parameter Pool.borrowAllowed(address,address,uint256)._lender (../../sb/Pool.sol#1321) is not in mixedCase
+Parameter Pool.borrowAllowed(address,address,uint256)._amount (../../sb/Pool.sol#1321) is not in mixedCase
+Parameter Pool.repayAllowed(address,address,address,uint256)._pool (../../sb/Pool.sol#1325) is not in mixedCase
+Parameter Pool.repayAllowed(address,address,address,uint256)._payer (../../sb/Pool.sol#1325) is not in mixedCase
+Parameter Pool.repayAllowed(address,address,address,uint256)._borrower (../../sb/Pool.sol#1325) is not in mixedCase
+Parameter Pool.repayAllowed(address,address,address,uint256)._amount (../../sb/Pool.sol#1325) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Redundant expression "_loanIds (../../sb/Pool.sol#709)" inBorrowable (../../sb/Pool.sol#610-890)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements
+
+Exponential.halfScale (../../sb/Pool.sol#385) is never used in Pool (../../sb/Pool.sol#1020-1337)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-state-variable
+
+Loop condition i < creditLines.length (../../sb/Pool.sol#657) should use cached array length instead of referencing `length` member of the storage array.
+ Loop condition i < creditLines.length (../../sb/Pool.sol#665) should use cached array length instead of referencing `length` member of the storage array.
+ Loop condition i < creditLines.length (../../sb/Pool.sol#1167) should use cached array length instead of referencing `length` member of the storage array.
+ Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cache-array-length
+
+ERC20Mintable._admin (../../sb/Pool.sol#156) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+
+The function Lendable.redeemInternal(address,uint256,uint256) (../../sb/Pool.sol#506-538) reads require(bool,string)(this.getCash() >= vars.redeemAmount,toString(Error.NOT_ENOUGH_CASH)) (../../sb/Pool.sol#531) with `this` which adds an extra STATICCALL.
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#public-variable-read-in-external-context
+/sb/Pool.sol analyzed (25 contracts with 93 detectors), 82 result(s) found

@@ -1,0 +1,57 @@
+'solc --version' running
+'solc /sb/OVM_L1ERC20Gateway.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+OVM_L1ERC20Gateway._handleInitiateDeposit(address,address,uint256) (../../sb/OVM_L1ERC20Gateway.sol#487-502) ignores return value by l1ERC20.transferFrom(_from,address(this),_amount) (../../sb/OVM_L1ERC20Gateway.sol#497-501)
+OVM_L1ERC20Gateway._handleFinalizeWithdrawal(address,uint256) (../../sb/OVM_L1ERC20Gateway.sol#511-521) ignores return value by l1ERC20.transfer(_to,_amount) (../../sb/OVM_L1ERC20Gateway.sol#520)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+OVM_CrossDomainEnabled.constructor(address)._messenger (../../sb/OVM_L1ERC20Gateway.sol#133) lacks a zero-check on :
+		- messenger = _messenger (../../sb/OVM_L1ERC20Gateway.sol#135)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+Reentrancy in Abs_L1TokenGateway._initiateDeposit(address,address,uint256) (../../sb/OVM_L1ERC20Gateway.sol#319-348):
+	External calls:
+	- sendCrossDomainMessage(l2DepositedToken,data,getFinalizeDepositL2Gas()) (../../sb/OVM_L1ERC20Gateway.sol#341-345)
+		- getCrossDomainMessenger().sendMessage(_crossDomainTarget,_data,_gasLimit) (../../sb/OVM_L1ERC20Gateway.sol#191)
+	Event emitted after the call(s):
+	- DepositInitiated(_from,_to,_amount) (../../sb/OVM_L1ERC20Gateway.sol#347)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Abs_L1TokenGateway._handleFinalizeWithdrawal(address,uint256) (../../sb/OVM_L1ERC20Gateway.sol#234-242) is never used and should be removed
+Abs_L1TokenGateway._handleInitiateDeposit(address,address,uint256) (../../sb/OVM_L1ERC20Gateway.sol#252-261) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version>0.5.0<0.8.0 (../../sb/OVM_L1ERC20Gateway.sol#1) is too complex
+solc-0.7.6 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Contract iOVM_L1TokenGateway (../../sb/OVM_L1ERC20Gateway.sol#5-48) is not in CapWords
+Contract iOVM_L2DepositedToken (../../sb/OVM_L1ERC20Gateway.sol#50-93) is not in CapWords
+Contract iAbs_BaseCrossDomainMessenger (../../sb/OVM_L1ERC20Gateway.sol#95-123) is not in CapWords
+Contract OVM_CrossDomainEnabled (../../sb/OVM_L1ERC20Gateway.sol#125-193) is not in CapWords
+Parameter OVM_CrossDomainEnabled.sendCrossDomainMessage(address,bytes,uint32)._crossDomainTarget (../../sb/OVM_L1ERC20Gateway.sol#187) is not in mixedCase
+Parameter OVM_CrossDomainEnabled.sendCrossDomainMessage(address,bytes,uint32)._data (../../sb/OVM_L1ERC20Gateway.sol#188) is not in mixedCase
+Parameter OVM_CrossDomainEnabled.sendCrossDomainMessage(address,bytes,uint32)._gasLimit (../../sb/OVM_L1ERC20Gateway.sol#189) is not in mixedCase
+Contract Abs_L1TokenGateway (../../sb/OVM_L1ERC20Gateway.sol#195-378) is not in CapWords
+Parameter Abs_L1TokenGateway.deposit(uint256)._amount (../../sb/OVM_L1ERC20Gateway.sol#288) is not in mixedCase
+Parameter Abs_L1TokenGateway.depositTo(address,uint256)._to (../../sb/OVM_L1ERC20Gateway.sol#302) is not in mixedCase
+Parameter Abs_L1TokenGateway.depositTo(address,uint256)._amount (../../sb/OVM_L1ERC20Gateway.sol#303) is not in mixedCase
+Parameter Abs_L1TokenGateway.finalizeWithdrawal(address,uint256)._to (../../sb/OVM_L1ERC20Gateway.sol#363) is not in mixedCase
+Parameter Abs_L1TokenGateway.finalizeWithdrawal(address,uint256)._amount (../../sb/OVM_L1ERC20Gateway.sol#364) is not in mixedCase
+Variable Abs_L1TokenGateway.DEFAULT_FINALIZE_DEPOSIT_L2_GAS (../../sb/OVM_L1ERC20Gateway.sol#225) is not in mixedCase
+Contract iOVM_ERC20 (../../sb/OVM_L1ERC20Gateway.sol#380-426) is not in CapWords
+Contract OVM_L1ERC20Gateway (../../sb/OVM_L1ERC20Gateway.sol#445-522) is not in CapWords
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+OVM_L1ERC20Gateway.slitherConstructorVariables() (../../sb/OVM_L1ERC20Gateway.sol#445-522) uses literals with too many digits:
+	- DEFAULT_FINALIZE_DEPOSIT_L2_GAS = 1200000 (../../sb/OVM_L1ERC20Gateway.sol#225)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+Abs_L1TokenGateway.DEFAULT_FINALIZE_DEPOSIT_L2_GAS (../../sb/OVM_L1ERC20Gateway.sol#225) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+
+Abs_L1TokenGateway.l2DepositedToken (../../sb/OVM_L1ERC20Gateway.sol#201) should be immutable 
+OVM_CrossDomainEnabled.messenger (../../sb/OVM_L1ERC20Gateway.sol#127) should be immutable 
+OVM_L1ERC20Gateway.l1ERC20 (../../sb/OVM_L1ERC20Gateway.sol#451) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+/sb/OVM_L1ERC20Gateway.sol analyzed (7 contracts with 93 detectors), 29 result(s) found

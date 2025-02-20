@@ -1,0 +1,120 @@
+'solc --version' running
+'solc /sb/WusdAaveStrategy.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes,compact-format --allow-paths .,/sb' running
+
+Reentrancy in WusdAaveStrategy.withdrawAll() (../../sb/WusdAaveStrategy.sol#568-583):
+	External calls:
+	- usdcWithdrawn = lendingPool.withdraw(address(usdc),amUsdcBalance,address(this)) (../../sb/WusdAaveStrategy.sol#570)
+	- usdc.safeTransfer(treasury(),usdcWithdrawn - usdcInvestedAmount) (../../sb/WusdAaveStrategy.sol#572)
+	- usdc.safeTransfer(address(wusdMaster),usdcInvestedAmount) (../../sb/WusdAaveStrategy.sol#573)
+	- usdc.safeTransfer(address(wusdMaster),usdcWithdrawn) (../../sb/WusdAaveStrategy.sol#578)
+	State variables written after the call(s):
+	- usdcInvestedAmount = 0 (../../sb/WusdAaveStrategy.sol#582)
+	WusdAaveStrategy.usdcInvestedAmount (../../sb/WusdAaveStrategy.sol#494) can be used in cross function reentrancies:
+	- WusdAaveStrategy.expectedUsdcRewards() (../../sb/WusdAaveStrategy.sol#515-517)
+	- WusdAaveStrategy.invest(uint256) (../../sb/WusdAaveStrategy.sol#524-533)
+	- WusdAaveStrategy.usdcInvestedAmount (../../sb/WusdAaveStrategy.sol#494)
+	- WusdAaveStrategy.withdrawAll() (../../sb/WusdAaveStrategy.sol#568-583)
+	- WusdAaveStrategy.withdrawToMaster(uint256) (../../sb/WusdAaveStrategy.sol#539-548)
+	- WusdAaveStrategy.withdrawUsdcRewards(uint256) (../../sb/WusdAaveStrategy.sol#550-558)
+Reentrancy in WusdAaveStrategy.withdrawToMaster(uint256) (../../sb/WusdAaveStrategy.sol#539-548):
+	External calls:
+	- usdcWithdrawn = withdraw(address(wusdMaster),amUsdcAmount) (../../sb/WusdAaveStrategy.sol#544)
+		- lendingPool.withdraw(address(usdc),amUsdcAmount,to) (../../sb/WusdAaveStrategy.sol#536)
+	State variables written after the call(s):
+	- usdcInvestedAmount -= usdcWithdrawn (../../sb/WusdAaveStrategy.sol#545)
+	WusdAaveStrategy.usdcInvestedAmount (../../sb/WusdAaveStrategy.sol#494) can be used in cross function reentrancies:
+	- WusdAaveStrategy.expectedUsdcRewards() (../../sb/WusdAaveStrategy.sol#515-517)
+	- WusdAaveStrategy.invest(uint256) (../../sb/WusdAaveStrategy.sol#524-533)
+	- WusdAaveStrategy.usdcInvestedAmount (../../sb/WusdAaveStrategy.sol#494)
+	- WusdAaveStrategy.withdrawAll() (../../sb/WusdAaveStrategy.sol#568-583)
+	- WusdAaveStrategy.withdrawToMaster(uint256) (../../sb/WusdAaveStrategy.sol#539-548)
+	- WusdAaveStrategy.withdrawUsdcRewards(uint256) (../../sb/WusdAaveStrategy.sol#550-558)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+WusdAaveStrategy.invest(uint256) (../../sb/WusdAaveStrategy.sol#524-533) ignores return value by usdc.approve(address(lendingPool),usdcAmount) (../../sb/WusdAaveStrategy.sol#528)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+Reentrancy in WusdAaveStrategy.invest(uint256) (../../sb/WusdAaveStrategy.sol#524-533):
+	External calls:
+	- usdc.approve(address(lendingPool),usdcAmount) (../../sb/WusdAaveStrategy.sol#528)
+	- lendingPool.deposit(address(usdc),usdcAmount,address(this),0) (../../sb/WusdAaveStrategy.sol#529)
+	State variables written after the call(s):
+	- usdcInvestedAmount += usdcAmount (../../sb/WusdAaveStrategy.sol#530)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in WusdAaveStrategy.invest(uint256) (../../sb/WusdAaveStrategy.sol#524-533):
+	External calls:
+	- usdc.approve(address(lendingPool),usdcAmount) (../../sb/WusdAaveStrategy.sol#528)
+	- lendingPool.deposit(address(usdc),usdcAmount,address(this),0) (../../sb/WusdAaveStrategy.sol#529)
+	Event emitted after the call(s):
+	- UsdcInvested(usdcAmount) (../../sb/WusdAaveStrategy.sol#532)
+Reentrancy in WusdAaveStrategy.returnUsdcToMaster() (../../sb/WusdAaveStrategy.sol#585-590):
+	External calls:
+	- usdc.safeTransfer(address(wusdMaster),amount) (../../sb/WusdAaveStrategy.sol#587)
+	Event emitted after the call(s):
+	- UsdcWithdrawnToMaster(amount) (../../sb/WusdAaveStrategy.sol#589)
+Reentrancy in WusdAaveStrategy.withdrawAll() (../../sb/WusdAaveStrategy.sol#568-583):
+	External calls:
+	- usdcWithdrawn = lendingPool.withdraw(address(usdc),amUsdcBalance,address(this)) (../../sb/WusdAaveStrategy.sol#570)
+	- usdc.safeTransfer(treasury(),usdcWithdrawn - usdcInvestedAmount) (../../sb/WusdAaveStrategy.sol#572)
+	- usdc.safeTransfer(address(wusdMaster),usdcInvestedAmount) (../../sb/WusdAaveStrategy.sol#573)
+	Event emitted after the call(s):
+	- UsdcWithdrawnToMaster(usdcInvestedAmount) (../../sb/WusdAaveStrategy.sol#576)
+	- UsdcWithdrawnToTreasury(usdcWithdrawn - usdcInvestedAmount) (../../sb/WusdAaveStrategy.sol#575)
+Reentrancy in WusdAaveStrategy.withdrawAll() (../../sb/WusdAaveStrategy.sol#568-583):
+	External calls:
+	- usdcWithdrawn = lendingPool.withdraw(address(usdc),amUsdcBalance,address(this)) (../../sb/WusdAaveStrategy.sol#570)
+	- usdc.safeTransfer(address(wusdMaster),usdcWithdrawn) (../../sb/WusdAaveStrategy.sol#578)
+	Event emitted after the call(s):
+	- UsdcWithdrawnToMaster(usdcWithdrawn) (../../sb/WusdAaveStrategy.sol#580)
+Reentrancy in WusdAaveStrategy.withdrawToMaster(uint256) (../../sb/WusdAaveStrategy.sol#539-548):
+	External calls:
+	- usdcWithdrawn = withdraw(address(wusdMaster),amUsdcAmount) (../../sb/WusdAaveStrategy.sol#544)
+		- lendingPool.withdraw(address(usdc),amUsdcAmount,to) (../../sb/WusdAaveStrategy.sol#536)
+	Event emitted after the call(s):
+	- UsdcWithdrawnToTreasury(usdcWithdrawn) (../../sb/WusdAaveStrategy.sol#547)
+Reentrancy in WusdAaveStrategy.withdrawUsdcRewards(uint256) (../../sb/WusdAaveStrategy.sol#550-558):
+	External calls:
+	- usdcWithdrawn = withdraw(treasury(),amUsdcAmount) (../../sb/WusdAaveStrategy.sol#555)
+		- lendingPool.withdraw(address(usdc),amUsdcAmount,to) (../../sb/WusdAaveStrategy.sol#536)
+	Event emitted after the call(s):
+	- UsdcWithdrawnToTreasury(usdcWithdrawn) (../../sb/WusdAaveStrategy.sol#557)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+Address.isContract(address) (../../sb/WusdAaveStrategy.sol#191-201) uses assembly
+	- INLINE ASM (../../sb/WusdAaveStrategy.sol#197-199)
+Address._verifyCallResult(bool,bytes,string) (../../sb/WusdAaveStrategy.sol#354-374) uses assembly
+	- INLINE ASM (../../sb/WusdAaveStrategy.sol#366-369)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Address.functionCall(address,bytes) (../../sb/WusdAaveStrategy.sol#244-246) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (../../sb/WusdAaveStrategy.sol#273-279) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (../../sb/WusdAaveStrategy.sol#333-335) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (../../sb/WusdAaveStrategy.sol#343-352) is never used and should be removed
+Address.functionStaticCall(address,bytes) (../../sb/WusdAaveStrategy.sol#306-308) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (../../sb/WusdAaveStrategy.sol#316-325) is never used and should be removed
+Address.sendValue(address,uint256) (../../sb/WusdAaveStrategy.sol#219-224) is never used and should be removed
+Context._msgData() (../../sb/WusdAaveStrategy.sol#21-23) is never used and should be removed
+SafeERC20.safeApprove(IERC20,address,uint256) (../../sb/WusdAaveStrategy.sol#413-426) is never used and should be removed
+SafeERC20.safeDecreaseAllowance(IERC20,address,uint256) (../../sb/WusdAaveStrategy.sol#437-448) is never used and should be removed
+SafeERC20.safeIncreaseAllowance(IERC20,address,uint256) (../../sb/WusdAaveStrategy.sol#428-435) is never used and should be removed
+SafeERC20.safeTransferFrom(IERC20,address,address,uint256) (../../sb/WusdAaveStrategy.sol#397-404) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Pragma version0.8.9 (../../sb/WusdAaveStrategy.sol#1) allows old versions
+solc-0.8.9 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in Address.sendValue(address,uint256) (../../sb/WusdAaveStrategy.sol#219-224):
+	- (success) = recipient.call{value: amount}() (../../sb/WusdAaveStrategy.sol#222)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (../../sb/WusdAaveStrategy.sol#287-298):
+	- (success,returndata) = target.call{value: value}(data) (../../sb/WusdAaveStrategy.sol#296)
+Low level call in Address.functionStaticCall(address,bytes,string) (../../sb/WusdAaveStrategy.sol#316-325):
+	- (success,returndata) = target.staticcall(data) (../../sb/WusdAaveStrategy.sol#323)
+Low level call in Address.functionDelegateCall(address,bytes,string) (../../sb/WusdAaveStrategy.sol#343-352):
+	- (success,returndata) = target.delegatecall(data) (../../sb/WusdAaveStrategy.sol#350)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+WusdAaveStrategy (../../sb/WusdAaveStrategy.sol#483-592) should inherit from IWUSDMaster (../../sb/WusdAaveStrategy.sol#479-481)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-inheritance
+/sb/WusdAaveStrategy.sol analyzed (9 contracts with 93 detectors), 31 result(s) found

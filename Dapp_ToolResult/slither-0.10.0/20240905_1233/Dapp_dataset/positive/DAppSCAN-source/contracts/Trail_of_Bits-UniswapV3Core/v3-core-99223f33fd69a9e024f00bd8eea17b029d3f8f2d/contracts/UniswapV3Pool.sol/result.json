@@ -1,0 +1,144 @@
+{
+    "errors": [],
+    "fails": [],
+    "findings": [
+        {
+            "confidence": "Medium",
+            "contract": "UniswapV3Pool",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Trail_of_Bits-UniswapV3Core/v3-core-99223f33fd69a9e024f00bd8eea17b029d3f8f2d/contracts/UniswapV3Pool.sol",
+            "function": "collectProtocol",
+            "impact": "Medium",
+            "line": 2929,
+            "line_end": 2949,
+            "message": "Reentrancy in UniswapV3Pool.collectProtocol(address,uint128,uint128) (UniswapV3Pool.sol#2929-2949):\n\tExternal calls:\n\t- TransferHelper.safeTransfer(token0,recipient,amount0) (UniswapV3Pool.sol#2940)\n\tState variables written after the call(s):\n\t- protocolFees.token1 -= amount1 (UniswapV3Pool.sol#2944)\n\tUniswapV3Pool.protocolFees (UniswapV3Pool.sol#2284) can be used in cross function reentrancies:\n\t- UniswapV3Pool.collectProtocol(address,uint128,uint128) (UniswapV3Pool.sol#2929-2949)\n\t- UniswapV3Pool.flash(address,uint256,uint256,bytes) (UniswapV3Pool.sol#2872-2915)\n\t- UniswapV3Pool.protocolFees (UniswapV3Pool.sol#2284)\n\t- UniswapV3Pool.swap(address,bool,int256,uint160,bytes) (UniswapV3Pool.sol#2699-2869)\n",
+            "name": "reentrancy-no-eth",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "UniswapV3Pool",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Trail_of_Bits-UniswapV3Core/v3-core-99223f33fd69a9e024f00bd8eea17b029d3f8f2d/contracts/UniswapV3Pool.sol",
+            "function": "swap",
+            "impact": "Medium",
+            "line": 2699,
+            "line_end": 2869,
+            "message": "Reentrancy in UniswapV3Pool.swap(address,bool,int256,uint160,bytes) (UniswapV3Pool.sol#2699-2869):\n\tExternal calls:\n\t- TransferHelper.safeTransfer(token1,recipient,uint256(- amount1)) (UniswapV3Pool.sol#2854)\n\t- IUniswapV3SwapCallback(msg.sender).uniswapV3SwapCallback(amount0,amount1,data) (UniswapV3Pool.sol#2857)\n\t- TransferHelper.safeTransfer(token0,recipient,uint256(- amount0)) (UniswapV3Pool.sol#2860)\n\t- IUniswapV3SwapCallback(msg.sender).uniswapV3SwapCallback(amount0,amount1,data) (UniswapV3Pool.sol#2863)\n\tState variables written after the call(s):\n\t- slot0.unlocked = true (UniswapV3Pool.sol#2868)\n\tUniswapV3Pool.slot0 (UniswapV3Pool.sol#2271) can be used in cross function reentrancies:\n\t- UniswapV3Pool._modifyPosition(UniswapV3Pool.ModifyPositionParams) (UniswapV3Pool.sol#2425-2491)\n\t- UniswapV3Pool.flash(address,uint256,uint256,bytes) (UniswapV3Pool.sol#2872-2915)\n\t- UniswapV3Pool.increaseObservationCardinalityNext(uint16) (UniswapV3Pool.sol#2373-2385)\n\t- UniswapV3Pool.initialize(uint160) (UniswapV3Pool.sol#2390-2408)\n\t- UniswapV3Pool.lock() (UniswapV3Pool.sol#2303-2308)\n\t- UniswapV3Pool.observe(uint32[]) (UniswapV3Pool.sol#2354-2370)\n\t- UniswapV3Pool.secondsInside(int24,int24) (UniswapV3Pool.sol#2347-2351)\n\t- UniswapV3Pool.setFeeProtocol(uint8,uint8) (UniswapV3Pool.sol#2918-2926)\n\t- UniswapV3Pool.slot0 (UniswapV3Pool.sol#2271)\n\t- UniswapV3Pool.swap(address,bool,int256,uint160,bytes) (UniswapV3Pool.sol#2699-2869)\n",
+            "name": "reentrancy-no-eth",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "UniswapV3Pool",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Trail_of_Bits-UniswapV3Core/v3-core-99223f33fd69a9e024f00bd8eea17b029d3f8f2d/contracts/UniswapV3Pool.sol",
+            "function": "observe",
+            "impact": "Medium",
+            "line": 2354,
+            "line_end": 2370,
+            "message": "UniswapV3Pool.observe(uint32[]) (UniswapV3Pool.sol#2354-2370) ignores return value by observations.observe(_blockTimestamp(),secondsAgos,slot0.tick,slot0.observationIndex,liquidity,slot0.observationCardinality) (UniswapV3Pool.sol#2361-2369)\n",
+            "name": "unused-return",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "UniswapV3Pool",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Trail_of_Bits-UniswapV3Core/v3-core-99223f33fd69a9e024f00bd8eea17b029d3f8f2d/contracts/UniswapV3Pool.sol",
+            "function": "flash",
+            "impact": "Low",
+            "line": 2872,
+            "line_end": 2915,
+            "message": "Reentrancy in UniswapV3Pool.flash(address,uint256,uint256,bytes) (UniswapV3Pool.sol#2872-2915):\n\tExternal calls:\n\t- TransferHelper.safeTransfer(token0,recipient,amount0) (UniswapV3Pool.sol#2886)\n\t- TransferHelper.safeTransfer(token1,recipient,amount1) (UniswapV3Pool.sol#2887)\n\t- IUniswapV3FlashCallback(msg.sender).uniswapV3FlashCallback(fee0,fee1,data) (UniswapV3Pool.sol#2889)\n\tState variables written after the call(s):\n\t- feeGrowthGlobal0X128 += FullMath.mulDiv(paid0 - fees0,FixedPoint128.Q128,_liquidity) (UniswapV3Pool.sol#2905)\n\t- feeGrowthGlobal1X128 += FullMath.mulDiv(paid1 - fees1,FixedPoint128.Q128,_liquidity) (UniswapV3Pool.sol#2911)\n\t- protocolFees.token0 += uint128(fees0) (UniswapV3Pool.sol#2904)\n\t- protocolFees.token1 += uint128(fees1) (UniswapV3Pool.sol#2910)\n",
+            "name": "reentrancy-benign",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "UniswapV3Pool",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Trail_of_Bits-UniswapV3Core/v3-core-99223f33fd69a9e024f00bd8eea17b029d3f8f2d/contracts/UniswapV3Pool.sol",
+            "function": "swap",
+            "impact": "Low",
+            "line": 2699,
+            "line_end": 2869,
+            "message": "Reentrancy in UniswapV3Pool.swap(address,bool,int256,uint160,bytes) (UniswapV3Pool.sol#2699-2869):\n\tExternal calls:\n\t- TransferHelper.safeTransfer(token1,recipient,uint256(- amount1)) (UniswapV3Pool.sol#2854)\n\t- IUniswapV3SwapCallback(msg.sender).uniswapV3SwapCallback(amount0,amount1,data) (UniswapV3Pool.sol#2857)\n\t- TransferHelper.safeTransfer(token0,recipient,uint256(- amount0)) (UniswapV3Pool.sol#2860)\n\t- IUniswapV3SwapCallback(msg.sender).uniswapV3SwapCallback(amount0,amount1,data) (UniswapV3Pool.sol#2863)\n\tEvent emitted after the call(s):\n\t- Swap(msg.sender,recipient,amount0,amount1,state.sqrtPriceX96,state.tick) (UniswapV3Pool.sol#2867)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "UniswapV3Pool",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Trail_of_Bits-UniswapV3Core/v3-core-99223f33fd69a9e024f00bd8eea17b029d3f8f2d/contracts/UniswapV3Pool.sol",
+            "function": "collectProtocol",
+            "impact": "Low",
+            "line": 2929,
+            "line_end": 2949,
+            "message": "Reentrancy in UniswapV3Pool.collectProtocol(address,uint128,uint128) (UniswapV3Pool.sol#2929-2949):\n\tExternal calls:\n\t- TransferHelper.safeTransfer(token0,recipient,amount0) (UniswapV3Pool.sol#2940)\n\t- TransferHelper.safeTransfer(token1,recipient,amount1) (UniswapV3Pool.sol#2945)\n\tEvent emitted after the call(s):\n\t- CollectProtocol(msg.sender,recipient,amount0,amount1) (UniswapV3Pool.sol#2948)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "UniswapV3Pool",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Trail_of_Bits-UniswapV3Core/v3-core-99223f33fd69a9e024f00bd8eea17b029d3f8f2d/contracts/UniswapV3Pool.sol",
+            "function": "mint",
+            "impact": "Low",
+            "line": 2565,
+            "line_end": 2595,
+            "message": "Reentrancy in UniswapV3Pool.mint(address,int24,int24,uint128,bytes) (UniswapV3Pool.sol#2565-2595):\n\tExternal calls:\n\t- IUniswapV3MintCallback(msg.sender).uniswapV3MintCallback(amount0,amount1,data) (UniswapV3Pool.sol#2590)\n\tEvent emitted after the call(s):\n\t- Mint(msg.sender,recipient,tickLower,tickUpper,amount,amount0,amount1) (UniswapV3Pool.sol#2594)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "UniswapV3Pool",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Trail_of_Bits-UniswapV3Core/v3-core-99223f33fd69a9e024f00bd8eea17b029d3f8f2d/contracts/UniswapV3Pool.sol",
+            "function": "flash",
+            "impact": "Low",
+            "line": 2872,
+            "line_end": 2915,
+            "message": "Reentrancy in UniswapV3Pool.flash(address,uint256,uint256,bytes) (UniswapV3Pool.sol#2872-2915):\n\tExternal calls:\n\t- TransferHelper.safeTransfer(token0,recipient,amount0) (UniswapV3Pool.sol#2886)\n\t- TransferHelper.safeTransfer(token1,recipient,amount1) (UniswapV3Pool.sol#2887)\n\t- IUniswapV3FlashCallback(msg.sender).uniswapV3FlashCallback(fee0,fee1,data) (UniswapV3Pool.sol#2889)\n\tEvent emitted after the call(s):\n\t- Flash(msg.sender,recipient,amount0,amount1,paid0,paid1) (UniswapV3Pool.sol#2914)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "UniswapV3Pool",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Trail_of_Bits-UniswapV3Core/v3-core-99223f33fd69a9e024f00bd8eea17b029d3f8f2d/contracts/UniswapV3Pool.sol",
+            "function": "collect",
+            "impact": "Low",
+            "line": 2598,
+            "line_end": 2621,
+            "message": "Reentrancy in UniswapV3Pool.collect(address,int24,int24,uint128,uint128) (UniswapV3Pool.sol#2598-2621):\n\tExternal calls:\n\t- TransferHelper.safeTransfer(token0,recipient,amount0) (UniswapV3Pool.sol#2613)\n\t- TransferHelper.safeTransfer(token1,recipient,amount1) (UniswapV3Pool.sol#2617)\n\tEvent emitted after the call(s):\n\t- Collect(msg.sender,recipient,tickLower,tickUpper,amount0,amount1) (UniswapV3Pool.sol#2620)\n",
+            "name": "reentrancy-events",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "UniswapV3Pool",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Trail_of_Bits-UniswapV3Core/v3-core-99223f33fd69a9e024f00bd8eea17b029d3f8f2d/contracts/UniswapV3Pool.sol",
+            "function": "initialize",
+            "impact": "Low",
+            "line": 2390,
+            "line_end": 2408,
+            "message": "UniswapV3Pool.initialize(uint160) (UniswapV3Pool.sol#2390-2408) uses timestamp for comparisons\n\tDangerous comparisons:\n\t- require(bool,string)(slot0.sqrtPriceX96 == 0,AI) (UniswapV3Pool.sol#2391)\n",
+            "name": "timestamp",
+            "check": "FP"
+        },
+        {
+            "confidence": "Medium",
+            "contract": "UniswapV3Pool",
+            "filename": "Dapp_dataset/positive/DAppSCAN-source/contracts/Trail_of_Bits-UniswapV3Core/v3-core-99223f33fd69a9e024f00bd8eea17b029d3f8f2d/contracts/UniswapV3Pool.sol",
+            "function": "swap",
+            "impact": "Low",
+            "line": 2699,
+            "line_end": 2869,
+            "message": "UniswapV3Pool.swap(address,bool,int256,uint160,bytes) (UniswapV3Pool.sol#2699-2869) uses timestamp for comparisons\n\tDangerous comparisons:\n\t- state.amountSpecifiedRemaining != 0 && state.sqrtPriceX96 != sqrtPriceLimitX96 (UniswapV3Pool.sol#2742)\n\t- step.tickNext < TickMath.MIN_TICK (UniswapV3Pool.sol#2754)\n\t- step.tickNext > TickMath.MAX_TICK (UniswapV3Pool.sol#2756)\n\t- cache.feeProtocol > 0 (UniswapV3Pool.sol#2783)\n\t- state.liquidity > 0 (UniswapV3Pool.sol#2790)\n\t- state.sqrtPriceX96 == step.sqrtPriceNextX96 (UniswapV3Pool.sol#2794)\n\t- state.sqrtPriceX96 != step.sqrtPriceStartX96 (UniswapV3Pool.sol#2813)\n\t- state.tick != slot0Start.tick (UniswapV3Pool.sol#2823)\n\t- cache.liquidityStart != state.liquidity (UniswapV3Pool.sol#2836)\n\t- state.protocolFee > 0 (UniswapV3Pool.sol#2842)\n\t- state.protocolFee > 0 (UniswapV3Pool.sol#2845)\n\t- amount1 < 0 (UniswapV3Pool.sol#2854)\n\t- require(bool,string)(balance0Before.add(uint256(amount0)) <= balance0(),IIA) (UniswapV3Pool.sol#2858)\n\t- amount0 < 0 (UniswapV3Pool.sol#2860)\n\t- require(bool,string)(balance1Before.add(uint256(amount1)) <= balance1(),IIA) (UniswapV3Pool.sol#2864)\n\t- (step.sqrtPriceNextX96 < sqrtPriceLimitX96) (UniswapV3Pool.sol#2764-2772)\n\t- (step.sqrtPriceNextX96 > sqrtPriceLimitX96) (UniswapV3Pool.sol#2764-2772)\n",
+            "name": "timestamp",
+            "check": "FP"
+        }
+    ],
+    "infos": [],
+    "parser": {
+        "id": "slither-0.10.0",
+        "mode": "solidity",
+        "version": "2024/04/30"
+    }
+}
